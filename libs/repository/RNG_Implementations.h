@@ -34,13 +34,11 @@ namespace RNG_Components
 				_seed = seed_value;
 				_generator.seed(_seed);
 			}
-			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> TargetType Next_Rand()
 			{
 				return (TargetType) _distribution(_generator);
 			}
-			tag_feature_as_available(Next_Rand);
 
 			m_data(unsigned long, seed, NONE, NONE);
 			m_data(mt19937, generator, NONE, NONE);
@@ -75,7 +73,6 @@ namespace RNG_Components
 
 				BaseType::_distribution = uniform_real_distribution<double>(_minimum,_maximum);
 			}
-			tag_feature_as_available(Initialize);
 
 			m_data(double, maximum, NONE, NONE);
 			m_data(double, minimum, NONE, NONE);
@@ -113,13 +110,11 @@ namespace RNG_Components
 				_distribution = normal_distribution<double>(_location,_scale);
 				//_distribution = tr1::uniform_real_distribution<double>(MT_Uniform_Double::_minimum,MT_Uniform_Double::_maximum);
 			}
-			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> TargetType Next_Rand()
 			{
 				return (TargetType) _distribution(GrandBaseType::_generator);
 			}
-			tag_feature_as_available(Next_Rand);
 
 			m_data(normal_distribution<double>, distribution, NONE, NONE);
 			m_data(double, location, NONE, NONE);
@@ -151,13 +146,11 @@ namespace RNG_Components
 				_seed = seed_value;
 				_distribution.SetSeed(_seed);
 			}
-			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> TargetType Next_Rand()
 			{
 				return (TargetType) _distribution.RandU01();
 			}
-			tag_feature_as_available(Next_Rand);
 
 			m_data(unsigned long, seed, NONE, NONE);
 			m_data(double, maximum, NONE, NONE);

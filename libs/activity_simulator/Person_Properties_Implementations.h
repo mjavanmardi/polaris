@@ -68,7 +68,6 @@ namespace Person_Components
 			{
 				
 			}
-			tag_feature_as_available(Initialize);
 			template<typename SynthesisZoneType> void Initialize(SynthesisZoneType home_synthesis_zone/*, requires(TargetType,check(SynthesisZoneType, PopSyn::Concepts::Is_Synthesis_Zone) && check(SynthesisZoneType, is_pointer))*/)
 			{	
 				// updates for counters
@@ -147,9 +146,9 @@ namespace Person_Components
 				assert_check(strip_modifiers(TargetType)::ParamType, Zone_Components::Concepts::Is_Zone_Prototype,"Error: must pass in home zone as a zone_prototype");
 				assert_check(strip_modifiers(TargetType)::ParamType, is_pointer, "Error: must pass in home zone as a pointer.");
 			}*/
-			tag_feature_signature_as_available(Initialize,1);
 
 			// Getter / setter for the average activity duration
+
 			template<typename ActivitytypeType, typename ReturnTimeType> ReturnTimeType Average_Activity_Duration(ActivitytypeType act_type)
 			{
 				Time_Minutes value;
@@ -172,7 +171,6 @@ namespace Person_Components
 				duration = GLOBALS::Time_Converter.Convert_Value<Time_Minutes,ReturnTimeType>(value);
 				return duration;
 			}
-			tag_feature_signature_as_available(Average_Activity_Duration,1);
 			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Duration(ActivitytypeType act_type, TimeType value)
 			{
 				// duration stored in minutes
@@ -189,7 +187,6 @@ namespace Person_Components
 					this->_average_activity_frequency_and_duration_container.insert(pair<ActType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
 				}
 			}
-			tag_feature_signature_as_available(Average_Activity_Duration,2);
 
 			// Getter / Setter for the activity frequency
 			template<typename ActivitytypeType, typename ReturnType> ReturnType Average_Activity_Frequency(ActivitytypeType act_type)
@@ -206,7 +203,6 @@ namespace Person_Components
 					return (ReturnType)0.0;
 				}
 			}
-			tag_feature_signature_as_available(Average_Activity_Frequency,1);
 			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Frequency(ActivitytypeType act_type, TimeType value)
 			{
 				typename average_activity_frequency_and_duration_container_type::iterator itr;
@@ -220,7 +216,6 @@ namespace Person_Components
 					this->_average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<ValueType,ValueType> >(act_type, pair<ValueType,ValueType>(value,0)));
 				}
 			}
-			tag_feature_signature_as_available(Average_Activity_Frequency,2);
 		};
 		template<typename MasterType, typename InheritanceList> int* ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count_Array;
 		template<typename MasterType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count;

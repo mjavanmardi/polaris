@@ -30,7 +30,6 @@ namespace Household_Components
 			{
 				
 			}
-			tag_feature_as_available(Initialize);
 			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(typename TargetType, is_pointer)))
 			{	
 				//===============================================================================================================
@@ -78,8 +77,6 @@ namespace Household_Components
 				pzone->template pop_households<int&>()++;
 
 			}	
-			tag_feature_signature_as_available(Initialize,1);
-
 		};
 
 
@@ -120,7 +117,6 @@ namespace Household_Components
 		//		pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[14]);
 
 		//	}
-		//	tag_feature_signature_as_available(Characteristics, 1);
 		//};
 
 	}

@@ -11,11 +11,11 @@ namespace polaris
 	/// General Macros
 	///----------------------------------------------------------------------------------------------------
 
-	#define get_value_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type>::type::Component_Type
-	#define get_data_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type::second_type>::type::Component_Type
+	#define get_component_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type>::type::Component_Type
+	#define get_mapped_component_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type::second_type>::type::Component_Type
 
-	#define get_interface_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type>::type	
-	#define get_mapped_interface_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type::second_type>::type
+	#define get_value_type(CONTAINERTYPE) typename CONTAINERTYPE::value_type
+	#define get_mapped_value_type(CONTAINERTYPE) typename CONTAINERTYPE::value_type::second_type
 	//#define get_mapped_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::mapped_type>::type::Component_Type
 
 	///----------------------------------------------------------------------------------------------------
@@ -993,12 +993,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			void NAME(CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>* set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>* set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
-				this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>*>(set_value);\
+				this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>*>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>* set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>* set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -1030,12 +1030,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>* NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>* NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
-				return this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>*>();\
+				return this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>*>();\
 			}\
 			template<typename TargetType>\
-			CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_data_type(TargetType)>*>* NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			CONTAINER_PROTOTYPE<TargetType,typename TargetType::key_type,VALUE_PROTOTYPE<get_mapped_component_type(TargetType)>*>* NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -1053,7 +1053,12 @@ namespace polaris
 			template<typename CType/* = NAME##_type*/>\
 			struct NAME##_type_getter\
 			{\
-				typedef CType type;\
+				template<typename Relevant_Type,typename Other_Type>\
+				struct Delayer\
+				{\
+					typedef Relevant_Type type;\
+				};\
+				typedef typename Delayer<typename Component_Type::NAME##_type,CType>::type type;\
 			};\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\

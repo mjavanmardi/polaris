@@ -171,13 +171,13 @@ namespace PopSyn
 
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
-				typedef get_data_type(region_collection_type)									region_type;
+				typedef get_mapped_component_type(region_collection_type)									region_type;
 				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_data_type(sample_collection_type)									sample_type;
+				typedef get_mapped_component_type(sample_collection_type)									sample_type;
 				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
-				typedef get_data_type(temporary_sample_collection_type)							temp_sample_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)							temp_sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_data_type(zone_collection_type)										zone_type;
+				typedef get_mapped_component_type(zone_collection_type)										zone_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
@@ -530,13 +530,13 @@ namespace PopSyn
 				// Type defines for sub_objects
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
-				typedef get_data_type(region_collection_type)									region_type;
+				typedef get_mapped_component_type(region_collection_type)									region_type;
 				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_data_type(sample_collection_type)									sample_type;
+				typedef get_mapped_component_type(sample_collection_type)									sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_data_type(zone_collection_type)										zone_type;
+				typedef get_mapped_component_type(zone_collection_type)										zone_type;
 				typedef typename zone_type::get_type_of(Synthetic_Households_Container)			household_collection_type;
-				typedef get_value_type(household_collection_type)								household_type;
+				typedef get_component_type(household_collection_type)								household_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
@@ -558,10 +558,10 @@ namespace PopSyn
 				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
 
 
-				typedef Household_Components::Prototypes::Household<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))>  household_itf;
+				typedef Household_Components::Prototypes::Household<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))>  household_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 
-				typedef Person_Components::Prototypes::Person<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))>  person_itf;
+				typedef Person_Components::Prototypes::Person<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))>  person_itf;
 				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
 
 
@@ -690,13 +690,13 @@ namespace PopSyn
 				// Type defines for sub_objects
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
-				typedef get_data_type(region_collection_type)									region_type;
+				typedef get_mapped_component_type(region_collection_type)									region_type;
 				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_data_type(sample_collection_type)									sample_type;
+				typedef get_mapped_component_type(sample_collection_type)									sample_type;
 				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
-				typedef get_data_type(temporary_sample_collection_type)							temp_sample_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)							temp_sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_data_type(zone_collection_type)										zone_type;
+				typedef get_mapped_component_type(zone_collection_type)										zone_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
@@ -708,10 +708,10 @@ namespace PopSyn
 
 		
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> households_container_itf;
-				typedef Household_Components::Prototypes::Household_Properties<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
 
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))> person_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> person_itf;
 				
 
 				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;

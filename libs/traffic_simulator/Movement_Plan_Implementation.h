@@ -176,7 +176,6 @@ namespace Movement_Plan_Components
 				// copy pointer to the activity reference from original movement plan
 				_destination_activity_reference = move->destination_activity_reference<destination_activity_reference_interface*>();
 			}	 
-			tag_feature_signature_as_available(Initialize, 1);
 
 			m_prototype(Null_Prototype< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);

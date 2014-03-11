@@ -43,12 +43,12 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_type::get_type_of(zones_container)::value_type>::type>  zone_interface;
-			typedef Pair_Associative_Container< typename network_reference_type::get_type_of(zones_container), zone_interface*> zones_container_interface;
-
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_type::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
-			typedef Random_Access_Sequence< typename network_reference_type::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
-
+			typedef Pair_Associative_Container< typename network_reference_type::get_type_of(zones_container)> zones_container_interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_container_interface)>  zone_interface;
+			
+			typedef Random_Access_Sequence< typename network_reference_type::get_type_of(activity_locations_container)> locations_container_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
+			
 
 			//=======================================================================================================================================================================
 			// FEATURES
@@ -78,7 +78,6 @@ namespace Household_Components
 				this->scenario_reference<ScenarioRefType>(scenario_ref);
 
 			}
-			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> void Set_Home_Location()
 			{

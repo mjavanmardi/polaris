@@ -48,7 +48,6 @@ namespace Household_Components
 				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[14]);
 
 			}
-			tag_feature_as_available(Characteristics);
 		};
 
 	}

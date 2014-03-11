@@ -103,12 +103,13 @@ namespace Prototypes
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 			typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename scheduler_itf::get_type_of(Activity_Container)::value_type>::type>  Activity;
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container), Activity*> Activities;
 
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename get_type_of(Activity_Record_Container)::value_type>::type>  Activity_Record;
-			typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container), Activity_Record*> Activity_Records;
-
+			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activities;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activities)>  Activity;
+			
+			typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container)> Activity_Records;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)>  Activity_Record;
+			
 			
 			typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::person_data_logger_type> _Logger_Interface;
 			
@@ -309,9 +310,10 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
 
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
@@ -328,9 +330,10 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -365,9 +368,10 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
 
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
@@ -378,9 +382,10 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
 
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
@@ -399,9 +404,10 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
@@ -418,9 +424,9 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -449,9 +455,9 @@ namespace Prototypes
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
@@ -487,14 +493,15 @@ namespace Prototypes
 		template<typename TargetType> string To_String()
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
-			typedef  Person_Properties<typename get_type_of(Static_Properties)> static_properties_itf;
+			typedef Person_Properties<typename get_type_of(Static_Properties)> static_properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_itf::get_type_of(zones_container)::value_type>::type>  zone_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(zones_container), zone_itf*> zone_container_itf;
-
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
-
+			
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zone_container_itf;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zone_container_itf)>  zone_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> locations_container_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  location_interface;
+			
 
 			properties_itf* props = this->Properties<properties_itf*>();
 			static_properties_itf* static_props = this->Static_Properties<static_properties_itf*>();

@@ -14,9 +14,9 @@ namespace polaris
 
 	#define this_component() ((ComponentType*)this)
 
-	#define type_of(NAME) NAME##_type_getter<NAME##_type>::type
-	#define get_type_of(NAME) Component_Type::NAME##_type_getter<NAME##_type>::type
-
+	#define type_of(NAME) NAME##_type_getter<Component_Type>::type
+	#define get_type_of(NAME) Component_Type::NAME##_type_getter<Component_Type>::type
+	//#define get_type_of(TYPE_TO_PULL_MEMBER_TYPE_FROM, MEMBER_NAME) TYPE_TO_PULL_MEMBER_TYPE_FROM::Component_Type::MEMBER_NAME##_type_getter<TYPE_TO_PULL_MEMBER_TYPE_FROM::Component_Type::MEMBER_NAME##_type>::type
 
 	#define NONE true
 	#define NA false
@@ -545,7 +545,12 @@ namespace polaris
 			template<typename CType>\
 			struct NAME##_type_getter\
 			{\
-				typedef CType type;\
+				template<typename Relevant_Type,typename Other_Type>\
+				struct Delayer\
+				{\
+					typedef Relevant_Type type;\
+				};\
+				typedef typename Delayer<typename Component_Type::NAME##_type,CType>::type type;\
 			};\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
@@ -742,7 +747,12 @@ namespace polaris
 			template<typename CType/* = NAME##_type*/>\
 			struct NAME##_type_getter\
 			{\
-				typedef typename remove_pointer<CType>::type::Component_Type type;\
+				template<typename Relevant_Type,typename Other_Type>\
+				struct Delayer\
+				{\
+					typedef Relevant_Type type;\
+				};\
+				typedef typename remove_pointer<typename Delayer<typename Component_Type::NAME##_type,CType>::type>::type::Component_Type type;\
 			};\
 			\
 			template<typename TargetType>\

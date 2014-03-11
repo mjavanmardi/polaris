@@ -45,8 +45,8 @@ namespace Person_Components
 			//m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
 			//m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
 			// quick fix for moving network and scenario handling to the perception class
-			typedef typename Perception_Faculty_type::type_of(Network) network_reference_type;
-			typedef typename Perception_Faculty_type::type_of(Scenario) scenario_reference_type;
+			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_type;
+			typedef typename type_of(Perception_Faculty)::type_of(Scenario) scenario_reference_type;
 			template<typename TargetType> TargetType network_reference()
 			{
 				return this->_Perception_Faculty->template Network<TargetType>();
@@ -94,15 +94,16 @@ namespace Person_Components
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
 			typedef Prototypes::Mode_Chooser<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)> mode_choice_itf;
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_interface::get_type_of(zones_container)::value_type>::type>  zone_interface;
-			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container), zone_interface*> zones_container_interface;
-
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_interface::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
-			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
-
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(Activity_Record_Container)::value_type>::type> Activity_Record;
+			
+			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container)> zones_container_interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_container_interface)>  zone_interface;
+			
+			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
+			
 			typedef Back_Insertion_Sequence< typename type_of(Activity_Record_Container),Activity_Record*> Activity_Records;
-
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)> Activity_Record;
+			
 			
 			//=======================================================================================================================================================================
 			// FEATURES
@@ -182,7 +183,6 @@ namespace Person_Components
 				scenario_reference_interface* scenario = this->scenario_reference<scenario_reference_interface*>();
 				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->template pretrip_informed_market_share<float>());
 			}
-			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> void Set_Locations()
 			{
@@ -215,7 +215,7 @@ namespace Person_Components
 				// update the simulated employment in the work zone
 				zone->employment_simulated<int&>() += 1.0f / scenario->percent_to_synthesize<float>();
 			}
-			tag_feature_as_available(Choose_Work_Location);
+
 			template<typename TargetType> void Choose_Work_Location_Based_On_Census()
 			{
 				// interface to this
@@ -330,7 +330,6 @@ namespace Person_Components
 					}
 				}
 			}
-			tag_feature_as_available(Choose_Work_Location_Based_On_Census);
 
 			template<typename TargetType> void Choose_School_Location()
 			{
@@ -440,13 +439,11 @@ namespace Person_Components
 					else pthis->template School_Location<int>(pthis->template Home_Location<int>());
 				}
 			}
-			tag_feature_as_available(Choose_School_Location);
 
 			template<typename TargetType> void arrive_at_destination()
 			{
 
 			}
-			tag_feature_as_available(arrive_at_destination);
 
 
 			//=======================================================================================================================================================================
@@ -473,7 +470,7 @@ namespace Person_Components
 				Activity_Records* records = this->Activity_Record_Container<Activity_Records*>();
 				boost::container::list<typename MasterType::activity_record_type*>* recs = (list<typename MasterType::activity_record_type*>*)records;
 				recs->sort(record_comparer);
-			}tag_feature_as_available(Sort_Activity_Records);
+			}
 		};
 
 	}

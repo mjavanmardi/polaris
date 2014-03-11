@@ -28,34 +28,37 @@ namespace Person_Components
 			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
 			// Interface definitions
-			typedef  Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
-			typedef  Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
-			typedef  Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
-			typedef  Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
-			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;
+			typedef Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
+			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
+			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
+			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Activity_Location_Interface::get_type_of(origin_links)::value_type>::type>  _Link_Interface;
-			typedef  Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links), _Link_Interface*> _Links_Container_Interface;
+			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
+			
+			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
+			
+			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename _Network_Interface::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
-			typedef  Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container), _Zone_Interface*> _Zones_Container_Interface;
-
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename type_of(Activity_Container)::value_type>::type> Activity_Plan;
-			typedef Back_Insertion_Sequence<typename type_of(Activity_Container),Activity_Plan*> Activity_Plans;
-
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<typename type_of(Movement_Plans_Container)::value_type>::type> Movement_Plan;
-			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container),Movement_Plan*> Movement_Plans;
-
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(Parent_Person)::type_of(Activity_Record_Container)::value_type>::type> Activity_Record;
-			typedef Back_Insertion_Sequence<typename type_of(Parent_Person)::type_of(Activity_Record_Container),Activity_Record*> Activity_Records;
-
+			typedef Back_Insertion_Sequence<typename type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+			
+			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container)> Movement_Plans;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;
+			
+			typedef Back_Insertion_Sequence<typename type_of(Parent_Person)::type_of(Activity_Record_Container)> Activity_Records;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)> Activity_Record;
+			
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> At_Home_Activity_Plan;
+
+
 			// member features
 			template<typename TargetType> void Initialize()
 			{
 
-			} tag_feature_as_available(Initialize);
+			}
 
 			// scheduling features - move to Person_Scheduler eventually
 			template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -66,7 +69,6 @@ namespace Person_Components
 				if ((itr = movement_plans->find(iteration())) != movement_plans->end()) return (TargetType)*itr;
 				else return NULL;
 			}
-			tag_feature_as_available(current_movement_plan);
 			template<typename TargetType> TargetType current_activity_plan(requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class
@@ -75,7 +77,6 @@ namespace Person_Components
 				if ((itr = activity_plans->find(iteration())) != activity_plans->end()) return (TargetType)*itr;
 				else return NULL;
 			}
-			tag_feature_as_available(current_activity_plan);
 
 			template<typename TimeType, typename ReturnType> ReturnType previous_activity_plan(TimeType current_time)
 			{
@@ -100,7 +101,6 @@ namespace Person_Components
 				}
 				return (ReturnType)previous;
 			}
-			tag_feature_signature_as_available(previous_activity_plan,1);
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType, check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
@@ -158,7 +158,6 @@ namespace Person_Components
 				assert_check(strip_modifiers(ParamType), Is_Time_Value,"ParamType must be either a Time_Value type, or ");
 				assert_check(strip_modifiers(ParamType), Activity_Components::Concepts::Is_Activity_Plan_Prototype,"ParamType must be an Activity_Plan_Prototype.");
 			}
-			tag_feature_signature_as_available(next_activity_plan,1);
 
 			template<typename ActivityItfType, typename ReturnType> ReturnType previous_location(ActivityItfType current_activity)
 			{
@@ -209,7 +208,6 @@ namespace Person_Components
 				// return the expected origin
 				return (ReturnType)orig;
 			}
-			tag_feature_signature_as_available(previous_location,1);
 			template<typename ActivityItfType, typename ReturnType> ReturnType next_location(ActivityItfType current_activity)
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
@@ -262,7 +260,6 @@ namespace Person_Components
 				// return the expected origin
 				return (ReturnType)dest;
 			}
-			tag_feature_signature_as_available(next_location,1);
 
 			// Simplified timing conflict resolution - only modifying the new activity
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
@@ -423,7 +420,6 @@ namespace Person_Components
 					return false;
 				}
 			}
-			tag_feature_signature_as_available(Resolve_Timing_Conflict,1);
 			template<typename TargetType> void Resolve_At_Home_Timing_Conflict(TargetType current_activity, TargetType previous_activity)
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
@@ -460,7 +456,6 @@ namespace Person_Components
 				new_end = act->template Start_Time<Time_Seconds>() - ttime;
 				prev_act->template End_Time<Time_Seconds>(new_end,false);
 			}
-			tag_feature_signature_as_available(Resolve_At_Home_Timing_Conflict,1);
 
 			// Adding activities and movements to the planning schedules
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -550,7 +545,6 @@ namespace Person_Components
 				assert_check(strip_modifiers(TargetType),is_pointer, "Error, TargetType must be passed as a pointer");
 				assert_check(strip_modifiers(TargetType), Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype, "Error, Function requires TargetType to be a Movement_Plan_Prototype.");
 			}
-			tag_feature_as_available(Add_Movement_Plan);
 			template<typename TargetType> void Remove_Movement_Plan(TargetType movement_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer)))
 			{
 				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
@@ -646,7 +640,7 @@ namespace Person_Components
 
 				acts->sort(comparer);
 				
-			} tag_feature_as_available(Sort_Activity_Schedule);
+			}
 
 
 		};

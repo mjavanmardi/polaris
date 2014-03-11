@@ -45,19 +45,16 @@ namespace Person_Components
 				pair<ReturnType, ReturnType> return_val = Get_Start_Time_and_Duration(activity_ref);
 				return return_val.first;
 			}
-			tag_feature_signature_as_available(Get_Start_Time,1);
 			template<typename ActivityRefType, typename TimeType, typename ReturnType> ReturnType Get_Start_Time(ActivityRefType activity_ref, TimeType range_start, TimeType range_end)
 			{
 				pair<ReturnType, ReturnType> return_val = Get_Start_Time_and_Duration(activity_ref,range_start,range_end);
 				return return_val.first;
 			}
-			tag_feature_signature_as_available(Get_Start_Time,3);
 			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Duration(ActivityRefType activity_ref)
 			{
 				pair<ReturnType, ReturnType> return_val = Get_Start_Time_and_Duration(activity_ref);
 				return return_val.second;
 			}
-			tag_feature_signature_as_available(Get_Duration,1);
 			template<typename ActivityRefType, typename ReturnType> pair<ReturnType, ReturnType> Get_Start_Time_and_Duration(ActivityRefType activity_ref)
 			{
 				// get interface to activity reference
@@ -89,7 +86,6 @@ namespace Person_Components
 				
 				return return_val;
 			}
-			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);
 			template<typename ReturnTimeType, typename ActivityType, typename InputTimeType> pair<ReturnTimeType,ReturnTimeType> Get_Start_Time_and_Duration(ActivityType activity_ref, InputTimeType range_start, InputTimeType range_end)
 			{
 				assert(range_end > range_start);
@@ -126,7 +122,6 @@ namespace Person_Components
 				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.second);
 				return return_val;
 			}
-			tag_feature_signature_as_available(Get_Start_Time_and_Duration,3);
 
 
 			// Static initialization

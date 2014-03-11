@@ -383,7 +383,7 @@ namespace Network_Skimming_Components
 			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
 			
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_data_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
@@ -450,7 +450,7 @@ namespace Network_Skimming_Components
 				// tree builder interface
 				//typedef Routing_Components::Prototypes::Routing<typename remove_pointer<typename  type_of(path_trees_container)::value_type>::type>  tree_builder_itf;
 				typedef Pair_Associative_Container< type_of(path_trees_container)> tree_builder_list_itf;
-				typedef Routing_Components::Prototypes::Routing<typename get_data_type(tree_builder_list_itf)> tree_builder_itf;
+				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(tree_builder_list_itf)> tree_builder_itf;
 
 				tree_builder_list_itf* tree_list = this->path_trees_container<tree_builder_list_itf*>();
 

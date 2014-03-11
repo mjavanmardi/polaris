@@ -88,7 +88,7 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
 			{
-				assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 			}
 
 

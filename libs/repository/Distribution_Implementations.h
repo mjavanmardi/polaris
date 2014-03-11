@@ -26,7 +26,6 @@ namespace Distributions
 
 				return (TargetType)p;
 			}
-			tag_feature_as_available(Probability_Density_Value);
 
 			template<typename TargetType> TargetType Cumulative_Distribution_Value(TargetType x, TargetType mean=0.0, TargetType std=1.0, TargetType shape=0.0)
 			{
@@ -45,7 +44,6 @@ namespace Distributions
 				if (x_std > 0)	cnd = 1.0 - cnd;
 				return (TargetType)cnd;
 			}
-			tag_feature_as_available(Cumulative_Distribution_Value);
 		};
 	}
 

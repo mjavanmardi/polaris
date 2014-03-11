@@ -53,7 +53,6 @@ namespace Person_Components
 				}
 				return is_employed;
 			}
-			tag_feature_as_available(Is_Employed);
 			template<typename TargetType> bool Is_Student()
 			{
 				bool is_student = false;
@@ -68,7 +67,6 @@ namespace Person_Components
 				}
 				return is_student;
 			}
-			tag_feature_as_available(Is_Student);
 
 			m_data(int, Journey_To_Work_Vehicle_Occupancy, NONE, NONE);
 			m_data(int, Age, NONE, NONE);
@@ -411,7 +409,6 @@ namespace Person_Components
 				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)(*data)[16]);
 				pthis->Work_Hours<Time_Hours>((*data)[19]);
 			}
-			tag_feature_signature_as_available(Characteristics, 1);
 		};
 
 	}

@@ -145,10 +145,10 @@ namespace Network_Skimming_Components
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			
 				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-				typedef Link_Components::Prototypes::Link<typename get_value_type(links_itf)> link_itf;
+				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
 				
 				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-				typedef Turn_Movement_Components::Prototypes::Movement<typename get_value_type(turns_itf)> turn_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
 
 				/*typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename get_type_of(origin_locations)::value_type>::type> origin_location_itf;
 				typedef Random_Access_Sequence<typename get_type_of(origin_locations),origin_location_itf*> origin_locations_itf;*/
@@ -371,11 +371,11 @@ namespace Network_Skimming_Components
 			{
 				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<get_value_type(_skim_container_itf)> _skim_itf;
+				typedef Prototypes::Skim_Table<get_component_type(_skim_container_itf)> _skim_itf;
 
 				//typedef (_skim_matrix_itf, _los_itf,typename _skim_itf::get_type_of(skim_table),Multidimensional_Random_Access_Array,Prototypes::LOS);
 				typedef Multidimensional_Random_Access_Array<typename _skim_itf::get_type_of(skim_table)> _skim_matrix_itf;
-				typedef Prototypes::LOS<get_value_type(_skim_matrix_itf)> _los_itf;
+				typedef Prototypes::LOS<get_component_type(_skim_matrix_itf)> _los_itf;
 				
 				// call the general get los function
 				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
@@ -403,7 +403,7 @@ namespace Network_Skimming_Components
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-				typedef Zone_Components::Prototypes::Zone<typename get_data_type(zones_itf)> zone_itf;
+				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -427,7 +427,7 @@ namespace Network_Skimming_Components
 				// Transferred code here from former mode_skim_prototype
 				//-------------------------------------------------------------------
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<typename get_value_type(get_type_of(skims_by_time_container))> _skim_itf;
+				typedef Prototypes::Skim_Table<typename get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
 
 				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 				_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();

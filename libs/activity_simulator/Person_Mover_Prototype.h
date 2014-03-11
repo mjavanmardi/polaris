@@ -47,8 +47,8 @@ namespace Prototypes
 
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename person_itf::get_type_of(vehicle)> vehicle_itf;
-			typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename person_itf::get_type_of(vehicle)> vehicle_itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 
 			movement_itf* movement = pthis->template Movement<movement_itf*>();
 			person_itf* person = pthis->template Parent_Person<person_itf*>();
@@ -212,20 +212,22 @@ namespace Prototypes
 		template<typename TargetType> void Do_Pretrip_Information_Acquisition()
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
-
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename link_itf::get_type_of(activity_locations)::value_type>::type>  location_itf;
-			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations), location_itf*> locations;
-
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_itf::get_type_of(zones_container)::value_type>::type>  zone_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(zones_container), zone_itf*> zones;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+			
+			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations)>  location_itf;
+			
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones)>  zone_itf;
+			
 
 			
 			// HAR interface
@@ -278,28 +280,29 @@ namespace Prototypes
 		template<typename TargetType> void Evaluate_Network_Event(TargetType event, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
-			typedef  Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> planning_itf;
-			typedef  Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
-			typedef  Person_Components::Prototypes::Destination_Chooser< typename planning_itf::get_type_of(Destination_Choice_Faculty)> destination_chooser_itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+			typedef Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> planning_itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
+			typedef Person_Components::Prototypes::Destination_Chooser< typename planning_itf::get_type_of(Destination_Choice_Faculty)> destination_chooser_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
 			//typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(activity_reference)> activity_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+			
+			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations)>  location_itf;
+			
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones)>  zone_itf;
 
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename link_itf::get_type_of(activity_locations)::value_type>::type>  location_itf;
-			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations), location_itf*> locations;
-
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_itf::get_type_of(zones_container)::value_type>::type>  zone_itf;
-			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container), zone_itf*> zones;
-
-			typedef  Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename scheduler_itf::get_type_of(Activity_Container)::value_type>::type>  activity_itf;
-			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container), activity_itf*> activity_container_itf;
-
+			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> activity_container_itf;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(activity_container_itf)>  activity_itf;
+			
 			
 			// person, router, etc. interfaces
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
@@ -401,26 +404,27 @@ namespace Prototypes
 		template<typename TargetType> bool Is_Event_Relevant(TargetType event, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer<typename movement_itf::get_type_of(trajectory_container)::value_type>::type> trajectory_unit_interface;
-			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container),trajectory_unit_interface*> trajectory_interface;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			
+			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container)> trajectory_interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(trajectory_interface)> trajectory_unit_interface;
 
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+			
+			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations)>  location_itf;
+			
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones)>  zone_itf;
 
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename link_itf::get_type_of(activity_locations)::value_type>::type>  location_itf;
-			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations), location_itf*> locations;
-
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_itf::get_type_of(zones_container)::value_type>::type>  zone_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(zones_container), zone_itf*> zones;
-
-			typedef  Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename scheduler_itf::get_type_of(Activity_Container)::value_type>::type>  activity_itf;
-			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container), activity_itf*> activity_container_itf;
+			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> activity_container_itf;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(activity_container_itf)>  activity_itf;
 
 			
 			// get destination link for current movement
@@ -488,11 +492,12 @@ namespace Prototypes
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer<typename movement_itf::get_type_of(trajectory_container)::value_type>::type> trajectory_unit_interface;
-			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container),trajectory_unit_interface*> trajectory_interface;
-
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			
+			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container)> trajectory_interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(trajectory_interface)> trajectory_unit_interface;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
 
 			
 			// get destination link for current movement
@@ -523,21 +528,24 @@ namespace Prototypes
 		template<typename TargetType> void Get_Event_Extents(TargetType event, boost::unordered::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer<typename movement_itf::get_type_of(trajectory_container)::value_type>::type> trajectory_unit_interface;
-			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container),trajectory_unit_interface*> trajectory_interface;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			
+			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container)> trajectory_interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(trajectory_interface)> trajectory_unit_interface;
 
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+			
+			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations)>  location_itf;
+			
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones)>  zone_itf;
 
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename link_itf::get_type_of(activity_locations)::value_type>::type>  location_itf;
-			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations), location_itf*> location_container_itf;
-
-			typedef  Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
 			
 			// interface to event
 			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
@@ -564,13 +572,15 @@ namespace Prototypes
 		template<typename TargetType> void Do_Pretrip_Replanning()
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+
 
 			typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::Master_Type::person_data_logger_type> _Logger_Interface;
 
@@ -599,9 +609,10 @@ namespace Prototypes
 			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
 
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
+			
 			
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Planning_Itf* planner = person->template Planning_Faculty<Planning_Itf*>();
@@ -628,15 +639,16 @@ namespace Prototypes
 
 
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-			typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
+
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
 
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
@@ -695,23 +707,24 @@ namespace Prototypes
 
 			// interfaces
 			typedef Vehicle_Components::Types::Vehicle_Type_Keys MODE;
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
-			typedef  Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> Scheduler_Itf;
-			typedef  Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planner_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> Scheduler_Itf;
+			typedef Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planner_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename network_itf::get_type_of(skimming_faculty)> skim_itf;
-			typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-			typedef  Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links_container_itf;
-
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename network_itf::get_type_of(turn_movements_container)::value_type>::type>  turn_itf;
-			typedef Random_Access_Sequence< typename network_itf::get_type_of(turn_movements_container), turn_itf*> turns_container_itf;
-
+			typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
+			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links_container_itf;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links_container_itf)  link_itf;
+			
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(turn_movements_container)> turns_container_itf;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_container_itf)>  turn_itf;
+			
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
@@ -901,8 +914,8 @@ namespace Prototypes
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()
 		{
 			// interfaces
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 

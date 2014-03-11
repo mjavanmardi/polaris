@@ -60,13 +60,13 @@ namespace PopSyn
 				typedef Prototypes::Solver_Settings<typename get_type_of(Solver_Settings)> solution_settings_itf;
 				//typedef Synthesis_Zone<typename remove_pointer<typename get_type_of(Synthesis_Zone_Collection)::value_type>::type> zone_itf;
 				typedef Pair_Associative_Container<typename get_type_of(Synthesis_Zone_Collection)> zones_itf;
-				typedef Synthesis_Zone<get_data_type(typename get_type_of(Synthesis_Zone_Collection))> zone_itf;
+				typedef Synthesis_Zone<get_mapped_component_type(typename get_type_of(Synthesis_Zone_Collection))> zone_itf;
 
 				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Joint_Distribution),value_type> mway_itf;
 				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				//typedef  Person_Components::Prototypes::Person_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Person_Components::Prototypes::Person_Properties <get_data_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
+				typedef  Person_Components::Prototypes::Person_Properties <get_mapped_component_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
 
 				#pragma endregion
 				//==========================================================

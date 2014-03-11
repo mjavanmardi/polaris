@@ -3,8 +3,6 @@
 #endif
 
 #include "Polaris_PCH.h"
-#include "Population_Synthesis.h"
-#include "Scenario_Implementation.h"
 
 #define TEST_APP
 #ifdef TEST_APP
@@ -20,7 +18,7 @@ prototype struct Agent
 		this_component()->Initialize<T>();
 	}	
 
-	accessor(data,NONE,NONE);
+	accessor(agent_data,NONE,NONE);
 
 };
 
@@ -32,6 +30,29 @@ prototype struct Agent_Data
 	accessor(val2,NONE,NONE);
 };
 
+prototype struct Other
+{
+	tag_as_prototype;
+
+	accessor(message,NONE,NONE);
+	accessor(my_agent,NONE,NONE);
+	accessor(my_data,NONE,NONE);
+
+	template<typename T> void Initialize()
+	{
+		/*typedef Agent<typename get_type_of(my_agent)> agent_itf;
+		typedef Agent_Data<typename agent_itf::get_type_of(agent_data)> data_itf;
+
+		agent_itf* the_agent = this->my_agent<agent_itf*>();
+		data_itf* my_data = the_agent->agent_data<data_itf*>();
+
+		cout << "VALUE 1 IS: " <<my_data->val1<int>() <<endl<<endl;*/
+		this_component()->Initialize<T>();
+	}	
+
+
+
+};
 
 implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
 {
@@ -41,7 +62,7 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 	typedef double name1;
 	typedef double name2;
 
-	m_prototype(Agent_Data< typename MasterType::data_type>, data, NONE, NONE);
+	m_prototype(Agent_Data< typename MasterType::agent_data_type>, agent_data, NONE, NONE);
 
 	template<typename T> void Initialize()
 	{
@@ -84,10 +105,57 @@ implementation struct Agent_Data_Implementation : public Polaris_Component<Maste
 	m_data(int,val2,NONE,NONE);
 };
 
+implementation struct Other_Implementation : public Polaris_Component<MasterType,INHERIT(Other_Implementation),Execution_Object>
+{
+	typedef typename Polaris_Component<MasterType,INHERIT(Other_Implementation),Execution_Object>::Component_Type ComponentType;
+	typedef Other<ComponentType> agent_itf;
+
+	typedef double name1;
+	typedef double name2;
+
+	m_prototype(Agent< typename MasterType::agent_type>, my_agent, NONE, NONE);
+
+	template<typename T> void Initialize()
+	{
+		typedef Agent<typename type_of(my_agent)> agent_itf;
+		typedef Agent_Data<typename agent_itf::get_type_of(agent_data)> data_itf;
+		//typedef Agent_Data<typename type_of(agent_itf::Component_Type::agent_data)> data_itf;
+
+		agent_itf* the_agent = this->my_agent<agent_itf*>();
+		data_itf* my_data = the_agent->agent_data<data_itf*>();
+
+		cout << "VALUE 1 IS: " <<my_data->val1<int>() <<endl<<endl;
+
+		/*this->message(string("Test_Agent_Implementation"));
+		Load_Event<ComponentType>(&ComponentType::Agent_Event,1,0);*/			
+	}
+	static void Agent_Event(ComponentType* _this,Event_Response& response)
+	{
+		agent_itf* _this_ptr=(agent_itf*)_this;
+		
+		if (iteration() % 100 == 0)
+		{
+			cout <<_this_ptr->message<string>() << ": The iteration is: "<< iteration() <<". The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes."<<endl;
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+		
+		else
+		{
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+	}
+
+	m_data(string, message,NONE,NONE);
+};
+
+
 struct MasterType
 {
 	typedef Inherited_Agent_Implementation<MT> agent_type;
-	typedef Agent_Data_Implementation<MT> data_type;
+	typedef Agent_Data_Implementation<MT> agent_data_type;
+	typedef Other_Implementation<MT> other_type;
 };
 
 
@@ -103,11 +171,18 @@ int main(int argc, char* argv[])
 	typedef Agent<MasterType::agent_type> agent_itf;
 	agent_itf* my_agent = (agent_itf*)Allocate<MasterType::agent_type>();
 
-	typedef Agent<MasterType::data_type> data_itf;
-	data_itf* my_data = (data_itf*)Allocate<MasterType::data_type>();
+	typedef Agent_Data<MasterType::agent_data_type> data_itf;
+	data_itf* my_data = (data_itf*)Allocate<MasterType::agent_data_type>();
+
+	typedef Other<MasterType::other_type> other_itf;
+	other_itf* my_other = (other_itf*)Allocate<MasterType::other_type>();
+
+	my_other->Initialize<NT>();
 
 	my_agent->Initialize<NT>();
-	my_agent->data(my_data);
+	my_agent->agent_data(my_data);
+
+	my_other->my_agent<agent_itf*>(my_agent);
 
 	START();
 
@@ -119,6 +194,11 @@ int main(int argc, char* argv[])
 
 
 #ifdef HIDE
+
+#include "Population_Synthesis.h"
+#include "Scenario_Implementation.h"
+
+
 struct MasterType
 {
 	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;

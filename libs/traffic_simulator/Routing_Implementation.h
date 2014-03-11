@@ -23,7 +23,8 @@ namespace Routing_Components
 			m_prototype(Movement_Plan<typename MasterType::movement_plan_type>,movement_plan,NONE,NONE);
 			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
 
-			typedef Link_Components::Prototypes::Link<typename movement_plan_type::get_type_of(origin)> Link_Interface;
+			typedef Movement_Plan<typename type_of(movement_plan)> movement_plan_interface;
+			typedef Link_Components::Prototypes::Link<typename movement_plan_interface::get_type_of(origin)> Link_Interface;
 
 			template<typename Movement_Plan_Type>
 			void Attach_New_Movement_Plan(Movement_Plan<Movement_Plan_Type>* mp)
