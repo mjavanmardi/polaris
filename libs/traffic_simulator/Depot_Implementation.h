@@ -129,7 +129,7 @@ namespace Depot_Components
 
 			m_data(boost::container::vector<typename MasterType::tow_truck_type>,tow_trucks, NONE, NONE);
 			//m_data(polaris::Depot*,depot_service, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::traffic_management_center_type>,traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::traffic_management_center_type,traffic_management_center, NONE, NONE);
 
 			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
 		};

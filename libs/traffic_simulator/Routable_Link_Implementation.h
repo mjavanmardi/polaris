@@ -24,17 +24,17 @@ namespace Link_Components
 		//	m_data(float, travel_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 		//	m_data(float, f_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 		//	m_data(float, h_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-		//	m_prototype(Null_Prototype<typename MasterType::routable_link_type>, label_pointer, NONE, NONE);
+		//	m_prototype(Null_Prototype,typename MasterType::routable_link_type>, label_pointer, NONE, NONE);
 		//	m_data(float, label_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 		//	m_data(Network_Components::Types::Scan_List_Status_Keys, scan_list_status, NONE, NONE);
 		//	
 		//	m_data(int, scan_list_position, NONE, NONE);
 		//	m_data(bool, reset_list_status, NONE, NONE);
 
-		//	m_prototype(Null_Prototype<typename MasterType::link_type>, network_link_reference, NONE, NONE);
+		//	m_prototype(Null_Prototype,typename MasterType::link_type>, network_link_reference, NONE, NONE);
 		//
-		//	m_prototype(Null_Prototype<typename MasterType::routable_intersection_type>, upstream_intersection, NONE, NONE);
-		//	m_prototype(Null_Prototype<typename MasterType::routable_intersection_type>, downstream_intersection, NONE, NONE);
+		//	m_prototype(Null_Prototype,typename MasterType::routable_intersection_type>, upstream_intersection, NONE, NONE);
+		//	m_prototype(Null_Prototype,typename MasterType::routable_intersection_type>, downstream_intersection, NONE, NONE);
 
 		//	template<typename TargetType> void reset_routable_link()
 		//	{

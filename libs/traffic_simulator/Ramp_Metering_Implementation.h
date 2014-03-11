@@ -19,8 +19,8 @@ namespace Ramp_Metering_Components
 			
 			//ramp
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_prototype(Null_Prototype<typename MasterType::link_type>, on_ramp_link, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::link_type>, downstream_freeway_link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, on_ramp_link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, downstream_freeway_link, NONE, NONE);
 			m_data(bool, operation_status, NONE, NONE);
 
 			//detector

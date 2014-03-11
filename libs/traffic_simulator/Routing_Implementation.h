@@ -20,8 +20,8 @@ namespace Routing_Components
 	{
 		implementation struct Routing_Implementation:public Polaris_Component<MasterType,INHERIT(Routing_Implementation),Execution_Object>
 		{
-			m_prototype(Movement_Plan<typename MasterType::movement_plan_type>,movement_plan,NONE,NONE);
-			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
+			m_prototype(Movement_Plan,typename MasterType::movement_plan_type,movement_plan,NONE,NONE);
+			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 
 			typedef Movement_Plan<typename type_of(movement_plan)> movement_plan_interface;
 			typedef Link_Components::Prototypes::Link<typename movement_plan_interface::get_type_of(origin)> Link_Interface;
@@ -214,9 +214,9 @@ namespace Routing_Components
 //			}
 //
 //			// don't need ifdef here - just change the typedef of MasterType::person_type to traveler_implemenationt in the mastertype definition
-//			m_prototype(Null_Prototype<typename MasterType::person_type>, traveler, NONE, NONE);
-//			m_prototype(Null_Prototype<typename MasterType::network_type>, network, NONE, NONE);
-//			m_prototype(Null_Prototype<typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
+//			m_prototype(Null_Prototype,typename MasterType::person_type>, traveler, NONE, NONE);
+//			m_prototype(Null_Prototype,typename MasterType::network_type>, network, NONE, NONE);
+//			m_prototype(Null_Prototype,typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
 //			m_data(int, departure_time, NONE, NONE);
 //
 //			template<typename TargetType> TargetType vehicle()

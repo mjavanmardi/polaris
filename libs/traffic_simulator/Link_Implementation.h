@@ -139,7 +139,7 @@ namespace Link_Components
 			m_data(float, original_speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, original_num_lanes, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(bool, shoulder_opened, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_prototype(Null_Prototype<typename MasterType::ramp_metering_type>, ramp_meter, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::ramp_metering_type, ramp_meter, NONE, NONE);
 
 
 			m_data(float, speed_adjustment_factor_due_to_weather, NONE, NONE);
@@ -155,14 +155,14 @@ namespace Link_Components
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
 
-			m_prototype(Network_Components::Prototypes::Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
 		//==================================================================================================================
 		/// Upstream and Downstream Intersections Reference
 		//------------------------------------------------------------------------------------------------------------------			
 
-			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
-			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection,typename MasterType::intersection_type, upstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection,typename MasterType::intersection_type, downstream_intersection, NONE, NONE);
 
 		//==================================================================================================================
 		/// Containers of Cached Cumulative Vehicle Statistics
@@ -195,7 +195,7 @@ namespace Link_Components
 		/// Replicas Containers
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype<typename MasterType::approach_type>, approach, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::approach_type, approach, NONE, NONE);
 			m_data(int, link_num_vehicles_in_queue, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_container(boost::container::deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, NONE, NONE);
 			m_data(int, num_vehicles_on_link, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -260,9 +260,9 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 
 			m_data(bool, weather_event_to_process, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::weather_network_event_type>, current_weather_event, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::weather_network_event_type, current_weather_event, NONE, NONE);
 			m_data(bool, accident_event_to_process, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::accident_network_event_type>, current_accident_event, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::accident_network_event_type, current_accident_event, NONE, NONE);
 
 			typedef typename MasterType::base_network_event_type base_network_event_type;
 			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
@@ -273,11 +273,11 @@ namespace Link_Components
 		/// ITS
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype< typename MasterType::advisory_radio_type>, advisory_radio, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::depot_type>, depot, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::variable_word_sign_type>, variable_word_sign, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::variable_speed_sign_type>, variable_speed_sign, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::link_sensor_type>, link_sensor, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::advisory_radio_type, advisory_radio, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::depot_type, depot, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::variable_word_sign_type, variable_word_sign, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::variable_speed_sign_type, variable_speed_sign, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::link_sensor_type, link_sensor, NONE, NONE);
 
 
 

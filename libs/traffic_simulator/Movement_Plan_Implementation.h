@@ -22,7 +22,7 @@ namespace Movement_Plan_Components
 			m_data(int, enter_interval_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, estimated_link_accepting_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			
-			m_prototype(Null_Prototype<typename MasterType::link_type>, link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, link, NONE, NONE);
 
 			template<typename TargetType> void Initialize(TargetType link_val)
 			{
@@ -35,7 +35,7 @@ namespace Movement_Plan_Components
 
 		implementation struct Movement_Plan_Implementation:public Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object>
 		{
-			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
+			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(boost::container::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
@@ -63,21 +63,21 @@ namespace Movement_Plan_Components
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype<typename MasterType::activity_location_type>, origin_location, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::activity_location_type>, destination_location, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::activity_location_type, origin_location, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::activity_location_type, destination_location, NONE, NONE);
 
-			//m_prototype(Null_Prototype<typename MasterType::zone_type>, origin_zone, NONE, NONE);
-			//m_prototype(Null_Prototype<typename MasterType::zone_type>, destination_zone, NONE, NONE);
+			//m_prototype(Null_Prototype,typename MasterType::zone_type>, origin_zone, NONE, NONE);
+			//m_prototype(Null_Prototype,typename MasterType::zone_type>, destination_zone, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::link_type>, origin, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::link_type>, destination, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, origin, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, destination, NONE, NONE);
 
 			member_component_and_feature_accessor(departed_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(planning_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(arrived_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(expected_travel_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 
-			m_prototype(Null_Prototype<typename MasterType::plan_type>, plan, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::plan_type, plan, NONE, NONE);
 			m_data(int, routed_travel_time, NONE, NONE);
 			m_data(int, estimated_travel_time_when_departed, NONE, NONE);
 			m_data(int, number_of_switches, NONE, NONE);
@@ -128,7 +128,7 @@ namespace Movement_Plan_Components
 			typedef Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)> Base_Type;
 			typedef typename Base_Type::Component_Type ComponentType;
 
-			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
 			template<typename TargetType> void arrive_to_destination()
 			{
 				Base_Type* bthis = (Base_Type*)this;
@@ -177,7 +177,7 @@ namespace Movement_Plan_Components
 				_destination_activity_reference = move->destination_activity_reference<destination_activity_reference_interface*>();
 			}	 
 
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);
 			m_data(bool, valid_trajectory, NONE, NONE);
 		};

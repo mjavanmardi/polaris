@@ -21,21 +21,21 @@ namespace Intersection_Components
 	//	{
 	//		m_data(int, uuid, NONE, NONE);
 	//		m_data(float, forward_link_turn_travel_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-	//		m_prototype(Null_Prototype<typename MasterType::routable_link_type>, inbound_link, NONE, NONE);
-	//		m_prototype(Null_Prototype<typename MasterType::routable_link_type>, outbound_link, NONE, NONE);
+	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, inbound_link, NONE, NONE);
+	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, outbound_link, NONE, NONE);
 	//	};
 
 
 	//	implementation struct Routable_Inbound_Outbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Inbound_Outbound_Movements_Implementation),Data_Object>
 	//	{
-	//		m_prototype(Null_Prototype<typename MasterType::routable_link_type>, inbound_link_reference, NONE, NONE);
+	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, inbound_link_reference, NONE, NONE);
 	//		m_container(boost::container::vector<typename MasterType::routable_movement_type*>, outbound_movements, NONE, NONE);
 	//	};
 
 	//	
 	//	implementation struct Routable_Outbound_Inbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Outbound_Inbound_Movements_Implementation),Data_Object>
 	//	{
-	//		m_prototype(Null_Prototype<typename MasterType::routable_link_type>, outbound_link_reference, NONE, NONE);
+	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, outbound_link_reference, NONE, NONE);
 	//		m_container(boost::container::vector<typename MasterType::routable_movement_type*>, inbound_movements, NONE, NONE);
 	//	};
 

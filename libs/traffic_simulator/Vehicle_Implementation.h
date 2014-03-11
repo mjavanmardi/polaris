@@ -38,13 +38,13 @@ namespace Vehicle_Components
 			m_data(bool, is_integrated, NONE, NONE);
 			m_data(bool, its_switch, NONE, NONE);
 
-			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 #ifndef EXCLUDE_DEMAND
-			m_prototype(Null_Prototype<typename MasterType::person_type>, traveler, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::person_type, traveler, NONE, NONE);
 #else
-			m_prototype(Null_Prototype<typename MasterType::traveler_type>, traveler, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::traveler_type, traveler, NONE, NONE);
 #endif
-			m_prototype(Routing_Components::Prototypes::Routing< typename MasterType::routing_type>, router, NONE, NONE);
+			m_prototype(Routing_Components::Prototypes::Routing, typename MasterType::routing_type, router, NONE, NONE);
 			m_data(float, distance_to_stop_bar, NONE, NONE);
 			m_data(float, local_speed, NONE, NONE);
 			m_data(int, downstream_preferred_departure_time, NONE, NONE);

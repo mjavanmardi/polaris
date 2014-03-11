@@ -1,6 +1,6 @@
 #define EXCLUDE_DEMAND
 
-#define ANTARES
+//#define ANTARES
 
 #include "Polaris_PCH.h"
 
@@ -371,8 +371,8 @@ void run_with_input_from_db(char* scenario_filename)
 
 		//define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
 		
-		typedef Link<remove_pointer<_Network_Interface::get_type_of(links_container)::value_type>::type> _Link_Interface;
-		typedef Random_Access_Sequence<_Network_Interface::get_type_of(links_container),_Link_Interface*> _Links_Container_Interface;
+		typedef Link<typename MasterType::link_type> _Link_Interface;
+		typedef Random_Access_Sequence<_Network_Interface::Component_Type::links_container_accessible_type,_Link_Interface*> _Links_Container_Interface;
 
 		_Links_Container_Interface::iterator links_itr;
 
@@ -387,8 +387,8 @@ void run_with_input_from_db(char* scenario_filename)
 		//define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
 		//
 		
-		typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
-		typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
+		typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+		typedef Random_Access_Sequence<_Network_Interface::Component_Type::intersections_container_accessible_type,_Intersection_Interface*> _Intersections_Container_Interface;
 
 		_Intersections_Container_Interface::iterator intersections_itr;
 

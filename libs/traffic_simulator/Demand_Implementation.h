@@ -18,9 +18,9 @@ namespace Demand_Components
 		implementation struct Demand_Implementation:public Polaris_Component<MasterType,INHERIT(Demand_Implementation),Data_Object>
 		{
 
-			m_prototype(Null_Prototype<typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			
 			m_container(boost::container::vector<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 

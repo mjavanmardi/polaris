@@ -230,7 +230,7 @@ namespace Traffic_Management_Center_Components
 
 			// that places a pointer to network_event_manager_type
 			//			  name of the prototype class		variable name					underlying type
-			m_prototype(Network_Event_Components::Prototypes::Network_Event_Manager< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Network_Event_Components::Prototypes::Network_Event_Manager, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
 			m_data(boost::container::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
 			m_data(boost::container::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);

@@ -56,9 +56,9 @@ namespace Traveler_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
 
-			m_prototype(Routing_Components::Prototypes::Routing<typename MasterType::routing_type>, router, NONE, NONE);
-			m_prototype(Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
-			//m_prototype(Null_Prototype<typename MasterType::plan_type>, plan, NONE, NONE);
+			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
+			m_prototype(Vehicle_Components::Prototypes::Vehicle,typename MasterType::vehicle_type, vehicle, NONE, NONE);
+			//m_prototype(Null_Prototype,typename MasterType::plan_type>, plan, NONE, NONE);
 		};
 	}
 

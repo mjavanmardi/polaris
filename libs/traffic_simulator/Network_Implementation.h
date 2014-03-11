@@ -98,7 +98,7 @@ namespace Network_Components
 			//template<typename TargetType> void scenario_reference(TargetType val){}
 			//template<typename TargetType> TargetType scenario_reference(){return (TargetType)_scenario_reference;}
 
-			m_prototype(Null_Prototype<typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::intersection_control_type*>, intersection_controls_container, NONE, NONE);
 
@@ -1209,19 +1209,19 @@ namespace Network_Components
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
 			//==================================================================================================================
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
-			m_prototype(Null_Prototype< typename MasterType::traffic_management_center_type>, traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::traffic_management_center_type, traffic_management_center, NONE, NONE);
 		};
 
 		implementation struct Integrated_Network_Implementation : public Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>
 		{
 			typedef typename Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>::Component_Type ComponentType;
 
-			m_prototype(Null_Prototype<typename MasterType::network_skim_type>, skimming_faculty, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_skim_type, skimming_faculty, NONE, NONE);
 
 			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
 			{

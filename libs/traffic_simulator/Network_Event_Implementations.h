@@ -260,7 +260,7 @@ namespace Network_Event_Components
 			m_data(string,notes, NONE, NONE);
 
 			static m_data(boost::container::vector<string>,event_keys, NONE, NONE);
-			static m_prototype(Null_Prototype<typename MasterType::network_event_manager_type>,network_event_manager, NONE, NONE);
+			static m_prototype(Null_Prototype,typename MasterType::network_event_manager_type,network_event_manager, NONE, NONE);
 			
 			static m_data(concat(boost::unordered::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
 		};
