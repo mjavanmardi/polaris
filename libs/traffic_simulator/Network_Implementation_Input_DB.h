@@ -50,7 +50,7 @@ namespace Network_Components
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
 
 			_Intersections_Container_Interface* intersections_container_ptr=intersections_container<_Intersections_Container_Interface*>();
-			type_of(intersections_container)& intersections_container_monitor=(type_of(intersections_container)&)(*intersections_container_ptr);
+			//type_of(intersections_container)& intersections_container_monitor=(type_of(intersections_container)&)(*intersections_container_ptr);
 			typedef  Intersection_Control_Components::Prototypes::Intersection_Control< typename _Intersection_Interface::get_type_of(intersection_control)> _Intersection_Control_Interface;
 			typedef  Intersection_Control_Components::Prototypes::Control_Plan<typename remove_pointer< _Intersection_Control_Interface::get_type_of(control_plan_data_array)::value_type>::type>  _Control_Plan_Interface;
 			typedef  Random_Access_Sequence< _Intersection_Control_Interface::get_type_of(control_plan_data_array), _Control_Plan_Interface*> _Control_Plans_Container_Interface;
@@ -130,7 +130,7 @@ namespace Network_Components
 			typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 			_Links_Container_Interface* links_container_ptr=links_container<_Links_Container_Interface*>();
-			type_of(links_container)& links_container_monitor=(type_of(links_container)&)(*links_container_ptr);				
+			//type_of(links_container)& links_container_monitor=(type_of(links_container)&)(*links_container_ptr);				
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();				
 

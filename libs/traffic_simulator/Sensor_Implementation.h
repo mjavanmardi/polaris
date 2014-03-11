@@ -115,7 +115,7 @@ namespace Sensor_Components
 				link_id_dir.id = instance.getLink();
 				link_id_dir.dir = instance.getDir();
 
-				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
+				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
 
 				if(db_map.count(link_id_dir.id_dir))
 				{
@@ -152,7 +152,7 @@ namespace Sensor_Components
 
 			m_data(boost::container::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename type_of(MasterType::link)>,covered_link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type,covered_link, NONE, NONE);
 		};
 	}
 }

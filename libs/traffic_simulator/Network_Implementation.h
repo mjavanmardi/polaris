@@ -98,7 +98,7 @@ namespace Network_Components
 			//template<typename TargetType> void scenario_reference(TargetType val){}
 			//template<typename TargetType> TargetType scenario_reference(){return (TargetType)_scenario_reference;}
 
-			m_prototype(Null_Prototype<typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::intersection_control_type*>, intersection_controls_container, NONE, NONE);
 
@@ -1191,8 +1191,8 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------		
 			template<typename TargetType> void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
-				_db_reader = Allocate<type_of(db_reader)>();
-				typedef Prototypes::Network_DB_Reader<type_of(db_reader)> _DB_Interface;
+				_db_reader = Allocate<remove_pointer<type_of(db_reader)>::type>();
+				typedef Prototypes::Network_DB_Reader<remove_pointer<type_of(db_reader)>::type> _DB_Interface;
 				_DB_Interface* db = (_DB_Interface*)_db_reader;
 				db->template network_reference<ComponentType*>((ComponentType*)this);
 
@@ -1209,19 +1209,19 @@ namespace Network_Components
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
 			//==================================================================================================================
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
-			m_prototype(Null_Prototype< typename type_of(MasterType::traffic_management_center)>, traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::traffic_management_center_type, traffic_management_center, NONE, NONE);
 		};
 
 		implementation struct Integrated_Network_Implementation : public Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>
 		{
 			typedef typename Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>::Component_Type ComponentType;
 
-			m_prototype(Null_Prototype<typename MasterType::network_skim_type>, skimming_faculty, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_skim_type, skimming_faculty, NONE, NONE);
 
 			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
 			{

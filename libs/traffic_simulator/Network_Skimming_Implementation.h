@@ -48,7 +48,7 @@ namespace Network_Skimming_Components
 				this->auto_ttime<Simulation_Timestep_Increment>(FLT_MAX);
 			}
 			member_component_and_feature_accessor(auto_ttime, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
-			m_prototype(Prototypes::LOS<LOS_Time_Invariant_Value_Implementation<NT>>,LOS_time_invariant, NONE, NONE);
+			m_prototype(Prototypes::LOS,LOS_Time_Invariant_Value_Implementation<NT>,LOS_time_invariant, NONE, NONE);
 
 			// pass through feature accessors for the time invariant components, if one of these becomes time variable, replace this with the 'featurea_and_accessor' statement in the current invariant implementation
 			member_component_feature(auto_tolls, LOS_time_invariant, auto_tolls, Prototypes::LOS);
@@ -84,11 +84,11 @@ namespace Network_Skimming_Components
 			m_data(float, max_deviation, NONE, NONE);
 			
 			// Link back to the parent network_skimmer class
-			m_prototype(Null_Prototype<typename MasterType::network_skim_type>, skim_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_skim_type, skim_reference, NONE, NONE);
 			//m_prototype(Prototypes::Mode_Skim_Table< typename MasterType::network_mode_skim_type>, mode_skim_reference, NONE, NONE);
 
 			// links back to the network to be skimmed
-			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 
 
 
@@ -342,7 +342,7 @@ namespace Network_Skimming_Components
 			typedef Basic_Units::Currency_Variables::Cents Stored_Currency_Type;
 
 			// reference to the transportation network
-			m_prototype(Network_Components::Prototypes::Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
 			// time increment at which skim tables are updated - set in the initializer
 			m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment, NONE, NONE);

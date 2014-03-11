@@ -13,16 +13,16 @@ namespace polaris
 	
 	void Event_Block::Update_Object_Schedule(Event_Object* updated_object)
 	{
-		boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>>::iterator itr;
+		//boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>>::iterator itr;
 
 		// ptex lock makes it schedule safe
 		LOCK( _ptex_lock );
 
-			itr = _event_schedule.iterator_to(*updated_object);
+			//itr = _event_schedule.iterator_to(*updated_object);
 
-			if(itr->_events_hook.is_linked()){ _event_schedule.erase(itr); }
+			//if(itr->_events_hook.is_linked()){ _event_schedule.erase(itr); }
 
-			_event_schedule.insert(*updated_object );
+			_event_schedule_heap = _event_schedule.insert( _event_schedule_heap, updated_object );
 
 		UNLOCK( _ptex_lock );
 	}
@@ -270,7 +270,7 @@ namespace polaris
 		// log the current revision as a const
 		const Revision this_revision = revision();
 		
-		Revision cached_next_revision;
+		//Revision cached_next_revision;
 
 		// prepare to iterate over contiguous memory
 		Byte* object_itr = (((Byte*)this)+_data_offset);
@@ -281,14 +281,15 @@ namespace polaris
 		Event_Response optex_conditional;
 		optex_conditional.next = __revision_omega;
 
-		for(boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>>::iterator itr = _event_schedule.begin();itr!=_event_schedule.end();itr=_event_schedule.begin())
+		//for(boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>>::iterator itr = _event_schedule.begin();itr!=_event_schedule.end();itr=_event_schedule.begin())
 		//while(!_event_schedule.isEmpty())
+		while(true);
 		{
-			DataType* const current_object = (DataType* const) &(*itr);
+			//DataType* const current_object = (DataType* const) &(*itr);
 			
-			//DataType* const current_object = (DataType* const) &(_event_schedule.getMinimum());
+			DataType* const current_object = (DataType* const) (_event_schedule.extract_min(_event_schedule_heap));
 
-			cached_next_revision = current_object->_next_revision;
+			//cached_next_revision = current_object->_next_revision;
 
 			// Safe mode locks the execution object for increased thread safety
 			#ifdef SAFE_MODE
@@ -314,9 +315,9 @@ namespace polaris
 					}
 				#endif
 
-				Update_Object_Schedule(current_object);
+				//Update_Object_Schedule(current_object);
 				
-				//_event_schedule.insert(*current_object);
+				_event_schedule.insert(*current_object);
 			}
 
 			// Here locking is not necessary because local copies are being updated

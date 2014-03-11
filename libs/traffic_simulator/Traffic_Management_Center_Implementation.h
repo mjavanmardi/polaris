@@ -203,24 +203,24 @@ namespace Traffic_Management_Center_Components
 			
 			typedef typename Polaris_Component<MasterType,INHERIT(Simple_TMC),Execution_Object>::Component_Type ComponentType;
 			
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
 
 			typedef MasterType Reference_Type;
 
 			// added for convenience
-			typedef Network_Event<typename MasterType::type_of(base_network_event)> Base_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::base_network_event_type> Base_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::weather_network_event_type> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::congestion_network_event_type> Congestion_Network_Event_Interface;
 
 			
 
-			typedef Advisory_ITS<typename MasterType::type_of(variable_speed_sign)> Variable_Speed_Sign_Interface;
-			typedef Advisory_ITS<typename MasterType::type_of(variable_word_sign)> Variable_Word_Sign_Interface;
-			typedef Advisory_ITS<typename MasterType::type_of(advisory_radio)> Advisory_Radio_Interface;
+			typedef Advisory_ITS<typename MasterType::variable_speed_sign_type> Variable_Speed_Sign_Interface;
+			typedef Advisory_ITS<typename MasterType::variable_word_sign_type> Variable_Word_Sign_Interface;
+			typedef Advisory_ITS<typename MasterType::advisory_radio_type> Advisory_Radio_Interface;
 
-			typedef Depot<typename MasterType::type_of(depot)> Depot_Interface;
-			typedef Link_Control<typename MasterType::type_of(link_control)> Link_Control_Interface;
-			typedef Sensor<typename MasterType::type_of(link_sensor)> Sensor_Interface;
+			typedef Depot<typename MasterType::depot_type> Depot_Interface;
+			typedef Link_Control<typename MasterType::link_control_type> Link_Control_Interface;
+			typedef Sensor<typename MasterType::link_sensor_type> Sensor_Interface;
 			
 			typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> Zone_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename Link_Interface::get_type_of(activity_locations)::value_type>::type> Location_Interface;
@@ -230,7 +230,7 @@ namespace Traffic_Management_Center_Components
 
 			// that places a pointer to network_event_manager_type
 			//			  name of the prototype class		variable name					underlying type
-			m_prototype(Null_Prototype< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Network_Event_Components::Prototypes::Network_Event_Manager, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
 			m_data(boost::container::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
 			m_data(boost::container::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);
@@ -350,26 +350,26 @@ namespace Traffic_Management_Center_Components
 			template<typename TargetType> void Load_New_Events()
 			{
 				boost::container::vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
 
 				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
 				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
 				for(typename boost::container::vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
 				for(typename boost::container::vector<Depot_Interface*>::iterator itr=_depots.begin();itr!=_depots.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 			}
 
@@ -377,22 +377,22 @@ namespace Traffic_Management_Center_Components
 			{
 				boost::container::vector<Base_Network_Event_Interface*> current_events;
 
-				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::weather_network_event)>((boost::container::vector<Weather_Network_Event_Interface*>&)current_events);
+				_network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>((boost::container::vector<Weather_Network_Event_Interface*>&)current_events);
 				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
 				current_events.clear();
 
-				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
 				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
 					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 			}
 

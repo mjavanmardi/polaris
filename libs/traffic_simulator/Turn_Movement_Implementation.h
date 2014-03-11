@@ -102,9 +102,9 @@ namespace Turn_Movement_Components
 
 			m_container(boost::container::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::link_type>, inbound_link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::link_type>, outbound_link, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link, NONE, NONE);
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);

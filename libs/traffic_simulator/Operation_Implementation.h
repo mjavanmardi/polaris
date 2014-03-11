@@ -15,7 +15,7 @@ namespace Operation_Components
 	{
 		implementation struct Operation_Implementation:public Polaris_Component<MasterType,INHERIT(Operation_Implementation),Data_Object>
 		{
-			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 		};
 	}
 

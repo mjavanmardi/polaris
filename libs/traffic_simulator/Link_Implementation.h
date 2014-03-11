@@ -139,7 +139,7 @@ namespace Link_Components
 			m_data(float, original_speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, original_num_lanes, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(bool, shoulder_opened, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_prototype(Null_Prototype<typename MasterType::ramp_metering_type>, ramp_meter, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::ramp_metering_type, ramp_meter, NONE, NONE);
 
 
 			m_data(float, speed_adjustment_factor_due_to_weather, NONE, NONE);
@@ -155,14 +155,14 @@ namespace Link_Components
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
 
-			m_prototype(Network_Components::Prototypes::Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
 		//==================================================================================================================
 		/// Upstream and Downstream Intersections Reference
 		//------------------------------------------------------------------------------------------------------------------			
 
-			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
-			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection,typename MasterType::intersection_type, upstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection,typename MasterType::intersection_type, downstream_intersection, NONE, NONE);
 
 		//==================================================================================================================
 		/// Containers of Cached Cumulative Vehicle Statistics
@@ -195,7 +195,7 @@ namespace Link_Components
 		/// Replicas Containers
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype<typename MasterType::approach_type>, approach, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::approach_type, approach, NONE, NONE);
 			m_data(int, link_num_vehicles_in_queue, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_container(boost::container::deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, NONE, NONE);
 			m_data(int, num_vehicles_on_link, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -260,9 +260,9 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 
 			m_data(bool, weather_event_to_process, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::weather_network_event_type>, current_weather_event, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::weather_network_event_type, current_weather_event, NONE, NONE);
 			m_data(bool, accident_event_to_process, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::accident_network_event_type>, current_accident_event, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::accident_network_event_type, current_accident_event, NONE, NONE);
 
 			typedef typename MasterType::base_network_event_type base_network_event_type;
 			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
@@ -273,11 +273,11 @@ namespace Link_Components
 		/// ITS
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype< typename MasterType::advisory_radio_type>, advisory_radio, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::depot_type>, depot, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::variable_word_sign_type>, variable_word_sign, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::variable_speed_sign_type>, variable_speed_sign, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::link_sensor_type>, link_sensor, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::advisory_radio_type, advisory_radio, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::depot_type, depot, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::variable_word_sign_type, variable_word_sign, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::variable_speed_sign_type, variable_speed_sign, NONE, NONE);
+			m_prototype(Null_Prototype, typename MasterType::link_sensor_type, link_sensor, NONE, NONE);
 
 
 
@@ -412,7 +412,7 @@ namespace Link_Components
 				_link_downstream_cumulative_arrived_vehicles = link_shifted_cumulative_arrived_vehicles;
 
 
-				typedef network_reference_type::routable_networks_type routable_networks_type;
+				typedef typename remove_pointer<network_reference_type>::type::Component_Type::routable_networks_type routable_networks_type;
 
 				Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>* routable_networks = _network_reference->routable_networks<routable_networks_type>();
 
@@ -650,7 +650,7 @@ namespace Link_Components
 				//_link_origin_cumulative_arrived_vehicles = 0;
 				//_link_origin_vehicle_array.clear();
 
-				_network_reference = (network_reference_type*)network;
+				_network_reference = (network_reference_type)network;
 
 				//init link simulation model
 				_link_capacity = 0;
@@ -903,25 +903,25 @@ namespace Link_Components
 				}
 			}
 
-			static void Weather_Event_Notification(void* link, Network_Event<type_of(typename MasterType::weather_network_event)>* net_event)
+			static void Weather_Event_Notification(void* link, Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_weather_event(net_event);
 			}
 
-			static void Accident_Event_Notification(void* link, Network_Event<type_of(typename MasterType::accident_network_event)>* net_event)
+			static void Accident_Event_Notification(void* link, Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_accident_event(net_event);
 			}
 
-			void record_weather_event(Network_Event<type_of(typename MasterType::weather_network_event)>* net_event)
+			void record_weather_event(Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				_weather_event_to_process = true;
 				_current_weather_event = (Null_Prototype<typename MasterType::weather_network_event_type>*)net_event; 
 			}
 				
-			void record_accident_event(Network_Event<type_of(typename MasterType::accident_network_event)>* net_event)
+			void record_accident_event(Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				_accident_event_to_process = true;
 				_current_accident_event = (Null_Prototype<typename MasterType::accident_network_event_type>*)net_event; 
@@ -990,29 +990,29 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
+			template<typename TargetType> void Accept_ITS( typename MasterType::variable_speed_sign_type* vss)
 			{
-				_variable_speed_sign = (variable_speed_sign_type*)vss;
+				_variable_speed_sign = (variable_speed_sign_type)vss;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_word_sign)* vws)
+			template<typename TargetType> void Accept_ITS( typename MasterType::variable_word_sign_type* vws)
 			{
-				_variable_word_sign = (variable_word_sign_type*)vws;
+				_variable_word_sign = (variable_word_sign_type)vws;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::advisory_radio)* har)
+			template<typename TargetType> void Accept_ITS( typename MasterType::advisory_radio_type* har)
 			{
-				_advisory_radio = (advisory_radio_type*)har;
+				_advisory_radio = (advisory_radio_type)har;
 			}
 
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::depot)* depot)
+			template<typename TargetType> void Accept_ITS( typename MasterType::depot_type* depot)
 			{
-				_depot = (depot_type*)depot;
+				_depot = (depot_type)depot;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::link_sensor)* link_sensor)
+			template<typename TargetType> void Accept_ITS( typename MasterType::link_sensor_type* link_sensor)
 			{
-				_link_sensor = (link_sensor_type*)link_sensor;
+				_link_sensor = (link_sensor_type)link_sensor;
 			}
 
 

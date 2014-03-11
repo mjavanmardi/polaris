@@ -16,7 +16,7 @@ namespace Analyze_Link_Group_Components
 		implementation struct Analyze_Link_Group_Implementation:public Polaris_Component<MasterType,INHERIT(Analyze_Link_Group_Implementation),Data_Object>
 		{
 			m_container(boost::container::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::base_network_event_type>, event, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::base_network_event_type, event, NONE, NONE);
 			m_data(fstream, link_moe_output_file, NONE, NONE);
 			m_data(int, analyze_link_group_id, NONE, NONE);
 

@@ -27,35 +27,31 @@ namespace polaris
 	{
 		private:
 			int nH;
-			T *H;
+			T* H;
 		public:
-			T* InitializeHeap();
-			int Fibonnaci_link(T*, T*, T*);
-			T *Insert(T *, T *);
-			T *Extract_Min(T *);
-			int Consolidate(T *);
+			T* initialize();
+			int fibonnaci_link(T*, T*, T*);
+			T* insert(T*, T*);
+			T* extract_min(T*);
+			int consolidate(T*);
         
 			FibonacciHeap()
 			{
-				H = InitializeHeap();
+				H = initialize();
 			}
 	};
-	/*
-	 * Initialize Heap
-	 */
+
 	template<typename T>
-	T* FibonacciHeap<T>::InitializeHeap()
+	T* FibonacciHeap<T>::initialize()
 	{
 		nH = 0;
 		T* np;
 		np = NULL;
 		return np;
 	}
-	/*
-	 * Insert Node
-	 */
+
 	template<typename T>
-	T* FibonacciHeap<T>::Insert(T* H, T* x)
+	T* FibonacciHeap<T>::insert(T* H, T* x)
 	{
 		x->degree = 0;
 		x->parent = NULL;
@@ -80,11 +76,9 @@ namespace polaris
 		nH = nH + 1;
 		return H;
 	}
-	/*
-	 * Link Nodes in Fibonnaci Heap
-	 */
+
 	template<typename T>
-	int FibonacciHeap<T>::Fibonnaci_link(T* H1, T* y, T* z)
+	int FibonacciHeap<T>::fibonnaci_link(T* H1, T* y, T* z)
 	{
 		(y->left)->right = y->right;
 		(y->right)->left = y->left;
@@ -105,11 +99,9 @@ namespace polaris
 
 		return 1;
 	}
-	/*
-	 * Extract Min Node in Fibonnaci Heap
-	 */
+
 	template<typename T>
-	T* FibonacciHeap<T>::Extract_Min(T* H1)
+	T* FibonacciHeap<T>::extract_min(T* H1)
 	{
 		T* p;
 		T* ptr;
@@ -148,16 +140,14 @@ namespace polaris
 		else
 		{
 			H1 = (T*)z->right;
-			Consolidate(H1);
+			consolidate(H1);
 		}
 		nH = nH - 1;
 		return p;
 	}
-	/*
-	 * Consolidate Node in Fibonnaci Heap
-	 */
+
 	template<typename T>
-	int FibonacciHeap<T>::Consolidate(T* H1)
+	int FibonacciHeap<T>::consolidate(T* H1)
 	{
 		int d, i;
 		float f = (log((float)nH)) / (log((float)2));
@@ -184,7 +174,7 @@ namespace polaris
 				}
 				if (y == H1)
 					H1 = x;
-				Fibonnaci_link(H1, y, x);
+				fibonnaci_link(H1, y, x);
 				if (x->right == x)
 					H1 = x;
 					A[d] = NULL;
@@ -223,6 +213,7 @@ namespace polaris
 
 		return 1;
 	}
+
 	// Forward Declaration of Event_Block
 	class Event_Block;
 
@@ -230,7 +221,7 @@ namespace polaris
 	/// Event_Object - Object which records revision, and memory information
 	///----------------------------------------------------------------------------------------------------
 
-	class Event_Object : public Base_Object
+	class Event_Object : public node, public Base_Object
 	{
 	public:
 

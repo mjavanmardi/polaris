@@ -21,7 +21,7 @@ namespace Intersection_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Outbound_Inbound_Movements_Implementation),Data_Object>::ComponentType ComponentType;
 
 			// pointer to the outbound link
-			m_prototype(Null_Prototype<typename MasterType::link_type>, outbound_link_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link_reference, NONE, NONE);
 			
 			// container of inbound movements
 			m_container(boost::container::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
@@ -322,7 +322,7 @@ namespace Intersection_Components
 	
 		implementation struct Inbound_Outbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Inbound_Outbound_Movements_Implementation),Data_Object>
 		{
-			m_prototype(Null_Prototype<typename MasterType::link_type>, inbound_link_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
 		};
 		
@@ -342,8 +342,8 @@ namespace Intersection_Components
 			m_container(boost::container::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::intersection_control_type>, intersection_control, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
 
 			typedef typename MasterType::vehicle_type vehicle_type;
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
@@ -552,7 +552,7 @@ namespace Intersection_Components
 
 			template<typename TargetType> void initialize_features(void* network)
 			{
-				_network_reference = (network_reference_type*)network;
+				_network_reference = (network_reference_type)network;
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
 				unsigned long seed = abs(std::sin(((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>() + (float)_internal_id + 1)*(float)INT_MAX);
 				//unsigned long seed = 1;

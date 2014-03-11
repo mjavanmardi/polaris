@@ -27,7 +27,7 @@ namespace Traveler_Components
 
 			void Initiate_Departure()
 			{
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename vehicle_type::get_type_of(movement_plan)> Movement_Interface;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<vehicle_type>::type::get_type_of(movement_plan)> Movement_Interface;
 				typedef  Link_Components::Prototypes::Link<typename Movement_Interface::get_type_of(origin)>  Link_Interface;
 				
 				Movement_Interface* attached_movement_plan = _vehicle->template movement_plan<Movement_Interface*>();
@@ -56,9 +56,9 @@ namespace Traveler_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
 
-			m_prototype(Routing_Components::Prototypes::Routing<typename MasterType::routing_type>, router, NONE, NONE);
-			m_prototype(Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
-			//m_prototype(Null_Prototype<typename MasterType::plan_type>, plan, NONE, NONE);
+			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
+			m_prototype(Vehicle_Components::Prototypes::Vehicle,typename MasterType::vehicle_type, vehicle, NONE, NONE);
+			//m_prototype(Null_Prototype,typename MasterType::plan_type>, plan, NONE, NONE);
 		};
 	}
 

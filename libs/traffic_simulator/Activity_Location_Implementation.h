@@ -14,11 +14,11 @@ namespace Activity_Location_Components
 	{
 		implementation struct Activity_Location_Implementation:public Polaris_Component<MasterType,INHERIT(Activity_Location_Implementation),Data_Object>
 		{
-			m_prototype(Null_Prototype<typename MasterType::zone_type>, zone, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::zone_type, zone, NONE, NONE);
 
-			m_container(boost::container::vector<Link<typename MasterType::link_type>*>, origin_links, NONE, NONE);
+			m_container(boost::container::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, origin_links, NONE, NONE);
 
-			m_container(boost::container::vector<Link<typename MasterType::link_type>*>, destination_links, NONE, NONE);
+			m_container(boost::container::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, destination_links, NONE, NONE);
 
 			m_container(boost::container::vector<float>, origin_link_choice_cdfs, NONE, NONE);
 
