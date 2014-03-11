@@ -203,6 +203,8 @@ namespace Traffic_Management_Center_Components
 			
 			typedef typename Polaris_Component<MasterType,INHERIT(Simple_TMC),Execution_Object>::Component_Type ComponentType;
 			
+			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+
 			typedef MasterType Reference_Type;
 
 			// added for convenience
@@ -210,7 +212,7 @@ namespace Traffic_Management_Center_Components
 			typedef Network_Event<typename MasterType::weather_network_event_type> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::congestion_network_event_type> Congestion_Network_Event_Interface;
 
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			
 
 			typedef Advisory_ITS<typename MasterType::type_of(variable_speed_sign)> Variable_Speed_Sign_Interface;
 			typedef Advisory_ITS<typename MasterType::type_of(variable_word_sign)> Variable_Word_Sign_Interface;
@@ -228,7 +230,7 @@ namespace Traffic_Management_Center_Components
 
 			// that places a pointer to network_event_manager_type
 			//			  name of the prototype class		variable name					underlying type
-			m_prototype(Network_Event_Manager< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
 
 			m_data(boost::container::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
 			m_data(boost::container::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);

@@ -31,7 +31,7 @@ namespace Person_Components
 			}
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
 
 			// Pointer to the child classses
 			//m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Person_Scheduler, NONE, NONE);
@@ -48,16 +48,11 @@ namespace Person_Components
 			member_component_and_feature_accessor(Generation_Time_Increment, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Planning_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 
-			//Containers for activity planning events and movement planning events
-			//m_container(boost::container::list<typename MasterType::activity_type*>,Activity_Container, NONE, NONE);
-			//m_container(boost::container::list<typename MasterType::activity_record_type*>,Activity_Record_Container, NONE, NONE);
-			//m_container(boost::container::list<typename MasterType::movement_plan_type*>,Movement_Plans_Container, NONE, NONE);
-
 
 			// Interface definitions
-			typedef  Prototypes::Person_Scheduler< typename Parent_Person_interface_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
-			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_interface_type::get_type_of(scenario_reference)> _Scenario_Interface;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_interface_type::get_type_of(network_reference)> _Network_Interface;
+			typedef  Prototypes::Person_Scheduler< typename Parent_Person_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
+			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_type::get_type_of(scenario_reference)> _Scenario_Interface;
+			typedef  Network_Components::Prototypes::Network< typename Parent_Person_type::get_type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;
@@ -91,6 +86,13 @@ namespace Person_Components
 				scheduler->Add_Activity_Plan<TargetType>(activity_plan);
 
 			} tag_feature_as_available(Add_Activity_Plan);
+
+			template<typename TargetType> void Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
+			{	
+				base_type::template Generation_Time_Increment<Time_Minutes>(END);
+				base_type::template Planning_Time_Increment<Time_Minutes>(5);
+				base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
+			}
 		};
 		// static member definition
 		/*template<typename MasterType,  typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType,  InheritanceList>::logs[num_sim_threads()];
@@ -105,19 +107,19 @@ namespace Person_Components
 			typedef General_Person_Planner_Implementation<MasterType,  INHERIT(POLARIS_Person_Planner_Implementation)> base_type;
 			typedef typename base_type::Component_Type ComponentType;
 
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
 			{	
 				base_type::template Generation_Time_Increment<Time_Minutes>(END);
 				base_type::template Planning_Time_Increment<Time_Minutes>(5);
 				base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
+			/*template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
 			}
-			tag_feature_as_available(Initialize);
+			tag_feature_as_available(Initialize);*/
 
 		};
 		

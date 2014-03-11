@@ -38,8 +38,8 @@ void* _global_person_logger;
 // POPSYN COMPONENTS
 //#include "Population_Unit_Implementations.h"
 //#include "Synthesis_Zone_Implementations.h"
-#include "Synthesis_Region_Implementation.h"
-#include "PopSyn_Implementations.h"
+//#include "Synthesis_Region_Implementation.h"
+//#include "PopSyn_Implementations.h"
 #endif
 
 

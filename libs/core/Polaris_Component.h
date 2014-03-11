@@ -70,6 +70,8 @@ namespace polaris
 
 		typedef MasterType Master_Type;
 
+		typedef ObjectType Object_Type;
+
 		typedef InheritanceList Inheritance_List;
 		
 		typedef typename TypeAt<InheritanceList,1>::Result Component_Type;

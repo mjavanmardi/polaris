@@ -138,22 +138,31 @@ namespace Network_Skimming_Components
 				network_itf* network = this->network_reference<network_itf*>();
 
 				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
-				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type> zone_itf;
-				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
+				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::mapped_type>::type> zone_itf;
+				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),int,zone_itf*> zones_itf;
 
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
+			
+				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
+				typedef Link_Components::Prototypes::Link<typename get_value_type(links_itf)> link_itf;
+				
+				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<typename get_value_type(turns_itf)> turn_itf;
 
-				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename location_itf::get_type_of(origin_links)::value_type>::type> link_itf;
-				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links),link_itf*> links_itf;
+				/*typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename get_type_of(origin_locations)::value_type>::type> origin_location_itf;
+				typedef Random_Access_Sequence<typename get_type_of(origin_locations),origin_location_itf*> origin_locations_itf;*/
+				typedef Prototype_Random_Access_Sequence<typename get_type_of(origin_locations),Activity_Location_Components::Prototypes::Activity_Location> origin_locations_itf;
+				typedef strip_modifiers(typename origin_locations_itf::value_type) origin_location_itf;
 
-				typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename link_itf::get_type_of(outbound_turn_movements)::value_type>::type> turn_itf;
-				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements),turn_itf*> turns_itf;
+				/*typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename get_type_of(destination_locations)::value_type>::type> destination_location_itf;
+				typedef Random_Access_Sequence<typename get_type_of(destination_locations),origin_location_itf*> destination_locations_itf;*/
+				typedef Prototype_Random_Access_Sequence<typename get_type_of(destination_locations),Activity_Location_Components::Prototypes::Activity_Location> destination_locations_itf;
+				typedef strip_modifiers(typename destination_locations_itf::value_type) destination_location_itf;
 
-				typedef (origin_locations_itf,origin_location_itf,typename get_type_of(origin_locations), Random_Access_Sequence,Activity_Location_Components::Prototypes::Activity_Location);
-				typedef (destination_locations_itf,destination_location_itf,typename get_type_of(destination_locations), Random_Access_Sequence,Activity_Location_Components::Prototypes::Activity_Location);
-				typedef (zone_origins_itf,typename get_type_of(zone_origins_count), Pair_Associative_Container,int);
-				typedef (zone_destinations_itf,typename get_type_of(zone_destinations_count), Pair_Associative_Container,int);
+				typedef Pair_Associative_Container<typename get_type_of(zone_origins_count),int> zone_origins_itf;
+				typedef Pair_Associative_Container<typename get_type_of(zone_destinations_count),int> zone_destinations_itf;
+
 				origin_locations_itf* origin_locations = this->template origin_locations<origin_locations_itf*>();
 				destination_locations_itf* destination_locations = this->template destination_locations<destination_locations_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
@@ -167,7 +176,7 @@ namespace Network_Skimming_Components
 				typename locations_itf::iterator loc_itr;
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
-					zone_itf* orig_zone = itr->second;
+					zone_itf* orig_zone = (zone_itf*)(itr->second);
 					locations_itf& available_locations = orig_zone->template origin_activity_locations<locations_itf&>();
 					int num_locations = (int)available_locations.size();
 					zone_origins_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
@@ -238,7 +247,7 @@ namespace Network_Skimming_Components
 				// Loop through zones, choose destination points to route to, and add to maps
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
-					zone_itf* dest_zone = itr->second;
+					zone_itf* dest_zone = (zone_itf*)(itr->second);
 					locations_itf& available_locations = dest_zone->template destination_activity_locations<locations_itf&>();
 					int num_locations = (int)available_locations.size();
 					zone_destinations_count.insert(pair<long,int>(dest_zone->template internal_id<long>(),0));
@@ -313,14 +322,14 @@ namespace Network_Skimming_Components
 //load_event(ComponentType,Skim_Table_Update_Conditional,Update_Skim_Tables_Event,0,Types::SUB_ITERATIONS::INITIALIZE,NULLTYPE);
 
 			}
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,check(strip_modifiers(TargetType), is_pointer) && check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
 				// set the network references
 				this->template network_reference<TargetType>(network_reference);
 				
 				this->template Initialize<NULLTYPE>();
 			}			
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,!check(strip_modifiers(TargetType), is_pointer) || !check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,!check(TargetType, is_pointer) || !check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
 				assert_check(strip_modifiers(TargetType), is_pointer,"TargetType is not a pointer" );
 				assert_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
@@ -351,11 +360,8 @@ namespace Network_Skimming_Components
 			// This returns the travel time based on the current simulation time
 			template<typename LocationType, typename ModeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, requires(ReturnType,check(ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{	
-				PUSH_TO_STACK("Get_TTime");
-
 				// call the get los function
 				ReturnType return_val = this->template Get_TTime<LocationType,ModeType, Simulation_Timestep_Increment,ReturnType>(Origin, Destination, Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
-				POP_FROM_STACK;
 
 				return return_val;
 
@@ -363,15 +369,16 @@ namespace Network_Skimming_Components
 			// This returns the travel time during a specific time interval
 			template<typename LocationType, typename ModeType, typename TimeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, TimeType Start_Time, requires(ReturnType,check(ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
-				PUSH_TO_STACK("Get_TTime");
+				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
+				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
+				typedef Prototypes::Skim_Table<get_value_type(_skim_container_itf)> _skim_itf;
 
-				typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
-				typedef (_skim_matrix_itf, _los_itf,typename _skim_itf::get_type_of(skim_table),Multidimensional_Random_Access_Array,Prototypes::LOS);
+				//typedef (_skim_matrix_itf, _los_itf,typename _skim_itf::get_type_of(skim_table),Multidimensional_Random_Access_Array,Prototypes::LOS);
+				typedef Multidimensional_Random_Access_Array<typename _skim_itf::get_type_of(skim_table)> _skim_matrix_itf;
+				typedef Prototypes::LOS<get_value_type(_skim_matrix_itf)> _los_itf;
 				
 				// call the general get los function
-				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,ReturnType>(Origin, Destination, Start_Time);
-
-				POP_FROM_STACK;
+				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
 
 				// extract and return the auto travel time
 				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->auto_ttime<ReturnType>();
@@ -382,25 +389,21 @@ namespace Network_Skimming_Components
 			}
 			
 			// This returns the full level of service information for the O/D pair at the current time
-			template<typename LocationType, typename ReturnType> ReturnType Get_LOS(LocationType Origin, LocationType Destination, requires(ReturnType,check(ReturnType, Concepts::Is_LOS_Prototype)))
+			template<typename LocationType, typename ReturnType> ReturnType Get_LOS(LocationType Origin, LocationType Destination, requires(ReturnType,check(strip_modifiers(ReturnType), Concepts::Is_LOS_Prototype)))
 			{		
-				PUSH_TO_STACK("Get_TTime");
-
 				// call the get los function
 				ReturnType ret_value = this->template Get_LOS<LocationType, Simulation_Timestep_Increment, ReturnType>(Origin, Destination, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
-				
-				POP_FROM_STACK;
+
 				return ret_value;
 			}
 			// This returns the full level of service information for the O/D pair at a specific time
-			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType  Get_LOS(LocationType Origin, LocationType Destination, TimeType Start_Time, requires(ReturnType,check(ReturnType, Concepts::Is_LOS_Prototype)))
+			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType  Get_LOS(LocationType Origin, LocationType Destination, TimeType Start_Time, requires(ReturnType,check(strip_modifiers(ReturnType), Concepts::Is_LOS_Prototype)))
 			{
-				PUSH_TO_STACK("Get_TTime");
-
 				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type> zone_itf;
-				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
+				
+				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
+				typedef Zone_Components::Prototypes::Zone<typename get_data_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -414,16 +417,19 @@ namespace Network_Skimming_Components
 				int Destination_Zone_ID = this->Get_Zone_ID<LocationType>(Destination);
 
 				// Do a lookup to make sure the zone is in the network (may be able to remove this)
-				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = zone_itr->second;}
+				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
 				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << Origin->uuid<int>()<<","<<Origin->internal_id<int>());
 
-				if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = zone_itr->second;}
+				if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = (zone_itf *)(zone_itr->second);}
 				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found for Destination uuid,internal_id: "<<Destination->uuid<int>()<<","<<Destination->internal_id<int>()<<", mem location: "<<Destination);
 
 				//============================================================
 				// Transferred code here from former mode_skim_prototype
 				//-------------------------------------------------------------------
-				typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
+				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
+				typedef Prototypes::Skim_Table<typename get_value_type(get_type_of(skims_by_time_container))> _skim_itf;
+
+				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 				_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
 				typename _skim_container_itf::iterator itr = skims->begin();
 				_skim_itf* skim_table;
@@ -441,7 +447,6 @@ namespace Network_Skimming_Components
 					{
 						ReturnType return_val =  skim_table->template Get_LOS<int,ReturnType>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>());
 						
-						POP_FROM_STACK;
 						return return_val;
 					}
 				}
@@ -535,22 +540,22 @@ namespace Network_Skimming_Components
 				outfile.close();
 			}
 
-			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(strip_modifiers(TargetType), is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
+			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> _location_interface;
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> _zone_interface;
 				_location_interface* loc = (_location_interface*)area_type_interface_ptr;
 				return loc->template zone<_zone_interface*>()->template uuid<int>();
 			}
-			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(strip_modifiers(TargetType), is_pointer) && check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone_Prototype)))
+			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone_Prototype)))
 			{
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> _zone_interface;
 				_zone_interface* zone = (_zone_interface*)area_type_interface_ptr;
 				return zone->template uuid<int>();
 			}
-			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,!check(strip_modifiers(TargetType), is_pointer) || (!check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone_Prototype) && !check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype))))
+			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,!check(TargetType, is_pointer) || (!check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone_Prototype) && !check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype))))
 			{
-				assert_check(strip_modifiers(TargetType), is_pointer, "Error, TargetType must be a pointer type.");
+				assert_check(TargetType, is_pointer, "Error, TargetType must be a pointer type.");
 				assert_check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone_Prototype, "Error, TargetType must be either a Zone_Prototype or ");
 				assert_check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype, "TargetType must be an Activity_Location_Prototype.");
 			}
@@ -674,11 +679,7 @@ namespace Network_Skimming_Components
 
 			template<typename ParamType, typename ReturnType> ReturnType Get_LOS(ParamType Origin_Index, ParamType Destination_Index)
 			{
-				PUSH_TO_STACK("Get_LOS");
-
 				ReturnType ret_value = this_component()->Get_LOS<ParamType, ReturnType>(Origin_Index,Destination_Index);
-
-				POP_FROM_STACK;
 				return ret_value;
 			}
 		};

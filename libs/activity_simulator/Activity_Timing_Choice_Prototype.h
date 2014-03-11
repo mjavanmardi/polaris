@@ -13,6 +13,8 @@ namespace Person_Components
 	{
 		prototype struct Activity_Timing_Chooser ADD_DEBUG_INFO
 		{
+			tag_as_prototype;
+
 			accessor(Parent_Planner, NONE, NONE/*check(strip_modifiers(TargetType),Concepts::Is_Person_Planner_Prototype),check(strip_modifiers(TargetType),Concepts::Is_Person_Planner_Prototype)*/);
 
 

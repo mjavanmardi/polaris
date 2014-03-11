@@ -139,19 +139,19 @@ namespace Person_Components
 
 
 				// Initialize hashmap for start time
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SCHOOL_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::HEALTHCARE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::LEISURE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SOCIAL_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SCHOOL_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::EAT_OUT_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::ERRANDS_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::HEALTHCARE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::LEISURE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::OTHER_SHOPPING_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PICK_UP_OR_DROP_OFF_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SOCIAL_ACTIVITY,map_type()));
 
 
 				// add items
@@ -174,6 +174,6 @@ namespace Person_Components
 
 		template<typename MasterType, typename InheritanceList> typename Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::type_of(is_initialized) Activity_Timing_Chooser_Implementation<MasterType,InheritanceList>::_is_initialized = false;
 		//static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
-		template<typename MasterType, typename InheritanceList> Pair_Associative_Container<boost::unordered::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
+		template<typename MasterType, typename InheritanceList> boost::unordered::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
 	}
 }

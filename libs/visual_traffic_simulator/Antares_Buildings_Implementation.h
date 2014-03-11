@@ -174,8 +174,7 @@ namespace Buildings_Components
 							current_vertex->_y = coord*3.28084f;
 							current_vertex->_z = height;
 
-//TODO
-//							Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<NT>&>>(*current_vertex);
+							Scale_Coordinates<MT>(*current_vertex);
 							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::type_of(canvas)>(*current_vertex);
 
 							++current_vertex;
@@ -215,8 +214,7 @@ namespace Buildings_Components
 						{
 							current_vertex->_z = coord*3.28084f;
 
-//TODO
-//							Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<NT>&>>(*current_vertex);
+							Scale_Coordinates<MT>(*current_vertex);
 
 							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::type_of(canvas)>(*current_vertex);
 
@@ -268,8 +266,7 @@ namespace Buildings_Components
 			{
 				Antares_Layer_Configuration cfg;
 
-//TODO
-//				_buildings_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(buildings_layer)>*, string& > >(string("Buildings"));
+				_buildings_layer=Allocate_New_Layer<MT>(string("Buildings"));
 				
 				True_Color_RGBA<NT> color;
 				color._r = 0;

@@ -14,20 +14,33 @@ namespace Person_Components
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>
 		{
 			boost::container::vector<int> num_acts;
-			boost::container::vector<int> planned_acts[num_sim_threads()];
-			boost::container::vector<int> executed_acts[num_sim_threads()];
-			boost::container::vector<int> ttime_distribution[num_sim_threads()];
-			boost::container::vector<string> output_data[num_sim_threads()];
-			boost::container::vector<string> output_data_buffer[num_sim_threads()];
-			boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records[num_sim_threads()];
-			boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[num_sim_threads()];
-			boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records[num_sim_threads()];
-			boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records_buffer[num_sim_threads()];
+			boost::container::vector<int>* planned_acts;
+			boost::container::vector<int>* executed_acts;
+			boost::container::vector<int>* ttime_distribution;
+			boost::container::vector<string>* output_data;
+			boost::container::vector<string>* output_data_buffer;
+			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_records;
+			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_records_buffer;
+			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_records;
+			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_records_buffer;
+			//boost::container::vector<int> planned_acts[num_sim_threads()];
+			//boost::container::vector<int> executed_acts[num_sim_threads()];
+			//boost::container::vector<int> ttime_distribution[num_sim_threads()];
+			//boost::container::vector<string> output_data[num_sim_threads()];
+			//boost::container::vector<string> output_data_buffer[num_sim_threads()];
+			//boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records[num_sim_threads()];
+			//boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[num_sim_threads()];
+			//boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records[num_sim_threads()];
+			//boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records_buffer[num_sim_threads()];
 
-			float expected_ttime[num_sim_threads()];
-			float routed_ttime[num_sim_threads()];
-			float actual_ttime[num_sim_threads()];
-			int num_acts_in_interval[num_sim_threads()];
+			float* expected_ttime;
+			float* routed_ttime;
+			float* actual_ttime;
+			int* num_acts_in_interval;
+			//float expected_ttime[num_sim_threads()];
+			//float routed_ttime[num_sim_threads()];
+			//float actual_ttime[num_sim_threads()];
+			//int num_acts_in_interval[num_sim_threads()];
 
 			boost::container::vector<string>* buff;
 			boost::container::vector<string>* current;
@@ -59,6 +72,20 @@ namespace Person_Components
 				this->_cancelled_activities = 0;
 				this->_activity_time_lost = 0;
 
+				// initialize storage arrays
+				planned_acts = new boost::container::vector<int>[num_sim_threads()];
+				executed_acts = new boost::container::vector<int>[num_sim_threads()];
+				ttime_distribution = new boost::container::vector<int>[num_sim_threads()];
+				output_data = new boost::container::vector<string>[num_sim_threads()];
+				output_data_buffer = new boost::container::vector<string>[num_sim_threads()];
+				trip_records = new boost::container::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
+				trip_records_buffer = new boost::container::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
+				activity_records = new boost::container::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
+				activity_records_buffer = new boost::container::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
+				expected_ttime = new float[num_sim_threads()];
+				routed_ttime = new float[num_sim_threads()];
+				actual_ttime = new float[num_sim_threads()];
+				num_acts_in_interval = new int[num_sim_threads()];
 
 				if (scenario->template write_demand_to_database<bool>())
 				{
@@ -113,7 +140,7 @@ namespace Person_Components
 
 				// Initialize data count containers
 				num_acts.resize(20,0);
-				for (int i=0; i<num_sim_threads();++i)
+				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 
 					executed_acts[i].resize(20,0);

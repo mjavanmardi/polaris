@@ -18,7 +18,7 @@ namespace Person_Components
 
 
 			// data members
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, current_activity, NONE, NONE );
 			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, previous_activity, NONE, NONE );
 			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, next_activity, NONE, NONE );
@@ -144,8 +144,6 @@ namespace Person_Components
 			// Local features
 			template<typename TargetType> TargetType Calculate_Utility_For_Known_Location()
 			{
-				PUSH_TO_STACK("Calculate_Utility_For_Known_Location");
-
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 
@@ -189,7 +187,6 @@ namespace Person_Components
 				//cout <<",Auto_cost:" << los->auto_distance<Miles>()*15.0 + dest_zone->Parking_Cost<Cents>() + los->auto_tolls<Cents>();
 				//cout <<",Transit_fare:" << los->transit_fare<Cents>() << ",utility:"<< u << endl;
 				
-				POP_FROM_STACK;
 				return (TargetType)u;				
 			}
 			template<typename TargetType> TargetType Calculate_Utility_For_Unknown_Location()
@@ -383,7 +380,7 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 			m_prototype(Choice_Model_Components::Prototypes::Choice_Model< Mode_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);

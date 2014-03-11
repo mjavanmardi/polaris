@@ -60,6 +60,9 @@ struct MasterType
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
 	#else
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<M> network_type;
+	//typedef Network_Components::Implementations::Network_Implementation<M> network_type;
+
+
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
@@ -74,16 +77,16 @@ struct MasterType
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
-	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
-	typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
+	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
+	//typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
+	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
 	typedef Operation_Components::Implementations::Operation_Implementation<M> operation_type;
 	typedef Intersection_Control_Components::Implementations::Intersection_Control_Implementation<M> intersection_control_type;
 	typedef Intersection_Control_Components::Implementations::Control_Plan_Implementation<M> control_plan_type;
@@ -116,7 +119,7 @@ struct MasterType
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
 	typedef Household_Components::Implementations::Household_Implementation<M> household_type;
 
-	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M> person_planner_type;
+	typedef Person_Components::Implementations::General_Person_Planner_Implementation<M> person_planner_type;
 	typedef Person_Components::Implementations::Person_Mover_Implementation<M> person_mover_type;
 	typedef Person_Components::Implementations::General_Person_Scheduler_Implementation<M> person_scheduler_type;
 	typedef Person_Components::Implementations::General_Person_Perception_Implementation<M> person_perception_type;
@@ -148,8 +151,8 @@ struct MasterType
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
-	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
-	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
+	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Full<MasterType> synthesis_zone_type;
+	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Full<MasterType> synthesis_region_type;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
@@ -202,6 +205,17 @@ struct MasterType
 	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+
+
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
+	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
+	typedef Routing_Components::Types::static_to_static static_to_static_type;
+	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
+
+
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 };
@@ -214,9 +228,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
 
-
-
-
+	
 	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -226,150 +238,6 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
-	#pragma region OLD network model stuff
-	/*Network_Components::Types::Network_IO_Maps network_io_maps;
-	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
-
-
-	network_models::network_information::scenario_data_information::ScenarioData scenario_data_for_output;
-	network_models::network_information::network_data_information::NetworkData network_data_for_output;
-	network_models::network_information::demand_data_information::DemandData demand_data_for_output;
-	network_models::network_information::operation_data_information::OperationData operation_data_for_output;
-	network_models::initialization(scenario_data_for_output,network_data_for_output,demand_data_for_output,operation_data_for_output);
-
-
-	//data
-	cout << "allocating data structures..." <<endl;	
-	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
-	
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
-	_global_scenario = scenario;
-
-	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
-	
-	_Network_Interface* network=(_Network_Interface*)Allocate<MasterType::network_type>();
-	_global_network = network;
-	network->scenario_reference<_Scenario_Interface*>(scenario);
-	
-	////data input
-	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
-	cout << "converting scenario data..." << endl;
-	scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
-	//network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);
-	//cout<<"writing scenario data..."<<endl;
-	//network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);	
-
-	cout << "reading network data..." <<endl;	
-	network->read_network_data<Net_IO_Type>(network_io_maps);
-
-	cout << "converting network data..." << endl;
-	network->write_network_data<network_models::network_information::network_data_information::NetworkData&>(network_data_for_output);
-	//network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
-	//cout<<"writing network data..."<<endl;
-	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
-
-	
-	cout << "initializing simulation..." <<endl;	
-	network->simulation_initialize<NULLTYPE>();
-
-	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
-	operation->network_reference<_Network_Interface*>(network);
-	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading intersection control data..." << endl;
-		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
-	}
-	if (scenario->ramp_metering_flag<bool>() == true) {
-		cout <<"reading ramp metering data..." << endl;
-		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
-	}
-	cout <<"converting operation data..." << endl;
-	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
-	cout<<"writing operation data..."<<endl;
-	network_models::network_information::operation_data_information::write_operation_data(scenario->output_dir_name<string>(),scenario_data_for_output,operation_data_for_output,network_data_for_output);
-	
-	//==================================================================================================================================
-	// Start Antares UI
-	//----------------------------------------------------------------------------------------------------------------------------------
-	#ifdef ANTARES
-	network->set_network_bounds<NULLTYPE>();
-	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
-	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	MasterType::vehicle_type::Initialize_Layer();
-	network->initialize_antares_layers<NULLTYPE>();
-	MasterType::link_type::configure_link_moes_layer();
-
-	if (scenario->buildings_geometry_file<string&>() != "")
-	{
-		MasterType::buildings_type::Initialize_Type();
-		MasterType::buildings_type* buildings_layer = Allocate<MasterType::buildings_type>();
-		buildings_layer->Initialize( scenario->buildings_geometry_file<string&>() );
-	}
-	#endif
-
-
-
-	if(scenario->use_network_events<bool>())
-	{
-		cout << "setting up network events" << endl;
-		define_component_interface(_Network_Event_Manager_Interface, MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
-		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<MasterType::network_event_manager_type>();
-		network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
-		net_event_manager->Initialize<NT>();
-
-		if (scenario->use_tmc<bool>())
-		{
-			cout << "setting up tmc" << endl;
-
-			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
-
-			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
-			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
-			tmc->Initialize<NT>();
-		}
-	}
-
-
-
-	////initialize network agents	
-	cout << "initializing link agents..." <<endl;
-	define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
-	_Links_Container_Interface::iterator links_itr;
-
-	for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
-		links_itr!=network->links_container<_Links_Container_Interface&>().end();
-		links_itr++)
-	{
-		((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
-	}
-
-	cout << "initializing intersection agents..." <<endl;
-	define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
-	_Intersections_Container_Interface::iterator intersections_itr;
-
-	for(intersections_itr=network->intersections_container<MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
-		intersections_itr++)
-	{
-		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
-	}
-
-	cout << "initializing ramp metering agents..." <<endl;
-	define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Prototype, NULLTYPE);
-	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
-
-	Ramp_Metering_Prototype<MasterType::ramp_metering_type>::Initialize_Type<NT>();
-	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
-		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
-		ramp_metering_itr++)
-	{
-		((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
-	}
-
-	cout << "starting sim..." <<endl;
-	*/#pragma endregion
-
 	#pragma region New network_model.cpp stuff
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
@@ -389,15 +257,17 @@ int main(int argc,char** argv)
 
 	cout << "allocating data structures..." <<endl;	
 
+
 	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
 	typedef Network<typename MasterType::network_type> _Network_Interface;
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
+
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
-	
+
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 
@@ -412,12 +282,12 @@ int main(int argc,char** argv)
 	network->simulation_initialize<NULLTYPE>();
 
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	typedef Demand<MasterType::demand_type> _Demand_Interface;
-	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	demand->scenario_reference<_Scenario_Interface*>(scenario);
-	demand->network_reference<_Network_Interface*>(network);
-	cout << "reading demand data..." <<endl;
-	demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	//typedef Demand<MasterType::demand_type> _Demand_Interface;
+	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
+	//demand->scenario_reference<_Scenario_Interface*>(scenario);
+	//demand->network_reference<_Network_Interface*>(network);
+	//cout << "reading demand data..." <<endl;
+	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 	typedef Operation<MasterType::operation_type> _Operation_Interface;
@@ -432,15 +302,14 @@ int main(int argc,char** argv)
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
 
-	if (scenario->run_simulation_for_db_input<bool>())
-	{
+
 #ifdef ANTARES
-		network->set_network_bounds<NULLTYPE>();
-		Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
-		START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-		MasterType::vehicle_type::Initialize_Layer();
-		network->initialize_antares_layers<NULLTYPE>();
-		MasterType::link_type::configure_link_moes_layer();
+	network->set_network_bounds<NULLTYPE>();
+	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
+	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
+	MasterType::vehicle_type::Initialize_Layer();
+	network->initialize_antares_layers<NULLTYPE>();
+	MasterType::link_type::configure_link_moes_layer();
 #endif
 
 	if(scenario->use_network_events<bool>())
@@ -453,11 +322,11 @@ int main(int argc,char** argv)
 
 		if (scenario->use_tmc<bool>())
 		{
-			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
+			//typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
-			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
-			tmc->Initialize<NT>();
+			//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			//tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+			//tmc->Initialize<NT>();
 		}
 	}
 
@@ -511,7 +380,7 @@ int main(int argc,char** argv)
 
 	if (scenario->use_network_events<bool>())
 	{
-		MasterType::link_type::subscribe_events();
+		MasterType::link_type::subscribe_events<NT>();
 	}
 	#pragma endregion
 	
@@ -523,12 +392,12 @@ int main(int argc,char** argv)
 
 	if (scenario->read_demand_from_database<bool>())
 	{
-		define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+		typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
 		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
 		demand->scenario_reference<_Scenario_Interface*>(scenario);
 		demand->network_reference<_Network_Interface*>(network);
 		cout << "reading external demand data..." <<endl;
-		demand->read_demand_data<Net_IO_Type>(network_io_maps);
+		//demand->read_demand_data<Net_IO_Type>(network_io_maps);
 	}
 
 	
@@ -571,8 +440,8 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
-	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
+	typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
+	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
 	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 	if (skimmer->read_input<bool>())
 	{
@@ -614,21 +483,21 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
+	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
 	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
 	// Logging of activity generation / scheduling outputs
 	//----------------------------------------------------------------------------------------------------------------------------------
-	define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+	typedef Person_Components::Prototypes::Person_Data_Logger<MasterType::person_data_logger_type> _Logger_Interface;	
 	_Logger_Interface* logger=(_Logger_Interface*)Allocate<MasterType::person_data_logger_type>();
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
 	
-	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events();
+	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
 
 
 	//==================================================================================================================================
@@ -727,6 +596,14 @@ implementation struct Test_Agent_Implementation : public Polaris_Component<Maste
 			response.next._sub_iteration = 0;
 		}
 	}
+};
+
+implementation struct Inherited_Agent_Implementation : public Test_Agent_Implementation<MasterType,INHERIT(Inherited_Agent_Implementation)>
+{
+	typedef typename Test_Agent_Implementation<MasterType,INHERIT(Inherited_Agent_Implementation)>::Component_Type ComponentType;
+	typedef Test_Agent<ComponentType> agent_itf;
+
+
 };
 
 struct MasterType

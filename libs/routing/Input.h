@@ -36,7 +36,7 @@ namespace polaris
 
 			Connection_Group<Connection_Group_Type>* connection_group = (Connection_Group<Connection_Group_Type>*)memory;
 
-			connection_group->num_forward_edges( _neighbors.size() );
+			connection_group->num_forward_edges((uint) _neighbors.size() );
 
 			Connection<connection_type>* fwd_edge_itr = connection_group->forward_edges();
 			boost::container::deque<connection_attributes_type>::iterator connection_attributes_itr = _neighbor_attributes.begin();

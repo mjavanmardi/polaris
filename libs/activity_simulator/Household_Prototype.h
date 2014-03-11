@@ -2,9 +2,6 @@
 
 
 #include "Activity_Simulator_Includes.h"
-//#include "Network_Prototype.h"
-//#include "Zone_Prototype.h"
-//#include "Household_Properties_Prototype.h"
 
 
 namespace Household_Components
@@ -52,7 +49,7 @@ namespace Prototypes
 
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,check(ComponentType,Concepts::Has_Initialize)))
 		{
-			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
+			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 			this->template Set_Home_Location<NT>();
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,!check(ComponentType,Concepts::Has_Initialize)))

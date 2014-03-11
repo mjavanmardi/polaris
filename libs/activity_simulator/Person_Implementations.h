@@ -5,6 +5,7 @@
 #include "Person_Planner_Implementations.h"
 #include "Movement_Plan_Prototype.h"
 #include "Network_Skimming_Prototype.h"
+#include "Network_Prototype.h"
 #include "Activity_Prototype.h"
 
 
@@ -28,16 +29,16 @@ namespace Person_Components
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::zone>, home_synthesis_zone, NONE, NONE);
+			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);
 			m_prototype(Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
 			m_prototype(Routing_Components::Prototypes::Routing<typename MasterType::routing_type>, router, NONE, NONE);
 			
-			m_prototype(Prototypes::Person_Mover<typename MasterType::person_mover_type>, Moving_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Planning_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Scheduling_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Person_Perception< typename MasterType::person_perception_type>, Perception_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Person_Properties< typename MasterType::person_properties_type>, Properties, NONE, NONE);
-			m_prototype(Prototypes::Person_Properties<typename MasterType::person_static_properties_type>, Static_Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Mover<typename MasterType::person_mover_type>, Moving_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Planning_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Scheduling_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Perception< typename MasterType::person_perception_type>, Perception_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties< typename MasterType::person_properties_type>, Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>, Static_Properties, NONE, NONE);
 			
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, current_location, NONE, NONE);
 
@@ -83,13 +84,13 @@ namespace Person_Components
 
 		
 			// Record of completed activities (stores a simplified subset of activity data)
-			m_container(boost::container::list<typename MasterType::activity_record_type*>, Activity_Record_Container, NONE, NONE);
+			m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
-			typedef Prototypes::Activity_Generator<typename Planning_Faculty_interface_type::get_type_of(Activity_Generation_Faculty)> generator_itf;
+			typedef Prototypes::Activity_Generator<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)> generator_itf;
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
 			typedef Prototypes::Mode_Chooser<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)> mode_choice_itf;
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;
@@ -191,8 +192,6 @@ namespace Person_Components
 
 			template<typename TargetType> void Choose_Work_Location()
 			{
-				PUSH_TO_STACK("Choose_Work_Location");
-
 				// interface to this
 				this_itf* pthis = (this_itf*)this;
 				destination_choice_itf* dest_chooser = this->_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>();
@@ -215,14 +214,10 @@ namespace Person_Components
 				
 				// update the simulated employment in the work zone
 				zone->employment_simulated<int&>() += 1.0f / scenario->percent_to_synthesize<float>();
-
-				POP_FROM_STACK;
 			}
 			tag_feature_as_available(Choose_Work_Location);
 			template<typename TargetType> void Choose_Work_Location_Based_On_Census()
 			{
-				PUSH_TO_STACK("Choose_Work_Location");
-
 				// interface to this
 				this_itf* pthis = (this_itf*)this;
 
@@ -334,14 +329,11 @@ namespace Person_Components
 						}
 					}
 				}
-				POP_FROM_STACK;
 			}
 			tag_feature_as_available(Choose_Work_Location_Based_On_Census);
 
 			template<typename TargetType> void Choose_School_Location()
 			{
-				PUSH_TO_STACK("Choose_School_Location");
-
 				// interface to this
 				this_itf* pthis = (this_itf*)this;
 				zone_interface* selected_zone = nullptr;
@@ -354,7 +346,6 @@ namespace Person_Components
 				if (status != SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC && status != SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 				{
 					pthis->template School_Location<int>(-1);
-					POP_FROM_STACK;
 					return;
 				}
 
@@ -400,7 +391,6 @@ namespace Person_Components
 					if (temp_zones.size()==0)
 					{
 						pthis->template School_Location<int>(pthis->template Home_Location<int>());
-						POP_FROM_STACK;
 						return;
 					}
 
@@ -449,8 +439,6 @@ namespace Person_Components
 					if (loc != nullptr) pthis->template School_Location<int>(loc->template internal_id<int>());
 					else pthis->template School_Location<int>(pthis->template Home_Location<int>());
 				}
-
-				POP_FROM_STACK;
 			}
 			tag_feature_as_available(Choose_School_Location);
 

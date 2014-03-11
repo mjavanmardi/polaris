@@ -38,7 +38,7 @@ namespace Vehicle_Components
 			m_data(bool, is_integrated, NONE, NONE);
 			m_data(bool, its_switch, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
 #ifndef EXCLUDE_DEMAND
 			m_prototype(Null_Prototype<typename MasterType::person_type>, traveler, NONE, NONE);
 #else
@@ -64,7 +64,7 @@ namespace Vehicle_Components
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
-			typedef  Random_Access_Sequence< type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
 
 			typedef  Link<typename remove_pointer< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), _Link_Interface*> _Links_Container_Interface;
@@ -81,7 +81,7 @@ namespace Vehicle_Components
 			typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
-			typedef  Traveler_Components::Prototypes::Traveler< type_of(traveler)> _Traveler_Interface;
+			typedef  Traveler_Components::Prototypes::Traveler<typename type_of(traveler)> _Traveler_Interface;
 			
 			//TODO:ROUTING
 			//typedef Network_Components::Prototypes::Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
@@ -115,8 +115,9 @@ namespace Vehicle_Components
 #ifdef ANTARES
 				else
 				{
+					Load_Event<ComponentType>(&ComponentType::Vehicle_Action_Condition,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION);
 					//TODO
-//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
+					//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
 					((ComponentType*)this)->route_being_displayed = false;
 				}
 #endif
@@ -175,6 +176,7 @@ namespace Vehicle_Components
 				_Link_Interface* link = mp->template origin<_Link_Interface*>();
 				move_to_link<_Link_Interface*>((_Link_Interface*)link);
 				_simulation_status = Types::Vehicle_Status_Keys::IN_NETWORK;
+
 				update_network_vht_compensation<TargetType>();
 			}
 
@@ -437,9 +439,10 @@ namespace Vehicle_Components
 				}
 			}
 
-			declare_event(Vehicle_Action)
+			//declare_event(Vehicle_Action)
+			void Vehicle_Action()
 			{
-				((_Vehicle_Interface*)_this)->template take_action<NT>();
+				take_action<NT>();
 			}
 
 			template<typename TargetType> bool exploit_events_set(TargetType events_set)

@@ -94,7 +94,7 @@ namespace Advisory_ITS_Components
 			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
 			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
 
-			m_prototype(Traffic_Management_Center<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);
 
 			//static m_data(boost::container::vector<string>, component_keys, NONE, NONE);
 		};

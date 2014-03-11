@@ -353,7 +353,7 @@ namespace polaris
 		Execution_Block* current_block;
 
 		// Computing blocks here is safe because they will not be added or removed until later
-		const unsigned int active_blocks_size = _active_blocks.size();
+		const unsigned int active_blocks_size = (const unsigned int)_active_blocks.size();
 		const unsigned int suggested_blocks_per_execution_segment = (int)(((float)active_blocks_size)/((float)execution_segments_per_thread() * (float)num_sim_threads()));
 		const unsigned int min_blocks = 1;
 		const unsigned int blocks_per_execution_segment = max(suggested_blocks_per_execution_segment,min_blocks);

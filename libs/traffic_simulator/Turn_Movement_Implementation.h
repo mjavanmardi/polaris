@@ -119,10 +119,10 @@ namespace Turn_Movement_Components
 			struct Movement_MOE_Data realtime_movement_moe_data;
 
 			
-			typedef  Link_Components::Prototypes::Link< type_of(inbound_link)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link)> _Link_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename  type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
-			typedef  Back_Insertion_Sequence< type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+			typedef  Back_Insertion_Sequence<typename type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Turn_Movement_Components::Prototypes::Movement<typename MasterType::movement_type> _Turn_Movement_Interface;

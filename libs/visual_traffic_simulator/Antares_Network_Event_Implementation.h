@@ -65,12 +65,11 @@ namespace Network_Event_Components
 			}
 
 
-			template<typename TargetType> static void Initialize_Type(const boost::container::vector<shared_ptr<polaris::io::Event_Key>>& keys,string& name)
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys,string& name)
 			{
-				InheritanceTemplate<MasterType,NT,INHERIT(Base_Antares_Network_Event)>::Initialize_Type<NT>(keys);
+				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Initialize_Type<NT>(keys);
 
-//TODO
-//				_event_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer)>*, string& > >(name);
+				_event_layer=Allocate_New_Layer<MT>(name);
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Lines();
@@ -78,7 +77,7 @@ namespace Network_Event_Components
 				cfg.head_size_value=3;
 				cfg.storage_period=1;
 				cfg.head_accent_size_value=6;
-				cfg.targetsub_iteration() = 0;
+				cfg.target_sub_iteration = 0;
 				cfg.selection_callback=&on_select;
 
 				cfg.head_color._r = 255;
@@ -132,8 +131,7 @@ namespace Network_Event_Components
 						current_segment->a._y = intersection->y_position<float>();
 						current_segment->a._z = 2;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+						Scale_Coordinates<MT>( current_segment->a );
 
 						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -141,8 +139,7 @@ namespace Network_Event_Components
 						current_segment->b._y = intersection->y_position<float>();
 						current_segment->b._z = 2;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+						Scale_Coordinates<MT>( current_segment->b );
 
 						++current_segment;
 					}
@@ -155,12 +152,12 @@ namespace Network_Event_Components
 			
 			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
-				InheritanceTemplate<MasterType,NT,INHERIT(Base_Antares_Network_Event)>::Initialize<weak_ptr<polaris::io::Event_Instance>&>(instance);
+				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Initialize<weak_ptr<polaris::io::Event_Instance>&>(instance);
 			}
 
 			template<typename TargetType> void Initialize(int start_time, int end_time, boost::container::vector<typename MasterType::link_type*>& affected_links)
 			{
-				InheritanceTemplate<MasterType,NT,INHERIT(Base_Antares_Network_Event)>::Initialize<MasterType::link_type*>(start_time,end_time,affected_links);
+				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Initialize<MasterType::link_type*>(start_time,end_time,affected_links);
 			}
 			
 			//template<typename TargetType> void Incident_Conditional()
@@ -186,11 +183,12 @@ namespace Network_Event_Components
 			//	response.result = true;
 			//}
 
-			declare_event(Incident_Event)
+			//declare_event(Incident_Event)
+			void Incident_Event()
 			{
-				ComponentType* pthis = (ComponentType*)_this;
+				ComponentType* pthis = (ComponentType*)this;
 
-				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Incident_Event<NT>(_this);
+				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Incident_Event();
 
 				if(pthis->_active)
 				{
@@ -217,8 +215,7 @@ namespace Network_Event_Components
 						current_segment->a._y = intersection->y_position<float>();
 						current_segment->a._z = 2;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+						Scale_Coordinates<MT>( current_segment->a );
 
 						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -226,8 +223,7 @@ namespace Network_Event_Components
 						current_segment->b._y = intersection->y_position<float>();
 						current_segment->b._z = 2;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+						Scale_Coordinates<MT>( current_segment->b );
 
 						++current_segment;
 					}
@@ -254,13 +250,14 @@ namespace Network_Event_Components
 			};
 #pragma pack(pop)
 
-			declare_event(Incident_Event)
+			//declare_event(Incident_Event)
+			void Incident_Event()
 			{
-				Base_Antares_Network_Event::Incident_Event<NT>(_this);
+				Base_Antares_Network_Event::Incident_Event();
 
 				if( _particle_layer->draw<bool>() )
 				{
-					((ComponentType*)_this)->Update_Particles<NT>();
+					Update_Particles<NT>();
 				}
 			}
 			
@@ -354,8 +351,7 @@ namespace Network_Event_Components
 						precipitation_particle.particle._y = intersection->y_position<float>();
 						precipitation_particle.particle._z = rand()%5000;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
+						Scale_Coordinates<MT>( precipitation_particle.particle );
 
 						_precipitation_particles.push_back(pair<Point_3D<MasterType>,Colored_Particle>(Point_3D<MasterType>(),precipitation_particle));
 
@@ -381,8 +377,7 @@ namespace Network_Event_Components
 						precipitation_particle.particle._y = intersection->y_position<float>();
 						precipitation_particle.particle._z = rand()%5000;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
+						Scale_Coordinates<MT>( precipitation_particle.particle );
 
 						_precipitation_particles.push_back(pair<Point_3D<MasterType>,Colored_Particle>(Point_3D<MasterType>(),precipitation_particle));
 
@@ -403,18 +398,17 @@ namespace Network_Event_Components
 				return size;
 			}
 
-			template<typename TargetType> static void Initialize_Type(const boost::container::vector<shared_ptr<polaris::io::Event_Key>>& keys)
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
 				Base_Antares_Network_Event::Initialize_Type<NT>(keys,string("Weather_Events"));
 
-//TODO
-//				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer)>*, string& > >(string("Weather_Event_Precipitation"));
+				_particle_layer=Allocate_New_Layer<MT>(string("Weather_Event_Precipitation"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
-				cfg.targetsub_iteration() = 0;
+				cfg.target_sub_iteration = 0;
 				cfg.pixel_size_callback = &pixel_size_callback;
 
 				cfg.head_color._r = 100;
@@ -444,13 +438,14 @@ namespace Network_Event_Components
 			};
 #pragma pack(pop)
 
-			declare_event(Incident_Event)
+			//declare_event(Incident_Event)
+			void Incident_Event()
 			{
-				Base_Antares_Network_Event::Incident_Event<NT>(_this);
+				Base_Antares_Network_Event::Incident_Event();
 
 				if( _particle_layer->draw<bool>() )
 				{
-					((ComponentType*)_this)->Update_Particles<NT>();
+					Update_Particles<NT>();
 				}
 			}
 			
@@ -569,8 +564,7 @@ namespace Network_Event_Components
 					precipitation_particle.particle._y = upstream_intersection->y_position<float>();
 					precipitation_particle.particle._z = rand()%1000;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
+					Scale_Coordinates<MT>( precipitation_particle.particle );
 
 					//_precipitation_particles.push_back(precipitation_particle);
 
@@ -596,8 +590,7 @@ namespace Network_Event_Components
 					precipitation_particle.particle._y = downstream_intersection->y_position<float>();
 					precipitation_particle.particle._z = rand()%1000;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
+					Scale_Coordinates<MT>( precipitation_particle.particle );
 
 					//_precipitation_particles.push_back(precipitation_particle);
 
@@ -625,8 +618,7 @@ namespace Network_Event_Components
 						precipitation_particle.particle._y = upstream_intersection->y_position<float>()*((float)i)/(parts)+downstream_intersection->y_position<float>()*(parts-(float)i)/(parts);
 						precipitation_particle.particle._z = rand()%1000;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
+						Scale_Coordinates<MT>( precipitation_particle.particle );
 
 						//_precipitation_particles.push_back(precipitation_particle);
 
@@ -647,18 +639,17 @@ namespace Network_Event_Components
 				return size;
 			}
 
-			template<typename TargetType> static void Initialize_Type(const boost::container::vector<shared_ptr<polaris::io::Event_Key>>& keys)
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
 				Base_Antares_Network_Event::Initialize_Type<NT>(keys,string("Accident_Events"));
 
-//TODO
-//				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer)>*, string& > >(string("Accident Smoke"));
+				_particle_layer=Allocate_New_Layer<MT>(string("Accident Smoke"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
-				cfg.targetsub_iteration() = 0;
+				cfg.target_sub_iteration = 0;
 				cfg.pixel_size_callback = &pixel_size_callback;
 
 				cfg.head_color._r = 255;
@@ -679,7 +670,7 @@ namespace Network_Event_Components
 
 		implementation struct Antares_Congestion_Network_Event : public Base_Antares_Network_Event<MasterType,INHERIT(Antares_Congestion_Network_Event),Congestion_Network_Event>
 		{
-			template<typename TargetType> static void Initialize_Type(const boost::container::vector<shared_ptr<polaris::io::Event_Key>>& keys)
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
 				Base_Antares_Network_Event::Initialize_Type<NT>(keys,string("Congestion_Events"));
 			}
@@ -687,7 +678,7 @@ namespace Network_Event_Components
 
 		implementation struct Antares_Lane_Closure_Network_Event : public Base_Antares_Network_Event<MasterType,INHERIT(Antares_Lane_Closure_Network_Event),Lane_Closure_Network_Event>
 		{
-			template<typename TargetType> static void Initialize_Type(const boost::container::vector<shared_ptr<polaris::io::Event_Key>>& keys)
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
 				Base_Antares_Network_Event::Initialize_Type<NT>(keys,string("Lane_Closure_Events"));
 			}

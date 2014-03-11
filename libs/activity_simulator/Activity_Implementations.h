@@ -1,4 +1,6 @@
 #pragma once
+
+#include "activity_simulator\Person_Scheduler_Implementations.h"
 #include "Activity_Prototype.h"
 
 
@@ -32,7 +34,6 @@ namespace Activity_Components
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
 			//m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::movement_plan_record_type>, movement_record, NONE, NONE);
 
-			static int Route_Planning_Counter[num_sim_threads()];
 			static m_data(int, Route_Planning_Count, NONE, NONE);
 			static m_data(_lock, update_lock, NONE, NONE);
 
@@ -40,34 +41,38 @@ namespace Activity_Components
 			//================================================================================================================================================================================================
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType> this_itf;
-			typedef  Person_Components::Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _person_itf;
-			typedef  Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
-			typedef  Person_Components::Prototypes::Person_Scheduler< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty)> _scheduler_itf;
-			typedef  Person_Components::Prototypes::Person_Properties< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties)> _properties_itf;
-			typedef Person_Components::Prototypes::Person_Planner<type_of(Parent_Planner)> _planning_itf;
+			typedef Person_Components::Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _person_itf;
+			typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty)> _scheduler_itf;
+			typedef Person_Components::Prototypes::Person_Properties< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties)> _properties_itf;
+			typedef Person_Components::Prototypes::Person_Planner<typename type_of(Parent_Planner)> _planning_itf;
 			typedef Person_Components::Prototypes::Destination_Chooser<typename _planning_itf::get_type_of(Destination_Choice_Faculty)> _dest_choice_itf;
-			typedef  Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _scenario_itf;
-			typedef  Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _network_itf;
+			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _scenario_itf;
+			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _network_itf;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _network_itf::get_type_of(skimming_faculty)> _skim_itf;
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _network_itf::get_type_of(activity_locations_container)::value_type>::type>  _activity_location_itf;
-			typedef  Random_Access_Sequence< typename _network_itf::get_type_of(activity_locations_container), _activity_location_itf*> _activity_locations_container_itf;
-
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _activity_location_itf::get_type_of(origin_links)::value_type>::type>  _link_itf;
-			typedef  Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links), _link_itf*> _links_container_itf;
-
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _link_itf::get_type_of(outbound_turn_movements)::value_type>::type>  _turn_itf;
-			typedef  Random_Access_Sequence< typename _link_itf::get_type_of(outbound_turn_movements), _turn_itf*> _turns_container_itf;
-
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename _network_itf::get_type_of(zones_container)::value_type>::type>  _zone_itf;
-			typedef  Pair_Associative_Container< typename _network_itf::get_type_of(zones_container), _zone_itf*> _zones_container_itf;
-
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename _scheduler_itf::get_type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
-
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename _scheduler_itf::get_type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
-			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-
 			typedef Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> _home_activity_itf;
+
+			typedef Random_Access_Sequence< typename _network_itf::get_type_of(activity_locations_container)> _activity_locations_container_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_value_type(_activity_locations_container_itf)>  _activity_location_itf;	
+			
+			typedef Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links)> _links_container_itf;
+			typedef Link_Components::Prototypes::Link<typename get_value_type(_links_container_itf)>  _link_itf;
+			
+			typedef Random_Access_Sequence< typename _link_itf::get_type_of(outbound_turn_movements)> _turns_container_itf;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename get_value_type(_turns_container_itf)>  _turn_itf;
+	
+			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
+			typedef Zone_Components::Prototypes::Zone<typename get_data_type(_zones_container_itf)>  _zone_itf;
+		
+
+			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Activity_Container)> _activity_plans_container_itf;
+			//typedef Prototypes::Activity_Planner<typename get_value_type(_activity_plans_container_itf)> _activity_plan_itf;	
+			typedef Prototypes::Activity_Planner<ComponentType> _activity_plan_itf;
+
+			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container)> _movement_plans_container_itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
+
+			
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -93,7 +98,7 @@ namespace Activity_Components
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Actual_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
-			m_container(boost::container::vector<typename MasterType::person_type*>, Involved_Persons_Container, NONE, NONE);
+			m_container(boost::container::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Involved_Persons_Container, NONE, NONE);
 			template<typename TargetType> TargetType End_Time()
 			{
 				this_itf* pthis = (this_itf*)this;
@@ -180,8 +185,6 @@ namespace Activity_Components
 
 			template<typename TargetType> void Route_Planning_Event_Handler()
 			{			
-				PUSH_TO_STACK("Route_Planning_Event_Handler");
-
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
@@ -222,7 +225,6 @@ namespace Activity_Components
 				if (orig == nullptr || dest == nullptr)
 				{
 					THROW_WARNING("Null origin or destination values specified");
-					POP_FROM_STACK;
 					return;
 				}
 
@@ -232,7 +234,6 @@ namespace Activity_Components
 				// exit if no trip is needed
 				if (orig->template internal_id<int>() == dest->template internal_id<int>())
 				{
-					POP_FROM_STACK;
 					return;
 				}
 				
@@ -241,7 +242,7 @@ namespace Activity_Components
 				{
 					planner->template Schedule_New_Routing<_movement_plan_itf*>(iteration()+1, move);
 				}
-				POP_FROM_STACK;
+				
 			}
 			template<typename TargetType> void Add_Activity_To_Schedule_Event_Handler()
 			{
@@ -292,8 +293,6 @@ namespace Activity_Components
 			}		
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)
 			{
-				PUSH_TO_STACK("Update_Movement_Plan");
-
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_activity_location_itf* orig = (_activity_location_itf*)origin;
 				_activity_location_itf* dest = (_activity_location_itf*)destination;
@@ -320,7 +319,6 @@ namespace Activity_Components
 							_link_itf* o_link =move->template origin<_link_itf*>();
 							_link_itf* d_link =move->template destination<_link_itf*>();
 							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<int>()) << "." << concat(this->Activity_Plan_ID< int>()) <<", " << concat(this->Activity_Type< ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
-							POP_FROM_STACK;
 							return;
 						}
 						
@@ -363,7 +361,6 @@ namespace Activity_Components
 					THROW_WARNING("Null origin or destination values specified");
 				}
 
-				POP_FROM_STACK;
 			}
 			template<typename TargetType> void Arrive_At_Activity()
 			{
@@ -846,8 +843,6 @@ namespace Activity_Components
 			}
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()
 			{
-				PUSH_TO_STACK("Start_Time_Planning_Event_Handler");
-
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
@@ -886,7 +881,6 @@ namespace Activity_Components
 				// END HERE if no planner routing is requested through scenario
 				if (!scenario->template do_planner_routing<bool>())	
 				{
-					POP_FROM_STACK;
 					return;
 				}
 				//------------------------------------------------------------------------
@@ -925,7 +919,7 @@ namespace Activity_Components
 					int start_increment = max<int>(start_seconds, iteration());
 					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}	
-				POP_FROM_STACK;
+				
 			}
 			template<typename TargetType> void Involved_Persons_Planning_Event_Handler()
 			{
@@ -1151,8 +1145,6 @@ namespace Activity_Components
 
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()
 			{
-				PUSH_TO_STACK("Start_Time_Planning_Event_Handler");
-
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
@@ -1198,7 +1190,6 @@ namespace Activity_Components
 				// END HERE if no planner routing is requested through scenario
 				if (!scenario->template do_planner_routing<bool>())
 				{
-					POP_FROM_STACK;
 					return;
 				}
 				//------------------------------------------------------------------------
@@ -1237,7 +1228,6 @@ namespace Activity_Components
 					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}
 
-				POP_FROM_STACK;
 			}
 
 			template<typename TargetType> void Involved_Persons_Planning_Event_Handler()
@@ -1520,7 +1510,6 @@ namespace Activity_Components
 		//=======================================================================
 		// Static activity plan member initialization
 		//-----------------------------------------------------------------------
-		template<typename MasterType, typename InheritanceList> int Basic_Activity_Plan_Implementation<MasterType,InheritanceList>::Route_Planning_Counter[];
 		template<typename MasterType, typename InheritanceList> int Basic_Activity_Plan_Implementation<MasterType,InheritanceList>::_Route_Planning_Count=0;
 		template<typename MasterType, typename InheritanceList> _lock Basic_Activity_Plan_Implementation<MasterType,  InheritanceList>::_update_lock = 0;
 	}

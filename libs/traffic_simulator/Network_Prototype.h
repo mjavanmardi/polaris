@@ -153,8 +153,6 @@ namespace Network_Components
 			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, 
 				requires(TargetType,check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value) /*&& check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)*/))
 			{			
-				PUSH_TO_STACK("Get_TTime, network prototype,");
-
 				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
 				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> _location_interface;
 				//typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> _zone_interface;
@@ -171,13 +169,11 @@ namespace Network_Components
 //TODO
 //				typename TargetType::ReturnType ret_value = skim->template Get_TTime<Target_Type<NT,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, typename TargetType::Param3Type>>(Origin, Destination, Mode_Indicator, Start_Time);
 				
-				POP_FROM_STACK;
 				return ret_value;
 			}
 
 			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Start_Time /*, requires(TargetType,check(typename TargetType::ReturnType, Network_Skimming_Components::Concepts::Is_LOS_Prototype) && check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype))*/)
 			{		
-				PUSH_TO_STACK("Get_LOS, network prototype,");
 				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
 				/*typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> _zone_interface;
@@ -191,7 +187,6 @@ namespace Network_Components
 //TODO
 //				typename TargetType::ReturnType ret_value = skim->Get_LOS<Target_Type<NT,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type>>(Origin, Destination, Start_Time);
 				
-				POP_FROM_STACK;
 				return ret_value;
 			}
 			

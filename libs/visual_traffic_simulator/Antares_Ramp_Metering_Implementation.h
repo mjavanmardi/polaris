@@ -205,8 +205,7 @@ namespace Ramp_Metering_Components
 			{
 				Ramp_Metering_Implementation<MasterType,INHERIT(Antares_Ramp_Metering_Implementation)>::Initialize_Type<TargetType>();
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Ramp Meters"));
+				_its_component_layer=Allocate_New_Layer<MT>(string("Ramp Meters"));
 				
 				Antares_Layer_Configuration cfg;
 
@@ -217,7 +216,7 @@ namespace Ramp_Metering_Components
 
 				cfg.storage_period = ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				cfg.storage_offset = ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
-				cfg.targetsub_iteration()=Scenario_Components::Types::END_OF_ITERATION+1;
+				cfg.target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 				cfg.head_size_value=24;
 				cfg.head_accent_size_value=48;
 				cfg.selection_callback=&on_select;
@@ -249,9 +248,8 @@ namespace Ramp_Metering_Components
 				
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-				
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 				
 				float current_meter_flow_ratio = meter_flow_ratio<TargetType>();
 
@@ -287,9 +285,8 @@ namespace Ramp_Metering_Components
 				
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-				
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 				
 				float current_meter_flow_ratio = meter_flow_ratio<TargetType>();
 
@@ -332,9 +329,8 @@ namespace Ramp_Metering_Components
 				
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-				
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 				
 				float current_meter_flow_ratio = meter_flow_ratio<TargetType>();
 
@@ -376,8 +372,7 @@ namespace Ramp_Metering_Components
 				link_line.up_node._y = intersection->y_position<float>();
 				link_line.up_node._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
+				Scale_Coordinates<MT>( link_line.up_node );
 
 				intersection = link->downstream_intersection< Intersection_Interface* >();
 
@@ -385,8 +380,7 @@ namespace Ramp_Metering_Components
 				link_line.down_node._y = intersection->y_position<float>();
 				link_line.down_node._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
+				Scale_Coordinates<MT>( link_line.down_node );
 
 				MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 			}

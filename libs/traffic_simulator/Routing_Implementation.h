@@ -23,7 +23,7 @@ namespace Routing_Components
 			m_prototype(Movement_Plan<typename MasterType::movement_plan_type>,movement_plan,NONE,NONE);
 			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
 
-			typedef Link_Components::Prototypes::Link<typename movement_plan_interface_type::get_type_of(origin)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename movement_plan_type::get_type_of(origin)> Link_Interface;
 
 			template<typename Movement_Plan_Type>
 			void Attach_New_Movement_Plan(Movement_Plan<Movement_Plan_Type>* mp)
@@ -132,6 +132,45 @@ namespace Routing_Components
 
 		template<typename MasterType,typename InheritanceList>
 		Network<typename MasterType::network_type>* Routing_Implementation<MasterType,InheritanceList>::_network;
+
+		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>
+		{
+			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>::Component_Type ComponentType;
+			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)
+			{
+				typedef Routing_Components::Prototypes::Routing<ComponentType> _Routing_Interface;
+				
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				if(sub_iteration() == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
+				{
+					if (iteration() >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
+					{
+						response.result=true;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					}
+					else
+					{
+						response.result=false;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					}
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in routing conditional!" << endl;
+				}
+
+				CHECK_CONDITIONAL
+			}
+			m_container(boost::container::vector<float>,travel_times_to_link_container, NONE, NONE);
+			
+			member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+
+		};
 
 //		implementation struct Routing_Implementation:public Polaris_Component<MasterType,INHERIT(Routing_Implementation),Execution_Object>
 //		{

@@ -176,9 +176,9 @@ namespace Prototypes
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
-			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
+			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 		}
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,!check(ComponentType,Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,!check(ComponentType,Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && !check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 			assert_check_2(typename ComponentType::Object_Type,Execution_Object,is_same, "ComponentType must be an execution object, or ");

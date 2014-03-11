@@ -114,11 +114,10 @@ namespace Vehicle_Components
 
 			static void Initialize_Vehicle_Shapes_Layer()
 			{
-//TODO
-//				_vehicle_shapes=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_shapes),Antares_Vehicle_Implementation>*, string& > >(string("Vehicles (shape)"));
+				_vehicle_shapes=Allocate_New_Layer<MT>(string("Vehicles (shape)"));
 				Antares_Layer_Configuration cfg;
 				cfg.dynamic_data=true;
-				cfg.targetsub_iteration()=Scenario_Components::Types::END_OF_ITERATION+1;
+				cfg.target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 				cfg.storage_offset=iteration();
 				cfg.storage_size=4;
 				cfg.storage_period=1;
@@ -160,8 +159,7 @@ namespace Vehicle_Components
 
 			static void Initialize_Vehicle_Points_Layer()
 			{
-//TODO
-//				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Antares_Vehicle_Implementation>*, string& > >(string("Vehicles (point)"));
+				_vehicle_points=Allocate_New_Layer<MT>(string("Vehicles (point)"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Points();
 				cfg.primitive_color=true;
@@ -186,8 +184,7 @@ namespace Vehicle_Components
 			
 			static void Initialize_Vehicle_Routes_Layer()
 			{
-//TODO
-//				_routes_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(routes_layer),Antares_Vehicle_Implementation>*, string& > >(string("Routes"));
+				_routes_layer=Allocate_New_Layer<MT>(string("Routes"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Lines();
 				cfg.primitive_color=true;
@@ -200,8 +197,7 @@ namespace Vehicle_Components
 			
 			static void Initialize_Vehicle_Locations_Layer()
 			{
-//TODO
-//				_locations_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Antares_Vehicle_Implementation>*, string& > >(string("Locations"));
+				_locations_layer=Allocate_New_Layer<MT>(string("Locations"));
 				Antares_Layer_Configuration cfg;
 				cfg.primitive_type=_TRIANGLE;
 				//cfg.head_accent_size_value=14;
@@ -237,9 +233,10 @@ namespace Vehicle_Components
 				}
 			}
 
-			declare_event(compute_vehicle_position)
+			//declare_event(compute_vehicle_position)
+			void compute_vehicle_position()
 			{
-				Antares_Vehicle_Implementation* pthis=(Antares_Vehicle_Implementation*)_this;
+				Antares_Vehicle_Implementation* pthis=(Antares_Vehicle_Implementation*)this;
 				if (pthis->simulation_status<Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
 				pthis->update_vehicle_position<NT>();
 				if (_vehicle_shapes->template draw<bool>() || _vehicle_points->template draw<bool>())
@@ -298,7 +295,7 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
-
+#ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
@@ -307,7 +304,9 @@ namespace Vehicle_Components
 						body_color._g = 100;
 						body_color._b = 255;
 					}
-					else if (num_switch_decisions > 0)
+					else
+#endif
+					if (num_switch_decisions > 0)
 					{
 						if (num_switch_decisions == 1)
 						{
@@ -1178,7 +1177,7 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
-
+#ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
@@ -1187,7 +1186,9 @@ namespace Vehicle_Components
 						coordinate.color._g = 100;
 						coordinate.color._b = 255;
 					}
-					else if (num_switch_decisions > 0)
+					else
+#endif
+					if (num_switch_decisions > 0)
 					{
 						if (num_switch_decisions == 1)
 						{
@@ -1240,13 +1241,16 @@ namespace Vehicle_Components
 				//int first_triggeriteration() = ((iteration() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()) + 1) * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1;
 				if ((iteration() + 1) % ((_Scenarion_Interface*)_global_scenario)->template simulation_interval_length<int>() == 0)
 				{
+
+					Load_Event<ComponentType>(&Vehicle_Action_Condition,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION);
 					//TODO
-//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template Vehicle_Action,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,NULLTYPE);
+					//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template Vehicle_Action,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,NULLTYPE);
 				}
 				else
 				{
+					Load_Event<ComponentType>(&Vehicle_Action_Condition,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION);
 					//TODO
-//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
+					//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
 				}
 			}
 
@@ -1256,7 +1260,6 @@ namespace Vehicle_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface; 
 				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
 				{
-					response.result=false;
 					response.next._iteration=END;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION && ((_Scenario_Interface*)_global_scenario)->template vehicle_taking_action<bool>())
@@ -1266,16 +1269,17 @@ namespace Vehicle_Components
 						cout << "iteration() " << iteration() << " is invalid" << endl;
 						assert(false);
 					}
-					((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					response.result=true;
+					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
+					_this->Vehicle_Action();
+
 					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 					{
-						response.next._iteration=_iteration;
+						response.next._iteration=iteration();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 					}
 					else
 					{
-						response.next._iteration=_iteration;
+						response.next._iteration=iteration();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -1286,19 +1290,19 @@ namespace Vehicle_Components
 						cout << "iteration() " << iteration() << " is invalid" << endl;
 						assert(false);
 					}
-					((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
+					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
+					_this->Vehicle_Action();
+					response.next._iteration=iteration();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 				}
 				else if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
-					((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&compute_vehicle_position<NULLTYPE>);
-					response.result=true;
+					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&compute_vehicle_position<NULLTYPE>);
+					_this->compute_vehicle_position();
 
 					if(!((_Scenario_Interface*)_global_scenario)->template vehicle_taking_action<bool>())
 					{
-						response.next._iteration=_iteration + 1;
+						response.next._iteration=iteration() + 1;
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 					else
@@ -1306,19 +1310,19 @@ namespace Vehicle_Components
 						// depending on whether the next iteration is a simulation interval border iteration
 						if ((iteration() + 2) % ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() != 0)
 						{
-							response.next._iteration=_iteration + 1;
+							response.next._iteration=iteration() + 1;
 							response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 						}
 						else
 						{
 							if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 							{
-								response.next._iteration=_iteration + 1;
+								response.next._iteration=iteration() + 1;
 								response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 							}
 							else
 							{
-								response.next._iteration=_iteration + 1;
+								response.next._iteration=iteration() + 1;
 								response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
 							}
 						}
@@ -1437,7 +1441,7 @@ namespace Vehicle_Components
 			{
 				if(simulation_status<Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
 
-				display_route<typename MasterType::vehicle_type,NT,NT>();
+				display_route<NT>();
 
 				Vehicle_Attribute_Shape accented_vehicle_shape;
 
@@ -1479,9 +1483,9 @@ namespace Vehicle_Components
 
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 
-				display_route<typename MasterType::vehicle_type,NT,NT>();
+				display_route<NT>();
 
-
+#ifdef INCLUDE_DEMAND
 				if (((ComponentType*)this)->_is_integrated)
 				{
 					if (_locations_layer->template draw<bool>())
@@ -1544,7 +1548,8 @@ namespace Vehicle_Components
 						}
 					}	
 				}
-						
+#endif
+
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
@@ -1648,7 +1653,7 @@ namespace Vehicle_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-//#ifdef IntegratedModelApplication
+#ifdef INCLUDE_DEMAND
 				if (((ComponentType*)this)->_is_integrated)
 				{
 					// Activity Attributes
@@ -1751,7 +1756,7 @@ namespace Vehicle_Components
 						bucket.push_back(key_value_pair);
 	*/				}
 				}
-//#endif
+#endif
 			}
 			
 			template<typename TargetType> void make_pyramid(Point_3D<MasterType>* vertex,const Point_3D<MasterType>& center,const float radius)
@@ -1761,24 +1766,21 @@ namespace Vehicle_Components
 				vertex->_y = center._y;
 				vertex->_z = radius*2;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 				
 				vertex->_x = center._x - radius;
 				vertex->_y = center._y + radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 				vertex->_x = center._x + radius;
 				vertex->_y = center._y + radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 
@@ -1788,24 +1790,21 @@ namespace Vehicle_Components
 				vertex->_y = center._y;
 				vertex->_z = radius*2;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 				
 				vertex->_x = center._x + radius;
 				vertex->_y = center._y + radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 				vertex->_x = center._x + radius;
 				vertex->_y = center._y - radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 
@@ -1815,24 +1814,21 @@ namespace Vehicle_Components
 				vertex->_y = center._y;
 				vertex->_z = radius*2;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 				
 				vertex->_x = center._x + radius;
 				vertex->_y = center._y - radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 				vertex->_x = center._x - radius;
 				vertex->_y = center._y - radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 
@@ -1842,24 +1838,21 @@ namespace Vehicle_Components
 				vertex->_y = center._y;
 				vertex->_z = radius*2;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 				
 				vertex->_x = center._x - radius;
 				vertex->_y = center._y - radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				++vertex;
 
 				vertex->_x = center._x - radius;
 				vertex->_y = center._y + radius;
 				vertex->_z = 0;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				Scale_Coordinates<MT>(*vertex);
 				//++vertex;
 
 
@@ -1934,9 +1927,8 @@ namespace Vehicle_Components
 					start._z = previous_act_end;
 
 					//cout <<endl<< "Unscaled previous location: "<<previous_location->x_position<float>()<<","<<previous_location->y_position<float>()<<endl;
-					
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(start);
+
+					Scale_Coordinates<MT>(start);
 
 					Point_3D<MasterType> end;
 					end._x = location->x_position<float>();
@@ -1947,8 +1939,7 @@ namespace Vehicle_Components
 
 					//cout << "Start: " << start._x << "," << start._y << "," << start._z << ".  End: " << end._x << ", " << end._y << ", " << end._z<<endl;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end);
+					Scale_Coordinates<MT>(end);
 
 					Point_3D<MasterType> mid;
 					mid._x = (start._x + end._x)/2;
@@ -1963,10 +1954,9 @@ namespace Vehicle_Components
 					end_act._y = location->y_position<float>();
 					end_act._z = current_act_end;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(start_act);
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end_act);
+					Scale_Coordinates<MT>(start_act);
+
+					Scale_Coordinates<MT>(end_act);
 
 					//cout << "Start_act: " << start_act._x << "," << start_act._y << "," << start_act._z << ".  End_act: " << end_act._x << ", " << end_act._y << ", " << end_act._z<<endl;
 					
@@ -2055,7 +2045,10 @@ namespace Vehicle_Components
 					Point_3D<MasterType> down_node;
 				} link_line;
 #pragma pack(pop)
-				for(typename _Trajectory_Container_Interface::iterator itr = _movement_plan->_trajectory_container.begin(); itr != _movement_plan->_trajectory_container.end(); itr++)
+
+				_Trajectory_Container_Interface* trajectory_container = ((_Movement_Plan_Interface*)_movement_plan)->trajectory_container<_Trajectory_Container_Interface*>();
+
+				for(typename _Trajectory_Container_Interface::iterator itr = trajectory_container->begin(); itr != trajectory_container->end(); itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)(*itr);
 					_Link_In_Trajectory_Interface* link = vehicle_trajectory_data->template link<_Link_In_Trajectory_Interface*>();
@@ -2064,14 +2057,13 @@ namespace Vehicle_Components
 					link_line.up_node._y = link->template upstream_intersection<_Intersection_Interface*>()->template y_position<float>();
 					link_line.up_node._z = link->template upstream_intersection<_Intersection_Interface*>()->template z_position<float>();
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.up_node);
+					Scale_Coordinates<MT>(link_line.up_node);
 
 					link_line.down_node._x = link->template downstream_intersection<_Intersection_Interface*>()->template x_position<float>();
 					link_line.down_node._y = link->template downstream_intersection<_Intersection_Interface*>()->template y_position<float>();
 					link_line.down_node._z = link->template downstream_intersection<_Intersection_Interface*>()->template z_position<float>();
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.down_node);
+
+					Scale_Coordinates<MT>(link_line.down_node);
 					
 					link_line.color._r = 0;
 					link_line.color._g = 0;
@@ -2094,14 +2086,13 @@ namespace Vehicle_Components
 						link_line.up_node._y = link->template upstream_intersection<_Intersection_Interface*>()->template y_position<float>();
 						link_line.up_node._z = link->template upstream_intersection<_Intersection_Interface*>()->template z_position<float>();
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.up_node);
+						Scale_Coordinates<MT>(link_line.up_node);
 
 						link_line.down_node._x = link->template downstream_intersection<_Intersection_Interface*>()->template x_position<float>();
 						link_line.down_node._y = link->template downstream_intersection<_Intersection_Interface*>()->template y_position<float>();
 						link_line.down_node._z = link->template downstream_intersection<_Intersection_Interface*>()->template z_position<float>();
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.down_node);
+
+						Scale_Coordinates<MT>(link_line.down_node);
 					
 						link_line.color._r = 0;
 						link_line.color._g = 0;

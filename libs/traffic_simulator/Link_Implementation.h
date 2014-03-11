@@ -155,14 +155,14 @@ namespace Link_Components
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
 
-			m_prototype(Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network<typename MasterType::network_type>, network_reference, NONE, NONE);
 
 		//==================================================================================================================
 		/// Upstream and Downstream Intersections Reference
 		//------------------------------------------------------------------------------------------------------------------			
 
-			m_prototype(Null_Prototype<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
 
 		//==================================================================================================================
 		/// Containers of Cached Cumulative Vehicle Statistics
@@ -273,11 +273,11 @@ namespace Link_Components
 		/// ITS
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Advisory_ITS< typename MasterType::advisory_radio_type>, advisory_radio, NONE, NONE);
-			m_prototype(Depot< typename MasterType::depot_type>, depot, NONE, NONE);
-			m_prototype(Advisory_ITS< typename MasterType::variable_word_sign_type>, variable_word_sign, NONE, NONE);
-			m_prototype(Advisory_ITS< typename MasterType::variable_speed_sign_type>, variable_speed_sign, NONE, NONE);
-			m_prototype(Sensor< typename MasterType::link_sensor_type>, link_sensor, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::advisory_radio_type>, advisory_radio, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::depot_type>, depot, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::variable_word_sign_type>, variable_word_sign, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::variable_speed_sign_type>, variable_speed_sign, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::link_sensor_type>, link_sensor, NONE, NONE);
 
 
 
@@ -285,7 +285,7 @@ namespace Link_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
 			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
-			typedef  Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
@@ -295,10 +295,10 @@ namespace Link_Components
 			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence< type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef  Intersection_Components::Prototypes::Intersection< type_of(upstream_intersection)> _Intersection_Interface;
+			typedef  Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
 			typedef  Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
 			Link_Implementation()
@@ -650,7 +650,7 @@ namespace Link_Components
 				//_link_origin_cumulative_arrived_vehicles = 0;
 				//_link_origin_vehicle_array.clear();
 
-				_network_reference = (network_reference_interface_type*)network;
+				_network_reference = (network_reference_type*)network;
 
 				//init link simulation model
 				_link_capacity = 0;
@@ -992,36 +992,45 @@ namespace Link_Components
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
 			{
-				_variable_speed_sign = (variable_speed_sign_interface_type*)vss;
+				_variable_speed_sign = (variable_speed_sign_type*)vss;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_word_sign)* vws)
 			{
-				_variable_word_sign = (variable_word_sign_interface_type*)vws;
+				_variable_word_sign = (variable_word_sign_type*)vws;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::advisory_radio)* har)
 			{
-				_advisory_radio = (advisory_radio_interface_type*)har;
+				_advisory_radio = (advisory_radio_type*)har;
 			}
 
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::depot)* depot)
 			{
-				_depot = (depot_interface_type*)depot;
+				_depot = (depot_type*)depot;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::link_sensor)* link_sensor)
 			{
-				_link_sensor = (link_sensor_interface_type*)link_sensor;
+				_link_sensor = (link_sensor_type*)link_sensor;
 			}
 
-			static void subscribe_events()
+
+			template<typename TargetType> static void subscribe_events()
 			{
 				// event subscription
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
 				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
 				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
 			}
+
+			//void subscribe_events_local()
+			//{
+			//	// event subscription
+			//	_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
+			//	network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
+			//	network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
+			//}
 
 			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
 			{

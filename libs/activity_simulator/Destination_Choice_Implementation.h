@@ -18,7 +18,7 @@ namespace Person_Components
 
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 
 			// PARAMETER DECLARATIONS
 			#pragma region DESTINATION CHOICE MODEL PARAMETERS
@@ -91,8 +91,6 @@ namespace Person_Components
 
 			template<typename TargetType> TargetType Calculate_Utility()
 			{
-				PUSH_TO_STACK("Calculate_Utility");
-
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
 
@@ -255,15 +253,12 @@ namespace Person_Components
 					THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
 					u = -9999.9;
 				}
-				POP_FROM_STACK;
 				return (TargetType)u;				
 			}
 			tag_feature_as_available(Calculate_Utility);
 
 			template<typename TargetType> TargetType Print_Utility()
 			{
-				PUSH_TO_STACK("Calculate_Utility");
-
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
 
@@ -425,8 +420,7 @@ namespace Person_Components
 					THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
 					u = -999999.0;
 				}
-				POP_FROM_STACK;
-
+				
 				cout << "Utility for zone " << zone->uuid<int>() << " = " << u <<" from origin zone " <<_previous->zone<_Zone_Interface*>()->uuid<int>()<< ": ";
 				cout << ", ttime_deflected="<<ttime_deflected;
 				cout << ", inc_diff ="<<inc_diff ;
@@ -747,7 +741,7 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(ADAPTS_Destination_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 			m_prototype(Choice_Model_Components::Prototypes::Choice_Model< Destination_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
 			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, Current_Activity, NONE, NONE);
 			

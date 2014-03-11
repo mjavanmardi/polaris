@@ -152,7 +152,7 @@ namespace Sensor_Components
 
 			m_data(boost::container::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
 
-			m_prototype(Link<typename type_of(MasterType::link)>,covered_link, NONE, NONE);
+			m_prototype(Null_Prototype<typename type_of(MasterType::link)>,covered_link, NONE, NONE);
 		};
 	}
 }

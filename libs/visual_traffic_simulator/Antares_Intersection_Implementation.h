@@ -57,8 +57,8 @@ namespace Intersection_Components
 				Point_3D<MasterType> v_node;
 				v_node._x = _x_position;
 				v_node._y = _y_position;
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(v_node);
+
+				Scale_Coordinates<MT>(v_node);
 
 				float x = v_node._x;
 				float y = v_node._y;
@@ -192,15 +192,16 @@ namespace Intersection_Components
 			//	return true;
 			//}
 
-			declare_event(Intersection_REALTIME_MOE_Update)
+			//declare_event(Intersection_REALTIME_MOE_Update)
+			void Intersection_REALTIME_MOE_Update()
 			{
 
-				Intersection_Implementation<MasterType,INHERIT(Antares_Intersection_Implementation)>::Intersection_REALTIME_MOE_Update<NT>(_this);
+				Intersection_Implementation<MasterType,INHERIT(Antares_Intersection_Implementation)>::Intersection_REALTIME_MOE_Update();
 
 				typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				_this_ptr->template update_vehicle_locations<NT>();
 			}
 		};
