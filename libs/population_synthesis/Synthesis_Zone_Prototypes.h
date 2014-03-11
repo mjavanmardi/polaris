@@ -152,10 +152,6 @@ namespace PopSyn
 
 				sample_itf* sample = (sample_itf*)Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
-				
-				// Get interface to the zone random number generator
-				typedef RNG_Components::Prototypes::RNG<typename get_type_of(Rand)> rand_itf;
-				rand_itf& rand = this->Rand<rand_itf&>();
 
 				// loop through all cells in the regional mway matrix, and make N = Mway(i,j,...) attempts to add each pop_unit corresponding to that index
 				// The code below grabs a range for each index in the MWAY matrix which has corresponding samples which can be chosen.
@@ -171,11 +167,7 @@ namespace PopSyn
 					typename sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
 
-					//if (stored_pop_unit->Household_size<int>() == 5)
-					//{
-					//	int tes = 1;
-					//}
-									
+								
 					//----------------------------------------------------------------------------------
 					//get the cumulative weight of all items corresponding to current index
 					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);
@@ -202,7 +194,7 @@ namespace PopSyn
 						
 						for (int i = 0; i<attempts_to_make; ++i)
 						{
-							if (rand.template Next_Rand<double>() < w/cumulative_weight)
+							if (GLOBALS::Uniform_RNG.Next_Rand<double>() < w/cumulative_weight)
 							{					
 								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated++;// += (int)(1.0 / settings.template Percentage_to_synthesize<double>());
@@ -233,7 +225,7 @@ namespace PopSyn
 
 					//----------------------------------------------------------------------------------
 					// if a fractional num_required is left, add another unit with probability of num_required
-					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required /** settings.template Percentage_to_synthesize<double>()*/)
+					if (num_required > 0.0 && GLOBALS::Uniform_RNG.Next_Rand<double>() < num_required /** settings.template Percentage_to_synthesize<double>()*/)
 					{
 						// create the actual person agent
 						this->Create_Household<pop_unit_itf*>(stored_pop_unit);
@@ -356,7 +348,6 @@ namespace PopSyn
 			//===================================================================================================================================
 			// OPTIONAL: Other accessors that may be of use
 			accessor(ID, NONE, NONE);
-			accessor(Rand, NONE, NONE);
 			accessor(Solver_Settings, NONE, NONE);
 			accessor(Selection_Settings, NONE, NONE);
 

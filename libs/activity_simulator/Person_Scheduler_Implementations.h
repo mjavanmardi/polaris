@@ -24,7 +24,8 @@ namespace Person_Components
 			m_data(int, Activity_Count, NONE, NONE);
 
 			//Containers for activity planning events and movement planning events
-			m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
+			//m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
+			m_prototype_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
 			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
 			// Interface definitions
@@ -43,8 +44,9 @@ namespace Person_Components
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence<typename type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
-			
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type_test(Activity_Container)> Activity_Plan;
+			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
+
 			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;
 			
@@ -61,7 +63,7 @@ namespace Person_Components
 			}
 
 			// scheduling features - move to Person_Scheduler eventually
-			template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
+			template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class			
 				Movement_Plans* movement_plans = this->template Movement_Plans_Container< Movement_Plans*>();
@@ -69,7 +71,7 @@ namespace Person_Components
 				if ((itr = movement_plans->find(iteration())) != movement_plans->end()) return (TargetType)*itr;
 				else return NULL;
 			}
-			template<typename TargetType> TargetType current_activity_plan(requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			template<typename TargetType> TargetType current_activity_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
@@ -151,7 +153,7 @@ namespace Person_Components
 						}
 					}
 				}
-				return (TargetType)next;
+				return (ReturnType)next;
 			}
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(ParamType, !check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype) && !check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
@@ -458,7 +460,7 @@ namespace Person_Components
 			}
 
 			// Adding activities and movements to the planning schedules
-			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
+			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// define interfaces
 				typename Movement_Plans::iterator move_itr;
@@ -540,12 +542,12 @@ namespace Person_Components
 				//act_records->push_back(act_record);
 				
 			}
-			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,!check(strip_modifiers(TargetType),is_pointer) || !check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
+			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,!check(TargetType,is_pointer) || !check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
-				assert_check(strip_modifiers(TargetType),is_pointer, "Error, TargetType must be passed as a pointer");
+				assert_check(TargetType,is_pointer, "Error, TargetType must be passed as a pointer");
 				assert_check(strip_modifiers(TargetType), Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype, "Error, Function requires TargetType to be a Movement_Plan_Prototype.");
 			}
-			template<typename TargetType> void Remove_Movement_Plan(TargetType movement_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer)))
+			template<typename TargetType> void Remove_Movement_Plan(TargetType movement_plan, requires(TargetType,check(TargetType,is_pointer)))
 			{
 				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
@@ -575,7 +577,7 @@ namespace Person_Components
 			}
 		
 			
-			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
 				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
@@ -594,7 +596,7 @@ namespace Person_Components
 				activities->push_back(act);
 				_Activity_Count++;
 			}
-			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(strip_modifiers(TargetType),is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
 				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;

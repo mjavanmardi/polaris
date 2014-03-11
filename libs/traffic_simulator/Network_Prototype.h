@@ -150,8 +150,8 @@ namespace Network_Components
 			/// demand compatible network
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(skimming_faculty, NONE, NONE);
-			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, 
-				requires(TargetType,check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value) /*&& check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)*/))
+			template<typename LocationType, typename ModeType, typename TimeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, TimeType Start_Time,
+				requires(LocationType,check(strip_modifiers(ReturnType), Basic_Units::Concepts::Is_Time_Value) /*&& check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)*/))
 			{			
 				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
 				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> _location_interface;
@@ -166,13 +166,13 @@ namespace Network_Components
 				//Destination_ID = dest->template zone<_zone_interface*>()->template uuid<int>();
 
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
-//TODO
-//				typename TargetType::ReturnType ret_value = skim->template Get_TTime<Target_Type<NT,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, typename TargetType::Param3Type>>(Origin, Destination, Mode_Indicator, Start_Time);
+				ReturnType ret_value = skim->template Get_TTime<LocationType, ModeType, TimeType, ReturnType>(Origin, Destination, Mode_Indicator, Start_Time);
 				
 				return ret_value;
 			}
 
-			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Start_Time /*, requires(TargetType,check(typename TargetType::ReturnType, Network_Skimming_Components::Concepts::Is_LOS_Prototype) && check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype))*/)
+			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, TimeType Start_Time,
+				requires(LocationType,check(strip_modifiers(ReturnType), Network_Skimming_Components::Concepts::Is_LOS_Prototype) /*&& check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)*/))
 			{		
 				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
@@ -184,18 +184,17 @@ namespace Network_Components
 				Origin_ID = orig->template zone<_zone_interface*>()->template uuid<int>();
 				Destination_ID = dest->template zone<_zone_interface*>()->template uuid<int>();*/
 
-//TODO
-//				typename TargetType::ReturnType ret_value = skim->Get_LOS<Target_Type<NT,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type>>(Origin, Destination, Start_Time);
+				ReturnType ret_value = skim->Get_LOS<LocationType, TimeType, ReturnType>(Origin, Destination, Start_Time);
 				
 				return ret_value;
 			}
 			
-			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, 
-				requires(TargetType,!check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			template<typename LocationType, typename ModeType, typename TimeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, TimeType Start_Time,
+				requires(LocationType,!check(strip_modifiers(ReturnType), Basic_Units::Concepts::Is_Time_Value)))
 			{			
-				assert_check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value, "Return type must be a time value.");
-				assert_check(typename TargetType::ReturnType, Zone_Components::Concepts::Is_Zone_Prototype, "Origin/Destination must be specified as a zone_prototype.");
-				assert_check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype, " Or Origin/Destination must be specified as an activity_location_prototype.");
+				assert_check(strip_modifiers(ReturnType), Basic_Units::Concepts::Is_Time_Value, "Return type must be a time value.");
+				//assert_check(ReturnType, Zone_Components::Concepts::Is_Zone_Prototype, "Origin/Destination must be specified as a zone_prototype.");
+				//assert_check(LocationType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype, " Or Origin/Destination must be specified as an activity_location_prototype.");
 			}
 			
 			//------------------------------------------------------------------------------------------------------------------

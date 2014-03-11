@@ -129,7 +129,7 @@ struct MasterType
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
 	
-	typedef RNG_Components::Implementations::RngStream_Implementation<M> rng_type;
+	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
 	typedef Activity_Components::Implementations::Basic_Activity_Plan_Implementation<M> activity_type;
 	typedef Activity_Components::Implementations::ADAPTS_Activity_Plan_Implementation<M> activity_plan_type;
@@ -226,6 +226,9 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Allocation hints block
 	//----------------------------------------------------------------------------------------------------------------------------------
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(86400);
+	INITIALIZE_SIMULATION(cfg);
 	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
 
 	

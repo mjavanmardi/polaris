@@ -36,7 +36,7 @@ namespace PopSyn
 			m_container(s_array<double>,Target_Marginal_Distribution, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::ipf_solver_settings_type,Solver_Settings, NONE, NONE);
-			m_prototype(Null_Prototype,typename MasterType::rng_type, Rand, NONE, NONE);
+
 			m_prototype(Null_Prototype,typename MasterType::synthesis_region_type, parent_reference, NONE, NONE);
 	
 			typedef boost::unordered_multimap<uint, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __sample_map_type;		

@@ -509,18 +509,36 @@ namespace Activity_Components
 				Revision& route = this->Route_Planning_Time<Revision&>();
 
 				// Load the first event
-				if (Is_Minimum_Plan_Time(persons)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons._iteration, persons._sub_iteration,NT);
-				else if (Is_Minimum_Plan_Time(mode)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Mode_Planning_Event, mode._iteration, mode._sub_iteration,NT);
-				else if (Is_Minimum_Plan_Time(duration)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration._iteration, duration._sub_iteration,NT);
-				else if (Is_Minimum_Plan_Time(location)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
-				else if (Is_Minimum_Plan_Time(start_time)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
-				else if (Is_Minimum_Plan_Time(route)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
+				if (Is_Minimum_Plan_Time(persons)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons._iteration, persons._sub_iteration,NT);
+				}
+				else if (Is_Minimum_Plan_Time(mode)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Mode_Planning_Event, mode._iteration, mode._sub_iteration,NT);
+				}
+				else if (Is_Minimum_Plan_Time(duration)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration._iteration, duration._sub_iteration,NT);
+				}
+				else if (Is_Minimum_Plan_Time(location)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
+				}
+				else if (Is_Minimum_Plan_Time(start_time)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
+				}
+				else if (Is_Minimum_Plan_Time(route)) 
+				{
+					int test = 1;
+//					load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
+				}
 				else 
 				{
 					stringstream err;
@@ -537,7 +555,7 @@ namespace Activity_Components
 				this_component()->template Set_Meta_Attributes<TargetType>();
 			}
 
-			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
+			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
 				this_component()->Update_Movement_Plan<TargetType>(origin,destination,min_departure);
 			}

@@ -195,12 +195,12 @@ namespace Prototypes
 			}
 		}
 		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
-			!check(TimeType, Basic_Units::Concepts::Is_Time_Value) || 
+			!check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value) || 
 			!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) || 
 			(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))))
 		{
-			assert_check(TimeType, Basic_Units::Concepts::Is_Time_Value, "Error, must use a valid time value when scheduling departure.");
-			assert_check(MovementItfType, Movement_Plan_Components::Concepts::Is_Movement_Plan, "Error, movement parameter is not a valid Movement_Plan interface.");
+			assert_check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value, "Error, must use a valid time value when scheduling departure.");
+			assert_check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan, "Error, movement parameter is not a valid Movement_Plan interface.");
 			assert_check(MovementItfType, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
 		}
 		
@@ -720,7 +720,7 @@ namespace Prototypes
 			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links_container_itf;
-			typedef Link_Components::Prototypes::Link<typename get_component_type(links_container_itf)  link_itf;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links_container_itf)>  link_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(turn_movements_container)> turns_container_itf;
 			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_container_itf)>  turn_itf;

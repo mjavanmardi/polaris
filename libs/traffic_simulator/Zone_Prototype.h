@@ -89,7 +89,7 @@ namespace Zone_Components
 			{
 				this_component()->Initialize<TargetType>();
 			}
-			template<typename TargetType> TargetType Get_Random_Location(requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> TargetType Get_Random_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename get_type_of(origin_activity_locations)::value_type>::type> activity_location_itf;
 				typedef Random_Access_Sequence< typename get_type_of(origin_activity_locations),activity_location_itf*> activity_locations_itf;

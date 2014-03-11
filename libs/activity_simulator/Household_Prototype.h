@@ -78,7 +78,7 @@ namespace Prototypes
 		
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
 		{
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -93,7 +93,7 @@ namespace Prototypes
 			int loc_id = properties->template home_location_id<int>();
 			return (TargetType)(*locations)[loc_id];						
 		}
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(TargetType,is_pointer)))
 		{
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -115,7 +115,7 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			return properties->template home_location_id<TargetType>();
 		}
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ( (check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(strip_modifiers(TargetType),!is_pointer) ) ) )
+		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ( (check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(TargetType,!is_pointer) ) ) )
 		{
 			assert_check(strip_modifiers(TargetType),is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}

@@ -41,18 +41,18 @@ namespace Person_Components
 			accessor(current_movement_plan, NONE, NONE);
 			accessor(current_activity_plan, NONE, NONE);
 			
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType,check(ParamType,Is_Time_Value)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType,check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
 				return this_component()->next_activity_plan<ParamType, ReturnType>(current_time);
 			}
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(ParamType,check(ParamType,Activity_Components::Concepts::Is_Activity_Plan)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(ParamType,check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan)))
 			{
 				return this_component()->next_activity_plan<ParamType, ReturnType>(current_act);
 			}
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(ParamType,!check(ParamType,Is_Time_Value) && !check(ParamType,Activity_Components::Concepts::Is_Activity_Plan)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(ParamType,!check(strip_modifiers(ParamType),Is_Time_Value) && !check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan)))
 			{
-				assert_check(ParamType,Is_Time_Value, "target type must be either Time_Value type or");
-				assert_check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");
+				assert_check(strip_modifiers(ParamType),Is_Time_Value, "target type must be either Time_Value type or");
+				assert_check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");
 			}
 			
 			template<typename TimeType, typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, check(TimeType,Is_Time_Value))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/

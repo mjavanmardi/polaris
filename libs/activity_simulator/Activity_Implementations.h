@@ -30,7 +30,7 @@ namespace Activity_Components
 
 			//=================================================================
 			// Pointer back to planner
-			m_prototype_test(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
 			// pointer to movement plan associated with activity
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
@@ -46,7 +46,8 @@ namespace Activity_Components
 			typedef Person_Components::Prototypes::Person<typename _planning_itf::get_type_of(Parent_Person)> _person_itf;
 			typedef Person_Components::Prototypes::Person_Perception<typename _person_itf::get_type_of(Perception_Faculty)> _perception_itf;
 			typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
-			typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
+			//typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type> _scheduler_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Properties)> _properties_itf;
 			
 			typedef Person_Components::Prototypes::Destination_Chooser<typename _planning_itf::get_type_of(Destination_Choice_Faculty)> _dest_choice_itf;
@@ -67,8 +68,8 @@ namespace Activity_Components
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 		
-
-			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Activity_Container)> _activity_plans_container_itf;
+			typedef typename _scheduler_itf::Component_Type ctype;
+			typedef Back_Insertion_Sequence< typename ctype::type_of(Activity_Container)> _activity_plans_container_itf;
 			typedef Prototypes::Activity_Planner<ComponentType> _activity_plan_itf;
 
 			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container)> _movement_plans_container_itf;
@@ -1433,7 +1434,7 @@ namespace Activity_Components
 				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = END+1;
 				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = END+1;
 				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Route_Planning_Time<  Revision&>()._iteration = _iteration+1;
+				base_this->template Route_Planning_Time<  Revision&>()._iteration = iteration()+1;
 				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = Scenario_Components::Types::ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))

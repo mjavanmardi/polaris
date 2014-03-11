@@ -306,7 +306,7 @@ namespace Prototypes
 		//	assert_check(strip_modifiers(TargetType), is_integral, "Error, Home_Location can only be set by passing an integral index from network::activity_locations_container");
 		//}
 		
-		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -326,7 +326,7 @@ namespace Prototypes
 			}
 			return (TargetType)(*locations)[loc_id];						
 		}
-		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -360,11 +360,11 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			return properties->template work_location_id<TargetType>();
 		}
-		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ( (check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(strip_modifiers(TargetType),!is_pointer) ) ) )
+		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ( (check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(TargetType,!is_pointer) ) ) )
 		{
 			assert_check(strip_modifiers(TargetType),is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}
-		template<typename TargetType> void Work_Location(TargetType location, requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> void Work_Location(TargetType location, requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -393,14 +393,14 @@ namespace Prototypes
 			if (location_index < -1 || location_index >= (signed int)locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.");
 			properties->template work_location_id<TargetType>(location_index);
 		}
-		template<typename TargetType> void Work_Location(TargetType location_index, requires(TargetType,!check(strip_modifiers(TargetType), is_integral) && (!check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) || !check(strip_modifiers(TargetType),is_pointer))))
+		template<typename TargetType> void Work_Location(TargetType location_index, requires(TargetType,!check(strip_modifiers(TargetType), is_integral) && (!check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) || !check(TargetType,is_pointer))))
 		{
 			assert_check(strip_modifiers(TargetType), is_integral, "Error, work location can only be set by passing an integral index from network::activity_locations_container");
 			assert_check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location, "Error, work location can only be set by passing an activity_location prototype");
-			assert_check(strip_modifiers(TargetType), is_pointer, "Error, work location can only be set by passing a pointer to an activity location prototype, target type is not a pointer type.");
+			assert_check(TargetType, is_pointer, "Error, work location can only be set by passing a pointer to an activity location prototype, target type is not a pointer type.");
 		}
 
-		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -420,7 +420,7 @@ namespace Prototypes
 			}
 			return (TargetType)(*locations)[loc_id];						
 		}
-		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(strip_modifiers(TargetType),is_pointer)))
+		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -447,7 +447,7 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			return properties->template school_location_id<TargetType>();
 		}
-		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ((check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(strip_modifiers(TargetType),!is_pointer) ) ) )
+		template<typename TargetType> TargetType School_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ((check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(TargetType,!is_pointer) ) ) )
 		{
 			assert_check(strip_modifiers(TargetType),is_integral,"Error, School_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}

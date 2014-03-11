@@ -879,7 +879,7 @@ namespace Person_Components
 				return return_ptr;
 			}
 
-			template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -961,7 +961,7 @@ namespace Person_Components
 				}
 			}
 
-			template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();

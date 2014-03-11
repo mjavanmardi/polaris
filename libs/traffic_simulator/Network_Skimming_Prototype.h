@@ -331,7 +331,7 @@ namespace Network_Skimming_Components
 			}			
 			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,!check(TargetType, is_pointer) || !check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
-				assert_check(strip_modifiers(TargetType), is_pointer,"TargetType is not a pointer" );
+				assert_check(TargetType, is_pointer,"TargetType is not a pointer" );
 				assert_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
 				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, is_basic_network, "TargetType is not a basic network");
 				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
@@ -619,7 +619,7 @@ namespace Network_Skimming_Components
 				//los->resize(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), 0);
 			}			
 
-			template<typename TargetType> void Initialize(TargetType initial_data, requires(TargetType,check(strip_modifiers(TargetType), is_pointer)))
+			template<typename TargetType> void Initialize(TargetType initial_data, requires(TargetType,check(TargetType, is_pointer)))
 			{
 				//cout << endl << "Initializing skim table at iteration - " << iteration();
 

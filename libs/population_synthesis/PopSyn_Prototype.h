@@ -151,11 +151,6 @@ namespace PopSyn
 				//===============================================================================================================
 				// Initialize settings
 				//---------------------------------------------------------------------------------------------------------------
-				// CREATE RNG for later use
-				typedef RNG<typename ComponentType::Master_Type::rng_type> Rand_Interface;
-				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::rng_type>();
-				rand->template Initialize<double>(0.0);
-
 				// IPF Solver Settings
 				typedef PopSyn::Prototypes::Solver_Settings<typename get_type_of(Solution_Settings)> solver_itf;
 				solver_itf* solver = this->Solution_Settings<solver_itf*>();
@@ -246,10 +241,7 @@ namespace PopSyn
 						new_region->parent_reference(this);
 						dist = new_region->template Target_Joint_Distribution<joint_itf*>();
 						marg = new_region->template Target_Marginal_Distribution<marginal_itf*>();
-						Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>(); // ALLOCATION TEST
-						my_rand->template Initialize<double>(ID);
 						new_region->template Output_Stream<ostream&>(out);
-						((zone_itf*)new_region)->template Rand<Rand_Interface*>(my_rand);
 
 						//-----------------------------------------------------------------------------------------
 						// Initialize the distribution and marginals
@@ -418,10 +410,6 @@ namespace PopSyn
 					marginal_itf* marg = zone->template Target_Marginal_Distribution<marginal_itf*>();
 					mway->resize(dimensions,0);
 					marg->resize(dimensions,0);
-					Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>();
-					my_rand->template Initialize<double>(rand->template Next_Rand<double>()*(double)SHRT_MAX);
-					
-					zone->template Rand<Rand_Interface*>(my_rand);
 
 					for (typename marginal_itf::size_type i=0; i<dimensions.size(); i++)
 					{

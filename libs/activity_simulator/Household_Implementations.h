@@ -59,7 +59,7 @@ namespace Household_Components
 				//this->First_Iteration<Time_Minutes>(1.0);
 
 				// Create and Initialize the Properties faculty
-				_Properties = (Properties_type*)Allocate<type_of(Properties)>();
+				_Properties = (Properties_type)Allocate<type_of(Properties)>();
 				_Properties->template Initialize<void>();
 				_Properties->template Parent_Household<ComponentType*>(this);
 
@@ -81,7 +81,7 @@ namespace Household_Components
 
 			template<typename TargetType> void Set_Home_Location()
 			{
-				_Properties->template Initialize<home_synthesis_zone_type*>(this->_home_synthesis_zone);
+				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
 			}
 
 		};
