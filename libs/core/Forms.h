@@ -14,10 +14,9 @@ namespace polaris
 
 	#define this_component() ((ComponentType*)this)
 
-	#define type_of(NAME) NAME##_type_getter<Component_Type>::type
-	#define get_type_of(NAME) Component_Type::NAME##_type_getter<Component_Type>::type
-	//#define get_type_of(TYPE_TO_PULL_MEMBER_TYPE_FROM, MEMBER_NAME) TYPE_TO_PULL_MEMBER_TYPE_FROM::Component_Type::MEMBER_NAME##_type_getter<TYPE_TO_PULL_MEMBER_TYPE_FROM::Component_Type::MEMBER_NAME##_type>::type
-
+	#define type_of(NAME) NAME##_type_getter<NT>::type
+	#define get_type_of(NAME) Component_Type::NAME##_type_getter<NT>::type
+	
 	#define NONE true
 	#define NA false
 

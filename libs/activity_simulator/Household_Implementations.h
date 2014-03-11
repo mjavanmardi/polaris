@@ -43,10 +43,10 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			typedef Pair_Associative_Container< typename network_reference_type::get_type_of(zones_container)> zones_container_interface;
+			typedef Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container)> zones_container_interface;
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_container_interface)>  zone_interface;
 			
-			typedef Random_Access_Sequence< typename network_reference_type::get_type_of(activity_locations_container)> locations_container_interface;
+			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
 			
 

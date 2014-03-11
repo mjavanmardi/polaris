@@ -47,6 +47,7 @@ namespace Person_Components
 			// quick fix for moving network and scenario handling to the perception class
 			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_type;
 			typedef typename type_of(Perception_Faculty)::type_of(Scenario) scenario_reference_type;
+
 			template<typename TargetType> TargetType network_reference()
 			{
 				return this->_Perception_Faculty->template Network<TargetType>();
@@ -67,8 +68,9 @@ namespace Person_Components
 			}	
 			tag_getter_as_available(scenario_reference);
 			tag_setter_as_available(scenario_reference);
-			typedef Network_Components::Prototypes::Network<typename Perception_Faculty_type::type_of(Network)> network_reference_interface;
-			typedef Scenario_Components::Prototypes::Scenario<typename Perception_Faculty_type::type_of(Scenario)> scenario_reference_interface;
+
+			typedef Network_Components::Prototypes::Network<typename type_of(Perception_Faculty)::type_of(Network)> network_reference_interface;
+			typedef Scenario_Components::Prototypes::Scenario<typename type_of(Perception_Faculty)::type_of(Scenario)> scenario_reference_interface;
 
 
 			// Agent ID
@@ -90,6 +92,8 @@ namespace Person_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
+			typedef Routing_Components::Prototypes::Routing<typename type_of(router)> router_interface;
+
 			typedef Prototypes::Activity_Generator<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)> generator_itf;
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
 			typedef Prototypes::Mode_Chooser<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)> mode_choice_itf;
@@ -101,7 +105,7 @@ namespace Person_Components
 			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
 			
-			typedef Back_Insertion_Sequence< typename type_of(Activity_Record_Container),Activity_Record*> Activity_Records;
+			typedef Back_Insertion_Sequence< typename type_of(Activity_Record_Container)> Activity_Records;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)> Activity_Record;
 			
 			

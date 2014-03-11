@@ -50,19 +50,20 @@ namespace Person_Components
 
 
 			// Interface definitions
-			typedef  Prototypes::Person_Scheduler< typename Parent_Person_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
-			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_type::get_type_of(scenario_reference)> _Scenario_Interface;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_type::get_type_of(network_reference)> _Network_Interface;
+			typedef Prototypes::Person<typename type_of(Parent_Person)> _Person_Interface;
+			typedef Prototypes::Person_Scheduler< typename _Person_Interface::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
+			typedef Scenario_Components::Prototypes::Scenario< typename _Person_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
+			typedef Network_Components::Prototypes::Network< typename _Person_Interface::get_type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			
-			typedef Random_Access_Sequence< typename Network_type::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
+			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
 			
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
-			typedef Pair_Associative_Container< typename Network_type::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<typename get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 
 			///*typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;

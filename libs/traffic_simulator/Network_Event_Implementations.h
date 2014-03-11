@@ -272,7 +272,7 @@ namespace Network_Event_Components
 		boost::unordered::unordered_map<size_t,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
 
 		template<typename MasterType,typename InheritanceList>
-		Network_Event_Manager<typename type_of(MasterType::network_event_manager)>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
+		Network_Event_Manager<typename MasterType::network_event_manager_type>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
 
 		implementation struct Weather_Network_Event : public Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>
 		{

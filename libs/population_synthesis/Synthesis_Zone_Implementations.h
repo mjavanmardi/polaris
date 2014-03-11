@@ -9,6 +9,8 @@ namespace PopSyn
 	{
 		implementation struct _Synthesis_Zone_Implementation
 		{
+			typedef _Synthesis_Zone_Implementation Component_Type;
+
 			typedef true_type Has_Marginals_In_Distribution;
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;

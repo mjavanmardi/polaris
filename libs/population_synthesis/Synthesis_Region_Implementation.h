@@ -10,7 +10,7 @@ namespace PopSyn
 		implementation struct _Synthesis_Region_Implementation
 		{
 			// Tag as implementation
-			//typedef typename Polaris_Component<MasterType,INHERIT(Synthesis_Region_Implementation_Simple),Execution_Object>::Component_Type ComponentType;
+			typedef _Synthesis_Region_Implementation Component_Type;
 
 			typedef dense_hash_map<long long, Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type>*> zone_map_type;
 			m_container(zone_map_type, Synthesis_Zone_Collection, NONE, NONE);

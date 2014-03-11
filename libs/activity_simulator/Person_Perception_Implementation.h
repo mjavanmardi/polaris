@@ -23,15 +23,16 @@ namespace Person_Components
 			m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, Scenario, NONE, NONE);
 
 			// Interface definitions
-			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename Network_type::get_type_of(skimming_faculty)> _Skim_Interface;
+			typedef Network_Components::Prototypes::Network< typename type_of(Network)> _Network_Interface;
+			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			
-			typedef Random_Access_Sequence< typename Network_type::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
+			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
 			
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
-			typedef Pair_Associative_Container< typename Network_type::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<typename get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 			
 			template<typename TargetType> void Initialize()
