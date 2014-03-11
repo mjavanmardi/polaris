@@ -1050,16 +1050,7 @@ namespace polaris
 			CONTAINER_TYPE _##NAME;\
 		public:\
 			typedef CONTAINER_TYPE NAME##_type;\
-			template<typename CType/* = NAME##_type*/>\
-			struct NAME##_type_getter\
-			{\
-				template<typename Relevant_Type,typename Other_Type>\
-				struct Delayer\
-				{\
-					typedef Relevant_Type type;\
-				};\
-				typedef typename Delayer<typename Component_Type::NAME##_type,CType>::type type;\
-			};\
+			typedef NAME##_type NAME##_accessible_type;\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\

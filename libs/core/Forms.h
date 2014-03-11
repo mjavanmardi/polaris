@@ -14,8 +14,8 @@ namespace polaris
 
 	#define this_component() ((ComponentType*)this)
 
-	#define type_of(NAME) NAME##_type_getter<NT>::type
-	#define get_type_of(NAME) Component_Type::NAME##_type_getter<NT>::type
+	#define type_of(NAME) NAME##_accessible_type
+	#define get_type_of(NAME) Component_Type::NAME##_accessible_type
 	
 	#define NONE true
 	#define NA false
@@ -541,16 +541,7 @@ namespace polaris
 			DATA_TYPE _##NAME;\
 		public:\
 			typedef typename DATA_TYPE NAME##_type;\
-			template<typename CType>\
-			struct NAME##_type_getter\
-			{\
-				template<typename Relevant_Type,typename Other_Type>\
-				struct Delayer\
-				{\
-					typedef Relevant_Type type;\
-				};\
-				typedef typename Delayer<typename Component_Type::NAME##_type,CType>::type type;\
-			};\
+			typedef NAME##_type NAME##_accessible_type;\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
@@ -737,23 +728,12 @@ namespace polaris
 	/// m_prototype – member prototype creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
-	#define m_prototype(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-			DATA_TYPE* _##NAME;\
+	#define m_prototype(PROTOTYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+			PROTOTYPE<COMPONENT_TYPE>* _##NAME;\
 		public:\
-			/*typedef typename DATA_TYPE::Component_Type NAME##_type;*/\
-			/*typedef DATA_TYPE NAME##_interface_type;*/\
-			typedef DATA_TYPE* NAME##_type;\
-			template<typename CType/* = NAME##_type*/>\
-			struct NAME##_type_getter\
-			{\
-				template<typename Relevant_Type,typename Other_Type>\
-				struct Delayer\
-				{\
-					typedef Relevant_Type type;\
-				};\
-				typedef typename remove_pointer<typename Delayer<typename Component_Type::NAME##_type,CType>::type>::type::Component_Type type;\
-			};\
-			\
+			typedef PROTOTYPE<COMPONENT_TYPE>* NAME##_type;\
+			typedef COMPONENT_TYPE NAME##_component_type;\
+			typedef NAME##_component_type NAME##_accessible_type;\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(*_##NAME);}\
