@@ -24,13 +24,13 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);	
-			m_prototype(Household_Components::Prototypes::Household_Properties< typename MasterType::household_properties_type>, Properties, NONE,NONE);
-			m_prototype(Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>, Static_Properties, NONE, NONE);
+			m_prototype(PopSyn::Prototypes::Synthesis_Zone, typename MasterType::synthesis_zone_type, home_synthesis_zone, NONE, NONE);	
+			m_prototype(Household_Components::Prototypes::Household_Properties, typename MasterType::household_properties_type, Properties, NONE,NONE);
+			m_prototype(Household_Components::Prototypes::Household_Properties,typename MasterType::household_static_properties_type, Static_Properties, NONE, NONE);
 			
 			// Physical world elements
-			m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
-			m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, network_reference, NONE, NONE);
+			m_prototype(Scenario_Components::Prototypes::Scenario, typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 
 			// Agent ID
 			m_data(long,uuid, NONE, NONE);

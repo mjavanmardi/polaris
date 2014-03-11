@@ -552,7 +552,7 @@ namespace Intersection_Components
 
 			template<typename TargetType> void initialize_features(void* network)
 			{
-				_network_reference = (network_reference_type*)network;
+				_network_reference = (network_reference_type)network;
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
 				unsigned long seed = abs(std::sin(((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>() + (float)_internal_id + 1)*(float)INT_MAX);
 				//unsigned long seed = 1;

@@ -9,8 +9,6 @@ namespace PopSyn
 	{
 		implementation struct _Synthesis_Zone_Implementation
 		{
-			typedef _Synthesis_Zone_Implementation Component_Type;
-
 			typedef true_type Has_Marginals_In_Distribution;
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
@@ -37,9 +35,9 @@ namespace PopSyn
 			m_container(m_array<double>,Target_Joint_Distribution, NONE,NONE);
 			m_container(s_array<double>,Target_Marginal_Distribution, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::ipf_solver_settings_type>,Solver_Settings, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::rng_type>, Rand, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::synthesis_region_type>, parent_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::ipf_solver_settings_type,Solver_Settings, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::rng_type, Rand, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::synthesis_region_type, parent_reference, NONE, NONE);
 	
 			typedef boost::unordered_multimap<uint, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __sample_map_type;		
 			m_container(__sample_map_type, Sample_Data, NONE, NONE); 

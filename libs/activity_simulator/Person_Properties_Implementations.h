@@ -57,7 +57,7 @@ namespace Person_Components
 			}
 
 			// local data members
-			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 			//m_data(int, home_location_id, NONE, NONE);
 			m_data(int, work_location_id, NONE, NONE);
 			m_data(int, school_location_id, NONE, NONE);

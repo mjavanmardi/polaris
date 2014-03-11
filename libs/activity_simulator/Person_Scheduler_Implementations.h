@@ -20,7 +20,7 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 			m_data(int, Activity_Count, NONE, NONE);
 
 			//Containers for activity planning events and movement planning events
@@ -29,8 +29,8 @@ namespace Person_Components
 
 			// Interface definitions
 			typedef Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
-			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
-			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
+			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(Perception_Faculty)::type_of(Scenario)> _Scenario_Interface;
+			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(Perception_Faculty)::type_of(Network)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
@@ -40,7 +40,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<typename get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence<typename type_of(Activity_Container)> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;

@@ -4,7 +4,7 @@
 
 #include "Polaris_PCH.h"
 
-#define TEST_APP
+
 #ifdef TEST_APP
 
 prototype struct Agent
@@ -62,7 +62,7 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 	typedef double name1;
 	typedef double name2;
 
-	m_prototype(Agent_Data< typename MasterType::agent_data_type>, agent_data, NONE, NONE);
+	m_prototype(Agent_Data, typename MasterType::agent_data_type, agent_data, NONE, NONE);
 
 	template<typename T> void Initialize()
 	{
@@ -113,7 +113,7 @@ implementation struct Other_Implementation : public Polaris_Component<MasterType
 	typedef double name1;
 	typedef double name2;
 
-	m_prototype(Agent< typename MasterType::agent_type>, my_agent, NONE, NONE);
+	m_prototype(Agent, typename MasterType::agent_type, my_agent, NONE, NONE);
 
 	template<typename T> void Initialize()
 	{
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#ifdef HIDE
+#ifndef HIDE
 
 #include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"

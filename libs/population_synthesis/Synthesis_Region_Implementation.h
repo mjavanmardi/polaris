@@ -9,13 +9,10 @@ namespace PopSyn
 	{
 		implementation struct _Synthesis_Region_Implementation
 		{
-			// Tag as implementation
-			typedef _Synthesis_Region_Implementation Component_Type;
-
 			typedef dense_hash_map<long long, Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type>*> zone_map_type;
 			m_container(zone_map_type, Synthesis_Zone_Collection, NONE, NONE);
 			m_data(ostream*,Output_Stream, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::population_synthesis_type>, parent_reference, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::population_synthesis_type, parent_reference, NONE, NONE);
 
 			typedef dense_hash_map<double, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __temp_sample_map_type;		
 			m_container(__temp_sample_map_type, Temporary_Sample_Data, NONE, NONE); 

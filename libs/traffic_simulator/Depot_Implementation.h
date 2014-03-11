@@ -16,10 +16,10 @@ namespace Depot_Components
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Tow_Truck_Implementation),NT>::Component_Type ComponentType;
 
-			typedef Depot<typename type_of(MasterType::depot)> Depot_Interface;
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Depot<typename MasterType::depot_type> Depot_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Intersection<typename MasterType::intersection_type> Intersection_Interface;
 
 			template<typename TargetType> static void Initialize_Type()
 			{
@@ -35,7 +35,7 @@ namespace Depot_Components
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Tow_Truck_Depot),Execution_Object>::Component_Type ComponentType;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
-			typedef Tow_Truck<typename type_of(MasterType::tow_truck)> Tow_Truck_Interface;
+			typedef Tow_Truck<typename MasterType::tow_truck_type> Tow_Truck_Interface;
 
 			template<typename TargetType> static void Initialize_Type()
 			{
@@ -43,17 +43,17 @@ namespace Depot_Components
 			}
 			
 			
-			template<typename TargetType> void Accept_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			template<typename TargetType> void Accept_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
 			{
 				_current_events.clear();
 
 				// Filter out accident events
 
-				for(typename boost::container::vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
 				{
-					Network_Event<typename type_of(MasterType::base_network_event)>* net_event = *itr;
+					Network_Event<typename MasterType::base_network_event_type>* net_event = *itr;
 
-					if( net_event->template Is_Type<typename type_of(MasterType::accident_network_event)>() )
+					if( net_event->template Is_Type<typename MasterType::accident_network_event_type>() )
 					{
 						_current_events.push_back( *itr );
 					}
@@ -88,7 +88,7 @@ namespace Depot_Components
 
 				const std::vector<int>& db_covered_links = (*link_list).getLinks();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
 
 				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -98,7 +98,7 @@ namespace Depot_Components
 					{
 						boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
 
-						typename boost::container::vector<typename type_of(MasterType::link)*>::iterator vitr;
+						typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -123,15 +123,15 @@ namespace Depot_Components
 				//_depot_service = new polaris::Depot( instance );
 			}
 
-			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			m_data(Link_Interface*,resident_link, NONE, NONE);
 			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
 
-			m_data(boost::container::vector<typename type_of(MasterType::tow_truck)>,tow_trucks, NONE, NONE);
+			m_data(boost::container::vector<typename MasterType::tow_truck_type>,tow_trucks, NONE, NONE);
 			//m_data(polaris::Depot*,depot_service, NONE, NONE);
-			m_prototype(Null_Prototype<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype<typename MasterType::traffic_management_center_type>,traffic_management_center, NONE, NONE);
 
-			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, NONE, NONE);
+			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
 		};
 	}
 }

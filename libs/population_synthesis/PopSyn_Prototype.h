@@ -171,13 +171,13 @@ namespace PopSyn
 
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
-				typedef get_mapped_component_type(region_collection_type)									region_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
 				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_mapped_component_type(sample_collection_type)									sample_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
 				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
-				typedef get_mapped_component_type(temporary_sample_collection_type)							temp_sample_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_mapped_component_type(zone_collection_type)										zone_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 

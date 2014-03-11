@@ -412,7 +412,7 @@ namespace Link_Components
 				_link_downstream_cumulative_arrived_vehicles = link_shifted_cumulative_arrived_vehicles;
 
 
-				typedef network_reference_type::routable_networks_type routable_networks_type;
+				typedef typename remove_pointer<network_reference_type>::type::Component_Type::routable_networks_type routable_networks_type;
 
 				Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>* routable_networks = _network_reference->routable_networks<routable_networks_type>();
 
@@ -650,7 +650,7 @@ namespace Link_Components
 				//_link_origin_cumulative_arrived_vehicles = 0;
 				//_link_origin_vehicle_array.clear();
 
-				_network_reference = (network_reference_type*)network;
+				_network_reference = (network_reference_type)network;
 
 				//init link simulation model
 				_link_capacity = 0;
@@ -903,25 +903,25 @@ namespace Link_Components
 				}
 			}
 
-			static void Weather_Event_Notification(void* link, Network_Event<type_of(typename MasterType::weather_network_event)>* net_event)
+			static void Weather_Event_Notification(void* link, Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_weather_event(net_event);
 			}
 
-			static void Accident_Event_Notification(void* link, Network_Event<type_of(typename MasterType::accident_network_event)>* net_event)
+			static void Accident_Event_Notification(void* link, Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_accident_event(net_event);
 			}
 
-			void record_weather_event(Network_Event<type_of(typename MasterType::weather_network_event)>* net_event)
+			void record_weather_event(Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				_weather_event_to_process = true;
 				_current_weather_event = (Null_Prototype<typename MasterType::weather_network_event_type>*)net_event; 
 			}
 				
-			void record_accident_event(Network_Event<type_of(typename MasterType::accident_network_event)>* net_event)
+			void record_accident_event(Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				_accident_event_to_process = true;
 				_current_accident_event = (Null_Prototype<typename MasterType::accident_network_event_type>*)net_event; 
@@ -990,29 +990,29 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
+			template<typename TargetType> void Accept_ITS( typename MasterType::variable_speed_sign_type* vss)
 			{
-				_variable_speed_sign = (variable_speed_sign_type*)vss;
+				_variable_speed_sign = (variable_speed_sign_type)vss;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_word_sign)* vws)
+			template<typename TargetType> void Accept_ITS( typename MasterType::variable_word_sign_type* vws)
 			{
-				_variable_word_sign = (variable_word_sign_type*)vws;
+				_variable_word_sign = (variable_word_sign_type)vws;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::advisory_radio)* har)
+			template<typename TargetType> void Accept_ITS( typename MasterType::advisory_radio_type* har)
 			{
-				_advisory_radio = (advisory_radio_type*)har;
+				_advisory_radio = (advisory_radio_type)har;
 			}
 
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::depot)* depot)
+			template<typename TargetType> void Accept_ITS( typename MasterType::depot_type* depot)
 			{
-				_depot = (depot_type*)depot;
+				_depot = (depot_type)depot;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::link_sensor)* link_sensor)
+			template<typename TargetType> void Accept_ITS( typename MasterType::link_sensor_type* link_sensor)
 			{
-				_link_sensor = (link_sensor_type*)link_sensor;
+				_link_sensor = (link_sensor_type)link_sensor;
 			}
 
 

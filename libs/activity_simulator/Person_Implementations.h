@@ -29,24 +29,23 @@ namespace Person_Components
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);
-			m_prototype(Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
-			m_prototype(Routing_Components::Prototypes::Routing<typename MasterType::routing_type>, router, NONE, NONE);
+			m_prototype(PopSyn::Prototypes::Synthesis_Zone, typename MasterType::synthesis_zone_type, home_synthesis_zone, NONE, NONE);
+			m_prototype(Vehicle_Components::Prototypes::Vehicle,typename MasterType::vehicle_type, vehicle, NONE, NONE);
+			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
 			
-			m_prototype(Person_Components::Prototypes::Person_Mover<typename MasterType::person_mover_type>, Moving_Faculty, NONE, NONE);
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Planning_Faculty, NONE, NONE);
-			m_prototype(Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Scheduling_Faculty, NONE, NONE);
-			m_prototype(Person_Components::Prototypes::Person_Perception< typename MasterType::person_perception_type>, Perception_Faculty, NONE, NONE);
-			m_prototype(Person_Components::Prototypes::Person_Properties< typename MasterType::person_properties_type>, Properties, NONE, NONE);
-			m_prototype(Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>, Static_Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Mover,typename MasterType::person_mover_type, Moving_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Planning_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Scheduler,typename MasterType::person_scheduler_type, Scheduling_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Perception, typename MasterType::person_perception_type, Perception_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties, typename MasterType::person_properties_type, Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties,typename MasterType::person_static_properties_type, Static_Properties, NONE, NONE);
 			
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, current_location, NONE, NONE);
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location,typename MasterType::activity_location_type, current_location, NONE, NONE);
 
-			//m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
-			//m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+
 			// quick fix for moving network and scenario handling to the perception class
-			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_type;
-			typedef typename type_of(Perception_Faculty)::type_of(Scenario) scenario_reference_type;
+			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_accessible_type;
+			typedef typename type_of(Perception_Faculty)::type_of(Scenario) scenario_reference_accessible_type;
 
 			template<typename TargetType> TargetType network_reference()
 			{

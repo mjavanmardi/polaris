@@ -15,7 +15,7 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Activity_Generator_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner,typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
 			// Interface definitions
 			typedef Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _Person_Interface;

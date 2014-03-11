@@ -16,11 +16,11 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Perception_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 
 			// Physical world elements
-			m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, Network, NONE, NONE);
-			m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, Scenario, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, Network, NONE, NONE);
+			m_prototype(Scenario_Components::Prototypes::Scenario, typename MasterType::scenario_type, Scenario, NONE, NONE);
 
 			// Interface definitions
 			typedef Network_Components::Prototypes::Network< typename type_of(Network)> _Network_Interface;

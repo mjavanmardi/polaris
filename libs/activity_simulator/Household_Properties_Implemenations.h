@@ -22,7 +22,7 @@ namespace Household_Components
 
 
 			// local data members
-			m_prototype(Prototypes::Household< typename MasterType::household_type>, Parent_Household, NONE, NONE);
+			m_prototype(Prototypes::Household,typename MasterType::household_type, Parent_Household, NONE, NONE);
 			m_data(int, home_location_id, NONE, NONE);
 		
 			// Methods

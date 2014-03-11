@@ -28,7 +28,7 @@ namespace Link_Control_Components
 
 				const std::vector<int>& db_covered_links = (*link_list).getLinks();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
 
 				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -38,7 +38,7 @@ namespace Link_Control_Components
 					{
 						boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
 
-						typename boost::container::vector<typename type_of(MasterType::link)*>::iterator vitr;
+						typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -54,7 +54,7 @@ namespace Link_Control_Components
 			//m_data(float, x_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			//m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
-			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
 			m_data(bool,shoulder_opened, NONE, NONE);
 

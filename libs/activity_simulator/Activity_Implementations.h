@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Person_Prototype.h"
+#include "Person_Planner_Prototype.h"
 #include "activity_simulator\Person_Scheduler_Implementations.h"
 #include "Activity_Prototype.h"
 
@@ -28,11 +30,10 @@ namespace Activity_Components
 
 			//=================================================================
 			// Pointer back to planner
-			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype_test(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
 			// pointer to movement plan associated with activity
-			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
-			//m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::movement_plan_record_type>, movement_record, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 
 			static m_data(int, Route_Planning_Count, NONE, NONE);
 			static m_data(_lock, update_lock, NONE, NONE);
@@ -41,14 +42,16 @@ namespace Activity_Components
 			//================================================================================================================================================================================================
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType> this_itf;
-			typedef Person_Components::Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _person_itf;
+			typedef Person_Components::Prototypes::Person_Planner<Parent_Planner_component_type> _planning_itf;
+			typedef Person_Components::Prototypes::Person<typename _planning_itf::get_type_of(Parent_Person)> _person_itf;
+			typedef Person_Components::Prototypes::Person_Perception<typename _person_itf::get_type_of(Perception_Faculty)> _perception_itf;
 			typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
-			typedef Person_Components::Prototypes::Person_Scheduler< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty)> _scheduler_itf;
-			typedef Person_Components::Prototypes::Person_Properties< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties)> _properties_itf;
-			typedef Person_Components::Prototypes::Person_Planner<typename type_of(Parent_Planner)> _planning_itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
+			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Properties)> _properties_itf;
+			
 			typedef Person_Components::Prototypes::Destination_Chooser<typename _planning_itf::get_type_of(Destination_Choice_Faculty)> _dest_choice_itf;
-			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _scenario_itf;
-			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _network_itf;
+			typedef Scenario_Components::Prototypes::Scenario< typename _perception_itf::get_type_of(Scenario)> _scenario_itf;
+			typedef Network_Components::Prototypes::Network< typename _perception_itf::get_type_of(Network)> _network_itf;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _network_itf::get_type_of(skimming_faculty)> _skim_itf;
 			typedef Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> _home_activity_itf;
 
@@ -91,7 +94,7 @@ namespace Activity_Components
 			m_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility, NONE, NONE);
 
 			// Activity attributes
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, NONE, NONE);
 			member_component_and_feature_accessor(Start_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
@@ -1486,7 +1489,7 @@ namespace Activity_Components
 			// Fundamental activity properties
 			m_data(char, Activity_Plan_ID, NONE, NONE);
 			m_data(char, Activity_Type, NONE, NONE);
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
 			m_data(Time_Minutes, Start_Time, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));
 			m_data(Time_Minutes, Duration, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));
 			m_data(Time_Minutes, Travel_Time, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));

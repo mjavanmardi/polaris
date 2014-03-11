@@ -31,14 +31,14 @@ namespace Person_Components
 			}
 
 			// Pointer to the Parent class
-			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 
 			// Pointer to the child classses
 			//m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Person_Scheduler, NONE, NONE);
-			m_prototype(Prototypes::Activity_Generator< typename MasterType::activity_generator_type>, Activity_Generation_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Destination_Chooser< typename MasterType::person_destination_chooser_type>, Destination_Choice_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Mode_Chooser< typename MasterType::person_mode_chooser_type>, Mode_Choice_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Activity_Timing_Chooser< typename MasterType::activity_timing_chooser_type>, Timing_Chooser, NONE, NONE);
+			m_prototype(Prototypes::Activity_Generator, typename MasterType::activity_generator_type, Activity_Generation_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Destination_Chooser, typename MasterType::person_destination_chooser_type, Destination_Choice_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Mode_Chooser, typename MasterType::person_mode_chooser_type, Mode_Choice_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Activity_Timing_Chooser, typename MasterType::activity_timing_chooser_type, Timing_Chooser, NONE, NONE);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_component_and_feature_accessor(Next_Activity_Generation_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);

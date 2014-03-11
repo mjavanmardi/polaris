@@ -1191,8 +1191,8 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------		
 			template<typename TargetType> void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
-				_db_reader = Allocate<type_of(db_reader)>();
-				typedef Prototypes::Network_DB_Reader<type_of(db_reader)> _DB_Interface;
+				_db_reader = Allocate<remove_pointer<type_of(db_reader)>::type>();
+				typedef Prototypes::Network_DB_Reader<remove_pointer<type_of(db_reader)>::type> _DB_Interface;
 				_DB_Interface* db = (_DB_Interface*)_db_reader;
 				db->template network_reference<ComponentType*>((ComponentType*)this);
 
@@ -1214,7 +1214,7 @@ namespace Network_Components
 			//==================================================================================================================
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
-			m_prototype(Null_Prototype< typename type_of(MasterType::traffic_management_center)>, traffic_management_center, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::traffic_management_center_type>, traffic_management_center, NONE, NONE);
 		};
 
 		implementation struct Integrated_Network_Implementation : public Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>
