@@ -201,8 +201,8 @@ int main(int argc, char* argv[])
 	cfg.Multi_Threaded_Setup(24*60*60,8);
 	INITIALIZE_SIMULATION(cfg);
 
-    Average_Execution_Objects_Hint<MasterType::routing_type>(2778495);
-    Average_Execution_Objects_Hint<MasterType::traveler_type>(2778495);
+    Average_Execution_Objects_Hint<MasterType::routing_type>(27784950);
+    Average_Execution_Objects_Hint<MasterType::traveler_type>(27784950);
     Average_Execution_Objects_Hint<MasterType::link_type>(55008);
     Average_Execution_Objects_Hint<MasterType::intersection_type>(18904);
 #ifdef ANTARES

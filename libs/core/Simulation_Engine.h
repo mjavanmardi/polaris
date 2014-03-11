@@ -4,6 +4,7 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include "Execution_Component_Manager.h"
+#include "Event_Component_Manager.h"
 
 namespace polaris
 {

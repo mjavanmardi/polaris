@@ -59,6 +59,7 @@ namespace polaris
 	enum Component_Manager_Types
 	{
 		EXECUTION_MANAGER,
+		EVENT_MANAGER,
 		DATA_MANAGER,
 		NULL_MANAGER
 	};

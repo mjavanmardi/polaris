@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Event_Object_Methods.h"
 #include "Execution_Object_Methods.h"
 #include "Data_Component_Manager_Methods.h"
 #include "Dynamic_Dispatch.h"
