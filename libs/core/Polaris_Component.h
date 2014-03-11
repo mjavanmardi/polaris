@@ -6,6 +6,7 @@
 #include "Container_Forms.h"
 #include "Data_Component_Manager.h"
 #include "Execution_Component_Manager.h"
+#include "Event_Component_Manager.h"
 #include "Data_Object.h"
 
 namespace polaris
@@ -27,6 +28,12 @@ namespace polaris
 	struct Get_Component_Manager<Execution_Object,ComponentType>
 	{
 		typedef Execution_Component_Manager<ComponentType> type;
+	};
+	
+	template<typename ComponentType>
+	struct Get_Component_Manager<Event_Object,ComponentType>
+	{
+		typedef Event_Component_Manager<ComponentType> type;
 	};
 
 	template<typename ComponentType>

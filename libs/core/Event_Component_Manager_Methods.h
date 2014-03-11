@@ -1,6 +1,6 @@
 #pragma once
 ///----------------------------------------------------------------------------------------------------
-/// Execution_Component_Manager_Methods.h - Base and type-specific managers for all objects of that type
+/// Event_Component_Manager_Methods.h - Base and type-specific managers for all objects of that type
 ///----------------------------------------------------------------------------------------------------
 
 #include "World.h"
@@ -13,7 +13,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------	
 	
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Deactivate_Block( Execution_Block* block )
+	void Event_Component_Manager<DataType>::Deactivate_Block( Event_Block* block )
 	{
 		LOCK(_tex_lock);
 
@@ -26,7 +26,7 @@ namespace polaris
 				//_active_blocks.erase( _active_blocks.iterator_to(*block) );
 					
 				// linear search when deque is used as fundamental container
-				for(boost::container::deque<Execution_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+				for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 				{
 					if((*active_itr) == block)
 					{
@@ -48,73 +48,11 @@ namespace polaris
 	}
 
 	///----------------------------------------------------------------------------------------------------
-	/// Update_Schedule - Thread safe update of the component manager's internal schedule
-	///----------------------------------------------------------------------------------------------------
-
-	void Execution_Component_Manager_Base::Update_Schedule(const Revision& update_revision)
-	{
-		// Following makes TEX aware, can catch TEX in 2 meaningful states: A) Will Visit B) Won't Visit
-
-		LOCK(_tex_lock);
-
-			if( !Visiting() )
-			{
-				// Work on the post-update data
-				if(update_revision < _tex_next_revision)
-				{
-					_tex_next_revision = update_revision;
-				}
-			}
-			else
-			{
-				// Work on the pre-update data
-				if(update_revision < _tex_next_next_revision)
-				{
-					_tex_next_next_revision = update_revision;
-				}
-
-			}
-
-		UNLOCK(_tex_lock);
-	}
-
-	///----------------------------------------------------------------------------------------------------
-	/// Average_Execution_Objects_Hint - provide a hint to the engine about number of objects expected
-	///----------------------------------------------------------------------------------------------------
-
-	template<typename DataType>
-	void Average_Execution_Objects_Hint(unsigned int value)
-	{
-		if(_world->Is_Running())
-		{
-			THROW_WARNING("Setting execution object hints during run is not a safe operation");
-		}
-		else
-		{
-			// Initial goal is to have __execution_segments_per_thread * __num_sim_threads blocks ideally, but to bound it by __max_execution_objects_per_block for memory performance
-			// In some cases __execution_segments_per_thread * __num_sim_threads * 4 seems to perform better, possibly due to round-off or reducing strain on the TLB
-			// However, in other cases __execution_segments_per_thread * __num_sim_threads performs better, possibly due to a friendlier cache situation when returning from a long call - more research is warranted
-			unsigned int hint;
-			
-			if(num_sim_threads() > 1)
-			{
-				hint = min( (unsigned int)max( (unsigned int)(value / ((execution_segments_per_thread() + 1) * num_sim_threads())), (unsigned int)1) , max_execution_objects_per_block() );
-			}
-			else
-			{
-				hint = max_execution_objects_per_block();
-			}
-
-			DataType::component_manager->objects_per_block_hint(hint);
-		}
-	}
-
-	///----------------------------------------------------------------------------------------------------
 	/// Allocate - Allocate an execution object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Execution_Component_Manager<DataType>::Allocate(int uuid)
+	DataType* Event_Component_Manager<DataType>::Allocate(int uuid)
 	{
 		// Check whether thread has memory of this type available
 		if( _blocks_with_free_cells[__thread_id].empty() )
@@ -124,7 +62,7 @@ namespace polaris
 
 			// Block size is chosen as the nearest page size (or power of 2 if less than page size) which can accommodate the desired objects per block
 
-			unsigned int suggested_block_size = Execution_Block::_data_offset + _ideal_cell_size * _objects_per_block_hint;
+			unsigned int suggested_block_size = Event_Block::_data_offset + _ideal_cell_size * _objects_per_block_hint;
 
 			unsigned int block_size;	
 
@@ -157,15 +95,15 @@ namespace polaris
 				else block_size = __page_size / 2;		
 			}
 
-			unsigned int num_cells = (block_size - Execution_Block::_data_offset) / _ideal_cell_size;
+			unsigned int num_cells = (block_size - Event_Block::_data_offset) / _ideal_cell_size;
 
 			// Global allocation and construction of the execution block memory
 			Byte* block_memory = new Byte[block_size];
 
 			// Construction locks in cell_size and num_cells for this particular block
-			new (block_memory) Execution_Block( _ideal_cell_size, num_cells );
+			new (block_memory) Event_Block( _ideal_cell_size, num_cells );
 
-			Execution_Block* new_block=(Execution_Block*)block_memory;
+			Event_Block* new_block=(Event_Block*)block_memory;
 
 			// Initialization of the new block
 			new_block->Initialize( );
@@ -178,7 +116,7 @@ namespace polaris
 			Add_Empty_Block(__thread_id);
 		}
 
-		Execution_Block* const free_block = _blocks_with_free_cells[__thread_id].front();
+		Event_Block* const free_block = _blocks_with_free_cells[__thread_id].front();
 
 		// If the free block is currently empty, then the following state applies:
 		// - The block is not in the _active_blocks list <- Actually we are not guaranteed this! It could be queued for deactivation, but still open for allocating to
@@ -215,7 +153,7 @@ namespace polaris
 							// Do the slow (but most conceptually simple) thing and remove it from the de-activation queue
 							// This condition almost never gets hit in practice, so it is ok to spend some time here
 
-							for(boost::container::deque<Execution_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
+							for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
 							{
 								if((*itr) == free_block)
 								{
@@ -262,7 +200,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Execution_Component_Manager<DataType>::Allocate_Array( unsigned int num )
+	DataType* Event_Component_Manager<DataType>::Allocate_Array( unsigned int num )
 	{
 		static_assert("Array allocation not supported for execution components");
 	}
@@ -272,17 +210,17 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Lazy_Free( DataType* ptr )
+	void Event_Component_Manager<DataType>::Lazy_Free( DataType* ptr )
 	{
 		ptr->_execution_block->Lazy_Free(ptr);
 	}
 
 	///----------------------------------------------------------------------------------------------------
-	/// Free - Free an Execution object of given type in a multi-threaded paradigm
+	/// Free - Free an Event object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Free( DataType* ptr )
+	void Event_Component_Manager<DataType>::Free( DataType* ptr )
 	{
 		ptr->execution_block()->Free(ptr);
 	}
@@ -292,7 +230,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Free_Array( DataType* ptr )
+	void Event_Component_Manager<DataType>::Free_Array( DataType* ptr )
 	{
 		static_assert("Array deallocation not supported for execution components");
 	}
@@ -302,7 +240,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Clean_Up_Thread_Memory()
+	void Event_Component_Manager<DataType>::Clean_Up_Thread_Memory()
 	{
 		// This routine may miss blocks which are emptied by other threads while it is running, but it will remain thread safe under these conditions
 
@@ -315,7 +253,7 @@ namespace polaris
 		{
 			// This iteration is safe because only this thread can grow this list
 
-			for(boost::container::deque<Execution_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
+			for(boost::container::deque<Event_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
 			{
 				// This check is safe because only this thread can make these blocks non-empty or (by extension) activated
 				// Skip blocks which are "activated", they must be in the deactivation queue (or at least they should be), and must be removed from the intrusive list in the update step
@@ -342,7 +280,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Step(Revision& out_next_revision)
+	void Event_Component_Manager<DataType>::Step(Revision& out_next_revision)
 	{
 		// Thread logs an overly conservative standing guess for when the next event should happen
 		Revision tex_proposed_next_revision = __revision_omega;
@@ -350,7 +288,7 @@ namespace polaris
 		// log the current revision as a const
 		const Revision this_revision = revision();
 
-		Execution_Block* current_block;
+		Event_Block* current_block;
 
 		// Computing blocks here is safe because they will not be added or removed until later
 		const unsigned int active_blocks_size = _active_blocks.size();
@@ -360,8 +298,8 @@ namespace polaris
 		unsigned int index = 0;
 
 		// loop over the execution blocks which are active this event step
-		//boost::intrusive::list<Execution_Block>::iterator itr = _active_blocks.begin();
-		boost::container::deque<Execution_Block*>::iterator itr = _active_blocks.begin();
+		//boost::intrusive::list<Event_Block>::iterator itr = _active_blocks.begin();
+		boost::container::deque<Event_Block*>::iterator itr = _active_blocks.begin();
 
 		while(true)
 		{
@@ -473,25 +411,26 @@ namespace polaris
 		UNLOCK(_tex_lock);
 	}
 
+
 	///----------------------------------------------------------------------------------------------------
 	/// Update - Update to be performed after all threads have finished visiting this component type
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Update()
+	void Event_Component_Manager<DataType>::Update()
 	{
 		if(_queued_deactivated_blocks.size())
 		{
 			// remove queued deactivated blocks, they are locked against _tex, so you are ok here
 
-			for(boost::container::deque<Execution_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
+			for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
 			{
 				if((*itr)->activated())
 				{
 					//_active_blocks.erase( _active_blocks.iterator_to( *(*itr) ) );
 
 					// linear search when deque is used as fundamental container
-					for(boost::container::deque<Execution_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+					for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 					{
 						if((*active_itr) == (*itr))
 						{
@@ -517,7 +456,7 @@ namespace polaris
 
 			while(_queued_activated_blocks.size())
 			{
-				Execution_Block* current_block = &_queued_activated_blocks.front();
+				Event_Block* current_block = &_queued_activated_blocks.front();
 
 				_queued_activated_blocks.pop_front();
 								

@@ -12,6 +12,8 @@
 #include <boost/container/map.hpp>
 #include <boost/unordered/unordered_map.hpp>
 #include <boost/unordered/unordered_set.hpp>
+#include <boost/intrusive/treap_set.hpp>
+#include <boost/intrusive/set.hpp>
 
 #include "Sparsehash/dense_hash_map.h"
 using google::dense_hash_map;
