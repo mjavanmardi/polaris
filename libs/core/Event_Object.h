@@ -6,138 +6,223 @@
 #include "Execution_Object.h"
 
 namespace polaris
-{
-	struct node {
-		node* prev;
-		node* next;
-		node* child;
-		node* parent;
+{	/*
+	 * Node Declaration
+	 */
+	struct node
+	{
 		int degree;
-		bool marked;
+		node* parent;
+		node* child;
+		node* left;
+		node* right;
+		char mark;
+		char C;
 	};
-	
-	template <class V> struct FibonacciHeap {
-		node* heap;
-
-		FibonacciHeap() {
-			heap=_empty();
-		}
-
-		node* insert(V& value) {
-			node* n = (node*)&value;
-			n->prev=n->next=n;
-			n->degree=0;
-			n->marked=false;
-			n->child=NULL;
-			n->parent=NULL;
-			heap=_merge(heap,n);
-			return n;
-		}
-
-		bool isEmpty() {
-			return heap==NULL;
-		}
-
-		V& getMinimum() {
-			return (V&)*heap;
-		}
-
-		V& removeMinimum() {
-			node* old=heap;
-			heap=_removeMinimum(heap);
-			return *((V*)old);
-		}
-
-		node* _empty() {
-			return NULL;
-		}
-
-		node* _merge(node* a,node* b) {
-			if(a==NULL)return b;
-			if(b==NULL)return a;
-			if(*((V*)a)>*((V*)b)) {
-				node* temp=a;
-				a=b;
-				b=temp;
+	/*
+	 * Class Declaration
+	 */
+	template<typename T>
+	class FibonacciHeap
+	{
+		private:
+			int nH;
+			T *H;
+		public:
+			T* InitializeHeap();
+			int Fibonnaci_link(T*, T*, T*);
+			T *Insert(T *, T *);
+			T *Extract_Min(T *);
+			int Consolidate(T *);
+        
+			FibonacciHeap()
+			{
+				H = InitializeHeap();
 			}
-			node* an=a->next;
-			node* bp=b->prev;
-			a->next=b;
-			b->prev=a;
-			an->prev=bp;
-			bp->next=an;
-			return a;
+	};
+	/*
+	 * Initialize Heap
+	 */
+	template<typename T>
+	T* FibonacciHeap<T>::InitializeHeap()
+	{
+		nH = 0;
+		T* np;
+		np = NULL;
+		return np;
+	}
+	/*
+	 * Insert Node
+	 */
+	template<typename T>
+	T* FibonacciHeap<T>::Insert(T* H, T* x)
+	{
+		x->degree = 0;
+		x->parent = NULL;
+		x->child = NULL;
+		x->left = x;
+		x->right = x;
+		x->mark = 'F';
+		x->C = 'N';
+		if (H != NULL)
+		{
+			(H->left)->right = x;
+			x->right = H;
+			x->left = H->left;
+			H->left = x;
+			if ((*x) < (*H))
+				H = x;
 		}
-
-		void _addChild(node* parent,node* child) {
-			child->prev=child->next=child;
-			child->parent=parent;
-			parent->degree++;
-			parent->child=_merge(parent->child,child);
+		else
+		{
+			H = x;
 		}
+		nH = nH + 1;
+		return H;
+	}
+	/*
+	 * Link Nodes in Fibonnaci Heap
+	 */
+	template<typename T>
+	int FibonacciHeap<T>::Fibonnaci_link(T* H1, T* y, T* z)
+	{
+		(y->left)->right = y->right;
+		(y->right)->left = y->left;
+		if (z->right == z)
+			H1 = z;
+		y->left = y;
+		y->right = y;
+		y->parent = z;
+		if (z->child == NULL)
+			z->child = y;
+		y->right = z->child;
+		y->left = (z->child)->left;
+		((z->child)->left)->right = y;
+		(z->child)->left = y;
+		if ((*y) < (*(T*)(z->child)))
+			z->child = y;
+		z->degree++;
 
-		void _unMarkAndUnParentAll(node* n) {
-			if(n==NULL)return;
-			node* c=n;
-			do {
-				c->marked=false;
-				c->parent=NULL;
-				c=c->next;
-			}while(c!=n);
-		}
-
-		node* _removeMinimum(node* n) {
-			_unMarkAndUnParentAll(n->child);
-			if(n->next==n) {
-				n=n->child;
-			} else {
-				n->next->prev=n->prev;
-				n->prev->next=n->next;
-				n=_merge(n->next,n->child);
+		return 1;
+	}
+	/*
+	 * Extract Min Node in Fibonnaci Heap
+	 */
+	template<typename T>
+	T* FibonacciHeap<T>::Extract_Min(T* H1)
+	{
+		T* p;
+		T* ptr;
+		T* z = H1;
+		p = z;
+		ptr = z;
+		if (z == NULL)
+			return z;
+		T* x;
+		T* np;
+		x = NULL;
+		if (z->child != NULL)
+			x = (T*)z->child;
+		if (x != NULL)
+		{
+			ptr = x;
+			do
+			{
+				np = (T*)x->right;
+				(H1->left)->right = x;
+				x->right = H1;
+				x->left = H1->left;
+				H1->left = x;
+				if ((*x) < (*H1))
+					H1 = x;
+				x->parent = NULL;
+				x = np;
 			}
-			if(n==NULL)return n;
-			node* trees[64]={NULL};
-
-			while(true) {
-				if(trees[n->degree]!=NULL) {
-					node* t=trees[n->degree];
-					if(t==n)break;
-					trees[n->degree]=NULL;
-					if(*((V*)n)<*((V*)t)) {
-						t->prev->next=t->next;
-						t->next->prev=t->prev;
-						_addChild(n,t);
-					} else {
-						t->prev->next=t->next;
-						t->next->prev=t->prev;
-						if(n->next==n) {
-							t->next=t->prev=t;
-							_addChild(t,n);
-							n=t;
-						} else {
-							n->prev->next=t;
-							n->next->prev=t;
-							t->next=n->next;
-							t->prev=n->prev;
-							_addChild(t,n);
-							n=t;
-						}
-					}
-					continue;
-				} else {
-					trees[n->degree]=n;
+			while (np != ptr);
+		}
+		(z->left)->right = z->right;
+		(z->right)->left = z->left;
+		H1 = (T*)z->right;
+		if (z == z->right && z->child == NULL)
+			H = NULL;
+		else
+		{
+			H1 = (T*)z->right;
+			Consolidate(H1);
+		}
+		nH = nH - 1;
+		return p;
+	}
+	/*
+	 * Consolidate Node in Fibonnaci Heap
+	 */
+	template<typename T>
+	int FibonacciHeap<T>::Consolidate(T* H1)
+	{
+		int d, i;
+		float f = (log((float)nH)) / (log((float)2));
+		int D = (int)f;
+		T** A = (T**)alloca((D+1)*sizeof(T*));
+		for (i = 0; i <= D; i++)
+			A[i] = NULL;
+		T* x = H1;
+		T* y;
+		T* np;
+		T* pt = x;
+		do
+		{
+			pt = (T*)pt->right;
+			d = x->degree;
+			while (A[d] != NULL)
+			{
+				y = A[d];
+				if ((*x) > (*y))
+				{
+					np = x;
+					x = y;
+					y = np;
 				}
-				n=n->next;
+				if (y == H1)
+					H1 = x;
+				Fibonnaci_link(H1, y, x);
+				if (x->right == x)
+					H1 = x;
+					A[d] = NULL;
+				d = d + 1;
 			}
-			node* min=n;
-			do {
-				if(*((V*)n)<*((V*)min)) min=n;
-				n=n->next;
-			} while(n!=n);
-			return min;
+			A[d] = x;
+			x = (T*)x->right;
 		}
-	};
+		while (x != H1);
+		H = NULL;
+		for (int j = 0; j <= D; j++)
+		{
+			if (A[j] != NULL)
+			{
+				A[j]->left = A[j];
+				A[j]->right =A[j];
+				if (H != NULL)
+				{
+					(H->left)->right = A[j];
+					A[j]->right = H;
+					A[j]->left = H->left;
+					H->left = A[j];
+					if (*(A[j]) < *(H))
+					H = A[j];
+				}
+				else
+				{
+					H = A[j];
+				}
+				if(H == NULL)
+					H = A[j];
+				else if (*(A[j]) < *(H))
+					H = A[j];
+			}
+		}
 
+		return 1;
+	}
 	// Forward Declaration of Event_Block
 	class Event_Block;
 
