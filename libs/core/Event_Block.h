@@ -10,7 +10,7 @@ namespace polaris
 	class Event_Block : public boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::normal_link>>
 	{
 	public:
-		Event_Block(unsigned int cell_size,unsigned int num_cells):_cell_size(cell_size),_num_cells(num_cells){_event_schedule_heap = _event_schedule.initialize();}
+		Event_Block(unsigned int cell_size,unsigned int num_cells):_cell_size(cell_size),_num_cells(num_cells){}
 
 		void Initialize();
 
@@ -93,7 +93,7 @@ namespace polaris
 		bool _activated;
 
 		//boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>> _event_schedule;
-		FibonacciHeap<Event_Object> _event_schedule;
-		Event_Object* _event_schedule_heap;
+		//BinaryHeap<Event_Object> _event_schedule;
+		Intrusive_Binary_Heap<Event_Object> _event_schedule;
 	};
 }
