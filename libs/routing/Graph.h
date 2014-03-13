@@ -17,6 +17,11 @@ namespace polaris
 		{
 			return this_component()->Create_Copy();
 		}
+		
+		boost::container::vector<base_edge_type*>* Get_Edges()
+		{
+			return this_component()->Get_Edges();
+		}
 
 		template<typename Edge_Type>
 		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)

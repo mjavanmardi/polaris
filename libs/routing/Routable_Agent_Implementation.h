@@ -172,4 +172,41 @@ namespace polaris
 
 		t_data(float,wait_horizon);
 	};
+
+
+	template<typename MasterType>
+	struct Tree_Agent_Implementation
+	{
+		template<typename CurrentEdgeType, typename ConnectionType>
+		bool process_connection_set(CurrentEdgeType* current)
+		{
+			return true;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return false;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return 0.0f;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_cost + connection->_cost;
+		}
+
+		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_time_cost + connection->_time_cost;
+		}
+
+		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
+		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){}
+	};
 }

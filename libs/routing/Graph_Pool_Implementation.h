@@ -11,6 +11,23 @@ namespace polaris
 		typedef Base_Graph_Type base_graph_type;
 		typedef typename base_graph_type::base_edge_type base_edge_type;
 
+		boost::container::vector<base_edge_type*>* Get_Edges(graph_id_type gid)
+		{
+			if( gid.graph_id < _graphs.size() && gid.graph_id >= 0 )
+			{
+				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*)_graphs[ gid.graph_id ];
+
+				return current_graph->Get_Edges();
+			}
+			else
+			{
+				THROW_WARNING("Graph id: " << gid.graph_id << " not found");
+
+				return nullptr;
+			}
+		}
+
+
 		base_edge_type* Get_Edge(global_edge_id& gid)
 		{
 			if( gid.graph_id < _graphs.size() && gid.graph_id >= 0 )

@@ -22,7 +22,7 @@ namespace polaris
 
 			//if(itr->_events_hook.is_linked()){ _event_schedule.erase(itr); }
 
-			_event_schedule_heap = _event_schedule.insert( _event_schedule_heap, updated_object );
+			_event_schedule.insert( updated_object );
 
 		UNLOCK( _ptex_lock );
 	}
@@ -270,7 +270,7 @@ namespace polaris
 		// log the current revision as a const
 		const Revision this_revision = revision();
 		
-		//Revision cached_next_revision;
+		Revision cached_next_revision;
 
 		// prepare to iterate over contiguous memory
 		Byte* object_itr = (((Byte*)this)+_data_offset);
@@ -283,13 +283,15 @@ namespace polaris
 
 		//for(boost::intrusive::multiset<Event_Object,boost::intrusive::member_hook<Event_Object, boost::intrusive::set_member_hook<>, &Event_Object::_events_hook>>::iterator itr = _event_schedule.begin();itr!=_event_schedule.end();itr=_event_schedule.begin())
 		//while(!_event_schedule.isEmpty())
-		while(true);
+		while(true)
 		{
 			//DataType* const current_object = (DataType* const) &(*itr);
 			
-			DataType* const current_object = (DataType* const) (_event_schedule.extract_min(_event_schedule_heap));
+			//DataType* const current_object = (DataType* const) _event_schedule.ExtractMin();
+			
+			DataType* const current_object = (DataType* const) _event_schedule.heap_front;
 
-			//cached_next_revision = current_object->_next_revision;
+			cached_next_revision = current_object->_next_revision;
 
 			// Safe mode locks the execution object for increased thread safety
 			#ifdef SAFE_MODE
@@ -300,7 +302,8 @@ namespace polaris
 			// If it is the current iteration, it must be overwritten
 			if( current_object->_next_revision == this_revision )
 			{
-				//_event_schedule.removeMinimum();
+				//_event_schedule.DeleteMin();
+				_event_schedule.extract_min();
 
 				// process the OPTEX
 				current_object->_event_callback(current_object,optex_conditional);
@@ -317,7 +320,7 @@ namespace polaris
 
 				//Update_Object_Schedule(current_object);
 				
-				_event_schedule.insert(*current_object);
+				_event_schedule.insert(current_object);
 			}
 
 			// Here locking is not necessary because local copies are being updated
@@ -342,7 +345,7 @@ namespace polaris
 				}
 			}
 
-			if(cached_next_revision._revision > this_revision._revision){ break; }
+			if(cached_next_revision._revision > this_revision._revision) break;
 
 			#ifdef SAFE_MODE
 				UNLOCK(current_object->_optex_lock);

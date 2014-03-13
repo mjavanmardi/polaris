@@ -36,6 +36,11 @@ namespace Routing_Components
 				return this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
 			}
 
+			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& edge_cost_container)
+			{
+				return this_component()->compute_static_network_tree(origin,edge_cost_container);
+			}
+
 			void test_routable_network()
 			{
 				this_component()->test_routable_network();

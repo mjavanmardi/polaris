@@ -21,6 +21,11 @@ namespace polaris
 		//	return this_component()->Get_Connection<Connection_Type>(inbound_edge_id,outbound_edge_id);
 		//}
 
+		boost::container::vector<base_edge_type*>* Get_Edges(graph_id_type gid)
+		{
+			return this_component()->Get_Edges(gid);
+		}
+
 		base_edge_type* Get_Edge(global_edge_id& gid)
 		{
 			return this_component()->Get_Edge(gid);

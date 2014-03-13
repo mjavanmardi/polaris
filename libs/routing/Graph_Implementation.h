@@ -20,6 +20,13 @@ namespace polaris
 		t_data(graph_id_type,graph_id);
 		t_data(bool,compiled);
 
+		
+		boost::container::vector< base_edge_type* >* Get_Edges()
+		{
+			return (boost::container::vector< base_edge_type* >*)_ordered_edge_reference;
+		}
+
+
 		template<typename Edge_Type>
 		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)
 		{
