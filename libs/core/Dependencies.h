@@ -40,6 +40,15 @@ using google::sparse_hash_set;
 #define __forceinline inline
 #endif
 
+//---------------------------------------------------------
+//	define numeric check (tr1::isnan is not available on vc++
+//---------------------------------------------------------
+#ifdef _MSC_VER
+#define ISNAN(x) _isnan(x)
+#else
+#define ISNAN(x) std::isnan(x)
+#endif
+
 
 using namespace std;
 

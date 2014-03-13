@@ -131,8 +131,23 @@ namespace Zone_Components
 			}
 
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total
-            accessor(production_count, NONE, NONE);
-            accessor(attraction_count, NONE, NONE);
+            template<typename T> void production_count(T count)
+			{
+				this_component()->production_count<T>(count);
+			}
+			template<typename T> T production_count()
+			{
+				return this_component()->production_count<T>();
+			}
+			template<typename T> void attraction_count(T count)
+			{
+				this_component()->attraction_count<T>(count);
+			}
+			template<typename T> T attraction_count()
+			{
+				return this_component()->attraction_count<T>();
+			}
+
 			accessor(employment_simulated, NONE, NONE);
 		};
 	}

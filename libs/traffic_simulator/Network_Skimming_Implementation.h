@@ -463,7 +463,7 @@ namespace Network_Skimming_Components
 				for (;orig_itr != origin_locations->end(); ++orig_itr, ++orig_index)
 				{
 
-					assert(false);
+					//assert(false);
 
 					////TODO: NEED TO REDO SKIM ROUTER TO USE THE NEW ROUTER IMPLEMENTATION
 					//// get the origin/destination indices

@@ -24,11 +24,10 @@ namespace Person_Components
 		{
 			tag_as_prototype;
 		 
-			// Conditonal handling and helper functions
+			// Event Controller handling and helper functions
 			static void Activity_Generation_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
 				//----------------------------------------------
-				// CONDITIONALS FOR BASIC ACTIVITY GENERATION
 				// 1.) Activity Generation (Occurs 
 				typedef Activity_Generator<ComponentType> _Generator_Interface;
 				_Generator_Interface* this_ptr=(_Generator_Interface*)_this;
@@ -56,7 +55,7 @@ namespace Person_Components
 		
 
 			// Event handling
-			template<typename TargetType> Activity_Generation_Event()
+			template<typename TargetType> void Activity_Generation_Event()
 			{
 				// Call specific implementation of the activity generation routine
 				this_component()->Activity_Generation<TargetType>();
@@ -76,7 +75,8 @@ namespace Person_Components
 				long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>() + (Simulation_Timestep_Increment)(random_number*60.0f);
 				this_component()->Initialize< TargetType>();
 
-				load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
+				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION);
 			}
 			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
 			{

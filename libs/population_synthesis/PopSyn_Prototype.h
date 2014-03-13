@@ -120,7 +120,7 @@ namespace PopSyn
 				}
 				else if (iteration() == 3)
 				{
-					//pthis->Output_Popsyn_To_DB_Event<NT>();
+					pthis->Output_Popsyn_To_DB_Event<NT>();
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
 				}
@@ -176,13 +176,13 @@ namespace PopSyn
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
-				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
 				//typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_itf*> regions_itf;
-				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_collection_type::mapped_type> regions_itf;
-
+				typedef Pair_Associative_Container<region_collection_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type> zones_itf;
 				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
-				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
-
+				
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type,sample_collection_type::mapped_type> sample_data_itf;
 
@@ -429,7 +429,7 @@ namespace PopSyn
 
 				//===============================================================================================================
 				// Link the synthesizer zones to the activity locations in the network_reference, if it exists, otherwise ignore
-				this->Link_Zones_To_Network_Locations<NT>();				
+				this->Link_Zones_To_Network_Locations<get_type_of(network_reference)>();				
 				//---------------------------------------------------------------------------------------------------------------
 
 				//------------------------
@@ -448,11 +448,31 @@ namespace PopSyn
 				//===============================================================================================================
 				// Fill zonal activity_locations boost::container::list from network reference
 				//---------------------------------------------------------------------------------------------------------------
-				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  location_itf;
-				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container), location_itf*> locations_container_itf;
+				// Define iterators and get pointer to the region collection
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
 
-				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> location_id_container_itf;
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_container_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_itf)>  location_itf;
+
+				typedef Pair_Associative_Container<region_collection_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+
+				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container)> location_id_container_itf;
+				//===============================================================================================================
+
+
 				network_itf* network = this->network_reference<network_itf*>();
 				locations_container_itf* locations = network->template activity_locations_container<locations_container_itf*>();
 				location_itf* location;
@@ -460,10 +480,13 @@ namespace PopSyn
 				zone_itf* zone;
 				typename locations_container_itf::iterator loc_itr;
 				typename zones_itf::iterator zone_itr;
+				typename regions_itf::iterator region_itr;
+
+				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
 
 				for (loc_itr = locations->begin(); loc_itr != locations->end(); ++loc_itr)
 				{
-					location = *loc_itr;
+					location = (location_itf*)(*loc_itr);
 					long long zone_id = location->template census_zone_id<long long >();
 					
 					// ignore non-residential land use locations
@@ -546,11 +569,12 @@ namespace PopSyn
 				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
 
 
-				typedef Household_Components::Prototypes::Household<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))>  household_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
-
-				typedef Person_Components::Prototypes::Person<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))>  person_itf;
+				typedef Household_Components::Prototypes::Household<typename get_component_type(household_collection_itf)>  household_itf;
+				
 				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
+				typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+				
 
 
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
@@ -794,139 +818,143 @@ namespace PopSyn
 			}
 	
 			// 5.) Write output to database (at Iteration 2)
-			//declare_event(Output_Popsyn_To_DB_Event)
-			//{
-			//	Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)_this;
+			template<typename TargetType> void Output_Popsyn_To_DB_Event()
+			{
+				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)this;
 
-			//	//---------------------------------------------------------------------------------------------
-			//	// Type defines for sub_objects
-			//	typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-			//	typedef typename region_collection_type::value_type			region_type;
-			//	typedef typename region_type::Sample_Data_type							sample_collection_type;
-			//	typedef typename sample_collection_type::value_type			sample_type;
-			//	typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-			//	typedef typename zone_collection_type::value_type			zone_type;
-			//	typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-			//	typedef typename household_collection_type::value_type		household_type;
-			//	typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
-			//	typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
-			//	//---------------------------------------------------------------------------------------------
-			//	// Interface defines for sub_objects
-			//	typedef PopSyn::Prototypes::Synthesis_Region<typename remove_pointer<typename region_collection_type::value_type>::type> region_itf;
-			//	typedef Pair_Associative_Container<region_collection_type,region_itf*> regions_itf;
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
+				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+				typedef typename get_mapped_component_type(region_collection_type)		region_type;
+				typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
+				typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
+				typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
+				typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
+				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
+				typedef typename get_component_type(household_collection_type)			household_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
-			//	typedef PopSyn::Prototypes::Synthesis_Zone<typename remove_pointer<typename zone_collection_type::value_type>::type> zone_itf;
-			//	typedef Pair_Associative_Container<zone_collection_type,zone_itf*> zones_itf;
+				//---------------------------------------------------------------------------------------------
+				// Interface defines for sub_objects
+				typedef Pair_Associative_Container<region_collection_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				
+				typedef Pair_Associative_Container<zone_collection_type> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				
+				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
+				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
+				
+				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+				
+				typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
+				typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
 
-			//	typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename sample_collection_type::value_type>::type> pop_unit_itf;
-			//	typedef Pair_Associative_Container<sample_collection_type,pop_unit_itf*> sample_data_itf;
+				typedef Random_Access_Sequence<household_collection_type> household_collection_itf;
+				typedef Household_Components::Prototypes::Household<household_type>  household_itf;
+				
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
+				typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+				
+				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container)> activity_location_ids_itf;
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+				
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				
+				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
+				typedef  Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+				//---------------------------------------------------------------------------------------------
 
-			//	typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
-			//	typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
 
-			//	typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
-			//	typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
-			//	typedef Household_Components::Prototypes::Household<typename remove_pointer<typename household_collection_type::value_type>::type>  household_itf;
-			//	typedef Random_Access_Sequence<household_collection_type, household_itf*> household_collection_itf;
+				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+				network_itf* network = pthis->network_reference<network_itf*>();
+				scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
+				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+				
 
-			//	typedef Person_Components::Prototypes::Person<typename remove_pointer<typename household_itf::get_type_of(Persons_Container)::value_type>::type>  person_itf;
-			//	typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container), person_itf*> person_collection_itf;
+				// EXIT if no request to write the demand to database
+				if (!scenario->template write_demand_to_database<bool>()) return;
 
-			//	typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
-			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-			//	typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
-			//	typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			//	typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_itf;
+				// Start database transaction
+				try
+				{
+					string name(scenario->template output_demand_database_name<string&>());
+					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
+					odb::transaction t(db->begin());
+				
 
-			//	typedef  Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
-			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container), _Zone_Interface*> _Zone_Container_Interface;
+					typename regions_itf::iterator r_itr;
+					typename zones_itf::iterator z_itr;
+					typename household_collection_itf::iterator p_itr;
+					int counter = 0;
 
-			//	
-			//	regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
-			//	network_itf* network = pthis->network_reference<network_itf*>();
-			//	scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
-			//	activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
-			//	
+					// Loop through all regions
+					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+					{
+						region_itf* region = r_itr->second;
+						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+						// loop through zones in each region
+						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+						{
+							zone_itf* zone = z_itr->second;
+							activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
-			//	// EXIT if no request to write the demand to database
-			//	if (!scenario->template write_demand_to_database<bool>()) return;
+							// loop through each synthesized person
+							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
+							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+							{
+								// update synthesizing persons counter
+								if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+								household_itf* hh = *p_itr;
+								pop_unit_itf* hh_unit = hh->template Static_Properties<pop_unit_itf*>();
+							
+								// create household record
+								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
+								hh_rec->setHhold(hh->template uuid<int>());
+								hh_rec->setPersons(hh_unit->template Household_size<int>());
+								hh_rec->setWorkers(hh_unit->template Number_of_workers<int>());
+								hh_rec->setVehicles(hh_unit->template Number_of_vehicles<int>());
+								hh_rec->setLocation(hh->template Home_Location<activity_location_itf*>()->template uuid<int>());
+								//push to database
+								db->persist(hh_rec);
 
-			//	// Start database transaction
-			//	try
-			//	{
-			//		string name(scenario->template output_demand_database_name<string&>());
-			//		unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
-			//		odb::transaction t(db->begin());
-			//	
+								person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
 
-			//		typename regions_itf::iterator r_itr;
-			//		typename zones_itf::iterator z_itr;
-			//		typename household_collection_itf::iterator p_itr;
-			//		int counter = 0;
+								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+								{		
+									person_itf* person = (person_itf*)(*p_itr);
 
-			//		// Loop through all regions
-			//		for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
-			//		{
-			//			region_itf* region = r_itr->second;
-			//			zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
-			//			// loop through zones in each region
-			//			for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
-			//			{
-			//				zone_itf* zone = z_itr->second;
-			//				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
+									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
+									per_rec->setId(person->template uuid<int>());
+									if (person->template School_Location<int>() >= 0)
+										per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
+									if (person->template Work_Location<int>() >= 0)
+										per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
+									per_rec->setHousehold(hh_rec);
+									//push to database
+									db->persist(per_rec);
 
-			//				// loop through each synthesized person
-			//				household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
-			//				for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
-			//				{
-			//					// update synthesizing persons counter
-			//					if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
-			//					household_itf* hh = *p_itr;
-			//					pop_unit_itf* hh_unit = hh->template Static_Properties<pop_unit_itf*>();
-			//				
-			//					// create household record
-			//					shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
-			//					hh_rec->setHhold(hh->template uuid<int>());
-			//					hh_rec->setPersons(hh_unit->template Household_size<int>());
-			//					hh_rec->setWorkers(hh_unit->template Number_of_workers<int>());
-			//					hh_rec->setVehicles(hh_unit->template Number_of_vehicles<int>());
-			//					hh_rec->setLocation(hh->template Home_Location<activity_location_itf*>()->template uuid<int>());
-			//					//push to database
-			//					db->persist(hh_rec);
+									person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
 
-			//					person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
+									counter++;
+								}
 
-			//					for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
-			//					{		
-			//						person_itf* person = (person_itf*)(*p_itr);
+							}
+						}
+					}
+					t.commit();
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << endl << ex.what();
+				}
 
-			//						shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
-			//						per_rec->setId(person->template uuid<int>());
-			//						if (person->template School_Location<int>() >= 0)
-			//							per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
-			//						if (person->template Work_Location<int>() >= 0)
-			//							per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
-			//						per_rec->setHousehold(hh_rec);
-			//						//push to database
-			//						db->persist(per_rec);
-
-			//						person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
-
-			//						counter++;
-			//					}
-
-			//				}
-			//			}
-			//		}
-			//		t.commit();
-			//	}
-			//	catch (odb::sqlite::database_exception ex)
-			//	{
-			//		cout << endl << ex.what();
-			//	}
-
-			//	
-			//}
+				
+			}
 
 			//----------------------------------------------------------------
 			// Required Forms - necessary for any synthesis routine

@@ -32,7 +32,7 @@ namespace Choice_Model_Components
 	{
 		concept struct Is_Choice_Option_Prototype
 		{
-			check_template_method_name(has_calculate_utility, Component_Type::Calculate_Utility);
+			check_method_name(has_calculate_utility, Component_Type::Calculate_Utility);
 			check_concept(is_prototype, Is_Prototype, T, V);
 			define_default_check(has_calculate_utility && is_prototype);
 		};
@@ -50,9 +50,9 @@ namespace Choice_Model_Components
 		};
 		concept struct Is_MNL_Model
 		{
-			check_concept(Valid_Choice_Model, Is_Choice_Model, T, V);
-			check_typedef_type(Is_MNL, MNL_Model_tag, true_type);
-			define_default_check(Is_MNL && Valid_Choice_Model);
+			//check_concept(Valid_Choice_Model, Is_Choice_Model, T, V);
+			check_typedef_name(Is_MNL, MNL_Model_tag);
+			define_default_check(Is_MNL /*&& Valid_Choice_Model*/);
 		};
 		concept struct Is_Mixed_Logit_Model
 		{
@@ -74,12 +74,12 @@ namespace Choice_Model_Components
 		};
 		concept struct Is_Probabilistic_Prototype
 		{
-			check_typedef_type(is_probabilistic_choice, Component_Type::Probabilistic_Choice_tag, true_type);
+			check_typedef_name(is_probabilistic_choice, Component_Type::Probabilistic_Choice_tag);
 			define_default_check(is_probabilistic_choice);
 		};
 		concept struct Is_Probabilistic
 		{
-			check_typedef_type(is_probabilistic_choice, Probabilistic_Choice_tag, true_type);
+			check_typedef_name(is_probabilistic_choice, Probabilistic_Choice_tag);
 			check_concept(is_prototype, Is_Probabilistic_Prototype, T, V);
 			define_default_check(is_prototype || is_probabilistic_choice);
 		};
@@ -91,18 +91,13 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Prototypes
 	{
-		// use this to call the calculate utility method for types in TList's passed to features
-		//define_feature_dispatcher(Calculate_Utility, calculate_utility_dispatcher);
-		//define_feature_dispatcher(Print_Utility, print_utility_dispatcher);
 		prototype struct Choice_Model ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
-			
-
 			template<typename TargetType> void Initialize()
 			{
-				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),> choice_options_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),float> utilities_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),float> probabilities_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
@@ -113,26 +108,25 @@ namespace Choice_Model_Components
 				prob->clear();
 			}
 
-			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(strip_modifiers(TargetType),is_pointer)))
+			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
 			{
-				// Validate that TargetType is in AvailableTypes
-				if (IndexOf<typename Component_Type::TList,strip_modifiers(TargetType) >::value < 0) THROW_EXCEPTION("ERROR: TargetType is not a member of AvailableTypes TypeList.");
-
 				// Push item into boost::container::vector as anonymous
-				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
-				options->push_back((void*)choice_option);				
+				options->push_back((Choice_Option<Implementations::Choice_Option_Base<NT>>*)choice_option);				
 			}
-			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,!check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) || !check(strip_modifiers(TargetType),is_pointer)))
+			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,!check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) || !check(TargetType,is_pointer)))
 			{
 				assert_sub_check(strip_modifiers(TargetType),Concepts::Is_Choice_Option_Prototype, has_calculate_utility,  "TargetType does not have Calculate_Utility feature.");
 				assert_sub_check(strip_modifiers(TargetType),Concepts::Is_Choice_Option_Prototype, is_prototype,  "TargetType is not a valid prototype.");
+				assert_check(TargetType,is_pointer,  "TargetType is not a pointer.");
 			}
 						
 			/// EVALUATE THE AVAILABLE CHOICES (i.e. CALCULATE UTILITY, SET PROBABILITIES, ETC.)
-			template<typename TargetType> void Evaluate_Choices(requires(TargetType,check(ComponentType, Concepts::Is_MNL_Model)))
+			template<typename TargetType> void Evaluate_Choices(requires(TargetType,check(Component_Type, Concepts::Is_MNL_Model)))
 			{	
-				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
+				typedef Choice_Option<Implementations::Choice_Option_Base<NT>> choice_option_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),double> utilities_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
@@ -142,7 +136,7 @@ namespace Choice_Model_Components
 				probabilities_itf*	probs =		this->choice_probabilities<probabilities_itf*>();
 				typename choice_options_itf::iterator	itr = choices->begin();
 				typename utilities_itf::iterator			u_itr = utils->begin();
-				generic_prototype<generic_implementation<NT>>* choice;
+				choice_option_itf* choice;
 
 				double u, p;
 				double utility_sum = 0;
@@ -151,10 +145,9 @@ namespace Choice_Model_Components
 				for (itr; itr!= choices->end(); itr++)
 				{
 					//cout << endl << "Option " << i <<": ";
-					choice = (generic_prototype<generic_implementation<NT>>*)(*itr);
-					//u = choice->Calculate_Utility<float>();
-//TODO
-//					u = dispatch_to_feature(calculate_utility_dispatcher,typename Component_Type::TList,choice,Target_Type<double,double>);
+					choice = (choice_option_itf*)(*itr);
+					u = choice->Calculate_Utility();
+
 					//cout << ", utility = " << u;
 					utils->push_back(u);
 					utility_sum = utility_sum + exp(u);
@@ -169,9 +162,8 @@ namespace Choice_Model_Components
 					for (itr; itr!= choices->end(); itr++, i++)
 					{
 						cout << endl << "Option " << i <<": ";
-						choice = (generic_prototype<generic_implementation<NT>>*)(*itr);
-//TODO
-//						u = dispatch_to_feature(print_utility_dispatcher,typename Component_Type::TList,choice,Target_Type<double,double>);
+						choice = (choice_option_itf*)(*itr);
+						choice->Print_Utility();
 					}
 					choices->clear();
 					probs->clear();
@@ -188,15 +180,16 @@ namespace Choice_Model_Components
 				}
 
 			}
-			template<typename TargetType> void Evaluate_Choices(requires(TargetType,!check(ComponentType, Concepts::Is_MNL_Model)))
+			template<typename TargetType> void Evaluate_Choices(requires(TargetType,!check(Component_Type, Concepts::Is_MNL_Model)))
 			{
-				assert_check(ComponentType, Concepts::Is_MNL_Model, "ComponentType is not an MNL or Rule-based model");
+				assert_check(Component_Type, Concepts::Is_MNL_Model, "ComponentType is not an MNL or Rule-based model");
 			}
 			
 			/// SELECT FROM THE AVAILABLE CHOICES FOR SIMULATION
 			template<typename TargetType> TargetType Choose(int& selected_index, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic)))
 			{
-				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
+				typedef Choice_Option<Implementations::Choice_Option_Base<NT>> choice_option_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
 				// Local type definition option
@@ -242,6 +235,15 @@ namespace Choice_Model_Components
 			accessor(choice_options, NONE, NONE);
 			accessor(choice_utilities, NONE, NONE);
 			accessor(choice_probabilities, NONE, NONE);
+		};
+
+		prototype struct Choice_Option ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+
+			void Print_Utility();
+
+			double Calculate_Utility();
 		};
 	}
 }

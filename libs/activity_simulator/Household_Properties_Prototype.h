@@ -112,11 +112,11 @@ namespace Household_Components
 				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
 			}
 
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Concepts::Initialize_exists)))
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Initialize_exists)))
 			{
 				this_component()->Initialize<TargetType>(home_zone);
 			}
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Concepts::Initialize_exists)))
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Initialize_exists)))
 			{
 				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
 			}

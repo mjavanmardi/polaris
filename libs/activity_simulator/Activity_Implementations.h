@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vehicle_Prototype.h"
 #include "Person_Prototype.h"
 #include "Person_Planner_Prototype.h"
 #include "activity_simulator\Person_Scheduler_Implementations.h"
@@ -187,7 +188,7 @@ namespace Activity_Components
 			template<typename TargetType> void Route_Planning_Event_Handler()
 			{			
 				// Create movement plan and give it an ID
-				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::value_type>();
+				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 
@@ -210,9 +211,9 @@ namespace Activity_Components
 					orig = prev_act->template Location<_activity_location_itf*>();
 					// check if a stop at home will fit prior to activity
 					Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
-					Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(),SOV,start);
-					Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(person->template Home_Location<_activity_location_itf*>(),dest, SOV,start);
-					Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, dest, SOV, start);
+					Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(),Vehicle_Components::Types::SOV,start);
+					Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(person->template Home_Location<_activity_location_itf*>(),dest, Vehicle_Components::Types::SOV,start);
+					Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, dest, Vehicle_Components::Types::SOV, start);
 					// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
 					float min_home_time = min((float)ttime_prev_to_home,(float)ttime_home_to_this);	
 					// don't reset origin, however, if this trip is a return-to-home trip
@@ -277,7 +278,7 @@ namespace Activity_Components
 						scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 
 					}
-					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->template uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->template uuid<int>())<< ",at iteration " << _iteration << "." << sub_iteration()<<". Scheduled for route planning @ " << move->template planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->template departed_time<Simulation_Timestep_Increment>());		
+					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->template uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->template uuid<int>())<< ",at iteration " << iteration() << "." << sub_iteration()<<". Scheduled for route planning @ " << move->template planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->template departed_time<Simulation_Timestep_Increment>());		
 				}
 				else
 				{
@@ -724,12 +725,12 @@ namespace Activity_Components
 
 				int route_sub = max(start_sub,max(dur_sub,max(loc_sub,max(mode_sub,inv_sub)))) + 1;
 
-				start._iteration = max(_iteration+1, (int)planning_time);
+				start._iteration = max(iteration()+1, (int)planning_time);
 				dur._iteration = END; //dur._iteration = max(_iteration+1, (int)planning_time);
-				loc._iteration = max(_iteration+1,(int)planning_time);
-				mode._iteration = max(_iteration+1, (int)planning_time);
-				persons._iteration = max(_iteration+1, (int)planning_time);
-				route._iteration = max(_iteration+1, (int)planning_time);
+				loc._iteration = max(iteration()+1,(int)planning_time);
+				mode._iteration = max(iteration()+1, (int)planning_time);
+				persons._iteration = max(iteration()+1, (int)planning_time);
+				route._iteration = max(iteration()+1, (int)planning_time);
 				
 				start._sub_iteration = start_sub;
 				dur._sub_iteration = END; //dur._sub_iteration = dur_sub;
@@ -1014,17 +1015,17 @@ namespace Activity_Components
 			{
 				base_type* base_this = (base_type*)this;
 
-				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = 0;
-				base_this->template Duration_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Duration_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Duration_Planning_Time<  Revision&>()._sub_iteration = 1;
-				base_this->template Location_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Location_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Location_Planning_Time<  Revision&>()._sub_iteration = 2;
-				base_this->template Mode_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Mode_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = 3;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = 4;
-				base_this->template Route_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Route_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
 				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = 5;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))

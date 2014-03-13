@@ -50,8 +50,9 @@ namespace Person_Components
 		{
 			tag_as_prototype;
 		 
-			// Conditonal handling and helper functions
-			static void Planning_Conditional(ComponentType* _this,Event_Response& response)
+			//=========================================================================================================
+			// Event handling and helper functions
+			static void Planning_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
 				//----------------------------------------------
 				// CONDITIONALS FOR BASIC AGENT SCHEDULING
@@ -87,19 +88,19 @@ namespace Person_Components
 					// If activity generation is to be performed, do that next
 					if(this_ptr->template Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.template Current_Time<Time_Seconds>()) 
 					{	
-						this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,false,response);
+						this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,response);
 					}
 					else if (move_itr != movement_plans->end())
 					{
 						if (movement->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
-							this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
+							this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,response);
 						else
-							this_ptr->template Go_To_Next_Iteration<NT>(false,response);
+							this_ptr->template Go_To_Next_Iteration<NT>(response);
 					}
 					// otherwise move on to next main iteration
 					else
 					{
-						this_ptr->template Go_To_Next_Iteration<NT>(false,response);
+						this_ptr->template Go_To_Next_Iteration<NT>(response);
 					}
 				}
 
@@ -107,107 +108,61 @@ namespace Person_Components
 				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
 				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 				{
-					_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
-					this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
+					this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,response);
+
+					this_ptr->Activity_Generation_Event<NT>();
 				}
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future subiteration() schedule
 				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 				{
-					_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
-					this_ptr->template Go_To_Next_Iteration<NT>(true,response);
+					this_ptr->template Go_To_Next_Iteration<NT>(response);
+
+					this_ptr->Movement_Planning_Event<NT>();
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// No valid events scheduled - skip to next iteration
 				else
 				{
-					this_ptr->template Go_To_Next_Iteration<NT>(false,response);
+					this_ptr->template Go_To_Next_Iteration<NT>(response);
 				}
 
 				// set next planning time for other functions to use
 				this_ptr->template Next_Planning_Time<Simulation_Timestep_Increment>(iteration() + this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>());
-
-				CHECK_CONDITIONAL
 			}
-			template<typename TargetType> void Go_To_Subiteration(Person_Components::Types::PLANNING_ITERATION_STEP_KEYS subiteration(), bool do_current_event, Event_Response& response)
+			template<typename TargetType> void Go_To_Subiteration(Person_Components::Types::PLANNING_ITERATION_STEP_KEYS subiteration, Event_Response& response)
 			{
-				response.next._iteration = _iteration;
-				response.next._sub_iteration = sub_iteration;
-				response.result = do_current_event;
+				response.next._iteration = iteration();
+				response.next._sub_iteration = subiteration;
 			}
-			template<typename TargetType> void Go_To_Next_Iteration(bool do_current_event, Event_Response& response)
+			template<typename TargetType> void Go_To_Next_Iteration(Event_Response& response)
 			{
 				response.next._iteration = Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 				response.next._sub_iteration = 0;
-				response.result = do_current_event;
 			}
 		
-
-			// Event handling
-			declare_event(Activity_Generation_Event)
+			//=========================================================================================================
+			// Planning events
+			template<typename T> void Activity_Generation_Event()
 			{
-				// Create alias for this to use in conditional
+				// Create alias
 				typedef Person_Planner<ComponentType> _Planning_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
+				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// Call specific implementation of the activity generation routine
 				typedef Prototypes::Activity_Generator<typename get_type_of(Activity_Generation_Faculty)> activity_generator_itf;
 				activity_generator_itf* generator = this_ptr->template Activity_Generation_Faculty<activity_generator_itf*>();
-				generator->template Activity_Generation<TargetType>();
+				generator->template Activity_Generation<T>();
 
 				// set next activity generation occurence
 				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
-			}
-			declare_event(Activity_Planning_Event)
+			}		
+			template<typename T> void Movement_Planning_Event()
 			{
-				//// Create alias for this to use in conditional
-				//typedef Person_Planner<ComponentType> _Planning_Interface;
-				//ComponentType* _pthis = (ComponentType*)_this;
-				//_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
-
-				//typedef Activity_Planner<typename remove_pointer<typename get_type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
-				//typedef Back_Insertion_Sequence<typename get_type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
-
-				//Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-				//typename Activity_Plans::iterator act_itr = activities->begin();
-
-				//while (act_itr != activities->end())
-				//{
-				//	Activity_Plan* act = *act_itr;
-
-				//	// if movement happens in the current planning increment, execute movement
-				//	if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
-				//		act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-				//	{
-				//		// Do activity planning
-				//		act->template Do_Activity_Planning<NULLTYPE>();	
-	
-				//		//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
-				//		typename Activity_Plans::iterator prev = act_itr++;
-				//		activities->erase(prev);
-				//	}
-
-				//	// remove movements which have already been skipped
-				//	else if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
-				//	{
-				//		typename Activity_Plans::iterator prev = act_itr++;
-				//		activities->erase(prev);
-				//	}
-				//	// exit if no movements in current timestep
-				//	else
-				//	{
-				//		break;
-				//	}
-				//}
-			}
-			declare_event(Movement_Planning_Event)
-			{
-				// Create alias for this to use in conditional
+				// Create alias
 				typedef Person_Planner<ComponentType> _Planning_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
+				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// create aliases for network components from parent
 				typedef Prototypes::Person<typename get_type_of(Parent_Person)> parent_itf;
@@ -328,13 +283,16 @@ namespace Person_Components
 				}
 			}
 
+			//=========================================================================================================
+			// Member functions
 			local_check_template_method_name(Has_Initialize,Initialize);
 			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Has_Initialize)))
 			{
 				this_component()->template Initialize< TargetType>();
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
-				//TODO
-//load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
+
+				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
+				//load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 			}
 			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
 			{
@@ -344,8 +302,9 @@ namespace Person_Components
 			{
 				this_component()->template Initialize< TargetType>(initializer);
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
-				//TODO
-//load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,first_iter,0,NULLTYPE);
+
+				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
+				//load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,first_iter,0,NULLTYPE);
 			}
 			template<typename TargetType> void Initialize(TargetType initializer, requires(TargetType,!check(ComponentType,Has_Initialize)))
 			{
@@ -369,7 +328,7 @@ namespace Person_Components
 				Activity_Itf* act = move->template destination_activity_reference<Activity_Itf*>();
 
 				// set movement plan as current movement in router faculty
-				itf->template movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
+				itf->movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
 
 				move->template planning_time<Simulation_Timestep_Increment>(planning_time);
 
@@ -379,12 +338,12 @@ namespace Person_Components
 				// calculate route, if the mode is auto, otherwise return
 				if (act == nullptr)
 				{
-					itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
+					itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time/*,scenario->template read_network_snapshots<bool>()*/);
 					return;
 				}
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
-					itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
+					itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>()/*, planning_time,scenario->template read_network_snapshots<bool>()*/);
 				}
 
 			}

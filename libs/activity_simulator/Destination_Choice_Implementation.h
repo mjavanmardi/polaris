@@ -11,7 +11,7 @@ namespace Person_Components
 		/// Planning classes
 		//----------------------------------------------------------------------------------
 
-		implementation struct ADAPTS_Destination_Choice_Option : public Polaris_Component<MasterType,INHERIT(ADAPTS_Destination_Choice_Option),Data_Object>
+		implementation struct ADAPTS_Destination_Choice_Option : public Choice_Model_Components::Implementations::Choice_Option_Base<MasterType,INHERIT(ADAPTS_Destination_Choice_Option)>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(ADAPTS_Destination_Choice_Option),Data_Object>::Component_Type ComponentType;
@@ -83,7 +83,7 @@ namespace Person_Components
 			{	
 			}
 
-			template<typename TargetType> TargetType Calculate_Utility()
+			virtual double Calculate_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
@@ -250,7 +250,7 @@ namespace Person_Components
 				return (TargetType)u;				
 			}
 
-			template<typename TargetType> TargetType Print_Utility()
+			virtual void Print_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
@@ -780,7 +780,7 @@ namespace Person_Components
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;
 
 				// set the current activity from input
-				this->_Current_Activity = (Current_Activity_interface*)activity;
+				this->_Current_Activity = (Current_Activity_type)activity;
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -796,7 +796,7 @@ namespace Person_Components
 
 				// Create choice set
 				boost::container::vector<_Choice_Option_Interface*> loc_options;
-				fill_choice_boost::container::set<ReturnType>(locations,loc_options,choice_model);
+				fill_choice_set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
 				int selected_index = 0;
@@ -849,7 +849,7 @@ namespace Person_Components
 
 				// Create choice set
 				boost::container::vector<_Choice_Option_Interface*> loc_options;
-				fill_routine_choice_boost::container::set<TargetType>(act_type, locations,loc_options,choice_model);
+				fill_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
 
 				// Make choice
 				int selected_index = 0;
@@ -973,7 +973,7 @@ namespace Person_Components
 				_Zones_Container_Interface::iterator zone_itr;
 
 				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
-				Current_Activity_interface* prev_act, *next_act;
+				Current_Activity_type prev_act, *next_act;
 				_Activity_Location_Interface* prev_loc, *next_loc;
 				bool restrict_choice_set = true;
 
@@ -1009,7 +1009,7 @@ namespace Person_Components
 					choice->template destination<_Activity_Location_Interface*>(loc);
 					choice->template next<_Activity_Location_Interface*>(next_loc);
 					choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(act_type);
-					choice->template Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
+					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
 					choice_set.push_back(choice);
 				}

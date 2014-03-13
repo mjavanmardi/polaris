@@ -39,7 +39,7 @@ namespace Prototypes
 		//========================================================
 		// Events
 		//--------------------------------------------------------
-		static void Movement_Conditional(ComponentType* _this,Event_Response& response)
+		static void Movement_Event_Controller(ComponentType* _this,Event_Response& response)
 		{
 			typedef Person_Mover<ComponentType> _Person_Mover_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
@@ -76,38 +76,43 @@ namespace Prototypes
 			{
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				response.result = true;
+				//response.result = true;
+				pthis->Artificial_Arrival_Event<NT>();
 			}
 
 			// DO PRE-TRIP PLANNING, THEN SCHEDULE NEXT ITERATION FOR DEPARTURE TIME
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION)
 			{
-				response.next._iteration = _iteration;
+				response.next._iteration = iteration();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION;
-				response.result = has_pretrip_info;
+				//response.result = has_pretrip_info;
+				if (has_pretrip_info) pthis->Do_Pretrip_Information_Acquisition<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
 			{
-				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
+				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
 				response.next._iteration = routing_timestep;
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
-				response.result = pthis->template Replanning_Needed<bool>();
+				//response.result = pthis->template Replanning_Needed<bool>();
+				if (pthis->template Replanning_Needed<bool>()) pthis->Do_Pretrip_Replanning<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
 				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()) THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
-				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
+				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
 				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
-				response.result = true;
+				//response.result = true;
+				pthis->Do_Pretrip_Routing<NT>();
 			}
 			// GO TO DEPARTURE TIMESTEP
 			else if (sub_iteration() == Scenario_Components::Types::END_OF_ITERATION)
 			{
-				_pthis->Swap_Event((Event)&Person_Mover::Movement_Event<NULLTYPE>);
+				//_pthis->Swap_Event((Event)&Person_Mover::Movement_Event<NULLTYPE>);
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				response.result = true;
+				//response.result = true;
+				pthis->Do_Movement<NT>();
 			}
 
 
@@ -117,59 +122,9 @@ namespace Prototypes
 				THROW_EXCEPTION("ERROR: should not reach this point in conditional, improper response.revision set at some point.");
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				response.result = false;
+				//response.result = false;
 			}
-
-			CHECK_CONDITIONAL
 		}
-		declare_event(Pretrip_Information_Acquisition_Event)
-		{
-			typedef Person_Mover<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->Do_Pretrip_Information_Acquisition<NT>();
-		}
-		declare_event(Pretrip_Replanning_Event)
-		{
-			typedef Person_Mover<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->Do_Pretrip_Replanning<NT>();
-		}
-		declare_event(Pretrip_Routing_Event)
-		{
-			typedef Person_Mover<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->Do_Pretrip_Routing<NT>();
-		}
-		declare_event(Movement_Event)
-		{
-			typedef Person_Mover<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->Do_Movement<NT>();
-		}
-		declare_event(Artificial_Arrival_Event)
-		{
-			typedef Person_Mover<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-
-			pthis->template Artificial_Movement_Scheduled<bool>(false);
-			
-			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-			typedef  Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
-
-			Parent_Person_Itf* person = pthis->Parent_Person<Parent_Person_Itf*>();
-			movement_itf* movements = pthis->Movement<movement_itf*>();
-			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
-
-			act->template Arrive_At_Activity<NT>();
-		}
-
 
 		//========================================================
 		// Main hook to person planner - called 5 minutes prior to estimated departure
@@ -185,13 +140,14 @@ namespace Prototypes
 			// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
 			int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<TimeType>(iteration()+1);
 			if (departure_time > iteration() + 2) 
-			{	//TODO
-//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			{	
+				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
 			}
 			else 
 			{
-				//TODO
-//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::END_OF_ITERATION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
 			}
 		}
 		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
@@ -204,7 +160,28 @@ namespace Prototypes
 			assert_check(MovementItfType, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
 		}
 		
+		//========================================================
+		// Artificial arrival for non-simulated trips
+		//--------------------------------------------------------	
+		template<typename T> void Artificial_Arrival_Event()
+		{
+			typedef Person_Mover<ComponentType> _Person_Interface;
+			_Person_Interface* pthis =(_Person_Interface*)this;
+
+			pthis->template Artificial_Movement_Scheduled<bool>(false);
 			
+			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef  Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
+
+			Parent_Person_Itf* person = pthis->Parent_Person<Parent_Person_Itf*>();
+			movement_itf* movements = pthis->Movement<movement_itf*>();
+			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
+
+			act->template Arrive_At_Activity<NT>();
+		}
+
 
 		//========================================================
 		// Information Acquisition Functionality
@@ -336,7 +313,7 @@ namespace Prototypes
 				person->template has_done_replanning<bool>(true);
 
 				// get all zones affected by weather
-				boost::container::vector<location_itf*> *unaffected_locations = weather_event->template unaffected_locations<vector<location_itf*>*>();
+				boost::container::vector<location_itf*> *unaffected_locations = weather_event->template unaffected_locations<boost::container::vector<location_itf*>*>();
 
 				// replan, select new zone ouside of affected area
 				location_itf* orig, * dest, *next;
@@ -363,7 +340,7 @@ namespace Prototypes
 				if (dest != nullptr)
 				{
 					movement->template destination<location_itf*>(dest);
-					movement->template destination<link_itf*>(dest->template origin_links<links*>()->at(0));
+					movement->template destination<link_itf*>((link_itf*)(dest->template origin_links<links*>()->at(0)));
 					activity_itf* act = movement->template destination_activity_reference<activity_itf*>();
 					act->template Location<location_itf*>(dest);
 					
@@ -439,7 +416,7 @@ namespace Prototypes
 			weather_itf* my_event = (weather_itf*)event;
 
 			// does event affect destination zone?
-			boost::container::vector<zone_itf*> *affected_zones = my_event->template affected_zones<vector<zone_itf*> *>();
+			boost::container::vector<zone_itf*> *affected_zones = my_event->template affected_zones<boost::container::vector<zone_itf*> *>();
 			
 			// event is not relevent if going to home/work/school as these locations are fixed.
 
@@ -515,10 +492,10 @@ namespace Prototypes
 			link_itf* affected_link;
 			for (typename links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
 			{
-				affected_link = *itr;
+				affected_link = (link_itf*)(*itr);
 				for (typename trajectory_interface::iterator t_itr = trajectory->begin(); t_itr != trajectory->end(); ++t_itr)
 				{
-					traj_unit = *t_itr;
+					traj_unit = (trajectory_unit_interface*)(*t_itr);
 					if (affected_link == traj_unit->template link<link_itf*>()) return true;
 				}
 			}
@@ -634,10 +611,6 @@ namespace Prototypes
 		//--------------------------------------------------------
 		template<typename TargetType> void Do_Movement()
 		{
-			//this->Movement_Scheduled<bool>(true);
-			debug("DO_Movement @,"<<iteration());
-
-
 			// interfaces
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 			typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
@@ -676,7 +649,7 @@ namespace Prototypes
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
 					link_itf* origin_link = movements->template origin<link_itf*>();
-					origin_link->push_vehicle(vehicle);
+					origin_link->push_vehicle_from_origin(vehicle);
 				}
 				// for all other trips - do magic move and arrive at activity
 				else
@@ -926,8 +899,8 @@ namespace Prototypes
 
 			int arrival_time = max((int)act->Start_Time<Simulation_Timestep_Increment>(),iteration()+1);
 
-			//TODO
-//load_event(ComponentType,Movement_Conditional,Artificial_Arrival_Event,arrival_time,0,NULLTYPE);
+			((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,arrival_time,0);
+			//load_event(ComponentType,Movement_Conditional,Artificial_Arrival_Event,arrival_time,0,NULLTYPE);
 		}
 
 		//========================================================

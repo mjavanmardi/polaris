@@ -121,23 +121,23 @@ namespace Zone_Components
 				for (int i=0; i< num_sim_threads()+1; i++) production_counter[i]=0;
 				for (int i=0; i< num_sim_threads()+1; i++) attraction_counter[i]=0;
 			}
-			template<typename TargetType> TargetType production_count(requires(TargetType,check(strip_modifiers(TargetType), !is_reference) && check(strip_modifiers(TargetType), is_integral)))
+			template<typename TargetType> TargetType production_count(requires(TargetType,check(TargetType, !is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				TargetType productions = 0;
 				for (int i=0; i< num_sim_threads()+1; i++) productions+=production_counter[i];
 				return productions;
 			} 	
-			template<typename TargetType> TargetType attraction_count(requires(TargetType,check(strip_modifiers(TargetType), !is_reference) && check(strip_modifiers(TargetType), is_integral)))
+			template<typename TargetType> TargetType attraction_count(requires(TargetType,check(TargetType, !is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				int attractions = 0;
 				for (int i=0; i< num_sim_threads()+1; i++) attractions+=attraction_counter[i];
 				return attractions;
 			}
-			template<typename TargetType> TargetType production_count(requires(TargetType,check(strip_modifiers(TargetType), is_reference) && check(strip_modifiers(TargetType), is_integral)))
+			template<typename TargetType> TargetType production_count(requires(TargetType,check(TargetType, is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				return (TargetType)production_counter[__thread_id];
 			}	
-			template<typename TargetType> TargetType attraction_count(requires(TargetType,check(strip_modifiers(TargetType), is_reference) && check(strip_modifiers(TargetType), is_integral)))
+			template<typename TargetType> TargetType attraction_count(requires(TargetType,check(TargetType, is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				return (TargetType)attraction_counter[__thread_id];
 			}	

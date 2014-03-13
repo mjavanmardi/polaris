@@ -1,6 +1,10 @@
 #pragma once
 
-#include "Person_Prototype.h"
+//#include "Person_Prototype.h"
+#include "Activity_Prototype.h"
+#include "Activity_Generator_Prototype.h"
+
+using namespace Activity_Components::Types;
 
 namespace Person_Components
 {
@@ -103,7 +107,7 @@ namespace Person_Components
 			static float service_vehicle_activity_freq[8];
 			static float social_activity_freq[8];
 
-			static int Generator_Count_Array[num_sim_threads()];
+			static int Generator_Count_Array[32/*num_sim_threads()*/];
 			static int Generator_Count;
 
 			
@@ -128,13 +132,13 @@ namespace Person_Components
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Basic_Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;	
 
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type> Routine_Activity_Plan;
-			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> At_Home_Activity_Plan;
 
 			template<typename TargetType> void Initialize()
@@ -162,7 +166,7 @@ namespace Person_Components
 				int person_index = this->Person_Type_index<NT>();
 				
 				// get references to the plan containers
-				Activities* activities = scheduler->template Activity_Container<Activities*>();
+				Activity_Plans* activities = scheduler->template Activity_Container<Activity_Plans*>();
 				Movement_Plans* movements = scheduler->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references

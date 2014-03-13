@@ -61,7 +61,7 @@ namespace Prototypes
 		tag_as_prototype;
 
 		// Event handling
-		static void Agent_Conditional(ComponentType* _this,Event_Response& response)
+		static void Agent_Event_Controller(ComponentType* _this,Event_Response& response)
 		{
 			typedef Person_Planner<typename get_type_of(Planning_Faculty)> planner_itf;
 			typedef Person<ComponentType> _Person_Interface;
@@ -76,31 +76,31 @@ namespace Prototypes
 				Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
 				response.next._iteration = first_plan_time;
 				response.next._sub_iteration = 0;
-				response.result = true;
+				pthis->Set_Locations_Event<NT>();
 			}
 			// then, prior to the first planning period, dump all preplanned activities to file
 			else
 			{	
-				_pthis->Swap_Event((Event)&Person::Print_Preplanned_Activities_Event<NULLTYPE>);
+				//_pthis->Swap_Event((Event)&Person::Print_Preplanned_Activities_Event<NULLTYPE>);
 				response.next._iteration = END;
 				response.next._sub_iteration = 0;
-				response.result = true;
+				pthis->Print_Preplanned_Activities_Event<NT>();
 			}
+		}
+		template<typename TargetType> void Set_Locations_Event()
+		{
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_type_of(current_location)> location_itf;
 
-			CHECK_CONDITIONAL
+			// set the home/workplace/school locations on event
+			this_component()->template Set_Locations< TargetType>();
+
+			// start the agent off at home
+			this->current_location<location_itf*>(this->Home_Location<location_itf*>());
 		}
-		declare_event(Set_Locations_Event)
+		template<typename T> void Print_Preplanned_Activities_Event()
 		{
 			typedef Person<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->template Set_Locations<NT>();
-		}
-		declare_event(Print_Preplanned_Activities_Event)
-		{
-			typedef Person<ComponentType> _Person_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+			_Person_Interface* pthis =(_Person_Interface*)this;
 			typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 
@@ -124,7 +124,7 @@ namespace Prototypes
 				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(*itr,false);
 
 				// store activity records in the person activity record container.
-				Activity_Record* new_record = (Activity_Record*)Allocate<typename get_type_of(Activity_Record_Container)::value_type>();
+				Activity_Record* new_record = (Activity_Record*)Allocate<typename get_component_type(Activity_Records)>();
 				new_record->Initialize<Activity*>(*itr);
 				activity_records->push_back(new_record);
 			}
@@ -153,8 +153,9 @@ namespace Prototypes
 			int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
 
 			this_component()->template Initialize< TargetType>(id);	
-			//TODO
+
 			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
+			((ComponentType*)this)->Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
 		}
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
@@ -172,8 +173,9 @@ namespace Prototypes
 			int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
 
 			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
-			//TODO
+
 			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
+			((ComponentType*)this)->Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
@@ -187,17 +189,6 @@ namespace Prototypes
 		}
 
 		// Sub-component accessors	
-
-		template<typename TargetType> void Set_Locations()
-		{
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_type_of(current_location)> location_itf;
-
-			// set the home/workplace/school locations on event
-			this_component()->template Set_Locations< TargetType>();
-
-			// start the agent off at home
-			this->current_location<location_itf*>(this->Home_Location<location_itf*>());
-		}
 		accessor(Household, NONE, NONE);
 		accessor(Planning_Faculty, NONE, NONE);
 		accessor(Perception_Faculty, NONE, NONE);
@@ -345,7 +336,7 @@ namespace Prototypes
 				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
 				return nullptr;
 			}
-			activity_location_itf* loc = (*locations)[loc_id];	
+			activity_location_itf* loc = (activity_location_itf*)((*locations)[loc_id]);	
 			TargetType z = loc->template zone<TargetType>();
 			if (z == nullptr)
 			{
@@ -570,22 +561,6 @@ namespace Prototypes
 			this_component()->template Add_Activity_Plan<TargetType>(activity_plan);
 		}
 	};
-
-
-	prototype struct Activity_Generator ADD_DEBUG_INFO
-	{
-		tag_as_prototype;
-
-		// accessor to parent class
-		accessor(Parent_Planner, NONE, NONE);
-
-		template<typename TargetType> void Activity_Generation()
-		{
-			this_component()->template Activity_Generation<TargetType>();
-		}
-	};
-
-
 
 }
 

@@ -92,9 +92,9 @@ namespace Person_Components
 
 			template<typename TargetType> void Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
 			{	
-				base_type::template Generation_Time_Increment<Time_Minutes>(END);
-				base_type::template Planning_Time_Increment<Time_Minutes>(5);
-				base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
+				Generation_Time_Increment<Time_Minutes>(END);
+				Planning_Time_Increment<Time_Minutes>(5);
+				Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
 			}
 		};
 		// static member definition

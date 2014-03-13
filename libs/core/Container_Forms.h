@@ -269,7 +269,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename ComponentType,typename T = typename ComponentType::value_type>
-	struct Random_Access_Sequence
+	struct Random_Access_Sequence ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;

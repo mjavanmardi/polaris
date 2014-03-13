@@ -23,9 +23,10 @@ namespace Routing_Components
 		{
 			tag_as_prototype;
 
-			void Schedule_Route_Computation(int time_to_depart)
+			void Schedule_Route_Computation(Simulation_Timestep_Increment time_to_depart, Simulation_Timestep_Increment planning_time = 0)
 			{
-				this_component()->Schedule_Route_Computation(time_to_depart);
+				departure_time<Simulation_Timestep_Increment>(time_to_depart);
+				this_component()->Schedule_Route_Computation(time_to_depart, planning_time);
 			}
 
 			template<typename Movement_Plan_Type>
@@ -35,7 +36,8 @@ namespace Routing_Components
 			}
 			
 			accessor(network, NONE, NONE);
-
+			accessor(movement_plan, NONE, NONE);
+			accessor(departure_time, NONE, NONE); // the time at which routing is triggered.
 		};
 
 //		prototype struct Routing ADD_DEBUG_INFO

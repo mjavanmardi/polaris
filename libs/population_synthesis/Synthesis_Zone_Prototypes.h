@@ -56,7 +56,7 @@ namespace PopSyn
 			template<typename TargetType> void Fit_Joint_Distribution_To_Marginal_Data(requires(TargetType,check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				// Get the solution settings
-				typedef Prototypes::Solver_Settings<typename get_type_of(Solver_Settings)> solution_settings_itf;
+				typedef PopSyn::Prototypes::Solver_Settings<typename get_type_of(Solver_Settings)> solution_settings_itf;
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution

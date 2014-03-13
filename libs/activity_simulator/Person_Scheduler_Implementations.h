@@ -326,7 +326,7 @@ namespace Person_Components
 					// modify the previous activity if it is an at-home act
 					if (prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
-						Resolve_At_Home_Timing_Conflict<NT,Activity_Plan*>(act, prev_act);
+						Resolve_At_Home_Timing_Conflict<Activity_Plan*>(act, prev_act);
 						at_home_activity_modified = true;
 					}
 

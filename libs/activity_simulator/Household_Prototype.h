@@ -106,7 +106,7 @@ namespace Prototypes
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
 			int loc_id = properties->template home_location_id<int>();
-			activity_location_itf* loc = (*locations)[loc_id];	
+			activity_location_itf* loc = (activity_location_itf*)((*locations)[loc_id]);	
 			return loc->template zone<TargetType>();
 		}
 		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), is_integral)))

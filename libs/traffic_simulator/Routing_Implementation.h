@@ -22,6 +22,7 @@ namespace Routing_Components
 		{
 			m_prototype(Movement_Plan,typename MasterType::movement_plan_type,movement_plan,NONE,NONE);
 			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
+			m_data(Simulation_Timestep_Increment, departure_time, NONE, NONE);
 
 			typedef Movement_Plan<typename type_of(movement_plan)> movement_plan_interface;
 			typedef Link_Components::Prototypes::Link<typename movement_plan_interface::get_type_of(origin)> Link_Interface;
@@ -33,23 +34,21 @@ namespace Routing_Components
 			}
 
 
-			void Schedule_Route_Computation(int time_to_depart)
+			void Schedule_Route_Computation(Simulation_Timestep_Increment time_to_depart, Simulation_Timestep_Increment planning_time)
 			{
-				//TODO:ROUTING_OPERATION
-				//typedef Scenario<typename Component_Type::Master_Type::scenario_type> _Scenario_Interface;
+				// if planning time is not set, use the departure time as the time to route
+				if (planning_time==0) planning_time = time_to_depart;
 
-				//if (((_Scenario_Interface*)_global_scenario)->template routing_with_snapshots<bool>())
-				//{
-				//	departure_time<int>(time_to_depart);
-				//	//TODO
-				//	//load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
-				//}
-				//else
-				//{
-				//	this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
-				//}
+				typedef Scenario<typename Component_Type::Master_Type::scenario_type> _Scenario_Interface;
 
-				this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+				if (((_Scenario_Interface*)_global_scenario)->template routing_with_snapshots<bool>())
+				{
+					this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+				}
+				else
+				{
+					this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+				}
 			}
 
 			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)

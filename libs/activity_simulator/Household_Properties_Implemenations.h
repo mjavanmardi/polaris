@@ -36,18 +36,19 @@ namespace Household_Components
 				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS
 				//---------------------------------------------------------------------------------------------------------------
 				// get an interface to the given home zone;
-				typedef PopSyn::Prototypes::Synthesis_Zone<typename MasterType::zone> zone_itf;
-				typedef Prototypes::Household_Properties<typename Parent_Household_interface::get_type_of(Static_Properties)> pop_unit_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type> zone_itf;
+				typedef Prototypes::Household_Properties<typename type_of(Parent_Household)::get_type_of(Static_Properties)> pop_unit_itf;
 				
 				// useful interfaces
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
-				typedef Network_Components::Prototypes::Network<typename Parent_Household_interface::get_type_of(network_reference)> network_itf;
-				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_itf;
-
-				typedef  Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
-				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container), _Zone_Interface*> _Zone_Container_Interface;
-
+				typedef Network_Components::Prototypes::Network<typename type_of(Parent_Household)::get_type_of(network_reference)> network_itf;
+				
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				
+				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
+				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+				
 			
 				zone_itf* zone = (zone_itf*)home_synthesis_zone;
 				network_itf* network = _Parent_Household->template network_reference<network_itf*>();

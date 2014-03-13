@@ -4,7 +4,7 @@
 
 #include "Polaris_PCH.h"
 
-
+#define TEST_APP
 #ifdef TEST_APP
 
 prototype struct Agent
@@ -53,6 +53,30 @@ prototype struct Other
 
 
 };
+
+implementation struct Choice_Option_1 : public Choice_Model_Components::Implementations::Choice_Option_Base<MasterType, INHERIT(Choice_Option_1)>
+{
+	virtual double Calculate_Utility()
+	{
+		return 1.0;
+	}
+	virtual void Print_Utility()
+	{
+		cout<<"Option 1 utility = 1.0"<<endl;
+	}
+};
+implementation struct Choice_Option_2 : public Choice_Model_Components::Implementations::Choice_Option_Base<MasterType, INHERIT(Choice_Option_2)>
+{
+	virtual double Calculate_Utility()
+	{
+		return 2.0;
+	}
+	virtual void Print_Utility()
+	{
+		cout<<"Option 2 utility = 2.0"<<endl;
+	}
+};
+
 
 implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
 {
@@ -156,6 +180,9 @@ struct MasterType
 	typedef Inherited_Agent_Implementation<MT> agent_type;
 	typedef Agent_Data_Implementation<MT> agent_data_type;
 	typedef Other_Implementation<MT> other_type;
+
+	typedef Choice_Option_1<MT> choice_1_type;
+	typedef Choice_Option_2<MT> choice_2_type;
 };
 
 
@@ -164,6 +191,34 @@ int main(int argc, char* argv[])
 	Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
+
+	//==================================================================================================================================
+	// Choice MOdel Test
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	GLOBALS::Normal_RNG.Set_Seed<int>();
+	GLOBALS::Uniform_RNG.Set_Seed<int>();
+
+	typedef Choice_Model_Components::Prototypes::Choice_Option<MasterType::choice_1_type> choice_1_itf;
+	typedef Choice_Model_Components::Prototypes::Choice_Option<MasterType::choice_2_type> choice_2_itf;
+	typedef Choice_Model_Components::Prototypes::Choice_Model<Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType>> _Choice_Model_Interface;
+
+	_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType> >();
+	choice_1_itf* choice_1 = (choice_1_itf*)Allocate<MasterType::choice_1_type>();
+	choice_2_itf* choice_2 = (choice_2_itf*)Allocate<MasterType::choice_2_type>();
+
+	choice_model->Add_Choice_Option<choice_1_itf*>(choice_1);
+	choice_model->Add_Choice_Option<choice_2_itf*>(choice_2);
+
+	int choice_id;
+
+	for (int i=0; i<18; i++)
+	{
+		choice_model->Evaluate_Choices<NT>();
+		choice_model->Choose<choice_1_itf*>(choice_id);
+		cout <<"Choice = " << choice_id<<endl;
+	}
 
 	//==================================================================================================================================
 	// Start test
@@ -177,12 +232,14 @@ int main(int argc, char* argv[])
 	typedef Other<MasterType::other_type> other_itf;
 	other_itf* my_other = (other_itf*)Allocate<MasterType::other_type>();
 
-	my_other->Initialize<NT>();
+	
 
 	my_agent->Initialize<NT>();
 	my_agent->agent_data(my_data);
 
 	my_other->my_agent<agent_itf*>(my_agent);
+
+	my_other->Initialize<NT>();
 
 	START();
 
@@ -193,6 +250,7 @@ int main(int argc, char* argv[])
 #endif
 
 
+#define HIDE
 #ifndef HIDE
 
 #include "Population_Synthesis.h"

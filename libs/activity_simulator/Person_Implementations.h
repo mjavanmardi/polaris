@@ -85,13 +85,20 @@ namespace Person_Components
 
 		
 			// Record of completed activities (stores a simplified subset of activity data)
-			m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
+			m_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
+			typedef Prototypes::Person_Properties<typename type_of(Properties)> Properties_interface;
+			typedef Prototypes::Person_Properties<typename type_of(Static_Properties)> Static_Properties_interface;
+			typedef Prototypes::Person_Mover<typename type_of(Moving_Faculty)> Moving_Faculty_interface;
+			typedef Prototypes::Person_Planner<typename type_of(Planning_Faculty)> Planning_Faculty_interface;
+			typedef Prototypes::Person_Scheduler<typename type_of(Scheduling_Faculty)> Scheduling_Faculty_interface;
+			typedef Prototypes::Person_Perception<typename type_of(Perception_Faculty)> Perception_Faculty_interface;
 			typedef Routing_Components::Prototypes::Routing<typename type_of(router)> router_interface;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename type_of(vehicle)> vehicle_interface;
 
 			typedef Prototypes::Activity_Generator<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)> generator_itf;
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
@@ -150,7 +157,7 @@ namespace Person_Components
 
 				// Create and Initialize the routing faculty
 				_router=(router_interface*)Allocate<type_of(router)>();
-				_router->template traveler<ComponentType*>(this);
+				//_router->template traveler<ComponentType*>(this);
 					
 
 				// Moving faculty
@@ -190,7 +197,7 @@ namespace Person_Components
 			template<typename TargetType> void Set_Locations()
 			{
 				// This call sets the work/school locations from the properties sub class and uses the functions below
-				_Properties->template Initialize<home_synthesis_zone_interface* >(this->_home_synthesis_zone);
+				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
 			}
 
 			template<typename TargetType> void Choose_Work_Location()
@@ -376,7 +383,7 @@ namespace Person_Components
 					{
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
-							zone_interface* zone = z_itr->second;
+							zone_interface* zone = (zone_interface*)(z_itr->second);
 							Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours,Time_Minutes>(orig,zone, Vehicle_Components::Types::SOV,9);
 							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
 							{
@@ -436,7 +443,7 @@ namespace Person_Components
 					locations_container_interface* school_locations = selected_zone->template school_locations<locations_container_interface*>();
 					float size = school_locations->size();
 					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
-					location_interface* loc = (*school_locations)[index];
+					location_interface* loc = (location_interface*)((*school_locations)[index]);
 
 					if (loc != nullptr) pthis->template School_Location<int>(loc->template internal_id<int>());
 					else pthis->template School_Location<int>(pthis->template Home_Location<int>());
@@ -459,19 +466,19 @@ namespace Person_Components
 			//=======================================================================================================================================================================
 			// Record sorting
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			static bool record_comparer(typename MasterType::activity_record_type* act1, typename MasterType::activity_record_type* act2)
+			static bool record_comparer(Activity_Record* act1, Activity_Record* act2)
 			{
 				//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence< type_of(Activity_Container),Activity_Plan*> Activity_Plans;
 
-				Activity_Record* act1_itf = (Activity_Record*)act1;
-				Activity_Record* act2_itf = (Activity_Record*)act2;
-				return (act1_itf->template Start_Time<Time_Minutes>() < act2_itf->template Start_Time<Time_Minutes>());
+				//Activity_Record* act1_itf = (Activity_Record*)act1;
+				//Activity_Record* act2_itf = (Activity_Record*)act2;
+				return (act1->template Start_Time<Time_Minutes>() < act2->template Start_Time<Time_Minutes>());
 			}
 			template<typename TargetType> TargetType Sort_Activity_Records()
 			{
 				Activity_Records* records = this->Activity_Record_Container<Activity_Records*>();
-				boost::container::list<typename MasterType::activity_record_type*>* recs = (list<typename MasterType::activity_record_type*>*)records;
+				std::list<Activity_Record*>* recs = (std::list<Activity_Record*>*)records;
 				recs->sort(record_comparer);
 			}
 		};

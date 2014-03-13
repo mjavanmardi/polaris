@@ -460,11 +460,7 @@ namespace Link_Components
 			// }
 
 
-#ifndef EXCLUDE_DEMAND
-			template<typename TargetType> void accept_vehicle(TargetType veh/*,requires(TargetType,check_2(typename MasterType::routing_type,is_same) || check(Traveler_Components::Concepts::Is_Traveler) || check(Person_Components::Concepts::Is_Person_Mover))*/)
-#else
 			template<typename TargetType> void accept_vehicle_from_origin(TargetType veh)
-#endif
 			{
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 

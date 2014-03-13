@@ -100,9 +100,9 @@ namespace Person_Components
 				this->Logging_Interval<Time_Minutes>(5);
 				this->Next_Logging_Time<Time_Minutes>(5);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<Simulation_Timestep_Increment>();
-				//TODO
-//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
-
+				
+				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
+				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
 
 				// Initialize pointers to data buffers
 				buff = output_data_buffer;
@@ -342,7 +342,7 @@ namespace Person_Components
 				this->_replanned_activities++;
 			}
 
-			static void Logging_Conditional(ComponentType* _this,Event_Response& response)
+			static void Logging_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
 				typedef typename MasterType::person_data_logger_type this_type;
 				typedef Prototypes::Person_Data_Logger<typename MasterType::person_data_logger_type> _Interface;
@@ -367,32 +367,24 @@ namespace Person_Components
 					pthis->activity_buff = pthis->activity_current;
 					pthis->activity_current = tmp_act;
 
-					response.next._iteration = _iteration;
+					response.next._iteration = iteration();
 					response.next._sub_iteration = 1;
-					response.result = true;
+					pthis->Write_Data_To_File_Event<NT>();
 				}
-				else if (sub_iteration() < num_sim_threads())
+				else if (sub_iteration() < (int)num_sim_threads())
 				{
-					response.next._iteration = _iteration;
-					response.next._sub_iteration = _sub_iteration+1;
-					response.result = true;
+					response.next._iteration = iteration();
+					response.next._sub_iteration = sub_iteration()+1;
+					pthis->Write_Data_To_File_Event<NT>();
 				}
 				else
 				{
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
-					response.result = false;
 				}
+			}
 
-				CHECK_CONDITIONAL
-			}
-			declare_event(Write_Data_To_File_Event)
-			{
-				typedef Prototypes::Person_Data_Logger<typename MasterType::person_data_logger_type> _Interface;
-				_Interface* _this_ptr=(_Interface*)_this;
-				_this_ptr->template Write_Data_To_File<NT>();
-			}
-			template<typename TargetType> void Write_Data_To_File()
+			template<typename TargetType> void Write_Data_To_File_Event()
 			{
 				int i = sub_iteration();
 
@@ -411,7 +403,7 @@ namespace Person_Components
 					for (int j=0; j < 25; j++)
 					{
 						int count = 0;
-						for (int k=0; k < num_sim_threads(); k++) // collect value over all threads
+						for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
 						{
 							count += ttime_distribution[k][j];
 						}
@@ -423,7 +415,7 @@ namespace Person_Components
 					for (int j=0; j < 20; j++)
 					{
 						int count = 0;
-						for (int k=0; k < num_sim_threads(); k++) // collect value over all threads
+						for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
 						{
 							count += executed_acts[k][j];
 						}
@@ -444,7 +436,7 @@ namespace Person_Components
 					float routed_ttime_sum=0;
 					float expected_ttime_sum=0;
 					float acts_in_interval = 0;
-					for (int i=0; i < num_sim_threads(); i++)
+					for (int i=0; i < (int)num_sim_threads(); i++)
 					{
 						actual_ttime_sum += actual_ttime[i];
 						expected_ttime_sum += expected_ttime[i];
