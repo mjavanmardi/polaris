@@ -122,4 +122,88 @@ namespace polaris
 
 		return total_cost;
 	}
+
+	template<typename MasterType,typename AgentType,typename GraphPoolType>
+	static float A_Star_Tree(Tree_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, unsigned int start_time, boost::container::vector<float>& out_edge_costs)
+	{
+		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+
+		boost::container::deque< base_edge_type* > modified_edges;
+		
+		boost::intrusive::multiset< base_edge_type > open_set;
+
+		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
+		if(start == nullptr){ THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
+
+		A_Star_Edge<base_edge_type>* end = nullptr;
+
+		Routing_Data<base_edge_type> routing_data;
+
+		routing_data.modified_edges = &modified_edges;
+		routing_data.open_set = &open_set;
+		routing_data.start_edge = (base_edge_type*)start;
+		routing_data.end_edge = (base_edge_type*)end;
+		routing_data.start_time = start_time;
+
+		start->cost_from_origin(0.0f);
+		start->time_label((float)start_time);
+
+		float initial_estimated_cost_origin_destination = start->cost_from_origin();
+
+		start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
+
+		open_set.insert( *((base_edge_type*)start) );
+
+		if( !start->marked_for_reset() )
+		{
+			modified_edges.push_back((base_edge_type*)start);
+			start->marked_for_reset(true);
+		}
+		
+		bool success = false;
+
+		while( open_set.size() )
+		{
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+
+			if( agent->at_destination((base_edge_type*)current, (base_edge_type*)end) )
+			{
+				success = true;
+				break;
+			}
+			
+			open_set.erase( open_set.iterator_to( *((base_edge_type*)current) ) );
+
+			current->in_open_set(false);
+			current->in_closed_set(true);
+
+			Anonymous_Connection_Group<MasterType,base_edge_type>* connection_set_iterator = current->begin_connection_groups();
+			const Anonymous_Connection_Group<MasterType,base_edge_type>* const connection_set_end = current->end_connection_groups();
+
+			while( connection_set_iterator != connection_set_end )
+			{
+				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+			}
+		}
+
+		boost::container::vector<typename MasterType::base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
+
+		for(boost::container::vector< base_edge_type* >::iterator itr = edges->begin();itr!=edges->end();itr++)
+		{
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
+
+			//current->
+			out_edge_costs.push_back( (*itr)->estimated_cost_origin_destination() );
+		}
+		
+		
+		float total_cost = 0.0f;
+
+		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
+		{
+			(*itr)->reset();
+		}
+
+		return total_cost;
+	}
 }

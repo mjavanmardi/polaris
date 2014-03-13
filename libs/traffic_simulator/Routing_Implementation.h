@@ -95,38 +95,6 @@ namespace Routing_Components
 				{
 					//cout << "Unable to route: " << origin_id << "," << destination_id << endl;
 				}
-
-
-
-
-//				boost::container::vector<float> reversed_arrival_time_container;
-//				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
-//
-//				if (routed_travel_time >= 0.0)
-//				{	
-//
-//					mp->template valid_trajectory<bool>(true);
-//					mp->template routed_travel_time<float>(routed_travel_time);
-//					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template absolute_departure_time<int>() + routed_travel_time);
-//					mp->template estimated_travel_time_when_departed<float>(routed_travel_time);
-//					// print out and break when scheduling departure for veh_id 101319
-//					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
-//					{
-//						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-//						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
-//					}
-//
-//					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
-//
-//				}
-
-
-				//cout << "Routing successful, path: " << endl;
-				
-				//for(boost::container::deque< global_edge_id >::iterator itr = path_container.begin();itr!=path_container.end();itr++)
-				//{
-				//	cout << itr->edge_id /2 << endl;
-				//}
 			}
 
 		};
@@ -146,6 +114,7 @@ namespace Routing_Components
 				{
 					if (iteration() >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
 					{
+						_this->Compute_Tree();
 						response.result=true;
 						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
 						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
@@ -165,6 +134,20 @@ namespace Routing_Components
 
 				CHECK_CONDITIONAL
 			}
+
+
+			void Compute_Tree()
+			{
+				// get a routable network
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
+				
+				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
+
+				_travel_times_to_link_container.clear();
+
+				routable_network->compute_static_network_tree(origin_id,_travel_times_to_link_container);
+			}
+
 			m_container(boost::container::vector<float>,travel_times_to_link_container, NONE, NONE);
 			
 			member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);

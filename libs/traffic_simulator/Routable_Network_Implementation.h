@@ -26,7 +26,11 @@ namespace Routing_Components
 		implementation struct Routable_Network_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Network_Implementation),Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Routable_Network_Implementation),Data_Object>::Component_Type ComponentType;
-			
+
+			m_data(unsigned int,static_network_graph_id,NONE,NONE);
+
+			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
+
 			Routable_Network<ComponentType>* create_copy()
 			{
 				Routable_Network_Implementation* copy = Allocate<ComponentType>();
@@ -165,6 +169,25 @@ namespace Routing_Components
 				return routed_time;
 			}
 
+			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& cost_container)
+			{
+				Tree_Agent<typename MT::tree_agent_type> proxy_agent;
+
+				global_edge_id start;
+
+				start.edge_id = origin;
+				start.graph_id = _static_network_graph_id;
+				
+				global_edge_id end;
+
+				end.edge_id = destination;
+				end.graph_id = _static_network_graph_id;
+
+				float routed_time = A_Star_Tree<MT,typename MT::tree_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,0,cost_container);
+
+				return routed_time;
+			}
+
 			void update_edge_turn_cost(unsigned int edge_id,float edge_cost,unsigned int outbound_turn_index,float turn_cost)
 			{
 				global_edge_id edge_lookup;
@@ -208,9 +231,6 @@ namespace Routing_Components
 				}
 			}
 
-			m_data(unsigned int,static_network_graph_id,NONE,NONE);
-
-			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
 		};
 	}
 }
