@@ -11,19 +11,19 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Implementations
 	{
-		implementation struct Choice_Option_Base : public Polaris_Component<NT,INHERIT(Choice_Option_Base),Data_Object>
+		implementation struct Choice_Option_Base : public Polaris_Component<MT,INHERIT(Choice_Option_Base),Data_Object>
 		{
 			virtual double Calculate_Utility() = 0;
 			virtual void Print_Utility() = 0;
 		};
 
-		implementation struct Choice_Model_Implementation : public Polaris_Component<NT,INHERIT(Choice_Model_Implementation),Data_Object>
+		implementation struct Choice_Model_Implementation : public Polaris_Component<MT,INHERIT(Choice_Model_Implementation),Data_Object>
 		{
-			m_container(std::vector<Prototypes::Choice_Option<Choice_Option_Base<NT>>*>,choice_options, NONE, NONE);
+			m_container(std::vector<Prototypes::Choice_Option<Choice_Option_Base<MT>>*>,choice_options, NONE, NONE);
 			m_container(std::vector<double>,choice_utilities, NONE, NONE);
 			m_container(std::vector<double>,choice_probabilities, NONE, NONE);
 		};
-		implementation struct MNL_Model_Implementation : public Polaris_Component<NT,INHERIT(Choice_Model_Implementation),Data_Object>
+		implementation struct MNL_Model_Implementation : public Polaris_Component<MT,INHERIT(MNL_Model_Implementation),Data_Object>
 		{
 			typedef true_type MNL_Model_tag;
 			typedef true_type Probabilistic_Choice_tag;

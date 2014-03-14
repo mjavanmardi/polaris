@@ -50,9 +50,9 @@ namespace Choice_Model_Components
 		};
 		concept struct Is_MNL_Model
 		{
-			//check_concept(Valid_Choice_Model, Is_Choice_Model, T, V);
+			check_concept(Valid_Choice_Model, Is_Choice_Model, T, V);
 			check_typedef_name(Is_MNL, MNL_Model_tag);
-			define_default_check(Is_MNL /*&& Valid_Choice_Model*/);
+			define_default_check(Is_MNL && Valid_Choice_Model);
 		};
 		concept struct Is_Mixed_Logit_Model
 		{

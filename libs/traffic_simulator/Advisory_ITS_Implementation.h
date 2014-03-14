@@ -64,7 +64,7 @@ namespace Advisory_ITS_Components
 			
 			template<typename TargetType> void Get_Displayed_Messages(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
-				const int target_component_id = TargetType::component_id;
+				const int target_component_id = (int)TargetType::component_id;
 
 				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{

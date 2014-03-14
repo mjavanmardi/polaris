@@ -143,6 +143,8 @@ struct MasterType
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
 	typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
 	typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
+
+	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
 	
 	#ifdef ANTARES
 		typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
@@ -208,6 +210,7 @@ struct MasterType
 
 
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;

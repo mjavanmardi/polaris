@@ -1158,7 +1158,7 @@ namespace Activity_Components
 
 					// get the combined start time and duration
 					_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
-					pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<ComponentType*,Time_Seconds>(this);
+					pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<this_itf*,Time_Seconds>(pthis);
 
 					// make sure start time is not prior to current iteration
 					Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());

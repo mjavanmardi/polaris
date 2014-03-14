@@ -95,9 +95,9 @@ namespace Person_Components
 				_Skim_Interface* los = network->template skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
-				TargetType ttime_before, ttime_after, ttime_without, ttime_deflected, u;
-				TargetType utility_sum = 0;
-				TargetType prob_sum = 0;
+				double ttime_before, ttime_after, ttime_without, ttime_deflected, u;
+				double utility_sum = 0;
+				double prob_sum = 0;
 				_Zone_Interface* zone;
 
 				// select zones to choose from and estimate utility
@@ -125,19 +125,19 @@ namespace Person_Components
 				float area_off = zone->office_area<Square_Feet>()/1000000.0;
 				float area_mix = zone->mixed_use_area<Square_Feet>()/1000000.0;
 				float area_sch = zone->school_area<Square_Feet>()/1000000.0;
-				float emp_oth = zone->employment_other<TargetType>()/1000.0;
-				float emp_ind = zone->employment_industrial<TargetType>()/1000.0;
-				float emp_man = zone->employment_manufacturing<TargetType>()/1000.0;
-				float emp_gov = zone->employment_government<TargetType>()/1000.0;
-				float emp_srv = zone->employment_services<TargetType>()/1000.0;
-				float emp_ret = zone->employment_retail<TargetType>()/1000.0;
+				float emp_oth = zone->employment_other<double>()/1000.0;
+				float emp_ind = zone->employment_industrial<double>()/1000.0;
+				float emp_man = zone->employment_manufacturing<double>()/1000.0;
+				float emp_gov = zone->employment_government<double>()/1000.0;
+				float emp_srv = zone->employment_services<double>()/1000.0;
+				float emp_ret = zone->employment_retail<double>()/1000.0;
 
-				float thetag = zone->accessibility_employment_government<TargetType>()/1000.0;
-				float thetam = zone->accessibility_employment_manufacturing<TargetType>()/1000.0;
-				float thetar = zone->accessibility_employment_retail<TargetType>()/1000.0;
-				float thetas = zone->accessibility_employment_services<TargetType>()/1000.0;
-				float thetai = zone->accessibility_employment_industrial<TargetType>()/1000.0;
-				float thetao = zone->accessibility_employment_other<TargetType>()/1000.0;
+				float thetag = zone->accessibility_employment_government<double>()/1000.0;
+				float thetam = zone->accessibility_employment_manufacturing<double>()/1000.0;
+				float thetar = zone->accessibility_employment_retail<double>()/1000.0;
+				float thetas = zone->accessibility_employment_services<double>()/1000.0;
+				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
+				float thetao = zone->accessibility_employment_other<double>()/1000.0;
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
 				{
@@ -247,7 +247,7 @@ namespace Person_Components
 					THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
 					u = -9999.9;
 				}
-				return (TargetType)u;				
+				return u;				
 			}
 
 			virtual void Print_Utility()
@@ -262,9 +262,9 @@ namespace Person_Components
 				_Skim_Interface* los = network->template skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
-				TargetType ttime_before, ttime_after, ttime_without, ttime_deflected, u;
-				TargetType utility_sum = 0;
-				TargetType prob_sum = 0;
+				double ttime_before, ttime_after, ttime_without, ttime_deflected, u;
+				double utility_sum = 0;
+				double prob_sum = 0;
 				_Zone_Interface* zone;
 
 				// select zones to choose from and estimate utility
@@ -292,19 +292,19 @@ namespace Person_Components
 				float area_off = zone->office_area<Square_Feet>()/1000000.0;
 				float area_mix = zone->mixed_use_area<Square_Feet>()/1000000.0;
 				float area_sch = zone->school_area<Square_Feet>()/1000000.0;
-				float emp_oth = zone->employment_other<TargetType>()/1000.0;
-				float emp_ind = zone->employment_industrial<TargetType>()/1000.0;
-				float emp_man = zone->employment_manufacturing<TargetType>()/1000.0;
-				float emp_gov = zone->employment_government<TargetType>()/1000.0;
-				float emp_srv = zone->employment_services<TargetType>()/1000.0;
-				float emp_ret = zone->employment_retail<TargetType>()/1000.0;
+				float emp_oth = zone->employment_other<double>()/1000.0;
+				float emp_ind = zone->employment_industrial<double>()/1000.0;
+				float emp_man = zone->employment_manufacturing<double>()/1000.0;
+				float emp_gov = zone->employment_government<double>()/1000.0;
+				float emp_srv = zone->employment_services<double>()/1000.0;
+				float emp_ret = zone->employment_retail<double>()/1000.0;
 
-				float thetag = zone->accessibility_employment_government<TargetType>()/1000.0;
-				float thetam = zone->accessibility_employment_manufacturing<TargetType>()/1000.0;
-				float thetar = zone->accessibility_employment_retail<TargetType>()/1000.0;
-				float thetas = zone->accessibility_employment_services<TargetType>()/1000.0;
-				float thetai = zone->accessibility_employment_industrial<TargetType>()/1000.0;
-				float thetao = zone->accessibility_employment_other<TargetType>()/1000.0;
+				float thetag = zone->accessibility_employment_government<double>()/1000.0;
+				float thetam = zone->accessibility_employment_manufacturing<double>()/1000.0;
+				float thetar = zone->accessibility_employment_retail<double>()/1000.0;
+				float thetas = zone->accessibility_employment_services<double>()/1000.0;
+				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
+				float thetao = zone->accessibility_employment_other<double>()/1000.0;
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
 				{
@@ -440,7 +440,7 @@ namespace Person_Components
 				cout << ", thetao ="<<thetao ;
 				cout << endl;
 
-				return (TargetType)u;				
+				//return (TargetType)u;				
 			}
 		};
 
@@ -718,12 +718,12 @@ namespace Person_Components
 		#pragma endregion
 
 
-		implementation struct Destination_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)>
-		{
-			typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)> BaseType;
-			typedef typename BaseType::Component_Type ComponentType;
-			typedef TypeList<Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type >> TList;
-		};
+		//implementation struct Destination_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)>
+		//{
+		//	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)> BaseType;
+		//	typedef typename BaseType::Component_Type ComponentType;
+		//	typedef TypeList<Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type >> TList;
+		//};
 
 
 
@@ -734,14 +734,15 @@ namespace Person_Components
 
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
-			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, Destination_Choice_Model_Implementation<MasterType>, Choice_Model, NONE, NONE);
+			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);
 
 			// Interface definitions
-			typedef Choice_Model_Components::Prototypes::Choice_Model<Destination_Choice_Model_Implementation<MasterType> > _Choice_Model_Interface;
-			typedef Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type> _Choice_Option_Interface;
+			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
+			typedef Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type> _Destination_Choice_Option_Interface;
+			typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::person_destination_choice_option_type> _Choice_Option_Interface;
 
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
@@ -776,8 +777,9 @@ namespace Person_Components
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
 				// create local choice model
-				Destination_Choice_Model_Implementation<MasterType> a;
-				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;
+				//Destination_Choice_Model_Implementation<MasterType> a;
+
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();//(_Choice_Model_Interface*)&a;
 
 				// set the current activity from input
 				this->_Current_Activity = (Current_Activity_type)activity;
@@ -795,7 +797,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Choice_Option_Interface*> loc_options;
+				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_choice_set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
@@ -813,7 +815,7 @@ namespace Person_Components
 					cout << "WARNING: selected is null - no destination choice made, index = " << selected_index << " of " << loc_options.size() << " options, utility values for options: "<<endl;
 					for (int i=0; i<loc_options.size(); ++i)
 					{
-						loc_options[i]->Print_Utility<float>();
+						((_Choice_Option_Interface*)loc_options[i])->Print_Utility();
 					}
 					cout << endl;
 				
@@ -822,8 +824,9 @@ namespace Person_Components
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
+				Free<typename MasterType::mnl_model_type>(choice_model);
 
-				return return_ptr;
+				return return_ptr;	
 			}
 
 			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<TargetType>* destinations_to_use=nullptr)
@@ -831,8 +834,9 @@ namespace Person_Components
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
 				// create local choice model
-				Destination_Choice_Model_Implementation<MasterType> a;
-				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;
+				/*Destination_Choice_Model_Implementation<MasterType> a;
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;*/
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();//(_Choice_Model_Interface*)&a;
 
 
 				// external knowledge references
@@ -848,7 +852,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Choice_Option_Interface*> loc_options;
+				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
 
 				// Make choice
@@ -875,11 +879,12 @@ namespace Person_Components
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
+				Free<typename MasterType::mnl_model_type>(choice_model);
 
 				return return_ptr;
 			}
 
-			template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -890,13 +895,13 @@ namespace Person_Components
 
 
 				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
-				Current_Activity_interface* prev_act, *next_act;
+				Current_Activity_type prev_act, next_act;
 				_Activity_Location_Interface* prev_loc, *next_loc;
 				bool restrict_choice_set = true;
 				if (this->_Current_Activity->Start_Is_Planned<bool>())
 				{
-					prev_act = scheduler->previous_activity_plan<Time_Seconds,Current_Activity_interface*>(this->_Current_Activity->Start_Time<Time_Seconds>());
-					next_act = scheduler->previous_activity_plan<Time_Seconds,Current_Activity_interface*>(this->_Current_Activity->Start_Time<Time_Seconds>());
+					prev_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
+					next_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
 					// check previous act, if it is not known or if its location is not know, do not restrict current choice set
 					if (prev_act == nullptr)
 					{
@@ -948,20 +953,20 @@ namespace Person_Components
 				for (int i=0; i<_choice_set_size; i++)
 				{
 					loc_id = (int)((Uniform_RNG.template Next_Rand<float>()*0.999999)*size);
-					_Activity_Location_Interface* loc = available_set->at(loc_id);
+					_Activity_Location_Interface* loc = (_Activity_Location_Interface*)(available_set->at(loc_id));
 					
-					_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
 					choice->template previous<_Activity_Location_Interface*>(prev_loc);
 					choice->template destination<_Activity_Location_Interface*>(loc);
 					choice->template next<_Activity_Location_Interface*>(next_loc);
 					choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(this->_Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>());
-					choice->template Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
-					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
+					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 					choice_set.push_back(choice);
 				}
 			}
 
-			template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -1004,13 +1009,13 @@ namespace Person_Components
 					}
 					if (failed_attempts >= 10) continue;
 
-					_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
 					choice->template previous<_Activity_Location_Interface*>(prev_loc);
 					choice->template destination<_Activity_Location_Interface*>(loc);
 					choice->template next<_Activity_Location_Interface*>(next_loc);
 					choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(act_type);
 					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
+					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 					choice_set.push_back(choice);
 				}
 			}

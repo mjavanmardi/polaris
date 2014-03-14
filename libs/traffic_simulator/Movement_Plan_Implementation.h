@@ -63,14 +63,14 @@ namespace Movement_Plan_Components
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype,typename MasterType::activity_location_type, origin_location, NONE, NONE);
-			m_prototype(Null_Prototype,typename MasterType::activity_location_type, destination_location, NONE, NONE);
+			m_prototype(Activity_Location,typename MasterType::activity_location_type, origin_location, NONE, NONE);
+			m_prototype(Activity_Location,typename MasterType::activity_location_type, destination_location, NONE, NONE);
 
 			//m_prototype(Null_Prototype,typename MasterType::zone_type>, origin_zone, NONE, NONE);
 			//m_prototype(Null_Prototype,typename MasterType::zone_type>, destination_zone, NONE, NONE);
 
-			m_prototype(Null_Prototype,typename MasterType::link_type, origin, NONE, NONE);
-			m_prototype(Null_Prototype,typename MasterType::link_type, destination, NONE, NONE);
+			m_prototype(Link,typename MasterType::link_type, origin, NONE, NONE);
+			m_prototype(Link,typename MasterType::link_type, destination, NONE, NONE);
 
 			member_component_and_feature_accessor(departed_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(planning_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);

@@ -167,3 +167,4 @@ namespace Vehicle_Components
 }
 
 using namespace Vehicle_Components::Prototypes;
+using namespace Vehicle_Components::Types;

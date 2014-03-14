@@ -20,7 +20,7 @@ namespace Distributions
 			tag_as_prototype;
 
 			// Probability density function
-			define_feature_exists_check(Probability_Density_Value, has_pdf);
+			local_check_template_method_name(has_pdf, Probability_Density_Value);
 			template<typename TargetType> TargetType Probability_Density_Value(TargetType x ,requires(TargetType,check(ComponentType,has_pdf) && check(strip_modifiers(TargetType), is_arithmetic)))
 			{
 				return this_component()->Probability_Density_Value<TargetType>(x);
@@ -59,7 +59,7 @@ namespace Distributions
 			}
 			
 			// Cumulative distribution function
-			define_feature_exists_check(Cumulative_Distribution_Value, has_cdf);
+			local_check_template_method_name(has_cdf, Cumulative_Distribution_Value);
 			template<typename TargetType> TargetType Cumulative_Distribution_Value(TargetType x ,requires(TargetType,check(ComponentType,has_cdf) && check(strip_modifiers(TargetType), is_arithmetic)))
 			{
 				return this_component()->Cumulative_Distribution_Value<TargetType>(x);

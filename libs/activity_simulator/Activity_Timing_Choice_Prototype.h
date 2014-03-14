@@ -39,17 +39,21 @@ namespace Person_Components
 			//};
 
 
-			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Start_Time(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Start_Time(ActivityRefType activity_ref, requires(ActivityRefType,check(strip_modifiers(ActivityRefType), Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
 				return this_component()->template Get_Start_Time<ActivityRefType, ReturnType>();
 			}
-			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(strip_modifiers(ActivityRefType), Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
 				return this_component()->template Get_Duration<ActivityRefType, ReturnType>();
 			}
-			template<typename ActivityRefType, typename ReturnType> pair<ReturnType,ReturnType> Get_Start_Time_and_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> pair<ReturnType,ReturnType> Get_Start_Time_and_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(strip_modifiers(ActivityRefType), Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
 				return this_component()->template Get_Start_Time_and_Duration<ActivityRefType, ReturnType>(activity_ref);
+			}
+			template<typename ActivityRefType, typename ReturnType> pair<ReturnType,ReturnType> Get_Start_Time_and_Duration(ActivityRefType activity_ref, requires(ActivityRefType,!check(strip_modifiers(ActivityRefType), Activity_Components::Concepts::Is_Activity_Plan_Prototype) || !check(ReturnType,Is_Time_Value)))
+			{
+				assert_check(strip_modifiers(ActivityRefType), Activity_Components::Concepts::Is_Activity_Plan_Prototype,"ActivityRefType is not a valid activity type")
 			}
 		};
 	}

@@ -66,11 +66,11 @@ namespace Person_Components
 			
 			template<typename TargetType, typename ReturnType> ReturnType next_location(TargetType current_activity, requires(TargetType,check(TargetType,is_pointer))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
 			{
-				this_component()->next_location<TaretType,ReturnType>(current_activity);
+				return this_component()->next_location<TargetType,ReturnType>(current_activity);
 			}
 			template<typename TargetType, typename ReturnType> ReturnType previous_location(TargetType current_activity, requires(TargetType,check(TargetType,is_pointer))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
 			{
-				this_component()->previous_location<TaretType,ReturnType>(current_activity);
+				return this_component()->previous_location<TargetType,ReturnType>(current_activity);
 			}
 			
 			

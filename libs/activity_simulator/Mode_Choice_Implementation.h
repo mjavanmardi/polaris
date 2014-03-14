@@ -11,7 +11,7 @@ namespace Person_Components
 		/// Planning classes
 		//----------------------------------------------------------------------------------
 
-		implementation struct Mode_Choice_Option : public Polaris_Component<MasterType,INHERIT(Mode_Choice_Option),Data_Object>
+		implementation struct Mode_Choice_Option : public Choice_Model_Components::Implementations::Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Option)>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Mode_Choice_Option),Data_Object>::Component_Type ComponentType;
@@ -102,9 +102,9 @@ namespace Person_Components
 			//------------------------------------------------------------------------------------------------------------------------------------
 
 			// Feature called from prototype and by Choice_Model
-			template<typename TargetType> TargetType Calculate_Utility()
+			virtual double Calculate_Utility()
 			{
-				TargetType utility;
+				double utility;
 
 				// Since the model is bimodal, treat SOV as the reference class
 				if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
@@ -125,20 +125,20 @@ namespace Person_Components
 						if (dest_zone->uuid<int>() < 88) _to_CBD = true;
 						else _to_CBD = false;
 						
-						utility = Calculate_Utility_For_Known_Location<TargetType>();
+						utility = Calculate_Utility_For_Known_Location<double>();
 					}
 					else 
 					{
 						_to_CBD = false;
-						utility = Calculate_Utility_For_Unknown_Location<TargetType>();
+						utility = Calculate_Utility_For_Unknown_Location<double>();
 					}
 				}
 				return utility;				
 			}
 
-			template<typename TargetType> TargetType Print_Utility()
+			virtual void Print_Utility()
 			{
-				return 0.0;
+				//return 0.0;
 			}
 
 			// Local features
@@ -365,12 +365,12 @@ namespace Person_Components
 		#pragma endregion
 
 
-		implementation struct Mode_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)>
-		{
-			typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)> BaseType;
-			typedef typename BaseType::Component_Type ComponentType;
-			typedef TypeList<Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type >> TList;
-		};
+		//implementation struct Mode_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)>
+		//{
+		//	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)> BaseType;
+		//	typedef typename BaseType::Component_Type ComponentType;
+		//	typedef TypeList<Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type >> TList;
+		//};
 
 
 
@@ -381,13 +381,14 @@ namespace Person_Components
 
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
-			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, Mode_Choice_Model_Implementation<MasterType>, Choice_Model, NONE, NONE);
+			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);
 
-			// Interface definitions
-			typedef Choice_Model_Components::Prototypes::Choice_Model<Mode_Choice_Model_Implementation<MasterType> > _Choice_Model_Interface;
-			typedef Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
+			// Interface definitions	
+			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
+			typedef Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type> _Mode_Choice_Option_Interface;
+			typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
 
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
@@ -438,9 +439,10 @@ namespace Person_Components
 				if (household_properties->Number_of_vehicles<int>() < 1) auto_available = false;
 
 				// create local choice model
-				Mode_Choice_Model_Implementation<MasterType> a;
-				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;
-				boost::container::vector<_Choice_Option_Interface*> mode_options;
+				/*Mode_Choice_Model_Implementation<MasterType> a;
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;*/
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
+				boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -477,15 +479,15 @@ namespace Person_Components
 				
 				//============================================================================================
 				// add the SOV choice option
-				_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-				choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
+				_Mode_Choice_Option_Interface* choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
+				choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
 				choice->current_activity<ActivityItfType>(activity);
-				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
+				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				mode_options.push_back(choice);
 				// add the transit choice option
-				choice = (_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-				choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
+				choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
+				choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
 				choice->current_activity<ActivityItfType>(activity);
 				choice->destination<_Activity_Location_Interface*>(dest_location);
@@ -494,7 +496,7 @@ namespace Person_Components
 				choice->next_activity<Activity_Plan*>(next_act);
 				choice->next_location<_Activity_Location_Interface*>(next_location);
 				choice->auto_available<bool>(auto_available);
-				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
+				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				mode_options.push_back(choice);
 
 				// Make choice
@@ -504,15 +506,18 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 
 				if (selected == nullptr ) {THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
-				else selected_mode = selected->mode_type<ReturnType>();
+				else selected_mode = ((_Choice_Option_Interface*)selected)->mode_type<ReturnType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);
+				Free<typename MasterType::mnl_model_type>(choice_model);
 
 				// return the chosen mode
 				return selected_mode;
 			}
 		};
+
+
 		#pragma region Choice option parameters
 		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
 		template<typename MasterType, typename InheritanceList> typename Mode_Chooser_Implementation<MasterType, InheritanceList>::type_of(choice_set_size) Mode_Chooser_Implementation<MasterType,InheritanceList>::_choice_set_size;		

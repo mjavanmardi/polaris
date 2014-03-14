@@ -4,6 +4,7 @@
 #include "Person_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Activity_Prototype.h"
+#include "Vehicle_Prototype.h"
 
 
 namespace Person_Components
