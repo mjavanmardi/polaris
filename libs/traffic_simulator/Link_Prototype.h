@@ -273,13 +273,11 @@ namespace Link_Components
 
 			template<typename TargetType> void get_events_from_vms(TargetType events_set)
 			{
-				//TODO: fix when porting network events code
-				//this_component()->template get_events_from_vms<TargetType>(events_set);
+				this_component()->template get_events_from_vms<TargetType>(events_set);
 			}
 			template<typename TargetType> void get_events_from_har(TargetType events_set)
 			{
-				//TODO: fix when porting network events code
-				//this_component()->template get_events_from_har<TargetType>(events_set);
+				this_component()->template get_events_from_har<TargetType>(events_set);
 			}
 
 			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)

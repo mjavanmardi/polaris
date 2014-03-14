@@ -273,10 +273,10 @@ namespace Link_Components
 		/// ITS
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Null_Prototype, typename MasterType::advisory_radio_type, advisory_radio, NONE, NONE);
-			m_prototype(Null_Prototype, typename MasterType::depot_type, depot, NONE, NONE);
-			m_prototype(Null_Prototype, typename MasterType::variable_word_sign_type, variable_word_sign, NONE, NONE);
-			m_prototype(Null_Prototype, typename MasterType::variable_speed_sign_type, variable_speed_sign, NONE, NONE);
+			m_prototype(Advisory_ITS_Components::Prototypes::Advisory_ITS, typename MasterType::advisory_radio_type, advisory_radio, NONE, NONE);
+			m_prototype(Depot_Components::Prototypes::Depot, typename MasterType::depot_type, depot, NONE, NONE);
+			m_prototype(Advisory_ITS_Components::Prototypes::Advisory_ITS, typename MasterType::variable_word_sign_type, variable_word_sign, NONE, NONE);
+			m_prototype(Advisory_ITS_Components::Prototypes::Advisory_ITS, typename MasterType::variable_speed_sign_type, variable_speed_sign, NONE, NONE);
 			m_prototype(Null_Prototype, typename MasterType::link_sensor_type, link_sensor, NONE, NONE);
 
 
@@ -1016,8 +1016,8 @@ namespace Link_Components
 			{
 				// event subscription
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
-				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
+				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification,component_id);
+				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,component_id);
 			}
 
 			//void subscribe_events_local()

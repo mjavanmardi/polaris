@@ -7,7 +7,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares OFF)
+set(Antares ON)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
@@ -149,7 +149,7 @@ if (MSVC AND Antares)
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
 	add_subdirectory (libs/visual_traffic_simulator)
-	add_subdirectory (apps/test) 
+	add_subdirectory (apps/test)
 endif()
 
 add_subdirectory (libs/traffic_simulator)

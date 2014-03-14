@@ -1,6 +1,6 @@
 #define EXCLUDE_DEMAND
 
-//#define ANTARES
+#define ANTARES
 
 #include "Polaris_PCH.h"
 
