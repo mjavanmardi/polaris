@@ -33,7 +33,7 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<Mast
 	void Allocate_New_Layer(string& name);
 	template<typename TargetType> void Toggle_Named_Layer(string& name,bool check_state);
 
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
+	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
 };
 
 //---------------------------------------------------------

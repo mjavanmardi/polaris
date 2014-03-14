@@ -21,7 +21,7 @@ public:
 	m_data(wxBoxSizer*,sizer, NONE, NONE);
 
 	m_data(int,cached_iteration, NONE, NONE);
-	m_prototype(Antares_Layer<typename MasterType::type_of(antares_layer)>,layer, NONE, NONE);
+	m_prototype(Antares_Layer,typename MasterType::antares_layer_type,layer, NONE, NONE);
 };
 
 //---------------------------------------------------------

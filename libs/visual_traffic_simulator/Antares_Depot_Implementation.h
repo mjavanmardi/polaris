@@ -64,7 +64,7 @@ namespace Depot_Components
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			int Compute_Travel_Time(Network_Event< typename type_of(MasterType::base_network_event) >* net_event)
+			int Compute_Travel_Time(Network_Event< typename MasterType::base_network_event_type >* net_event)
 			{
 
 
@@ -111,13 +111,13 @@ namespace Depot_Components
 					
 					ComponentType* its_component=(ComponentType*)selected.back();
 
-					boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& >();
+					boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
 
-					for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
+					for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
 					{
 						if(user_event_choice == (*itr)->notes<string&>())
 						{
-							Network_Event< typename type_of(MasterType::base_network_event) >* net_event = *itr;
+							Network_Event< typename MasterType::base_network_event_type >* net_event = *itr;
 
 							
 							
@@ -151,9 +151,9 @@ namespace Depot_Components
 
 				dropdowns.resize(1);
 
-				boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& >();
+				boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
 
-				for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
+				for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
 				{
 					dropdowns[0].push_back( (*itr)->notes<string&>() );
 				}
@@ -249,22 +249,22 @@ namespace Depot_Components
 				MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
 
 
 		};
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Tow_Truck<MasterType,InheritanceList>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Tow_Truck<MasterType,InheritanceList>::_its_component_layer;
 
 		implementation struct Antares_Tow_Truck_Depot : public Tow_Truck_Depot<MasterType,INHERIT(Antares_Tow_Truck_Depot)>
 		{
 			typedef typename Tow_Truck_Depot<MasterType,INHERIT(Antares_Tow_Truck_Depot)>::ComponentType ComponentType;
 			
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
-			typedef Intersection_Components::Prototypes::Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
-			typedef Depot_Components::Prototypes::Depot<typename type_of(MasterType::depot)> Depot_Interface;
-			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type> Intersection_Interface;
+			typedef Depot_Components::Prototypes::Depot<typename MasterType::depot_type> Depot_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 
 #pragma pack(push,1)
 			struct ITS_Location
@@ -308,9 +308,9 @@ namespace Depot_Components
 
 				pthis->_tow_trucks.clear();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 				
-				typename type_of(MasterType::tow_truck) tow_truck;
+				typename MasterType::tow_truck_type tow_truck;
 
 				Tow_Truck_Interface* tow_truck_itf = (Tow_Truck_Interface*)&tow_truck;
 
@@ -336,7 +336,7 @@ namespace Depot_Components
 
 						Scale_Coordinates<MT>( truck_location.position );
 
-						type_of(MasterType::tow_truck)::_its_component_layer->Push_Element<Regular_Element>(&truck_location);
+						MasterType::tow_truck_type::_its_component_layer->Push_Element<Regular_Element>(&truck_location);
 					}
 				}
 			}
@@ -478,12 +478,12 @@ namespace Depot_Components
 				}
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
 			
 		};
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Tow_Truck_Depot<MasterType,InheritanceList>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Tow_Truck_Depot<MasterType,InheritanceList>::_its_component_layer;
 
 
 	}

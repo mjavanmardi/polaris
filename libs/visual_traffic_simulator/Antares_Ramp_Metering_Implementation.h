@@ -26,9 +26,9 @@ namespace Ramp_Metering_Components
 			typedef typename Ramp_Metering_Implementation<MasterType,INHERIT(Antares_Ramp_Metering_Implementation)>::ComponentType ComponentType;
 			
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Intersection<typename MasterType::intersection_type> Intersection_Interface;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
 
 #pragma pack(push,1)
 			struct ITS_Location
@@ -394,10 +394,10 @@ namespace Ramp_Metering_Components
 				pthis->Update_Ramp_Meters<NT,NT>();
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Ramp_Metering_Implementation<MasterType,InheritanceList>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Ramp_Metering_Implementation<MasterType,InheritanceList>::_its_component_layer;
 	}
 }

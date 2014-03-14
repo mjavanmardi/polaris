@@ -295,11 +295,11 @@ namespace Buildings_Components
 				_buildings_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,buildings_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,buildings_layer, NONE, NONE);
 		};
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Buildings_Implementation<MasterType,InheritanceList>::_buildings_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Buildings_Implementation<MasterType,InheritanceList>::_buildings_layer;
 	}
 }
 

@@ -15,13 +15,13 @@ public:
 	Information_Panel_Implementation(wxFrame* parent);
 	virtual ~Information_Panel_Implementation(void){};
 	
-	typedef Antares_Layer<typename type_of(MasterType::antares_layer)> Antares_Layer_Interface;
+	typedef Antares_Layer<typename MasterType::antares_layer_type> Antares_Layer_Interface;
 
 	template<typename TargetType> Antares_Layer_Interface* Allocate_New_Layer(string& name)
 	{
 		Antares_Layer_Interface* new_layer=nullptr;
 
-		boost::container::list< Information_Page<typename MasterType::type_of(information_page)>* >::iterator itr;
+		boost::container::list< Information_Page<typename MasterType::information_page_type>* >::iterator itr;
 
 		bool blank_page_skipped=false;
 
@@ -29,7 +29,7 @@ public:
 		{
 			if((*itr)->layer<Antares_Layer_Interface*>()==nullptr && blank_page_skipped)
 			{
-				new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
+				new_layer=(Antares_Layer_Interface*)Allocate<typename MasterType::antares_layer_type>();
 
 				(*itr)->layer<Antares_Layer_Interface*>(new_layer);
 
@@ -60,7 +60,7 @@ public:
 	
 	m_data(int,cached_iteration, NONE, NONE);
 
-	boost::container::list< Information_Page<typename MasterType::type_of(information_page)>* > _2D_layers;
+	boost::container::list< Information_Page<typename MasterType::information_page_type>* > _2D_layers;
 
 	m_data(bool,initialized, NONE, NONE);
 };
@@ -86,7 +86,7 @@ Information_Panel_Implementation<MasterType,InheritanceList>::Information_Panel_
 
 	for(int i=0;i<25;i++)
 	{
-		Information_Page<typename MasterType::type_of(information_page)>* layer = (Information_Page<typename MasterType::type_of(information_page)>*) new typename MasterType::type_of(information_page)(_information_book);
+		Information_Page<typename MasterType::information_page_type>* layer = (Information_Page<typename MasterType::information_page_type>*) new typename MasterType::information_page_type(_information_book);
 		
 		_2D_layers.push_back(layer);
 		

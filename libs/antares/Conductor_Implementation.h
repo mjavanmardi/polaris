@@ -12,9 +12,9 @@
 implementation class Conductor_Implementation : public Polaris_Component<MasterType,INHERIT(Conductor_Implementation),Execution_Object>
 {
 public:
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
-	m_prototype(Information_Panel<typename MasterType::type_of(information_panel)>,information_panel, NONE, NONE);
-	m_prototype(Time_Panel<typename MasterType::type_of(time_panel)>,time_panel, NONE, NONE);
+	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
+	m_prototype(Information_Panel,typename MasterType::information_panel_type,information_panel, NONE, NONE);
+	m_prototype(Time_Panel,typename MasterType::time_panel_type,time_panel, NONE, NONE);
 
 	LARGE_INTEGER _start_timer;
 	LARGE_INTEGER _end_timer;

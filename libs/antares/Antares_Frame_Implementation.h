@@ -37,14 +37,14 @@ public:
 
 	m_data(wxStatusBar*,status_bar, NONE, NONE);
 
-	m_prototype(Conductor<typename MasterType::type_of(conductor)>,conductor, NONE, NONE);
-	m_prototype(Control_Panel<typename MasterType::type_of(control_panel)>,control_panel, NONE, NONE);
-	m_prototype(Time_Panel<typename MasterType::type_of(time_panel)>,time_panel, NONE, NONE);
-	m_prototype(Information_Panel<typename MasterType::type_of(information_panel)>,information_panel, NONE, NONE);
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
-	m_prototype(Attributes_Panel<typename MasterType::type_of(attributes_panel)>,attributes_panel, NONE, NONE);
+	m_prototype(Conductor,typename MasterType::conductor_type,conductor, NONE, NONE);
+	m_prototype(Control_Panel,typename MasterType::control_panel_type,control_panel, NONE, NONE);
+	m_prototype(Time_Panel,typename MasterType::time_panel_type,time_panel, NONE, NONE);
+	m_prototype(Information_Panel,typename MasterType::information_panel_type,information_panel, NONE, NONE);
+	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
+	m_prototype(Attributes_Panel,typename MasterType::attributes_panel_type,attributes_panel, NONE, NONE);
 
-	typedef Layer_Options<typename MasterType::type_of(layer_options)> layer_options_interface_type;
+	typedef Layer_Options<typename MasterType::layer_options_type>* layer_options_type;
 };
 
 template<typename MasterType,typename InheritanceList>
@@ -179,7 +179,7 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 {
 	//---- initialize conductor ----
 
-	_conductor=(conductor_interface_type*)Allocate<typename MasterType::type_of(conductor)>();
+	_conductor=(conductor_type)Allocate<typename MasterType::conductor_type>();
 
 	_conductor->Initialize<NULLTYPE>();
 	
@@ -244,27 +244,27 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 
 	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0};
 
-	_canvas=(canvas_interface_type*)new type_of(canvas)(this,args);
+	_canvas=(canvas_type)new type_of(canvas)(this,args);
 
 	_aui_manager.AddPane((type_of(canvas)*)_canvas,wxAuiPaneInfo().Name("Canvas").CenterPane().CloseButton(false));
 
-	_control_panel=(control_panel_interface_type*)new type_of(control_panel)(this);
+	_control_panel=(control_panel_type)new type_of(control_panel)(this);
 	
 	_aui_manager.AddPane((type_of(control_panel)*)_control_panel,wxAuiPaneInfo().Name("Control_Panel").Left().MinSize(250,100).CloseButton(false).Position(0));
 	
 
 
-	_time_panel=(time_panel_interface_type*)new type_of(time_panel)(this);
+	_time_panel=(time_panel_type)new type_of(time_panel)(this);
 
 	_aui_manager.AddPane((type_of(time_panel)*)_time_panel,wxAuiPaneInfo().Name("Time_Panel").Bottom().MinSize(250,100).CloseButton(false).Position(0));
 	
-	_information_panel=(information_panel_interface_type*)new type_of(information_panel)(this);
+	_information_panel=(information_panel_type)new type_of(information_panel)(this);
 
 	//1920-250
 	_aui_manager.AddPane((type_of(information_panel)*)_information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(1920-250,300).CloseButton(true).Position(1));
 	
 
-	_attributes_panel=(attributes_panel_interface_type*)new type_of(attributes_panel)(this);
+	_attributes_panel=(attributes_panel_type)new type_of(attributes_panel)(this);
 	
 	_aui_manager.AddPane((type_of(attributes_panel)*)_attributes_panel,wxAuiPaneInfo().Name("Attributes_Panel").Right().MinSize(250,100).CloseButton(false));
 
@@ -272,24 +272,24 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 	
 	//---- connect conductor to other panels ----
 
-	_conductor->canvas<canvas_interface_type*>(_canvas);
-	_conductor->information_panel<information_panel_interface_type*>(_information_panel);
-	_conductor->time_panel<time_panel_interface_type*>(_time_panel);
+	_conductor->canvas<canvas_type>(_canvas);
+	_conductor->information_panel<information_panel_type>(_information_panel);
+	_conductor->time_panel<time_panel_type>(_time_panel);
 
 	//---- connect canvas to other panels ----
 
-	_canvas->time_panel<time_panel_interface_type*>(_time_panel);
-	_canvas->information_panel<information_panel_interface_type*>(_information_panel);
-	_canvas->attributes_panel<attributes_panel_interface_type*>(_attributes_panel);
-	_canvas->control_panel<control_panel_interface_type*>(_control_panel);
-	_canvas->layer_options<layer_options_interface_type*>( _control_panel->layer_options<layer_options_interface_type*>() );
+	_canvas->time_panel<time_panel_type>(_time_panel);
+	_canvas->information_panel<information_panel_type>(_information_panel);
+	_canvas->attributes_panel<attributes_panel_type>(_attributes_panel);
+	_canvas->control_panel<control_panel_type>(_control_panel);
+	_canvas->layer_options<layer_options_type>( _control_panel->layer_options<layer_options_type>() );
 
 	//---- connect control_panel to other panels ----
 
-	_control_panel->canvas<canvas_interface_type*>(_canvas);
-	_control_panel->layer_options<layer_options_interface_type*>()->canvas<canvas_interface_type*>(_canvas);
+	_control_panel->canvas<canvas_type>(_canvas);
+	_control_panel->layer_options<layer_options_type>()->canvas<canvas_type>(_canvas);
 
 	//---- connect time_panel to canvas ----
 
-	_time_panel->canvas<canvas_interface_type*>(_canvas);
+	_time_panel->canvas<canvas_type>(_canvas);
 }

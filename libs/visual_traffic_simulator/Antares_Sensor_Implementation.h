@@ -119,11 +119,11 @@ namespace Sensor_Components
 					Link_Line_Segment* current_segment = group.segments;
 
 
-					Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)_covered_link;
+					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)_covered_link;
 				
-					Intersection<typename type_of(MasterType::intersection)>* intersection;
+					Intersection<typename MasterType::intersection_type>* intersection;
 				
-					intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 				
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
@@ -131,7 +131,7 @@ namespace Sensor_Components
 
 					Scale_Coordinates<MT>( current_segment->a );
 
-					intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
@@ -168,11 +168,11 @@ namespace Sensor_Components
 				//Link_Line_Segment* current_segment = group.segments;
 
 
-				//Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)_covered_link;
+				//Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)_covered_link;
 				//
-				//Intersection<typename type_of(MasterType::intersection)>* intersection;
+				//Intersection<typename MasterType::intersection_type>* intersection;
 				//
-				//intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+				//intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 				//		
 				//current_segment->a._x = intersection->x_position<float>();
 				//current_segment->a._y = intersection->y_position<float>();
@@ -181,7 +181,7 @@ namespace Sensor_Components
 //TODO
 //				//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
-				//intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+				//intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 				//current_segment->b._x = intersection->x_position<float>();
 				//current_segment->b._y = intersection->y_position<float>();
@@ -230,11 +230,11 @@ namespace Sensor_Components
 
 				Link_Line_Segment* current_segment = group.segments;
 
-				Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)_covered_link;
+				Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)_covered_link;
 				
-				Intersection<typename type_of(MasterType::intersection)>* intersection;
+				Intersection<typename MasterType::intersection_type>* intersection;
 				
-				intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+				intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 				
 				current_segment->a._x = intersection->x_position<float>();
 				current_segment->a._y = intersection->y_position<float>();
@@ -242,7 +242,7 @@ namespace Sensor_Components
 
 				Scale_Coordinates<MT>( current_segment->a );
 
-				intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+				intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 				current_segment->b._x = intersection->x_position<float>();
 				current_segment->b._y = intersection->y_position<float>();
@@ -255,11 +255,11 @@ namespace Sensor_Components
 				delete[] segments;
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList,template<class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Fixed_Sensor<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Fixed_Sensor<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
 
 		implementation struct Antares_Link_Sensor : public Antares_Fixed_Sensor<MasterType,INHERIT(Antares_Link_Sensor),Link_Sensor>
 		{

@@ -95,9 +95,9 @@ namespace Link_Control_Components
 						its_component->_shoulder_opened=false;
 					}
 
-					for(boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
+					for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
 					{
-						Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
 						if(open_shoulder)
 						{
@@ -119,7 +119,7 @@ namespace Link_Control_Components
 
 				dropdowns.resize(1);
 
-				//for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+				//for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
 				//{
 					dropdowns[0].push_back( "Open Shoulder" );
 					dropdowns[0].push_back( "Close Shoulder" );
@@ -182,13 +182,13 @@ namespace Link_Control_Components
 
 				Link_Line_Segment* current_segment = group.segments;
 
-				for(boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
-					Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
-					Intersection<typename type_of(MasterType::intersection)>* intersection;
+					Intersection<typename MasterType::intersection_type>* intersection;
 					
-					intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 					
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
@@ -196,7 +196,7 @@ namespace Link_Control_Components
 
 					Scale_Coordinates<MT>( current_segment->a );
 
-					intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
@@ -227,13 +227,13 @@ namespace Link_Control_Components
 
 					Link_Line_Segment* current_segment = group.segments;
 
-					for(boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 					{
-						Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 						
-						Intersection<typename type_of(MasterType::intersection)>* intersection;
+						Intersection<typename MasterType::intersection_type>* intersection;
 						
-						intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
@@ -241,7 +241,7 @@ namespace Link_Control_Components
 
 						Scale_Coordinates<MT>( current_segment->a );
 
-						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
@@ -258,11 +258,11 @@ namespace Link_Control_Components
 				}
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList,template<class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Control<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Control<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
 
 		implementation struct Antares_Lane_Link_Control : public Antares_Link_Control<MasterType,INHERIT(Antares_Lane_Link_Control),Lane_Link_Control>
 		{

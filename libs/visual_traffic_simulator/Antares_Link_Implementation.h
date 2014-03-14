@@ -721,7 +721,7 @@ namespace Link_Components
 			{
 				if(removed.size())
 				{
-					((type_of(MasterType::network)*) _global_network)->_link_lines->Clear_Accented<NT>();
+					((MasterType::network_type*) _global_network)->_link_lines->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -756,7 +756,7 @@ namespace Link_Components
 				accented_line.up_node = _displayed_line.up_node;
 				accented_line.down_node = _displayed_line.down_node;
 
-				((type_of(MasterType::network)*) _global_network)->_link_lines->Push_Element<Accented_Element>(&accented_line);
+				((MasterType::network_type*) _global_network)->_link_lines->Push_Element<Accented_Element>(&accented_line);
 			}
 			
 			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
@@ -1137,18 +1137,18 @@ namespace Link_Components
 				_this_ptr->template visualize_moe<NULLTYPE>();
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_travel_time_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_travel_time_delay_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_speed_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_density_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_in_flow_rate_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_out_flow_rate_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_speed_ratio_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_in_flow_ratio_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_out_flow_ratio_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_density_ratio_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_travel_time_ratio_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_queue_length_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_travel_time_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_travel_time_delay_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_speed_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_density_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_in_flow_rate_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_out_flow_rate_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_speed_ratio_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_in_flow_ratio_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_out_flow_ratio_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_density_ratio_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_travel_time_ratio_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_queue_length_layer, NONE, NONE);
 
 			m_data(boost::container::vector<Point_2D<MasterType>>,link_travel_time_cache, NONE, NONE);
 			m_data(boost::container::vector<Point_2D<MasterType>>,link_speed_cache, NONE, NONE);
@@ -1168,36 +1168,36 @@ namespace Link_Components
 
 			m_data(Link_Line<MasterType>, displayed_line, NONE, NONE);
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_moe_plot, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_moe_plot, NONE, NONE);
 		};
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_delay_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_delay_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_speed_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_speed_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_density_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_density_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_in_flow_rate_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_in_flow_rate_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_out_flow_rate_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_out_flow_rate_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_speed_ratio_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_speed_ratio_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_in_flow_ratio_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_in_flow_ratio_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_out_flow_ratio_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_out_flow_ratio_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_density_ratio_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_density_ratio_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_ratio_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_travel_time_ratio_layer;
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_queue_length_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_queue_length_layer;
 		
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_moe_plot;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Link_Implementation<MasterType,InheritanceList>::_link_moe_plot;
 
 		template<typename MasterType,typename InheritanceList>
 		Link_MOE_Data Antares_Link_Implementation<MasterType,InheritanceList>::visualization_reference;

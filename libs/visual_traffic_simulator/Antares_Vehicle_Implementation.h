@@ -96,7 +96,7 @@ namespace Vehicle_Components
 
 			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
 			
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,num_vehicles, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,num_vehicles, NONE, NONE);
 
 			static volatile m_data(int,vehicles_counter, NONE, NONE);
 
@@ -215,8 +215,8 @@ namespace Vehicle_Components
 				_locations_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
+			typedef Intersection<typename MasterType::intersection_type> Intersection_Interface;
 			
 			static void compute_vehicle_position_condition(ComponentType* _this,Event_Response& response)
 			{
@@ -294,7 +294,7 @@ namespace Vehicle_Components
 					
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
-					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
+					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
 #ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
@@ -1176,7 +1176,7 @@ namespace Vehicle_Components
 					//
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
-					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
+					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
 #ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
@@ -1341,9 +1341,9 @@ namespace Vehicle_Components
 				{
 					//Select removed one or more objects
 
-					(type_of(MasterType::vehicle)::_vehicle_points)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_locations_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_vehicle_points)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_routes_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_locations_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -1366,9 +1366,9 @@ namespace Vehicle_Components
 				{
 					//Refreshing on time step
 
-					(type_of(MasterType::vehicle)::_vehicle_points)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_locations_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_vehicle_points)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_routes_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_locations_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -1393,8 +1393,8 @@ namespace Vehicle_Components
 				{
 					//Select removed one or more objects
 
-					(type_of(MasterType::vehicle)::_vehicle_shapes)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_vehicle_shapes)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_routes_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -1417,8 +1417,8 @@ namespace Vehicle_Components
 				{
 					//Refreshing on time step
 
-					(type_of(MasterType::vehicle)::_vehicle_shapes)->Clear_Accented<NT>();
-					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_vehicle_shapes)->Clear_Accented<NT>();
+					(MasterType::vehicle_type::_routes_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -1491,13 +1491,13 @@ namespace Vehicle_Components
 					if (_locations_layer->template draw<bool>())
 					{
 
-						typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
+						typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
 
 						Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
 						Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
 						Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
 
-						boost::container::list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
+						boost::container::list<typename MasterType::activity_type*>* activities = scheduler->Activity_Container<list<typename MasterType::activity_type*>*>();
 						Activity_Location_Interface* previous_location;
 
 						//cout << endl <<endl<< "Num activities="<<activities->size();
@@ -1508,14 +1508,14 @@ namespace Vehicle_Components
 						{
 							previous_location = person->Home_Location<Activity_Location_Interface*>();
 							int prev_end, current_start, current_end;
-							Activity_Planner<typename type_of(MasterType::activity)>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity)>*)(*(activities->begin()));
+							Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Planner<typename MasterType::activity_type>*)(*(activities->begin()));
 							prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
 
 							display_location<typename MasterType::vehicle_type,NT,NT>(previous_location, previous_location,0,0, prev_end, false );
 						
-							for(boost::container::list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+							for(boost::container::list<typename MasterType::activity_type*>::iterator itr=activities->begin();itr!=activities->end();itr++)
 							{
-								Activity_Planner<typename type_of(MasterType::activity)>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity)>*)(*itr);
+								Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Planner<typename MasterType::activity_type>*)(*itr);
 								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
 								current_start = activity_planner->Start_Time<Time_Minutes>();
 								current_end = activity_planner->End_Time<Time_Minutes>();
@@ -1527,7 +1527,7 @@ namespace Vehicle_Components
 							display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, 1440, false );
 						}
 
-						boost::container::list<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
+						boost::container::list<typename MasterType::activity_record_type*>* discarded_activities = person->Activity_Record_Container<list<typename MasterType::activity_record_type*>*>();
 
 						//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
@@ -1535,9 +1535,9 @@ namespace Vehicle_Components
 						{
 							previous_location = person->Home_Location<Activity_Location_Interface*>();
 
-							for(boost::container::list<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
+							for(boost::container::list<typename MasterType::activity_record_type*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
 							{
-								Activity_Planner<typename type_of(MasterType::activity_record)>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record)>*)(*itr);
+								Activity_Planner<typename MasterType::activity_record_type>* activity_planner = (Activity_Planner<typename MasterType::activity_record_type>*)(*itr);
 								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
 
 								display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
@@ -1657,9 +1657,9 @@ namespace Vehicle_Components
 				if (((ComponentType*)this)->_is_integrated)
 				{
 					// Activity Attributes
-					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
+					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
 					typedef Zone<typename type_of(MasterType::zone)> zone_interface;
-					typedef Activity_Planner<typename type_of(MasterType::activity)> activity_interface;
+					typedef Activity_Planner<typename MasterType::activity_type> activity_interface;
 
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
 					Household<typename ComponentType::traveler_type::type_of(Household)>* household = person->Household<Household<typename ComponentType::traveler_type::type_of(Household)>*>();
@@ -1858,7 +1858,7 @@ namespace Vehicle_Components
 
 			}
 
-			template<typename TargetType> void display_location(Activity_Location<typename type_of(MasterType::activity_location)>* location, Activity_Location<typename type_of(MasterType::activity_location)>* previous_location, int previous_act_end, int current_act_start, int current_act_end, bool discarded=false)
+			template<typename TargetType> void display_location(Activity_Location<typename MasterType::activity_location_type>* location, Activity_Location<typename MasterType::activity_location_type>* previous_location, int previous_act_end, int current_act_start, int current_act_end, bool discarded=false)
 			{
 
 				int time_scale_factor = 5;
@@ -2104,26 +2104,26 @@ namespace Vehicle_Components
 
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,vehicle_shapes, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,vehicle_points, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,routes_layer, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,locations_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,vehicle_shapes, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,vehicle_points, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,routes_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,locations_layer, NONE, NONE);
 		};
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer)>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_shapes;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_shapes;
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer)>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_points;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_points;
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer)>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_routes_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_routes_layer;
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer)>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles;
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer)>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_locations_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_locations_layer;
 
 		template<typename MasterType,typename InheritanceList>
 		volatile int Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicles_counter;

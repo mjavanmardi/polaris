@@ -15,15 +15,15 @@ typename Canvas_Implementation<MasterType,InheritanceList>::Antares_Layer_Interf
 {
 	SetFocus();
 
-	Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
+	Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename MasterType::antares_layer_type>();
 
 	_layers.push_back(new_layer);
 	
 	new_layer->list_index<int>(_layers.size() - 1);
 
 	new_layer->name<string&>(name);
-	new_layer->attributes_panel<attributes_panel_interface_type*>(_attributes_panel);
-	new_layer->layer_options<layer_options_interface_type*>(_layer_options);
+	new_layer->attributes_panel<attributes_panel_type>(_attributes_panel);
+	new_layer->layer_options<layer_options_type>(_layer_options);
 
 	_layer_options->Allocate_New_Layer(name);
 
