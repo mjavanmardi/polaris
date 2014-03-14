@@ -109,7 +109,7 @@ namespace Network_Event_Components
 			{
 				if(_active)
 				{
-					boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr;
+					boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr;
 
 					Link_Line_Segment* segments = new Link_Line_Segment[ _affected_links.size() ];
 					
@@ -121,11 +121,11 @@ namespace Network_Event_Components
 
 					for(itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
 					{
-						Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 						
-						Intersection<typename type_of(MasterType::intersection)>* intersection;
+						Intersection<typename MasterType::intersection_type>* intersection;
 						
-						intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
@@ -133,7 +133,7 @@ namespace Network_Event_Components
 
 						Scale_Coordinates<MT>( current_segment->a );
 
-						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
@@ -192,7 +192,7 @@ namespace Network_Event_Components
 
 				if(pthis->_active)
 				{
-					boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr;
+					boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr;
 
 					Link_Line_Segment* segments = new Link_Line_Segment[ pthis->_affected_links.size() ];
 					
@@ -205,11 +205,11 @@ namespace Network_Event_Components
 
 					for(itr = pthis->_affected_links.begin(); itr != pthis->_affected_links.end(); itr++)
 					{
-						Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 						
-						Intersection<typename type_of(MasterType::intersection)>* intersection;
+						Intersection<typename MasterType::intersection_type>* intersection;
 						
-						intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
@@ -217,7 +217,7 @@ namespace Network_Event_Components
 
 						Scale_Coordinates<MT>( current_segment->a );
 
-						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
@@ -234,11 +234,11 @@ namespace Network_Event_Components
 				}
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,event_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,event_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList,template<class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Base_Antares_Network_Event<MasterType,InheritanceList,InheritanceTemplate>::_event_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Base_Antares_Network_Event<MasterType,InheritanceList,InheritanceTemplate>::_event_layer;
 
 		implementation struct Antares_Weather_Network_Event : public Base_Antares_Network_Event<MasterType,INHERIT(Antares_Weather_Network_Event),Weather_Network_Event>
 		{
@@ -332,13 +332,13 @@ namespace Network_Event_Components
 
 				for(boost::container::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
 				{
-					Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
-					Intersection<typename type_of(MasterType::intersection)>* intersection;
+					Intersection<typename MasterType::intersection_type>* intersection;
 					
 					if( rand()%4 )
 					{
-						intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 						
 						float saturation = (float)(rand()%50+50);
 						saturation/=100.0f;
@@ -364,7 +364,7 @@ namespace Network_Event_Components
 
 					if( rand()%4 )
 					{
-						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+						intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 						float saturation = (float)(rand()%50+50);
 						saturation/=100.0f;
@@ -421,11 +421,11 @@ namespace Network_Event_Components
 
 			m_data(concat(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,particle_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,particle_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Weather_Network_Event<MasterType,InheritanceList>::_particle_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Weather_Network_Event<MasterType,InheritanceList>::_particle_layer;
 
 		
 		implementation struct Antares_Accident_Network_Event : public Base_Antares_Network_Event<MasterType,INHERIT(Antares_Accident_Network_Event),Accident_Network_Event>
@@ -546,12 +546,12 @@ namespace Network_Event_Components
 
 				for(boost::container::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
 				{
-					Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
-					Intersection<typename type_of(MasterType::intersection)>* upstream_intersection;
-					Intersection<typename type_of(MasterType::intersection)>* downstream_intersection;
+					Intersection<typename MasterType::intersection_type>* upstream_intersection;
+					Intersection<typename MasterType::intersection_type>* downstream_intersection;
 
-					upstream_intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					upstream_intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 					
 					float saturation = (float)(rand()%50+50);
 					saturation/=100.0f;
@@ -577,7 +577,7 @@ namespace Network_Event_Components
 //					//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( _precipitation_particles.back().first );
 
 
-					downstream_intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					downstream_intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 					saturation = (float)(rand()%50+50);
 					saturation/=100.0f;
@@ -662,11 +662,11 @@ namespace Network_Event_Components
 
 			m_data(concat(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,particle_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,particle_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Accident_Network_Event<MasterType,InheritanceList>::_particle_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Accident_Network_Event<MasterType,InheritanceList>::_particle_layer;
 
 		implementation struct Antares_Congestion_Network_Event : public Base_Antares_Network_Event<MasterType,INHERIT(Antares_Congestion_Network_Event),Congestion_Network_Event>
 		{

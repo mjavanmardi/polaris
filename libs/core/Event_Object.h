@@ -263,8 +263,6 @@ namespace polaris
 
 		ibh_node* extract_min()
 		{
-			//if(heap_front == nullptr) return nullptr;
-
 			ibh_node* ret = heap_front;
 
 			if(next_heap_row != nullptr && heap_front != next_heap_row_itr)

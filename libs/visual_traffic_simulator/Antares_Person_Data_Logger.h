@@ -42,11 +42,11 @@ namespace Person_Components
 
 			//==================================================================================
 			// 2D plotting layers
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,replanned_activities_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,activity_time_lost_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,cancelled_activities_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,ttime_distribution_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,activity_type_distribution_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,replanned_activities_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,activity_time_lost_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,cancelled_activities_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,ttime_distribution_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,activity_type_distribution_layer, NONE, NONE);
 
 			bool _draw_reference;
 

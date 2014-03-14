@@ -864,7 +864,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 				_control_dialog = nullptr;
 			}
 
-			_control_dialog = (control_dialog_interface_type*)new type_of(control_dialog)(_name,_selected_elements,dialog_key_value,dialog_dropdown,_submission_callback);
+			_control_dialog = (control_dialog_type)new type_of(control_dialog)(_name,_selected_elements,dialog_key_value,dialog_dropdown,_submission_callback);
 
 			_control_dialog->ShowModal<NULLTYPE>();
 		}
@@ -995,9 +995,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	m_data(selection_callback_type,selection_callback, NONE, NONE);
 	m_data(double_click_callback_type,double_click_callback, NONE, NONE);
 
-	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options, NONE, NONE);
-	m_prototype(Attributes_Panel<typename MasterType::type_of(attributes_panel)>,attributes_panel, NONE, NONE);
-	m_prototype(Control_Dialog<typename MasterType::type_of(control_dialog)>,control_dialog, NONE, NONE);
+	m_prototype(Layer_Options,typename MasterType::layer_options_type,layer_options, NONE, NONE);
+	m_prototype(Attributes_Panel,typename MasterType::attributes_panel_type,attributes_panel, NONE, NONE);
+	m_prototype(Control_Dialog,typename MasterType::control_dialog_type,control_dialog, NONE, NONE);
 
 	m_data(boost::container::list<void*>,selected_elements, NONE, NONE);
 	m_data(boost::container::list<void*>,deselected_elements, NONE, NONE);

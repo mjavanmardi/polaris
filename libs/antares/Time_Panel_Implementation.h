@@ -43,9 +43,9 @@ public:
 	m_data(wxBoxSizer*,record_sizer, NONE, NONE);
 	m_data(wxTextCtrl*,time_display, NONE, NONE);
 
-	m_prototype(Conductor<typename MasterType::conductor_type>,conductor, NONE, NONE);
+	m_prototype(Conductor,typename MasterType::conductor_type,conductor, NONE, NONE);
 
-	m_prototype(Canvas<typename MasterType::canvas_type>,canvas, NONE, NONE);
+	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
 
 	m_data(int,delay, NONE, NONE);
 };
@@ -61,7 +61,7 @@ Time_Panel_Implementation<MasterType,InheritanceList>::Time_Panel_Implementation
 
 	//---- miscellaneous initialization ----
 
-	_conductor=(conductor_interface_type*)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
+	_conductor=(conductor_type)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
 
 	//---- initialize the sizers ----
 	

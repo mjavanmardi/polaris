@@ -24,7 +24,7 @@ namespace Intersection_Components
 			{
 				if(removed.size())
 				{
-					((type_of(MasterType::network)*) _global_network)->_link_lines->Clear_Accented<NT>();
+					((MasterType::network_type*) _global_network)->_link_lines->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -105,7 +105,7 @@ namespace Intersection_Components
 				polygon.color._g = 0;
 				polygon.color._b = 0;
 				polygon.data = (void*)(this);
-				((type_of(MasterType::network)*) _global_network)->_intersection_polygons->Push_Element<Accented_Element>(&polygon);
+				((MasterType::network_type*) _global_network)->_intersection_polygons->Push_Element<Accented_Element>(&polygon);
 			}
 
 			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)

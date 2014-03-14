@@ -24,7 +24,7 @@ void Information_Panel_Implementation<MasterType,InheritanceList>::Render()
 
 	//---- loop over and draw all layers ----
 
-	Information_Page<typename MasterType::type_of(information_page)>* active_page = (Information_Page<typename MasterType::type_of(information_page)>*)_information_book->GetPage(_information_book->GetSelection());
+	Information_Page<typename MasterType::information_page_type>* active_page = (Information_Page<typename MasterType::information_page_type>*)_information_book->GetPage(_information_book->GetSelection());
 	
 	if(active_page->layer<void*>()!=nullptr)
 	{

@@ -19,8 +19,8 @@ namespace Advisory_ITS_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,INHERIT(Antares_Advisory_ITS)>::ComponentType ComponentType;
 
-			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
-			typedef Intersection_Components::Prototypes::Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type> Intersection_Interface;
 
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
 
@@ -134,13 +134,13 @@ namespace Advisory_ITS_Components
 
 					//Link_Line_Segment* current_segment = group.segments;
 
-					//for(boost::container::vector<Link<typename type_of(MasterType::link)>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					//for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 					//{
-					//	Link<typename type_of(MasterType::link)>* link = (Link<typename type_of(MasterType::link)>*)(*itr);
+					//	Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					//	
-					//	Intersection<typename type_of(MasterType::intersection)>* intersection;
+					//	Intersection<typename MasterType::intersection_type>* intersection;
 					//	
-					//	intersection = link->upstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					//	intersection = link->upstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 					//	
 					//	current_segment->a._x = intersection->x_position<float>();
 					//	current_segment->a._y = intersection->y_position<float>();
@@ -149,7 +149,7 @@ namespace Advisory_ITS_Components
 //TODO
 //					//	Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
-					//	intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
+					//	intersection = link->downstream_intersection< Intersection<typename MasterType::intersection_type>* >();
 
 					//	current_segment->b._x = intersection->x_position<float>();
 					//	current_segment->b._y = intersection->y_position<float>();
@@ -176,7 +176,7 @@ namespace Advisory_ITS_Components
 				{
 					ComponentType* its_component=(ComponentType*) (*sitr);
 
-					for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+					for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
 					{
 						if(user_event_choice == (*itr)->notes<string&>())
 						{
@@ -198,7 +198,7 @@ namespace Advisory_ITS_Components
 
 				dropdowns.resize(1);
 
-				for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+				for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
 				{
 					dropdowns[0].push_back( (*itr)->notes<string&>() );
 				}
@@ -233,7 +233,7 @@ namespace Advisory_ITS_Components
 				}
 			}
 			
-			template<typename TargetType> void Accept_Displayed_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			template<typename TargetType> void Accept_Displayed_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
 			{
 			}
 
@@ -380,15 +380,15 @@ namespace Advisory_ITS_Components
 				//delete[] segments;
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_component_layer, NONE, NONE);
-			//static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,its_coverage_layer, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
+			//static m_prototype(Antares_Layer<typename MasterType::antares_layer_type>,its_coverage_layer, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList,template<class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::_its_component_layer;
 		
 		//template<typename MasterType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
-		//Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::_its_coverage_layer;
+		//Antares_Layer<typename MasterType::antares_layer_type,typename Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,InheritanceList,InheritanceTemplate>::_its_coverage_layer;
 
 	}
 }

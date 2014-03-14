@@ -117,9 +117,9 @@ namespace Network_Event_Components
 				this_component()->template Get_Network_Events<TargetType>(container);
 			}
 
-			template<typename TargetType> void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
+			template<typename TargetType> void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback,int component_id)
 			{
-				this_component()->template Push_Subscriber<TargetType>(callback);
+				this_component()->template Push_Subscriber<TargetType>(callback,component_id);
 			}
 		};
 	}

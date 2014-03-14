@@ -205,10 +205,10 @@ namespace Traffic_Management_Center_Components
 		//		//Setup_Depots<NT>();
 		//	}
 
-		//	m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_control_layer, NONE, NONE);
-		//	m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,advisory_radio_layer, NONE, NONE);
-		//	m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,variable_message_sign_layer, NONE, NONE);
-		//	m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,depot_layer, NONE, NONE);
+		//	m_prototype(Antares_Layer<typename MasterType::antares_layer_type>,link_control_layer, NONE, NONE);
+		//	m_prototype(Antares_Layer<typename MasterType::antares_layer_type>,advisory_radio_layer, NONE, NONE);
+		//	m_prototype(Antares_Layer<typename MasterType::antares_layer_type>,variable_message_sign_layer, NONE, NONE);
+		//	m_prototype(Antares_Layer<typename MasterType::antares_layer_type>,depot_layer, NONE, NONE);
 		//};
 	}
 

@@ -239,7 +239,7 @@ namespace Zone_Components
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,zone_centroids, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,zone_centroids, NONE, NONE);
 		};
 
 
@@ -352,7 +352,7 @@ namespace Zone_Components
 
 			m_data(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment, NONE, NONE);
 			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time);
-			static m_prototype(Graphical_Zone_Group<typename MasterType::graphical_zone_group_type>,graphical_zone_group, NONE, NONE);
+			static m_prototype(Graphical_Zone_Group,typename MasterType::graphical_zone_group_type,graphical_zone_group, NONE, NONE);
 			m_data(int, production_count_buffer, NONE, NONE);
 			m_data(int, attraction_count_buffer, NONE, NONE);
 		};

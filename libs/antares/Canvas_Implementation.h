@@ -19,7 +19,7 @@ public:
 	void Initialize_GLCanvas();
 	void Calculate_Bounds();
 
-	typedef Antares_Layer<typename type_of(MasterType::antares_layer)> Antares_Layer_Interface;
+	typedef Antares_Layer<typename MasterType::antares_layer_type> Antares_Layer_Interface;
 
 	//void Custom_Draw();
 	//void Custom_Init();
@@ -144,11 +144,11 @@ public:
 
 	//member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
 
-	m_prototype(Time_Panel<typename MasterType::type_of(time_panel)>,time_panel, NONE, NONE);
-	m_prototype(Information_Panel<typename MasterType::type_of(information_panel)>,information_panel, NONE, NONE);
-	m_prototype(Control_Panel<typename MasterType::type_of(control_panel)>,control_panel, NONE, NONE);
-	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options, NONE, NONE);
-	m_prototype(Attributes_Panel<typename MasterType::type_of(attributes_panel)>,attributes_panel, NONE, NONE);
+	m_prototype(Time_Panel,typename MasterType::time_panel_type,time_panel, NONE, NONE);
+	m_prototype(Information_Panel,typename MasterType::information_panel_type,information_panel, NONE, NONE);
+	m_prototype(Control_Panel,typename MasterType::control_panel_type,control_panel, NONE, NONE);
+	m_prototype(Layer_Options,typename MasterType::layer_options_type,layer_options, NONE, NONE);
+	m_prototype(Attributes_Panel,typename MasterType::attributes_panel_type,attributes_panel, NONE, NONE);
 
 	boost::container::list<Antares_Layer_Interface*> _layers;
 	m_data(Antares_Layer_Interface*,selected_layer, NONE, NONE);

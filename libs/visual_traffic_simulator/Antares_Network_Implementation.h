@@ -81,33 +81,33 @@ namespace Network_Components
 			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_density_ratio_cache;
 			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_queue_length_cache;
 
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_vmt_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_vht_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_cumulative_loaded_vehicles_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_cumulative_departed_vehicles_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_in_network_vehicles_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_cumulative_arrived_vehicles_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_cumulative_combined_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_vmt_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_vht_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_cumulative_loaded_vehicles_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_cumulative_departed_vehicles_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_in_network_vehicles_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_cumulative_arrived_vehicles_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_cumulative_combined_layer, NONE, NONE);
 
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_travel_time_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_speed_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_density_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_in_volume_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_out_volume_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_travel_time_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_speed_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_density_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,network_avg_link_queue_length_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_travel_time_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_speed_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_density_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_in_volume_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_out_volume_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_travel_time_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_speed_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_density_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_avg_link_queue_length_layer, NONE, NONE);
 
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_travel_time_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_speed_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_density_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_in_volume_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_out_volume_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_travel_time_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_speed_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_density_ratio_layer, NONE, NONE);
-			m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,historic_link_queue_length_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_travel_time_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_speed_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_density_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_in_volume_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_out_volume_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_travel_time_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_speed_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_density_ratio_layer, NONE, NONE);
+			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_queue_length_layer, NONE, NONE);
 
 			boost::container::vector<struct Extended_MOE_Data> reference_td_network_moe_data_array;
 
@@ -340,7 +340,7 @@ namespace Network_Components
 				cfg.primitive_color=true;
 				cfg.storage_period = 1;
 
-				cfg.selection_callback = &MasterType::type_of(link)::on_select;
+				cfg.selection_callback = &MasterType::link_type::on_select;
 				cfg.head_accent_size_value = 3;
 				
 				//cfg.head_size_value = 
@@ -381,7 +381,7 @@ namespace Network_Components
 				cfg.Configure_Static_Polygons();
 				cfg.draw=false;
 
-				cfg.selection_callback = &MasterType::type_of(intersection)::on_select;
+				cfg.selection_callback = &MasterType::intersection_type::on_select;
 				//cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(intersection)::fetch_attributes;
 				//cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
 
@@ -827,8 +827,8 @@ namespace Network_Components
 			}
 			m_data(Rectangle_XY<MasterType>, network_bounds, NONE, NONE);
 			
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,link_lines, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,intersection_polygons, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_lines, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,intersection_polygons, NONE, NONE);
 	
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
@@ -842,10 +842,10 @@ namespace Network_Components
 		float Antares_Network_Implementation<MasterType,InheritanceList>::_intersection_radius = 50;
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Network_Implementation<MasterType,InheritanceList>::_link_lines;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_link_lines;
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename type_of(MasterType::antares_layer)>* Antares_Network_Implementation<MasterType,InheritanceList>::_intersection_polygons;
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_intersection_polygons;
 	}
 }
 

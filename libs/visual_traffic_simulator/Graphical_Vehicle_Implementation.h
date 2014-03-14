@@ -44,7 +44,7 @@ namespace Vehicle_Components
 
 			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
 			
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,num_vehicles, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,num_vehicles, NONE, NONE);
 
 			static volatile m_data(int,vehicles_counter, NONE, NONE);
 
@@ -106,16 +106,16 @@ namespace Vehicle_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
 
-			m_prototype(Movement_Plan< typename MasterType::movement_plan_type>, movement_plan, NONE, NONE);
+			m_prototype(Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 
 #ifndef EXCLUDE_DEMAND
-			m_prototype(Null_Prototype<typename MasterType::person_type>, traveler, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::person_type, traveler, NONE, NONE);
 #else
-			m_prototype(Null_Prototype<typename MasterType::traveler_type>, traveler, NONE, NONE);
+			m_prototype(Null_Prototype,typename MasterType::traveler_type, traveler, NONE, NONE);
 #endif
 
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
+			typedef Intersection<typename MasterType::intersection_type> Intersection_Interface;
 
 			static void compute_vehicle_position_condition(ComponentType* _this,Event_Response& response)
 			{
@@ -277,18 +277,18 @@ namespace Vehicle_Components
 				}
 			}
 
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,vehicle_shapes, NONE, NONE);
-			static m_prototype(Antares_Layer<typename type_of(MasterType::antares_layer)>,vehicle_points, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,vehicle_shapes, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,vehicle_points, NONE, NONE);
 		};
 
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_shapes;
+		Antares_Layer<typename MasterType::antares_layer_type,Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_shapes;
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_points;
+		Antares_Layer<typename MasterType::antares_layer_type,Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicle_points;
 		
 		template<typename MasterType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles;
+		Antares_Layer<typename MasterType::antares_layer_type,Graphical_Vehicle_Implementation<MasterType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles;
 
 		template<typename MasterType,typename InheritanceList>
 		volatile int Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicles_counter;

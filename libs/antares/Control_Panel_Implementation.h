@@ -17,9 +17,9 @@ public:
 	Control_Panel_Implementation(wxFrame* parent);
 	virtual ~Control_Panel_Implementation(void){};
 
-	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options, NONE, NONE);
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
-	m_prototype(Splash_Panel<typename MasterType::type_of(splash_panel)>,splash_panel, NONE, NONE);
+	m_prototype(Layer_Options,typename MasterType::layer_options_type,layer_options, NONE, NONE);
+	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
+	m_prototype(Splash_Panel,typename MasterType::splash_panel_type,splash_panel, NONE, NONE);
 
 	m_data(wxAuiNotebook*,control_book, NONE, NONE);
 	m_data(wxBoxSizer*,sizer, NONE, NONE);
@@ -37,7 +37,7 @@ Control_Panel_Implementation<MasterType,InheritanceList>::Control_Panel_Implemen
 	//---- initialize the sizer and container notebook ----
 	
 	_sizer=new wxBoxSizer(wxVERTICAL);
-	_splash_panel=(splash_panel_interface_type*)new type_of(splash_panel)(this);
+	_splash_panel=(splash_panel_type)new type_of(splash_panel)(this);
 
 	_sizer->Add((wxPanel*)_splash_panel);
 

@@ -506,10 +506,10 @@ namespace Network_Event_Components
 			
 			typedef Link<typename MasterType::link_type> Link_Interface;
 
-			template<typename TargetType> void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
+			template<typename TargetType> void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback,int component_id)
 			{
 				//TODO
-				//Network_Event<TargetType>::template Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback::component_id);
+				Network_Event<TargetType>::template Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback,component_id);
 			}
 
 			template<typename TargetType> void Initialize()

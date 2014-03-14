@@ -119,9 +119,9 @@ namespace Ramp_Metering_Components
 				{
 					//((typename MasterType::ramp_metering_type*)_this)->Swap_Event((Event)&Ramp_Metering<NULLTYPE>);
 					//response.result=true;
+					_this->Ramp_Metering_Event();
 					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION;
-
 				}
 				else
 				{
@@ -130,12 +130,10 @@ namespace Ramp_Metering_Components
 				}
 			}
 
-			declare_event(Ramp_Metering_Event)
+			void Ramp_Metering_Event()
 			{
-				typedef Ramp_Metering<ComponentType> _Ramp_Metering_Interface;
-				_Ramp_Metering_Interface* _this_ptr=(_Ramp_Metering_Interface*)_this;
 				//step 1: update ramp metering
-				_this_ptr->template ramp_metering_update<NULLTYPE>();
+				this->template ramp_metering_update<NULLTYPE>();
 			}
 
 			template<typename TargetType> bool is_enabled()

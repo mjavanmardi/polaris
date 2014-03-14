@@ -1,6 +1,6 @@
 #define EXCLUDE_DEMAND
 
-//#define ANTARES
+#define ANTARES
 
 #include "Polaris_PCH.h"
 
@@ -34,6 +34,7 @@ struct MasterType
 	typedef Antares_Link_Implementation<MasterType> link_type;
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
+
 #else
 #ifndef EXCLUDE_DEMAND
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<MasterType> network_type;
@@ -109,7 +110,6 @@ struct MasterType
 	
 	typedef Intersection_Control_Components::Implementations::Approach_Implementation<MasterType> approach_type;
 
-	typedef Ramp_Metering_Components::Implementations::Ramp_Metering_Implementation<MasterType> ramp_metering_type;
 
 	typedef Zone_Components::Implementations::Zone_Implementation<MasterType> zone_type;
 
@@ -144,6 +144,7 @@ struct MasterType
 	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+	typedef Ramp_Metering_Components::Implementations::Antares_Ramp_Metering_Implementation<MasterType> ramp_metering_type;
 
 	typedef Link_Control_Components::Implementations::Antares_Lane_Link_Control<MasterType> link_control_type;
 	typedef Depot_Components::Implementations::Antares_Tow_Truck_Depot<MasterType> depot_type;
@@ -158,6 +159,8 @@ struct MasterType
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
 	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+
+	typedef Ramp_Metering_Components::Implementations::Ramp_Metering_Implementation<MasterType> ramp_metering_type;
 
 	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
 	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
@@ -409,6 +412,7 @@ void run_with_input_from_db(char* scenario_filename)
 
 		_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
 
+		_Ramp_Metering_Interface::Initialize_Type<NT>();
 		for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
 			ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
 			ramp_metering_itr++)
