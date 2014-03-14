@@ -60,7 +60,7 @@ namespace Ramp_Metering_Components
 				{
 					ComponentType* its_component=(ComponentType*) (*sitr);
 
-					its_component->enable<NT,NT>(toggle_operation);
+					its_component->enable<NT>(toggle_operation);
 
 					update_successful = true;
 				}
@@ -385,13 +385,13 @@ namespace Ramp_Metering_Components
 				MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 			}
 
-			declare_event(Ramp_Metering)
+			void Ramp_Metering_Event()
 			{
-				Ramp_Metering_Implementation<MasterType,INHERIT(Antares_Ramp_Metering_Implementation)>::Ramp_Metering<NT>(_this);
+				Ramp_Metering_Implementation<MasterType,INHERIT(Antares_Ramp_Metering_Implementation)>::Ramp_Metering_Event();
 
-				ComponentType* pthis = (ComponentType*)_this;
+				ComponentType* pthis = (ComponentType*)this;
 
-				pthis->Update_Ramp_Meters<NT,NT>();
+				pthis->Update_Ramp_Meters<NT>();
 			}
 
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,its_component_layer, NONE, NONE);
