@@ -186,7 +186,7 @@ namespace polaris
 			}
 		}
 
-		boost::container::vector<typename MasterType::base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
+		boost::container::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
 
 		for(boost::container::vector< base_edge_type* >::iterator itr = edges->begin();itr!=edges->end();itr++)
 		{

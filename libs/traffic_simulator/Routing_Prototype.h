@@ -34,10 +34,26 @@ namespace Routing_Components
 			{
 				this_component()->Attach_New_Movement_Plan<Movement_Plan_Type>(mp);
 			}
+
+			template<typename T> T Get_Tree_Results_For_Destination(int destination_internal_id, requires(T,check(strip_modifiers(T),Basic_Units::Concepts::Is_Time_Value)))
+			{
+				// get reference to travel times
+				typedef Random_Access_Sequence<typename get_type_of(travel_times_to_link_container)> travel_times_itf;
+
+				travel_times_itf* travel_times = this->travel_times_to_link_container<travel_times_itf*>();
+
+				// return travel time to destion in requested time units
+				return Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment, T>(travel_times->at(destination_internal_id));
+			}
 			
 			accessor(network, NONE, NONE);
+			accessor(origin_link, NONE,NONE);
 			accessor(movement_plan, NONE, NONE);
 			accessor(departure_time, NONE, NONE); // the time at which routing is triggered.
+			accessor(update_increment, NONE, NONE);
+			accessor(start_time, NONE, NONE);
+			accessor(end_time, NONE, NONE);
+			accessor(travel_times_to_link_container, NONE, NONE);
 		};
 
 //		prototype struct Routing ADD_DEBUG_INFO

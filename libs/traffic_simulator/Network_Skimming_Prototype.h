@@ -40,52 +40,55 @@ namespace Network_Skimming_Components
 
 				if (sub_iteration() == 0)
 				{
-					response.next._iteration = _iteration;
+					response.next._iteration = iteration();
 					response.next._sub_iteration = Types::SUB_ITERATIONS::INITIALIZE;
-					response.result = false;
+					//response.result = false;
 				}
 				else if (sub_iteration() == Types::SUB_ITERATIONS::INITIALIZE)
 				{
-					response.next._iteration = _iteration;
+					response.next._iteration = iteration();
 					response.next._sub_iteration = Types::SUB_ITERATIONS::PROCESS;
-					response.result = false;
+					//response.result = false;
 				}
 				else if (sub_iteration() == Types::SUB_ITERATIONS::PROCESS)
 				{
-					_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
-					response.next._iteration = _iteration;
+					//_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
+					this_ptr->Process_Skim_Trees_Event<NT>();
+					response.next._iteration = iteration();
 					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
-					response.result = true;
+					
+					//response.result = true;
 				}
 				else if (sub_iteration() == Types::SUB_ITERATIONS::UPDATE)
 				{
-					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
+					//_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
+					this_ptr->Update_Skim_Tables_Event<NT>();
 					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
-					response.result = true;
+					//response.result = true;
 				}
 				else
 				{
 					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
-					response.result = true;
+					//response.result = true;
 				}
 			}
-			declare_event(Process_Skim_Trees_Event)
+			template<typename T> void Process_Skim_Trees_Event()
 			{
 				cout<<endl<<endl<<"====================================================="<<endl<<"Updating Network Skims:"<<endl;
-				typedef Network_Skimming<ComponentType> _Skim_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
-				this_ptr->template timer<Counter&>().Start();
+				//typedef Network_Skimming<ComponentType> _Skim_Interface;
+				//ComponentType* _pthis = (ComponentType*)_this;
+				//_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
+				this->template timer<Counter&>().Start();
 			}
-			declare_event(Update_Skim_Tables_Event)
+			template<typename T> void Update_Skim_Tables_Event()
 			{
-				typedef Network_Skimming<ComponentType> _Skim_Interface;
+				/*typedef Network_Skimming<ComponentType> _Skim_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
-				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
+				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;*/
 
-				this_ptr->template Update_Skim_Tables<NULLTYPE>();
+				this->template Update_Skim_Tables<NULLTYPE>();
 			}
 
 
@@ -318,8 +321,7 @@ namespace Network_Skimming_Components
 				this_component()->Initialize_Skims<TargetType>();
 
 				// Load the skim updating event, which recalculates network skims at every Update interval (set in implementation)
-				//TODO
-//load_event(ComponentType,Skim_Table_Update_Conditional,Update_Skim_Tables_Event,0,Types::SUB_ITERATIONS::INITIALIZE,NULLTYPE);
+				this_component()->Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
 			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
@@ -460,7 +462,9 @@ namespace Network_Skimming_Components
 			
 			template<typename TargetType> bool Update_LOS()
 			{
-				typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
+				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
+				typedef Prototypes::Skim_Table<typename get_component_type(_skim_container_itf)> _skim_itf;
+
 				_skim_container_itf* skim = this->template skims_by_time_container<_skim_container_itf*>();
 				
 				for (typename _skim_container_itf::iterator itr = skim->begin(); itr != skim->end(); ++itr)
@@ -481,7 +485,9 @@ namespace Network_Skimming_Components
 			}
 			template<typename TargetType> void Write_LOS()
 			{
-				typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
+				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
+				typedef Prototypes::Skim_Table<typename get_component_type(_skim_container_itf)> _skim_itf;
+
 				_skim_container_itf* skim = this->skims_by_time_container<_skim_container_itf*>();
 
 				for (typename _skim_container_itf::iterator itr = skim->begin(); itr != skim->end(); ++itr)

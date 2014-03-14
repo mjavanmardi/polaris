@@ -83,20 +83,31 @@ namespace Activity_Components
 			accessor(Parent_ID, NONE, NONE);
 			accessor(movement_plan, NONE, NONE);
 			accessor(movement_record,check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Record_Prototype), NONE);
+			accessor(is_valid, NONE, NONE);
 
 			//===========================================
 			// Activity Plan execution scheduling functionality
 			//-------------------------------------------
 			static void Activity_Planning_Event_Controller(ComponentType* _this,Event_Response& response)
 			{		
+			
 				//----------------------------------------------
 				typedef Activity_Planner<ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				//response.result = true;
-
+				
+	
 				int id =  this_ptr->Parent_ID<int>();
 				int actid = this_ptr->Activity_Plan_ID<int>();
+
+				//---------------------
+				// check if activity is valid, if not, remove from schedule
+				if (!this_ptr->is_valid<bool>())
+				{
+					response.next._iteration = END;
+					response.next._sub_iteration = END;
+					return;
+				}
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// DURATION_PLANNING Iteration
@@ -263,6 +274,12 @@ namespace Activity_Components
 			}
 			template<typename TargetType> void Unschedule_Activity_Events()
 			{
+				// set activity to invalid so further execution will not continue
+				this->is_valid(false);
+
+				int cur_iteration = iteration();
+				int cur_sub_iteration = sub_iteration();
+
 				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();
 				Revision& mode = this->Mode_Planning_Time<Revision&>();
 				Revision& duration = this->Duration_Planning_Time<Revision&>();
@@ -281,6 +298,7 @@ namespace Activity_Components
 				start_time._sub_iteration = END+1;
 				route._iteration = END+1;
 				route._sub_iteration = END+1;
+				this_component()->Reschedule<ComponentType>(END+1, END+1);
 			}
 			template<typename TargetType> bool Is_Minimum_Plan_Time(TargetType plan_time, requires(TargetType,check_2(TargetType, Revision,is_same)))
 			{
@@ -310,41 +328,41 @@ namespace Activity_Components
 			// Activity Planning events
 			//-------------------------------------------
 			template<typename TargetType> void Location_Planning_Event_Handler()
-			{
-				this_component()->template Location_Planning_Event_Handler<TargetType>();
+			{	
 				this->Location_Planning_Time<Revision&>()._iteration = END+1;
 				this->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+				this_component()->template Location_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Mode_Planning_Event_Handler()
 			{
-				this_component()->template Mode_Planning_Event_Handler<TargetType>();
 				this->Mode_Planning_Time<Revision&>()._iteration = END+1;
 				this->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
+				this_component()->template Mode_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()
 			{
-				this_component()->template Start_Time_Planning_Event_Handler<TargetType>();
 				this->Start_Time_Planning_Time<Revision&>()._iteration = END+1;
 				this->Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
+				this_component()->template Start_Time_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Duration_Planning_Event_Handler()
 			{
-				this_component()->template Duration_Planning_Event_Handler<TargetType>();
 				// set duration planning time schedule to END - duration Is Planned
 				this->Duration_Planning_Time<Revision&>()._iteration = END;
 				this->Duration_Planning_Time<Revision&>()._sub_iteration = END;
+				this_component()->template Duration_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Involved_Persons_Planning_Event_Handler()
 			{
-				this_component()->template Involved_Persons_Planning_Event_Handler<TargetType>();
 				this->Involved_Persons_Planning_Time<Revision&>()._iteration = END+1;
 				this->Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END+1;
+				this_component()->template Involved_Persons_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Route_Planning_Event_Handler()
 			{
-				this_component()->template Route_Planning_Event_Handler<TargetType>();
 				this->Route_Planning_Time<Revision&>()._iteration = END+1;
 				this->Route_Planning_Time<Revision&>()._sub_iteration = END+1;
+				this_component()->template Route_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Add_Activity_To_Schedule_Event_Handler()
 			{
@@ -423,10 +441,12 @@ namespace Activity_Components
 			//-------------------------------------------
 			template<typename TargetType> void Initialize(TargetType activity, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Activity_Plan_Prototype)))
 			{
+				// call initializer
 				this_component()->template Initialize<TargetType>(activity);
 			}
 			template<typename ActivitytypeType, typename TimeType> void Initialize(ActivitytypeType act_type, TimeType planning_time, requires(ActivitytypeType,check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same)))
 			{
+
 				this_component()->template Initialize< ActivitytypeType>(act_type);
 				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<TimeType>(planning_time);
@@ -450,6 +470,10 @@ namespace Activity_Components
 			
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
+				//---------------------
+				// set activity as valid at start of events
+				this->is_valid(true);
+
 				// Call the model to determine the attribute planning times
 				this_component()->template Set_Attribute_Planning_Times<TargetType>(planning_time);
 

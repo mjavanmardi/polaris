@@ -178,10 +178,10 @@ namespace Routing_Components
 				start.edge_id = origin;
 				start.graph_id = _static_network_graph_id;
 				
-				global_edge_id end;
+				//global_edge_id end;
 
-				end.edge_id = destination;
-				end.graph_id = _static_network_graph_id;
+				//end.edge_id = destination;
+				//end.graph_id = _static_network_graph_id;
 
 				float routed_time = A_Star_Tree<MT,typename MT::tree_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,0,cost_container);
 

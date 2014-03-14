@@ -104,7 +104,23 @@ namespace Routing_Components
 		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>
 		{
 			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>::Component_Type ComponentType;
-			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)
+			
+			m_prototype(Link,typename MasterType::link_type,origin_link,NONE,NONE);
+			m_container(boost::container::vector<float>,travel_times_to_link_container, NONE, NONE);
+			
+			member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
+
+
+			//============================================================================================
+			/// Events and event handling
+			void Schedule_Route_Computation(Simulation_Timestep_Increment time_to_depart, Simulation_Timestep_Increment planning_time)
+			{
+				this_component()->Load_Event<ComponentType>(&Compute_Route_Event_Controller,time_to_depart,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING);
+			}
+			
+			static void Compute_Route_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
 				typedef Routing_Components::Prototypes::Routing<ComponentType> _Routing_Interface;
 				
@@ -114,13 +130,13 @@ namespace Routing_Components
 					if (iteration() >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
 					{
 						_this->Compute_Tree();
-						response.result=true;
+						//response.result=true;
 						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
 						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
 					else
 					{
-						response.result=false;
+						//response.result=false;
 						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
 						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
@@ -130,29 +146,19 @@ namespace Routing_Components
 					assert(false);
 					cout << "Should never reach here in routing conditional!" << endl;
 				}
-
-				CHECK_CONDITIONAL
 			}
-
 
 			void Compute_Tree()
 			{
 				// get a routable network
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
 				
-				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
+				unsigned int origin_id = _origin_link->uuid<unsigned int>();
 
 				_travel_times_to_link_container.clear();
 
 				routable_network->compute_static_network_tree(origin_id,_travel_times_to_link_container);
 			}
-
-			m_container(boost::container::vector<float>,travel_times_to_link_container, NONE, NONE);
-			
-			member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
-			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
-			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
-
 		};
 
 //		implementation struct Routing_Implementation:public Polaris_Component<MasterType,INHERIT(Routing_Implementation),Execution_Object>

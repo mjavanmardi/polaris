@@ -92,37 +92,37 @@ namespace polaris
 	template<typename DataType>
 	void Execution_Object::Reschedule(int start_iteration,int start_sub_iteration)
 	{
-		const Revision starting_revision(start_iteration,start_sub_iteration);
+		const Revision update_revision(start_iteration,start_sub_iteration);
 
 		#ifdef FORWARD_SIMULATION_MODE
-			if(starting_revision <= revision() && starting_revision != FREE)
+			if(update_revision <= revision() && update_revision != FREE)
 			{
-				THROW_EXCEPTION("Simulation specified as Forward Simulation, error rescheduling object: " << typeid(DataType).name() << " at step: " << iteration() << "," << sub_iteration() << " to step: " << starting_revision._iteration << "," << starting_revision._sub_iteration);
+				THROW_EXCEPTION("Simulation specified as Forward Simulation, error rescheduling object: " << typeid(DataType).name() << " at step: " << iteration() << "," << sub_iteration() << " to step: " << update_revision._iteration << "," << update_revision._sub_iteration);
 			}
 		#endif
 
 		if( _world->Is_Running() )
 		{
 			// Update the EX
-			_world->simulation_engine()->Update_Schedule(starting_revision);
+			_world->simulation_engine()->Update_Schedule(update_revision);
 			
 			// Update the TEX
-			DataType::component_manager->Update_Schedule(starting_revision);
+			DataType::component_manager->Update_Schedule(update_revision);
 
 			// Update the PTEX
-			_execution_block->Update_Schedule(starting_revision);
+			_execution_block->Update_Schedule(update_revision);
 
 			// If safeties are enabled, mitigate an unsafe rescheduling (object which is going this event step is being rescheduled by an external thread)
 			#ifdef SAFE_MODE
 				LOCK(_optex_lock);
 			#elif defined ENABLE_WARNINGS
-				if( Visiting() && _execution_block->_thread_processing!=__thread_id )
+				if( Visiting() && _execution_block->thread_processing()!=__thread_id )
 				{
 					THROW_WARNING("Unreliable Rescheduling of object: " << typeid(DataType).name() << " at step: " << iteration () << "," << sub_iteration());
 				}
 			#endif
 			
-			next_revision = update_revision;
+			_next_revision = update_revision;
 			
 			#ifdef SAFE_MODE
 				UNLOCK(_optex_lock);
@@ -131,19 +131,19 @@ namespace polaris
 		else
 		{
 			// Update the EX
-			if(update_revision < _world->simulation_engine()->_ex_next_revision)
+			if(update_revision < _world->simulation_engine()->ex_next_revision())
 			{
 				_world->simulation_engine()->ex_next_revision(update_revision);
 			}
 
 			// Update the TEX
-			if(update_revision < DataType::component_manager->_tex_next_revision)
+			if(update_revision < DataType::component_manager->tex_next_revision())
 			{
 				DataType::component_manager->tex_next_revision(update_revision);
 			}
 
 			// Update the PTEX
-			if(update_revision < _execution_block->_ptex_next_revision)
+			if(update_revision < _execution_block->ptex_next_revision())
 			{
 				_execution_block->ptex_next_revision(update_revision);
 			}

@@ -112,8 +112,8 @@ namespace Zone_Components
 			m_data(int, employment_simulated, NONE, NONE);
 
 
-			m_data(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment, NONE, NONE);
-			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time);
+			//m_data(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment, NONE, NONE);
+			member_component_and_feature_accessor(update_increment, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<MasterType>);
 
 			// production and attraction counters
 			template<typename TargetType> void reset_counters()

@@ -28,6 +28,7 @@ namespace Activity_Components
 			// Tag As Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Basic_Activity_Plan_Implementation),Execution_Object>::Component_Type ComponentType;
 
+			m_data(bool, is_valid, NONE,NONE);
 
 			//=================================================================
 			// Pointer back to planner
@@ -195,9 +196,18 @@ namespace Activity_Components
 				// General interfaces, to parent and global classes
 				_planning_itf* planner = this->Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_household_itf* household = person->template Household<_household_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+
+
+
+				//TODO: remove when finished testing
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
 
 				
 				// Get the origin and destination locations
@@ -255,6 +265,17 @@ namespace Activity_Components
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
+
+				//TODO: remove when finished testing
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+				if (move==nullptr)
+				{
+					int id = person->uuid<int>();
+					int test = 1;
+				}
 
 
 				// exit if movement plan origin/destination not set
@@ -455,9 +476,7 @@ namespace Activity_Components
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
-		
-			m_data(Basic_Units::Implementations::Time_Implementation<NT>,_Activity_Planning_Time, NONE, NONE);
-			member_component_feature(Activity_Planning_Time, _Activity_Planning_Time, Value, Basic_Units::Prototypes::Time)
+			member_component_and_feature_accessor(Activity_Planning_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>)
 
 			// Activity attribute planning properties		
 			m_data(Types::PLAN_HORIZON_VALUES, Activity_Plan_Horizon, NONE, NONE);
@@ -759,6 +778,15 @@ namespace Activity_Components
 
 				_activity_location_itf *home_loc = person->template Home_Location<_activity_location_itf*>();
 
+
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
+
 				//// timing variables
 				//Time_Minutes start, end, prev_end, next_start, time_before, time_after, ttime_prev_to_home, ttime_home_to_next;
 				//start = pthis->template Start_Time<Time_Minutes>();
@@ -834,6 +862,14 @@ namespace Activity_Components
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
 
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
+
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
 
@@ -860,6 +896,15 @@ namespace Activity_Components
 				// make sure start time is not prior to current iteration
 				Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
 				pthis->template Start_Time<Time_Seconds>(max<int>(start_and_duration.first,time_min.Value));
+
+
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
 
 
 				// set the duration, making sure it fits into current schedule slot
@@ -924,7 +969,6 @@ namespace Activity_Components
 			}
 			template<typename TargetType> void Involved_Persons_Planning_Event_Handler()
 			{
-				
 			}
 			
 		};
@@ -1041,6 +1085,14 @@ namespace Activity_Components
 				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 
 
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
+
 				// Select the location based on the activity type
 				_activity_location_itf* dest = nullptr;		
 				if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::AT_HOME_ACTIVITY)
@@ -1107,6 +1159,15 @@ namespace Activity_Components
 				_mode_choice_itf* mode_chooser = planner->template Mode_Choice_Faculty<_mode_choice_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
+
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
+
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
 			}
@@ -1118,6 +1179,15 @@ namespace Activity_Components
 
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
+
+
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
 
 				Time_Minutes duration; 	
 	
@@ -1146,6 +1216,16 @@ namespace Activity_Components
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+
+
+				//TODO: remove when finished testing
+				_household_itf* household = person->template Household<_household_itf*>();
+				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
+
+
 
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 

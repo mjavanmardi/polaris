@@ -140,12 +140,13 @@ namespace Network_Skimming_Components
 				typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
 				typedef Prototypes::Network_Skimming<typename type_of(skim_reference)> skimmer_itf;
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(zone_origins_count),int> zone_location_count_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename network_itf::get_type_of(activity_locations_container)::value_type>::type> location_itf;
-				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container),location_itf*> locations_itf;
-
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename location_itf::get_type_of(origin_links)::value_type>::type> link_itf;
-				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links),link_itf*> links_itf;
-
+				
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
+				
+				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
+				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+				
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
@@ -154,8 +155,12 @@ namespace Network_Skimming_Components
 				locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
 				
 				// origin to zone / destination to zone mappings
-				typedef (origin_locations_itf,origin_location_itf,typename skimmer_itf::get_type_of(origin_locations), Random_Access_Sequence,Activity_Location_Components::Prototypes::Activity_Location);
-				typedef (destination_locations_itf,destination_location_itf,typename skimmer_itf::get_type_of(destination_locations), Random_Access_Sequence,Activity_Location_Components::Prototypes::Activity_Location);
+				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> origin_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> origin_location_itf;
+				
+				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> destination_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> destination_location_itf;
+				
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();
 				destination_locations_itf* destination_locations = skim->template destination_locations<destination_locations_itf*>();		
 				typename origin_locations_itf::iterator orig_itr = origin_locations->begin();
@@ -164,9 +169,9 @@ namespace Network_Skimming_Components
 				typename zone_location_count_itf::iterator zone_destination_count_itr;
 
 				// get reference to the routers used to create path-trees from each origin
-				typedef Routing_Components::Prototypes::Routing<typename remove_pointer<typename skimmer_itf::get_type_of(path_trees_container)::value_type>::type> path_tree_itf;
-				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(path_trees_container),path_tree_itf*> path_trees_itf;
-
+				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(path_trees_container)> path_trees_itf;
+				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(path_trees_itf)> path_tree_itf;
+				
 				path_trees_itf* trees_container = skim->template path_trees_container<path_trees_itf*>();
 				typename path_trees_itf::iterator tree_itr = trees_container->begin();	
 					
@@ -200,7 +205,7 @@ namespace Network_Skimming_Components
 				for (;tree_itr != trees_container->end(); ++tree_itr)
 				{
 					long orig_index = tree_itr->first;
-					path_tree_itf* tree = tree_itr->second;
+					path_tree_itf* tree = (path_tree_itf*)(tree_itr->second);
 
 					// get the origin activity location from the stored index in the route-tree map item
 					origin_location_itf* orig_loc = origin_locations->at(orig_index);
@@ -265,7 +270,7 @@ namespace Network_Skimming_Components
 
 					stringstream outline("");
 					outline<<iteration()<<","<<this->weighted_deviation<  float>()<<","<<this->max_deviation<  float>();
-//					File_IO::File_Writer& out_file = skim->template skim_fit_results_file<File_IO::File_Writer&>();
+					File_IO::File_Writer& out_file = skim->template skim_fit_results_file<File_IO::File_Writer&>();
 					out_file.Write_Line(outline);
 					cout << "W.A.A.P.D from previous skim: " << this->weighted_deviation<  float>()<<endl;
 					cout << "Maximum deviation from previous: " << this->max_deviation<  float>()<<endl;
@@ -298,11 +303,11 @@ namespace Network_Skimming_Components
 				for (int i=0; i < num_pairs; ++i)
 				{
 					typename MasterType::los_value_type* los_value = (los->get_data_pointer())[i];
-					values[i] = los_value->auto_ttime<typename MasterType::los_value_type,Stored_Time_Type>();
+					values[i] = los_value->auto_ttime<Stored_Time_Type>();
 				}
 
 
-//				File_IO::Binary_File_Writer& bw = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
+				File_IO::Binary_File_Writer& bw = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
 				bw.WriteArray<float>(values, (int)(zones->size() * zones->size()));
 				
 				delete values;
@@ -462,30 +467,27 @@ namespace Network_Skimming_Components
 				long orig_index = 0;
 				for (;orig_itr != origin_locations->end(); ++orig_itr, ++orig_index)
 				{
+					//TODO: NEED TO REDO SKIM ROUTER TO USE THE NEW ROUTER IMPLEMENTATION
+					// get the origin/destination indices
+					origin_location_itf* orig_node = (origin_location_itf*)*orig_itr;
 
-					//assert(false);
+					// Allocate a tree_builder for each origin node		
+					tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename tree_builder_itf::Component_Type>();
 
-					////TODO: NEED TO REDO SKIM ROUTER TO USE THE NEW ROUTER IMPLEMENTATION
-					//// get the origin/destination indices
-					//origin_location_itf* orig_node = (origin_location_itf*)*orig_itr;
+					// Set the current routable origin for the tree builder
+					tree_builder->template origin_link<link_itf*>((link_itf*)*(orig_node->template origin_links<links_itf*>()->begin()));
+					tree_builder->template network<network_itf*>(network);
 
-					//// Allocate a tree_builder for each origin node		
-					//tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename tree_builder_itf::Component_Type>();
+					// Set the start, end and update times for the router
+					tree_builder->template update_increment<Simulation_Timestep_Increment>(skim->template update_increment<Simulation_Timestep_Increment>());
+					tree_builder->template start_time<Simulation_Timestep_Increment>(0);//this->start_time<Simulation_Timestep_Increment>());
+					tree_builder->template end_time<Simulation_Timestep_Increment>(END);//this->end_time<Simulation_Timestep_Increment>());
+			
+					// Add the tree_builder to the boost::container::list for future processing
+					tree_builder->Schedule_Route_Computation(iteration());
 
-					//// Set the current routable origin for the tree builder
-					//tree_builder->template routable_origin<link_itf*>((link_itf*)*(orig_node->template origin_links<links_itf*>()->begin()));
-					//tree_builder->template network<network_itf*>(network);
-
-					//// Set the start, end and update times for the router
-					//tree_builder->template update_increment<Simulation_Timestep_Increment>(skim->template update_increment<Simulation_Timestep_Increment>());
-					//tree_builder->template start_time<Simulation_Timestep_Increment>(0);//this->start_time<Simulation_Timestep_Increment>());
-					//tree_builder->template end_time<Simulation_Timestep_Increment>(END);//this->end_time<Simulation_Timestep_Increment>());
-
-					//// Add the tree_builder to the boost::container::list for future processing
-					//tree_builder->template Initialize_Tree_Computation<NULLTYPE>(iteration());
-
-					//pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig_index,tree_builder);
-					//tree_list->insert(item);
+					pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig_index,tree_builder);
+					tree_list->insert(item);
 				}
 
 				Simulation_Timestep_Increment start;
