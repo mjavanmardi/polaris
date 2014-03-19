@@ -183,15 +183,15 @@ namespace PopSyn
 				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type> zones_itf;
 				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
 				
+				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
-				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type,sample_collection_type::mapped_type> sample_data_itf;
-
+				
+				typedef Pair_Associative_Container<temporary_sample_collection_type,temporary_sample_collection_type::key_type> temp_sample_data_itf;
 				typedef Household_Components::Prototypes::Household_Properties<temp_sample_type> temp_pop_unit_itf;
-				typedef Pair_Associative_Container<temporary_sample_collection_type,temporary_sample_collection_type::key_type,temp_pop_unit_itf*> temp_sample_data_itf;
-
-				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
-				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
-
+				
+				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+				
 				typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
 	
@@ -333,8 +333,9 @@ namespace PopSyn
 						temp_sample = new_region->template Temporary_Sample_Data<temp_sample_data_itf*>();
 
 						// get characteristics from file
-						typename person_unit_itf::get_type_of(ID) sample_id;
-						fr.Get_Data<typename person_unit_itf::get_type_of(ID)>(sample_id,linker->person_sample_id_column());
+						typedef person_unit_itf::get_type_of(ID) ID_type;
+						ID_type sample_id;
+						fr.Get_Data<ID_type>(sample_id,linker->person_sample_id_column());
 						boost::container::vector<double> data;
 						fr.Get_Data<double>(data,linker->get_person_data_columns());
 

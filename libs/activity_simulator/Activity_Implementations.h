@@ -187,12 +187,7 @@ namespace Activity_Components
 			}
 
 			template<typename TargetType> void Route_Planning_Event_Handler()
-			{			
-				// Create movement plan and give it an ID
-				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
-				move->template initialize_trajectory<NULLTYPE>();
-				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
-
+			{		
 				// General interfaces, to parent and global classes
 				_planning_itf* planner = this->Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
@@ -201,6 +196,12 @@ namespace Activity_Components
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
+
+				// Create movement plan and give it an ID
+				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
+				move->template initialize_trajectory<NULLTYPE>();
+				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
+				move->network<_network_itf*>(network);
 
 
 				//TODO: remove when finished testing
@@ -533,7 +534,7 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
 				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 
@@ -1339,7 +1340,7 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
 				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 

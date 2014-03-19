@@ -153,7 +153,8 @@ namespace Person_Components
 				// Call specific implementation of the activity generation routine
 				typedef Prototypes::Activity_Generator<typename get_type_of(Activity_Generation_Faculty)> activity_generator_itf;
 				activity_generator_itf* generator = this_ptr->template Activity_Generation_Faculty<activity_generator_itf*>();
-				generator->template Activity_Generation<T>();
+	
+				generator->Activity_Generation<T>();
 
 				// set next activity generation occurence
 				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
@@ -286,30 +287,27 @@ namespace Person_Components
 			//=========================================================================================================
 			// Member functions
 			local_check_template_method_name(Has_Initialize,Initialize);
-			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Has_Initialize)))
+			template<typename TargetType> void Initialize()
 			{
+				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+
 				this_component()->template Initialize< TargetType>();
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
 
 				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
 				//load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
+
+			template<typename TargetType> void Initialize(TargetType initializer)
 			{
 				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			}
-			template<typename TargetType> void Initialize(TargetType initializer, requires(TargetType,check(ComponentType,Has_Initialize)))
-			{
+
 				this_component()->template Initialize< TargetType>(initializer);
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
 
 				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
-				//load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,first_iter,0,NULLTYPE);
 			}
-			template<typename TargetType> void Initialize(TargetType initializer, requires(TargetType,!check(ComponentType,Has_Initialize)))
-			{
-				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			}
+
 
 			template<typename TargetType> void Schedule_New_Routing(int planning_time, TargetType movement_plan, requires(TargetType,check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan)))
 			{
@@ -363,14 +361,6 @@ namespace Person_Components
 			accessor(Mode_Choice_Faculty, NONE, NONE);
 			accessor(Timing_Chooser, NONE, NONE);
 
-			//accessor(Activity_Container, NONE, NONE);
-			//accessor(Activity_Record_Container, NONE, NONE);
-			//accessor(Movement_Plans_Container, NONE, NONE);
-			//accessor(Schedule_Container, NONE, NONE);	
-
-			// Pass through members to scheduler class
-			//accessor(current_movement_plan, NONE, NONE);
-			//accessor(current_activity_plan, NONE, NONE);
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->template Add_Movement_Plan<TargetType>(movement_plan);

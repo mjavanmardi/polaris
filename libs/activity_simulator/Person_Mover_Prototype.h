@@ -41,6 +41,11 @@ namespace Prototypes
 		//--------------------------------------------------------
 		static void Movement_Event_Controller(ComponentType* _this,Event_Response& response)
 		{
+
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
+
+
 			typedef Person_Mover<ComponentType> _Person_Mover_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Mover_Interface* pthis =(_Person_Mover_Interface*)_pthis;
@@ -76,7 +81,7 @@ namespace Prototypes
 			{
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				//response.result = true;
+
 				pthis->Artificial_Arrival_Event<NT>();
 			}
 
@@ -85,33 +90,33 @@ namespace Prototypes
 			{
 				response.next._iteration = iteration();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION;
-				//response.result = has_pretrip_info;
+
 				if (has_pretrip_info) pthis->Do_Pretrip_Information_Acquisition<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
 			{
-				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
 				response.next._iteration = routing_timestep;
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
-				//response.result = pthis->template Replanning_Needed<bool>();
+
 				if (pthis->template Replanning_Needed<bool>()) pthis->Do_Pretrip_Replanning<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
-				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()) THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
-				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
+				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()+1) //THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
+				{
+					movement->template departed_time<Simulation_Timestep_Increment>(iteration()+1);
+				}
 				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
-				//response.result = true;
+
 				pthis->Do_Pretrip_Routing<NT>();
 			}
 			// GO TO DEPARTURE TIMESTEP
 			else if (sub_iteration() == Scenario_Components::Types::END_OF_ITERATION)
 			{
-				//_pthis->Swap_Event((Event)&Person_Mover::Movement_Event<NULLTYPE>);
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				//response.result = true;
+
 				pthis->Do_Movement<NT>();
 			}
 
@@ -146,7 +151,7 @@ namespace Prototypes
 			}
 			else 
 			{
-				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::END_OF_ITERATION);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
 				//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
 			}
 		}

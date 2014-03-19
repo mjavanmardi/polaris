@@ -3,7 +3,7 @@
 
 
 #ifdef _DEBUG
-#define SHOW_WARNINGS
+//#define SHOW_WARNINGS
 #else
 //#define SHOW_WARNINGS
 #endif
@@ -227,19 +227,24 @@ struct MasterType
 int main(int argc,char** argv)
 {
 	//==================================================================================================================================
-	// Allocation hints block
-	//----------------------------------------------------------------------------------------------------------------------------------
-	Simulation_Configuration cfg;
-	cfg.Single_Threaded_Setup(86400);
-	INITIALIZE_SIMULATION(cfg);
-	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
-
-	
-	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
+	int threads = 1;
+	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
+
+
+	//==================================================================================================================================
+	// Allocation hints block
+	//----------------------------------------------------------------------------------------------------------------------------------
+	Simulation_Configuration cfg;
+	cfg.Multi_Threaded_Setup(86400, threads);
+	INITIALIZE_SIMULATION(cfg);
+	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
+
+	
+	
 
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF

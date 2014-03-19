@@ -352,7 +352,7 @@ namespace Network_Skimming_Components
 				}
 
 				// Network Skim timer
-				cout << endl<<"Network Skimming run-time: " << this->template timer<Counter&>().Stop();
+				cout << endl<<"Network Skimming run-time: " << this->template timer<Counter&>().Stop()<<endl<<endl;
 				return true;
 			}
 

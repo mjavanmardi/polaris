@@ -11,11 +11,12 @@ namespace polaris
 	/// MESSAGES - Enable / Disable various categories of runtime messages
 	///----------------------------------------------------------------------------------------------------
 
+#ifdef _DEBUG
 	#define ENABLE_MESSAGES
 	#define ENABLE_WARNINGS
+	#define ENABLE_DEBUG_MESSAGES
+#endif
 	#define ENABLE_EXCEPTIONS
-	//#define ENABLE_DEBUG_MESSAGES
-
 	///----------------------------------------------------------------------------------------------------
 	/// SAFE_MODE - Enables all general purpose safeties during run
 	///----------------------------------------------------------------------------------------------------

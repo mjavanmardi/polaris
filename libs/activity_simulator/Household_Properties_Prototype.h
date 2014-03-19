@@ -103,32 +103,38 @@ namespace Household_Components
 			
 			// Pass through methods
 			local_check_template_method_name(Initialize_exists,Initialize);
-			template<typename TargetType> void Initialize(requires(TargetType, check(ComponentType,Initialize_exists)))
+			template<typename TargetType> void Initialize(/*requires(TargetType, check(ComponentType,Initialize_exists))*/)
 			{
+				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
+
 				this_component()->Initialize<TargetType>();
 			}
-			template<typename TargetType> void Initialize(requires(TargetType, !check(ComponentType,Initialize_exists)))
+			//template<typename TargetType> void Initialize(requires(TargetType, !check(ComponentType,Initialize_exists)))
+			//{
+			//	assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
+			//}
+
+			template<typename TargetType> void Initialize(TargetType home_zone/*, requires(TargetType, check(ComponentType,Initialize_exists))*/)
 			{
 				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
-			}
 
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Initialize_exists)))
-			{
 				this_component()->Initialize<TargetType>(home_zone);
 			}
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Initialize_exists)))
-			{
-				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
-			}
+			//template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Initialize_exists)))
+			//{
+			//	assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
+			//}
 
 			local_check_template_method_name(Characteristics_exists,Characteristics);
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check(ComponentType, Characteristics_exists) && check_2(TargetType, boost::container::vector<double>*, is_same)))
-			{
-				this_component()->Characteristics<TargetType>(data);
-			}
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, !check(ComponentType, Characteristics_exists) || !check_2(TargetType, boost::container::vector<double>*, is_same)))
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*check(ComponentType, Characteristics_exists) && */check_2(TargetType, boost::container::vector<double>*, is_same)))
 			{
 				assert_check(ComponentType, Characteristics_exists, "No 'Characteristics' data member defined in component.");
+
+				this_component()->Characteristics<TargetType>(data);
+			}
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*!check(ComponentType, Characteristics_exists) || */!check_2(TargetType, boost::container::vector<double>*, is_same)))
+			{
+				/*assert_check(ComponentType, Characteristics_exists, "No 'Characteristics' data member defined in component.");*/
 				assert_check(TargetType, Characteristics_exists, "'data' parameter must be passed as a pointer to a boost::vector of doubles.");
 			}
 
