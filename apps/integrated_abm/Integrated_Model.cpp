@@ -223,9 +223,13 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
+void output_object_sizes();
 
 int main(int argc,char** argv)
 {
+	
+
+
 	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -234,13 +238,16 @@ int main(int argc,char** argv)
 	int threads = 1;
 	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
 
-
+	
 	//==================================================================================================================================
 	// Allocation hints block
 	//----------------------------------------------------------------------------------------------------------------------------------
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(86400, threads);
 	INITIALIZE_SIMULATION(cfg);
+
+	//polaris::_type_counter.resize(__all_components->size(),threads+1,0);
+
 	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
 
 	
@@ -252,6 +259,8 @@ int main(int argc,char** argv)
 	#pragma region New network_model.cpp stuff
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
+
+	output_object_sizes();
 
 	//===============
 	// OUTPUT OPTIONS
@@ -524,6 +533,73 @@ int main(int argc,char** argv)
 
 	cout << "Finished!" << endl;
 	system("PAUSE");
+}
+
+void output_object_sizes()
+{
+	cout << endl <<"network_type size = "<<sizeof(MasterType::network_type)<<", Component ID: "<<(int)MasterType::network_type::component_id<<endl;
+	cout << endl <<"link_type size = "<<sizeof(MasterType::link_type)<<", Component ID: "<<(int)MasterType::link_type::component_id<<endl;
+	cout << endl <<"intersection_type size = "<<sizeof(MasterType::intersection_type)<<", Component ID: "<<(int)MasterType::intersection_type::component_id<<endl;
+	cout << endl <<"vehicle_type size = "<<sizeof(MasterType::vehicle_type)<<", Component ID: "<<(int)MasterType::vehicle_type::component_id<<endl;
+	cout << endl <<"zone_type size = "<<sizeof(MasterType::zone_type)<<", Component ID: "<<(int)MasterType::zone_type::component_id<<endl;
+	cout << endl <<"scenario_type size = "<<sizeof(MasterType::scenario_type)<<", Component ID: "<<(int)MasterType::scenario_type::component_id<<endl;
+	cout << endl <<"network_db_reader_type size = "<<sizeof(MasterType::network_db_reader_type)<<", Component ID: "<<(int)MasterType::network_db_reader_type::component_id<<endl;
+	cout << endl <<"movement_type size = "<<sizeof(MasterType::movement_type)<<", Component ID: "<<(int)MasterType::movement_type::component_id<<endl;
+	cout << endl <<"turn_movement_type size = "<<sizeof(MasterType::turn_movement_type)<<", Component ID: "<<(int)MasterType::turn_movement_type::component_id<<endl;
+	cout << endl <<"routable_network_type size = "<<sizeof(MasterType::routable_network_type)<<", Component ID: "<<(int)MasterType::routable_network_type::component_id<<endl;
+	cout << endl <<"routing_type size = "<<sizeof(MasterType::routing_type)<<", Component ID: "<<(int)MasterType::routing_type::component_id<<endl;
+	cout << endl <<"skim_routing_type size = "<<sizeof(MasterType::skim_routing_type)<<", Component ID: "<<(int)MasterType::skim_routing_type::component_id<<endl;
+	cout << endl <<"activity_location_type size = "<<sizeof(MasterType::activity_location_type)<<", Component ID: "<<(int)MasterType::activity_location_type::component_id<<endl;
+	cout << endl <<"traveler_type size = "<<sizeof(MasterType::traveler_type)<<", Component ID: "<<(int)MasterType::traveler_type::component_id<<endl;
+	cout << endl <<"switch_decision_data_type size = "<<sizeof(MasterType::switch_decision_data_type)<<", Component ID: "<<(int)MasterType::switch_decision_data_type::component_id<<endl;
+	cout << endl <<"inbound_outbound_movements_type size = "<<sizeof(MasterType::inbound_outbound_movements_type)<<", Component ID: "<<(int)MasterType::inbound_outbound_movements_type::component_id<<endl;
+	cout << endl <<"outbound_inbound_movements_type size = "<<sizeof(MasterType::outbound_inbound_movements_type)<<", Component ID: "<<(int)MasterType::outbound_inbound_movements_type::component_id<<endl;
+	cout << endl <<"operation_type size = "<<sizeof(MasterType::operation_type)<<", Component ID: "<<(int)MasterType::operation_type::component_id<<endl;
+	cout << endl <<"intersection_control_type size = "<<sizeof(MasterType::intersection_control_type)<<", Component ID: "<<(int)MasterType::intersection_control_type::component_id<<endl;
+	cout << endl <<"control_plan_type size = "<<sizeof(MasterType::control_plan_type)<<", Component ID: "<<(int)MasterType::control_plan_type::component_id<<endl;
+	cout << endl <<"phase_type size = "<<sizeof(MasterType::phase_type)<<", Component ID: "<<(int)MasterType::phase_type::component_id<<endl;
+	cout << endl <<"phase_movement_type size = "<<sizeof(MasterType::phase_movement_type)<<", Component ID: "<<(int)MasterType::phase_movement_type::component_id<<endl;
+	cout << endl <<"approach_type size = "<<sizeof(MasterType::approach_type)<<", Component ID: "<<(int)MasterType::approach_type::component_id<<endl;
+	cout << endl <<"plan_type size = "<<sizeof(MasterType::plan_type)<<", Component ID: "<<(int)MasterType::plan_type::component_id<<endl;
+	cout << endl <<"movement_plan_type size = "<<sizeof(MasterType::movement_plan_type)<<", Component ID: "<<(int)MasterType::movement_plan_type::component_id<<endl;
+	cout << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type)<<", Component ID: "<<(int)MasterType::movement_plan_record_type::component_id<<endl;
+	cout << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type)<<", Component ID: "<<(int)MasterType::trajectory_unit_type::component_id<<endl;
+	cout << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type)<<", Component ID: "<<(int)MasterType::network_skim_type::component_id<<endl;
+	cout << endl <<"demand_type size = "<<sizeof(MasterType::demand_type)<<", Component ID: "<<(int)MasterType::demand_type::component_id<<endl;
+	cout << endl <<"person_type size = "<<sizeof(MasterType::person_type)<<", Component ID: "<<(int)MasterType::person_type::component_id<<endl;
+	cout << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type)<<", Component ID: "<<(int)MasterType::person_planner_type::component_id<<endl;
+	cout << endl <<"person_mover_type size = "<<sizeof(MasterType::person_mover_type)<<", Component ID: "<<(int)MasterType::person_mover_type::component_id<<endl;
+	cout << endl <<"person_scheduler_type size = "<<sizeof(MasterType::person_scheduler_type)<<", Component ID: "<<(int)MasterType::person_scheduler_type::component_id<<endl;
+	cout << endl <<"person_perception_type size = "<<sizeof(MasterType::person_perception_type)<<", Component ID: "<<(int)MasterType::person_perception_type::component_id<<endl;
+	cout << endl <<"activity_generator_type size = "<<sizeof(MasterType::activity_generator_type)<<", Component ID: "<<(int)MasterType::activity_generator_type::component_id<<endl;
+	cout << endl <<"person_properties_type size = "<<sizeof(MasterType::person_properties_type)<<", Component ID: "<<(int)MasterType::person_properties_type::component_id<<endl;
+	cout << endl <<"person_static_properties_type size = "<<sizeof(MasterType::person_static_properties_type)<<", Component ID: "<<(int)MasterType::person_static_properties_type::component_id<<endl;
+	cout << endl <<"person_data_logger_type size = "<<sizeof(MasterType::person_data_logger_type)<<", Component ID: "<<(int)MasterType::person_data_logger_type::component_id<<endl;
+	cout << endl <<"activity_type size = "<<sizeof(MasterType::activity_type)<<", Component ID: "<<(int)MasterType::activity_type::component_id<<endl;
+	cout << endl <<"activity_plan_type size = "<<sizeof(MasterType::activity_plan_type)<<", Component ID: "<<(int)MasterType::activity_plan_type::component_id<<endl;
+	cout << endl <<"routine_activity_plan_type size = "<<sizeof(MasterType::routine_activity_plan_type)<<", Component ID: "<<(int)MasterType::routine_activity_plan_type::component_id<<endl;
+	cout << endl <<"at_home_activity_plan_type size = "<<sizeof(MasterType::at_home_activity_plan_type)<<", Component ID: "<<(int)MasterType::at_home_activity_plan_type::component_id<<endl;
+	cout << endl <<"activity_record_type size = "<<sizeof(MasterType::activity_record_type)<<", Component ID: "<<(int)MasterType::activity_record_type::component_id<<endl;
+	cout << endl <<"activity_timing_chooser_type size = "<<sizeof(MasterType::activity_timing_chooser_type)<<", Component ID: "<<(int)MasterType::activity_timing_chooser_type::component_id<<endl;
+	cout << endl <<"person_destination_chooser_type size = "<<sizeof(MasterType::person_destination_chooser_type)<<", Component ID: "<<(int)MasterType::person_destination_chooser_type::component_id<<endl;
+	cout << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type)<<", Component ID: "<<(int)MasterType::person_destination_choice_option_type::component_id<<endl;
+	cout << endl <<"synthesis zone size = "<<sizeof(MasterType::synthesis_zone_type)<<", Component ID: "<<(int)MasterType::synthesis_zone_type::component_id<<endl;
+	cout << endl <<"region size = "<<sizeof(MasterType::synthesis_region_type)<<", Component ID: "<<(int)MasterType::synthesis_region_type::component_id<<endl;
+	cout << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::ipf_solver_settings_type)<<", Component ID: "<<(int)MasterType::ipf_solver_settings_type::component_id<<endl;
+	cout << endl <<"popsyn_solver size = "<<sizeof(MasterType::population_synthesis_type)<<", Component ID: "<<(int)MasterType::population_synthesis_type::component_id<<endl;
+	cout << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type)<<", Component ID: "<<(int)MasterType::traffic_management_center_type::component_id<<endl;
+	cout << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type)<<", Component ID: "<<(int)MasterType::weather_network_event_type::component_id<<endl;
+	cout << endl <<"accident_network_event_type size = "<<sizeof(MasterType::accident_network_event_type)<<", Component ID: "<<(int)MasterType::accident_network_event_type::component_id<<endl;
+	cout << endl <<"congestion_network_event_type size = "<<sizeof(MasterType::congestion_network_event_type)<<", Component ID: "<<(int)MasterType::congestion_network_event_type::component_id<<endl;
+	cout << endl <<"lane_closure_network_event_type size = "<<sizeof(MasterType::lane_closure_network_event_type)<<", Component ID: "<<(int)MasterType::lane_closure_network_event_type::component_id<<endl;
+	cout << endl <<"link_control_type size = "<<sizeof(MasterType::link_control_type)<<", Component ID: "<<(int)MasterType::link_control_type::component_id<<endl;
+	cout << endl <<"depot_type size = "<<sizeof(MasterType::depot_type)<<", Component ID: "<<(int)MasterType::depot_type::component_id<<endl;
+	cout << endl <<"advisory_radio_type size = "<<sizeof(MasterType::advisory_radio_type)<<", Component ID: "<<(int)MasterType::advisory_radio_type::component_id<<endl;
+	cout << endl <<"variable_word_sign_type size = "<<sizeof(MasterType::variable_word_sign_type)<<", Component ID: "<<(int)MasterType::variable_word_sign_type::component_id<<endl;
+	cout << endl <<"variable_speed_sign_type size = "<<sizeof(MasterType::variable_speed_sign_type)<<", Component ID: "<<(int)MasterType::variable_speed_sign_type::component_id<<endl;
+	cout << endl <<"link_sensor_type size = "<<sizeof(MasterType::link_sensor_type)<<", Component ID: "<<(int)MasterType::link_sensor_type::component_id<<endl;
+	cout << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type)<<", Component ID: "<<(int)MasterType::base_network_event_type::component_id<<endl;
+	cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type)<<", Component ID: "<<(int)MasterType::network_event_manager_type::component_id<<endl;
 }
 #endif
 

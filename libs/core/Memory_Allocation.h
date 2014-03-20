@@ -2,9 +2,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Memory_Allocation.h - Memory_Allocation routines
 ///----------------------------------------------------------------------------------------------------
-
+#include "m_array.h"
 #include "Generic.h"
 #include "windows\gperftools\tcmalloc.h"
+
+
+#define ENABLE_MEMORY_LOGGING
+
 
 namespace polaris
 {
@@ -15,6 +19,10 @@ namespace polaris
 	// indicate agent to be freed
 	#define FREE __revision_free
 
+#ifdef ENABLE_MEMORY_LOGGING
+	extern matrix<long long> _type_counter;
+#endif
+
 	///----------------------------------------------------------------------------------------------------
 	/// Allocate, Allocate_Array - pass through to the component_manager
 	///----------------------------------------------------------------------------------------------------
@@ -22,6 +30,11 @@ namespace polaris
 	template<typename DataType>
 	DataType* Allocate(int uuid = -1)
 	{
+#ifdef ENABLE_MEMORY_LOGGING
+		int i=(int)DataType::component_id;
+		int j=thread_id();
+		_type_counter(i,j)+=sizeof(DataType);
+#endif
 		return (DataType*)((DataType::component_manager)->Allocate(uuid));
 	}
 
@@ -38,6 +51,11 @@ namespace polaris
 	template<typename DataType>
 	void Free( DataType* ptr )
 	{
+#ifdef ENABLE_MEMORY_LOGGING
+		int i=(int)DataType::component_id;
+		int j=thread_id();
+		_type_counter(i,j)-=sizeof(DataType);
+#endif
 		((DataType::component_manager)->Free(ptr));
 	}
 

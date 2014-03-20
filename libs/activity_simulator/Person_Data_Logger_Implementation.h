@@ -228,9 +228,9 @@ namespace Person_Components
 				}
 				zone_itf* zone = loc->template zone<zone_itf*>();
 
-				Revision& location = act->template Stored_Location_Planning_Time<Revision&>();
-				Revision& start = act->template Stored_Start_Time_Planning_Time<Revision&>();
-				Revision& route = act->template Stored_Route_Planning_Time<Revision&>();
+				Revision& location = act->template Location_Planning_Time<Revision&>();
+				Revision& start = act->template Start_Time_Planning_Time<Revision&>();
+				Revision& route = act->template Route_Planning_Time<Revision&>();
 				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Get_Type_String<NT>() << "\t"<<zone->template uuid<int>()<<"\t";
 				s << "Plan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					

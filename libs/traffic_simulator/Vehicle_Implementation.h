@@ -393,6 +393,8 @@ namespace Vehicle_Components
 				}				
 				typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
 				trajectory_container_type().swap((trajectory_container_type&)trajectory);
+
+				if(trajectory.size()!=0) cout << "swap ineffective!" << endl;
 			}
 
 			template<typename TargetType> void start_agent()
@@ -506,20 +508,20 @@ namespace Vehicle_Components
 			{
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 
-				_Switch_Decision_Data_Interface* switch_decision_data = (_Switch_Decision_Data_Interface*)Allocate<typename MasterType::switch_decision_data_type>();
+				//_Switch_Decision_Data_Interface* switch_decision_data = (_Switch_Decision_Data_Interface*)Allocate<typename MasterType::switch_decision_data_type>();
 				
-				switch_decision_data->template switch_decision_index<int>(int(_switch_decisions_container.size()));
+				//switch_decision_data->template switch_decision_index<int>(int(_switch_decisions_container.size()));
 
-				typename _Trajectory_Container_Interface::iterator itr;
+				//typename _Trajectory_Container_Interface::iterator itr;
 
-				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
-				{
-					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
-					_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
-					_Links_Container_Interface& links_container = switch_decision_data->template route_links_container<_Links_Container_Interface&>();
-					links_container.push_back(route_link);
-				}
-				switch_decisions_container<_Switch_Decision_Data_Container_Interface&>().push_back(switch_decision_data);
+				//for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
+				//{
+				//	_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+				//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+				//	_Links_Container_Interface& links_container = switch_decision_data->template route_links_container<_Links_Container_Interface&>();
+				//	links_container.push_back(route_link);
+				//}
+				//switch_decisions_container<_Switch_Decision_Data_Container_Interface&>().push_back(switch_decision_data);
 
 				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_switched_decisions<NULLTYPE>(cause_for_switching);
 			}

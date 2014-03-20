@@ -9,6 +9,10 @@ namespace polaris
 {
 	const unsigned int __page_size = 4096;
 	const unsigned int __cache_line_size = 64;
+
+#ifdef ENABLE_MEMORY_LOGGING
+	matrix<long long> _type_counter;
+#endif
 }
 
 void* operator new ( size_t size ) { return tc_malloc( size ); }

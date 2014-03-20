@@ -132,12 +132,12 @@ namespace Activity_Components
 			m_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
-			m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
 			template<typename TargetType> bool Location_Is_Planned(){return (_Location_Planning_Time._iteration >= (int)END && _Location_Planning_Time._sub_iteration >= (int)END);}
 			template<typename TargetType> bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration >= (int)END && _Mode_Planning_Time._sub_iteration >= (int)END);}

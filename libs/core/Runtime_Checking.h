@@ -8,6 +8,11 @@
 namespace polaris
 {
 	///----------------------------------------------------------------------------------------------------
+	/// Enables the memory log to be constructed
+	///----------------------------------------------------------------------------------------------------
+	//#define ENABLE_MEMORY_LOGGING
+
+	///----------------------------------------------------------------------------------------------------
 	/// MESSAGES - Enable / Disable various categories of runtime messages
 	///----------------------------------------------------------------------------------------------------
 
@@ -27,11 +32,12 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	#define FORWARD_SIMULATION_MODE
 
+	
 	///----------------------------------------------------------------------------------------------------
 	/// PERFORMANCE_MODE - Disables all safeties during run to maximize performance
 	///----------------------------------------------------------------------------------------------------
 	//#define PERFORMANCE_MODE
-
+	
 
 	#ifdef SAFE_MODE
 		#define ENABLE_WARNINGS
@@ -39,7 +45,7 @@ namespace polaris
 	#endif
 
 	#ifdef FORWARD_SIMULATION_MODE
-		#define ENABLE_EXCEPTIONS
+		#define ENABLE_EXCEPTIONS	
 	#endif
 
 	#ifdef ENABLE_MESSAGES
