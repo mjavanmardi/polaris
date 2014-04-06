@@ -21,6 +21,7 @@ namespace Person_Components
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type,Movement, NONE, NONE);
 			m_data(bool, Movement_Scheduled, NONE, NONE);
 			m_data(bool, Artificial_Movement_Scheduled, NONE, NONE);
+			m_data(Simulation_Timestep_Increment, Artificial_Arrival_Time, NONE, NONE);
 			m_data(bool, Replanning_Needed, NONE, NONE);
 		};
 

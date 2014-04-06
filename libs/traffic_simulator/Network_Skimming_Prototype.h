@@ -364,7 +364,6 @@ namespace Network_Skimming_Components
 			{	
 				// call the get los function
 				ReturnType return_val = this->template Get_TTime<LocationType,ModeType, Simulation_Timestep_Increment,ReturnType>(Origin, Destination, Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
-
 				return return_val;
 
 			}
@@ -381,6 +380,14 @@ namespace Network_Skimming_Components
 				
 				// call the general get los function
 				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
+
+				//TODO: remove when done testing
+				if (los_value->auto_ttime<Time_Seconds>() > END || los_value->auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->auto_ttime<Time_Seconds>()))
+				{
+					int O = this->Get_Zone_ID<LocationType>(Origin);
+					int D = this->Get_Zone_ID<LocationType>(Destination);
+					THROW_EXCEPTION("Error: travel time is greater than 1 day for auto mode, ttime="<<los_value->auto_ttime<Time_Seconds>()<<", O="<<O<<", D="<<D);
+				}
 
 				// extract and return the auto travel time
 				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->auto_ttime<ReturnType>();
@@ -454,7 +461,7 @@ namespace Network_Skimming_Components
 				}
 
 				// if the code gets here, then the requested time does not fall within any skim_table time period
-				cout << endl << "Get LOS failure: " <<"origin: " << Origin_Zone_ID <<", destination: " << Destination_Zone_ID<<", time: "  << Start_Time<<endl;
+				cout << endl << "Get LOS failure: " <<"origin: " << Origin_Zone_ID <<", destination: " << Destination_Zone_ID<<", time: "  << Start_Time<<", remain time="<<remain<<", rounded="<<rounded<<endl;
 				assert(false);
 				return false;
 			}

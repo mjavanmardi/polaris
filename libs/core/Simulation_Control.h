@@ -165,4 +165,5 @@ namespace polaris
 	};
 
 	typedef void (*Event)(void*,Event_Response&);
+
 }

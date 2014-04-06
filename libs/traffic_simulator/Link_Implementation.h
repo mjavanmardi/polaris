@@ -496,6 +496,8 @@ namespace Link_Components
 					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
+					
+					Free((typename MasterType::movement_plan_type*)mp);
 				}
 				else
 				{

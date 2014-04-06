@@ -23,7 +23,7 @@ namespace Basic_Units
 	//==========================================================================
 	// Define the arithmetic value type to use in basic unit calculations here
 	typedef float Value_Type;
-	typedef double Time_Value_Type;
+	typedef float Time_Value_Type;
 	//==========================================================================
 
 	namespace Types

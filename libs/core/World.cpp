@@ -227,6 +227,7 @@ void World::Start_Turning()
 #ifdef ENABLE_MEMORY_LOGGING
 	std::ofstream _mem_log_file;
 	_mem_log_file.open("memory_logging.csv");
+	_mem_log_file << "Typeid,Iteration,KBytes"<<endl;
 #endif
 
 	if(_running)
@@ -263,14 +264,25 @@ void World::Start_Turning()
 			// continue simulation
 			Send_Signal_To_Threads();
 
+//==========================================
 #ifdef ENABLE_MEMORY_LOGGING
 			if (iteration() % 3600 == 0 && sub_iteration() == 0)
 			{
-				_mem_log_file << "Iteration: " << iteration();
-				polaris::_type_counter.print(_mem_log_file);
+				//_mem_log_file << "Iteration: " << iteration();
+				//polaris::_type_counter.print(_mem_log_file);
+				for (int i=0; i<polaris::_type_counter.num_rows(); i++)
+				{
+					float kbytes=0;
+					_mem_log_file<<i<<","<<iteration()<<",";
+					for (int j=0; j<polaris::_type_counter.num_cols(); j++)
+					{
+						kbytes+=polaris::_type_counter(i,j)/1024.0;
+					}
+					_mem_log_file<<kbytes<<endl;
+				}
 			}
 #endif
-
+//==========================================
 		}
 		else
 		{

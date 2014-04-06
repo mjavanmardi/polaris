@@ -179,6 +179,7 @@ namespace Network_Skimming_Components
 				matrix<typename MasterType::los_value_type*>* los = (matrix<typename MasterType::los_value_type*>*)&this->_skim_table;
 				typedef typename matrix<typename MasterType::los_value_type*>::size_type size_t;
 
+				// copy old values into temporary and reset the current values to zero
 				matrix<float> los_old;
 				if (scenario->template read_skim_tables<bool>())
 				{
@@ -605,7 +606,15 @@ namespace Network_Skimming_Components
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
 							typename MasterType::los_value_type* temp_los = Allocate<typename MasterType::los_value_type>();
-							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(data[i]);
+							// get, validate and store the auto ttime.  make sure not greater than max expected
+							Stored_Time_Type a_ttime = (Stored_Time_Type)data[i];
+							if (a_ttime > GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(720.0) || a_ttime < 0 || ISNAN(a_ttime))
+							{
+								cout <<"Warning, invalid travel auto travel time value="<<a_ttime<<" found when reading skim file, travel time reset to default value=180.0."<<endl;
+								a_ttime = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(180.0);
+							}
+							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(a_ttime);
+							// store the other time invariant los characteristics for the current los record
 							((los_value_itf*)temp_los)->LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}

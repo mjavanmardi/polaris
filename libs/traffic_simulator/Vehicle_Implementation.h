@@ -390,11 +390,10 @@ namespace Vehicle_Components
 				for (int i = 0; i < (int)trajectory.size(); i++)
 				{
 					Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
-				}				
+				}
 				typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
 				trajectory_container_type().swap((trajectory_container_type&)trajectory);
 
-				if(trajectory.size()!=0) cout << "swap ineffective!" << endl;
 			}
 
 			template<typename TargetType> void start_agent()
