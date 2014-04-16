@@ -283,6 +283,7 @@ namespace Person_Components
 
 				// else get the start and end times for the activity
 				Time_Seconds start = act->template Start_Time<Time_Seconds>();
+				Time_Seconds dur = act->template Duration<Time_Seconds>();
 				Time_Seconds end = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
 
 				// get the activity location for calculating approximate travel times to from surrounding activities
@@ -366,7 +367,7 @@ namespace Person_Components
 							move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev); //act->template Expected_Travel_Time<Time_Seconds>());
 						}
 						// update the following movement plan to account for new travel time
-						if (next_act != nullptr) 
+						if (next_act != nullptr && next_move != nullptr) 
 						{
 							next_move->template origin<_Activity_Location_Interface*>(loc);
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
@@ -393,7 +394,7 @@ namespace Person_Components
 							move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev); //act->template Expected_Travel_Time<Time_Seconds>());
 						}
 						// update the following movement plan to account for new travel time
-						if (next_act != nullptr) 
+						if (next_act != nullptr && next_move != nullptr) 
 						{
 							next_move->template origin<_Activity_Location_Interface*>(loc);
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
@@ -410,9 +411,17 @@ namespace Person_Components
 						if (next_loc == nullptr) next_loc =  _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						ttime_next = network->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds,Time_Seconds>(prev_loc, next_loc,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, end);
 					
-						next_move->template origin<_Activity_Location_Interface*>(prev_loc);
-						next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
+						if (next_move != nullptr)
+						{
+							next_move->template origin<_Activity_Location_Interface*>(prev_loc);
+							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
+						}
 
+						//TODO: remove when done testing
+						if (next_move->template departed_time<Time_Seconds>() > (END)*2.0)
+						{
+							THROW_EXCEPTION("Error, invalid value when setting end_time: "<<next_move->template departed_time<Time_Seconds>()<<", next_act.start="<<next_act->Start_Time<Time_Seconds>()<<", ttime_next="<<ttime_next<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<next_loc->zone<_Zone_Interface*>()->uuid<int>());
+						}
 						if (at_home_activity_modified) prev_act->template End_Time<Time_Seconds>(next_move->template departed_time<Time_Seconds>(),false);
 
 					}
@@ -457,6 +466,12 @@ namespace Person_Components
 
 				// get maximum end time of current activity given departure time for next activity
 				new_end = act->template Start_Time<Time_Seconds>() - ttime;
+
+				//TODO: remove when done testing
+				if (new_end > (END)*2.0)
+				{
+					THROW_EXCEPTION("Error, invalid value when setting end_time: "<<new_end<<", act.start="<<act->Start_Time<Time_Seconds>()<<", start="<<start<<", ttime="<<ttime<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<loc->zone<_Zone_Interface*>()->uuid<int>());
+				}
 				prev_act->template End_Time<Time_Seconds>(new_end,false);
 			}
 

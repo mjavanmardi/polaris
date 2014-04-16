@@ -99,30 +99,49 @@ namespace Activity_Components
 			// Activity attributes
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, NONE, NONE);
-			member_component_and_feature_accessor(Start_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
+			member_component_and_feature_accessor(_Start_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Actual_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			m_container(boost::container::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Involved_Persons_Container, NONE, NONE);
-			template<typename TargetType> TargetType End_Time()
+			// Error checking features for the _Start_Time member feature
+			template<typename TargetType> TargetType Start_Time()
 			{
-				this_itf* pthis = (this_itf*)this;
-				return pthis->template Start_Time<TargetType>() + pthis->template Duration<TargetType>();
-			}	tag_getter_as_available(End_Time);
-			template<typename TargetType> void End_Time(TargetType value, bool maintain_duration)
+				return this->_Start_Time<TargetType>();
+			}
+			template<typename TargetType> void Start_Time(TargetType value)
 			{
-				this_itf* pthis = (this_itf*)this;
-
-				if (maintain_duration) pthis->template Start_Time<TargetType>(value - pthis->template Duration<TargetType>());
+				if (value > (END)*2.0)
+				{
+					THROW_EXCEPTION("Error, invalid value when setting start-time: " << value);
+				}
 				else
 				{
-					if (value < pthis->template Start_Time<TargetType>()) 
+					this->template _Start_Time<TargetType>(value);
+				}
+			}
+			// End time feature
+			template<typename TargetType> TargetType End_Time()
+			{
+				return this->template Start_Time<TargetType>() + this->template Duration<TargetType>();
+			}
+			template<typename TargetType> void End_Time(TargetType value, bool maintain_duration)
+			{
+				if (value > (END)*2.0)
+				{
+					THROW_EXCEPTION("Error, invalid value when setting end-time: " << value);
+				}
+
+				if (maintain_duration) this->template Start_Time<TargetType>(value - this->template Duration<TargetType>());
+				else
+				{
+					if (value < this->template Start_Time<TargetType>()) 
 					{
 						THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
 					}
-					else pthis->template Duration<TargetType>(value - pthis->template Start_Time<TargetType>());
+					else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
 				}
-			}	tag_setter_as_available(End_Time);
+			}
 
 			// Planning event time members
 			m_data(Revision,Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
@@ -132,12 +151,12 @@ namespace Activity_Components
 			m_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
-			m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
 			template<typename TargetType> bool Location_Is_Planned(){return (_Location_Planning_Time._iteration >= (int)END && _Location_Planning_Time._sub_iteration >= (int)END);}
 			template<typename TargetType> bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration >= (int)END && _Mode_Planning_Time._sub_iteration >= (int)END);}
@@ -187,12 +206,7 @@ namespace Activity_Components
 			}
 
 			template<typename TargetType> void Route_Planning_Event_Handler()
-			{			
-				// Create movement plan and give it an ID
-				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
-				move->template initialize_trajectory<NULLTYPE>();
-				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
-
+			{		
 				// General interfaces, to parent and global classes
 				_planning_itf* planner = this->Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
@@ -201,6 +215,12 @@ namespace Activity_Components
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
+
+				// Create movement plan and give it an ID
+				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
+				move->template initialize_trajectory<NULLTYPE>();
+				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
+				move->network<_network_itf*>(network);
 
 
 				//TODO: remove when finished testing
@@ -213,6 +233,8 @@ namespace Activity_Components
 				// Get the origin and destination locations
 				_activity_location_itf* orig;
 				_activity_location_itf* dest = this->Location<_activity_location_itf*>();
+				if (dest == nullptr) dest = person->template Home_Location<_activity_location_itf*>();
+
 				Time_Seconds start = this->Start_Time<Time_Seconds>();
 				this_itf* prev_act = scheduler->template previous_activity_plan<Time_Seconds,this_itf*>(this->Start_Time<Time_Seconds>());		
 				if (prev_act == nullptr)  orig = person->template Home_Location<_activity_location_itf*>();
@@ -267,12 +289,9 @@ namespace Activity_Components
 
 
 				//TODO: remove when finished testing
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
+				if (!this->Route_Is_Planned<bool>())
 				{
-					int test = 1;
-				}
-				if (move==nullptr)
-				{
+					cout <<"ERROR: attempting to add activity to schedule before the route handler is called."<<endl;
 					int id = person->uuid<int>();
 					int test = 1;
 				}
@@ -366,6 +385,11 @@ namespace Activity_Components
 						if (depart < min_departure)
 						{
 							depart = min_departure+1;
+
+							if (depart + ttime > (END)*2.0)
+							{
+								THROW_EXCEPTION("Bad start time, depart="<<depart<<", ttime="<<ttime);
+							}
 							this->Start_Time<Simulation_Timestep_Increment>(depart + ttime);
 						}
 
@@ -533,7 +557,7 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
 				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 
@@ -1339,7 +1363,7 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
 				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 
@@ -1485,7 +1509,12 @@ namespace Activity_Components
 
 			// Activity methods
 			template<typename TimeType, typename ModeType> void Initialize(TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
-			{		
+			{
+				if(start_time > (END)*2.0 || duration > END)
+				{
+					THROW_EXCEPTION("Invalid start/duration for at home activity. Start="<<start_time<<", duration="<<duration);
+				}
+
 				//UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
 

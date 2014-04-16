@@ -3,13 +3,12 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include "Simulation_Thread.h"
+#include <fstream>
 
 namespace polaris
 {
 
 World* _world = nullptr;
-
-
 
 ///----------------------------------------------------------------------------------------------------
 /// Initialize - Initialize Discrete Event Engine and Memory Allocator
@@ -83,6 +82,10 @@ void World::Initialize(Simulation_Configuration& cfg)
 
 	// wait for all threads to give the signal that they are at the ready
 	Wait_For_Signal_From_Threads();
+
+	#ifdef ENABLE_MEMORY_LOGGING
+		polaris::_type_counter.resize(__all_components->size(),_num_sim_threads+1,0);
+	#endif
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -220,6 +223,13 @@ void World::Wait_For_Signal_From_Threads()
 
 void World::Start_Turning()
 {
+
+#ifdef ENABLE_MEMORY_LOGGING
+	std::ofstream _mem_log_file;
+	_mem_log_file.open("memory_logging.csv");
+	_mem_log_file << "Typeid,Iteration,KBytes"<<endl;
+#endif
+
 	if(_running)
 	{
 		THROW_EXCEPTION("Simulation Has Already Started!");
@@ -253,6 +263,26 @@ void World::Start_Turning()
 		{
 			// continue simulation
 			Send_Signal_To_Threads();
+
+//==========================================
+#ifdef ENABLE_MEMORY_LOGGING
+			if (iteration() % 3600 == 0 && sub_iteration() == 0)
+			{
+				//_mem_log_file << "Iteration: " << iteration();
+				//polaris::_type_counter.print(_mem_log_file);
+				for (int i=0; i<polaris::_type_counter.num_rows(); i++)
+				{
+					float kbytes=0;
+					_mem_log_file<<i<<","<<iteration()<<",";
+					for (int j=0; j<polaris::_type_counter.num_cols(); j++)
+					{
+						kbytes+=polaris::_type_counter(i,j)/1024.0;
+					}
+					_mem_log_file<<kbytes<<endl;
+				}
+			}
+#endif
+//==========================================
 		}
 		else
 		{
@@ -268,6 +298,8 @@ void World::Start_Turning()
 			break;
 		}
 	}
+
+	_mem_log_file.close();
 }
 
 

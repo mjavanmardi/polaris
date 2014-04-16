@@ -23,6 +23,16 @@ namespace Person_Components
 		prototype struct Activity_Generator ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
+
+
+			template<typename T> void Activity_Generation()
+			{
+				this_component()->Activity_Generation<T>();
+			}
+
+			//==========================================================================
+			//TODO: the rest of the code below is not used as activity generation is 
+			//		still currently controlled by the person_planner - needs restructuring
 		 
 			// Event Controller handling and helper functions
 			static void Activity_Generation_Event_Controller(ComponentType* _this,Event_Response& response)
@@ -65,8 +75,10 @@ namespace Person_Components
 			}
 
 			local_check_template_method_name(Has_Initialize,Initialize);
-			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Has_Initialize)))
+			template<typename TargetType> void Initialize(/*requires(TargetType,check(ComponentType, Has_Initialize))*/)
 			{
+				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+
 				typedef Prototypes::Person_Planner<typename get_type_of(Parent_Planner)> planner_itf;
 				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 				person_itf* parent = this->Parent_Planner<planner_itf*>()->Parent_Person<person_itf*>();
@@ -78,10 +90,10 @@ namespace Person_Components
 				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
 				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION);
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
-			{
-				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			}
+			//template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
+			//{
+			//	assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+			//}
 
 
 

@@ -13,7 +13,8 @@ prototype struct Agent
 
 	accessor(message,NONE,NONE);
 
-	template<typename T> void Initialize()
+	local_check_template_method_name(has_initialize, Initialize);
+	template<typename T> void Initialize(requires(T,check(ComponentType,has_initialize) ))
 	{
 		this_component()->Initialize<T>();
 	}	

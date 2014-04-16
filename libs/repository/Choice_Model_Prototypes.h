@@ -241,9 +241,15 @@ namespace Choice_Model_Components
 		{
 			tag_as_prototype;
 
-			void Print_Utility();
+			void Print_Utility()
+			{
+				this_component()->Print_Utility();
+			}
 
-			double Calculate_Utility();
+			double Calculate_Utility()
+			{
+				return this_component()->Calculate_Utility();
+			}
 		};
 	}
 }

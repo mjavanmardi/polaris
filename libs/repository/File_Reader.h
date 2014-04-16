@@ -124,6 +124,18 @@ namespace File_IO
 			return true;
 
 		}
+		template<class T>
+		bool Get_Data(std::vector<T> &data, std::vector<int> columns)
+		{
+			T t;
+			for (std::vector<int>::iterator itr = columns.begin(); itr != columns.end(); itr++)
+			{
+				if (Get_Data<T>(t,*itr)) data.push_back(t);
+				else {/*cout<<"ERROR: could not get data from column"; */return false;}
+			}
+			return true;
+
+		}
 		const string& Get_String(int column)
 		{
 			return _string_data[column];

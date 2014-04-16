@@ -392,12 +392,12 @@ namespace Activity_Components
 			accessor(Involved_Persons_Plan_Horizon, NONE, NONE);
 			accessor(Involved_Persons_Flexibility, NONE, NONE);
 
-			accessor(Stored_Location_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			accessor(Stored_Mode_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			accessor(Stored_Start_Time_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			accessor(Stored_Duration_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			accessor(Stored_Involved_Persons_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			accessor(Stored_Route_Planning_Time, NONE, NONE/*check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same)*/);
+			//accessor(Stored_Location_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//accessor(Stored_Mode_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//accessor(Stored_Start_Time_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//accessor(Stored_Duration_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//accessor(Stored_Involved_Persons_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			//accessor(Stored_Route_Planning_Time, NONE, NONE/*check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same)*/);
 
 			//===========================================
 			// Primary Activity attribute accessors

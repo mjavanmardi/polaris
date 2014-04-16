@@ -506,11 +506,11 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 
 				if (selected == nullptr ) {THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
-				else selected_mode = ((_Choice_Option_Interface*)selected)->mode_type<ReturnType>();
+				else selected_mode = ((_Mode_Choice_Option_Interface*)selected)->mode_type<ReturnType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);
-				Free<typename MasterType::mnl_model_type>(choice_model);
+				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				// return the chosen mode
 				return selected_mode;

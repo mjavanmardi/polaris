@@ -83,6 +83,16 @@ namespace Person_Components
 				
 				// make sure duration is greater than 5 minutes
 				if (return_val.second < GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnType>(5.0f)) return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes, ReturnType>(5.0f);
+
+				// make sure start + duration is less than END
+				if (return_val.first >= GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END))
+				{
+					return_val.first = return_val.first - GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END);
+				}
+				if (return_val.second >= GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END))
+				{
+					return_val.second = GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END);
+				}
 				
 				return return_val;
 			}

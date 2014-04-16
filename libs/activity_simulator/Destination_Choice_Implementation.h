@@ -51,7 +51,9 @@ namespace Person_Components
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, previous, NONE, NONE );
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, destination, NONE, NONE );
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, next, NONE, NONE );
+			member_component_and_feature_accessor(start_time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>)
 			m_data(Activity_Components::Types::ACTIVITY_TYPES, activity_type, NONE, NONE);
+			m_data(float, bias_correction, NONE, NONE);
 			
 			//====================================================================================================================================
 			// Interface definitions
@@ -81,6 +83,7 @@ namespace Person_Components
 
 			template<typename TargetType> void Initialize()
 			{	
+				this->_bias_correction = 1.0;
 			}
 
 			virtual double Calculate_Utility()
@@ -99,15 +102,16 @@ namespace Person_Components
 				double utility_sum = 0;
 				double prob_sum = 0;
 				_Zone_Interface* zone;
+				Time_Minutes start_time = this->start_time<Time_Minutes>();
 
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
 				// get the deflected travel time due to the addition of the current activity
-				ttime_before = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				ttime_after = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_before = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes, Time_Minutes>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start_time);
+				ttime_after = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes, Time_Minutes>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start_time);
 				if (_previous == _next) ttime_without = 0;
-				else ttime_without = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else ttime_without = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes, Time_Minutes>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start_time);
 				ttime_deflected = ttime_before + ttime_after - ttime_without;
 				
 				// Get Income/race dif with zone
@@ -156,7 +160,7 @@ namespace Person_Components
 
 					// positive impact of working near home
 					float HOME = 0.0; 
-					if (zone = _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
+					if (zone == _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
 
 					// industry type interaction variables
 					float IndR = 0, IndS = 0, IndG = 0, IndI = 0, IndM = 0, IndO = 0;
@@ -187,7 +191,7 @@ namespace Person_Components
 					float theta_ur = thetar * (1.0 - IndR) + thetag * (1.0 - IndG) + thetas * (1.0 - IndS) + thetai * (1.0 - IndI) + thetam * (1.0 - IndM) + thetao * (1.0 - IndO);
 
 					// cut travel time in half since original work location choice equations only account for the half-tour travel time
-					ttime_deflected = ttime_deflected *0.5;
+					//ttime_deflected = ttime_deflected *0.5;
 
 					// Old values - with time strata at (45A/60T/20W)
 					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
@@ -247,6 +251,15 @@ namespace Person_Components
 					THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
 					u = -9999.9;
 				}
+
+				u += log(_bias_correction);
+
+
+
+				//TODO: remove when done testing
+				//cout <<"Utility for zone "<<zone->uuid<int>() << "="<<u<<endl;
+
+
 				return u;				
 			}
 
@@ -323,7 +336,7 @@ namespace Person_Components
 
 					// positive impact of working near home
 					float HOME = 0.0; 
-					if (zone = _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
+					if (zone == _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
 
 					// industry type interaction variables
 					float IndR = 0, IndS = 0, IndG = 0, IndI = 0, IndM = 0, IndO = 0;
@@ -718,15 +731,6 @@ namespace Person_Components
 		#pragma endregion
 
 
-		//implementation struct Destination_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)>
-		//{
-		//	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Destination_Choice_Model_Implementation)> BaseType;
-		//	typedef typename BaseType::Component_Type ComponentType;
-		//	typedef TypeList<Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type >> TList;
-		//};
-
-
-
 		implementation struct ADAPTS_Destination_Chooser_Implementation : public Polaris_Component<MasterType,INHERIT(ADAPTS_Destination_Chooser_Implementation),Data_Object>
 		{
 			// Tag as Implementation
@@ -738,6 +742,7 @@ namespace Person_Components
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);
+			static m_data(int, num_strata, NONE, NONE);
 
 			// Interface definitions
 			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
@@ -798,7 +803,7 @@ namespace Person_Components
 
 				// Create choice set
 				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
-				fill_choice_set<ReturnType>(locations,loc_options,choice_model);
+				fill_stratified_choice_set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
 				int selected_index = 0;
@@ -809,8 +814,10 @@ namespace Person_Components
 
 				// Validate the return value
 				ReturnType return_ptr = nullptr;
+
 				if (selected == nullptr) 
 				{
+					#ifdef SHOW_WARNINGS
 					//THROW_WARNING("WARNING: selected is null - no destination choice made, index = " << selected_index <<", prev/next="<<prev->template zone<_Zone_Interface*>()->uuid<int>() << "/"<<next->template zone<_Zone_Interface*>()->uuid<int>());
 					cout << "WARNING: selected is null - no destination choice made, index = " << selected_index << " of " << loc_options.size() << " options, utility values for options: "<<endl;
 					for (int i=0; i<loc_options.size(); ++i)
@@ -818,13 +825,13 @@ namespace Person_Components
 						((_Choice_Option_Interface*)loc_options[i])->Print_Utility();
 					}
 					cout << endl;
-				
+					#endif
 				}
-				else return_ptr = choice_model->template Choice_At<_Choice_Option_Interface*>(selected_index)->template destination<ReturnType>();
+				else return_ptr = choice_model->template Choice_At<_Destination_Choice_Option_Interface*>(selected_index)->template destination<ReturnType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
-				Free<typename MasterType::mnl_model_type>(choice_model);
+				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				return return_ptr;	
 			}
@@ -832,6 +839,8 @@ namespace Person_Components
 			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<TargetType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+
+				_Current_Activity = nullptr;
 				
 				// create local choice model
 				/*Destination_Choice_Model_Implementation<MasterType> a;
@@ -853,7 +862,13 @@ namespace Person_Components
 
 				// Create choice set
 				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
-				fill_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
+				fill_stratified_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
+
+
+
+				//TODO: remove when done testing
+				//cout <<endl<<endl<<"Performing destination choice:"<<endl;
+
 
 				// Make choice
 				int selected_index = 0;
@@ -862,6 +877,7 @@ namespace Person_Components
 				// Get interface to chosen option
 				_Choice_Option_Interface* selected = choice_model->template Choose<_Choice_Option_Interface*>(selected_index);
 
+				
 				// Validate the return value
 				TargetType return_ptr = nullptr;
 				if (selected == nullptr) 
@@ -875,11 +891,19 @@ namespace Person_Components
 					cout << endl;*/
 				
 				}
-				else return_ptr = choice_model->template Choice_At<_Choice_Option_Interface*>(selected_index)->template destination<TargetType>();
+				else 
+				{
+					return_ptr = choice_model->template Choice_At<_Destination_Choice_Option_Interface*>(selected_index)->template destination<TargetType>();
+
+
+
+					//TODO: remove when done testing
+					//cout <<"Chosen destination:"<<return_ptr->zone<_Zone_Interface*>()->uuid<int>();
+				}
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
-				Free<typename MasterType::mnl_model_type>(choice_model);
+				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				return return_ptr;
 			}
@@ -956,6 +980,7 @@ namespace Person_Components
 					_Activity_Location_Interface* loc = (_Activity_Location_Interface*)(available_set->at(loc_id));
 					
 					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+					choice->template bias_correction<float>(1.0);
 					choice->template previous<_Activity_Location_Interface*>(prev_loc);
 					choice->template destination<_Activity_Location_Interface*>(loc);
 					choice->template next<_Activity_Location_Interface*>(next_loc);
@@ -963,6 +988,182 @@ namespace Person_Components
 					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 					choice_set.push_back(choice);
+
+					
+				}
+			}
+
+			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				int strata_size = _choice_set_size / _num_strata;
+				const float EMP_SPLIT = 1000.0;
+				float TTIME_SPLIT = 20.0;
+
+				//----------------------------------------------------------------------------------------
+				// Get person context and system knowledge
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
+
+
+				// Get preceding and following activities based on start time, otherwise assume plan a new tour starting and ending at home
+				Current_Activity_type prev_act, next_act;
+				Time_Minutes min_start, max_end, start_time;
+				Time_Minutes avail_time = 1440.0;
+
+				_Activity_Location_Interface* prev_loc, *next_loc;
+				bool restrict_choice_set = true;
+				if (this->_Current_Activity->Start_Is_Planned<bool>())
+				{
+					start_time = _Current_Activity->Start_Time<Time_Minutes>();
+
+					prev_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
+					next_act = (Current_Activity_type)(scheduler->next_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
+
+					// check previous act, if it is not known or if its location is not know, do not restrict current choice set
+					if (prev_act == nullptr)
+					{
+						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						restrict_choice_set = false;
+					}
+					else if (prev_act->Location_Is_Planned<bool>())
+					{
+						prev_loc = prev_act->Location<_Activity_Location_Interface*>();
+						min_start = prev_act->End_Time<Time_Minutes>();
+					}
+					else
+					{
+						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						min_start = prev_act->End_Time<Time_Minutes>();				
+					}
+					// check next act, if it is not known or if its location is not know, do not restrict current choice set
+					if (next_act == nullptr)
+					{
+						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						restrict_choice_set = false;
+					}
+					else if(next_act->Location_Is_Planned<bool>())
+					{
+						next_loc = next_act->Location<_Activity_Location_Interface*>();
+						max_end = next_act->Start_Time<Time_Minutes>();
+					}
+					else
+					{
+						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						max_end = next_act->Start_Time<Time_Minutes>();
+					}
+
+					// Use half the available time to stratify the zone choices
+					if (restrict_choice_set)
+					{
+						avail_time = max_end - min_start - _Current_Activity->Duration<Time_Minutes>();
+						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;
+					}
+				}
+				else
+				{
+					start_time = 540.0; // default start time to 9AM if not planned, for ttime purposes
+					prev_act = nullptr;
+					next_act = nullptr;
+					prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+					next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+					restrict_choice_set = false;
+				}
+				// double check that prev/next locations are set properly, if not assume start/end of tour at home
+				if (prev_loc == nullptr) prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				if (next_loc == nullptr) next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+
+				//----------------------------------------------------------------------
+				// Get the mode of the activity, if not yet planned, assume 9AM
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
+				if (_Current_Activity->Mode_Is_Planned<NT>()) mode = _Current_Activity->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
+				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+
+
+				//TODO: remove when done testing
+				//if (avail_time < 1440 && avail_time > 0)
+				//{
+				//	cout <<endl<<"Choice set info:"<<endl;
+				//	cout << "Avail time="<<avail_time<<", time_split="<<TTIME_SPLIT<<", mode="<<mode<<", start_time="<<start_time<<", restrict="<<restrict_choice_set<<endl;
+				//	cout << "Prev act="<<prev_act<<", next_act="<<next_act<<", current_act="<<_Current_Activity<<endl;
+				//	cout << "Max_end="<<max_end<<", min_start="<<min_start<<", duration="<<_Current_Activity->Duration<Time_Minutes>()<<endl;
+				//	cout << "Prev loc="<<prev_loc<<", home_loc="<<_Parent_Person->Home_Location<_Activity_Location_Interface*>()<<", next_loc="<<next_loc<<endl;
+				//}
+
+
+
+
+				//----------------------------------------------------------------------
+				// Get the stratified availability sets
+				std::vector<_Zone_Interface*> zones_near;
+				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);			
+				std::vector<_Zone_Interface*> zones_far;
+				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, avail_time, mode, false);
+				std::vector<std::vector<_Zone_Interface*>> available_zones; //0=near-high, 1=near-low, 2=far-high, 3=far-low
+
+				for (int i=0; i<_num_strata; ++i) available_zones.push_back(std::vector<_Zone_Interface*>());
+
+				std::vector<_Zone_Interface*>::iterator z_itr;
+				for (z_itr = zones_near.begin(); z_itr != zones_near.end(); ++z_itr)
+				{
+					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
+					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
+					else available_zones[1].push_back(zone);
+				}
+				for (z_itr = zones_far.begin(); z_itr != zones_far.end(); ++z_itr)
+				{
+					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
+					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
+					else available_zones[3].push_back(zone);
+				}
+
+
+				//TODO: remove when done testing
+				//if (avail_time < 1440 && avail_time > 0)
+				//{
+				//	stringstream s("");
+				//	int total=0;
+				//	for (int i=0; i<_num_strata; ++i)
+				//	{
+				//		s <<"Strata "<<i+1<<" size = " << available_zones[i].size()<<endl;
+				//		total+=available_zones[i].size();
+				//	}
+				//	cout << "Total zones in choice set="<<total<<endl;
+				//	cout << s.str();
+				//}
+				
+
+				//----------------------------------------------------------------------
+				// Next, select zones to choose from each strata
+				for (int i=0; i<_num_strata; i++)
+				{
+					int available_count = available_zones[i].size();
+					// if too few zones to fill strata, add all and set bias correction to 1
+					if (available_count <= strata_size)
+					{
+						for (z_itr = available_zones[i].begin(); z_itr != available_zones[i].end(); ++z_itr)
+						{
+							Create_New_Choice_Option(choice_set,choice_model,(_Zone_Interface*)(*z_itr),act_type,prev_loc,next_loc,1.0/*,avail_time<1440*/);
+						}
+					}
+					// otherwise, pick randomly from the available zones
+					else
+					{
+						float bias = 1.0/( (float) strata_size / (float) available_count );
+
+						int num_added=0;
+						while (num_added < strata_size)
+						{
+							int r = int( (GLOBALS::Uniform_RNG.Next_Rand<float>()-0.0001) * (float)available_count );
+							_Zone_Interface* zone = available_zones[i][r];
+							Create_New_Choice_Option(choice_set,choice_model,zone,act_type,prev_loc,next_loc,bias/*,avail_time<1440*/);
+							num_added++;
+						}
+
+					}
 				}
 			}
 
@@ -1010,6 +1211,7 @@ namespace Person_Components
 					if (failed_attempts >= 10) continue;
 
 					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+					choice->template initialize<NT>();
 					choice->template previous<_Activity_Location_Interface*>(prev_loc);
 					choice->template destination<_Activity_Location_Interface*>(loc);
 					choice->template next<_Activity_Location_Interface*>(next_loc);
@@ -1019,10 +1221,165 @@ namespace Person_Components
 					choice_set.push_back(choice);
 				}
 			}
+			
+			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				int strata_size = _choice_set_size / _num_strata;
+				const float EMP_SPLIT = 1000.0;
+				const float TTIME_SPLIT = 45.0;
+
+				//----------------------------------------------------------------------
+				// Get person context and system knowledge
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Zone_Ids_Interface& zone_ids = network->template zone_ids_container<_Zone_Ids_Interface&>();
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
+				_Zones_Container_Interface::iterator zone_itr;
+
+				//----------------------------------------------------------------------
+				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
+				Current_Activity_type prev_act, next_act;
+				_Activity_Location_Interface* prev_loc, *next_loc;
+				bool restrict_choice_set = true;
+
+				prev_act = nullptr;
+				next_act = nullptr;
+				prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+
+				//----------------------------------------------------------------------
+				// Get the start time of the activity, if not yet planned, assume 9AM
+				Time_Minutes start_time = 9.0 * 60.0;
+				if (_Current_Activity!=nullptr)
+				{
+					if (_Current_Activity->Start_Is_Planned<NT>()) start_time = _Current_Activity->Start_Time<Time_Minutes>();
+				}
+
+				//----------------------------------------------------------------------
+				// Get the mode of the activity, if not yet planned, assume 9AM
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
+				if (_Current_Activity!=nullptr)
+				{
+					if (_Current_Activity->Mode_Is_Planned<NT>()) mode = _Current_Activity->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				}
+
+
+				//----------------------------------------------------------------------
+				// Get the stratified availability sets
+				std::vector<_Zone_Interface*> zones_near;
+				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);			
+				std::vector<_Zone_Interface*> zones_far;
+				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, 1440, mode, false);
+				std::vector<std::vector<_Zone_Interface*>> available_zones; //0=near-high, 1=near-low, 2=far-high, 3=far-low
+
+				for (int i=0; i<_num_strata; ++i) available_zones.push_back(std::vector<_Zone_Interface*>());
+
+				std::vector<_Zone_Interface*>::iterator z_itr;
+				for (z_itr = zones_near.begin(); z_itr != zones_near.end(); ++z_itr)
+				{
+					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
+					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
+					else available_zones[1].push_back(zone);
+				}
+				for (z_itr = zones_far.begin(); z_itr != zones_far.end(); ++z_itr)
+				{
+					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
+					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
+					else available_zones[3].push_back(zone);
+				}
+
+
+				//----------------------------------------------------------------------
+				// First, always add the home zone (i.e. work at home or nearby or attend school near home) as an option
+				_Zone_Interface* home_zone = _Parent_Person->Home_Location<_Zone_Interface*>();
+				Create_New_Choice_Option(choice_set,choice_model,home_zone,act_type,prev_loc,next_loc);
+
+
+				//----------------------------------------------------------------------
+				// Next, select zones to choose from each strata
+				for (int i=0; i<_num_strata; i++)
+				{
+					int available_count = available_zones[i].size();
+					// if too few zones to fill strata, add all and set bias correction to 1
+					if (available_count <= strata_size)
+					{
+						for (z_itr = available_zones[i].begin(); z_itr != available_zones[i].end(); ++z_itr)
+						{
+							Create_New_Choice_Option(choice_set,choice_model,(_Zone_Interface*)(*z_itr),act_type,prev_loc,next_loc);
+						}
+					}
+					// otherwise, pick randomly from the available zones
+					else
+					{
+						float bias = 1.0/( (float) strata_size / (float) available_count );
+
+						int num_added=0;
+						while (num_added < strata_size)
+						{
+							int r = int( (GLOBALS::Uniform_RNG.Next_Rand<float>()-0.0001) * (float)available_count );
+							_Zone_Interface* zone = available_zones[i][r];
+							Create_New_Choice_Option(choice_set,choice_model,zone,act_type,prev_loc,next_loc,bias);
+							num_added++;
+						}
+
+					}
+				}
+			}
+		
+			void Create_New_Choice_Option(boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
+			{
+				// ignore zone if all employment slots have already been assigned to other agents
+				if (act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY && zone->employment_simulated<int>() >= zone->employment_total<int>()) return;
+
+				// Get random location within that zone
+				_Activity_Location_Interface* loc;
+
+				// try to add a random suitable location, if failed then ignore zone
+				if(act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				{
+					loc = zone->Get_Random_Work_Location<_Activity_Location_Interface*>();
+				}
+				else if (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				{
+					loc = zone->Get_Random_School_Location<_Activity_Location_Interface*>();
+				}
+				else
+				{
+					loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
+				}
+
+				if (loc == nullptr) return;
+
+				// set the start time, if not planned, assume 9AM
+				Time_Minutes start_time = 540.0;
+				if (_Current_Activity != nullptr)
+				{
+					if (_Current_Activity->Start_Is_Planned<bool>()) start_time = _Current_Activity->Start_Time<Time_Minutes>();
+				}
+
+
+				_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+				choice->template bias_correction<int>(bias_correction);
+				choice->template previous<_Activity_Location_Interface*>(prev_loc);
+				choice->template destination<_Activity_Location_Interface*>(loc);
+				choice->template next<_Activity_Location_Interface*>(next_loc);
+				choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(act_type);
+				choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+				choice->template start_time<Time_Minutes>(start_time);
+				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+				choice_set.push_back(choice);
+
+		
+				//TODO: remove when doen testing
+				if (display) cout << "Destinations: previous="<<prev_loc<<", destination="<<loc<<", next="<<next_loc<<endl;
+			}
 		};
 		#pragma region Choice option parameters
 		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
 		template<typename MasterType, typename InheritanceList> typename ADAPTS_Destination_Chooser_Implementation<MasterType, InheritanceList>::type_of(choice_set_size) ADAPTS_Destination_Chooser_Implementation<MasterType,InheritanceList>::_choice_set_size;
+		template<typename MasterType, typename InheritanceList> typename ADAPTS_Destination_Chooser_Implementation<MasterType, InheritanceList>::type_of(num_strata) ADAPTS_Destination_Chooser_Implementation<MasterType,InheritanceList>::_num_strata=4;
 		#pragma endregion
 
 	}

@@ -8,14 +8,20 @@
 namespace polaris
 {
 	///----------------------------------------------------------------------------------------------------
+	/// Enables the memory log to be constructed
+	///----------------------------------------------------------------------------------------------------
+	//#define ENABLE_MEMORY_LOGGING
+
+	///----------------------------------------------------------------------------------------------------
 	/// MESSAGES - Enable / Disable various categories of runtime messages
 	///----------------------------------------------------------------------------------------------------
 
+#ifdef _DEBUG
 	#define ENABLE_MESSAGES
 	#define ENABLE_WARNINGS
+	#define ENABLE_DEBUG_MESSAGES
+#endif
 	#define ENABLE_EXCEPTIONS
-	//#define ENABLE_DEBUG_MESSAGES
-
 	///----------------------------------------------------------------------------------------------------
 	/// SAFE_MODE - Enables all general purpose safeties during run
 	///----------------------------------------------------------------------------------------------------
@@ -26,11 +32,20 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	#define FORWARD_SIMULATION_MODE
 
+	
 	///----------------------------------------------------------------------------------------------------
 	/// PERFORMANCE_MODE - Disables all safeties during run to maximize performance
 	///----------------------------------------------------------------------------------------------------
 	//#define PERFORMANCE_MODE
-
+	
+	#define P_ASSERT_FALSE \
+		struct assert_struct\
+		{\
+			void do_stuff(){x++;}\
+			int x;\
+		};\
+		((assert_struct*)nullptr)->do_stuff()
+	
 
 	#ifdef SAFE_MODE
 		#define ENABLE_WARNINGS
@@ -38,7 +53,7 @@ namespace polaris
 	#endif
 
 	#ifdef FORWARD_SIMULATION_MODE
-		#define ENABLE_EXCEPTIONS
+		#define ENABLE_EXCEPTIONS	
 	#endif
 
 	#ifdef ENABLE_MESSAGES
@@ -64,7 +79,7 @@ namespace polaris
 			{stringstream s;\
 			s << "\nRUNTIME_ERROR: " << __FILE__ << " at " << __LINE__<< "\n\t" << __VA_ARGS__ << endl;\
 			cerr << s.str();\
-			throw new runtime_error(s.str().c_str());}
+			P_ASSERT_FALSE/*throw new runtime_error(s.str().c_str())*/;}
 	#else
 		#define THROW_EXCEPTION(...) ;
 	#endif

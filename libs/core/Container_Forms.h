@@ -410,6 +410,7 @@ namespace polaris
 		typedef typename ComponentType::index_type index_type;
 		typedef typename ComponentType::const_index_type const_index_type;
 		typedef typename ComponentType::const_dimensional_type const_dimensional_type;
+		typedef T value_type;
 
 		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
 		iterator begin(size_type dim){return (iterator)((ComponentType*)this)->begin(dim);}
@@ -714,6 +715,12 @@ namespace polaris
 
 
 	};
+
+	template<typename KeyType, typename ValueType> bool Pair_Comparer(std::pair<KeyType,ValueType> &p1, std::pair<KeyType,ValueType> &p2)
+	{
+		if (p1.first < p2.first) return true;
+		else return false;
+	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// container_accessor - implements the standard get / set accessors for a container

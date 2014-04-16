@@ -41,6 +41,11 @@ namespace Prototypes
 		//--------------------------------------------------------
 		static void Movement_Event_Controller(ComponentType* _this,Event_Response& response)
 		{
+
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
+
+
 			typedef Person_Mover<ComponentType> _Person_Mover_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Mover_Interface* pthis =(_Person_Mover_Interface*)_pthis;
@@ -76,7 +81,7 @@ namespace Prototypes
 			{
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				//response.result = true;
+
 				pthis->Artificial_Arrival_Event<NT>();
 			}
 
@@ -85,34 +90,40 @@ namespace Prototypes
 			{
 				response.next._iteration = iteration();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION;
-				//response.result = has_pretrip_info;
+
 				if (has_pretrip_info) pthis->Do_Pretrip_Information_Acquisition<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
 			{
-				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
 				response.next._iteration = routing_timestep;
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
-				//response.result = pthis->template Replanning_Needed<bool>();
+
 				if (pthis->template Replanning_Needed<bool>()) pthis->Do_Pretrip_Replanning<NT>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
-				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()) THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
-				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
+				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()+1) //THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
+				{
+					movement->template departed_time<Simulation_Timestep_Increment>(iteration()+1);
+				}
 				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
-				//response.result = true;
+
 				pthis->Do_Pretrip_Routing<NT>();
 			}
 			// GO TO DEPARTURE TIMESTEP
 			else if (sub_iteration() == Scenario_Components::Types::END_OF_ITERATION)
 			{
-				//_pthis->Swap_Event((Event)&Person_Mover::Movement_Event<NULLTYPE>);
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
-				//response.result = true;
+
 				pthis->Do_Movement<NT>();
+
+				if (pthis->Artificial_Movement_Scheduled<bool>() == true)
+				{
+					response.next._iteration = pthis->Artificial_Arrival_Time<int>();
+					response.next._sub_iteration = 0;
+				}
 			}
 
 
@@ -146,7 +157,7 @@ namespace Prototypes
 			}
 			else 
 			{
-				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::END_OF_ITERATION);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
 				//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
 			}
 		}
@@ -713,6 +724,11 @@ namespace Prototypes
 			//=====================================================================
 			// schedule departure from destination if no following activity
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
+			movements->arrived_time<Simulation_Timestep_Increment>(iteration());
+			location_itf* destination = movements->destination<location_itf*>();
+			//=====================================================================
+			// remove from the scheduler movement container
+			scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 
 
 			//=====================================================================
@@ -790,9 +806,10 @@ namespace Prototypes
 				}
 
 			}
+
 			act->Start_Time<Simulation_Timestep_Increment>(iteration());
 			act->End_Time<Time_Seconds>(new_end,false);
-			movements->arrived_time<Simulation_Timestep_Increment>(iteration());
+			
 			
 
 			//=====================================================================
@@ -838,8 +855,17 @@ namespace Prototypes
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
 				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
 				Time_Seconds min_home_duration = 86400 - (end_this+ttime_this_to_home);
-				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
-				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
+				Time_Seconds new_start = end_this+ttime_this_to_home;
+				// Ignore travelers who return home after the simulation day is over
+				if (new_start > END || (float)min_home_duration < 0)
+				{
+					Free<typename ComponentType::Master_Type::at_home_activity_plan_type>((typename ComponentType::Master_Type::at_home_activity_plan_type*)new_act);
+				}
+				else
+				{
+					new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,new_start, min_home_duration,act->template Mode<MODE>());
+					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
+				}
 
 				return;
 			}
@@ -864,6 +890,14 @@ namespace Prototypes
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
 				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
+
+				//TODO: remove when done testing
+				if(end_this+ttime_this_to_home > END || duration > END)
+				{
+					cout<<endl<<"begin_next="<<begin_next<<", end_this="<<end_this<<", ttime_this_to_home="<<ttime_this_to_home<<", ttime_home_to_next="<<ttime_home_to_next<<", min_home_duration="<<min_home_duration<<", home="<<home<<", dest="<<dest<<", LOS_start="<<end_this + ttime_this_to_home<<endl;
+					THROW_EXCEPTION("Invalid start/duration for at home activity. Start="<<end_this+ttime_this_to_home<<", duration="<<duration<<", departure time="<<end_this<<", travel time="<<ttime_this_to_home);
+				}
+
 				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 			}
 
@@ -872,16 +906,21 @@ namespace Prototypes
 			else
 			{
 				// first, make sure following activity departs from current activity
-				if (next_movement->origin<location_itf*>() != movements->destination<location_itf*>())
+				if (next_movement->origin<location_itf*>() != destination)
 				{
-					next_act->Update_Movement_Plan<location_itf*>(movements->destination<location_itf*>(),next_movement->destination<location_itf*>(),end_this);
+					next_act->Update_Movement_Plan<location_itf*>(destination,next_movement->destination<location_itf*>(),end_this);
+				}
+				//TODO: remove when done testing
+				if (next_movement->departed_time<Time_Seconds>() > (END)*2.0)
+				{
+					THROW_EXCEPTION("Error, next_movement departure time is out of simulation time frame. next move depart time="<<next_movement->departed_time<Time_Seconds>()<<", next act start time="<<next_act->Start_Time<Time_Seconds>());
 				}
 				act->End_Time<Time_Seconds>(next_movement->departed_time<Time_Seconds>(),false);
 			}
 
 			// Finally, log the activity
 			((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
-
+			
 		}
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()
@@ -899,7 +938,9 @@ namespace Prototypes
 
 			int arrival_time = max((int)act->Start_Time<Simulation_Timestep_Increment>(),iteration()+1);
 
-			((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,arrival_time,0);
+			this->Artificial_Arrival_Time<Simulation_Timestep_Increment>(arrival_time);
+
+			//((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,arrival_time,0);
 			//load_event(ComponentType,Movement_Conditional,Artificial_Arrival_Event,arrival_time,0,NULLTYPE);
 		}
 
@@ -910,6 +951,7 @@ namespace Prototypes
 		accessor(Movement, NONE, NONE);
 		accessor(Movement_Scheduled, NONE, NONE);
 		accessor(Artificial_Movement_Scheduled, NONE, NONE);
+		accessor(Artificial_Arrival_Time, NONE, NONE);
 		accessor(Replanning_Needed, NONE, NONE);
 	};
 

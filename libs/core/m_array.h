@@ -1,11 +1,18 @@
 #pragma once
 
+#include "boost\container\vector.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
 #include <sstream>
 #include <vector>
 #include <exception>
+
+#define THROW_MATRIX_EXCEPTION(...) \
+			{stringstream s;\
+			s << "\nRUNTIME_ERROR: " << __FILE__ << " at " << __LINE__<< "\n\t" << __VA_ARGS__ << endl;\
+			cerr << s.str();\
+			throw new runtime_error(s.str().c_str());}
 
 typedef unsigned int uint;
 
@@ -149,11 +156,11 @@ private:
 	{
 		uint ind=0;
 
-		if (index.size() != _dimensions->size()) THROW_EXCEPTION("Error, incorrect number of dimensions in index.");
+		if (index.size() != _dimensions->size()) THROW_MATRIX_EXCEPTION("Error, incorrect number of dimensions in index.");
 
 		for (int i = 0; i< index.size(); i++)
 		{
-			if (index[i] >= (*_dimensions)[i]) THROW_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
+			if (index[i] >= (*_dimensions)[i]) THROW_MATRIX_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
 
 			int multiplier = 1;
 			for (int j=i+1; j< index.size(); j++)
@@ -324,13 +331,13 @@ public:
 
 		if (index.size() != _ndim)
 		{
-			THROW_EXCEPTION("Error, incorrect number of dimensions in index.");
+			THROW_MATRIX_EXCEPTION("Error, incorrect number of dimensions in index.");
 		}
 		for (size_type i = 0; i< index.size(); i++)
 		{
 			if (index[i] >= _dim_sizes[i]) 
 			{
-				THROW_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
+				THROW_MATRIX_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
 			}
 			size_type multiplier = 1;
 			for (size_type j=i+1; j< index.size(); j++)
@@ -728,7 +735,7 @@ public:
 	{
 		if (dimension==0) return _nrow;
 		if (dimension==1) return _ncol;
-		THROW_EXCEPTION("Error, can not request dimension size for dimension higher than 1");
+		THROW_MATRIX_EXCEPTION("Error, can not request dimension size for dimension higher than 1");
 	}
 	const_index_type dimensions(){return _dim_sizes;}
 	const size_type& num_dimensions() {return _ndim;}
@@ -747,7 +754,7 @@ public:
 
 		if (index.first >= _nrow || index.second >= _ncol)
 		{
-			THROW_EXCEPTION("Error, index ("<<index.first<<","<<index.second<<") was outside of matrix bounds {"<<_nrow<<","<<_ncol<<"}");
+			THROW_MATRIX_EXCEPTION("Error, index ("<<index.first<<","<<index.second<<") was outside of matrix bounds {"<<_nrow<<","<<_ncol<<"}" << endl);
 		}
 		ind = index.first *_ncol + index.second;
 		return ind;
@@ -873,7 +880,7 @@ template <class T>
 matrix<T> matrix<T>::operator*(const matrix<T>& obj)
 {
 	// check appropriate conditions
-	if (this->_ncol != obj._nrow) THROW_EXCEPTION("ERROR: matrix rows != matrix columns in multiplication.");
+	if (this->_ncol != obj._nrow) THROW_MATRIX_EXCEPTION("ERROR: matrix rows != matrix columns in multiplication.");
 
 	matrix<T> m = matrix<T>(matrix<T>::index_type(this->_nrow, obj._ncol),0);
 
@@ -967,7 +974,7 @@ void matrix<T>::cholesky(matrix<T>& LU)
 		for(int p=0; p<k; ++p) sum += LU._data[k*d+p] * LU._data[k*d+p];
 
 		diff = sqrt(this->_data[k*d+k]-sum);
-		if (diff < 0) THROW_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
+		if (diff < 0) THROW_MATRIX_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
 		LU._data[k*d+k] = diff;
 
 		for(int i=k+1;i<d;++i)
@@ -976,7 +983,7 @@ void matrix<T>::cholesky(matrix<T>& LU)
 			for(int p=0; p<k; ++p) sum += LU._data[i*d+p] * LU._data[k*d+p];
 
 			diff = LU._data[k*d+k];
-			if (diff == 0) THROW_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
+			if (diff == 0) THROW_MATRIX_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
 			LU._data[i*d+k] = (this->_data[i*d+k]-sum) / diff;
 		}
 	}

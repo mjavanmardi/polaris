@@ -71,7 +71,9 @@ namespace Network_Skimming_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Skim_Table_Implementation),Data_Object>::Component_Type ComponentType;
 			typedef Prototypes::LOS<typename MasterType::los_value_type> los_itf; 
 
+			// Table containing los values
 			m_container(matrix<typename MasterType::los_value_type*>, skim_table, NONE, NONE);
+			
 			
 
 			// start and end times of the period represented by the skim table
@@ -114,22 +116,66 @@ namespace Network_Skimming_Components
 			typedef typename skimmer_itf::Component_Type::Stored_Time_Type Stored_Time_Type;
 			
 
+			// vector of multimaps, one for each origin zone, which contains travel times to destination zones, sorted in ascending order
+			m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), auto_travel_time_sorter, NONE, NONE);
+			m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), transit_travel_time_sorter, NONE, NONE);
+
 			//=============================================
 			// Primary function accessors - used to calculate/return LOS values for OD pairs
 			//---------------------------------------------
 			template<typename TargetType> void Initialize()
 			{
+				//TODO: remove when done testing
+				cout << "Initializing Network Skim Tables..."<<endl;
+
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 				this->_skim_table.resize(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()),0);
+
+				// initialize the travel time sorter
+				for (int i=0; i < zones_container->size(); i++)
+				{
+					this->_auto_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
+					this->_transit_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
+				}
+
+				//TODO: remove when done testing
+				cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<endl;
 			}
 			template<typename TargetType> void Initialize(TargetType initial_data)
 			{
+				this->Initialize<NT>();
+
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 				this->_skim_table.Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), initial_data);
+
+				// initialize the travel time sorters with the initial data
+				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
+				{
+					zone_itf* orig_zone = (zone_itf*)o_itr->second;
+					int o_index = orig_zone->internal_id<int>();
+
+					this->_auto_travel_time_sorter[o_index].clear();
+					this->_transit_travel_time_sorter[o_index].clear();
+
+					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
+					{
+						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						int d_index = dest_zone->internal_id<int>();
+
+						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
+						float auto_ttime = los->auto_ttime<Time_Minutes>();
+						float transit_ttime = los->transit_ttime<Time_Minutes>();
+
+						this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));
+					}
+					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+				}
 			}
 			template<typename TargetType> bool Update_LOS()
 			{
@@ -153,6 +199,7 @@ namespace Network_Skimming_Components
 				network_itf* network = this->network_reference<  network_itf*>();
 				skimmer_itf* skim = this->skim_reference<  skimmer_itf*>();
 				locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
+				zones_itf* zones_container = network->zones_container<zones_itf*>();
 				
 				// origin to zone / destination to zone mappings
 				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> origin_locations_itf;
@@ -179,6 +226,7 @@ namespace Network_Skimming_Components
 				matrix<typename MasterType::los_value_type*>* los = (matrix<typename MasterType::los_value_type*>*)&this->_skim_table;
 				typedef typename matrix<typename MasterType::los_value_type*>::size_type size_t;
 
+				// copy old values into temporary and reset the current values to zero
 				matrix<float> los_old;
 				if (scenario->template read_skim_tables<bool>())
 				{
@@ -277,6 +325,33 @@ namespace Network_Skimming_Components
 				}
 				los_old.clear();
 
+
+				// update the travel time sorters with the initial data
+				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
+				{
+					zone_itf* orig_zone = (zone_itf*)(o_itr->second);
+					int o_index = orig_zone->internal_id<int>();
+
+					this->_auto_travel_time_sorter[o_index].clear();
+					this->_transit_travel_time_sorter[o_index].clear();
+
+					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
+					{
+						zone_itf* dest_zone = (zone_itf*)(d_itr->second);
+						int d_index = dest_zone->internal_id<int>();
+
+						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
+						float auto_ttime = los->auto_ttime<Time_Minutes>();
+						float transit_ttime = los->transit_ttime<Time_Minutes>();
+
+						this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));
+					}
+
+					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+				}
+
 				return true;
 			}
 			template<typename TargetType> void Write_LOS()
@@ -328,6 +403,68 @@ namespace Network_Skimming_Components
 			{		
 				ReturnType ret_value = (ReturnType)_skim_table[typename skim_table_itf::index_type(Origin_Index,Destination_Index)];
 				return ret_value;
+			}
+			template<typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<ReturnLocationType>& available_set, int origin_index, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			{
+				network_itf* network = this->network_reference<  network_itf*>();
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+
+				// get appropriate sorted ttimes based on mode indicator
+				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+
+				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+				{
+					//TODO: remove when done testing
+					//cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<", for origin index: " << origin_index<<endl;
+					ttime_sorter= this->_auto_travel_time_sorter[origin_index];
+				}
+
+	
+				// forward search - best when using small min_time
+				if (search_forward)
+				{
+					for (std::vector<pair<float, zone_itf*>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr)
+					{
+						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						float ttime=d_itr->first;
+
+						if (ttime < max_time)
+						{
+							if (ttime >= min_time) available_set.push_back(Get_Location_As_Needed<ReturnLocationType>(dest_zone));
+						}
+						else
+						{
+							return;
+						}
+					}
+				}
+				// backward search - best when using large min_time
+				else
+				{
+					for (std::vector<pair<float, zone_itf*>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr)
+					{
+						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						float ttime=d_itr->first;
+
+						if (ttime >= min_time)
+						{
+							if (ttime < max_time) available_set.push_back(Get_Location_As_Needed<ReturnLocationType>(dest_zone));
+						}
+						else
+						{
+							return;
+						}
+					}
+				}
+			}
+			template<typename ReturnLocationType> ReturnLocationType Get_Location_As_Needed(zone_itf* zone, requires(ReturnLocationType, check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
+			{
+				return zone;
+			}
+			template<typename ReturnLocationType> ReturnLocationType Get_Location_As_Needed(zone_itf* zone, requires(ReturnLocationType, check(strip_modifiers(ReturnLocationType), Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				zone->Get_Random_Location<ReturnLocationType>();
+				return ;
 			}
 		};
 
@@ -605,7 +742,15 @@ namespace Network_Skimming_Components
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
 							typename MasterType::los_value_type* temp_los = Allocate<typename MasterType::los_value_type>();
-							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(data[i]);
+							// get, validate and store the auto ttime.  make sure not greater than max expected
+							Stored_Time_Type a_ttime = (Stored_Time_Type)data[i];
+							if (a_ttime > GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(720.0) || a_ttime < 0 || ISNAN(a_ttime))
+							{
+								cout <<"Warning, invalid travel auto travel time value="<<a_ttime<<" found when reading skim file, travel time reset to default value=180.0."<<endl;
+								a_ttime = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(180.0);
+							}
+							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(a_ttime);
+							// store the other time invariant los characteristics for the current los record
 							((los_value_itf*)temp_los)->LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}

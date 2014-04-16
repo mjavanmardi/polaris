@@ -9,6 +9,12 @@
 
 typedef unsigned int uint;
 
+#define THROW_SARRAY_EXCEPTION(...) \
+			{stringstream s;\
+			s << "\nRUNTIME_ERROR: " << __FILE__ << " at " << __LINE__<< "\n\t" << __VA_ARGS__ << endl;\
+			cerr << s.str();\
+			throw new runtime_error(s.str().c_str());}
+
 using namespace std;
 
 //-------------------------------------------------------------
@@ -152,11 +158,11 @@ private:
 	{
 		uint ind=0;
 
-		if (index.first >= _row_sizes->size()) THROW_EXCEPTION("Error, row index points to a row outside of array bounds.");
+		if (index.first >= _row_sizes->size()) THROW_SARRAY_EXCEPTION("Error, row index points to a row outside of array bounds.");
 
 		for (uint i = 0; i< index.first; i++) ind += (*_row_sizes)[i];
 
-		if (index.second >= (*_row_sizes)[index.first]) THROW_EXCEPTION("Error, column index points to a column outside of array bounds.");
+		if (index.second >= (*_row_sizes)[index.first]) THROW_SARRAY_EXCEPTION("Error, column index points to a column outside of array bounds.");
 		ind += index.second;
 
 		return _data[ind];
@@ -303,11 +309,11 @@ protected:
 	{
 		uint ind=0;
 
-		if (index.first >= _row_sizes.size()) THROW_EXCEPTION("Error, row index points to a row outside of array bounds.");
+		if (index.first >= _row_sizes.size()) THROW_SARRAY_EXCEPTION("Error, row index points to a row outside of array bounds.");
 
 		for (uint i = 0; i< index.first; i++) ind += _row_sizes[i];
 
-		if (index.second >= _row_sizes[index.first]) THROW_EXCEPTION("Error, column index points to a column outside of array bounds.");
+		if (index.second >= _row_sizes[index.first]) THROW_SARRAY_EXCEPTION("Error, column index points to a column outside of array bounds.");
 		ind += index.second;
 
 		return ind;

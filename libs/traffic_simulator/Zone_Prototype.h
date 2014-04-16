@@ -108,6 +108,33 @@ namespace Zone_Components
 
 				return locations->at(loc_index);
 			}
+			template<typename TargetType> TargetType Get_Random_Work_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename get_type_of(work_locations)::value_type>::type> activity_location_itf;
+				typedef Random_Access_Sequence< typename get_type_of(work_locations),activity_location_itf*> activity_locations_itf;
+				
+				activity_locations_itf* locations = this->template work_locations<activity_locations_itf*>();
+				
+				int size = (int)locations->size();
+				if (size == 0) return nullptr;
+
+                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+				return locations->at(loc_index);
+			}
+			template<typename TargetType> TargetType Get_Random_School_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename get_type_of(school_locations)::value_type>::type> activity_location_itf;
+				typedef Random_Access_Sequence< typename get_type_of(school_locations),activity_location_itf*> activity_locations_itf;
+				
+				activity_locations_itf* locations = this->template school_locations<activity_locations_itf*>();
+				
+				int size = (int)locations->size();
+				if (size == 0) return nullptr;
+
+                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+				return locations->at(loc_index);
+			}
+			
 			template<typename TargetType> void Push_To_Zone_Display()
 			{
 				this_component()->template Push_To_Zone_Display<TargetType>();

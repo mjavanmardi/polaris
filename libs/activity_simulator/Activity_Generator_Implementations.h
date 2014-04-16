@@ -65,21 +65,6 @@ namespace Person_Components
 
 			template<typename TargetType> void Activity_Generation()
 			{
-				/*typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename base_type::type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
-				/*typedef Pair_Associative_Container<typename base_type::type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
-
-				Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::value_type>();
-				act->template Activity_Plan_ID<long>(iteration());
-				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(Simulation_Time.template Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
-
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<typename base_type::type_of(Movement_Plans_Container)::value_type>::type> Movement_Plan;
-				typedef Pair_Associative_Container<typename base_type::type_of(Movement_Plans_Container),Movement_Plan*> Movement_Plans;
-
-				Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::value_type>();
-				move->template Movement_Plan_ID<long>(iteration());
-				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
-				movements->insert(Simulation_Time.template Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);*/
 			}
 		};
 
