@@ -305,8 +305,7 @@ namespace Operation_Components
 
 				for(result<Signal>::iterator db_itr=signal_result.begin();db_itr!=signal_result.end();++db_itr)
 				{
-					if(db_itr->getSignal() > 5640) continue;
-
+					//if(rand()%3!=0) continue;
 					_Intersection_Interface* intersection = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNodes()->getNode()];
 
 					if(++counter%1000==0) cout << "\t" << counter << endl;
@@ -318,6 +317,8 @@ namespace Operation_Components
 
 					intersection_control->template intersection<_Intersection_Interface*>(intersection);
 					intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+
+					intersection->template intersection_type<Intersection_Control_Components::Types::Intersection_Type_Keys>(PRE_TIMED_SIGNAL_CONTROL);
 
 					std::vector<signal_time>::iterator signal_itr;
 					
@@ -362,7 +363,7 @@ namespace Operation_Components
 					}
 				}
 
-
+				int skipped = 0;
 
 				counter=0;
 
@@ -375,8 +376,6 @@ namespace Operation_Components
 
 				for(result<Timing>::iterator db_itr = timing_result.begin (); db_itr != timing_result.end (); ++db_itr)
 				{
-					if(db_itr->getSignal()->getSignal() > 5640) continue;
-
 					shared_ptr<Signal> signal=timing_result.begin ()->getSignal();
 
 					assert(net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode()));
@@ -387,6 +386,8 @@ namespace Operation_Components
 					if(++counter%10000==0) cout << "\t" << counter << endl;
 
 					_Intersection_Control_Interface* intersection_control = intersection->template intersection_control<_Intersection_Control_Interface*>();
+					
+					if(intersection_control == nullptr){ continue;}
 
 					_Control_Plans_Container_Interface& control_plans=intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>();
 
@@ -453,16 +454,17 @@ namespace Operation_Components
 
 				for(result<Phasing>::iterator db_itr = phasing_result.begin(); db_itr != phasing_result.end();++db_itr)
 				{
-					if(db_itr->getSignal()->getSignal() > 5640) continue;
-
 					shared_ptr<Signal> signal=db_itr->getSignal();
 
-					assert(net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode()));
+					if(!net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode())){ ++skipped; continue;}
+
 					_Intersection_Interface* intersection = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[signal->getNodes()->getNode()];
 
 
 					if(++counter%10000==0) cout << "\t" << counter << endl;
 					_Intersection_Control_Interface* intersection_control = intersection->template intersection_control<_Intersection_Control_Interface*>();
+
+					if(intersection_control == nullptr){ ++skipped; continue;}
 
 					_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
@@ -499,14 +501,15 @@ namespace Operation_Components
 
 							for(std::vector<phase_movement>::iterator phase_mvmt_itr=db_itr->nested_records.begin();phase_mvmt_itr!=db_itr->nested_records.end();phase_mvmt_itr++)
 							{
-								_Phase_Movement_Interface* phase_movement = (_Phase_Movement_Interface*)Allocate<typename _Phase_Movement_Interface::Component_Type>();
 
 								// must determine the in_link, out_link pair; first find the in_link to match
 
 								link_id_dir.dir=phase_mvmt_itr->dir;
 								link_id_dir.id=phase_mvmt_itr->link->getLink();
 								
-								assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+								if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir)){ ++skipped; continue;}
+								
+								_Phase_Movement_Interface* phase_movement = (_Phase_Movement_Interface*)Allocate<typename _Phase_Movement_Interface::Component_Type>();
 								
 								_Link_Interface* in_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];								
 
@@ -519,6 +522,7 @@ namespace Operation_Components
 
 								if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 								{
+									//cout << (int*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] << endl;
 									// an upstream intersection match confirms this is the correct out_link
 
 									if(((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template upstream_intersection<_Intersection_Interface*>()==intersection)
@@ -624,67 +628,68 @@ namespace Operation_Components
 
 
 				counter=0;
+				cout << skipped << endl;
 
-				cout << "Reading Signs" << endl;
+				//cout << "Reading Signs" << endl;
 
-				result<Sign> sign_result=db->template query<Sign>(query<Sign>::true_expr);
+				//result<Sign> sign_result=db->template query<Sign>(query<Sign>::true_expr);
 
-				for(result<Sign>::iterator db_itr=sign_result.begin();db_itr!=sign_result.end();++db_itr)
-				{
-					if(++counter%1000==0) cout << "\t" << counter << endl;
+				//for(result<Sign>::iterator db_itr=sign_result.begin();db_itr!=sign_result.end();++db_itr)
+				//{
+				//	if(++counter%1000==0) cout << "\t" << counter << endl;
 
-					link_id_dir.id=db_itr->getLink()->getLink();
-					link_id_dir.dir=db_itr->getDir();
+				//	link_id_dir.id=db_itr->getLink()->getLink();
+				//	link_id_dir.dir=db_itr->getDir();
 
-					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+				//	if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir)){ continue;}
 
 
-					_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template downstream_intersection<_Intersection_Interface*>();
+				//	_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template downstream_intersection<_Intersection_Interface*>();
 
-					_Intersection_Control_Interface* intersection_control;
-					
-					if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
-					{
-						intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+				//	_Intersection_Control_Interface* intersection_control;
+				//	
+				//	if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
+				//	{
+				//		intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
 
-						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+				//		intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 
-						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
-						
-						control_plan->template starting_time<int>(0.0);
-						control_plan->template ending_time<int>(USHRT_MAX);
-						
-						control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
-						control_plan->template cycle_starting_time<int>(0.0);
-						control_plan->template cycle_ending_time<int>(0.0);
-						control_plan->template cycle_leftover_time<int>(0.0);
-						control_plan->template cycle_index<int>(0.0);
-						control_plan->template control_plan_index<int>(0.0);
+				//		_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+				//		
+				//		control_plan->template starting_time<int>(0.0);
+				//		control_plan->template ending_time<int>(USHRT_MAX);
+				//		
+				//		control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
+				//		control_plan->template cycle_starting_time<int>(0.0);
+				//		control_plan->template cycle_ending_time<int>(0.0);
+				//		control_plan->template cycle_leftover_time<int>(0.0);
+				//		control_plan->template cycle_index<int>(0.0);
+				//		control_plan->template control_plan_index<int>(0.0);
 
-						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+				//		intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 
-						
-						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+				//		
+				//		_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
-						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
+				//		typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
-						for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
-						{
-							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
-							_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
+				//		for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
+				//		{
+				//			_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
+				//			_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
 
-							_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
+				//			_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 
-							approach->template inbound_link<_Link_Interface*>(link);
-							approach->template green_cycle_ratio<int>(0.0);
+				//			approach->template inbound_link<_Link_Interface*>(link);
+				//			approach->template green_cycle_ratio<int>(0.0);
 
-							link->template approach<_Approach_Interface*>(approach);
+				//			link->template approach<_Approach_Interface*>(approach);
 
-							control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
-						}
-					}
+				//			control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
+				//		}
+				//	}
 
-				}
+				//}
 				
 				counter=0;
 
@@ -698,45 +703,66 @@ namespace Operation_Components
 					
 					if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
 					{
-						if(++counter%1000==0) cout << "\t" << counter << endl;
+						intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
 
-						_Intersection_Control_Interface* intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
-
+						_Intersection_Control_Interface* intersection_control = (_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+						intersection_control->template intersection<_Intersection_Interface*>(intersection);
+					
+						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+						control_plan->template control_plan_index<int>(0.0);
+						control_plan->template control_type<int>(Intersection_Components::Types::NO_CONTROL);
+						control_plan->template starting_time<int>(0.0);
+						control_plan->template ending_time<int>(24*60*60);
+						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 
-						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
 						
-						control_plan->template starting_time<int>(0.0);
-						control_plan->template ending_time<int>(USHRT_MAX);
+
+
+
+
+
+
+
+						if(++counter%1000==0) cout << "\t" << counter << endl;
+
+						//_Intersection_Control_Interface* intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+
+						//intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+
+						//_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+						//
+						//control_plan->template starting_time<int>(0.0);
+						//control_plan->template ending_time<int>(USHRT_MAX);
+						//
+						//control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
+						//control_plan->template cycle_starting_time<int>(0.0);
+						//control_plan->template cycle_ending_time<int>(0.0);
+						//control_plan->template cycle_leftover_time<int>(0.0);
+						//control_plan->template cycle_index<int>(0.0);
+						//control_plan->template control_plan_index<int>(0.0);
+
+						//intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+
 						
-						control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
-						control_plan->template cycle_starting_time<int>(0.0);
-						control_plan->template cycle_ending_time<int>(0.0);
-						control_plan->template cycle_leftover_time<int>(0.0);
-						control_plan->template cycle_index<int>(0.0);
-						control_plan->template control_plan_index<int>(0.0);
+						//_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
-						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+						//typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
-						
-						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+						//for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
+						//{
+						//	_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
+						//	_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
 
-						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
+						//	_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 
-						for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
-						{
-							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
-							_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
+						//	approach->template inbound_link<_Link_Interface*>(link);
+						//	approach->template green_cycle_ratio<int>(0.0);
 
-							_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
+						//	link->template approach<_Approach_Interface*>(approach);
 
-							approach->template inbound_link<_Link_Interface*>(link);
-							approach->template green_cycle_ratio<int>(0.0);
-
-							link->template approach<_Approach_Interface*>(approach);
-
-							control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
-						}
+						//	control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
+						//}
 					}
 				}
 			}

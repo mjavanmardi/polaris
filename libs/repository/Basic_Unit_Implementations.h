@@ -33,7 +33,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Time base clase and Time Horizon Classes.
-		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation)>
+		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation),NT>
 		{
 			Time_Implementation()
 			{

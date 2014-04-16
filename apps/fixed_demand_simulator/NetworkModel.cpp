@@ -1,6 +1,6 @@
 #define EXCLUDE_DEMAND
 
-#define ANTARES
+//#define ANTARES
 
 #include "Polaris_PCH.h"
 
@@ -32,6 +32,7 @@ struct MasterType
 
 	typedef Antares_Network_Implementation<MasterType> network_type;
 	typedef Antares_Link_Implementation<MasterType> link_type;
+	
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
 
@@ -195,6 +196,7 @@ struct MasterType
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
 };
 
+
 ostream* stream_ptr;
 void run_with_input_from_db(char* scenario_filename);
 //void run_with_input_from_files();
@@ -203,7 +205,7 @@ int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
 	//cfg.Single_Threaded_Setup(24*60*60);
-	cfg.Multi_Threaded_Setup(24*60*60,8);
+	cfg.Multi_Threaded_Setup(24*60*60,12);
 	INITIALIZE_SIMULATION(cfg);
 
     Average_Execution_Objects_Hint<MasterType::routing_type>(27784950);
@@ -268,7 +270,7 @@ void run_with_input_from_db(char* scenario_filename)
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
-	
+
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 
@@ -279,8 +281,18 @@ void run_with_input_from_db(char* scenario_filename)
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 
+	typedef Operation<MasterType::operation_type> _Operation_Interface;
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	operation->network_reference<_Network_Interface*>(network);
+	if (scenario->intersection_control_flag<int>() == 1) {
+		cout <<"reading intersection control data..." << endl;
+		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
+	}
+
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
+	
+
 
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	typedef Demand<MasterType::demand_type> _Demand_Interface;
@@ -291,13 +303,7 @@ void run_with_input_from_db(char* scenario_filename)
 	demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	typedef Operation<MasterType::operation_type> _Operation_Interface;
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
-	operation->network_reference<_Network_Interface*>(network);
-	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading intersection control data..." << endl;
-		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
-	}
+
 	if (scenario->ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
@@ -441,7 +447,6 @@ void run_with_input_from_db(char* scenario_filename)
 #endif
 		cout << "starting sim..." <<endl;
 
-		
 
 		START();
 

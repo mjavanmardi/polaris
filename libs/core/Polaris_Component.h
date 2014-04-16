@@ -50,7 +50,7 @@ namespace polaris
 	static Component_Manager_Type* Add_Component_Manager(Component_Manager_Type* val, size_t component_id)
 	{
 		if(__all_components==nullptr) __all_components=new boost::unordered::unordered_map<size_t, Component_Manager_Base*>();
-
+		Component_Manager_Type::managed_type::component_id = component_id;
 		(*__all_components)[component_id] = (Component_Manager_Base*)val;
 		return val;
 	}
@@ -77,19 +77,21 @@ namespace polaris
 		typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
 		typedef Component_Type ComponentType;
 
-		static const size_t component_id;
+		static size_t component_id;
 		
 		typedef typename Get_Component_Manager<ObjectType,Component_Type>::type Component_Manager_Type;
 
 		static Component_Manager_Type* const component_manager;
 	};
 
-	template<typename MasterType,typename InheritanceList,typename ObjectType>
-	const size_t Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id = __component_counter;
+
 	
 	template<typename MasterType,typename InheritanceList,typename ObjectType>
 	typename Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type* const Polaris_Component<MasterType,InheritanceList,ObjectType>::component_manager 
 		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type(), ++__component_counter );
+	
+	template<typename MasterType,typename InheritanceList,typename ObjectType>
+	size_t Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id;
 
 	template<typename MasterType,typename InheritanceList>
 	class Polaris_Component<MasterType,InheritanceList,NT>

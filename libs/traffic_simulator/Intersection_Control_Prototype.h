@@ -239,6 +239,7 @@ namespace Intersection_Control_Components
 				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
 
 				//green times for each movement are assumed to be the length of the simulation interval
+				if((int*)intersection<_Intersection_Interface*>() == nullptr) return;
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
 				
@@ -1031,6 +1032,7 @@ namespace Intersection_Control_Components
 							}
 						}
 						movement->template green_time<float&>() +=  tmp_green_time*1.0f;
+						//cout << "updating green time " << movement->template green_time<float>();
 					}
 				}
 
@@ -1098,6 +1100,7 @@ namespace Intersection_Control_Components
 								}
 							}
 							movement->template green_time<float&>() +=  tmp_green_time*1.0f;
+							//cout << "updating green time B " << movement->template green_time<float>();
 						}
 					}
 

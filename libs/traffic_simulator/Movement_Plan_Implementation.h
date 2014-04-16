@@ -60,7 +60,7 @@ namespace Movement_Plan_Components
 				_current_trajectory_index=val;
 			}
 			tag_getter_setter_as_available(current_trajectory_position);
-			int _current_trajectory_index;
+
 			//------------------------------------------------------------------------------------------------------------------
 
 			m_prototype(Activity_Location,typename MasterType::activity_location_type, origin_location, NONE, NONE);
@@ -82,7 +82,6 @@ namespace Movement_Plan_Components
 			m_data(int, estimated_travel_time_when_departed, NONE, NONE);
 			m_data(int, number_of_switches, NONE, NONE);
 			m_data(int, estimated_time_of_arrival, NONE, NONE);
-			m_data(bool, is_integrated, NONE, NONE);
 			m_data(float, route_length, NONE, NONE);
 			m_data(int, entry_time, NONE, NONE);
 
@@ -116,8 +115,10 @@ namespace Movement_Plan_Components
 				((Movement_Plan<ComponentType>*)this)->template advance_trajectory<_Trajectory_Unit_Interface*>();
 				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
-
+			
+			int _current_trajectory_index;
 			m_data(bool, valid_trajectory, NONE, NONE);
+			m_data(bool, is_integrated, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>

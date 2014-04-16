@@ -189,9 +189,33 @@ namespace Turn_Movement_Components
 			template<typename TargetType> void update_flow()
 			{
 				if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
+				{
 					_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
+				}
 				else
-					_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
+				{
+					_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+
+					_Intersection_Interface* itx = lnk->downstream_intersection<_Intersection_Interface*>();
+
+					if(itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
+					{
+						_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
+					}
+					else
+					{
+						if(_movement_capacity == 0.0f)
+						{
+							_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
+						}
+						else
+						{
+							_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
+						}
+					}
+				}
+
 				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() == Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					float total_movement_flow = _movement_flow + _movement_capacity_leftover;

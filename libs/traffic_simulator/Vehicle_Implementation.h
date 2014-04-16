@@ -30,13 +30,20 @@ namespace Vehicle_Components
 
 		implementation struct Vehicle_Implementation:public Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>
 		{
+
+			m_data(bool, is_integrated, NONE, NONE);
+			m_data(bool, its_switch, NONE, NONE);
+			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
+
+
+
 			typedef typename Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>::ComponentType ComponentType;
 			
 			m_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, NONE, NONE);
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			
 			m_data(int, internal_id, NONE, NONE);
-			m_data(bool, is_integrated, NONE, NONE);
-			m_data(bool, its_switch, NONE, NONE);
+			m_data(float, distance_to_stop_bar, NONE, NONE);
 
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 #ifndef EXCLUDE_DEMAND
@@ -45,22 +52,23 @@ namespace Vehicle_Components
 			m_prototype(Null_Prototype,typename MasterType::traveler_type, traveler, NONE, NONE);
 #endif
 			m_prototype(Routing_Components::Prototypes::Routing, typename MasterType::routing_type, router, NONE, NONE);
-			m_data(float, distance_to_stop_bar, NONE, NONE);
+
 			m_data(float, local_speed, NONE, NONE);
 			m_data(int, downstream_preferred_departure_time, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, NONE, NONE);
+			
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, NONE, NONE);
 			m_data(float, information_compliance_rate, NONE, NONE);
+			
 			m_data(float, relative_indifference_band_route_choice, NONE, NONE);
 			m_data(float, minimum_travel_time_saving, NONE, NONE);
+			
 			//m_data(bool, enroute_updated, NONE, NONE);
 			m_data(int, last_enroute_switching_route_check_time, NONE, NONE);
-
 			m_data(int, entry_queue_length, NONE, NONE);
 
-			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
@@ -390,9 +398,10 @@ namespace Vehicle_Components
 				for (int i = 0; i < (int)trajectory.size(); i++)
 				{
 					Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
-				}				
+				}
 				typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
 				trajectory_container_type().swap((trajectory_container_type&)trajectory);
+
 			}
 
 			template<typename TargetType> void start_agent()
@@ -506,20 +515,20 @@ namespace Vehicle_Components
 			{
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 
-				_Switch_Decision_Data_Interface* switch_decision_data = (_Switch_Decision_Data_Interface*)Allocate<typename MasterType::switch_decision_data_type>();
+				//_Switch_Decision_Data_Interface* switch_decision_data = (_Switch_Decision_Data_Interface*)Allocate<typename MasterType::switch_decision_data_type>();
 				
-				switch_decision_data->template switch_decision_index<int>(int(_switch_decisions_container.size()));
+				//switch_decision_data->template switch_decision_index<int>(int(_switch_decisions_container.size()));
 
-				typename _Trajectory_Container_Interface::iterator itr;
+				//typename _Trajectory_Container_Interface::iterator itr;
 
-				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
-				{
-					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
-					_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
-					_Links_Container_Interface& links_container = switch_decision_data->template route_links_container<_Links_Container_Interface&>();
-					links_container.push_back(route_link);
-				}
-				switch_decisions_container<_Switch_Decision_Data_Container_Interface&>().push_back(switch_decision_data);
+				//for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
+				//{
+				//	_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+				//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+				//	_Links_Container_Interface& links_container = switch_decision_data->template route_links_container<_Links_Container_Interface&>();
+				//	links_container.push_back(route_link);
+				//}
+				//switch_decisions_container<_Switch_Decision_Data_Container_Interface&>().push_back(switch_decision_data);
 
 				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_switched_decisions<NULLTYPE>(cause_for_switching);
 			}
