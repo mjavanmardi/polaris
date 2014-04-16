@@ -39,6 +39,8 @@ namespace Prototypes
 		accessor(destination, NONE, NONE);
 		accessor(next, NONE, NONE);
 		accessor(activity_type, NONE, NONE);
+		accessor(bias_correction, NONE, NONE);
+		accessor(start_time,NONE,NONE);
 
 		template<typename TargetType> TargetType Calculate_Utility()
 		{

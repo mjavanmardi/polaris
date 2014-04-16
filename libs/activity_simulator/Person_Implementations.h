@@ -206,6 +206,7 @@ namespace Person_Components
 				this_itf* pthis = (this_itf*)this;
 				destination_choice_itf* dest_chooser = this->_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>();
 				
+				
 				// first, make sure person is worker, if not exit
 				EMPLOYMENT_STATUS status = _Static_Properties->template Employment_Status<EMPLOYMENT_STATUS>();
 				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
@@ -213,8 +214,14 @@ namespace Person_Components
 					pthis->template Work_Location<int>(-1);
 					return;
 				}
-				
-				location_interface* dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
+
+				location_interface* dest=nullptr;
+
+				// Do work at home choice first, if working from home, do not do destination choice		
+				if (!this->Work_At_Home_Choice())
+				{
+					dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
+				}
 
 				if (dest == nullptr) pthis->Work_Location<location_interface*>(pthis->Home_Location<location_interface*>());
 				else pthis->Work_Location<location_interface*>(dest);
@@ -453,6 +460,14 @@ namespace Person_Components
 			template<typename TargetType> void arrive_at_destination()
 			{
 
+			}
+
+			bool Work_At_Home_Choice()
+			{
+				// This is a placeholder for the work at home choice decision.
+				// Currently returns a randomized selection based on the average % of people working from home in CMAP 2007 survey
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < 0.072) return true;
+				else return false;
 			}
 
 

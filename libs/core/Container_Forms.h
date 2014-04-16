@@ -716,6 +716,12 @@ namespace polaris
 
 	};
 
+	template<typename KeyType, typename ValueType> bool Pair_Comparer(std::pair<KeyType,ValueType> &p1, std::pair<KeyType,ValueType> &p2)
+	{
+		if (p1.first < p2.first) return true;
+		else return false;
+	}
+
 	///----------------------------------------------------------------------------------------------------
 	/// container_accessor - implements the standard get / set accessors for a container
 	///		includes a tagless check on whether the implementation has corresponding accessors

@@ -498,11 +498,18 @@ int main(int argc,char** argv)
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 
+	typedef Pair_Associative_Container<_Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
+	_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
+	_Zone_Interface* zone = (_Zone_Interface*)(zones->begin()->second);
+	
+	std::vector<_Zone_Interface*> available_set;
+	skimmer->Get_Locations_Within_Range<_Zone_Interface*, Time_Minutes,Vehicle_Components::Types::Vehicle_Type_Keys,_Zone_Interface*>(available_set, zone, 0, 0, 4, Vehicle_Components::Types::SOV);
 
 	//==================================================================================================================================
 	// Destination choice model - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
-	MasterType::person_destination_chooser_type::_choice_set_size = 50;
+	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data.txt");	
