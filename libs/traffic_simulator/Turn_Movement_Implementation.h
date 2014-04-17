@@ -146,7 +146,15 @@ namespace Turn_Movement_Components
 				}
 				else
 				{
-					_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+					if(green_time_ratio < 1.0f)
+					{
+						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+						_movement_capacity = 0.0f;
+					}
+					else
+					{
+						_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+					}
 				}
 			}
 
@@ -199,6 +207,8 @@ namespace Turn_Movement_Components
 
 					_Intersection_Interface* itx = lnk->downstream_intersection<_Intersection_Interface*>();
 
+
+
 					if(itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
 					{
 						_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
@@ -207,13 +217,27 @@ namespace Turn_Movement_Components
 					{
 						if(_movement_capacity == 0.0f)
 						{
-							_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
+							//_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
+							_movement_flow = 0.0f;
 						}
 						else
 						{
 							_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
 						}
 					}
+
+					//if(_movement_capacity < _movement_demand && _movement_capacity < _movement_supply)
+					//{
+					//	int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
+
+					//	if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || inbound_link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+					//	{
+					//		
+
+					//		if(_movement_flow > 20) cout << "letting through: " << _movement_flow << " vs " << _movement_capacity << endl;
+					//	}
+					//	
+					//}
 				}
 
 				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() == Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
