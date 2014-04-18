@@ -9,7 +9,7 @@ namespace Routing_Components
 		template<typename MasterType>
 		struct static_attributes : public Base_Edge_A_Star<MasterType>
 		{
-
+			t_data(bool,is_highway);
 		};
 
 		struct static_to_static
@@ -90,6 +90,18 @@ namespace Routing_Components
 
 					input_static_edge._cost = current_link->travel_time<float>();
 					input_static_edge._time_cost = current_link->travel_time<float>();
+					
+					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
+					
+					if(link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+					{
+						input_static_edge._is_highway = false;
+					}
+					else
+					{
+						input_static_edge._is_highway = true;
+					}
+					
 
 					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->outbound_turn_movements<Turn_Movement_Container_Interface*>();
 

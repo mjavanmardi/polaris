@@ -146,15 +146,15 @@ namespace Turn_Movement_Components
 				}
 				else
 				{
-					if(green_time_ratio < 1.0f)
-					{
+					//if(green_time_ratio < 0.25f)
+					//{
 						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
-						_movement_capacity = 0.0f;
-					}
-					else
-					{
+						//_movement_capacity = 0.0f;
+					//}
+					//else
+					//{
 						_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
-					}
+					//}
 				}
 			}
 

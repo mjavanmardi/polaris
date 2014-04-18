@@ -305,7 +305,8 @@ namespace Operation_Components
 
 				for(result<Signal>::iterator db_itr=signal_result.begin();db_itr!=signal_result.end();++db_itr)
 				{
-					//if(rand()%3!=0) continue;
+					//if(rand()%2!=0) continue;
+
 					_Intersection_Interface* intersection = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNodes()->getNode()];
 
 					if(++counter%1000==0) cout << "\t" << counter << endl;
