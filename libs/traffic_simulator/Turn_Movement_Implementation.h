@@ -146,7 +146,7 @@ namespace Turn_Movement_Components
 				}
 				else
 				{
-					if(green_time_ratio < 0.85f)
+					if(green_time_ratio < 0.8f)
 					{
 						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
 						_movement_capacity = 0.0f;
