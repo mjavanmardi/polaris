@@ -45,7 +45,7 @@ namespace polaris
 		t_data(bool, marked_for_reset);
 		t_data(bool, in_closed_set);
 		t_data(bool, in_open_set);
-		
+
 		t_pointer(void*, came_from);
 		
 		t_data(edge_id_type, edge_id);

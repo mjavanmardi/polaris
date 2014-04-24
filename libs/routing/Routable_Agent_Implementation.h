@@ -72,7 +72,16 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_cost + connection->_cost;
+			if(neighbor->_is_highway)
+			{
+				//cout << "is highway" << endl;
+				return (current->_cost + connection->_cost)*.75f;
+			}
+			else
+			{
+				//cout << "is not highway" << endl;
+				return current->_cost + connection->_cost;
+			}
 		}
 
 		//template<>

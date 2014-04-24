@@ -378,29 +378,29 @@ namespace Link_Components
 
 				upstream_cumulative_departed_vehicles = max(0,upstream_cumulative_departed_vehicles);
 
-				//if (((_Scenario_Interface*)_global_scenario)->template jam_density_constraints_enforced<bool>())
-				//{
+				if (((_Scenario_Interface*)_global_scenario)->template jam_density_constraints_enforced<bool>())
+				{
 					_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
-				//}
-				//else
-				//{
-				//	int t_minus_bwtt=-1;
-				//	if(current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
-				//	{
-				//		t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size)%_link_bwtt_cached_simulation_interval_size;
-				//	}
-				//	if (t_minus_bwtt>-1)
-				//	{
-				//		int jam_vehicles = (int) (_num_lanes * _length * _jam_density/5280.0f);
-				//		jam_vehicles = max(_num_lanes*2,jam_vehicles);
-				//		int cached=_cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt]+jam_vehicles;
-				//		_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles,cached);
-				//	}
-				//	else
-				//	{
-				//		_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
-				//	}					
-				//}
+				}
+				else
+				{
+					int t_minus_bwtt=-1;
+					if(current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
+					{
+						t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size)%_link_bwtt_cached_simulation_interval_size;
+					}
+					if (t_minus_bwtt>-1)
+					{
+						int jam_vehicles = (int) (_num_lanes * _length * _jam_density/5280.0f);
+						jam_vehicles = max(_num_lanes*2,jam_vehicles);
+						int cached=_cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt]+jam_vehicles;
+						_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles,cached);
+					}
+					else
+					{
+						_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
+					}
+				}
 
 				int t_fftt = (current_simulation_interval_index)%_link_fftt_cached_simulation_interval_size;
 				int t_bwtt = (current_simulation_interval_index)%_link_bwtt_cached_simulation_interval_size;
