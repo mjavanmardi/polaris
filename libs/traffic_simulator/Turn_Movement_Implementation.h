@@ -405,7 +405,7 @@ namespace Turn_Movement_Components
 
 					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 					_turn_travel_penalty = turn_travel_penalty;
-					add_signal_penalty<TargetType>();
+					//add_signal_penalty<TargetType>();
 					//TODO:BIG_CHANGE
 					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);

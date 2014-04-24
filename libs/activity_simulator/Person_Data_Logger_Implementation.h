@@ -662,6 +662,8 @@ namespace Person_Components
 				act_rec->setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					act_rec->setMode ("AUTO");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
+					act_rec->setMode ("HOV");
 				else
 					act_rec->setMode ("TRANSIT");
 				act_rec->setType (act->template Get_Type_String<NT>());

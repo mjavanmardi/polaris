@@ -68,6 +68,30 @@ namespace Routing_Components
 
 			void Compute_Route()
 			{
+
+				
+
+				if (_network == nullptr)
+				{
+					THROW_EXCEPTION("Network is undefined.");
+				}
+				else if(((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				{
+					THROW_EXCEPTION("_routable_networks is undefined.");
+				}
+				else if(thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				{
+					THROW_EXCEPTION("_routable_networks is not large enough.");
+				}
+				else if (_movement_plan == nullptr)
+				{
+					THROW_EXCEPTION("Movement plan is undefined.");
+				}
+				else if (_movement_plan->origin<Link_Interface*>() == nullptr)
+				{
+					THROW_EXCEPTION("Origin is undefined.");
+				}
+
 				// get a routable network
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
 				

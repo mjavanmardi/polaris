@@ -709,7 +709,7 @@ namespace Scenario_Components
 				//===============================================
 				// set merging mode
 				string merging_mode_string;
-				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_LANE";
+				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_DEMAND";
 				if (merging_mode_string.compare("DRIVING_RULE") == 0)
 				{
 					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);

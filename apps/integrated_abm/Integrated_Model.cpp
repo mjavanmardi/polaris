@@ -8,6 +8,8 @@
 //#define SHOW_WARNINGS
 #endif
 
+#undef SHOW_WARNINGS
+
 #include "Polaris_PCH.h"
 //#include "core\Core.h"
 //#include "File_Reader.h"
@@ -306,7 +308,13 @@ int main(int argc,char** argv)
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
-
+	typedef Operation<MasterType::operation_type> _Operation_Interface;
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	operation->network_reference<_Network_Interface*>(network);
+	if (scenario->intersection_control_flag<int>() == 1) {
+		cout <<"reading intersection control data..." << endl;
+		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
+	}
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
@@ -319,18 +327,13 @@ int main(int argc,char** argv)
 	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	typedef Operation<MasterType::operation_type> _Operation_Interface;
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
-	operation->network_reference<_Network_Interface*>(network);
-	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading intersection control data..." << endl;
-		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
-	}
+
 	if (scenario->ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
 
+	
 
 #ifdef ANTARES
 	network->set_network_bounds<NULLTYPE>();
@@ -549,7 +552,7 @@ int main(int argc,char** argv)
 	}
 
 	cout << "Finished!" << endl;
-	system("PAUSE");
+	//system("PAUSE");
 }
 
 void output_object_sizes()
