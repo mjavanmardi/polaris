@@ -12,6 +12,20 @@ namespace Person_Components
 {
 	namespace Types
 	{
+		enum CONFLICT_TYPES
+		{
+			OVERLAP_START=1,
+			OVERLAP_END,
+			INSERT,
+			OVERLAP_ALL
+		};
+		enum RESOLUTION_TYPES
+		{
+			MODIFY_ORIGINAL = 1,
+			MODIFY_CONFLICTING = 2,
+			MODIFY_BOTH = 3,
+			DELETE_ORIGINAL = 4
+		};
 	}
 
 	namespace Concepts

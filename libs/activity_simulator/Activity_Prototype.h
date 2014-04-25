@@ -439,6 +439,11 @@ namespace Activity_Components
 			//===========================================
 			// Activity Planner Methods
 			//-------------------------------------------
+			template<typename TargetType> void Copy(TargetType activity, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Activity_Plan_Prototype)))
+			{
+				// call initializer
+				this_component()->template Copy<TargetType>(activity);
+			}
 			template<typename TargetType> void Initialize(TargetType activity, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// call initializer
@@ -478,6 +483,17 @@ namespace Activity_Components
 				this_component()->template Set_Attribute_Planning_Times<TargetType>(planning_time);
 
 				// store for later use
+				Schedule_Activity_Events<NT>();
+			}
+
+			// Use this in place of 'Initialize' for copied activities
+			template<typename TargetType> void Schedule_Activity_Events()
+			{
+				//---------------------
+				// set activity as valid at start of events
+				this->is_valid(true);
+
+				// store for later use
 				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();
 				Revision& mode = this->Mode_Planning_Time<Revision&>();
 				Revision& duration = this->Duration_Planning_Time<Revision&>();
@@ -490,37 +506,31 @@ namespace Activity_Components
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,persons._iteration, persons._sub_iteration);
-					//load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons._iteration, persons._sub_iteration,NT);
 				}
 				else if (Is_Minimum_Plan_Time(mode)) 
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,mode._iteration, mode._sub_iteration);
-//					load_event(ComponentType,Activity_Planning_Conditional, Mode_Planning_Event, mode._iteration, mode._sub_iteration,NT);
 				}
 				else if (Is_Minimum_Plan_Time(duration)) 
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,duration._iteration, duration._sub_iteration);
-//					load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration._iteration, duration._sub_iteration,NT);
 				}
 				else if (Is_Minimum_Plan_Time(location)) 
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,location._iteration, location._sub_iteration);
-//					load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
 				}
 				else if (Is_Minimum_Plan_Time(start_time)) 
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,start_time._iteration, start_time._sub_iteration);
-//					load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
 				}
 				else if (Is_Minimum_Plan_Time(route)) 
 				{
 					int test = 1;
 					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,route._iteration, route._sub_iteration);
-//					load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
 				}
 				else 
 				{
@@ -532,7 +542,9 @@ namespace Activity_Components
 					err << endl << "Route: "<<route._iteration <<","<<route._sub_iteration; 
 					THROW_EXCEPTION(err);
 				}
+
 			}
+
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
 				this_component()->Set_Meta_Attributes<TargetType>();

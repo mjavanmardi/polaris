@@ -142,7 +142,20 @@ namespace Activity_Components
 					else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
 				}
 			}
-
+			// departure time feature - set by route_handler, =0 before the route is planned
+			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
+			{
+				if (this->Route_Is_Planned<NT>())
+				{
+					_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
+					return move->template departed_time<TargetType>(depart);
+				}
+				else
+				{
+					return this->template Start_Time<TargetType>();
+				}
+			}
+			
 			// Planning event time members
 			m_data(Revision,Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
@@ -175,6 +188,42 @@ namespace Activity_Components
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
 				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			}
+
+			template<typename TargetType> void Copy(TargetType activity)
+			{
+				this_itf* obj = (this_itf*)activity;
+				this_itf* pthis = (this_itf*)this;
+
+				pthis->is_valid(obj->is_valid<bool>());
+				pthis->Parent_Planner(obj->Parent_Planner<Parent_Planner_type>());
+
+				// allocate movement plan
+				pthis->Activity_Plan_ID(obj->Activity_Plan_ID<int>());
+				pthis->Activity_Type(obj->Activity_Type<Types::ACTIVITY_TYPES>());
+
+				pthis->Location_Flexibility(obj->Location_Flexibility<Types::FLEXIBILITY_VALUES>());
+				pthis->Mode_Flexibility(obj->Mode_Flexibility<Types::FLEXIBILITY_VALUES>());
+				pthis->Start_Time_Flexibility(obj->Start_Time_Flexibility<Types::FLEXIBILITY_VALUES>());
+				pthis->Duration_Flexibility(obj->Duration_Flexibility<Types::FLEXIBILITY_VALUES>());
+				pthis->Involved_Persons_Flexibility(obj->Involved_Persons_Flexibility<Types::FLEXIBILITY_VALUES>());
+
+				pthis->Location<_activity_location_itf*>(obj->Location<_activity_location_itf*>());
+				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(obj->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+				pthis->Start_Time(obj->Start_Time<Time_Seconds>());
+				pthis->Duration(obj->Duration<Time_Seconds>());
+
+				for (Involved_Persons_Container_type::iterator itr = obj->Involved_Persons_Container<Involved_Persons_Container_type&>().begin(); itr != obj->Involved_Persons_Container<Involved_Persons_Container_type&>().end(); ++itr)
+				{
+					_Involved_Persons_Container.push_back(*itr);
+				}
+				
+				pthis->Location_Planning_Time(obj->Location_Planning_Time<Revision>());
+				pthis->Mode_Planning_Time(obj->Mode_Planning_Time<Revision>());		
+				pthis->Start_Time_Planning_Time(obj->Start_Time_Planning_Time<Revision>());		
+				pthis->Duration_Planning_Time(obj->Duration_Planning_Time<Revision>());		
+				pthis->Involved_Persons_Planning_Time(obj->Involved_Persons_Planning_Time<Revision>());		
+				pthis->Route_Planning_Time(obj->Route_Planning_Time<Revision>());		
 			}
 
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
@@ -221,15 +270,7 @@ namespace Activity_Components
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 				move->network<_network_itf*>(network);
-
-
-				//TODO: remove when finished testing
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-				
+			
 				// Get the origin and destination locations
 				_activity_location_itf* orig;
 				_activity_location_itf* dest = this->Location<_activity_location_itf*>();
@@ -241,6 +282,8 @@ namespace Activity_Components
 				else
 				{
 					orig = prev_act->template Location<_activity_location_itf*>();
+					if (orig == nullptr) orig = person->template Home_Location<_activity_location_itf*>();
+
 					// check if a stop at home will fit prior to activity
 					Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
 					Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(),Vehicle_Components::Types::SOV,start);
@@ -922,29 +965,20 @@ namespace Activity_Components
 				pthis->template Start_Time<Time_Seconds>(max<int>(start_and_duration.first,time_min.Value));
 
 
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
-
 				// set the duration, making sure it fits into current schedule slot
 				pthis->template Duration<Time_Seconds>(0.0f);
 				float duration = max<float>(start_and_duration.second, (float)pthis->Minimum_Duration<Time_Seconds>());
 				pthis->template Duration<Time_Seconds>(duration);
 
-				//========================================================================
-				// Resolve timing conflicts when timing is known
-				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
-				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
-				if (!is_scheduled) 
-				{
-					pthis->template Unschedule_Activity_Events<NT>();
-					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
-				}
+				////========================================================================
+				//// Resolve timing conflicts when timing is known
+				//bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
+				//// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
+				//if (!is_scheduled) 
+				//{
+				//	pthis->template Unschedule_Activity_Events<NT>();
+				//	scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
+				//}
 
 
 				//========================================================================
@@ -1585,6 +1619,8 @@ namespace Activity_Components
 
 			template<typename TargetType> void Initialize(TargetType object/*,requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Activity_Plan_Prototype))*/)
 			{
+				if (object == nullptr) {cout <<"Warning: cannot initialize activity record from a null activity."; return;}
+
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Prototypes::Activity_Planner<typename MasterType::activity_type> object_itf;

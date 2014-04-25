@@ -1140,7 +1140,7 @@ namespace Person_Components
 				// Next, select zones to choose from each strata
 				for (int i=0; i<_num_strata; i++)
 				{
-					int available_count = available_zones[i].size();
+					int available_count = (int)available_zones[i].size();
 					// if too few zones to fill strata, add all and set bias correction to 1
 					if (available_count <= strata_size)
 					{
@@ -1301,7 +1301,7 @@ namespace Person_Components
 				// Next, select zones to choose from each strata
 				for (int i=0; i<_num_strata; i++)
 				{
-					int available_count = available_zones[i].size();
+					int available_count = (int)available_zones[i].size();
 					// if too few zones to fill strata, add all and set bias correction to 1
 					if (available_count <= strata_size)
 					{

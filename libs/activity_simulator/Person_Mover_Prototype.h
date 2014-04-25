@@ -847,7 +847,6 @@ namespace Prototypes
 			if (next_act == nullptr)
 			{
 				// GENERATE A NEW AT HOME ACTIVITY
-				
 				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
 				new_act->template Parent_Planner<Planner_Itf*>(planner);

@@ -439,8 +439,6 @@ namespace Person_Components
 				if (household_properties->Number_of_vehicles<int>() < 1) auto_available = false;
 
 				// create local choice model
-				/*Mode_Choice_Model_Implementation<MasterType> a;
-				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;*/
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
 				boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
 
@@ -457,8 +455,10 @@ namespace Person_Components
 				{
 					prev_act = _Parent_Person->previous_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
 					prev_location = scheduler->previous_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
+					if (prev_location == nullptr) prev_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 					next_act = _Parent_Person->next_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
 					next_location = scheduler->next_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
+					if (next_location == nullptr) next_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 				}
 				// Otherwise, next activities not known, assume start and end tour location is home
 				else
@@ -474,7 +474,15 @@ namespace Person_Components
 				}
 				else
 				{
-					dest_location = nullptr;
+					dest_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				}
+
+				//============================================================================================
+				//Account for touring - if previous act is out of home and not using auto, then auto not available
+				if (prev_location != _Parent_Person->Home_Location<_Activity_Location_Interface*>() && prev_act != nullptr)
+				{
+					if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS) return Vehicle_Components::Types::BUS;
+					else if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV) return Vehicle_Components::Types::HOV;
 				}
 				
 				//============================================================================================
