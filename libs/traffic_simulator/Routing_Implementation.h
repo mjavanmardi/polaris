@@ -76,8 +76,19 @@ namespace Routing_Components
 
 				boost::container::deque<global_edge_id> path_container;
 				boost::container::deque<float> cost_container;
+				
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 
-				routable_network->compute_static_network_path(origin_id,destination_id,path_container,cost_container);
+				float best_route_time_to_destination = 0.0f;
+
+				if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				{
+					best_route_time_to_destination = routable_network->compute_static_network_path(origin_id,destination_id,path_container,cost_container);
+				}
+				else
+				{
+					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_id,iteration(),path_container,cost_container);
+				}
 
 
 				if(path_container.size())

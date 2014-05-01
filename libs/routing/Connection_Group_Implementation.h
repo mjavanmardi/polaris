@@ -74,10 +74,15 @@ namespace polaris
 			return this_component()->Visit_Neighbors(agent,(current_edge_type*)current,routing_data);
 		};
 
-		virtual Anonymous_Connection_Group* Visit_Neighbors(Tree_Agent<typename MasterType::tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::tree_agent_type>*)agent,(current_edge_type*)current,routing_data);
 		};
+		
+		//virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::time_dependent_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		//{
+		//	return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::time_dependent_agent_type>*)agent,(current_edge_type*)current,routing_data);
+		//};
 
 		static t_data(graph_id_type, linked_graph);
 

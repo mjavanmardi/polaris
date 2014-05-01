@@ -227,6 +227,6 @@ namespace polaris
 		size_t _graph_size;
 		char* _graph;
 
-		t_pointer(void*, graph_pool_reference);
+		t_data(void*, graph_pool_reference);
 	};
 }

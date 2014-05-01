@@ -98,6 +98,8 @@ namespace Scenario_Components
 			m_data(string, input_transit_skim_file_path_name, NONE, NONE);
 			m_data(string, output_transit_skim_file_path_name, NONE, NONE);
 
+			m_data(bool, time_dependent_routing, NONE, NONE);
+
 			m_data(double, percent_to_synthesize, NONE, NONE);
 			m_data(double, ipf_tolerance, NONE, NONE);
 			m_data(int, marginal_tolerance, NONE, NONE);

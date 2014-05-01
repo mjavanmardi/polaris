@@ -1090,16 +1090,50 @@ namespace Network_Components
 
 			void construct_routable_networks()
 			{
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+
+
+				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				{
+					MasterType::routable_network_type::initialize_moe_data();
+				}
+
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = (Routable_Network<typename MasterType::routable_network_type>*)Allocate<MasterType::routable_network_type>();
 				_routable_networks.push_back(routable_network);
 				
+				routable_network->initialize();
+
 				routable_network->construct_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
+
+
+				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				{
+					routable_network->construct_time_dependent_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
+				}
+
+				routable_network->finalize();
+
 
 				for(uint i=1;i<num_sim_threads();i++)
 				{
 					routable_network = routable_network->create_copy();
 					_routable_networks.push_back( routable_network );
 				}
+
+				//
+				//if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				//{
+				//	time_dependent_routable_network = (Routable_Network<typename MasterType::time_dependent_routable_network_type>*)Allocate<MasterType::time_dependent_routable_network_type>();
+
+				//	time_dependent_routable_network->construct_time_dependent_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
+
+				//	for(uint i=1;i<num_sim_threads();i++)
+				//	{
+				//		time_dependent_routable_network = time_dependent_routable_network->create_copy();
+				//		_time_dependent_routable_networks.push_back( time_dependent_routable_network );
+				//	}
+				//}
+
 			}
 
 			template<typename TargetType> void construct_realtime_routable_network()
