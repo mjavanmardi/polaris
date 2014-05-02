@@ -1106,6 +1106,25 @@ namespace Link_Components
 				return ffspd;
 			}
 
+			template<typename TargetType> float speed_limit_estimate()
+			{
+				float spd;
+
+				if(_free_flow_speed >= (50+10))
+				{
+					spd = _free_flow_speed - 10;
+				}
+				else if(_speed_limit >= (40+7) && _speed_limit < (50+7))
+				{
+					spd = _free_flow_speed - 7;
+				}
+				else if(_speed_limit < (40+7))
+				{
+					spd = _free_flow_speed - 5;
+				}
+				
+				return spd;
+			}
 
 			template<typename TargetType> void process_weather_event();
 			template<typename TargetType> void revert_weather_event();

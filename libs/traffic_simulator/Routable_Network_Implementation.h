@@ -556,6 +556,11 @@ namespace Routing_Components
 					}
 				}
 
+
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+
+
+				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
 				{
 
 					global_edge_id edge_lookup;
