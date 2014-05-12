@@ -1,3 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
 add_executable(Integrated_Model Integrated_Model.cpp)	
-target_link_libraries(Integrated_Model ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core)
+target_link_libraries(Integrated_Model ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core Routing Visual_Traffic_Simulator)
 set_target_properties(Integrated_Model PROPERTIES FOLDER apps)

@@ -634,7 +634,8 @@ namespace Person_Components
 				trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
 				trip_rec->setHhold(hh->template uuid<int>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec->setMode(0);
-				else trip_rec->setMode(1);
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec->setMode(1);
+				else trip_rec->setMode(2);
 				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
 				else trip_rec->setOrigin(new_origin);
 				trip_rec->setPartition(0);

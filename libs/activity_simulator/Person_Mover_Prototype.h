@@ -107,12 +107,12 @@ namespace Prototypes
 					movement->template departed_time<Simulation_Timestep_Increment>(iteration()+1);
 				}
 				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
-				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
+				response.next._sub_iteration = Scenario_Components::Types::MOVEMENT_SUB_ITERATION;
 
 				pthis->Do_Pretrip_Routing<NT>();
 			}
 			// GO TO DEPARTURE TIMESTEP
-			else if (sub_iteration() == Scenario_Components::Types::END_OF_ITERATION)
+			else if (sub_iteration() == Scenario_Components::Types::MOVEMENT_SUB_ITERATION)
 			{
 				response.next._iteration = END;
 				response.next._sub_iteration = END;

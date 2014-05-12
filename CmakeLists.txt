@@ -7,7 +7,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares OFF)
+set(Antares ON)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
@@ -109,12 +109,12 @@ add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
 
+
 #Apply CMake over POLARIS tests project structure
 add_subdirectory (tests/core_tests)
 
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
-add_subdirectory (apps/integrated_abm) 
 add_subdirectory (apps/population_synthesizer)
 
 
@@ -126,12 +126,12 @@ if (MSVC AND Antares)
     set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${DEPS_DIR}/glew-1.7.0/lib ${DEPS_DIR}/plplot/bin)
     link_directories( ${LINK_DIRECTORIES} ${DEPS_DIR}/wxWidgets-2.9.3/lib/vc_dll )
 
-    find_library(glew glew32)
-	find_library(plplotd plplotd)
-	find_library(plplotcxxd plplotcxxd )
-	find_library(csirocsa csirocsa)
-	find_library(qsastime qsastime)
-	find_library(plplotwxwidgetsd plplotwxwidgetsd )
+    find_library(glew glew32 ${DEPS_DIR}/glew-1.7.0/bin)
+	find_library(plplotd plplotd ${DEPS_DIR}/plplot/lib)
+	find_library(plplotcxxd plplotcxxd ${DEPS_DIR}/plplot/lib)
+	find_library(csirocsa csirocsa ${DEPS_DIR}/plplot/lib)
+	find_library(qsastime qsastime ${DEPS_DIR}/plplot/lib)
+	find_library(plplotwxwidgetsd plplotwxwidgetsd ${DEPS_DIR}/plplot/lib)
 	
 	ADD_DEFINITIONS( -D_UNICODE )
 	ADD_DEFINITIONS( -DNDEBUG )
@@ -154,3 +154,4 @@ endif()
 
 add_subdirectory (libs/traffic_simulator)
 add_subdirectory (apps/fixed_demand_simulator) 
+add_subdirectory (apps/integrated_abm)
