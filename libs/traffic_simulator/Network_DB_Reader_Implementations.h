@@ -219,7 +219,10 @@ namespace Network_Components
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 0.5f));
+						
+						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ab()+0.5f));
+						link->template speed_limit<float>(link->speed_limit_estimate<NT>());
+						//link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 0.5f));
 						link->template original_speed_limit<float>(link->template speed_limit<float>());
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ab());
@@ -273,7 +276,7 @@ namespace Network_Components
 						}
 
 						//link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
-						link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
+						//link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
 						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
@@ -332,7 +335,11 @@ namespace Network_Components
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 0.5f));
+
+						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ba()+0.5f));
+						link->template speed_limit<float>(link->speed_limit_estimate<NT>());
+
+						//link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 0.5f));
 						link->template original_speed_limit<float>(link->template speed_limit<float>());
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ba());
@@ -385,7 +392,7 @@ namespace Network_Components
 						}
 
 						//link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
-						link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
+						//link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
 						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);

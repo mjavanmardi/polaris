@@ -312,7 +312,12 @@ namespace Link_Components
 			template<typename TargetType> float free_flow_speed_estimate()
 			{
 				return this_component()->template free_flow_speed_estimate<TargetType>();
-			}			
+			}
+
+			template<typename TargetType> float speed_limit_estimate()
+			{
+				return this_component()->template speed_limit_estimate<TargetType>();
+			}
 		};
 	}
 }

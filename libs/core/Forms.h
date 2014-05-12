@@ -604,18 +604,18 @@ namespace polaris
 				return _##NAME;\
 			}
 
-	#define t_pointer(DATA_TYPE,NAME)\
-			DATA_TYPE _##NAME;\
-			typedef DATA_TYPE NAME##_type;\
-		public:\
-			void NAME(DATA_TYPE set_value)\
-			{\
-				_##NAME = set_value;\
-			}\
-			DATA_TYPE NAME()\
-			{\
-				return _##NAME;\
-			}
+	//#define t_pointer(DATA_TYPE,NAME)\
+	//		DATA_TYPE* _##NAME;\
+	//		typedef DATA_TYPE* NAME##_type;\
+	//	public:\
+	//		void NAME(DATA_TYPE* set_value)\
+	//		{\
+	//			_##NAME = set_value;\
+	//		}\
+	//		DATA_TYPE* NAME()\
+	//		{\
+	//			return _##NAME;\
+	//		}
 
 	//#define t_data(DATA_TYPE,NAME)\
 	//	DATA_TYPE _##NAME;\

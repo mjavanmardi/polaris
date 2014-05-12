@@ -30,17 +30,37 @@ namespace Routing_Components
 			{
 				this_component()->construct_routable_network(source_network);
 			}
+			
+			template<typename Source_Network_Type>
+			void construct_time_dependent_routable_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			{
+				this_component()->construct_time_dependent_routable_network(source_network);
+			}
 
 			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
 				return this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
 			}
 
+			float compute_time_dependent_network_path(unsigned int start_time, unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			{
+				return this_component()->compute_time_dependent_network_path(start_time,origin,destination,path_container,cost_container);
+			}
+
 			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& edge_cost_container)
 			{
 				return this_component()->compute_static_network_tree(origin,edge_cost_container);
 			}
+			
+			void initialize()
+			{
+				this_component()->initialize();
+			}
 
+			void finalize()
+			{
+				this_component()->finalize();
+			}
 			void test_routable_network()
 			{
 				this_component()->test_routable_network();

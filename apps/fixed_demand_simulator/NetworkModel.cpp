@@ -179,13 +179,17 @@ struct MasterType
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 
 
-	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	
+	//typedef Time_Dependent_Agent_Implementation<MasterType> time_dependent_agent_type;
 
-	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 
+
+
+	
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+
 
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
 
@@ -194,6 +198,23 @@ struct MasterType
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
+
+
+
+	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
+
+	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
+
+	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
+
+	typedef Custom_Connection_Group<MasterType, time_dependent_graph_type, time_dependent_graph_type, time_dependent_to_time_dependent_type> time_dependent_to_time_dependent_connection_type;
+
+	
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+
+	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+
+
 };
 
 
@@ -445,6 +466,8 @@ void run_with_input_from_db(char* scenario_filename)
 		skimmer->Initialize<_Network_Interface*>(network);
 		network->skimming_faculty<_network_skim_itf*>(skimmer);
 #endif
+
+
 		cout << "starting sim..." <<endl;
 
 

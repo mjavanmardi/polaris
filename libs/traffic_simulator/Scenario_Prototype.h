@@ -568,6 +568,7 @@ namespace Scenario_Components
 			accessor(historic_network_moe_file_path_name, NONE, NONE);
 			accessor(historic_link_moe_file_path_name, NONE, NONE);
 			accessor(read_normal_day_link_moe, NONE, NONE);
+			accessor(time_dependent_routing, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
 			accessor(historic_demand_moe_directory, NONE, NONE);
@@ -877,6 +878,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("enroute_excessive_delay_factor", enroute_excessive_delay_factor<double*>())!= PARAMETER_FOUND) enroute_excessive_delay_factor<double>(1.0);
 				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
 
+				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
 				
 
 

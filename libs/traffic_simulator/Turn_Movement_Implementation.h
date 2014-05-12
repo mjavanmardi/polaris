@@ -304,7 +304,7 @@ namespace Turn_Movement_Components
 				}
 				else
 				{
-					if(_movement_rule == Types::Turn_Movement_Rule_Keys::PROHIBITED)
+					if(_movement_rule == Types::Turn_Movement_Rule_Keys::PROHIBITED/* || _movement_capacity == 0.0f*/)
 					{
 						_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = INFINITY_FLOAT;
 					}
@@ -405,7 +405,7 @@ namespace Turn_Movement_Components
 
 					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 					_turn_travel_penalty = turn_travel_penalty;
-					//add_signal_penalty<TargetType>();
+					add_signal_penalty<TargetType>();
 					//TODO:BIG_CHANGE
 					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);
@@ -440,7 +440,10 @@ namespace Turn_Movement_Components
 				}
                 else
                 {
-                    float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+                    //float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+					float vc = 1.0f;
+
+
                     float cycle=75; // 75 seconds
                     float green;
                     if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
@@ -450,6 +453,7 @@ namespace Turn_Movement_Components
                     float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;
                     Di = max(Di, 0.0f);
                     signal_control_penalty = max(8.0f, Du + Di);
+					//if(((_link_component_type*)_inbound_link)->uuid<int>() == 104) cout << _movement_transferred << endl;
                 }
                 _turn_travel_penalty += signal_control_penalty;
 

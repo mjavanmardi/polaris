@@ -251,10 +251,10 @@ namespace Demand_Components
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
-					if(traveler_id_counter%10000==0)
-					{
-						cout << "\t" << traveler_id_counter << endl;
-					}
+					//if(traveler_id_counter%10000==0)
+					//{
+					//	cout << "\t" << traveler_id_counter << endl;
+					//}
 				}
 			}
 

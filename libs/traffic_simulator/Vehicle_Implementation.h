@@ -577,7 +577,19 @@ namespace Vehicle_Components
 
 				int best_route_link_sum = 0;
 
-				float best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),path_container,cumulative_cost_container);
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+
+				float best_route_time_to_destination = 0.0f;
+
+				//if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				//{
+					best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),path_container,cumulative_cost_container);
+				//}
+				//else
+				//{
+				//	best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),iteration(),path_container,cumulative_cost_container);
+				//}
+
 
 
 				if (best_route_time_to_destination >= 0.0)
