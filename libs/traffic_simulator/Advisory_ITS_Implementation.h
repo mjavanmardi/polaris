@@ -51,14 +51,6 @@ namespace Advisory_ITS_Components
 				{
 					_current_events.push_back( *itr );
 				}
-
-#ifndef ANTARES
-				_displayed_events.clear();
-				for (typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
-				{
-					_displayed_events.push_back( *itr );
-				}
-#endif
 			}
 
 			template<typename TargetType> void Accept_Displayed_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
