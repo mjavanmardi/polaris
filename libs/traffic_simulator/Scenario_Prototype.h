@@ -1025,6 +1025,14 @@ namespace Scenario_Components
 				odb::transaction t2(db2->begin());
 				t2.commit();
 
+				//----------------------
+				// synthetic population database
+				results_name = output_dir_name<string>().append(this->database_name<string&>());
+				unique_ptr<odb::database> db3(create_sqlite_database(results_name, polaris::io::db_inventory[5]));
+				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[5]));
+				odb::transaction t3(db3->begin());
+				t3.commit();
+
 
 				//vehicle trajectory
 				vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");

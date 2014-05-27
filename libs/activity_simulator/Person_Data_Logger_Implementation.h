@@ -461,20 +461,20 @@ namespace Person_Components
 				{
 					try
 					{
-					odb::transaction t(this->_db_ptr->begin());
-					for (boost::container::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
-					{
-						this->_db_ptr->persist(*itr);
-					}
-					for (boost::container::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
-					{
-						this->_db_ptr->persist(*itr);
-					}
-					t.commit();
+						odb::transaction t(this->_db_ptr->begin());
+						for (boost::container::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+						{
+							this->_db_ptr->persist(*itr);
+						}
+						for (boost::container::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
+						{
+							this->_db_ptr->persist(*itr);
+						}
+						t.commit();
 					}
 					catch (odb::sqlite::database_exception ex)
 					{
-						cout << ex.message()<<endl;
+						cout << ex.message()<<". DB error in person_data_logger_implementation, line 477."<<endl;
 					}
 
 					trip_current[i].clear();

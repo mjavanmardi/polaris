@@ -221,7 +221,11 @@ struct MasterType
 	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
-
+	
+	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
+	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
+	typedef Custom_Connection_Group<MasterType, time_dependent_graph_type, time_dependent_graph_type, time_dependent_to_time_dependent_type> time_dependent_to_time_dependent_connection_type;
 
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------

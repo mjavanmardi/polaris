@@ -71,11 +71,7 @@ namespace PopSyn
 			{
 				this_component()->Initialize(link_file_path);
 			}
-			/*void Read_Linker_File(boost::container::vector<int> &dim_sizes)
-			{
-				this_component()->Read_Linker_File(dim_sizes);
-			}*/
-	
+
 
 			/** fill ranges*/
 			void set_pums_columns(int region_id_column, int sampleid_column, int weight_column) 

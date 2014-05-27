@@ -1,5 +1,6 @@
 #pragma once
 
+#include "io\Io.h"
 //#include "Person_Prototype.h"
 //#include "Household_Prototype.h"
 #include "Population_Synthesis_Includes.h"
@@ -22,8 +23,9 @@ namespace PopSyn
 		{
 			tag_as_prototype; // Declare class as a polaris prototype
 
-			//----------------------------------------------------------------
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			// Initializers, with and without setting a network reference.  If the version without networktype is used the events which require network information are skipped
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			template<typename ScenarioType> void Initialize(ScenarioType scenario, requires(ScenarioType, check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
 			{
 				// Allocate IPF Solver and get Settings from scenario reference
@@ -45,7 +47,7 @@ namespace PopSyn
 				// Add references to other objects to the population synthesizer
 				this->Solution_Settings<solver_itf*>(solver);
 				this->scenario_reference<ScenarioType>(scenario);
-				this->network_reference<Null_Prototype<get_type_of(network_reference)>*>(nullptr);
+				this->network_reference<Null_Prototype<get_type_of(network_reference)>*>(nullptr); // no network object
 
 				// set up output files
 				stringstream pop_filename("");
@@ -82,9 +84,9 @@ namespace PopSyn
 			}
 			
 
-			//----------------------------------------------------------------
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			// Main analysis loop events, used to separate operations into different timesteps
-			//----------------------------------------------------------------
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			static void Popsyn_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
 				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)_this;
@@ -692,7 +694,6 @@ namespace PopSyn
 				marg_out.close();
 				popsyn_log.close();
 			}
-
 			template<typename TargetType> void Output_Popsyn_Event(requires(TargetType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))			
 			{
 				ofstream& sample_out = this->Output_Stream<ofstream&>();
@@ -703,13 +704,13 @@ namespace PopSyn
 				// Type defines for sub_objects
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
-				typedef get_mapped_component_type(region_collection_type)									region_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
 				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_mapped_component_type(sample_collection_type)									sample_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
 				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
-				typedef get_mapped_component_type(temporary_sample_collection_type)							temp_sample_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_mapped_component_type(zone_collection_type)										zone_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
@@ -724,7 +725,7 @@ namespace PopSyn
 				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
 
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> person_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 				
 
 				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
@@ -819,7 +820,7 @@ namespace PopSyn
 			}
 	
 			// 5.) Write output to database (at Iteration 2)
-			template<typename TargetType> void Output_Popsyn_To_DB_Event()
+			template<typename TargetType> void Output_Popsyn_To_DB_Event(requires(TargetType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)this;
 
@@ -867,7 +868,7 @@ namespace PopSyn
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-				typedef  Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
 				//---------------------------------------------------------------------------------------------
 
 
@@ -951,15 +952,156 @@ namespace PopSyn
 				}
 				catch (odb::sqlite::database_exception ex)
 				{
-					cout << endl << ex.what();
+					cout << endl << ex.what()<<". DB error in popsyn_prototype.h, line 954."<<endl;
+				}
+
+				
+			}
+			template<typename TargetType> void Output_Popsyn_To_DB_Event(requires(TargetType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)this;
+
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
+				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+				typedef typename get_mapped_component_type(region_collection_type)		region_type;
+				typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
+				typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
+				typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
+				typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
+				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
+				typedef typename get_component_type(household_collection_type)			household_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
+
+				//---------------------------------------------------------------------------------------------
+				// Interface defines for sub_objects
+				typedef Pair_Associative_Container<region_collection_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				
+				typedef Pair_Associative_Container<zone_collection_type> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				
+				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
+				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
+				
+				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
+				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> person_collection_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				
+				typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
+				typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
+
+				
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+				
+				//---------------------------------------------------------------------------------------------
+
+
+				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+
+				scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
+				
+
+				// EXIT if no request to write the demand to database
+				if (!scenario->template write_demand_to_database<bool>()) return;
+
+				// Start database transaction
+				try
+				{
+					string name(scenario->template output_demand_database_name<string&>());
+					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
+					odb::transaction t(db->begin());
+				
+
+					typename regions_itf::iterator r_itr;
+					typename zones_itf::iterator z_itr;
+					typename household_collection_itf::iterator p_itr;
+					int counter = 0;
+
+					// Loop through all regions
+					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+					{
+						region_itf* region = r_itr->second;
+						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+						// loop through zones in each region
+						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+						{
+							zone_itf* zone = z_itr->second;
+							
+							// loop through each synthesized person
+							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
+							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+							{
+								// update synthesizing persons counter
+								if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+								household_itf* hh = (household_itf*)*p_itr;
+
+								// create household record using the ACS properties
+								shared_ptr<polaris::io::Synthetic_Household> hh_rec(new polaris::io::Synthetic_Household());
+								hh_rec->setHhold(hh->uuid());
+								hh_rec->setPersons(hh->template Household_size<int>());
+								hh_rec->setWorkers(hh->template Number_of_workers<int>());
+								hh_rec->setVehicles(hh->template Number_of_vehicles<int>());
+								hh_rec->setLocation(zone->ID<long long>());
+								hh_rec->setIncome(hh->Income<Basic_Units::Currency_Variables::Dollars>());
+								hh_rec->setType(hh->Household_type<int>());
+
+								//push to database
+								db->persist(hh_rec);
+
+								person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
+
+								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+								{		
+									person_itf* person = (person_itf*)(*p_itr);
+
+									shared_ptr<polaris::io::Synthetic_Person> per_rec(new polaris::io::Synthetic_Person());
+									per_rec->setId(person->uuid());
+									per_rec->setAge(person->Age<int>());
+									per_rec->setEducation(person->Educational_Attainment<int>());
+									per_rec->setEmployment(person->Employment_Status<int>());
+									per_rec->setGender(person->Gender<int>());
+									per_rec->setIncome(person->Income<Dollars>());
+									per_rec->setIndustry(person->Employment_Industry<int>());
+									per_rec->setJourney_to_work_arrival_time(person->Journey_To_Work_Arrival_Time<Time_Minutes>());
+									per_rec->setJourney_to_work_mode(person->Journey_To_Work_Mode<int>());
+									per_rec->setJourney_to_work_travel_time(person->Journey_To_Work_Travel_Time<Time_Minutes>());
+									per_rec->setJourney_to_work_vehicle_occupancy(person->Journey_To_Work_Vehicle_Occupancy<int>());
+									per_rec->setMarital_status(person->Marital_Status<int>());
+									per_rec->setRace(person->Race<int>());
+									per_rec->setSchool_enrollment(person->School_Enrollment<int>());
+									per_rec->setSchool_grade_level(person->School_Grade_Level<int>());
+									per_rec->setWorker_class(person->Class_of_worker<int>());
+									per_rec->setWork_hours(person->Work_Hours<Time_Hours>());
+									per_rec->setHousehold(hh_rec);
+
+									//push to database
+									db->persist(per_rec);
+									counter++;
+								}
+
+							}
+						}
+					}
+					t.commit();
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << endl << ex.what()<<". DB error in popsyn_prototype.h, line 954."<<endl;
 				}
 
 				
 			}
 
-			//----------------------------------------------------------------
-			// Required Forms - necessary for any synthesis routine
-
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			// Required Features - necessary for any synthesis routine
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			accessor(Synthesis_Regions_Collection, NONE, NONE);
 			accessor(Solution_Settings, NONE, NONE);
 			accessor(scenario_reference, NONE, NONE);
@@ -969,12 +1111,15 @@ namespace PopSyn
 			accessor(write_marginal_output_flag, NONE, NONE);
 			accessor(write_full_output_flag, NONE, NONE);
 
-			//----------------------------------------------------------------
-			// Optional Forms - used for specific solution types
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			// Optional Features - used for specific solution types
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			accessor(linker_file_path, NONE, NONE);
 			
-			//----------------------------------------------------------------
+
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			// Output features - optional, used to write intermediate and final results
+			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			accessor(Output_Stream,check_2(strip_modifiers(TargetType),ofstream, is_same), check_2(strip_modifiers(TargetType),ofstream, is_same));
 			accessor(Marginal_Output_Stream,check_2(strip_modifiers(TargetType),ofstream, is_same), check_2(strip_modifiers(TargetType),ofstream, is_same));
 			accessor(Log_File,check_2(strip_modifiers(TargetType),ofstream, is_same), check_2(strip_modifiers(TargetType),ofstream, is_same));

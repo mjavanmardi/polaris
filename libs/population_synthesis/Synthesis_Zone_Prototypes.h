@@ -321,7 +321,7 @@ namespace PopSyn
 					person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
 					person_container->push_back((person_itf*)person);
 				}
-				//
+
 				household_container->push_back((household_itf*)static_properties);
 			}
 			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))

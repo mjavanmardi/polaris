@@ -377,7 +377,7 @@ namespace Person_Components
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();
 				itf->template Value<Time_Minutes>(val);
 			}
-			template<typename TargetType> TargetType Journey_To_Work_Arrival_Time(requires(TargetType,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Journey_To_Work_Arrival_Time()
 			{
 				typedef Basic_Units::Prototypes::Time<type_of(typename ComponentType::_Journey_To_Work_Arrival_Time)> _Journey_To_Work_Arrival_Time_itf;
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();

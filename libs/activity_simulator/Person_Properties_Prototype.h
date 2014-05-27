@@ -450,7 +450,7 @@ namespace Person_Components
 			accessor(Work_Hours, NONE, NONE);
 			accessor(Employment_Status, NONE, NONE);
 			accessor(Employment_Industry, NONE, NONE);	
-			accessor(Journey_To_Work_Arrival_Time, NONE, NONE);
+			accessor(Journey_To_Work_Arrival_Time, check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value), NONE);
 			accessor(Income, NONE, NONE);
 
 			// Non-static properties
