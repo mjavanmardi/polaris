@@ -420,6 +420,7 @@ namespace Scenario_Components
 
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
+			accessor(output_popsyn_database_name, NONE, NONE);
 
 
 			accessor(simulation_interval_length, NONE, NONE);
@@ -1029,7 +1030,7 @@ namespace Scenario_Components
 				// synthetic population database
 				results_name = output_dir_name<string>().append(this->database_name<string&>());
 				unique_ptr<odb::database> db3(create_sqlite_database(results_name, polaris::io::db_inventory[5]));
-				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[5]));
+				this->output_popsyn_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[5]));
 				odb::transaction t3(db3->begin());
 				t3.commit();
 

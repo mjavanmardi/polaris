@@ -407,10 +407,17 @@ namespace polaris
 		typedef typename ComponentType::iterator iterator;
 
 		typedef typename ComponentType::size_type size_type;
+		typedef typename ComponentType::const_size_type const_size_type;
 		typedef typename ComponentType::index_type index_type;
 		typedef typename ComponentType::const_index_type const_index_type;
 		typedef typename ComponentType::const_dimensional_type const_dimensional_type;
+		typedef typename ComponentType::dimensional_iterator dimensional_iterator;
 		typedef T value_type;
+
+		Multidimensional_Random_Access_Array() 
+		{
+			ComponentType();
+		}
 
 		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
 		iterator begin(size_type dim){return (iterator)((ComponentType*)this)->begin(dim);}
@@ -422,7 +429,7 @@ namespace polaris
 
 		size_type size(size_type dimension){return ((ComponentType*)this)->size(dimension);}
 
-		size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
+		const_size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
 
 		const_dimensional_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
@@ -446,13 +453,21 @@ namespace polaris
 		{
 			((ComponentType*)this)->Copy(dim_sizes, data);
 		}
+		size_type get_index(const_index_type index)
+		{
+			return ((ComponentType*)this)->get_index(index);
+		}
+		index_type get_index(size_type index)
+		{
+			return ((ComponentType*)this)->get_index(index);
+		}
 
 		void write(ostream& s){return ((ComponentType*)this)->print(s);}
 
 		void resize(const_dimensional_type n){return ((ComponentType*)this)->resize(n);}
 
 		void resize(const_dimensional_type n, T t){return ((ComponentType*)this)->resize(n,t);}
-
+		T sum(){return (((ComponentType*)this)->sum());}
 		T& back(){return (T&)(((ComponentType*)this)->back());}
 		T& back(size_type dimension){return (T&)(((ComponentType*)this)->back(dimension));}
 		T& back(size_type dimension, size_type index){return (T&)(((ComponentType*)this)->back(dimension, index));}
@@ -461,6 +476,8 @@ namespace polaris
 		const T& operator [](const_index_type i) const {return (T&)((*((ComponentType*)this))[i]);}
 		T& operator [](size_type i) {return (T&)((*((ComponentType*)this))[i]);}
 		const T& operator [](size_type i) const {return (T&)((*((ComponentType*)this))[i]);}
+		T& operator ()(size_type i, size_type j) {return (T&)((*((ComponentType*)this))(i,j));}
+		const T& operator ()(size_type i, size_type j) const {return (T&)((*((ComponentType*)this))(i,j));}
 
 		T& at(const_index_type i){return (T&)(((ComponentType*)this)->at(i));}
 

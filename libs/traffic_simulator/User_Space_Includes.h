@@ -142,7 +142,7 @@ public:
 	{
 		if (!QueryPerformanceCounter(&_l)) printf("QPC() failed with error %d\n", GetLastError());
 		_t_end = clock();
-		cout << endl << "approx clock time (s) = "<< (double)(_t_end - _t_start) / (double)CLOCKS_PER_SEC<<endl;
+		//cout << endl << "approx clock time (s) = "<< (double)(_t_end - _t_start) / (double)CLOCKS_PER_SEC<<endl;
 		return (double)(_l.QuadPart - _start)/_freq;
 	}
 	//const __int64& get_start_value(){return _start;}

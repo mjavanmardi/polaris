@@ -6,3 +6,4 @@
 #include "ACS_Household_Properties_Implementation.h"
 #include "ACS_Person_Properties_Implementation.h"
 #include "Popsyn_File_Linker_Implementations.h"
+#include "Solver_Settings_Implementations.h"

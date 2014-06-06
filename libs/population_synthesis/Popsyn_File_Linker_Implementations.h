@@ -10,12 +10,17 @@ namespace PopSyn
 	{
 		implementation struct Popsyn_File_Linker_Implementation : public Polaris_Component< MasterType,INHERIT(Popsyn_File_Linker_Implementation), Data_Object>
 		{
-			m_container(boost::container::vector<boost::container::vector<High_Low>>,ranges,NONE,NONE);
-			m_container(boost::container::vector<int>,pums_file_link,NONE,NONE);
-			m_container(boost::container::vector<boost::container::vector<int>>, sf3_file_link, NONE,NONE);
-			m_container(boost::container::vector<int>, pums_file_data_cols, NONE,NONE);
-			m_container(boost::container::vector<int>, person_file_data_cols, NONE,NONE);
-			m_container(boost::container::vector<int>, dimension_sizes, NONE,NONE);
+			m_container(std::vector<std::vector<High_Low>>,ranges,NONE,NONE);
+			m_container(std::vector<int>,pums_file_link,NONE,NONE);
+			m_container(std::vector<std::vector<int>>, sf3_file_link, NONE,NONE);				
+			m_container(std::vector<int>, hh_dimension_sizes, NONE,NONE);
+			m_container(std::vector<int>, pums_file_data_cols, NONE,NONE);
+
+			m_container(std::vector<std::vector<High_Low>>,person_ranges,NONE,NONE);
+			m_container(std::vector<int>,person_pums_file_link,NONE,NONE);
+			m_container(std::vector<std::vector<int>>, person_sf3_file_link, NONE,NONE);	
+			m_container(std::vector<int>, person_dimension_sizes, NONE,NONE);
+			m_container(std::vector<int>, person_file_data_cols, NONE,NONE);
 
 			m_data(File_IO::File_Reader,fr,NONE,NONE);
 			m_data(string, marg_file_path,NONE,NONE);
@@ -28,75 +33,131 @@ namespace PopSyn
 			m_data(int,sample_weight_column,NONE,NONE);
 			m_data(int,person_region_id_column,NONE,NONE);
 			m_data(int,person_sample_id_column,NONE,NONE);
+			m_data(int,person_weight_column,NONE,NONE);
 			m_data(int,region_in_zone_id_column,NONE,NONE);
-			m_data(int,number_of_dimensions,NONE,NONE);
+			m_data(int,number_of_hh_dimensions,NONE,NONE);
+			m_data(int,number_of_person_dimensions,NONE,NONE);
 
-
-			void set_pums_data_column(int dimension_number, int column_number)
+			void set_pums_data_column(int dimension_number, int column_number, bool household)
 			{
-				if (dimension_number < _pums_file_link.size())
+				if (household)
 				{
-					_pums_file_link[dimension_number] = column_number;
+					if (dimension_number < _pums_file_link.size())
+					{
+						_pums_file_link[dimension_number] = column_number;
+					}
+					else 
+					{
+						cout<<"Error: dimension outside of bounds when setting pums column."<<endl; return;
+					}
 				}
-				else 
+				else
 				{
-					cout<<"Error: dimension outside of bounds when setting pums column."<<endl; return;
+					if (dimension_number < _person_pums_file_link.size())
+					{
+						_person_pums_file_link[dimension_number] = column_number;
+					}
+					else 
+					{
+						cout<<"Error: dimension outside of bounds when setting person pums column."<<endl; return;
+					}
 				}
 			}
-			void set_sf3_data_column(int dimension_number, int index_in_dimension, double low_value, double high_value, int column_number)
+			void set_sf3_data_column(int dimension_number, int index_in_dimension, double low_value, double high_value, int column_number, bool household)
 			{
-				if (dimension_number >= _ranges.size())
+				if (household)
 				{
-					cout<<"Error: dimension outside of bounds when setting sf3 column."<<endl; return;
+					if (dimension_number >= _ranges.size())
+					{
+						cout<<"Error: dimension outside of bounds when setting sf3 column."<<endl; return;
+					}
+					if (index_in_dimension >= _ranges[dimension_number].size())
+					{
+						cout<<"Error: index outside of dimension bounds when setting sf3 column."<<endl; return;
+					}
+					_ranges[dimension_number][index_in_dimension].first=low_value; 
+					_ranges[dimension_number][index_in_dimension].second=high_value;
+					_sf3_file_link[dimension_number][index_in_dimension]=column_number;
 				}
-				if (index_in_dimension >= _ranges[dimension_number].size())
+				else
 				{
-					cout<<"Error: index outside of dimension bounds when setting sf3 column."<<endl; return;
+					if (dimension_number >= _person_ranges.size())
+					{
+						cout<<"Error: dimension outside of bounds when setting person sf3 column."<<endl; return;
+					}
+					if (index_in_dimension >= _person_ranges[dimension_number].size())
+					{
+						cout<<"Error: index outside of dimension bounds when setting person sf3 column."<<endl; return;
+					}
+					_person_ranges[dimension_number][index_in_dimension].first=low_value; 
+					_person_ranges[dimension_number][index_in_dimension].second=high_value;
+					_person_sf3_file_link[dimension_number][index_in_dimension]=column_number;
 				}
-				_ranges[dimension_number][index_in_dimension].first=low_value; _ranges[dimension_number][index_in_dimension].second=high_value;_sf3_file_link[dimension_number][index_in_dimension]=column_number;
 			}
-			High_Low& range(int dim, int index) 
+			High_Low& range(int dim, int index, bool household) 
 			{
-				return _ranges[dim][index];
+				if (household)
+				{
+					_ranges[dim][index];
+				}
+				else
+				{
+					_person_ranges[dim][index];
+				}
 			}
-			double& low(int dim, int index) 
+			double& low(int dim, int index, bool household) 
 			{
-				return _ranges[dim][index].first;
+				if (household)	return _ranges[dim][index].first;
+				else			return _person_ranges[dim][index].first;
 			}
-			double& high(int dim, int index) 
+			double& high(int dim, int index, bool household) 
 			{
-				return _ranges[dim][index].second;
+				if (household)	return _ranges[dim][index].second;
+				else			return _person_ranges[dim][index].second;
 			}
 
 			/** Links the columns in the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_pums_column(int dim)
+			int& get_pums_column(int dim, bool household)
 			{
-				return _pums_file_link[dim];
+				if (household)	return _pums_file_link[dim];
+				else			return _person_pums_file_link[dim];
 			}
 
 			/** Links the columns int the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_sf3_column(int dim, int index)
+			int& get_sf3_column(int dim, int index, bool household)
 			{
-				return _sf3_file_link[dim][index];
+				if (household)	return _sf3_file_link[dim][index];
+				else			return _person_sf3_file_link[dim][index];
 			}
 
-			boost::container::vector<int>& get_pums_data_columns()
+			std::vector<int>& get_pums_data_columns()
 			{
 				return _pums_file_data_cols;
 			}
-			boost::container::vector<int>& get_person_data_columns()
+			std::vector<int>& get_person_data_columns()
 			{
 				return _person_file_data_cols;
 			}
 
 			/** Find the variable index for a given dimension-value pair*/
-			int find_index_in_dimension(int dim, double value)
+			int find_index_in_dimension(int dim, double value, bool household)
 			{
-				for (int i=0; i<_ranges[dim].size(); i++)
+				if (household)
 				{
-					if (value >= low(dim,i) && value < high(dim,i)) return i;
+					for (int i=0; i<_ranges[dim].size(); i++)
+					{
+						if (value >= low(dim,i, household) && value < high(dim,i,household)) return i;
+					}
 				}
-				throw "Data outside of specified range was observed.";
+				else
+				{
+					for (int i=0; i<_person_ranges[dim].size(); i++)
+					{
+						if (value >= low(dim,i, household) && value < high(dim,i,household)) return i;
+					}
+				}
+				THROW_EXCEPTION( "Data outside of specified range was observed for dimension='"<<dim<<"' and value='"<<value<<"'.");
+				return -1;
 			}
 
 			void Initialize(string link_file_path)
@@ -108,7 +169,8 @@ namespace PopSyn
 
 				_fr.Open(link_file_path, false,",\t");
 				Read_Linker_File();
-				_number_of_dimensions = (int)_dimension_sizes.size();
+				_number_of_hh_dimensions = (int)_hh_dimension_sizes.size();
+				_number_of_person_dimensions = (int)_person_dimension_sizes.size();
 			}
 
 			void Read_Linker_File()
@@ -132,7 +194,7 @@ namespace PopSyn
 					key = _fr.Get_String(0);
 
 
-					if (key == "REGIONFILE")
+					if (key == "HHFILE")
 					{
 						_sample_file_path = _fr.Get_String(1);
 					}
@@ -144,21 +206,21 @@ namespace PopSyn
 					{
 						_marg_file_path = _fr.Get_String(1);
 					}
-					else if (key == "DIMS")
+					else if (key == "HHDIMS")
 					{
 						int dim;
 						for (int i= 1; i < _fr.Line_Length(); i++)
 						{
 							_fr.Get_Data<int>(dim, i);
-							_dimension_sizes.push_back(dim);
+							_hh_dimension_sizes.push_back(dim);
 						}
 
-						for (int i=0; i<_dimension_sizes.size(); i++)
+						for (int i=0; i<_hh_dimension_sizes.size(); i++)
 						{
-							boost::container::vector<High_Low> v_i;	
-							boost::container::vector<int> v_ind;
+							std::vector<High_Low> v_i;	
+							std::vector<int> v_ind;
 
-							for (int j=0; j<_dimension_sizes[i]; j++)
+							for (int j=0; j<_hh_dimension_sizes[i]; j++)
 							{
 								High_Low p_j;
 								Dim_Index p_c;
@@ -171,6 +233,33 @@ namespace PopSyn
 							_pums_file_link.push_back(-1);
 						}
 					}
+					else if (key == "PERSONDIMS")
+					{
+						int dim;
+						for (int i= 1; i < _fr.Line_Length(); i++)
+						{
+							_fr.Get_Data<int>(dim, i);
+							_person_dimension_sizes.push_back(dim);
+						}
+
+						for (int i=0; i<_person_dimension_sizes.size(); i++)
+						{
+							std::vector<High_Low> v_i;	
+							std::vector<int> v_ind;
+
+							for (int j=0; j<_person_dimension_sizes[i]; j++)
+							{
+								High_Low p_j;
+								Dim_Index p_c;
+								v_i.push_back(p_j);
+								v_ind.push_back(-1);		
+							}
+							_person_ranges.push_back(v_i);
+							_person_sf3_file_link.push_back(v_ind);
+			
+							_person_pums_file_link.push_back(-1);
+						}
+					}
 					else if (key == "REGION")
 					{
 						int col, col2, col3;
@@ -179,11 +268,11 @@ namespace PopSyn
 					}
 					else if (key == "PERSON")
 					{
-						int col, col2;
-						if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2,2)) linker->set_person_columns(col, col2);
-						else {cout<<"Error: person region id column not set"<<endl; return;}
+						int col, col2, col3;
+						if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2,2) && _fr.Get_Data<int>(col3,3)) linker->set_person_columns(col, col2, col3);
+						else {cout<<"Error: person region, sample and weight column not set"<<endl; return;}
 					}
-					else if (key == "REGIONDATA")
+					else if (key == "HHDATA")
 					{
 						int size = _fr.Line_Length();
 						for (int i = 1; i<size; i++)
@@ -209,18 +298,35 @@ namespace PopSyn
 						if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2, 2)) linker->set_sf3_columns(col, col2);
 						else {cout<<"Error: zone id columns not set"<<endl; return;}
 					}
-
-					else if (key == "SAMPLEVAR")
+					else if (key == "HHVAR")
 					{
 						int col, col2;
 						if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2, 2)) linker->set_pums_data_column(col, col2);
 						else {cout<<"Error: region data columns not set"<<endl; return;}
 					}
-					else if (key == "MARGVAR")
+					else if (key == "PERSONVAR")
+					{
+						int col, col2;
+						if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2, 2)) linker->set_pums_data_column(col, col2,false);
+						else {cout<<"Error: region data columns not set"<<endl; return;}
+					}
+					else if (key == "HHMARGVAR")
 					{
 						int c1, c2, c3, c4, c5;
 						if (_fr.Get_Data<int>(c1, 1) && _fr.Get_Data<int>(c2, 2) && _fr.Get_Data<int>(c3, 3) && _fr.Get_Data<int>(c4, 4) && _fr.Get_Data<int>(c5, 5)) linker->set_sf3_data_column(c1, c2,c3, c4, c5);
 						else {cout<<"Error: zone data columns not set"<<endl; return;}
+					}
+					else if (key == "PERSONMARGVAR")
+					{
+						int c1, c2, c3, c4, c5;
+						if (_fr.Get_Data<int>(c1, 1) && _fr.Get_Data<int>(c2, 2) && _fr.Get_Data<int>(c3, 3) && _fr.Get_Data<int>(c4, 4) && _fr.Get_Data<int>(c5, 5)) linker->set_sf3_data_column(c1, c2,c3, c4, c5,false);
+						else {cout<<"Error: zone data columns not set"<<endl; return;}
+					}
+					else if (key.empty()){}
+					else if (key.front() == '#'){}
+					else
+					{
+						THROW_EXCEPTION("Error, unrecognized keyword '" << key <<"' in population synthesis settings file.");
 					}
 				}
 				_fr.Close();

@@ -90,17 +90,25 @@ namespace Person_Components
 				if (scenario->template write_demand_to_database<bool>())
 				{
 					string name(scenario->template output_demand_database_name<string&>());
-					this->_db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (name);
-					odb::transaction t(this->_db_ptr->begin());
-					this->_db_ptr->execute("delete from trip");
-					t.commit();
+					try
+					{
+						this->_db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (name);
+						odb::transaction t(this->_db_ptr->begin());
+						this->_db_ptr->execute("delete from trip");
+						t.commit();
+					}
+					catch (odb::sqlite::database_exception ex)
+					{
+						cout << ex.message()<<endl;
+						THROW_EXCEPTION("DB error in accessing demand database '"<<name<<"'.")
+					}
 				}
-
 
 				this->Logging_Interval<Time_Minutes>(5);
 				this->Next_Logging_Time<Time_Minutes>(5);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<Simulation_Timestep_Increment>();
 				
+
 				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
 				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
 
@@ -114,6 +122,7 @@ namespace Person_Components
 				activity_buff = activity_records_buffer;
 				activity_current = activity_records;
 
+
 				// Initialize log file
 				stringstream filename("");
 				filename << scenario->template output_dir_name<string>();
@@ -121,6 +130,7 @@ namespace Person_Components
 				this->_filename = filename.str();
 				this->_log.open(this->_filename);
 				this->_log << "PER_ID\tACT_ID\tACT_TYP\tDEST_ZONE\tplanning_info\tTTIME_min\tEXECUTED\tORIG\tDEST\tDEPART\tARRIVE\tSTART\tEND\tMODE"<<endl;
+
 
 				// Initialize data counter files
 				stringstream filename_ttime("");

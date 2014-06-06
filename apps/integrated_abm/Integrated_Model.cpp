@@ -159,7 +159,7 @@ struct MasterType
 	// POPULATION SYNTHESIS CLASSES
 	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Full<MasterType> synthesis_zone_type;
 	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Full<MasterType> synthesis_region_type;
-	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
+	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	#pragma endregion
@@ -478,6 +478,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
+	cout << "Initializing network skims..." <<endl;
 	typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
 	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
 	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
@@ -507,13 +508,7 @@ int main(int argc,char** argv)
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 
-	typedef Pair_Associative_Container<_Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
-	_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-	_Zone_Interface* zone = (_Zone_Interface*)(zones->begin()->second);
-	
-	std::vector<_Zone_Interface*> available_set;
-	skimmer->Get_Locations_Within_Range<_Zone_Interface*, Time_Minutes,Vehicle_Components::Types::Vehicle_Type_Keys,_Zone_Interface*>(available_set, zone, 0, 0, 4, Vehicle_Components::Types::SOV);
+	cout << "Network skims done." <<endl;
 
 	//==================================================================================================================================
 	// Destination choice model - set parameters
@@ -531,6 +526,7 @@ int main(int argc,char** argv)
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
 	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
@@ -541,8 +537,8 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
-	
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
+
 
 
 	//==================================================================================================================================
@@ -550,7 +546,8 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	try
 	{
-	START();
+		cout <<"Starting simulation..."<<endl;
+		START();
 	}
 	catch (std::exception ex)
 	{
@@ -615,7 +612,7 @@ void output_object_sizes()
 	file << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type)<<","<<(int)MasterType::person_destination_choice_option_type::component_id<<endl;
 	file << endl <<"synthesis zone size = "<<sizeof(MasterType::synthesis_zone_type)<<","<<(int)MasterType::synthesis_zone_type::component_id<<endl;
 	file << endl <<"region size = "<<sizeof(MasterType::synthesis_region_type)<<","<<(int)MasterType::synthesis_region_type::component_id<<endl;
-	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::ipf_solver_settings_type)<<","<<(int)MasterType::ipf_solver_settings_type::component_id<<endl;
+	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::solver_settings_type)<<","<<(int)MasterType::solver_settings_type::component_id<<endl;
 	file << endl <<"popsyn_solver size = "<<sizeof(MasterType::population_synthesis_type)<<","<<(int)MasterType::population_synthesis_type::component_id<<endl;
 	file << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type)<<","<<(int)MasterType::traffic_management_center_type::component_id<<endl;
 	file << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type)<<","<<(int)MasterType::weather_network_event_type::component_id<<endl;

@@ -178,7 +178,6 @@ private:
 class m_array
 {
 public:
-
 	typedef T							value_type;
 	typedef value_type&					reference;
 	typedef value_type*					pointer;
@@ -191,6 +190,7 @@ public:
 	typedef boost::container::vector<size_type>			index_type;
 	typedef const boost::container::vector<size_type>&	const_index_type;
 	typedef const boost::container::vector<size_type>&	const_dimensional_type;
+	typedef const boost::container::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[get_index(i)];}
@@ -238,6 +238,8 @@ public:
 	void			clear(){_cleanup();}
 	void			resize(boost::container::vector<size_type> new_dimensions)
 	{
+		if (new_dimensions.size() == 0) return;
+
 		m_array<T> tmp = m_array<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
@@ -256,14 +258,11 @@ public:
 			else (*itr) = 0;
 			
 		}
-
-		for (int i = 0; i< this->size(); i++)
-		{
-			cout <<"**"<< this->_data[i] << " @ " << &this->_data[i]<<endl;
-		}
 	}
 	void			resize(boost::container::vector<size_type> new_dimensions, value_type value)
 	{
+		if (new_dimensions.size() == 0) return;
+
 		m_array<T> tmp = m_array<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
@@ -279,13 +278,16 @@ public:
 				size_type i = tmp.get_index(index);
 				(*itr) = tmp._data[i];
 			}
-			else (*itr) = value;
+			else
+			{
+				(*itr) = value;
+			}
 			
 		}
 	}
 
 	// MArray constructors/destructor
-	m_array (void){_size = 0;}
+	m_array (void);
 	m_array (const_index_type dim_sizes);
 	m_array (const_index_type dim_sizes, T init_val);
 	m_array (const m_array& obj);
@@ -308,18 +310,35 @@ public:
 	} 
 	reference operator[](size_type index) // get data at given index
 	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
 		return _data[index];
 	} 
 	const_reference operator[](const_size_type index) const // get data at given index
 	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
 		return _data[index];
 	} 
 	
 	// Property access members
-	const size_type& size() {return _size;}
-	const size_type& size(size_type dimension) {return _dim_sizes[dimension];}
+	const_size_type size() {return _size;}
+	const_size_type size(size_type dimension) {return _dim_sizes[dimension];}
 	const_index_type dimensions(){return _dim_sizes;}
-	const size_type& num_dimensions() {return _ndim;}
+	const_size_type num_dimensions() {return _ndim;}
+	value_type sum()
+	{
+		value_type _sum = 0;
+		for (size_type i=0; i<_size; i++)
+		{
+			_sum += _data[i];
+		}
+		return _sum;
+	}
 
 	// display member
 	void print(ostream& stream);
@@ -333,6 +352,7 @@ public:
 		{
 			THROW_MATRIX_EXCEPTION("Error, incorrect number of dimensions in index.");
 		}
+		
 		for (size_type i = 0; i< index.size(); i++)
 		{
 			if (index[i] >= _dim_sizes[i]) 
@@ -349,6 +369,33 @@ public:
 		}
 		return ind;
 	}
+	index_type get_index(size_type index)
+	{
+		index_type ind;
+
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, 1D index outside of array bounds, can not convert to index vector.");
+		}
+		size_type remain = index;
+		for (size_type i = 0; i< _dim_sizes.size(); i++)
+		{
+			size_type product = 1;
+			for (size_type j = i+1; j< _dim_sizes.size(); j++)
+			{
+				product *= _dim_sizes[j];
+			}
+			ind.push_back(remain / product);
+			remain = remain % product;
+		
+		}
+		return ind;
+	}
+
+	pointer get_data_pointer()
+	{
+		return _data;
+	}
 protected:
 	index_type _dim_sizes;
 	index_type _cursor;
@@ -360,11 +407,15 @@ protected:
 	void _copy(const m_array& obj);
 	void _cleanup()
 	{
-		if (_size > 0) delete _data;
+		//cout <<endl<< "cleanup 1, ";
+		if (_size > 0) delete[] _data;
 		_size=0;
 		_ndim=0;
+		//cout << "cleanup 2, ";
 		if (_dim_sizes.size() > 0) _dim_sizes.clear();
+		//cout << "cleanup 3, ";
 		if (_cursor.size() > 0) _cursor.clear();
+		//cout << "cleanup done"<<endl;
 	}
 
 
@@ -395,6 +446,18 @@ protected:
 
 // Multi-dim Array Constructors, copiers, assignment, etc.
 template <class T>
+m_array<T>::m_array (void)
+{
+	_dim_sizes.clear();
+	_cursor.clear();
+	_ndim=0;
+	_size=0;
+	_data=nullptr;
+	//index_type dims;
+	//dims.push_back(1);
+	//_init(dims);
+}
+template <class T>
 m_array<T>::m_array(const_index_type dim_sizes)
 {
 	_init(dim_sizes);
@@ -403,7 +466,10 @@ template <class T>
 m_array<T>::m_array(const_index_type dim_sizes, T init_val)
 {
 	_init(dim_sizes);
-	for (size_type i=0; i<_size; i++) _data[i]=init_val;
+	for (size_type i=0; i<_size; i++)
+	{
+		_data[i]=init_val;
+	}
 }
 template <class T>
 m_array<T>::m_array(const m_array<T>& obj)
@@ -413,6 +479,7 @@ m_array<T>::m_array(const m_array<T>& obj)
 template <class T>
 void m_array<T>::Copy(const m_array<T>& obj)
 {
+	//cout <<"Copy .... this, obj: " << (long long*)this->_data << ", " << (long long*)&obj._data<<endl;
 	if (this==&obj) return;
 	_cleanup();
 	_copy(obj);
@@ -420,20 +487,27 @@ void m_array<T>::Copy(const m_array<T>& obj)
 template <class T>
 void m_array<T>::_copy(const m_array<T>& obj)
 {
-	if (_dim_sizes.size() > 0) _dim_sizes.clear();
-	if (_cursor.size() > 0) _cursor.clear();
+	//cout <<endl<< "copy 1, ";
+	_dim_sizes.clear();
+	_cursor.clear();
 	_ndim = obj._ndim;
 	_size = obj._size;
+
+	//cout << "copy 2, ";
 
 	for (size_type i=0; i<obj._dim_sizes.size(); i++)
 	{
 		_dim_sizes.push_back(obj._dim_sizes[i]);
 		_cursor.push_back(0);
 	}
+	//cout << "copy 3, ";
 
-	_data = new T[_size];
+	if (_size>0) _data = new T[_size];
+	else _data = nullptr;
 
 	for (size_type i=0; i<_size; i++) _data[i] = obj._data[i];
+
+	//cout << "copy done."<<endl;
 }
 template <class T>
 void m_array<T>::Init(const_index_type dim_sizes)
@@ -485,6 +559,7 @@ m_array<T>::~m_array(void)
 template <class T>
 void m_array<T>::print(ostream& stream)
 {
+	if (this->_size == 0) return;
 	this->begin();
 	print(stream, 0);
 }
@@ -638,6 +713,7 @@ public:
 	typedef pair<size_type,size_type>	index_type;
 	typedef const index_type&			const_index_type;
 	typedef const index_type&			const_dimensional_type;
+	typedef const boost::container::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[i];}
@@ -718,10 +794,18 @@ public:
 	} 
 	reference operator[](size_type index) // get data at given index
 	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
 		return _data[index];
 	} 
 	const_reference operator[](const_size_type index) const // get data at given index
 	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
 		return _data[index];
 	} 
 	matrix operator*(const matrix& obj);
