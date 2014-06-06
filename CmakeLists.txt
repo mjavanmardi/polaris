@@ -133,6 +133,7 @@ if (MSVC AND Antares)
 	find_library(qsastime qsastime ${DEPS_DIR}/plplot/lib)
 	find_library(plplotwxwidgetsd plplotwxwidgetsd ${DEPS_DIR}/plplot/lib)
 	
+	ADD_DEFINITIONS( -DANTARES)
 	ADD_DEFINITIONS( -D_UNICODE )
 	ADD_DEFINITIONS( -DNDEBUG )
 	#ADD_DEFINITIONS( -DGLEW_STATIC )
