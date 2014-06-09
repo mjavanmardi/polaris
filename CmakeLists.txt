@@ -49,6 +49,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	endif()
 	
 	if (MSVC)
+		add_definitions(/Zi)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
 		find_library(libtcmalloc-r NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
 		find_library(libtcmalloc-d NAMES libtcmalloc_minimal-debug  HINTS ${DEPS_DIR}/gperftools-2.1/Debug)
@@ -79,10 +81,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
 	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d})
 #}
-
-
-
-
 
 
 
@@ -133,6 +131,7 @@ if (MSVC AND Antares)
 	find_library(qsastime qsastime ${DEPS_DIR}/plplot/lib)
 	find_library(plplotwxwidgetsd plplotwxwidgetsd ${DEPS_DIR}/plplot/lib)
 	
+	ADD_DEFINITIONS( -DANTARES)
 	ADD_DEFINITIONS( -D_UNICODE )
 	ADD_DEFINITIONS( -DNDEBUG )
 	#ADD_DEFINITIONS( -DGLEW_STATIC )
