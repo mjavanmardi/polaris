@@ -7,7 +7,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares ON)
+set(Antares OFF)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)

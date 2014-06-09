@@ -344,6 +344,12 @@ public:
 	void print(ostream& stream);
 	void scale(const T&);
 
+	// Arithmetic members
+	m_array& operator+(const m_array& obj);
+	m_array& operator-(const m_array& obj);
+	m_array& operator*(const m_array& obj);
+	m_array& operator/(const m_array& obj);
+
 	size_type get_index(const_index_type index)
 	{
 		size_type ind=0;
@@ -537,6 +543,34 @@ m_array<T>& m_array<T>::operator=(const m_array<T>& obj)
 	{
 		_cleanup();
 		_copy(obj);
+	}
+	return *this;
+}
+
+// arithmetic functions
+template <class T>
+m_array<T>& m_array<T>::operator+(const m_array<T>& obj)
+{
+	if (_size != obj._size)
+	{
+		THROW_MATRIX_EXCEPTION("Error, cannot add two arrays of different sizes.");
+	}
+	else
+	{
+		for (int i=0; i<_size; i++) _data[i]+=obj._data[i];
+	}
+	return *this;
+}
+template <class T>
+m_array<T>& m_array<T>::operator-(const m_array<T>& obj)
+{
+	if (_size != &obj.size())
+	{
+		THROW_MATRIX_EXCEPTION("Error, cannot add two arrays of different sizes.");
+	}
+	else
+	{
+		for (int i=0; i<_size; i++) _data[i]-=obj._data[i];
 	}
 	return *this;
 }

@@ -483,6 +483,17 @@ namespace polaris
 
 		T* get_data_pointer(){return((ComponentType*)this)->get_data_pointer();}
 
+		Multidimensional_Random_Access_Array& operator+(Multidimensional_Random_Access_Array& obj)
+		{
+			((ComponentType*)this)->operator+(*(ComponentType*)&obj);
+			return *this;
+		}
+		Multidimensional_Random_Access_Array& operator-(Multidimensional_Random_Access_Array& obj)
+		{
+			((ComponentType*)this)->operator-(*(ComponentType*)&obj);
+			return *this;
+		}
+
 		// basic feature tags
 		typedef true_type begin_feature_tag;
 		typedef true_type end_feature_tag;

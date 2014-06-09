@@ -19,9 +19,10 @@ namespace PopSyn
 			template<typename ScenarioType> void Initialize(ScenarioType scenario, requires(ScenarioType, check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
 			{
 				// Add references to other objects to the population synthesizer
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 				this->scenario_reference<ScenarioType>(scenario);
 				this->network_reference<Null_Prototype<get_type_of(network_reference)>*>(nullptr); // no network object
-
+				
 				// Allocate IPF Solver and get Settings from scenario reference
 				typedef PopSyn::Prototypes::Solver_Settings<typename get_type_of(Solution_Settings)> solver_itf;
 				solver_itf* solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>();
@@ -35,22 +36,22 @@ namespace PopSyn
 				linker->Initialize(scenario->template popsyn_control_file_name<string>());
 
 				// set up output files
-				stringstream pop_filename("");
-				pop_filename << scenario->template output_dir_name<string>();
-				pop_filename << "full_population.csv";
-				this->Output_Stream<ofstream&>().open(pop_filename.str(),ios_base::out);
-				this->Output_Stream<ofstream&>() << "ZONE_ID, ACS_ID,weight,index,HHTYPE,HHSIZE"<<endl;
+				if (scenario->write_full_output<bool>())
+				{
+					stringstream pop_filename("");
+					pop_filename << scenario->template output_dir_name<string>();
+					pop_filename << "joint_distributions.xls";
+					this->Output_Stream<ofstream&>().open(pop_filename.str(),ios_base::out);
+					this->Output_Stream<ofstream&>() << "Target and Synthesized Joint distributions for HH and Person Level for each zone:"<<endl;
+				}
 								
-
-				stringstream log_filename("");
-				log_filename << scenario->template output_dir_name<string>();
-				log_filename << "popsyn_log.csv";
-				this->Log_File<ofstream&>().open(log_filename.str(),ios_base::out);
-
-				stringstream marg_filename("");
-				marg_filename << scenario->template output_dir_name<string>();
-				marg_filename << "marginals_and_distributions.csv";
-				this->Marginal_Output_Stream<ofstream&>().open(marg_filename.str(),ios_base::out);	
+				if (scenario->write_marginal_output<bool>())
+				{
+					stringstream marg_filename("");
+					marg_filename << scenario->template output_dir_name<string>();
+					marg_filename << "marginal_distributions.xls";
+					this->Marginal_Output_Stream<ofstream&>().open(marg_filename.str(),ios_base::out);	
+				}
 						
 
 				this_component()->template Initialize<NT>();
@@ -522,6 +523,8 @@ namespace PopSyn
 							sample_out <<endl;
 							zone->template Synthesized_Joint_Distribution<joint_itf*>()->write(sample_out);
 							sample_out <<endl;
+							// Add the synthesized distribution back to the target distribution as this is subtracted during the synthesis process
+							zone->template Target_Person_Joint_Distribution<joint_itf&>() + zone->template Synthesized_Person_Joint_Distribution<joint_itf&>();
 							zone->template Target_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
 							sample_out <<endl;
 							zone->template Synthesized_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
