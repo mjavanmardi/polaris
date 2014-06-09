@@ -7,25 +7,24 @@ namespace PopSyn
 
 	namespace Implementations
 	{
-		implementation struct _Synthesis_Region_Implementation
+		//==========================================================================================
+		// This is the base region implementation, should work for any popsyn algorithm
+		implementation struct _Synthesis_Region_Base_Implementation
 		{
+			/// Zone collection associated with this region
 			typedef dense_hash_map<long long, Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type>*> zone_map_type;
 			m_container(zone_map_type, Synthesis_Zone_Collection, NONE, NONE);
-			m_data(ostream*,Output_Stream, NONE, NONE);
+
+			/// Pointer to the top-level population synthesizer class		
 			m_prototype(PopSyn::Prototypes::Population_Synthesizer,typename MasterType::population_synthesis_type, parent_reference, NONE, NONE);
 
+			/// Temporary container used to associate households with persons, keyed on household id
 			typedef dense_hash_map<double, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __temp_sample_map_type;		
 			m_container(__temp_sample_map_type, Temporary_Sample_Data, NONE, NONE); 
 
-			template<typename TargetType> void Init()
-			{
-				this->_Synthesis_Zone_Collection.set_empty_key(-1);
-				this->_Synthesis_Zone_Collection.set_deleted_key(-2);
+			/// Output file stream
+			m_data(ostream*,Output_Stream, NONE, NONE);
 
-				this->_Temporary_Sample_Data.set_empty_key(-1);
-				this->_Temporary_Sample_Data.set_deleted_key(-2);
-			}
-	
 			// pass through functions to access the Top-level class scenario/network
 			template<typename TargetType> TargetType scenario_reference()
 			{
@@ -36,65 +35,30 @@ namespace PopSyn
 				return this->parent_reference<type_of(parent_reference)&>().network_reference<TargetType>();
 			}
 
-
-			//TODO: remove when done testing
-			void Validate_Addresses()
+			// Function to initialize the google hash maps
+			template<typename TargetType> void Init()
 			{
-				//===============================================================================================================
-				// Define interfaces, iterators and get pointer to the region collection
-				//---------------------------------------------------------------------------------------------------------------
-				typedef parent_reference_accessible_type										popsyn_type;
-				typedef typename popsyn_type::get_type_of(Synthesis_Regions_Collection)			region_collection_type;
-				typedef get_mapped_component_type(region_collection_type)						region_type;
-				typedef typename region_type::Sample_Data_type									sample_collection_type;
-				typedef get_mapped_component_type(sample_collection_type)						sample_type;
-				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
-				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
-				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
-				typedef get_mapped_component_type(zone_collection_type)							zone_type;
-				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
-				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
+				this->_Synthesis_Zone_Collection.set_empty_key(-1);
+				this->_Synthesis_Zone_Collection.set_deleted_key(-2);
 
-				typedef Pair_Associative_Container<region_collection_type> regions_itf;
-				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;			
-				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type> zones_itf;
-				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;			
-				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
-				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;		
-				typedef Pair_Associative_Container<temporary_sample_collection_type,temporary_sample_collection_type::key_type> temp_sample_data_itf;
-				typedef Household_Components::Prototypes::Household_Properties<temp_sample_type> temp_pop_unit_itf;
-				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;		
-				typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
-				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
-			
-				regions_itf* regions = this->parent_reference<popsyn_type*>()->Synthesis_Regions_Collection<regions_itf*>();
-				typename regions_itf::iterator region_itr;
-				typename zones_itf::iterator z_itr;
-
-				bool valid = true;
-
-				// Loop through all regions
-				for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
-				{
-					region_itf* region = (region_itf*)region_itr->second;
-					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
-					// loop through zones in each region
-					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
-					{
-						zone_itf* zone = (zone_itf*)z_itr->second;
-						long long addr = (long long)zone->Target_Person_Joint_Distribution<joint_itf*>()->get_data_pointer();
-						if (addr > LLONG_MAX/2) valid = false;
-					}
-				}
-				if (valid) cout <<"Addresses are VALID."<<endl;
-				else cout <<"INVALID Addresses when checking for region."<<endl;
+				this->_Temporary_Sample_Data.set_empty_key(-1);
+				this->_Temporary_Sample_Data.set_deleted_key(-2);
 			}
-		};
 
-		implementation struct Synthesis_Region_Implementation_Simple : public Polaris_Component<MasterType,INHERIT(Synthesis_Region_Implementation_Simple),Execution_Object>, _Synthesis_Region_Implementation<MasterType>, _Synthesis_Zone_Polaris_Implementation<MasterType>
+		};
+		//------------------------------------------------------------------------------------------
+
+		//==========================================================================================
+		// Recreate the three classes below for different population synthesis algorithm - inherit from the appropriate zone implementation
+		//------------------------------------------------------------------------------------------
+		implementation struct _Synthesis_Region_Polaris_Implementation : public _Synthesis_Region_Base_Implementation<MasterType>, _Synthesis_Zone_Polaris_Implementation<MasterType> 
+		{
+		};
+		implementation struct Synthesis_Region_Implementation_Simple : public Polaris_Component<MasterType,INHERIT(Synthesis_Region_Implementation_Simple),Execution_Object>, _Synthesis_Region_Polaris_Implementation<MasterType>
 		{
 			// Methods for adding data to the region from which to sample - these will have to be rewritten in a new class if non-IPF methods are implemented
+			
+			// Use the current line in File_Reader and the info in linker to construct a new household object
 			template<typename TargetType> void Add_Household_Sample(File_IO::File_Reader& fr, TargetType linker, requires(TargetType,check(TargetType, is_pointer)))
 			{
 				typedef get_mapped_component_type(Sample_Data_type) sample_type;
@@ -132,6 +96,7 @@ namespace PopSyn
 				pair<typename Temporary_Sample_Data_type::key_type,pop_unit_itf*> tmp_item = pair<typename Temporary_Sample_Data_type::key_type,pop_unit_itf*>(sample_id,p);
 				_Temporary_Sample_Data.insert(tmp_item);
 			}
+			// Use the current line in File_Reader and the info in linker to construct a new person object
 			template<typename TargetType> void Add_Person_Sample(File_IO::File_Reader& fr, TargetType linker, requires(TargetType,check(TargetType, is_pointer)))
 			{
 				typedef get_mapped_component_type(Sample_Data_type) sample_type;
@@ -183,7 +148,6 @@ namespace PopSyn
 				if (_Target_Person_Joint_Distribution.size()) _Target_Person_Joint_Distribution[index] += weight;
 			}
 		};
-
 		implementation struct Synthesis_Region_Implementation_Full : public Synthesis_Region_Implementation_Simple<MasterType,INHERIT(Synthesis_Region_Implementation_Full)>
 		{
 		};
