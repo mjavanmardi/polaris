@@ -328,8 +328,12 @@ namespace Operation_Components
 						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
 						
 						control_plan->template starting_time<int>(signal_itr->start);
-						control_plan->template ending_time<int>(signal_itr->end);
+						//control_plan->template ending_time<int>(signal_itr->end);
+
+						control_plan->template ending_time<int>(24*60*60);
+
 						
+
 						control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::PRE_TIMED_SIGNAL_CONTROL);
 						control_plan->template cycle_starting_time<int>(0.0);
 						control_plan->template cycle_ending_time<int>(0.0);

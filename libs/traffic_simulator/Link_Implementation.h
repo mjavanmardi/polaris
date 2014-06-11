@@ -284,22 +284,22 @@ namespace Link_Components
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
-			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
-			typedef  Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
+			typedef Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
-			typedef  Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer< typename _Movement_Plan_Interface::get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
-			typedef  Random_Access_Sequence< typename _Movement_Plan_Interface::get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer< typename _Movement_Plan_Interface::get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+			typedef Random_Access_Sequence< typename _Movement_Plan_Interface::get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
 
 			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
+			typedef Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef  Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
-			typedef  Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
+			typedef Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
 			Link_Implementation()
 			{
@@ -385,10 +385,12 @@ namespace Link_Components
 				else
 				{
 					int t_minus_bwtt=-1;
+
 					if(current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
 					{
 						t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size)%_link_bwtt_cached_simulation_interval_size;
 					}
+
 					if (t_minus_bwtt>-1)
 					{
 						int jam_vehicles = (int) (_num_lanes * _length * _jam_density/5280.0f);
@@ -433,9 +435,14 @@ namespace Link_Components
 					
 					int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 
-					if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+					//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 					{	
 						float cost_update = turn_movement->forward_link_turn_travel_time<float>();
+
+						//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->dbid<int>() == 85584)
+						//{
+						//	cout << cost_update << endl;
+						//}
 
 						for(Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>::iterator routable_itr = routable_networks->begin();routable_itr != routable_networks->end();routable_itr++)
 						{
@@ -664,8 +671,26 @@ namespace Link_Components
 				_link_origin_loaded_capacity_leftover = 0.0;
 					
 				//supply
-				_num_vehicles_under_jam_density = _num_lanes * _length * _jam_density/5280.0f;
-				_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density);
+				//_num_vehicles_under_jam_density = _num_lanes * _length * _jam_density/5280.0f;
+				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density) + 30;
+				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density);
+
+				if(_link_type == Link_Components::Types::LOCAL || _link_type == Link_Components::Types::ARTERIAL)
+				{
+					// num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
+
+					// assuming an average pocket length of 60 meters and a pocket lane on either side
+					float adjusted_lanes = ((float)_num_lanes) + min(2.0f*(196.85f/_length),2.0f);
+					_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
+					_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
+
+					//cout << adjusted_lanes << "," << _num_lanes << endl;
+				}
+				else
+				{
+					_num_vehicles_under_jam_density = ((float)_num_lanes) * _length * _jam_density/5280.0f;
+					_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
+				}
 
 				_link_supply = _num_vehicles_under_jam_density;
 					
@@ -1114,15 +1139,23 @@ namespace Link_Components
 				{
 					spd = _free_flow_speed - 10;
 				}
-				else if(_speed_limit >= (40+7) && _speed_limit < (50+7))
+				else if(_free_flow_speed >= (40+7) && _free_flow_speed < (50+7))
 				{
 					spd = _free_flow_speed - 7;
 				}
-				else if(_speed_limit < (40+7))
+				else if(_free_flow_speed < (40+7))
 				{
 					spd = _free_flow_speed - 5;
 				}
 				
+				int intspd = (int)spd;
+
+				intspd/=5;
+				intspd*=5;
+				intspd+=5;
+
+				spd = (float)intspd;
+
 				return spd;
 			}
 

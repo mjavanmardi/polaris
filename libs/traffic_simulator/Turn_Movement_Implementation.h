@@ -142,18 +142,23 @@ namespace Turn_Movement_Components
 				float green_time_ratio = _green_time*1.0f/((float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
 				if(intersection_type == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
 				{
-					_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+					//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+					//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity);
+					_movement_capacity = inbound_link_capacity;
 				}
 				else
 				{
-					if(green_time_ratio < 0.8f)
+					//if(green_time_ratio < 0.8f)
+					if(green_time_ratio <= 0.0f)
 					{
 						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
 						_movement_capacity = 0.0f;
 					}
 					else
 					{
-						_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio;
+						//_movement_capacity = min(inbound_link_capacity,outbound_link_capacity);
+						_movement_capacity = inbound_link_capacity;
 					}
 				}
 			}
@@ -342,7 +347,9 @@ namespace Turn_Movement_Components
 
 					//update vehicle state: transfer to next link
 					int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
-					int delayed_time = max(0, int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
+					//int delayed_time = max(0, int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
+					//int delayed_time = max(0, (int)((float)iteration() - (float)enter_time - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
+					int delayed_time = max(0,    (int)ceil(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<float>() - (float)enter_time - ((_Link_Interface*)_inbound_link)->template link_fftt<float>())   );
 					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
@@ -395,15 +402,10 @@ namespace Turn_Movement_Components
 					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 				}
 
-				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{	
 					float turn_travel_penalty = 0.0;
-					for (int t_cached_time=0;t_cached_time<((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
-					{
-						turn_travel_penalty += _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_time];
-					}
-
-					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
+					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 					_turn_travel_penalty = turn_travel_penalty;
 					add_signal_penalty<TargetType>();
 					//TODO:BIG_CHANGE

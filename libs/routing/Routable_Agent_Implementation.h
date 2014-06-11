@@ -39,7 +39,8 @@ namespace polaris
 			if(neighbor->_is_highway)
 			{
 				//cout << "is highway" << endl;
-				return (current->_cost + connection->_cost)*.75f;
+				//return (current->_cost + connection->_cost)*.75f;
+				return (current->_cost + connection->_cost)*.95f;
 			}
 			else
 			{
