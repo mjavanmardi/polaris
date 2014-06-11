@@ -127,9 +127,11 @@ namespace Network_Components
 				float maximum_flow_rate = 2200.0; // in vehicles per hour per lane
 				const float maximum_flow_rate_ramp = 600.0; // 
 				const float maximum_flow_rate_arterial = 900;
-				const float jam_density = 220.0; // in vehiles per mile per lane
+				//const float jam_density = 220.0; // in vehiles per mile per lane
+				const float jam_density = 250.0; // in vehiles per mile per lane
 				const float backward_wave_speed = 12.0;
 				const float distance_factor = 1.5;				
+				float num_lanes = 0.0f;
 
 				_network_reference->template max_free_flow_speed<float>(-1);
 				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
@@ -216,12 +218,39 @@ namespace Network_Components
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
 
-						link->template num_lanes<int>(db_itr->getLanes_Ab());
+						num_lanes = db_itr->getLanes_Ab();
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+						/*
+						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL")
+						{
+							// add lanes proportional to that added by pocket lanes for increased capacity and space
+							num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
+						}
+						*/
+
+						link->template num_lanes<int>(num_lanes);
 						
-						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ab()+0.5f));
-						link->template speed_limit<float>(link->speed_limit_estimate<NT>());
+						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ab()+0.5f);
+						link->template free_flow_speed<float>(ffspd);
+
+						float speed_limit_estimate = link->speed_limit_estimate<NT>();
+						
+						if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
+						{
+							if(ffspd < 65.0f)
+							{
+								ffspd = 65.0f;
+								speed_limit_estimate = 55.0f;
+								link->template free_flow_speed<float>(ffspd);
+							}
+						}
+
+						
+						link->template speed_limit<float>(speed_limit_estimate);
+
+
 						//link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 0.5f));
 						link->template original_speed_limit<float>(link->template speed_limit<float>());
 						
@@ -233,7 +262,9 @@ namespace Network_Components
 
 						link->template num_inbound_turn_lanes<int>(0.0);
 						
-
+						//facility_type=="EXPRESSWAY" facility_type=="FREEWAY"
+						
+						
 						if(facility_type=="FREEWAY")
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::FREEWAY);
@@ -246,7 +277,7 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
 						}
-						else if(facility_type=="LOCAL" || facility_type=="MINOR")
+						else if(facility_type=="LOCAL"/* || facility_type=="MINOR"*/)
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::LOCAL);
 						}		
@@ -277,7 +308,22 @@ namespace Network_Components
 
 						//link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
 						//link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
-						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->template num_lanes<float>());
+						
+						//maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->template num_lanes<float>());
+						
+						if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						{
+							maximum_flow_rate = 2000.0f;
+						}
+						else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						{
+							maximum_flow_rate = 1800.0f;
+						}
+						else
+						{
+							maximum_flow_rate = ((float)db_itr->getCap_Ab()) / link->template num_lanes<float>();
+						}
+
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -332,12 +378,42 @@ namespace Network_Components
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 
-						link->template num_lanes<int>(db_itr->getLanes_Ba());
+						num_lanes = db_itr->getLanes_Ba();
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+						
+						/*
+						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL")
+						{
+							// add lanes proportional to that added by pocket lanes for increased capacity and space
+							num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
+						}
+						*/
 
-						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ba()+0.5f));
-						link->template speed_limit<float>(link->speed_limit_estimate<NT>());
+						link->template num_lanes<int>(num_lanes);
+
+
+						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ba()+0.5f);
+						link->template free_flow_speed<float>(ffspd);
+
+						float speed_limit_estimate = link->speed_limit_estimate<NT>();
+						
+						if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
+						{
+							//cout << ffspd << endl;
+
+							if(ffspd < 65.0f)
+							{
+								//cout << "ffspd updated on: " << link->dbid<int>() << "," << 65.0f - ffspd << endl;
+								ffspd = 65.0f;
+								speed_limit_estimate = 55.0f;
+								link->template free_flow_speed<float>(ffspd);
+							}
+						}
+						
+
+
+						link->template speed_limit<float>(speed_limit_estimate);
 
 						//link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 0.5f));
 						link->template original_speed_limit<float>(link->template speed_limit<float>());
@@ -390,10 +466,30 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
-
+						
+						
 						//link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
 						//link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
-						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->template num_lanes<float>());
+						//maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->template num_lanes<float>());
+
+						if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						{
+							maximum_flow_rate = 2000.0f;
+						}
+						else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						{
+							maximum_flow_rate = 1800.0f;
+						}
+						else
+						{
+							maximum_flow_rate = ((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
+						}
+
+						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						{
+							maximum_flow_rate = 1800.0f;
+						}
+
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
