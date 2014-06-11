@@ -51,6 +51,7 @@ namespace io
 		result.push_back("Demand");
 		result.push_back("System");
 		result.push_back("Network_Event");
+		result.push_back("Popsyn");
 		assert(result.size() > 0);
 		return result;
 	}

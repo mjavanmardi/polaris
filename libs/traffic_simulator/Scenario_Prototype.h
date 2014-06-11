@@ -388,6 +388,7 @@ namespace Scenario_Components
 				PRETRIP_PLANNING_SUB_ITERATION,
 				PRETRIP_ROUTING_SUB_ITERATION,
 				ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION,
+				MOVEMENT_SUB_ITERATION
 			};
 			enum RNG_Type_Keys
 			{
@@ -419,6 +420,7 @@ namespace Scenario_Components
 
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
+			accessor(output_popsyn_database_name, NONE, NONE);
 
 
 			accessor(simulation_interval_length, NONE, NONE);
@@ -710,7 +712,7 @@ namespace Scenario_Components
 				//===============================================
 				// set merging mode
 				string merging_mode_string;
-				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_LANE";
+				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_DEMAND";
 				if (merging_mode_string.compare("DRIVING_RULE") == 0)
 				{
 					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
@@ -844,7 +846,7 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
+				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_analzye_link_group_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool*>())!= PARAMETER_FOUND) load_analyze_link_groups_from_file<bool>(false);
 				if (cfgReader.getParameter("analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<string*>())!= PARAMETER_FOUND) analyze_link_groups_file_path_name<string>("analyze_link_groups");
@@ -1024,198 +1026,218 @@ namespace Scenario_Components
 				odb::transaction t2(db2->begin());
 				t2.commit();
 
+				//----------------------
+				// synthetic population database
+				results_name = output_dir_name<string>().append(this->database_name<string&>());
+				unique_ptr<odb::database> db3(create_sqlite_database(results_name, polaris::io::db_inventory[5]));
+				this->output_popsyn_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[5]));
+				odb::transaction t3(db3->begin());
+				t3.commit();
+
 
 				//vehicle trajectory
-				vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
-				vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
-				if(vehicle_trajectory_file<fstream&>().is_open()) 
-				{ 
-					vehicle_trajectory_file<fstream&>() 
-						<< "vehicle" <<  ","
-						<< "origin_zone " <<  ","
-						<< "destination_zone" << ","
-						<< "origin_activity_location" << ","
-						<< "destination_activity_location" << ","
-						<< "origin_link" << ","
-						<< "destination_link" << ","
-						<< "num_links" << ","
-						<< "departure_time" << ","
-						<< "arrival_time" << ","
-						<< "travel_time" << ","
-						<< "routed_travel_time" << ","
-						<< "travel_time_ratio" << ","
-						<< "trip_length" << ","
-						<< "num_switches" << ","
-						<< "loading_delay" << ","
-						<< "entry_queue_length" << ","
-						<<endl;
-
-					vehicle_trajectory_file<fstream&>() 
-						<< "link_number" <<  ","
-						<< "link_id " <<  ","
-						<< "entering_time" << ","
-						<< "travel_time" << ","
-						<< "delayed_time"
-						<<endl;
-				}
-				else
+				if (this->write_vehicle_trajectory<bool>())
 				{
-					cout << "Cannot open file - "
-						<< vehicle_trajectory_file_name<string&>()
-						<< endl;
+					vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
+					vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
+					if(vehicle_trajectory_file<fstream&>().is_open()) 
+					{ 
+						vehicle_trajectory_file<fstream&>() 
+							<< "vehicle" <<  ","
+							<< "origin_zone " <<  ","
+							<< "destination_zone" << ","
+							<< "origin_activity_location" << ","
+							<< "destination_activity_location" << ","
+							<< "origin_link" << ","
+							<< "destination_link" << ","
+							<< "num_links" << ","
+							<< "departure_time" << ","
+							<< "arrival_time" << ","
+							<< "travel_time" << ","
+							<< "routed_travel_time" << ","
+							<< "travel_time_ratio" << ","
+							<< "trip_length" << ","
+							<< "num_switches" << ","
+							<< "loading_delay" << ","
+							<< "entry_queue_length" << ","
+							<<endl;
+
+						vehicle_trajectory_file<fstream&>() 
+							<< "link_number" <<  ","
+							<< "link_id " <<  ","
+							<< "entering_time" << ","
+							<< "travel_time" << ","
+							<< "delayed_time"
+							<<endl;
+					}
+					else
+					{
+						cout << "Cannot open file - "
+							<< vehicle_trajectory_file_name<string&>()
+							<< endl;
+					}
 				}
 
 				//routed path
-				routed_path_file_name<string&>().assign(output_dir_name<string&>() + "routed_path.csv");
-				routed_path_file<fstream&>().open(routed_path_file_name<string&>(),fstream::out);
-				if(routed_path_file<fstream&>().is_open()) 
-				{ 
-					routed_path_file<fstream&>() 
-						<< "vehicle" <<  ","
-						<< "origin_zone " <<  ","
-						<< "destination_zone" << ","
-						<< "origin_activity_location" << ","
-						<< "destination_activity_location" << ","
-						<< "origin_link" << ","
-						<< "destination_link" << ","
-						<< "num_links" << ","
-						<< "departure_time" << ","
-						<< "arrival_time" << ","
-						<< "travel_time"
-						<<endl;
+				//routed_path_file_name<string&>().assign(output_dir_name<string&>() + "routed_path.csv");
+				//routed_path_file<fstream&>().open(routed_path_file_name<string&>(),fstream::out);
+				//if(routed_path_file<fstream&>().is_open()) 
+				//{ 
+				//	routed_path_file<fstream&>() 
+				//		<< "vehicle" <<  ","
+				//		<< "origin_zone " <<  ","
+				//		<< "destination_zone" << ","
+				//		<< "origin_activity_location" << ","
+				//		<< "destination_activity_location" << ","
+				//		<< "origin_link" << ","
+				//		<< "destination_link" << ","
+				//		<< "num_links" << ","
+				//		<< "departure_time" << ","
+				//		<< "arrival_time" << ","
+				//		<< "travel_time"
+				//		<<endl;
 
-					routed_path_file<fstream&>() 
-						<< "link_number" <<  ","
-						<< "link_id " <<  ","
-						<< "entering_time" << ","
-						<< "travel_time" << ","
-						<< "delayed_time"
-						<<endl;
-				}
-				else
-				{
-					cout << "Cannot open file - "
-						<< vehicle_trajectory_file_name<string&>()
-						<< endl;
-				}
+				//	routed_path_file<fstream&>() 
+				//		<< "link_number" <<  ","
+				//		<< "link_id " <<  ","
+				//		<< "entering_time" << ","
+				//		<< "travel_time" << ","
+				//		<< "delayed_time"
+				//		<<endl;
+				//}
+				//else
+				//{
+				//	cout << "Cannot open file - "
+				//		<< vehicle_trajectory_file_name<string&>()
+				//		<< endl;
+				//}
 
 				//link flow pattern
-				network_link_flow_file_name<string&>().assign(output_dir_name<string&>() + "network_link_flow.csv");
-				network_link_flow_file<fstream&>().open(network_link_flow_file_name<string&>(),fstream::out);
+				if (this->write_network_link_flow<bool>())
+				{
+					network_link_flow_file_name<string&>().assign(output_dir_name<string&>() + "network_link_flow.csv");
+					network_link_flow_file<fstream&>().open(network_link_flow_file_name<string&>(),fstream::out);
 
-				if(network_link_flow_file<fstream&>().is_open())
-				{
-					network_link_flow_file<fstream&>() 
-						<< "time" <<  ","
-						<< "link" <<  ","
-						<< "fftt" << ","
-						<< "bwtt" << ","
-						<< "origin_A" << ","
-						<< "origin_D" << ","
-						<< "destination_A" << ","
-						<< "upstream_A" << ","
-						<< "upstream_D" << ","
-						<< "downstream_A" << ","
-						<< "downstream_D" << ","
-						<< "queue_length" 
-						<<endl;
-				}
-				else
-				{
-					cout << "Cannot open file - "
-						<< network_link_flow_file_name<string&>()
-						<< endl;
+					if(network_link_flow_file<fstream&>().is_open())
+					{
+						network_link_flow_file<fstream&>() 
+							<< "time" <<  ","
+							<< "link" <<  ","
+							<< "fftt" << ","
+							<< "bwtt" << ","
+							<< "origin_A" << ","
+							<< "origin_D" << ","
+							<< "destination_A" << ","
+							<< "upstream_A" << ","
+							<< "upstream_D" << ","
+							<< "downstream_A" << ","
+							<< "downstream_D" << ","
+							<< "queue_length" 
+							<<endl;
+					}
+					else
+					{
+						cout << "Cannot open file - "
+							<< network_link_flow_file_name<string&>()
+							<< endl;
 	
+					}
 				}
 
 				//link turn times
-				network_link_turn_time_file_name<string&>() = output_dir_name<string&>() + "network_link_turn_time.csv";
-				network_link_turn_time_file<fstream&>().open(network_link_turn_time_file_name<string&>(),fstream::out);
+				if (this->write_network_link_turn_time<bool>())
+				{
+					network_link_turn_time_file_name<string&>() = output_dir_name<string&>() + "network_link_turn_time.csv";
+					network_link_turn_time_file<fstream&>().open(network_link_turn_time_file_name<string&>(),fstream::out);
 
-				if(network_link_turn_time_file<fstream&>().is_open())
-				{
-					network_link_turn_time_file<fstream&>() 
-						<< "clock" <<  ","
-						<< "time" <<  ","
-						<< "node" << ","
-						<< "turn_movement" <<  ","
-						<< "inbound_link" <<  ","
-						<< "outbound_link" <<  ","
-						<< "fftt" << ","
-						<< "inbound_link_fftt" << ","
-						<< "inbound_link_supply" << ","
-						<< "outbound_link_supply" << ","
-						<< "inbound_link_origin_arrived_vehicles" << ","
-						<< "outbound_link_origin_arrived_vehicles" << ","
-						<< "inbound_link_origin_departed_vehicles" << ","
-						<< "outbound_link_origin_departed_vehicles" << ","
-						<< "turn_penalty"  << ","
-						<< "green_time" << ","
-						<< "capacity" << ","
-						<< "demand" << ","
-						<< "supply" << ","
-						<< "flow" << ","
-						<< "transfered_veicles" << ","
-						<< "avg_turn_penalty"  << ","
-						<< "avg_link_turn_time"
-						<<endl;
-				}
-				else
-				{
-					cout << "Cannot open file - "
-						<< network_link_turn_time_file_name<string&>()
-						<< endl;
+					if(network_link_turn_time_file<fstream&>().is_open())
+					{
+						network_link_turn_time_file<fstream&>() 
+							<< "clock" <<  ","
+							<< "time" <<  ","
+							<< "node" << ","
+							<< "turn_movement" <<  ","
+							<< "inbound_link" <<  ","
+							<< "outbound_link" <<  ","
+							<< "fftt" << ","
+							<< "inbound_link_fftt" << ","
+							<< "inbound_link_supply" << ","
+							<< "outbound_link_supply" << ","
+							<< "inbound_link_origin_arrived_vehicles" << ","
+							<< "outbound_link_origin_arrived_vehicles" << ","
+							<< "inbound_link_origin_departed_vehicles" << ","
+							<< "outbound_link_origin_departed_vehicles" << ","
+							<< "turn_penalty"  << ","
+							<< "green_time" << ","
+							<< "capacity" << ","
+							<< "demand" << ","
+							<< "supply" << ","
+							<< "flow" << ","
+							<< "transfered_veicles" << ","
+							<< "avg_turn_penalty"  << ","
+							<< "avg_link_turn_time"
+							<<endl;
+					}
+					else
+					{
+						cout << "Cannot open file - "
+							<< network_link_turn_time_file_name<string&>()
+							<< endl;
 	
+					}
 				}
 
 
 				//operation control
-				network_node_control_state_file_name<string&>() = output_dir_name<string&>() + "node_control_state.csv";
-				network_node_control_state_file<fstream&>().open(network_node_control_state_file_name<string&>(),fstream::out);
-				if(network_node_control_state_file<fstream&>().is_open()) 
-				{ 
-					network_node_control_state_file<fstream&>() 
-						<< "time" <<  ","
-						<< "sim_int" <<  ","
-						<< "sim_time" << ","
-						<< "node" << ","
-						<< "control_plan_id" << ","
-						<< "control_time" << ","
-						<< "cp_s_time" << ","
-						<< "cp_e_time" << ","
-						<< "n_approaches" << ","
-						<< "cycle_index" << ","
-						<< "cycle_length" << ","
-						<< "c_s_time" << ","
-						<< "c_e_time" << ","
-						<< "n_phases" << ","
-						<< "phase" << ","
-						<< "green_s_time" << ","
-						<< "yellow_s_time" << ","
-						<< "red_s_time" << ","
-						<< "phase_end_time" << ","
-						<< "phase" << ","
-						<< "green_s_time" << ","
-						<< "yellow_s_time" << ","
-						<< "red_s_time" << ","
-						<< "phase_end_time" << ","
-						<< "phase" << ","
-						<< "green_s_time" << ","
-						<< "yellow_s_time" << ","
-						<< "red_s_time" << ","
-						<< "phase_end_time" << ","
-						<< "phase" << ","
-						<< "green_s_time" << ","
-						<< "yellow_s_time" << ","
-						<< "red_s_time" << ","
-						<< "phase_end_time"
-						<<endl;
-				}
-				else
+				if (this->write_node_control_state<bool>())
 				{
-					cout << "Cannot open file - "
-						<< network_node_control_state_file_name<string&>()
-						<< endl;
+					network_node_control_state_file_name<string&>() = output_dir_name<string&>() + "node_control_state.csv";
+					network_node_control_state_file<fstream&>().open(network_node_control_state_file_name<string&>(),fstream::out);
+					if(network_node_control_state_file<fstream&>().is_open()) 
+					{ 
+						network_node_control_state_file<fstream&>() 
+							<< "time" <<  ","
+							<< "sim_int" <<  ","
+							<< "sim_time" << ","
+							<< "node" << ","
+							<< "control_plan_id" << ","
+							<< "control_time" << ","
+							<< "cp_s_time" << ","
+							<< "cp_e_time" << ","
+							<< "n_approaches" << ","
+							<< "cycle_index" << ","
+							<< "cycle_length" << ","
+							<< "c_s_time" << ","
+							<< "c_e_time" << ","
+							<< "n_phases" << ","
+							<< "phase" << ","
+							<< "green_s_time" << ","
+							<< "yellow_s_time" << ","
+							<< "red_s_time" << ","
+							<< "phase_end_time" << ","
+							<< "phase" << ","
+							<< "green_s_time" << ","
+							<< "yellow_s_time" << ","
+							<< "red_s_time" << ","
+							<< "phase_end_time" << ","
+							<< "phase" << ","
+							<< "green_s_time" << ","
+							<< "yellow_s_time" << ","
+							<< "red_s_time" << ","
+							<< "phase_end_time" << ","
+							<< "phase" << ","
+							<< "green_s_time" << ","
+							<< "yellow_s_time" << ","
+							<< "red_s_time" << ","
+							<< "phase_end_time"
+							<<endl;
+					}
+					else
+					{
+						cout << "Cannot open file - "
+							<< network_node_control_state_file_name<string&>()
+							<< endl;
+					}
 				}
 
 				//operation control
@@ -1254,78 +1276,94 @@ namespace Scenario_Components
 				}
 
 				//vehicle_transfer
-				vehicle_transfer_file_name<string&>() = output_dir_name<string&>() + "vehicle_transfer.csv";
-				vehicle_transfer_file<fstream&>().open(vehicle_transfer_file_name<string&>(),fstream::out);
-				if(vehicle_transfer_file<fstream&>().is_open()) 
-				{ 
-					vehicle_transfer_file<fstream&>() 
-						<< "clock" << ","
-						<< "time" <<  ","
-						<< "node" << ","
-						<< "turn_movement" <<  ","
-						<< "inbound_link" <<  ","
-						<< "outbound_link" <<  ","
-						<< "link_supply"<< ","
-						<< "upstream_arrived_vehicles" << ","
-						<< "num_departed_vehicles" << ","
-						<< "num_link_origin_departed_vehicles_allowed" << ","
-						<< "link_origin_arrived_vehicles" << ","
-						<< "link_origin_departed_vehicles" << ","
-						<< "cumulative_arrival_vehicles" << ","
-						<< "vehicle_id" << ","
-						<< "vehicle_index" << ","
-						<< "path_size" << ","
-						<< "current_pos" << ","
-						<< "links" << ","
-						<<endl;
-				}
-				else
+				/*if (this->write_vehicle_transfer_file<bool>())
 				{
-					cout << "Cannot open file - "
-						<< vehicle_transfer_file_name<string&>()
-						<< endl;
-				}
+					vehicle_transfer_file_name<string&>() = output_dir_name<string&>() + "vehicle_transfer.csv";
+					vehicle_transfer_file<fstream&>().open(vehicle_transfer_file_name<string&>(),fstream::out);
+					if(vehicle_transfer_file<fstream&>().is_open()) 
+					{ 
+						vehicle_transfer_file<fstream&>() 
+							<< "clock" << ","
+							<< "time" <<  ","
+							<< "node" << ","
+							<< "turn_movement" <<  ","
+							<< "inbound_link" <<  ","
+							<< "outbound_link" <<  ","
+							<< "link_supply"<< ","
+							<< "upstream_arrived_vehicles" << ","
+							<< "num_departed_vehicles" << ","
+							<< "num_link_origin_departed_vehicles_allowed" << ","
+							<< "link_origin_arrived_vehicles" << ","
+							<< "link_origin_departed_vehicles" << ","
+							<< "cumulative_arrival_vehicles" << ","
+							<< "vehicle_id" << ","
+							<< "vehicle_index" << ","
+							<< "path_size" << ","
+							<< "current_pos" << ","
+							<< "links" << ","
+							<<endl;
+					}
+					else
+					{
+						cout << "Cannot open file - "
+							<< vehicle_transfer_file_name<string&>()
+							<< endl;
+					}
+				}*/
 
 				//real-time moe
-				//network
-				string out_realtime_network_moe_file_name = output_dir_name<string&>() + "realtime_moe_network.csv";
-				out_realtime_network_moe_file<fstream&>().open(out_realtime_network_moe_file_name, fstream::out);
-				out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_queue_length,network_vmt,network_vht,network_cumulative_loaded_vehicles,network_cumulative_departed_vehicles,network_in_network_vehicles,network_cumulative_arrived_vehicles\n";
-
+				if (this->output_network_moe_for_simulation_interval<bool>())
+				{
+					string out_realtime_network_moe_file_name = output_dir_name<string&>() + "realtime_moe_network.csv";
+					out_realtime_network_moe_file<fstream&>().open(out_realtime_network_moe_file_name, fstream::out);
+					out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_queue_length,network_vmt,network_vht,network_cumulative_loaded_vehicles,network_cumulative_departed_vehicles,network_in_network_vehicles,network_cumulative_arrived_vehicles\n";
+				}
 				//link
-				string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
-				out_realtime_link_moe_file<fstream&>().open(out_realtime_link_moe_file_name, fstream::out);
-				out_realtime_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
-
+				if (this->output_link_moe_for_simulation_interval<bool>())
+				{
+					string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
+					out_realtime_link_moe_file<fstream&>().open(out_realtime_link_moe_file_name, fstream::out);
+					out_realtime_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
+				}
 				//movement
-				string out_realtime_movement_moe_file_name = output_dir_name<string&>() + "realtime_moe_movement.csv";
-				out_realtime_movement_moe_file<fstream&>().open(out_realtime_movement_moe_file_name, fstream::out);
-				out_realtime_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
-
+				if (this->output_turn_movement_moe_for_simulation_interval<bool>())
+				{
+					string out_realtime_movement_moe_file_name = output_dir_name<string&>() + "realtime_moe_movement.csv";
+					out_realtime_movement_moe_file<fstream&>().open(out_realtime_movement_moe_file_name, fstream::out);
+					out_realtime_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
+				}
 				//moe
 				//network
-				string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
-				out_network_moe_file<fstream&>().open(out_network_moe_file_name, fstream::out);
-				//out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vht,vmt,assignment_calculation_time_in_second,simulation_calculation_time_in_second,operation_calculation_time_in_second,output_calculation_time_in_second\n";
-				out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vmt,vht\n";
-
+				if (this->output_network_moe_for_assignment_interval<bool>())
+				{
+					string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
+					out_network_moe_file<fstream&>().open(out_network_moe_file_name, fstream::out);
+					//out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vht,vmt,assignment_calculation_time_in_second,simulation_calculation_time_in_second,operation_calculation_time_in_second,output_calculation_time_in_second\n";
+					out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vmt,vht\n";
+				}
 				//link
-				string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
-				out_link_moe_file<fstream&>().open(out_link_moe_file_name, fstream::out);
-				out_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
-
+				if (this->output_link_moe_for_assignment_interval<bool>())
+				{
+					string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
+					out_link_moe_file<fstream&>().open(out_link_moe_file_name, fstream::out);
+					out_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
+				}
 				//movement
-				string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
-				out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
-				out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
-
+				if (this->output_turn_movement_moe_for_assignment_interval<bool>())
+				{
+					string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
+					out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
+					out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
+				}
 				//routable network snapshot
-				string routable_network_snapshots_file_name = output_dir_name<string&>() + "output_network_snapshots";
-				output_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::out);
-				output_network_snapshots_file<fstream&>() << "time\t maximum_free_flow_speed" << endl;
-				output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_dbid\t inbound_link_direction\t inbound_link_travel_time\t number_of_movements" << endl;
-				output_network_snapshots_file<fstream&>() << "movement_uuid\t movement_forward_link_turn_travel_time";
-
+				if (this->write_network_snapshots<bool>())
+				{
+					string routable_network_snapshots_file_name = output_dir_name<string&>() + "output_network_snapshots";
+					output_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::out);
+					output_network_snapshots_file<fstream&>() << "time\t maximum_free_flow_speed" << endl;
+					output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_dbid\t inbound_link_direction\t inbound_link_travel_time\t number_of_movements" << endl;
+					output_network_snapshots_file<fstream&>() << "movement_uuid\t movement_forward_link_turn_travel_time";
+				}
 				if (write_ttime_distribution_from_network_model<bool>())
 				{
 					if(vehicle_transfer_file<fstream&>().is_open()) 

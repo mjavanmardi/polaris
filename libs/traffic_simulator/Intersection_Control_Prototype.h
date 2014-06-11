@@ -164,6 +164,8 @@ namespace Intersection_Control_Components
 				// Make Interfaces
 				typedef  Intersection_Control_Components::Prototypes::Control_Plan<typename remove_pointer< typename get_type_of(control_plan_data_array)::value_type>::type>  _Control_Plan_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(control_plan_data_array), _Control_Plan_Interface*> _Control_Plans_Container_Interface;
+				typedef  Intersection_Components::Prototypes::Intersection<typename get_type_of(intersection)> _Intersection_Interface;
+
 
 				int control_type = current_control_plan<_Control_Plan_Interface*>()->template control_type<int>();
 

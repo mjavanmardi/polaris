@@ -55,13 +55,14 @@ namespace File_IO
 	public:
 		bool Open(string filepath, bool header=true, string delims = ",\t")
 		{
+			_filename = filepath;
 			_open=false;
 			_delims = delims;
 			//Attempt to open file
 			_file.open(filepath);
 			if (!_file.is_open())
 			{
-				cout<<"Error, file '" + filepath + "' could not be opened";
+				THROW_EXCEPTION("Error, file '" + filepath + "' could not be opened");
 				_open=false;
 			}
 			else _open=true;
@@ -125,6 +126,18 @@ namespace File_IO
 
 		}
 		template<class T>
+		bool Get_Data(boost::container::vector<T> &data, std::vector<int> columns)
+		{
+			T t;
+			for (std::vector<int>::iterator itr = columns.begin(); itr != columns.end(); itr++)
+			{
+				if (Get_Data<T>(t,*itr)) data.push_back(t);
+				else {/*cout<<"ERROR: could not get data from column"; */return false;}
+			}
+			return true;
+
+		}
+		template<class T>
 		bool Get_Data(std::vector<T> &data, std::vector<int> columns)
 		{
 			T t;
@@ -144,6 +157,7 @@ namespace File_IO
 
 	protected:
 		ifstream _file;
+		string _filename;
 		boost::container::vector<double> _data;
 		boost::container::vector<string> _string_data;
 		boost::container::vector<string> _header;

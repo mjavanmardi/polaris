@@ -56,7 +56,7 @@ namespace Types
 
 namespace Prototypes
 {
-	prototype struct Person
+	prototype struct Person ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 

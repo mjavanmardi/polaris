@@ -467,7 +467,7 @@ namespace Network_Skimming_Components
 			}
 			
 			//---------------------------------------------
-			// This function returns a list of zone-ids within range of a given origin at a specified time
+			// This function returns a list of zone-ids within range of a given origin at a specified time Get_Location_Indices_Within_Range 
 			template<typename LocationType, typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<ReturnLocationType>& available_set, LocationType origin, TimeType start_time, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward=true, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
 			{
 				available_set.clear();
@@ -520,6 +520,58 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
+			//template<typename LocationType, typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<Pair<float,ReturnLocationType>>& available_set, int& avail_index_low, int& avail_index_high, LocationType origin, TimeType start_time, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward=true, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			//{
+			//	available_set.clear();
+
+			//	// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
+			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
+			//	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+
+			//	network_itf* network = this->template network_reference<network_itf*>();
+			//	zones_itf* zones = network->template zones_container<zones_itf*>();
+			//	typename zones_itf::iterator zone_itr;
+
+			//	// convert the ids to indices
+			//	zone_itf *orig_zone;
+
+			//	// Extract zone ID information from the input origin/destination type (either location or zone)
+			//	int Origin_Zone_ID = this->Get_Zone_ID<LocationType>(origin);
+
+			//	// Do a lookup to make sure the zone is in the network (may be able to remove this)
+			//	if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
+			//	else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->uuid<int>()<<","<<origin->internal_id<int>());
+
+			//	//============================================================
+			//	// Transferred code here from former mode_skim_prototype
+			//	//-------------------------------------------------------------------
+			//	typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
+			//	typedef Prototypes::Skim_Table<typename get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
+
+			//	//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
+			//	_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
+			//	typename _skim_container_itf::iterator itr = skims->begin();
+			//	_skim_itf* skim_table;
+
+			//	// get only the HH:MM:SS portion of requested time if Time > 1 day
+			//	int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(start_time))/24);
+			//	typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+			//	typename TimeType remain = start_time - rounded;
+			//	
+			//	// go to skim table for requested time period
+			//	for (; itr != skims->end(); ++itr)
+			//	{
+			//		skim_table = *itr;
+			//		if (skim_table->template end_time<TimeType>() > remain)
+			//		{
+			//			////
+			//			skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
+			//			
+			//			return;
+			//		}
+			//	}
+			//}
 
 
 			template<typename TargetType> bool Update_LOS()
@@ -755,6 +807,10 @@ namespace Network_Skimming_Components
 			{
 				this_component()->Get_Locations_Within_Range<TimeType, ModeType, ReturnLocationType>(available_set, origin_index, min_time, max_time, mode_indicator, search_forward);
 			}
+			//template<typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<Pair<float,ReturnLocationType>>& available_set, int& avail_index_low, int& avail_index_high, int origin_index, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			//{
+			//	this_component()->Get_Locations_Within_Range<TimeType, ModeType, ReturnLocationType>(available_set, avail_index_low, avail_index_high, origin_index, min_time, max_time, mode_indicator, search_forward);
+			//}
 
 		};
 

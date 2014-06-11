@@ -55,6 +55,8 @@ namespace PopSyn
 			typed_accessor(int,person_region_id_column);
 			/// Specify column # in region (sample) person file which contains the sample id (hhid)
 			typed_accessor(int,person_sample_id_column);
+			/// Specify column # in region (sample) person file which contains the sample id (hhid)
+			typed_accessor(int,person_weight_column);
 
 			/// Specify column # in zone (marginal) file which contains the region id - used to link marginal to sample file so must be identically specified in both
 			typed_accessor(int,region_in_zone_id_column);
@@ -63,19 +65,17 @@ namespace PopSyn
 			typed_accessor(string, person_sample_file_path);
 			typed_accessor(string, marg_file_path);
 
-			typed_accessor(boost::container::vector<int>&, dimension_sizes);
-			typed_accessor(int, number_of_dimensions);
+			typed_accessor(std::vector<int>&, hh_dimension_sizes);
+			typed_accessor(std::vector<int>&, person_dimension_sizes);
+			typed_accessor(int, number_of_hh_dimensions);
+			typed_accessor(int, number_of_person_dimensions);
 
 			/** Initializer*/
 			void Initialize(string link_file_path)
 			{
 				this_component()->Initialize(link_file_path);
 			}
-			/*void Read_Linker_File(boost::container::vector<int> &dim_sizes)
-			{
-				this_component()->Read_Linker_File(dim_sizes);
-			}*/
-	
+
 
 			/** fill ranges*/
 			void set_pums_columns(int region_id_column, int sampleid_column, int weight_column) 
@@ -84,49 +84,50 @@ namespace PopSyn
 				this->sample_id_column(sampleid_column);
 				this->sample_weight_column(weight_column);
 			}
-			void set_person_columns(int region_id_column, int sampleid_column) 
+			void set_person_columns(int region_id_column, int sampleid_column, int weight_column) 
 			{
 				this->person_region_id_column(region_id_column);
 				this->person_sample_id_column(sampleid_column);
+				this->person_weight_column(weight_column);
 			}
-			void set_pums_data_column(int dimension_number, int column_number) 
+			void set_pums_data_column(int dimension_number, int column_number, bool household=true) 
 			{
-				this_component()->set_pums_data_column(dimension_number,column_number);
+				this_component()->set_pums_data_column(dimension_number,column_number, household);
 			}
 			void set_sf3_columns(int zone_column, int region_column) 
 			{
 				this->region_in_zone_id_column(region_column);
 				this->zone_id_column(zone_column);
 			}
-			void set_sf3_data_column(int dimension_number, int index_in_dimension, double low_value, double high_value, int column_number)
+			void set_sf3_data_column(int dimension_number, int index_in_dimension, double low_value, double high_value, int column_number, bool household=true)
 			{
-				this_component()->set_sf3_data_column(dimension_number,index_in_dimension, low_value, high_value, column_number);
+				this_component()->set_sf3_data_column(dimension_number,index_in_dimension, low_value, high_value, column_number, household);
 			}
 
 			/** Functions to get ranges for a variable dimension and index*/
-			High_Low& range(int dimension, int index_in_dimension) 
+			High_Low& range(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->range(dimension, index_in_dimension);
 			}
-			double& low(int dimension, int index_in_dimension) 
+			double& low(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->low(dimension, index_in_dimension);
 			}
-			double& high(int dimension, int index_in_dimension) 
+			double& high(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->high(dimension, index_in_dimension);
 			}
 
 			/** Links the columns in the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_pums_column(int dimension){return this_component()->get_pums_column(dimension);}
+			int& get_pums_column(int dimension, bool household=true){return this_component()->get_pums_column(dimension,household);}
 			/** Links the columns int the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_sf3_column(int dim, int index){return this_component()->get_sf3_column(dim, index);}
+			int& get_sf3_column(int dim, int index, bool household=true){return this_component()->get_sf3_column(dim, index, household);}
 
-			boost::container::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns();}
-			boost::container::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns();}
+			std::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns();}
+			std::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns();}
 
 			/** Find the variable index for a given dimension-value pair*/
-			int find_index_in_dimension(int dim, double value){return this_component()->find_index_in_dimension(dim, value);}
+			int find_index_in_dimension(int dim, double value, bool household=true){return this_component()->find_index_in_dimension(dim, value, household);}
 		};
 	}
 }

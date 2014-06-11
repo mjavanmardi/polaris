@@ -33,7 +33,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<typename get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 			
 			template<typename TargetType> void Initialize()
 			{

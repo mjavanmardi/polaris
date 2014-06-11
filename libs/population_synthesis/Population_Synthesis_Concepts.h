@@ -11,30 +11,58 @@ namespace PopSyn
 	{
 		concept struct Uses_Linker_File
 		{
-			check_data_member_name(Has_Use_Linker_File_Defined, _linker_file_path);
+			check_data_member_name(Has_Use_Linker_File_Defined, _file_linker);
 			define_default_check(Has_Use_Linker_File_Defined);
+		};
+
+		concept struct Scenario_Has_IPF_Configuration_Data
+		{
+			check_template_method_name(has_ipf_tolerance_p, Component_Type::ipf_tolerance);
+			check_template_method_name(has_marginal_tolerance_p, Component_Type::marginal_tolerance);
+			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
+
+			check_template_method_name(has_ipf_tolerance, ipf_tolerance);
+			check_template_method_name(has_marginal_tolerance, marginal_tolerance);
+			check_template_method_name(has_maximum_iterations, maximum_iterations);
+
+			define_sub_check(Has_IPF_Configuration_Data_Prototype, has_ipf_tolerance_p && has_marginal_tolerance_p && has_maximum_iterations_p);
+			define_sub_check(Has_IPF_Configuration_Data_Component, has_ipf_tolerance && has_marginal_tolerance && has_maximum_iterations);
+			define_default_check(Has_IPF_Configuration_Data_Prototype || Has_IPF_Configuration_Data_Component);
+		};
+
+		concept struct Scenario_Has_CO_Configuration_Data
+		{
+			// Prototype versions - add as needed
+			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
+
+			// Component versions - same as above, just remove the "Component_Type::"
+			check_template_method_name(has_maximum_iterations, maximum_iterations);
+
+			define_sub_check(Has_CO_Configuration_Data_Prototype, has_maximum_iterations_p);
+			define_sub_check(Has_CO_Configuration_Data_Component, has_maximum_iterations);
+			define_default_check(Has_CO_Configuration_Data_Prototype || Has_CO_Configuration_Data_Component);
 		};
 
 		concept struct Scenario_Has_Popsyn_Configuration_Data
 		{
+			check_concept(has_IPF_configuration, Scenario_Has_IPF_Configuration_Data,T,V);
+			check_concept(has_CO_configuration, Scenario_Has_IPF_Configuration_Data,T,V);
+			define_sub_check(has_configuration, has_IPF_configuration || has_CO_configuration);
+
 			check_template_method_name(has_percent_to_synthesize_p, Component_Type::percent_to_synthesize);
-			check_template_method_name(has_ipf_tolerance_p, Component_Type::ipf_tolerance);
-			check_template_method_name(has_marginal_tolerance_p, Component_Type::marginal_tolerance);
-			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
 			check_template_method_name(has_write_marginal_output_p, Component_Type::write_marginal_output);
 			check_template_method_name(has_write_full_output_p, Component_Type::write_full_output);
 			check_template_method_name(has_popsyn_control_file_name_p, Component_Type::popsyn_control_file_name);
 
 			check_template_method_name(has_percent_to_synthesize, percent_to_synthesize);
-			check_template_method_name(has_ipf_tolerance, ipf_tolerance);
-			check_template_method_name(has_marginal_tolerance, marginal_tolerance);
-			check_template_method_name(has_maximum_iterations, maximum_iterations);
 			check_template_method_name(has_write_marginal_output,write_marginal_output);
 			check_template_method_name(has_write_full_output,write_full_output);
 			check_template_method_name(has_popsyn_control_file_name,popsyn_control_file_name);
-			define_sub_check(Has_Popsyn_Configuration_Data_Prototype, has_percent_to_synthesize_p && has_ipf_tolerance_p && has_marginal_tolerance_p && has_maximum_iterations_p && has_write_marginal_output_p && has_write_full_output_p && has_popsyn_control_file_name_p);
-			define_sub_check(Has_Popsyn_Configuration_Data_Component, has_percent_to_synthesize && has_ipf_tolerance && has_marginal_tolerance && has_maximum_iterations && has_write_marginal_output && has_write_full_output && has_popsyn_control_file_name);
-			define_default_check(Has_Popsyn_Configuration_Data_Prototype || Has_Popsyn_Configuration_Data_Component);
+
+			define_sub_check(Has_Popsyn_Configuration_Data_Prototype, has_percent_to_synthesize_p && has_write_marginal_output_p && has_write_full_output_p && has_popsyn_control_file_name_p);
+			define_sub_check(Has_Popsyn_Configuration_Data_Component, has_percent_to_synthesize && has_write_marginal_output && has_write_full_output && has_popsyn_control_file_name);
+			
+			define_default_check(has_configuration && (Has_Popsyn_Configuration_Data_Prototype || Has_Popsyn_Configuration_Data_Component));
 		};
 
 		concept struct Is_Synthesis_Zone
@@ -64,11 +92,19 @@ namespace PopSyn
 			define_default_check(Is_Synthesis_Zone_Prototype || Is_Synthesis_Zone_Component);
 		};
 
-		concept struct Is_IPF_Capable
+		concept struct Is_IPF_Compatible
 		{
 			check_typedef_name(Has_Value_Type, Value_Type);
-			check_typedef_type(Has_Marginals, Has_Marginals_In_Distribution, true_type);
-			define_default_check(Has_Marginals && Has_Value_Type);
+			check_typedef_type(Has_Marginals, Has_Marginal_Distribution, true_type);
+			check_typedef_type(Has_MWAY, Has_Joint_Distribution, true_type);
+			define_default_check(Has_Marginals && Has_MWAY && Has_Value_Type);
+		};
+
+		concept struct Is_Combinatorial_Optimization_Compatible
+		{
+			check_typedef_name(Has_Value_Type, Value_Type);
+			check_typedef_type(Is_CO, Is_Combinatorial_Optimization_Type, true_type);
+			define_default_check(Has_Value_Type && Is_CO);
 		};
 
 		concept struct Is_Probabilistic_Selection
@@ -85,17 +121,6 @@ namespace PopSyn
 			define_default_check(Has_Loss_Function_Selection_Defined && Has_Value_Type);
 		};
 
-		concept struct Is_IPF_Solver_Setting
-		{
-			check_data_member_type(Has_IPF_Tolerance_d, IPF_Tolerance, double);
-			check_data_member_type(Has_IPF_Tolerance_f, IPF_Tolerance, float);
-			check_data_member_type(Has_Max_Iterations_int, Max_Iterations, int);
-			check_data_member_type(Has_Max_Iterations_uint, Max_Iterations, unsigned int);
-			check_data_member_type(Has_Max_Iterations_long, Max_Iterations, long);
-			check_data_member_type(Has_Max_Iterations_ulong, Max_Iterations, long);
-
-			define_default_check((Has_IPF_Tolerance_d || Has_IPF_Tolerance_f) && (Has_Max_Iterations_int || Has_Max_Iterations_uint || Has_Max_Iterations_long || Has_Max_Iterations_ulong));
-		};
 	}
 
 

@@ -90,17 +90,25 @@ namespace Person_Components
 				if (scenario->template write_demand_to_database<bool>())
 				{
 					string name(scenario->template output_demand_database_name<string&>());
-					this->_db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (name);
-					odb::transaction t(this->_db_ptr->begin());
-					this->_db_ptr->execute("delete from trip");
-					t.commit();
+					try
+					{
+						this->_db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (name);
+						odb::transaction t(this->_db_ptr->begin());
+						this->_db_ptr->execute("delete from trip");
+						t.commit();
+					}
+					catch (odb::sqlite::database_exception ex)
+					{
+						cout << ex.message()<<endl;
+						THROW_EXCEPTION("DB error in accessing demand database '"<<name<<"'.")
+					}
 				}
-
 
 				this->Logging_Interval<Time_Minutes>(5);
 				this->Next_Logging_Time<Time_Minutes>(5);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<Simulation_Timestep_Increment>();
 				
+
 				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
 				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
 
@@ -114,6 +122,7 @@ namespace Person_Components
 				activity_buff = activity_records_buffer;
 				activity_current = activity_records;
 
+
 				// Initialize log file
 				stringstream filename("");
 				filename << scenario->template output_dir_name<string>();
@@ -121,6 +130,7 @@ namespace Person_Components
 				this->_filename = filename.str();
 				this->_log.open(this->_filename);
 				this->_log << "PER_ID\tACT_ID\tACT_TYP\tDEST_ZONE\tplanning_info\tTTIME_min\tEXECUTED\tORIG\tDEST\tDEPART\tARRIVE\tSTART\tEND\tMODE"<<endl;
+
 
 				// Initialize data counter files
 				stringstream filename_ttime("");
@@ -461,20 +471,20 @@ namespace Person_Components
 				{
 					try
 					{
-					odb::transaction t(this->_db_ptr->begin());
-					for (boost::container::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
-					{
-						this->_db_ptr->persist(*itr);
-					}
-					for (boost::container::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
-					{
-						this->_db_ptr->persist(*itr);
-					}
-					t.commit();
+						odb::transaction t(this->_db_ptr->begin());
+						for (boost::container::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+						{
+							this->_db_ptr->persist(*itr);
+						}
+						for (boost::container::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
+						{
+							this->_db_ptr->persist(*itr);
+						}
+						t.commit();
 					}
 					catch (odb::sqlite::database_exception ex)
 					{
-						cout << ex.message()<<endl;
+						cout << ex.message()<<". DB error in person_data_logger_implementation, line 477."<<endl;
 					}
 
 					trip_current[i].clear();
@@ -634,7 +644,8 @@ namespace Person_Components
 				trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
 				trip_rec->setHhold(hh->template uuid<int>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec->setMode(0);
-				else trip_rec->setMode(1);
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec->setMode(1);
+				else trip_rec->setMode(2);
 				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
 				else trip_rec->setOrigin(new_origin);
 				trip_rec->setPartition(0);
@@ -662,6 +673,8 @@ namespace Person_Components
 				act_rec->setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					act_rec->setMode ("AUTO");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
+					act_rec->setMode ("HOV");
 				else
 					act_rec->setMode ("TRANSIT");
 				act_rec->setType (act->template Get_Type_String<NT>());

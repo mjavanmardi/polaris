@@ -1,4 +1,4 @@
-set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h)
+set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h Popsyn.h)
 
 if (UNIX)
 	set(odb_path /mnt/lustre/app/polaris/bin/odb)
@@ -11,7 +11,9 @@ set(headerfiles ${io_headers} database.h Utils.h)
 
 
 foreach (headerfile ${io_headers})
+	message(${headerfile})
 	string(REPLACE  ".h" "-odb.cxx" cxxfile ${headerfile})
+	message(${cxxfile})
 	string(REPLACE  ".h" "" schema ${headerfile})
 	
 	add_custom_command(

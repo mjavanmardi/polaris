@@ -439,8 +439,6 @@ namespace Person_Components
 				if (household_properties->Number_of_vehicles<int>() < 1) auto_available = false;
 
 				// create local choice model
-				/*Mode_Choice_Model_Implementation<MasterType> a;
-				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;*/
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
 				boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
 
@@ -457,8 +455,10 @@ namespace Person_Components
 				{
 					prev_act = _Parent_Person->previous_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
 					prev_location = scheduler->previous_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
+					if (prev_location == nullptr) prev_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 					next_act = _Parent_Person->next_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
 					next_location = scheduler->next_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
+					if (next_location == nullptr) next_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 				}
 				// Otherwise, next activities not known, assume start and end tour location is home
 				else
@@ -474,7 +474,15 @@ namespace Person_Components
 				}
 				else
 				{
-					dest_location = nullptr;
+					dest_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				}
+
+				//============================================================================================
+				//Account for touring - if previous act is out of home and not using auto, then auto not available
+				if (prev_location != _Parent_Person->Home_Location<_Activity_Location_Interface*>() && prev_act != nullptr)
+				{
+					if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS) return Vehicle_Components::Types::BUS;
+					else if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV) return Vehicle_Components::Types::HOV;
 				}
 				
 				//============================================================================================
@@ -485,6 +493,7 @@ namespace Person_Components
 				choice->current_activity<ActivityItfType>(activity);
 				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				mode_options.push_back(choice);
+
 				// add the transit choice option
 				choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
@@ -508,12 +517,62 @@ namespace Person_Components
 				if (selected == nullptr ) {THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
 				else selected_mode = ((_Mode_Choice_Option_Interface*)selected)->mode_type<ReturnType>();
 
+				// Add the temporary HOV correction - this should eventually be replaced by including HOV as an option in the choice model
+				if (Assign_To_HOV<ActivityItfType>(activity, selected_mode)) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+
 				// free memory allocated locally
 				for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);
 				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				// return the chosen mode
 				return selected_mode;
+			}
+
+			template<typename ActivityItfType> bool Assign_To_HOV(ActivityItfType activity, Vehicle_Components::Types::Vehicle_Type_Keys& selected_mode)
+			{
+				// if the mode is not chosen as an auto mode, return false
+				if (selected_mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return false;
+
+				// get interfaces
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				person_static_properties_itf* person_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
+				Activity_Plan* cur_act = (Activity_Plan*)activity;
+
+				// non-licensed drivers always use HOV	
+				if (person_properties->Age<float>() < 16.0) return true;
+
+				// probability of HOV
+				float p = 0.0;
+
+				// get probabilty for specific activity type
+				switch (cur_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>())
+				{
+				case Activity_Components::Types::AT_HOME_ACTIVITY: { p=0.154065262221031; break;}
+					case Activity_Components::Types::CHANGE_TRANSPORTATION_ACTIVITY: { p=0.427794057766015; break;}
+					case Activity_Components::Types::EAT_OUT_ACTIVITY: { p=0.249301559829059; break;}
+					case Activity_Components::Types::ERRANDS_ACTIVITY: { p=0.107109608324519; break;}
+					case Activity_Components::Types::HEALTHCARE_ACTIVITY: { p=0.214534967014411; break;}
+					case Activity_Components::Types::LEISURE_ACTIVITY: { p=0.209992348215725; break;}
+					case Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY: { p=0.200815449555537; break;}
+					case Activity_Components::Types::OTHER_ACTIVITY: { p=0.144108249493225; break;}
+					case Activity_Components::Types::OTHER_SHOPPING_ACTIVITY: { p=0.16716082963978; break;}
+					case Activity_Components::Types::OTHER_WORK_ACTIVITY: { p=0.040719107742865; break;}
+					case Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY: { p=0.17837940715925; break;}
+					case Activity_Components::Types::PICK_UP_OR_DROP_OFF_ACTIVITY: { p=0.0739687591191153; break;}
+					case Activity_Components::Types::PRIMARY_WORK_ACTIVITY: { p=0.0637426142432775; break;}
+					case Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY: { p=0.300601437534384; break;}
+					case Activity_Components::Types::SCHOOL_ACTIVITY: { p=0.228655158483933; break;}
+					case Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY: { p=0.145728864260415; break;}
+					case Activity_Components::Types::SOCIAL_ACTIVITY: { p=0.224093784698896; break;}
+					case Activity_Components::Types::WORK_AT_HOME_ACTIVITY: { p=0.0294387874193491; break;}
+					default :
+						p=0.149;
+				}
+
+				// Return true if the person uses HOV mode according to random draw
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < p) return true;
+				else return false;
+
 			}
 		};
 

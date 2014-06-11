@@ -1045,8 +1045,8 @@ namespace Link_Components
 			{
 				// event subscription
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification,component_id);
-				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,component_id);
+				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification,(int)component_id);
+				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,(int)component_id);
 			}
 
 			//void subscribe_events_local()

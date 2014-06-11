@@ -107,12 +107,12 @@ namespace Prototypes
 					movement->template departed_time<Simulation_Timestep_Increment>(iteration()+1);
 				}
 				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
-				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
+				response.next._sub_iteration = Scenario_Components::Types::MOVEMENT_SUB_ITERATION;
 
 				pthis->Do_Pretrip_Routing<NT>();
 			}
 			// GO TO DEPARTURE TIMESTEP
-			else if (sub_iteration() == Scenario_Components::Types::END_OF_ITERATION)
+			else if (sub_iteration() == Scenario_Components::Types::MOVEMENT_SUB_ITERATION)
 			{
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
@@ -597,23 +597,21 @@ namespace Prototypes
 			typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 			typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
+			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
 			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
-			
+					
 			
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Planning_Itf* planner = person->template Planning_Faculty<Planning_Itf*>();
-			/*Routing_Itf* itf= person ->template router<Routing_Itf*>();	
-			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
-			network_itf* network = person->template network_reference<network_itf*>();*/
 			movement_itf* movements = this->Movement<movement_itf*>();
-			
-			// check if movement plan origin is aligned with persons current location, if not change it
-			//if (movements->template origin<location_itf*>() != person->template current_location<location_itf*>()) movements->template origin<location_itf*>(person->template current_location<location_itf*>());
+			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
-			//itf->template movement_plan<movement_itf*>(movements);
-			//itf->template Schedule_Route_Computation<int>(iteration()+1);
+			// Skip routing if the mode is not SOV (remove when transit router is developed
+			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
+
+			// Do routing at the next timestep for the movement
 			planner->template Schedule_New_Routing<movement_itf*>(iteration()+1,movements);
 		}
 
@@ -849,7 +847,6 @@ namespace Prototypes
 			if (next_act == nullptr)
 			{
 				// GENERATE A NEW AT HOME ACTIVITY
-				
 				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
 				new_act->template Parent_Planner<Planner_Itf*>(planner);

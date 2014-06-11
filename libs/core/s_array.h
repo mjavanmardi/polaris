@@ -182,9 +182,11 @@ public:
 	typedef const s_array_iterator<T>			const_iterator;
 	typedef int									difference_type;
 	typedef uint								size_type;
+	typedef const uint&							const_size_type;
 	typedef pair<size_type,size_type>			index_type;
 	typedef const  pair<size_type,size_type>&	const_index_type;
 	typedef const boost::container::vector<size_type>&			const_dimensional_type;
+	typedef  boost::container::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[get_index(i)];}
@@ -238,6 +240,8 @@ public:
 	}
 	void			resize(const_dimensional_type new_row_sizes, value_type value)
 	{
+		if (new_row_sizes.size() == 0) return;
+
 		s_array<T> tmp = s_array<T>(*this);
 		this->_cleanup();
 		this->_init(new_row_sizes);
@@ -258,7 +262,7 @@ public:
 	}
 
 	// MArray constructors/destructor
-	s_array (void){_size = 0;}
+	s_array (void){_size = 0;_ndim=0;_data=nullptr;}
 	s_array (const_dimensional_type row_sizes);
 	s_array (const_dimensional_type row_sizes, T init_val);
 	s_array (const s_array& obj);
@@ -279,12 +283,38 @@ public:
 		size_type i = get_index(index);
 		return _data[i];
 	} 
-	
+	reference operator()(const_size_type row_index, const_size_type col_index)
+	{
+		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
+		return _data[i];
+	} 
+	const_reference operator()(const_size_type row_index, const_size_type col_index) const // get data at given index
+	{
+		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
+		return _data[i];
+	} 
+	reference operator()(const_size_type index)
+	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
+		return _data[index];
+	} 
+	const_reference operator()(const_size_type index) const // get data at given index
+	{
+		if (index >= _size)
+		{
+			THROW_MATRIX_EXCEPTION("Error, index '"<< index <<"' outside of array bounds (size="<< _size <<").");
+		}
+		return _data[index];
+	} 
+
 	// Property access members
-	const size_type& size() {return _size;}
-	const size_type& size(size_type row_index) {return _row_sizes[row_index];}
+	const_size_type size() {return _size;}
+	const_size_type size(size_type row_index) {return _row_sizes[row_index];}
 	const_dimensional_type dimensions(){return _row_sizes;}
-	const size_type& num_dimensions(){return _row_sizes;}
+	const_size_type num_dimensions(){return _ndim;}
 
 	// display member
 	void print(ostream& stream);
@@ -293,6 +323,7 @@ protected:
 	boost::container::vector<size_type> _row_sizes;
 	index_type _cursor;
 	size_type _size;
+	size_type _ndim;
 	pointer _data;
 
 	void _init(const_dimensional_type row_sizes);
@@ -389,6 +420,7 @@ void s_array<T>::_init(const_dimensional_type row_sizes)
 	_size = 1;
 	_cursor.first = 0;
 	_cursor.second = 0;
+	_ndim = (size_type)row_sizes.size();
 
 	for (size_type i=0; i<row_sizes.size(); i++)
 	{

@@ -11,6 +11,30 @@ namespace Person_Components
 {
 	namespace Implementations
 	{
+		//==================================================================================
+		/// Class to temporarily define activity conflicts
+		//----------------------------------------------------------------------------------
+		implementation struct Activity_Conflict : public Polaris_Component<MasterType,INHERIT(Activity_Conflict),NT>
+		{
+			// The newly added activity
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, original_activity, NONE, NONE);
+
+			// The originally scheduled activities
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, conflicting_activity, NONE, NONE);
+
+			Types::CONFLICT_TYPES conflict_type;
+
+			Types::RESOLUTION_TYPES resolution_type;
+
+			m_data(float, percent_overlap,NONE,NONE);
+
+			m_data(float, time_available,NONE,NONE);
+
+			m_data(bool, out_of_home,NONE,NONE);
+			m_data(bool, original_out_of_home,NONE,NONE);
+			m_data(bool, conflicting_out_of_home,NONE,NONE);
+		};
+
 
 		//==================================================================================
 		/// Planning classes
@@ -81,7 +105,7 @@ namespace Person_Components
 				else return NULL;
 			}
 
-			template<typename TimeType, typename ReturnType> ReturnType previous_activity_plan(TimeType current_time)
+			template<typename TimeType,  typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, check(strip_modifiers(TimeType),Is_Time_Value)))
 			{
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
 				typename Activity_Plans::iterator itr;
@@ -104,6 +128,21 @@ namespace Person_Components
 				}
 				return (ReturnType)previous;
 			}
+			template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType current_act,requires(ParamType, check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			{
+				// convert start time of current act to seconds
+				Activity_Plan* current = (Activity_Plan*)current_act;
+				Time_Seconds start_time = current->template Start_Time<Time_Seconds>();
+				
+				// call the time-based version of next_activity_plan using current_act start
+				return (ReturnType)previous_activity_plan<Time_Seconds,ReturnType>(start_time);
+			}
+			template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType value, requires(ParamType, !check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype) && !check(strip_modifiers(ParamType),Is_Time_Value)))
+			{
+				assert_check(strip_modifiers(ParamType), Is_Time_Value,"ParamType must be either a Time_Value type, or ");
+				assert_check(strip_modifiers(ParamType), Activity_Components::Concepts::Is_Activity_Plan_Prototype,"ParamType must be an Activity_Plan_Prototype.");
+			}
+
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType, check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
@@ -129,32 +168,12 @@ namespace Person_Components
 			}
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(ParamType, check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
-				typename Activity_Plans::iterator itr;
-
-				Activity_Plan* current = (Activity_Plan*)current_act;
-
 				// convert start time of current act to seconds
+				Activity_Plan* current = (Activity_Plan*)current_act;
 				Time_Seconds start_time = current->template Start_Time<Time_Seconds>();
-				Time_Seconds min_next = END;
-				Activity_Plan* act;
 				
-				Activity_Plan* next = nullptr;
-				
-				// search for the closest following activity
-				for (itr = activity_plans->begin(); itr != activity_plans->end(); ++itr)
-				{
-					act = (Activity_Plan*)(*itr);
-					if (act->template Start_Is_Planned<bool>() && act->template Start_Time<Time_Seconds>() >= start_time && act->template Start_Time<Time_Seconds>() < min_next)
-					{
-						if (act != current)
-						{
-							min_next = act->template Start_Time<Time_Seconds>();
-							next = act;
-						}
-					}
-				}
-				return (ReturnType)next;
+				// call the time-based version of next_activity_plan using current_act start
+				return (ReturnType)next_activity_plan<Time_Seconds,ReturnType>(start_time);
 			}
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(ParamType, !check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype) && !check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
@@ -281,6 +300,11 @@ namespace Person_Components
 					return false;
 				}
 
+
+				/*std::vector<Activity_Conflict<MT>> conflict_list;
+				Identify_Conflicts<TargetType>(current_activity,conflict_list);*/
+
+
 				// else get the start and end times for the activity
 				Time_Seconds start = act->template Start_Time<Time_Seconds>();
 				Time_Seconds dur = act->template Duration<Time_Seconds>();
@@ -298,6 +322,8 @@ namespace Person_Components
 
 				Time_Seconds ttime_prev;
 				Time_Seconds ttime_next;
+
+
 				
 				//=======================================================================
 				// find maximum end time of the new activity
@@ -346,6 +372,34 @@ namespace Person_Components
 
 				// determine conflict regimes and modify appropriately
 				Time_Seconds available_time = end_max - start_min;
+
+
+				// 0. insertion conflicts
+				// check for insertion conflicts - does not work with the current start_min/end_max setup
+				// Currently valid for original acts longer than 2 hours, where the conflicting act starts at least ttime + min_duration (300s) into the original act, 
+				// and ends ttime+min_duration before the end of the original act
+				if (prev_act != nullptr)
+				{
+					if (prev_act->Duration<Time_Hours>() > 2.0 && prev_act->Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->Start_Time<Time_Seconds>() && prev_act->End_Time<Time_Seconds>() >= act->End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
+					{
+						//Allocate new activity for the split half and copy from the other half
+						Activity_Components::Prototypes::Activity_Planner<MasterType::activity_plan_type>* new_act = (Activity_Components::Prototypes::Activity_Planner<MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
+						new_act->Copy<Activity_Plan*>(prev_act);
+						new_act->Activity_Plan_ID<int>(prev_act->Activity_Plan_ID<int>() + 1000);
+						new_act->Start_Time<Time_Seconds>(act->End_Time<Time_Seconds>()+ttime_prev);
+						new_act->End_Time<Time_Seconds>(prev_act->End_Time<Time_Seconds>(), false);
+						Revision &route = new_act->Route_Planning_Time<Revision&>();
+						route._iteration = iteration() + 1;
+						route._sub_iteration = 0;
+						new_act->Schedule_Activity_Events<NT>();
+					
+						//modify the preceding portion of the split activity
+						prev_act->End_Time<Time_Seconds>(act->Start_Time<Time_Seconds>() - ttime_prev,false);
+
+						//update movement plans
+						if (update_movement_plans) move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev);
+					}
+				}
 
 
 				// 1. simple conflict, fits without shortening
@@ -661,6 +715,75 @@ namespace Person_Components
 			}
 
 
+			//=======================================================================================================
+			//
+			// CONFLICT RESOLUTION ROUTINES
+			//
+			// - Assume ActivityItfType has been verified as a valid Activity_Prototype pointer
+			//
+			//-------------------------------------------------------------------------------------------------------
+			template<typename ActivityItfType> bool Identify_Conflicts(ActivityItfType current_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
+			{
+				Activity_Plan* current = (Activity_Plan*)current_activity;
+				Activity_Plan* previous = previous_activity_plan<Activity_Plan*,Activity_Plan*>(current);
+				Activity_Plan* next = next_activity_plan<Activity_Plan*,Activity_Plan*>(current);
+				Activity_Plan* next_next = nullptr;
+
+				// if the following activity is still within the current activity, get the next following activity
+				if (next->End_Time<Time_Seconds>() < current->End_Time<Time_Seconds>())
+				{
+					next_next = next_activity_plan<Activity_Plan*,Activity_Plan*>(next);
+
+					// if two activities are wholly overlapped by current activity, return false - can not resolve this conflict
+					if (next_next->End_Time<Time_Seconds>() < current->End_Time<Time_Seconds>()) return false;
+				}
+
+				// Determine if a conflict exists with any of the three surrounding activities
+				bool has_conflict = Define_Conflict<Activity_Plan*>(current, previous, conflict_list) || Define_Conflict<Activity_Plan*>(current, next, conflict_list) || Define_Conflict<Activity_Plan*>(current, next_next, conflict_list);
+			}
+
+			template<typename ActivityItfType> bool Define_Conflict(ActivityItfType conflicting_activity, ActivityItfType original_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
+			{
+				// no conflict if original_activity doesn't exist
+				if (original_activity == nullptr) return false;
+
+				Activity_Plan* conflicting = (Activity_Plan*)conflicting_activity;
+				Activity_Plan* original = (Activity_Plan*)original_activity;
+
+				// start defining the conflict
+				Implementations::Activity_Conflict<MT> conflict;				
+				conflict.conflicting_activity<Activity_Plan*>(conflicting);
+				conflict.original_activity<Activity_Plan*>(original);
+				
+				// determine the conflict type and overlap percentage
+				if (original->Start_Time<Time_Seconds>() <= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() >= conflicting->End_Time<Time_Seconds>())
+				{
+					conflict.conflict_type = Types::CONFLICT_TYPES::INSERT;
+					conflict.percent_overlap = conflicting->Duration<Time_Seconds>() / original->Duration<Time_Seconds>();
+				}
+				else if (original->Start_Time<Time_Seconds>() >= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() <= conflicting->End_Time<Time_Seconds>())
+				{
+					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_ALL;
+					conflict.percent_overlap = 1.0;
+				}
+				else if (original->Start_Time<Time_Seconds>() >= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() >= conflicting->End_Time<Time_Seconds>())
+				{
+					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_START;
+					conflict.percent_overlap = (conflicting->End_Time<Time_Seconds>() - original->Start_Time<Time_Seconds>) / original->Duration<Time_Seconds>();
+				}
+				else if (original->Start_Time<Time_Seconds>() <= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() <= conflicting->End_Time<Time_Seconds>())
+				{
+					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_END;
+					conflict.percent_overlap = (original->End_Time<Time_Seconds>() - conflicting->Start_Time<Time_Seconds>) / original->Duration<Time_Seconds>();
+				}
+				else
+				{
+					THROW_EXCEPTION("ERROR: indeterminate conflict type found, should not reach this point.");
+				}
+
+				// push to conflict list
+				conflict_list.push_back(conflict);
+			}
 		};
 
 	}

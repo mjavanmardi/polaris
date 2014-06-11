@@ -41,7 +41,11 @@ static std::map<std::string, shape_geometry> GetPointGeometry(const string& db_p
 	char *err_msg = NULL;
 	char sql[2048];
 	sqlite3* db_handle;
-	db_handle = open_spatialite_database(db_prefix, false, db_suffix);
+	string db_name;
+	db_name.append(db_prefix);
+	db_name.append(db_suffix);
+	//db_handle = open_spatialite_database(db_prefix, false, db_suffix);
+	db_handle = open_spatialite_database(db_prefix, false);
 	sprintf (sql, "Select %s, Transform(\"%s\", %i) from %s where %s is not null", pk_name, column_name, epsg, table_name, column_name);
 	
 	ret = sqlite3_exec(db_handle, sql, point_callback, &result, &err_msg);

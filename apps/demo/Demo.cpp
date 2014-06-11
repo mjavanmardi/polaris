@@ -305,9 +305,9 @@ implementation struct Link_Implementation : public Polaris_Component<MasterType,
 	// m_prototype is a special version of m_data, where the typed data member is another polaris_component, and is reference through an associated prototype
 	// all connections to other components should be handled in this way.
 	// This keyword creates a local 'prototype<member_type>* pointer variable which can be referenced using the given name preceded by an underscore
-	m_prototype(node_itf,anode,NONE,NONE); // i.e. _anode, which is of type Node<typename MasterType::node_type>*
+	m_prototype(Node,typename MasterType::node_type,anode,NONE,NONE); // i.e. _anode, which is of type Node<typename MasterType::node_type>*
 	// Note here the use of MasterType::node_type, which at this point is not defined, meaning that node_type is not a concrete type at this point, which is a KEY point of the Polaris framework
-	m_prototype(node_itf,bnode,NONE,NONE);
+	m_prototype(Node,typename MasterType::node_type,bnode,NONE,NONE);
 	m_data(int,anode_id,NONE,NONE);
 	m_data(int,bnode_id,NONE,NONE);
 	m_data(float,width,NONE,NONE);
@@ -434,7 +434,7 @@ prototype struct Router
 };
 implementation struct Random_Walk_Router_Implementation : public Polaris_Component<MasterType,INHERIT(Random_Walk_Router_Implementation),Data_Object>
 {
-	m_prototype(Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+	m_prototype(Network, typename MasterType::network_type, network_reference, NONE, NONE);
 
 	typedef Node<typename MasterType::node_type> node_itf;
 	typedef Link<typename MasterType::link_type> link_itf;
@@ -485,7 +485,7 @@ implementation struct Random_Walk_Router_Implementation : public Polaris_Compone
 };
 implementation struct Dead_Reckoning_Router_Implementation : public Polaris_Component<MasterType,INHERIT(Dead_Reckoning_Router_Implementation),Data_Object>
 {
-	m_prototype(Network<typename MasterType::network_type>, network_reference, NONE, NONE);
+	m_prototype(Network, typename MasterType::network_type, network_reference, NONE, NONE);
 
 	typedef Node<typename MasterType::node_type> node_itf;
 	typedef Link<typename MasterType::link_type> link_itf;
@@ -583,9 +583,9 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 	m_data(float, speed, NONE,NONE);
 	m_data(Point_3D<NT>, centroid, NONE,NONE);
 	m_data(int, path_location_index, NONE,NONE);
-	m_prototype(Network<typename MasterType::network_type>, network_reference, NONE, NONE);
-	m_prototype(Link<typename MasterType::link_type>, current_link, NONE, NONE);
-	m_prototype(Router<typename MasterType::router_type>, router, NONE, NONE);
+	m_prototype(Network, typename MasterType::network_type, network_reference, NONE, NONE);
+	m_prototype(Link, typename MasterType::link_type, current_link, NONE, NONE);
+	m_prototype(Router, typename MasterType::router_type, router, NONE, NONE);
 	m_container(std::vector<link_itf*>, path, NONE, NONE);
 
 	// typedefs dependent on data members - make sure to place this after the m_data statement which creates the referenced member

@@ -1,12 +1,15 @@
 //#define SHOW_WARNINGS
 //#define ENABLE_STACK_TRACE
-
+//#define ANTARES
+#define IntegratedModelApplication
 
 #ifdef _DEBUG
 //#define SHOW_WARNINGS
 #else
 //#define SHOW_WARNINGS
 #endif
+
+#undef SHOW_WARNINGS
 
 #include "Polaris_PCH.h"
 //#include "core\Core.h"
@@ -55,14 +58,14 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;
 	//typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> basic_vehicle_type;
 	//typedef Vehicle_Components::Implementations::Polaris_Base_Vehicle_Implementation<M> vehicle_type;
-	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
+
+	//typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
+	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
+
 	typedef Antares_Intersection_Implementation<M> intersection_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
 	#else
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<M> network_type;
-	//typedef Network_Components::Implementations::Network_Implementation<M> network_type;
-
-
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
@@ -147,7 +150,8 @@ struct MasterType
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
 	
 	#ifdef ANTARES
-		typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
+		//typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
+		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
 	#else
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
 	#endif
@@ -155,7 +159,7 @@ struct MasterType
 	// POPULATION SYNTHESIS CLASSES
 	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Full<MasterType> synthesis_zone_type;
 	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Full<MasterType> synthesis_region_type;
-	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
+	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	#pragma endregion
@@ -217,7 +221,11 @@ struct MasterType
 	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
-
+	
+	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
+	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
+	typedef Custom_Connection_Group<MasterType, time_dependent_graph_type, time_dependent_graph_type, time_dependent_to_time_dependent_type> time_dependent_to_time_dependent_connection_type;
 
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
@@ -306,7 +314,13 @@ int main(int argc,char** argv)
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
-
+	typedef Operation<MasterType::operation_type> _Operation_Interface;
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	operation->network_reference<_Network_Interface*>(network);
+	if (scenario->intersection_control_flag<int>() == 1) {
+		cout <<"reading intersection control data..." << endl;
+		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
+	}
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
@@ -319,18 +333,13 @@ int main(int argc,char** argv)
 	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	typedef Operation<MasterType::operation_type> _Operation_Interface;
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
-	operation->network_reference<_Network_Interface*>(network);
-	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading intersection control data..." << endl;
-		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
-	}
+
 	if (scenario->ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
 
+	
 
 #ifdef ANTARES
 	network->set_network_bounds<NULLTYPE>();
@@ -351,11 +360,11 @@ int main(int argc,char** argv)
 
 		if (scenario->use_tmc<bool>())
 		{
-			//typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
+			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-			//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
-			//tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
-			//tmc->Initialize<NT>();
+			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+			tmc->Initialize<NT>();
 		}
 	}
 
@@ -452,23 +461,24 @@ int main(int argc,char** argv)
 	// Set up graphical display
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#ifdef ANTARES
-	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
-	_Zones_Container_Interface::iterator zone_itr;
-	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
+	//define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
+	//_Zones_Container_Interface::iterator zone_itr;
+	//_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
 
-	//--------------------------------------------------------------------------------------------
-	// Graphical zone group display - integrate to graphical network when database is fixed
-	typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
-	zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
-	// initialize zone static reference to the graphical zone group
-	MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
-	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
+	////--------------------------------------------------------------------------------------------
+	//// Graphical zone group display - integrate to graphical network when database is fixed
+	//typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
+	//zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
+	//// initialize zone static reference to the graphical zone group
+	//MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
+	//_graphical_zone_group->configure_zones_layer<NULLTYPE>();
 	#endif
 
 
 	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
+	cout << "Initializing network skims..." <<endl;
 	typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
 	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
 	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
@@ -498,13 +508,7 @@ int main(int argc,char** argv)
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 
-	typedef Pair_Associative_Container<_Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
-	_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-	_Zone_Interface* zone = (_Zone_Interface*)(zones->begin()->second);
-	
-	std::vector<_Zone_Interface*> available_set;
-	skimmer->Get_Locations_Within_Range<_Zone_Interface*, Time_Minutes,Vehicle_Components::Types::Vehicle_Type_Keys,_Zone_Interface*>(available_set, zone, 0, 0, 4, Vehicle_Components::Types::SOV);
+	cout << "Network skims done." <<endl;
 
 	//==================================================================================================================================
 	// Destination choice model - set parameters
@@ -522,6 +526,7 @@ int main(int argc,char** argv)
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
 	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
@@ -532,8 +537,8 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
-	
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
+
 
 
 	//==================================================================================================================================
@@ -541,7 +546,8 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	try
 	{
-	START();
+		cout <<"Starting simulation..."<<endl;
+		START();
 	}
 	catch (std::exception ex)
 	{
@@ -549,7 +555,7 @@ int main(int argc,char** argv)
 	}
 
 	cout << "Finished!" << endl;
-	system("PAUSE");
+	//system("PAUSE");
 }
 
 void output_object_sizes()
@@ -606,7 +612,7 @@ void output_object_sizes()
 	file << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type)<<","<<(int)MasterType::person_destination_choice_option_type::component_id<<endl;
 	file << endl <<"synthesis zone size = "<<sizeof(MasterType::synthesis_zone_type)<<","<<(int)MasterType::synthesis_zone_type::component_id<<endl;
 	file << endl <<"region size = "<<sizeof(MasterType::synthesis_region_type)<<","<<(int)MasterType::synthesis_region_type::component_id<<endl;
-	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::ipf_solver_settings_type)<<","<<(int)MasterType::ipf_solver_settings_type::component_id<<endl;
+	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::solver_settings_type)<<","<<(int)MasterType::solver_settings_type::component_id<<endl;
 	file << endl <<"popsyn_solver size = "<<sizeof(MasterType::population_synthesis_type)<<","<<(int)MasterType::population_synthesis_type::component_id<<endl;
 	file << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type)<<","<<(int)MasterType::traffic_management_center_type::component_id<<endl;
 	file << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type)<<","<<(int)MasterType::weather_network_event_type::component_id<<endl;

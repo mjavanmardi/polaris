@@ -457,6 +457,82 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
+			template<typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Location_Indices_Within_Range(int& available_index_low, int& available_index_high, int origin_index, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			{
+				network_itf* network = this->network_reference<  network_itf*>();
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+
+				// get appropriate sorted ttimes based on mode indicator
+				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+
+				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+				{
+					//TODO: remove when done testing
+					//cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<", for origin index: " << origin_index<<endl;
+					ttime_sorter= this->_auto_travel_time_sorter[origin_index];
+				}
+
+	
+				// forward search - best when using small min_time
+				int index_low = INT_MAX;
+				int index_high = 0;
+				if (search_forward)
+				{
+					int index = 0;
+					for (std::vector<pair<float, zone_itf*>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr, ++index)
+					{
+						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						float ttime=d_itr->first;
+
+						if (ttime < max_time)
+						{
+							if (ttime >= min_time && index < index_low) index_low = index;
+							available_index_high = index;
+						}
+						else
+						{
+							available_index_low = index_low;
+							return;
+						}
+					}
+				}
+				// backward search - best when using large min_time
+				else
+				{
+					int index = ttime_sorter.size();
+					for (std::vector<pair<float, zone_itf*>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr, --index)
+					{
+						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						float ttime=d_itr->first;
+
+						if (ttime >= min_time)
+						{
+							if (ttime < max_time && index > index_high) index_high = index;
+							available_index_low = index;
+						}
+						else
+						{
+							available_index_high = index;
+							return;
+						}
+					}
+				}
+			}
+			template<typename TimeType, typename ModeType, typename ReturnLocationType> ReturnLocationType Get_Location_At_TTime_Index(int origin_index, int loc_ttime_index, requires(ReturnLocationType, check(ReturnLocationType, is_pointer) && check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
+			{
+				// make sure the indices are valid
+				if (origin_index >= this->_transit_travel_time_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
+				
+				// get appropriate sorted ttimes based on mode indicator
+				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+
+				if (loc_ttime_index >= ttime_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
+
+				// return pointer to zone interface
+				return ttime_sorter[loc_ttime_index]->second;
+				
+			}
+
 			template<typename ReturnLocationType> ReturnLocationType Get_Location_As_Needed(zone_itf* zone, requires(ReturnLocationType, check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
 			{
 				return zone;

@@ -267,10 +267,17 @@ namespace Vehicle_Components
 					}
 				}
 
+				if (_movement_plan == nullptr) return;
+
+
 				Vehicle_Implementation<MasterType,INHERIT(Antares_Vehicle_Implementation)>* bthis = (Vehicle_Implementation<MasterType,INHERIT(Antares_Vehicle_Implementation)>*)this;
 				
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
+
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
+
+				if (link == nullptr) return;
+
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
 				float u_x = link_line.up_node._x;
 				float u_y = link_line.up_node._y;

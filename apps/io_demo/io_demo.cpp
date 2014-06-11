@@ -12,37 +12,37 @@ int main( int argc, char** argv)
 	unique_ptr<odb::database> db;
 	db_path = argv[1];
 	db = open_sqlite_database(db_path);
-	typedef odb::query<polaris::io::Gtfs_Stop> query;
-	typedef odb::result<polaris::io::Gtfs_Stop> result;
+	//typedef odb::query<polaris::io::Gtfs_Stop> query;
+	//typedef odb::result<polaris::io::Gtfs_Stop> result;
 	odb::transaction t(db->begin());
 	try
 	{
-		result r(db->query<polaris::io::Gtfs_Stop>(query::true_expr));
+		//result r(db->query<polaris::io::Gtfs_Stop>(query::true_expr));
 	}
 	catch (const odb::exception& e)
 	{
 		std::cerr << e.what () << std::endl;
 		return 1;
 	}
-	result r(db->query<polaris::io::Gtfs_Stop>(query::true_expr));
+	//result r(db->query<polaris::io::Gtfs_Stop>(query::true_expr));
 	int count = 0;
-	for (result::iterator i (r.begin()); i!=r.end(); ++i)
-	{
-		count++;
-		if (count%100 == 0)
-		{
+	//for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	//{
+	//	count++;
+	//	if (count%100 == 0)
+	//	{
 
-			try
-			{
-				std::cout <<i->getStop_Id() << " " << i->getStop_Name() << "\n" ;
-			}
-			catch (const odb::exception& e)
-			{
-				std::cerr << e.what () << std::endl;
-				return 1;
-			}
-		}
-	}
+	//		try
+	//		{
+	//			std::cout <<i->getStop_Id() << " " << i->getStop_Name() << "\n" ;
+	//		}
+	//		catch (const odb::exception& e)
+	//		{
+	//			std::cerr << e.what () << std::endl;
+	//			return 1;
+	//		}
+	//	}
+	//}
 	t.commit();
 
 	std::map<std::string, polaris::io::shape_geometry> geom = polaris::io::GetPointGeometry(db_path, "gtfs_stops", "location", "stop_id", 26916, "gtfs");
