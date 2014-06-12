@@ -18,7 +18,7 @@ static int int_point_callback(void *points_, int argc, char **argv, char **azCol
 
 static int point_callback(void *points_, int argc, char **argv, char **azColName)
 {
-	assert(arc >= 2);
+	assert(argc >= 2);
 	std::map<std::string, shape_geometry> *points = (std::map<std::string, shape_geometry>*) points_;
 	shape_geometry pt;
 	Point2D db_pt = PointFromWkb<GeoPoint>(argv[1]);
