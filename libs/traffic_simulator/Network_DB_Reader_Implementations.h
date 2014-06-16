@@ -48,6 +48,8 @@ namespace Network_Components
 				read_turn_movement_data<TargetType>(db, net_io_maps);
 				read_zone_data<TargetType>(db, net_io_maps);
 				read_activity_location_data<TargetType>(db, net_io_maps);
+				read_pocket_data<TargetType>(db, net_io_maps);
+
 				if (!((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
 				{
 					clean_isolated_intersections<TargetType>();
@@ -311,13 +313,22 @@ namespace Network_Components
 						
 						//maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						
-						if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						//if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						//{
+						//	maximum_flow_rate = 2000.0f;
+						//}
+						//else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						//{
+						//	maximum_flow_rate = 1800.0f;
+						//}
+						//else
+						//{
+						//	maximum_flow_rate = ((float)db_itr->getCap_Ab()) / link->template num_lanes<float>();
+						//}
+
+						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
 						{
-							maximum_flow_rate = 2000.0f;
-						}
-						else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
-						{
-							maximum_flow_rate = 1800.0f;
+							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						}
 						else
 						{
@@ -472,23 +483,28 @@ namespace Network_Components
 						//link->template free_flow_speed<float>(link->template free_flow_speed_estimate<NT>());
 						//maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->template num_lanes<float>());
 
-						if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						//if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						//{
+						//	maximum_flow_rate = 2000.0f;
+						//}
+						//else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						//{
+						//	maximum_flow_rate = 1800.0f;
+						//}
+						//else
+						//{
+						//	maximum_flow_rate = ((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
+						//}
+
+						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
 						{
-							maximum_flow_rate = 2000.0f;
-						}
-						else if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
-						{
-							maximum_flow_rate = 1800.0f;
+							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						}
 						else
 						{
 							maximum_flow_rate = ((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
 						}
 
-						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
-						{
-							maximum_flow_rate = 1800.0f;
-						}
 
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
@@ -1080,6 +1096,46 @@ namespace Network_Components
 				}
 
 				cout <<"done."<<endl;
+			}
+			
+			template<typename TargetType> void read_pocket_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				using namespace odb;
+				using namespace polaris::io;
+
+				result<polaris::io::Pocket> pocket_result=db->template query<polaris::io::Pocket>(query<polaris::io::Pocket>::true_expr);
+				
+				int counter=0;
+
+				cout << "Reading Pockets" << endl;
+				
+				Types::Link_ID_Dir link_id_dir;
+
+				typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
+				Link_Interface* link;
+				Link_Components::Implementations::Pocket_Data* pocket_data;
+
+				for(typename result<polaris::io::Pocket>::iterator db_itr = pocket_result.begin (); db_itr != pocket_result.end (); ++db_itr)
+				{
+					if(counter%10000==0) cout << "\t" << counter << endl;
+					++counter;
+
+					link_id_dir.id = db_itr->getLink()->getLink();
+					link_id_dir.dir = db_itr->getDir();
+
+
+					if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
+					{
+						link = (Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+
+						pocket_data->num_pockets = db_itr->getLanes();
+						// convert to feet
+						pocket_data->pocket_length = db_itr->getLength()*3.28084;
+					}
+				}
+					
 			}
 
 			template<typename TargetType> void clean_isolated_intersections()
