@@ -105,36 +105,36 @@ namespace PopSyn
 					_person_ranges[dim][index];
 				}
 			}
-			double& low(int dim, int index, bool household) 
+			double low(int dim, int index, bool household) 
 			{
 				if (household)	return _ranges[dim][index].first;
 				else			return _person_ranges[dim][index].first;
 			}
-			double& high(int dim, int index, bool household) 
+			double high(int dim, int index, bool household) 
 			{
 				if (household)	return _ranges[dim][index].second;
 				else			return _person_ranges[dim][index].second;
 			}
 
 			/** Links the columns in the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_pums_column(int dim, bool household)
+			int get_pums_column(int dim, bool household)
 			{
 				if (household)	return _pums_file_link[dim];
 				else			return _person_pums_file_link[dim];
 			}
 
 			/** Links the columns int the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_sf3_column(int dim, int index, bool household)
+			int get_sf3_column(int dim, int index, bool household)
 			{
 				if (household)	return _sf3_file_link[dim][index];
 				else			return _person_sf3_file_link[dim][index];
 			}
 
-			std::vector<int>& get_pums_data_columns()
+			const std::vector<int>& get_pums_data_columns()
 			{
 				return _pums_file_data_cols;
 			}
-			std::vector<int>& get_person_data_columns()
+			const std::vector<int>& get_person_data_columns()
 			{
 				return _person_file_data_cols;
 			}
@@ -160,7 +160,7 @@ namespace PopSyn
 				return -1;
 			}
 
-			void Initialize(string link_file_path)
+			void Initialize(string& link_file_path)
 			{
 				_zone_id_column =-1;
 				_region_id_column=-1;

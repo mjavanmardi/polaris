@@ -13,8 +13,8 @@ namespace PopSyn
 	//-----------------------------------------------
 	struct High_Low:public pair<double,double>
 	{
-		double& low(){return first;}
-		double& high(){return second;}
+		double low(){return first;}
+		double high(){return second;}
 	};
 
 
@@ -61,9 +61,9 @@ namespace PopSyn
 			/// Specify column # in zone (marginal) file which contains the region id - used to link marginal to sample file so must be identically specified in both
 			typed_accessor(int,region_in_zone_id_column);
 
-			typed_accessor(string, sample_file_path);
-			typed_accessor(string, person_sample_file_path);
-			typed_accessor(string, marg_file_path);
+			typed_accessor(string&, sample_file_path);
+			typed_accessor(string&, person_sample_file_path);
+			typed_accessor(string&, marg_file_path);
 
 			typed_accessor(std::vector<int>&, hh_dimension_sizes);
 			typed_accessor(std::vector<int>&, person_dimension_sizes);
@@ -71,7 +71,7 @@ namespace PopSyn
 			typed_accessor(int, number_of_person_dimensions);
 
 			/** Initializer*/
-			void Initialize(string link_file_path)
+			void Initialize(string& link_file_path)
 			{
 				this_component()->Initialize(link_file_path);
 			}
@@ -105,26 +105,26 @@ namespace PopSyn
 			}
 
 			/** Functions to get ranges for a variable dimension and index*/
-			High_Low& range(int dimension, int index_in_dimension, bool household=true) 
+			High_Low range(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->range(dimension, index_in_dimension);
 			}
-			double& low(int dimension, int index_in_dimension, bool household=true) 
+			double low(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->low(dimension, index_in_dimension);
 			}
-			double& high(int dimension, int index_in_dimension, bool household=true) 
+			double high(int dimension, int index_in_dimension, bool household=true) 
 			{
 				return this_component()->high(dimension, index_in_dimension);
 			}
 
 			/** Links the columns in the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_pums_column(int dimension, bool household=true){return this_component()->get_pums_column(dimension,household);}
+			int get_pums_column(int dimension, bool household=true){return this_component()->get_pums_column(dimension,household);}
 			/** Links the columns int the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_sf3_column(int dim, int index, bool household=true){return this_component()->get_sf3_column(dim, index, household);}
+			int get_sf3_column(int dim, int index, bool household=true){return this_component()->get_sf3_column(dim, index, household);}
 
-			std::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns();}
-			std::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns();}
+			const std::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns();}
+			const std::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns();}
 
 			/** Find the variable index for a given dimension-value pair*/
 			int find_index_in_dimension(int dim, double value, bool household=true){return this_component()->find_index_in_dimension(dim, value, household);}

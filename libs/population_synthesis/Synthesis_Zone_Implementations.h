@@ -39,6 +39,8 @@ namespace PopSyn
 
 		//==========================================================================================
 		// Recreate the three classes below for each population synthesis algorithm
+		//
+		// More description about usage and inheritance patterns here (POLARIS component must be inherited first)
 		//------------------------------------------------------------------------------------------
 		implementation struct _Synthesis_Zone_Polaris_Implementation : public _Synthesis_Zone_Base_Implementation<MasterType>
 		{
