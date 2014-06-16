@@ -443,7 +443,9 @@ namespace Turn_Movement_Components
                 else
                 {
                     //float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
-					float vc = 1.0f;
+					float vc = ((typename MasterType::link_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+
+					//float vc = 1.0f;
 
 
                     float cycle=75; // 75 seconds
