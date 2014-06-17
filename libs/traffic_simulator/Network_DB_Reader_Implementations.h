@@ -1130,7 +1130,7 @@ namespace Network_Components
 
 						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
-						pocket_data->num_pockets = db_itr->getLanes();
+						pocket_data->num_pockets += db_itr->getLanes();
 						// convert to feet
 						pocket_data->pocket_length = db_itr->getLength()*3.28084;
 					}
