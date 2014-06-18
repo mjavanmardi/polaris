@@ -279,7 +279,7 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
 						}
-						else if(facility_type=="LOCAL"/* || facility_type=="MINOR"*/)
+						else if(facility_type=="LOCAL" || facility_type=="COLLECTOR"/* || facility_type=="MINOR"*/)
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::LOCAL);
 						}		
@@ -326,7 +326,11 @@ namespace Network_Components
 						//	maximum_flow_rate = ((float)db_itr->getCap_Ab()) / link->template num_lanes<float>();
 						//}
 
-						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						//if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP" || facility_type=="RAMP")
+						
+						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL ||
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						}
@@ -449,7 +453,7 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
 						}
-						else if(facility_type=="LOCAL" || facility_type=="MINOR")
+						else if(facility_type=="LOCAL" || facility_type=="COLLECTOR" /* || facility_type=="MINOR"*/)
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::LOCAL);
 						}			
@@ -496,7 +500,10 @@ namespace Network_Components
 						//	maximum_flow_rate = ((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
 						//}
 
-						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						//if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
+						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL ||
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						}
