@@ -58,6 +58,15 @@ namespace Link_Components
 
 			float num_vehicles_in_link;
 		};
+
+		struct Pocket_Data
+		{
+			Pocket_Data():num_pockets(0),pocket_length(0.0f){}
+
+			int num_pockets;
+			float pocket_length;
+		};
+
 	//==================================================================================================================
 	/// Polaris_Link_Base
 	//------------------------------------------------------------------------------------------------------------------
@@ -204,6 +213,8 @@ namespace Link_Components
 
 			m_data(float, link_vmt, NONE, NONE);
 			
+			m_data(Pocket_Data, pocket_data, NONE, NONE);
+
 			m_data(float, link_vht, NONE, NONE);
 			m_data(float, C, NONE, NONE);
 			m_data(float, Q, NONE, NONE);
@@ -669,28 +680,33 @@ namespace Link_Components
 				_link_destination_arrived_vehicles = 0;
 				_link_origin_vehicle_current_position = 0;
 				_link_origin_loaded_capacity_leftover = 0.0;
-					
+				
 				//supply
 				//_num_vehicles_under_jam_density = _num_lanes * _length * _jam_density/5280.0f;
 				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density) + 30;
 				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density);
 
-				if(_link_type == Link_Components::Types::LOCAL || _link_type == Link_Components::Types::ARTERIAL)
-				{
-					// num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
+				//if(_link_type == Link_Components::Types::LOCAL || _link_type == Link_Components::Types::ARTERIAL)
+				//{
+				//	// num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
 
-					// assuming an average pocket length of 60 meters and a pocket lane on either side
-					float adjusted_lanes = ((float)_num_lanes) + min(2.0f*(196.85f/_length),2.0f);
-					_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
-					_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
+				//	// assuming an average pocket length of 60 meters and a pocket lane on either side
+				//	float adjusted_lanes = ((float)_num_lanes) + min(2.0f*(196.85f/_length),2.0f);
+				//	_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
+				//	_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
 
-					//cout << adjusted_lanes << "," << _num_lanes << endl;
-				}
-				else
-				{
-					_num_vehicles_under_jam_density = ((float)_num_lanes) * _length * _jam_density/5280.0f;
-					_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
-				}
+				//	//cout << adjusted_lanes << "," << _num_lanes << endl;
+				//}
+				//else
+				//{
+				//	_num_vehicles_under_jam_density = ((float)_num_lanes) * _length * _jam_density/5280.0f;
+				//	_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
+				//}
+
+				float adjusted_lanes = ((float)_num_lanes) + ((float)_pocket_data.num_pockets)*( _pocket_data.pocket_length/_length );
+
+				_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
+				_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
 
 				_link_supply = _num_vehicles_under_jam_density;
 					

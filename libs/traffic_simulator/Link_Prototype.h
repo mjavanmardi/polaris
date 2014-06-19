@@ -58,6 +58,7 @@ namespace Link_Components
 			accessor(right_turn_bay_length, NONE, NONE);
 			accessor(approach, NONE, NONE);
 			accessor(num_inbound_turn_lanes, NONE, NONE);
+			accessor(pocket_data, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
