@@ -318,7 +318,10 @@ namespace Person_Components
 				Activity_Plan* prev_act = this->previous_activity_plan<Time_Seconds,Activity_Plan*>(start);
 				Activity_Plan* next_act = this->next_activity_plan<Activity_Plan*,Activity_Plan*>(act);
 				Movement_Plan* next_move = nullptr;
-				if (next_act != nullptr) next_move = next_act->template movement_plan<Movement_Plan*>();
+				if (next_act != nullptr)
+				{
+					if (next_act->Route_Is_Planned<bool>())	next_move = next_act->template movement_plan<Movement_Plan*>();
+				}
 
 				Time_Seconds ttime_prev;
 				Time_Seconds ttime_next;
@@ -471,12 +474,11 @@ namespace Person_Components
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 
-						//TODO: remove when done testing
-						if (next_move->template departed_time<Time_Seconds>() > (END)*2.0)
+						if (at_home_activity_modified)
 						{
-							THROW_EXCEPTION("Error, invalid value when setting end_time: "<<next_move->template departed_time<Time_Seconds>()<<", next_act.start="<<next_act->Start_Time<Time_Seconds>()<<", ttime_next="<<ttime_next<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<next_loc->zone<_Zone_Interface*>()->uuid<int>());
+							if (next_move != nullptr) prev_act->template End_Time<Time_Seconds>(next_move->template departed_time<Time_Seconds>(),false);
+							else prev_act->template End_Time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>(),false);
 						}
-						if (at_home_activity_modified) prev_act->template End_Time<Time_Seconds>(next_move->template departed_time<Time_Seconds>(),false);
 
 					}
 					else
@@ -561,7 +563,7 @@ namespace Person_Components
 						if (next_act == nullptr) return;
 
 						Movement_Plan* next_move = next_act->movement_plan<Movement_Plan*>();
-						if (next_move == nullptr) return;
+						if (next_move == nullptr || !next_act->Route_Is_Planned<bool>()) return;
 
 						next_move->departed_time<Simulation_Timestep_Increment>(move->departed_time<Simulation_Timestep_Increment>());
 					}

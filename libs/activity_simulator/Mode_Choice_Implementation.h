@@ -365,14 +365,6 @@ namespace Person_Components
 		#pragma endregion
 
 
-		//implementation struct Mode_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)>
-		//{
-		//	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType, INHERIT(Mode_Choice_Model_Implementation)> BaseType;
-		//	typedef typename BaseType::Component_Type ComponentType;
-		//	typedef TypeList<Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type >> TList;
-		//};
-
-
 
 		implementation struct Mode_Chooser_Implementation : public Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>
 		{
@@ -476,14 +468,6 @@ namespace Person_Components
 				{
 					dest_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 				}
-
-				//============================================================================================
-				//Account for touring - if previous act is out of home and not using auto, then auto not available
-				if (prev_location != _Parent_Person->Home_Location<_Activity_Location_Interface*>() && prev_act != nullptr)
-				{
-					if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS) return Vehicle_Components::Types::BUS;
-					else if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV) return Vehicle_Components::Types::HOV;
-				}
 				
 				//============================================================================================
 				// add the SOV choice option
@@ -519,6 +503,20 @@ namespace Person_Components
 
 				// Add the temporary HOV correction - this should eventually be replaced by including HOV as an option in the choice model
 				if (Assign_To_HOV<ActivityItfType>(activity, selected_mode)) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+
+				//============================================================================================
+				//Account for touring - if previous act is not at an anchor location and not using auto, then auto not available
+				//-need to update to disable auto mode when not available at the anchor location as well
+				if (prev_location != _Parent_Person->Home_Location<_Activity_Location_Interface*>() &&
+					prev_location != _Parent_Person->Work_Location<_Activity_Location_Interface*>() &&
+					prev_location != _Parent_Person->School_Location<_Activity_Location_Interface*>() &&
+					prev_act != nullptr)
+				{
+					//if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS || prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV)
+					//{
+					//	if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+					//}
+				}
 
 				// free memory allocated locally
 				for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);

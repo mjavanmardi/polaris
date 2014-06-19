@@ -557,7 +557,7 @@ m_array<T>& m_array<T>::operator+(const m_array<T>& obj)
 	}
 	else
 	{
-		for (int i=0; i<_size; i++) _data[i]+=obj._data[i];
+		for (int i=0; i<(int)_size; i++) _data[i]+=obj._data[i];
 	}
 	return *this;
 }

@@ -90,10 +90,20 @@ namespace Person_Components
 				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
 				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION);
 			}
-			//template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Has_Initialize)))
-			//{
-			//	assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			//}
+
+			template<typename TargetType, typename LocationType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location)
+			{
+				this_component()->Create_Activity<TargetType,LocationType>(act_type,start_plan_time,location);
+			}
+			template<typename TargetType, typename LocationType, typename ModeType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode)
+			{
+				this_component()->Create_Activity<TargetType,LocationType,ModeType>(act_type,start_plan_time,location,mode);
+			}
+			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
+			{
+				this_component()->Create_Activity<TargetType,LocationType,ModeType,TimeType>(act_type,start_plan_time,location,mode,start,duration);
+			}
+			
 
 
 

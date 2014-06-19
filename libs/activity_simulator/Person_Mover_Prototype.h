@@ -737,15 +737,23 @@ namespace Prototypes
 			{
 				Activity_Itf* next_act = scheduler->template next_activity_plan<Activity_Itf*,Activity_Itf*>(act);
 				movement_itf* next_movement;
-				if (next_act != nullptr) next_movement = next_act->template movement_plan<movement_itf*>();
+				if (next_act != nullptr)
+				{
+					next_movement = next_act->template movement_plan<movement_itf*>();
+					if (!next_act->Route_Is_Planned<bool>()) next_movement = nullptr;
+				}
 
 				// no following act, so just shift end
 				if (next_act == nullptr)
 				{
 					new_end = iteration() + act->template Duration<Simulation_Timestep_Increment>();
 				}
+				else if (next_movement == nullptr && iteration() + act->template Duration<Simulation_Timestep_Increment>() < next_act->template Start_Time<Simulation_Timestep_Increment>())
+				{
+					new_end = iteration() + act->template Duration<Simulation_Timestep_Increment>();
+				}
 				// following act does not depart before end of shifted current act, so just shift end
-				else if (iteration() + act->template Duration<Simulation_Timestep_Increment>() < next_movement->template departed_time<Simulation_Timestep_Increment>())
+				else if (next_movement != nullptr && iteration() + act->template Duration<Simulation_Timestep_Increment>() < next_movement->template departed_time<Simulation_Timestep_Increment>())
 				{
 					new_end = iteration() + act->template Duration<Simulation_Timestep_Increment>();
 				}

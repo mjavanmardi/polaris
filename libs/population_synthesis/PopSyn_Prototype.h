@@ -689,8 +689,14 @@ namespace PopSyn
 									per_rec->setId(person->template uuid<int>());
 									if (person->template School_Location<int>() >= 0)
 										per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
+									else
+										per_rec->setSchool_Location_Id(0);
 									if (person->template Work_Location<int>() >= 0)
 										per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
+									else
+										per_rec->setWork_Location_Id(0);
+									person_unit_itf* p = person->Static_Properties<person_unit_itf*>();
+									per_rec->setAge(p->Age<int>());
 									per_rec->setHousehold(hh_rec);
 									//push to database
 									db->persist(per_rec);

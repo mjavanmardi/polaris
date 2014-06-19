@@ -75,6 +75,46 @@ namespace Prototypes
 		accessor(internal_id, NONE, NONE);
 
 		accessor(Persons_Container, NONE, NONE);
+
+		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Person_Components::Concepts::Is_Person)))
+		{
+			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
+			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
+
+			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
+			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+
+			typename person_container_itf::iterator p_itr;
+			person_container_itf* persons = this->Persons_Container<person_container_itf*>();
+
+			for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+			{
+				person_itf* p = (person_itf*)(*p_itr);
+				if (p->Is_Free(start_time,end_time)) return (PersonItfType)p;
+			}
+			return nullptr;
+		}
+		
+		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Person_Components::Concepts::Is_Person)))
+		{
+			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
+			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
+
+			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
+			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+
+			typedef Person_Components::Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)>  person_properties_itf;
+
+			typename person_container_itf::iterator p_itr;
+			person_container_itf* persons = this->Persons_Container<person_container_itf*>();
+
+			for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+			{
+				person_itf* p = (person_itf*)(*p_itr);
+				if (p->Is_Free(start_time,end_time) && p->Static_Properties<person_properties_itf*>()->Age<int>()>=16) return (PersonItfType)p;
+			}
+			return nullptr;
+		}
 		
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
