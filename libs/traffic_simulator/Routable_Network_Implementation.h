@@ -22,7 +22,7 @@ namespace Routing_Components
 				if(_layer_step == -1)
 				{
 					_layer_step = (layer_id - _first_layer_id);
-					_layer_size = _layer_data.size();
+					_layer_size = (int)_layer_data.size();
 				}
 			}
 			
@@ -49,7 +49,7 @@ namespace Routing_Components
 			_layer_data.push_back(record);
 
 			//return &_layer_data.back();
-			return (_layer_data.size() - 1);
+			return ((int)_layer_data.size() - 1);
 		}
 		
 		DataRecord& get_closest_element(DataRecord* base_pointer,int layer_id)
@@ -60,7 +60,7 @@ namespace Routing_Components
 
 			if(layer_id < _first_layer_id || layer_id > ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id))
 			{
-				int max_id = ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id);
+				int max_id = (int)((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id);
 
 				// wrap around to future days
 				int days = layer_id/max_id;

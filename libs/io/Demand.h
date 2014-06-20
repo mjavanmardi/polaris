@@ -143,6 +143,8 @@ public:
 	void setSchool_Location_Id (const int& school_location_id_) {school_location_id = school_location_id_;}
 	const int& getWork_Location_Id () const {return work_location_id;}
 	void setWork_Location_Id (const int& work_location_id_) {work_location_id = work_location_id_;}
+	const int& getAge () const {return age;}
+	void setAge (const int& age_) {age = age_;}
 	const shared_ptr<Household> getHousehold () const {return household;}
 	void setHousehold (const shared_ptr<Household> household_) {household = household_;}
 	const unsigned int& getPrimaryKey () const {return person;}
@@ -155,6 +157,7 @@ private:
 	int id;
 	int school_location_id;
 	int work_location_id;
+	int age;
 	#pragma db not_null
 	shared_ptr<Household> household;
 };

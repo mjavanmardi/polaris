@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Activity_Simulator_Includes.h"
-//#include "Activity_Prototype.h"
+#include "Activity_Prototype.h"
 //#include "Network_Event_Prototype.h"
 //#include "Activity_Location_Prototype.h"
 //#include "Network_Prototype.h"
@@ -233,70 +233,7 @@ namespace Prototypes
 			household_itf* household = this->Household<household_itf*>();
 			return household->template Home_Location<TargetType>();					
 		}
-		/*template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),is_pointer)))
-		{
-			typedef Household_Components::Prototypes::Household<typename get_type_of(Household)> household_itf;
-			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
-			typedef Person_Perception<typename get_type_of(Perception_Faculty)> perception_itf;
-			typedef Network_Components::Prototypes::Network< typename perception_itf::get_type_of(Network)> network_itf;
 
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
-			properties_itf* properties = this->Properties<properties_itf*>();
-			network_itf* network = this->Perception_Faculty<perception_itf*>()->template Network<network_itf*>();
-			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-
-			household_itf* household = this->Household<household_itf*>();
-			
-			int loc_id = properties->template home_location_id<int>();
-			return (TargetType)(*locations)[loc_id];						
-		}
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Zone_Components::Concepts::Is_Zone) && check(strip_modifiers(TargetType),is_pointer)))
-		{
-			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
-			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-			typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
-			
-			properties_itf* properties = this->Properties<properties_itf*>();
-			network_itf* network = this->network_reference<network_itf*>();
-			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-
-			int loc_id = properties->template home_location_id<int>();
-			activity_location_itf* loc = (*locations)[loc_id];	
-			return loc->template zone<TargetType>();
-		}
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), is_integral)))
-		{
-			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
-			properties_itf* properties = this->Properties<properties_itf*>();
-			return properties->template home_location_id<TargetType>();
-		}
-		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), !is_integral) && ( (check(strip_modifiers(TargetType),!Activity_Location_Components::Concepts::Is_Activity_Location) && check(strip_modifiers(TargetType),!Zone_Components::Concepts::Is_Zone) ) || check(strip_modifiers(TargetType),!is_pointer) ) ) )
-		{
-			assert_check(strip_modifiers(TargetType),is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
-		}
-	*/	//template<typename TargetType> void Home_Location(TargetType location_index, requires(TargetType,check(strip_modifiers(TargetType), is_integral)))
-		//{
-		//	typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
-		//	typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
-		//	typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
-		//	typedef  Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_container_itf;
-
-		//	properties_itf* properties = this->Properties<properties_itf*>();
-		//	network_itf* network = this->network_reference<network_itf*>();
-		//	activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-
-		//	if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
-		//	properties->template home_location_id<TargetType>(location_index);
-		//}
-		//template<typename TargetType> void Home_Location(TargetType location_index, requires(TargetType,check(strip_modifiers(TargetType), !is_integral)))
-		//{
-		//	assert_check(strip_modifiers(TargetType), is_integral, "Error, Home_Location can only be set by passing an integral index from network::activity_locations_container");
-		//}
-		
 		template<typename TargetType> TargetType Work_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
 		{
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
@@ -468,10 +405,6 @@ namespace Prototypes
 
 			this_component()->template Choose_Work_Location<TargetType>();
 		}
-		//template<typename TargetType> void Choose_Work_Location(requires(TargetType,!check(ComponentType,has_Choose_Work_Location)))
-		//{
-		//	assert_check(ComponentType,has_Choose_Work_Location,"ComponentType does not have Choose_Work_Location feature.");
-		//}
 
 		local_check_template_method_name(has_Choose_School_Location,Choose_School_Location);
 		template<typename TargetType> void Choose_School_Location(requires(TargetType,check(ComponentType,has_Choose_School_Location)))
@@ -480,10 +413,6 @@ namespace Prototypes
 
 			this_component()->template Choose_School_Location<TargetType>();
 		}
-		//template<typename TargetType> void Choose_School_Location(requires(TargetType,!check(ComponentType,has_Choose_School_Location)))
-		//{
-		//	assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
-		//}
 
 		template<typename TargetType> string To_String()
 		{
@@ -530,6 +459,38 @@ namespace Prototypes
 			this_component()->Sort_Activity_Records<TargetType>();
 		}
 
+		// Determine if the person is free at a given time
+		template<typename TimeType> bool Is_Free(TimeType start, TimeType end)
+		{
+			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
+			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+
+			Activity_Plan* prev_act = this->previous_activity_plan<TimeType,Activity_Plan*>(start);
+			Activity_Plan* next_act = this->next_activity_plan<TimeType,Activity_Plan*>(start);
+
+			TimeType prev_end = 0;
+			TimeType next_start = END;
+			if (prev_act != nullptr) prev_end = prev_act->End_Time<TimeType>();
+			if (next_act != nullptr) next_start = next_act->Start_Time<TimeType>();
+
+			if ( prev_end < start && next_start > end) return true;
+			else if (prev_end > start && next_start > end)
+			{
+				if (prev_act != nullptr)
+				{
+					if (prev_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
+				}
+			}
+			else if (prev_end < start && next_start < end)
+			{
+				if (next_act != nullptr)
+				{
+					if (next_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
+				}
+			}
+			return false;
+		}
 
 		// PASS-THROUGH FEATURES OF SUB-COMPONENTS
 		template<typename TargetType> TargetType current_movement_plan()

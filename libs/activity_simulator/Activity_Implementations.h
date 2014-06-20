@@ -2,7 +2,10 @@
 
 #include "Vehicle_Prototype.h"
 #include "Person_Prototype.h"
+#include "Household_Prototype.h"
 #include "Person_Planner_Prototype.h"
+#include "Activity_Generator_Prototype.h"
+#include "Person_Properties_Prototype.h"
 #include "activity_simulator\Person_Scheduler_Implementations.h"
 #include "Activity_Prototype.h"
 
@@ -50,7 +53,9 @@ namespace Activity_Components
 			typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
 			//typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
 			typedef Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type> _scheduler_itf;
+			typedef Person_Components::Prototypes::Activity_Generator< typename MasterType::activity_generator_type> _generator_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Properties)> _properties_itf;
+			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Static_Properties)> _static_properties_itf;
 			
 			typedef Person_Components::Prototypes::Destination_Chooser<typename _planning_itf::get_type_of(Destination_Choice_Faculty)> _dest_choice_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename _perception_itf::get_type_of(Scenario)> _scenario_itf;
@@ -325,12 +330,13 @@ namespace Activity_Components
 			{
 				// General interfaces
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_static_properties_itf* properties = person->Static_Properties<_static_properties_itf*>();
 				_household_itf* household = person->template Household<_household_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
-
+				
 				//TODO: remove when finished testing
 				if (!this->Route_Is_Planned<bool>())
 				{
@@ -342,6 +348,51 @@ namespace Activity_Components
 
 				// exit if movement plan origin/destination not set
 				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
+
+
+				// If this is a child needing an escort
+				if (properties->Age<int>()<6 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
+				{
+					// Require parent escort when using HOV
+					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
+					{
+						// get a free adult available for escort
+						_person_itf* adult = household->Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+
+						// If no adults free and not school trip - cancel act
+						if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+						// if no adult but is school activity, force trip to transit
+						else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+						// otherwise, assign escort duty to adult
+						else
+						{
+							_generator_itf* gen = adult->Planning_Faculty<_planning_itf*>()->Activity_Generation_Faculty<_generator_itf*>();
+							gen->Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+						}
+					}
+				}
+				else if (properties->Age<int>()<16 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
+				{
+					// Attempt parent escort when using HOV - if fails force to transit
+					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
+					{
+						// get a free adult available for escort
+						_person_itf* adult = household->Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+
+						// If no adults free, force trip to transit
+						if (adult == nullptr) 
+						{
+							this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+						}
+						else
+						{
+							// if adult free, add new escort activity to the adult schedule
+							_generator_itf* gen = adult->Planning_Faculty<_planning_itf*>()->Activity_Generation_Faculty<_generator_itf*>();
+							gen->Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+						}
+					}
+				}
+
 
 				if (scenario->template do_planner_routing<bool>())
 				{

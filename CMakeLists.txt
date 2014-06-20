@@ -104,7 +104,7 @@ add_subdirectory (libs/spatial)
 add_subdirectory (libs/routing) 
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
-add_subdirectory (libs/activity_simulator)
+#add_subdirectory (libs/activity_simulator)
 
 
 #Apply CMake over POLARIS tests project structure

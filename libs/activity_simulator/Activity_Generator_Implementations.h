@@ -68,10 +68,10 @@ namespace Person_Components
 			}
 		};
 
-		implementation struct CTRAMP_Activity_Generator_Implementation : public General_Activity_Generator_Implementation<MasterType,  INHERIT(CTRAMP_Activity_Generator_Implementation)>
+		implementation struct Simple_Activity_Generator_Implementation : public General_Activity_Generator_Implementation<MasterType,  INHERIT(Simple_Activity_Generator_Implementation)>
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
-			typedef General_Activity_Generator_Implementation<MasterType,  INHERIT(CTRAMP_Activity_Generator_Implementation)> base_type;
+			typedef General_Activity_Generator_Implementation<MasterType,  INHERIT(Simple_Activity_Generator_Implementation)> base_type;
 			typedef typename base_type::Component_Type ComponentType;
 
 			typedef base_type base;
@@ -247,7 +247,7 @@ namespace Person_Components
 				return index;
 			}
 
-			template<typename TargetType> void Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
+			template<typename TargetType> Routine_Activity_Plan* Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
 				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
@@ -259,8 +259,9 @@ namespace Person_Components
 
 				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
 				activity_count++;
+				return activity;
 			}
-			template<typename TargetType> void Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
+			template<typename TargetType> Activity_Plan* Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
 				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
@@ -272,6 +273,110 @@ namespace Person_Components
 
 				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
+				return activity;
+			}
+			template<typename TargetType, typename LocationType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location)
+			{
+				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
+
+				_planner_itf* planner = activity->template Parent_Planner<_planner_itf*>();
+				person_itf* person = planner->Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = person->Scheduling_Faculty<scheduler_itf*>();
+
+				activity->template Activity_Plan_ID<int>(scheduler->Activity_Count<int>()+1);
+
+				activity->template Initialize<ACTIVITY_TYPES>(act_type);
+				activity->Set_Meta_Attributes<void>();
+				// schedule the activity events based on plan times.
+				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+				// set location and remove from planning stream
+				activity->Location<LocationType>(location);
+				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				activity->Schedule_Activity_Events<NT>();
+
+				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
+				return activity;
+			}
+			template<typename TargetType, typename LocationType, typename ModeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode)
+			{
+				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
+
+				_planner_itf* planner = activity->template Parent_Planner<_planner_itf*>();
+				person_itf* person = planner->Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = person->Scheduling_Faculty<scheduler_itf*>();
+
+				activity->template Activity_Plan_ID<int>(scheduler->Activity_Count<int>()+1);
+
+				activity->template Initialize<ACTIVITY_TYPES>(act_type);
+				activity->Set_Meta_Attributes<void>();
+				// schedule the activity events based on plan times.
+				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+				// set location and remove from planning stream
+				activity->Location<LocationType>(location);
+				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				// set location and remove from planning stream
+				activity->Mode<ModeType>(mode);
+				activity->Mode_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				activity->Schedule_Activity_Events<NT>();
+
+				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
+				return activity;
+			}
+			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
+			{
+				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
+
+				_planner_itf* planner = activity->template Parent_Planner<_planner_itf*>();
+				person_itf* person = planner->Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = person->Scheduling_Faculty<scheduler_itf*>();
+
+				activity->template Activity_Plan_ID<int>(scheduler->Activity_Count<int>()+1);
+
+				activity->template Initialize<ACTIVITY_TYPES>(act_type);
+				activity->Set_Meta_Attributes<void>();
+				// schedule the activity events based on plan times.
+				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+				//TODO: remove when done testing
+				if (start_plan_time > 400)
+				{
+					int test = 1;
+				}
+
+				// set location and remove from planning stream
+				activity->Location<LocationType>(location);
+				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				// set location and remove from planning stream
+				activity->Mode<ModeType>(mode);
+				activity->Mode_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				// set location and remove from planning stream
+				activity->Start_Time<TimeType>(start);
+				activity->Start_Time_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
+
+				activity->Duration<TimeType>(duration);
+				activity->Duration_Planning_Time<Revision&>()._iteration = END+1;
+				activity->Duration_Planning_Time<Revision&>()._sub_iteration = END+1;		
+
+				activity->Schedule_Activity_Events<NT>();
+				
+				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
+				return activity;
 			}
 			template<typename TargetType> void Create_Home_Activity(int& activity_count)
 			{
@@ -286,21 +391,21 @@ namespace Person_Components
 			}
 
 		};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::work_activity_freq[]= {0,0,0,1.0,0.75,0.15,0,0};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0,0.25};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::work_activity_freq[]= {0,0,0,1.0,0.75,0.15,0,0};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0,0.25};
 		
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::errands_activity_freq[]= {0.033,0.052,0.093,0.108,0.156,0.198,0.181,0.070};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::healthcare_activity_freq[]= {0.030,0.034,0.053,0.051,0.070,0.110,0.142,0.046};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::leisure_activity_freq[]= {0.198,0.271,0.234,0.161,0.213,0.236,0.184,0.206};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::major_shopping_activity_freq[]= {0.007,0.014,0.022,0.028,0.039,0.041,0.041,0.015};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::other_activity_freq[]= {0.008,0.016,0.021,0.027,0.023,0.034,0.031,0.028};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::other_shopping_activity_freq[]= {0.174,0.203,0.320,0.359,0.484,0.658,0.598,0.302};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::personal_business_activity_freq[]= {0.117,0.082,0.110,0.097,0.133,0.206,0.167,0.197};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::religious_or_civic_activity_freq[]= {0.059,0.069,0.033,0.049,0.074,0.113,0.103,0.043};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::service_vehicle_activity_freq[]= {0.021,0.023,0.043,0.080,0.076,0.077,0.076,0.061};
-		template<typename MasterType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::social_activity_freq[]= {0.227,0.188,0.215,0.129,0.211,0.225,0.189,0.200};
-		template<typename MasterType, typename InheritanceList> int CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count_Array[];
-		template<typename MasterType, typename InheritanceList> int CTRAMP_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count;
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::errands_activity_freq[]= {0.033,0.052,0.093,0.108,0.156,0.198,0.181,0.070};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::healthcare_activity_freq[]= {0.030,0.034,0.053,0.051,0.070,0.110,0.142,0.046};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::leisure_activity_freq[]= {0.198,0.271,0.234,0.161,0.213,0.236,0.184,0.206};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::major_shopping_activity_freq[]= {0.007,0.014,0.022,0.028,0.039,0.041,0.041,0.015};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::other_activity_freq[]= {0.008,0.016,0.021,0.027,0.023,0.034,0.031,0.028};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::other_shopping_activity_freq[]= {0.174,0.203,0.320,0.359,0.484,0.658,0.598,0.302};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::personal_business_activity_freq[]= {0.117,0.082,0.110,0.097,0.133,0.206,0.167,0.197};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::religious_or_civic_activity_freq[]= {0.059,0.069,0.033,0.049,0.074,0.113,0.103,0.043};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::service_vehicle_activity_freq[]= {0.021,0.023,0.043,0.080,0.076,0.077,0.076,0.061};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::social_activity_freq[]= {0.227,0.188,0.215,0.129,0.211,0.225,0.189,0.200};
+		template<typename MasterType, typename InheritanceList> int Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count_Array[];
+		template<typename MasterType, typename InheritanceList> int Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count;
 	}
 }

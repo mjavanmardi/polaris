@@ -9,7 +9,7 @@
 //#define SHOW_WARNINGS
 #endif
 
-#undef SHOW_WARNINGS
+#undef ENABLE_WARNINGS
 
 #include "Polaris_PCH.h"
 //#include "core\Core.h"
@@ -126,7 +126,7 @@ struct MasterType
 	typedef Person_Components::Implementations::Person_Mover_Implementation<M> person_mover_type;
 	typedef Person_Components::Implementations::General_Person_Scheduler_Implementation<M> person_scheduler_type;
 	typedef Person_Components::Implementations::General_Person_Perception_Implementation<M> person_perception_type;
-	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M> activity_generator_type;
+	typedef Person_Components::Implementations::Simple_Activity_Generator_Implementation<M> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
