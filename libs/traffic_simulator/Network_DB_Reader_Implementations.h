@@ -332,7 +332,33 @@ namespace Network_Components
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
+							// 1800 From HCM Equation 17-1
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+						}
+						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP)
+						{
+							// From HCM 2010 Exhibit 13-10
+
+							if(link->template free_flow_speed<float>() > 50.0f)
+							{
+								maximum_flow_rate = max(2200.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 40.0f)
+							{
+								maximum_flow_rate = max(2100.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 30.0f)
+							{
+								maximum_flow_rate = max(2000.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 20.0f)
+							{
+								maximum_flow_rate = max(1900.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+							}
+							else
+							{
+								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
+							}
 						}
 						else
 						{
@@ -505,7 +531,33 @@ namespace Network_Components
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
+							// 1800 From HCM Equation 17-1
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+						}
+						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP)
+						{
+							// From HCM 2010 Exhibit 13-10
+
+							if(link->template free_flow_speed<float>() > 50.0f)
+							{
+								maximum_flow_rate = max(2200.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 40.0f)
+							{
+								maximum_flow_rate = max(2100.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 30.0f)
+							{
+								maximum_flow_rate = max(2000.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+							}
+							else if(link->template free_flow_speed<float>() > 20.0f)
+							{
+								maximum_flow_rate = max(1900.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+							}
+							else
+							{
+								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
+							}
 						}
 						else
 						{
@@ -1138,6 +1190,21 @@ namespace Network_Components
 						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
 						pocket_data->num_pockets += db_itr->getLanes();
+						const string& type=db_itr->getType();
+
+						if(type == "RIGHT_TURN" || type == "RIGHT_MERGE")
+						{
+							pocket_data->num_pockets_right += db_itr->getLanes();
+						}
+						else if(type == "LEFT_TURN" || type == "LEFT_MERGE")
+						{
+							pocket_data->num_pockets_left += db_itr->getLanes();
+						}
+						else
+						{
+							cout << "Unknown pocket type: " << type << endl;
+						}
+
 						// convert to feet
 						pocket_data->pocket_length = db_itr->getLength()*3.28084;
 					}

@@ -367,6 +367,7 @@ namespace Scenario_Components
 				/* 1. update allowed flow for each turn movement.
 				 * 2. transfer vehicle */
 				INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,
+				INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION,
 				/* vehicles take action for transferring */
 				VEHICLE_ACTION_TRANSFER_SUB_ITERATION,
 				/* origin link loading */
