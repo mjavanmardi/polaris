@@ -1114,6 +1114,9 @@ namespace Network_Components
 				routable_network->finalize();
 
 
+				
+				routable_network->check_graph();
+
 				for(uint i=1;i<num_sim_threads();i++)
 				{
 					routable_network = routable_network->create_copy();

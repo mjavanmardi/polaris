@@ -241,6 +241,19 @@ namespace Choice_Model_Components
 		{
 			tag_as_prototype;
 
+			///These are only used if the choice option represents a nest
+			accessor(sub_choice_options, NONE, NONE);
+			accessor(inclusive_value_parameter, NONE, NONE);
+
+			template<typename TargetType> void Add_Sub_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
+			{
+				// Push item into boost::container::vector as anonymous
+				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
+				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
+				options->push_back((Choice_Option<Implementations::Choice_Option_Base<NT>>*)choice_option);			
+			}
+			
+
 			void Print_Utility()
 			{
 				this_component()->Print_Utility();
@@ -249,6 +262,27 @@ namespace Choice_Model_Components
 			double Calculate_Utility()
 			{
 				return this_component()->Calculate_Utility();
+			}
+
+			template<typename TargetType> double Calculate_Utility(requires(TargetType,check(ComponentType, Concepts::Is_MNL_Model)))
+			{
+				return this_component()->Calculate_Utility();
+			}
+
+			template<typename TargetType> double Calculate_Utility(requires(TargetType,check(ComponentType, Concepts::Is_Nested_Logit_Model)))
+			{
+				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
+				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
+
+				// Calculate log-sum
+				double IV = 0;
+				for (choice_options_itf::iterator itr = options->begin(); itr != options->end(); ++itr)
+				{
+					IV += exp((*itr)->Calculate_Utility<NT>());
+				}
+				IV = log(IV);
+
+				return this_component()->Calculate_Utility() + IV;
 			}
 		};
 	}

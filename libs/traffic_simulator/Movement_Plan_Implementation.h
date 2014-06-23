@@ -49,7 +49,19 @@ namespace Movement_Plan_Components
 			}
 			template<typename TargetType> TargetType current_trajectory_position(requires(TargetType,!check_2(TargetType,int,is_same) && !check_2(TargetType,int&,is_same)))
 			{
-				return (TargetType)_trajectory_container[_current_trajectory_index];
+				TargetType pos = nullptr;
+				if (_trajectory_container.size() ==0) return nullptr;
+
+				try
+				{
+					pos = (TargetType)_trajectory_container[_current_trajectory_index];
+				}
+				catch (std::exception& e)
+				{
+					cout << "Trajectory container pointer="<<&_trajectory_container<<", size="<<_trajectory_container.size()<<", Index="<<_current_trajectory_index<<", Exception: "<< e.what() << endl;
+				}
+
+				return pos;
 			}
 			template<typename TargetType> void current_trajectory_position(TargetType val,requires(TargetType,check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{

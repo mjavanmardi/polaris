@@ -19,7 +19,7 @@ namespace Routing_Components
 
 	namespace Prototypes
 	{
-		prototype struct Routing
+		prototype struct Routing ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

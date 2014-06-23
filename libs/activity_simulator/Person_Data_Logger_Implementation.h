@@ -630,10 +630,8 @@ namespace Person_Components
 			
 
 				//==============================================================================================
-				// write trips, only if auto mode used
+				// write trips, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
-				
-							
 				trip_rec->setConstraint(0);
 				trip_rec->setPerson(person->template uuid<int>());
 				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
@@ -656,7 +654,7 @@ namespace Person_Components
 				trip_rec->setTour(0);
 				trip_rec->setPriority(0);
 				trip_rec->setVehicle(9);
-				trip_rec->setType(0);
+				trip_rec->setType(1);
 				// add trip to the buffer for the current thread
 				trip_buff[__thread_id].push_back(trip_rec);
 				
@@ -681,7 +679,6 @@ namespace Person_Components
 				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec->setTrip (trip_rec);			
 				activity_buff[__thread_id].push_back(act_rec);
-
 			}
 		};
 	}

@@ -54,6 +54,11 @@ namespace Demand_Components
 			template<typename TargetType> void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(TargetType,check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
+				int counter = -1;
+				int trip_id = 0;
+
+				try
+				{
 				using namespace odb;
 				using namespace polaris::io;
 				typedef  Scenario_Components::Prototypes::Scenario< typename get_type_of(scenario_reference)> _Scenario_Interface;
@@ -92,6 +97,7 @@ namespace Demand_Components
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 
+
 				transaction t(db->begin());
 
 				result<Trip> trip_result=db->template query<Trip>(query<Trip>::true_expr);
@@ -123,8 +129,6 @@ namespace Demand_Components
 
 				cout << "Reading Travelers" << endl;
 
-
-				int counter = -1;
 				int departed_time;
 				int skipped_counter=0;
 
@@ -143,6 +147,8 @@ namespace Demand_Components
 				{
 					// perform demand reduction
 					if (GLOBALS::Uniform_RNG.Next_Rand<float>() > demand_percentage) continue;
+
+					trip_id = db_itr->getPrimaryKey();
 
 
 					if (++counter % 100000 == 0)
@@ -255,6 +261,11 @@ namespace Demand_Components
 					//{
 					//	cout << "\t" << traveler_id_counter << endl;
 					//}
+				}
+				}
+				catch (...)
+				{
+					THROW_EXCEPTION("Error: seems to be an ODB exception here, reading trip number "<<counter<<", trip id="<<trip_id);
 				}
 			}
 

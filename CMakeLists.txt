@@ -104,7 +104,7 @@ add_subdirectory (libs/spatial)
 add_subdirectory (libs/routing) 
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
-#add_subdirectory (libs/activity_simulator)
+add_subdirectory (libs/activity_simulator)
 
 
 #Apply CMake over POLARIS tests project structure
@@ -113,6 +113,7 @@ add_subdirectory (tests/core_tests)
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
 add_subdirectory (apps/population_synthesizer)
+add_subdirectory (apps/test) 
 
 
 if (MSVC AND Antares)
@@ -147,7 +148,7 @@ if (MSVC AND Antares)
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
 	add_subdirectory (libs/visual_traffic_simulator)
-	add_subdirectory (apps/test)
+	#add_subdirectory (apps/test)
 endif()
 
 add_subdirectory (libs/traffic_simulator)

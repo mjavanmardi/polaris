@@ -318,7 +318,22 @@ namespace Movement_Plan_Components
 
 				if(current_trajectory_position<int>() != -1)
 				{
-					return current_trajectory_position<_Trajectory_Unit_Interface*>()->template link<TargetType>();
+					_Trajectory_Unit_Interface* current_pos = current_trajectory_position<_Trajectory_Unit_Interface*>();
+
+					//TODO: REMOVE WHEN DONE TESTING FOR ANTARES
+					//cout << "Current_pos:"<<current_pos<<endl;
+					if (current_pos == nullptr) return nullptr;
+					
+					TargetType link = nullptr;
+					try
+					{
+						link = current_pos->template link<TargetType>();
+					}
+					catch (std::exception& e)
+					{
+						cout << "current_pos pointer="<<current_pos<<", Exception: "<< e.what() << endl;
+					}
+					return link;
 				}
 				else
 				{
