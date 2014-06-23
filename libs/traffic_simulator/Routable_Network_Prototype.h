@@ -9,11 +9,6 @@ namespace Routing_Components
 		prototype struct Routable_Network
 		{
 			tag_as_prototype;
-			
-			void check_graph()
-			{
-				return this_component()->check_graph();
-			}
 
 			Routable_Network<ComponentType>* create_copy()
 			{

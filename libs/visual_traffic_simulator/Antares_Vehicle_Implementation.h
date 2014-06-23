@@ -274,17 +274,7 @@ namespace Vehicle_Components
 				
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 
-				//TODO: REMOVE WHEN DONE TESTING ANTARES
-				//cout << "Movement plan ptr: "<< _movement_plan<<endl;
-				Link_Interface* link;
-				try
-				{
-					link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
-				}
-				catch (std::exception& e)
-				{
-					cout << "Movement pointer="<<_movement_plan<<", Exception: "<< e.what() << endl;
-				}
+				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				if (link == nullptr) return;
 

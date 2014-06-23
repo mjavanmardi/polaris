@@ -210,7 +210,6 @@ namespace Routing_Components
 				copy->_routable_graph_pool = graph_copy;
 				copy->_static_network_graph_id = _static_network_graph_id;
 
-
 				return (Routable_Network<ComponentType>*)copy;
 			}
 
@@ -330,19 +329,6 @@ namespace Routing_Components
 				Interactive_Graph<MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->Compile_Graph<Types::time_dependent_attributes<MT>>();
 	
 				//graph_pool->Link_Graphs();
-			}
-
-			void check_graph()
-			{
-				boost::container::vector<Graph_Pool<MT::graph_pool_type>::base_edge_type*>* edges = _routable_graph_pool->Get_Edges(_static_network_graph_id);
-				
-				cout << "Checking copy" << endl;
-
-				for(boost::container::vector<Graph_Pool<MT::graph_pool_type>::base_edge_type*>::iterator itr = edges->begin();itr !=edges->end();itr++)
-				{
-					if((*itr)->estimated_cost_origin_destination() != FLT_MAX/2.0f) cout << "Edge not correctly initialized! " << (*itr)->estimated_cost_origin_destination() << endl;
-					if((*itr)->cost_from_origin() != FLT_MAX/2.0f) cout << "Edge not correctly initialized! " << (*itr)->estimated_cost_origin_destination() << endl;
-				}
 			}
 
 			void finalize()
