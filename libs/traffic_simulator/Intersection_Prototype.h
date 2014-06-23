@@ -67,6 +67,11 @@ namespace Intersection_Components
 			accessor(lane_groups, NONE, NONE);
 			accessor(outbound_movements, NONE, NONE);
 
+			template<typename TargetType> void link_capacity_allocation()
+			{
+				this_component()->template link_capacity_allocation<TargetType>();
+			}
+
 			template<typename TargetType> void update_state()
 			{
 				//typedef  Link_Components::Prototypes::Link< typename get_type_of(inbound_link_reference)> _Link_Interface;
@@ -212,6 +217,11 @@ namespace Intersection_Components
 			template<typename TargetType> void turn_movement_supply_allocation()
 			{
 				this_component()->template turn_movement_supply_allocation<TargetType>();
+			}
+			
+			template<typename TargetType> void link_capacity_allocation()
+			{
+				this_component()->template link_capacity_allocation<TargetType>();
 			}
 
 			template<typename TargetType> void node_transfer()

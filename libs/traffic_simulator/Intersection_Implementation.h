@@ -322,8 +322,212 @@ namespace Intersection_Components
 	
 		implementation struct Inbound_Outbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Inbound_Outbound_Movements_Implementation),Data_Object>
 		{
+			typedef typename Polaris_Component<MasterType,INHERIT(Inbound_Outbound_Movements_Implementation),Data_Object>::ComponentType ComponentType;
+
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
+
+			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link_reference)> _Link_Interface;
+			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
+			typedef  Random_Access_Sequence<typename type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+
+			template<typename TargetType> void link_capacity_allocation()
+			{
+				// Computation is a disaggregated interpretation of HCM Equation 17-1
+
+				_Link_Interface* link = (_Link_Interface*)_inbound_link_reference;
+				
+				int num_lanes = link->num_lanes<int>();
+				
+				// skip non-arterial/local links
+
+				Link_Components::Types::Link_Type_Keys link_type = link->link_type<Link_Components::Types::Link_Type_Keys>();
+
+				// skip non-arterial/local links
+				if(link_type == Link_Components::Types::Link_Type_Keys::FREEWAY || 
+					link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || 
+					link_type == Link_Components::Types::Link_Type_Keys::ON_RAMP || 
+					link_type == Link_Components::Types::Link_Type_Keys::OFF_RAMP)
+				{
+					return;
+				}
+				
+				Link_Components::Implementations::Pocket_Data* pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+
+				if(!pocket_data->num_pockets_left || !pocket_data->num_pockets_right)
+				{
+					const float interval = (float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+
+					const float interval_capacity = (1800.0f/(60.0f*60.0f))*interval;
+
+					//boost::container::deque<_Movement_Interface*> through_movements;
+					//boost::container::deque<_Movement_Interface*> right_movements;
+					//boost::container::deque<_Movement_Interface*> left_movements;
+					
+					_Movement_Interface* outbound_movement;
+					typename _Movements_Container_Interface::iterator outbound_itr;
+					
+					float total_demand = 0.0f;
+					float left_demand = 0.0f;
+					float right_demand = 0.0f;
+					float through_demand = 0.0f;
+
+					float total_capacity = interval_capacity*((float)num_lanes)+interval_capacity*((float)pocket_data->num_pockets_left)+interval_capacity*((float)pocket_data->num_pockets_right);
+
+					for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
+					{
+						outbound_movement=(_Movement_Interface*)(*outbound_itr);
+						
+						total_demand += outbound_movement->movement_demand<float>();
+
+						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+
+						if(type == U_TURN || type == LEFT_TURN)
+						{
+							left_demand += outbound_movement->movement_demand<float>();
+						}
+						else if(type == RIGHT_TURN)
+						{
+							right_demand += outbound_movement->movement_demand<float>();
+						}
+						else if(type == THROUGH_TURN)
+						{
+							through_demand += outbound_movement->movement_demand<float>();
+						}
+					}
+
+					if(total_demand <= 0.5f) return;
+
+					// ascertain whether the link is constrained by left, right, and center
+					
+					float movement_supply;
+
+					// if there are 2 or more lanes, only the right (or left) lane would be backed up, the left (or right) lanes would have full capacity
+					// in addition, turners will only utilize the rightmost or leftmost lane
+					// this means the turn movement can receive no more than one lane's worth of capacity
+					// this one lane's capacity should also be subject to the percentage of demand for that lane
+					// however, we don't have a good way of estimating the % of through movers in one of those lanes; it should be less than an even split because they will avoid queues
+					// until we can get an estimate for that just compute proportion to demand and cap the capacity
+
+					// Additionally, there should be some mechanism to let unused supply flow back to other incident links
+
+					if(!pocket_data->num_pockets_left && !pocket_data->num_pockets_right)
+					{
+						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
+						{
+							outbound_movement=(_Movement_Interface*)(*outbound_itr);
+
+							// movement gets fraction of capacity proportional to fraction of demand
+							movement_supply = outbound_movement->movement_supply<float>();
+
+							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
+
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+
+							if(type == THROUGH_TURN)
+							{
+								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->movement_demand<float>() / total_demand ) ));
+							}
+							else
+							{
+								movement_supply = floor(min(interval_capacity,min( movement_supply, total_capacity * ( outbound_movement->movement_demand<float>() / total_demand ) )));
+							}
+
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( total_capacity * ( outbound_movement->movement_demand<float>() / total_demand));
+							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=total_demand)
+							//{
+							//	cout << "Left and Right Missing: " << outbound_movement->movement_supply<float>() << "," << total_capacity << "," << outbound_movement->movement_demand<float>() << "," << total_demand << "," << movement_supply << endl;
+							//}
+							outbound_movement->movement_supply<float>(movement_supply);
+						}
+					}
+					else if(!pocket_data->num_pockets_right)
+					{
+						// there are left pockets, but not right pockets, you can deduct the left turn demand from the total demand
+						// also deduct the left turn capacity from the total capacity
+
+						float shared_demand = total_demand - left_demand;
+						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_left);
+
+						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
+						{
+							outbound_movement=(_Movement_Interface*)(*outbound_itr);
+
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+
+							if(type == U_TURN || type == LEFT_TURN)
+							{
+								// skip these, they get full supply
+								continue;
+							}
+
+							// movement gets fraction of capacity proportional to fraction of demand
+							movement_supply = outbound_movement->movement_supply<float>();
+								
+							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
+
+							if(type == THROUGH_TURN)
+							{
+								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) ));
+							}
+							else
+							{
+								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) )));
+							}
+
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand));
+
+							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=shared_demand)
+							//{
+							//	cout << "Right Missing: " << outbound_movement->movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
+							//}
+							outbound_movement->movement_supply<float>(movement_supply);
+						}
+					}
+					else if(!pocket_data->num_pockets_left)
+					{
+						float shared_demand = total_demand - right_demand;
+						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_right);
+
+						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
+						{
+							outbound_movement=(_Movement_Interface*)(*outbound_itr);
+
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+
+							if(type == RIGHT_TURN)
+							{
+								// skip these, they get full supply
+								continue;
+							}
+
+							// movement gets fraction of capacity proportional to fraction of demand
+							movement_supply = outbound_movement->movement_supply<float>();
+							
+							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
+							if(type == THROUGH_TURN)
+							{
+								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) ));
+							}
+							else
+							{
+								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) )));
+							}
+							
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand));
+
+							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=shared_demand)
+							//{
+							//	cout << "Left Missing: " << outbound_movement->movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
+							//}
+
+							outbound_movement->movement_supply<float>(movement_supply);
+						}
+					}
+				}
+			}
 		};
 		
 		implementation struct Intersection_Implementation:public Polaris_Component<MasterType,INHERIT(Intersection_Implementation),Execution_Object>
@@ -347,25 +551,30 @@ namespace Intersection_Components
 
 			typedef typename MasterType::vehicle_type vehicle_type;
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
-			typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
-			typedef  Random_Access_Sequence<typename type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+			
+			
+			typedef Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
+			typedef Random_Access_Sequence<typename type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
 
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
-			typedef  Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
+			typedef Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
 
-			typedef  Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer<typename  type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
-			typedef  Random_Access_Sequence<typename type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Outbound_Movement_Interface;
-			typedef  Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Outbound_Movement_Interface*> _Outbound_Movements_Container_Interface;
+			typedef Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer<typename  type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
+			typedef Random_Access_Sequence<typename type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
-			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Outbound_Movement_Interface::get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
-			typedef  Back_Insertion_Sequence< typename _Outbound_Movement_Interface::get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Outbound_Movement_Interface;
+			typedef Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Outbound_Movement_Interface*> _Outbound_Movements_Container_Interface;
 
-			typedef  Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
-			typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
-			typedef  Intersection_Control_Components::Prototypes::Intersection_Control<typename type_of(intersection_control)> _Intersection_Control_Interface;
-			typedef  Intersection_Control_Components::Prototypes::Control_Plan< typename _Intersection_Control_Interface::get_type_of(current_control_plan)> _Control_Plan_Interface;
+
+
+			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Outbound_Movement_Interface::get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
+			typedef Back_Insertion_Sequence< typename _Outbound_Movement_Interface::get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+
+			typedef Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
+			typedef Intersection_Control_Components::Prototypes::Intersection_Control<typename type_of(intersection_control)> _Intersection_Control_Interface;
+			typedef Intersection_Control_Components::Prototypes::Control_Plan< typename _Intersection_Control_Interface::get_type_of(current_control_plan)> _Control_Plan_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
@@ -536,6 +745,18 @@ namespace Intersection_Components
 					break;
 				}
 			};
+
+			template<typename TargetType> void link_capacity_allocation()
+			{
+				//typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
+				//typedef  Random_Access_Sequence< type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+
+				typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+				for (inbound_itr=_inbound_outbound_movements.begin(); inbound_itr!=_inbound_outbound_movements.end(); inbound_itr++)
+				{
+					((_Inbound_Outbound_Movements_Interface*)(*inbound_itr))->template link_capacity_allocation<NULLTYPE>();
+				}
+			}
 
 			// load vehicles to their origin link
 			template<typename TargetType> void origin_link_loading()
@@ -776,16 +997,16 @@ namespace Intersection_Components
 					_pthis->Compute_Step_Flow();
 					//response.result=true;
 					response.next._iteration=iteration();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION;
+				}
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION)
+				{
+					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Origin_Loading_Step<NULLTYPE>);
+					_pthis->Origin_Loading_Step();
+					//response.result=true;
+					response.next._iteration=iteration();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
 				}
-				//else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION)
-				//{
-
-				//	((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Origin_Loading_Step<NULLTYPE>);
-				//	response.result=true;
-				//	response.next._iteration=_iteration;
-				//	response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
-				//} 
 				//else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
 				//{
 				//	//TODO:BIG_CHANGE!
@@ -797,7 +1018,6 @@ namespace Intersection_Components
 				//} 
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
 				{
-
 					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&ComponentType::template Intersection_REALTIME_MOE_Update<NULLTYPE>);
 					_pthis->Intersection_REALTIME_MOE_Update();
 					//response.result=true;
@@ -827,20 +1047,24 @@ namespace Intersection_Components
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
 				_this_ptr->template turn_movement_capacity_update<NULLTYPE>(); 
 				//step 3: allocate link supply to inbound turn movements according to a given merging policy
-				_this_ptr->template turn_movement_supply_allocation<NULLTYPE>();
+				
 				_this_ptr->template turn_movement_demand_calculation<NULLTYPE>();
-				//step 4: determine turn movement flow rate based on demand, capacity, and supply
-				_this_ptr->template turn_movement_flow_calculation<NULLTYPE>();
-				//step 5: node transfer
-				_this_ptr->template node_transfer<NULLTYPE>();
-				////step 6: origin link loading
-				//_this_ptr->template origin_link_loading<NULLTYPE>();
 			}
 
 			//declare_event(Origin_Loading_Step)
 			void Origin_Loading_Step()
 			{
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
+
+				_this_ptr->template turn_movement_supply_allocation<NULLTYPE>();
+				
+				_this_ptr->template link_capacity_allocation<NULLTYPE>();
+
+				//step 4: determine turn movement flow rate based on demand, capacity, and supply
+				_this_ptr->template turn_movement_flow_calculation<NULLTYPE>();
+				//step 5: node transfer
+				_this_ptr->template node_transfer<NULLTYPE>();
+
 				//step 6: origin link loading
 				//_this_ptr->template origin_link_loading<NULLTYPE>();
 			}

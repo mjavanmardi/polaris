@@ -61,9 +61,11 @@ namespace Link_Components
 
 		struct Pocket_Data
 		{
-			Pocket_Data():num_pockets(0),pocket_length(0.0f){}
+			Pocket_Data():num_pockets(0),num_pockets_left(0),num_pockets_right(0),pocket_length(0.0f){}
 
 			int num_pockets;
+			int num_pockets_left;
+			int num_pockets_right;
 			float pocket_length;
 		};
 
@@ -350,6 +352,7 @@ namespace Link_Components
 
 				float current_link_capacity = 0.0;
 				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0);
+
 				_link_capacity = current_link_capacity;
 			}
 			
@@ -1151,7 +1154,7 @@ namespace Link_Components
 			{
 				float spd;
 
-				if(_free_flow_speed >= (50+10))
+				if(_free_flow_speed >= (50+7))
 				{
 					spd = _free_flow_speed - 10;
 				}
