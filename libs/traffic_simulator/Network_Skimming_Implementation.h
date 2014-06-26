@@ -275,13 +275,14 @@ namespace Network_Skimming_Components
 						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->zone<zone_itf*>()->internal_id<int>());
 						float weight = 1.0 / ((float)zone_origin_count_itr->second * (float)zone_destination_count_itr->second);
 
-						// ignore location pairs were no valid route was found
-						if (time > 1440)
+						// ignore location pairs were no valid route was found travel time over 10 days
+						if (time > FLT_MAX/1000.0f)
 						{
 							typename links_itf::iterator link_itr = dest_node->template destination_links<links_itf*>()->begin();
 							for (;link_itr != dest_node->template destination_links<links_itf*>()->end(); ++link_itr)
 							{
-								cout << "Skimming error, destination location ID '" << dest_node->uuid<int>() << "' of land us type '"<<dest_node->Is_Routable_Location<bool>()<<"', is inaccessible from zone id '" << orig_loc->zone<zone_itf*>()->uuid<int>() <<"', location ID '"<< orig_loc->uuid<int>()<< " .  Destination link ID: "  << (*link_itr)->uuid<long>()<<". Check network for proper connectivity." <<endl;
+								typename links_itf::iterator orig_link_itr = orig_loc->template origin_links<links_itf*>()->begin();
+								cout << "SKIMMING ERROR, destination location ID=" << dest_node->uuid<int>() << ", link ID="  << (*link_itr)->uuid<long>()<<", is inaccessible from origin location ID="<< orig_loc->uuid<int>()<< ", link ID="  << (*orig_link_itr)->uuid<long>()<<". Check network connectivity." <<endl;
 							}
 							continue;
 						}
