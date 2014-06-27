@@ -215,13 +215,18 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 
-											
+						
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
 
 						num_lanes = db_itr->getLanes_Ab();
 						
+						if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
+						{
+							if(num_lanes <= 3) num_lanes = 4;
+						}
+
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 						/*
@@ -329,13 +334,13 @@ namespace Network_Components
 						//if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP" || facility_type=="RAMP")
 						
 						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL ||
-							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
 							// 1800 From HCM Equation 17-1
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						}
-						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP)
+						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP || 
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::OFF_RAMP)
 						{
 							// From HCM 2010 Exhibit 13-10
 
@@ -359,6 +364,10 @@ namespace Network_Components
 							{
 								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
+						}
+						else if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						{
+							maximum_flow_rate = 2000.0f;
 						}
 						else
 						{
@@ -421,6 +430,11 @@ namespace Network_Components
 
 						num_lanes = db_itr->getLanes_Ba();
 						
+						if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
+						{
+							if(num_lanes <= 3) num_lanes = 4;
+						}
+
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 						
 						/*
@@ -528,13 +542,13 @@ namespace Network_Components
 
 						//if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP")
 						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL ||
-							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP ||
 							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
 							// 1800 From HCM Equation 17-1
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						}
-						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP)
+						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP || 
+							link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::OFF_RAMP)
 						{
 							// From HCM 2010 Exhibit 13-10
 
@@ -558,6 +572,10 @@ namespace Network_Components
 							{
 								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
+						}
+						else if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
+						{
+							maximum_flow_rate = 2000.0f;
 						}
 						else
 						{
@@ -1182,6 +1200,8 @@ namespace Network_Components
 					link_id_dir.id = db_itr->getLink()->getLink();
 					link_id_dir.dir = db_itr->getDir();
 
+					int lanes = 0;
+					float length = 0.0f;
 
 					if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 					{
@@ -1189,24 +1209,33 @@ namespace Network_Components
 
 						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
-						pocket_data->num_pockets += db_itr->getLanes();
+						lanes = db_itr->getLanes();
+
+						if(lanes == 0) lanes=1;
+
+						pocket_data->num_pockets += lanes;
 						const string& type=db_itr->getType();
 
 						if(type == "RIGHT_TURN" || type == "RIGHT_MERGE")
 						{
-							pocket_data->num_pockets_right += db_itr->getLanes();
+							pocket_data->num_pockets_right += lanes;
 						}
 						else if(type == "LEFT_TURN" || type == "LEFT_MERGE")
 						{
-							pocket_data->num_pockets_left += db_itr->getLanes();
+							pocket_data->num_pockets_left += lanes;
 						}
 						else
 						{
 							cout << "Unknown pocket type: " << type << endl;
 						}
 
+						length = db_itr->getLength()*3.28084;
+
+						// average pocket length
+						if(length == 0.0f) length = 203.412f;
+
 						// convert to feet
-						pocket_data->pocket_length = db_itr->getLength()*3.28084;
+						pocket_data->pocket_length = length;
 					}
 				}
 					
