@@ -3,7 +3,7 @@
 #include "Population_Synthesis_Includes.h"
 #include "activity_simulator\Household_Prototype.h"
 #include "activity_simulator\Person_Prototype.h"
-
+#include <iomanip>
 
 namespace PopSyn
 {
@@ -52,7 +52,11 @@ namespace PopSyn
 					marg_filename << "marginal_distributions.xls";
 					this->Marginal_Output_Stream<ofstream&>().open(marg_filename.str(),ios_base::out);	
 				}
-						
+				
+				stringstream log_filename("");
+				log_filename << scenario->template output_dir_name<string>();
+				log_filename << "popsyn_log.csv";
+				this->Log_File<ofstream&>().open(log_filename.str(),ios_base::out);	
 
 				this_component()->template Initialize<NT>();
 
@@ -99,6 +103,7 @@ namespace PopSyn
 					case POPSYN_SUBITERATIONS::OUTPUT:
 						pthis->Create_Agents_Event<NT>();
 						pthis->Write_Files_Event<NT>();
+						pthis->Write_Fit_Results<NT>();
 						response.next._iteration = 3;
 						response.next._sub_iteration = 0;
 						break;
@@ -567,6 +572,125 @@ namespace PopSyn
 				}
 				sample_out.close();
 				marg_out.close();
+			}
+			template<typename TargetType> void Write_Fit_Results()
+			{
+				this->timer<Counter&>().Start();
+				ofstream& popsyn_log = this->Log_File<ofstream&>();
+
+				//=============================================================================================
+				#pragma region Define interfaces
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
+				// Define iterators and get pointer to the region collection
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
+
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_collection_type::mapped_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> households_container_itf;
+				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
+				typedef Multidimensional_Random_Access_Array<marg_dist_type>	marginal_itf;
+				typedef typename marginal_itf::index_type index;
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+				#pragma endregion
+					
+				scenario_itf* scenario = this->scenario_reference<scenario_itf*>();
+
+				marginal_itf marginal_hh_error;
+				marginal_itf marginal_hh_sum;
+				marginal_itf marginal_per_error;
+				marginal_itf marginal_per_sum;
+
+
+				//=============================================================================================
+				// Loop through all regions/zones and handle file output if needed
+				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
+
+				marginal_hh_error.resize(regions->begin()->second->Target_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_hh_sum.resize(regions->begin()->second->Target_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_per_error.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_per_sum.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+
+				for (typename regions_itf::iterator r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				{
+					region_itf* region = r_itr->second;
+					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+					for (typename zones_itf::iterator z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					{
+						zone_itf* zone = z_itr->second;
+
+						// write the marginal results
+						if (scenario->write_marginal_output<bool>())
+						{
+							marginal_itf& marg_hh =		zone->template Target_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& marg_per =	zone->template Target_Person_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_marg_hh = zone->template Synthesized_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_marg_per= zone->template Synthesized_Person_Marginal_Distribution<marginal_itf&>();
+							
+
+							for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)marg_hh.dimensions()[i]; ++d)
+								{
+									marginal_hh_error[index(i,d)] += abs(syn_marg_hh[index(i,d)] - marg_hh[index(i,d)]);
+									marginal_hh_sum[index(i,d)] += marg_hh[index(i,d)];
+								}
+							}
+							for (int i = 0; i < (int)marg_per.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)marg_per.dimensions()[i]; ++d)
+								{
+									marginal_per_error[index(i,d)] += abs(syn_marg_per[index(i,d)] - marg_per[index(i,d)]);
+									marginal_per_sum[index(i,d)] += marg_per[index(i,d)];
+								}
+							}
+						}
+					}
+				}
+				double total_hh_error = 0;
+				double total_hh_sum = 0;
+				popsyn_log <<"WAAPD value for household marginals:"<<setprecision(2)<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				for (int i = 0; i < (int)marginal_hh_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)marginal_hh_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<marginal_hh_error[index(i,d)]/marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_hh_error += marginal_hh_error[index(i,d)];
+						total_hh_sum +=marginal_hh_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_hh_error/total_hh_sum*100.0<<"%"<<endl<<endl;
+				popsyn_log <<"WAAPD value for person marginals:"<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_per_error = 0;
+				double total_per_sum = 0;
+				for (int i = 0; i < (int)marginal_per_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)marginal_per_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<marginal_per_error[index(i,d)]/marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_per_error += marginal_per_error[index(i,d)];
+						total_per_sum +=marginal_per_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_per_error/total_per_sum*100.0<<"%"<<endl;
 				popsyn_log.close();
 			}
 	

@@ -80,10 +80,7 @@ public:
        }
 
        m_array_iterator& operator++()
-       {    // preincrement
-			//++m_Ptr;
-			//return (*this);
-
+       {    
 			for (size_type d = (size_type)_dimensions->size()-1; d >= 0; d--)
 			{
 				if (d != _fixed_dim)
@@ -336,6 +333,16 @@ public:
 		for (size_type i=0; i<_size; i++)
 		{
 			_sum += _data[i];
+		}
+		return _sum;
+	}
+	value_type sum(size_type dimension, size_type index)
+	{
+		value_type _sum = 0;
+
+		for (m_array<T>::iterator itr = this->begin(dimension,index); itr != this->end(); ++itr)
+		{
+			_sum += *itr;
 		}
 		return _sum;
 	}

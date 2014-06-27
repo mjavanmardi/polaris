@@ -15,11 +15,16 @@ namespace Choice_Model_Components
 		{
 			virtual double Calculate_Utility() = 0;
 			virtual void Print_Utility() = 0;
+
+			m_data(double, choice_utility, NONE, NONE);
+			m_data(double, choice_probability, NONE, NONE);
 		};
 
 		implementation struct Nested_Choice_Option_Base : public Choice_Option_Base<MT,INHERIT(Nested_Choice_Option_Base)>
 		{
-			m_container(std::vector<void*>,choice_options, NONE, NONE);
+			typedef true_type Nested_Logit_Model_tag;
+			m_prototype_container(std::vector<Prototypes::Choice_Option<Nested_Choice_Option_Base<NT>>*>,Nested_Choice_Option_Base<NT>,sub_choice_options, NONE, NONE);
+			m_data(float, inclusive_value_parameter, NONE, NONE);
 		};
 
 		implementation struct Choice_Model_Implementation : public Polaris_Component<MT,INHERIT(Choice_Model_Implementation),Data_Object>
@@ -34,7 +39,7 @@ namespace Choice_Model_Components
 			typedef true_type Probabilistic_Choice_tag;
 			typedef true_type Utility_Based_Choice_tag;
 
-			m_container(std::vector<void*>,choice_options, NONE, NONE);
+			m_prototype_container(std::vector<Prototypes::Choice_Option<Choice_Option_Base<NT>>*>,Choice_Option_Base<NT>,choice_options, NONE, NONE);
 			m_container(std::vector<double>,choice_utilities, NONE, NONE);
 			m_container(std::vector<double>,choice_probabilities, NONE, NONE);
 		};
@@ -45,7 +50,7 @@ namespace Choice_Model_Components
 			typedef true_type Probabilistic_Choice_tag;
 			typedef true_type Utility_Based_Choice_tag;
 
-			m_container(std::vector<void*>,choice_options, NONE, NONE);
+			m_prototype_container(std::vector<Prototypes::Choice_Option<Nested_Choice_Option_Base<NT>>*>,Nested_Choice_Option_Base<NT>,choice_options, NONE, NONE);
 			m_container(std::vector<double>,choice_utilities, NONE, NONE);
 			m_container(std::vector<double>,choice_probabilities, NONE, NONE);
 		};

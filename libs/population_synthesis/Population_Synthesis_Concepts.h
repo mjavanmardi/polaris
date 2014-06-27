@@ -30,7 +30,7 @@ namespace PopSyn
 			define_default_check(Has_IPF_Configuration_Data_Prototype || Has_IPF_Configuration_Data_Component);
 		};
 
-		concept struct Scenario_Has_CO_Configuration_Data
+		concept struct Scenario_Has_IPU_Configuration_Data
 		{
 			// Prototype versions - add as needed
 			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
@@ -46,8 +46,8 @@ namespace PopSyn
 		concept struct Scenario_Has_Popsyn_Configuration_Data
 		{
 			check_concept(has_IPF_configuration, Scenario_Has_IPF_Configuration_Data,T,V);
-			check_concept(has_CO_configuration, Scenario_Has_IPF_Configuration_Data,T,V);
-			define_sub_check(has_configuration, has_IPF_configuration || has_CO_configuration);
+			check_concept(has_IPU_configuration, Scenario_Has_IPF_Configuration_Data,T,V);
+			define_sub_check(has_configuration, has_IPF_configuration || has_IPU_configuration);
 
 			check_template_method_name(has_percent_to_synthesize_p, Component_Type::percent_to_synthesize);
 			check_template_method_name(has_write_marginal_output_p, Component_Type::write_marginal_output);
@@ -100,11 +100,11 @@ namespace PopSyn
 			define_default_check(Has_Marginals && Has_MWAY && Has_Value_Type);
 		};
 
-		concept struct Is_Combinatorial_Optimization_Compatible
+		concept struct Is_IPU_Compatible
 		{
 			check_typedef_name(Has_Value_Type, Value_Type);
-			check_typedef_type(Is_CO, Is_Combinatorial_Optimization_Type, true_type);
-			define_default_check(Has_Value_Type && Is_CO);
+			check_typedef_type(Is_IPU, Is_IPU_Type, true_type);
+			define_default_check(Has_Value_Type && Is_IPU);
 		};
 
 		concept struct Is_Probabilistic_Selection

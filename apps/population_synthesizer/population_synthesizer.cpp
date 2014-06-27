@@ -12,8 +12,8 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
 	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
 	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
-	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
-	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
@@ -33,20 +33,33 @@ int main(int argc, char* argv[])
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
 
-	//boost::container::vector<uint> dims;
-	//dims.push_back(3); dims.push_back(3); dims.push_back(3);
+	m_array<double> m;
+	m_array<double>::index_type dims;
+	m_array<double>::index_type index;
+	dims.push_back(3);dims.push_back(3);dims.push_back(3);
+	index.push_back(0);index.push_back(0);index.push_back(0);
+	m.resize(dims,0);
+	for (int i=0; i < 3; ++i)
+	{
+		index[0] = i;
+		for (int j=0; j < 3; ++j)
+		{
+			index[1] = j;
+			for (int k=0; k < 3; ++k)
+			{
+				index[2] = k;
+				m[index] = i*dims[1]*dims[2] + j*dims[2] + k;
+			}
+		}
+	}
 
-	//m_array<double> m;
-	//m.resize(dims);
+	for (m_array<double>::iterator itr = m.begin(1,1); itr != m.end(); ++itr)
+	{
+		index = itr.get_index();
+		cout << index[0] <<","<<index[1]<<","<<index[2]<<" = "<< *itr<<endl;
+	}
 
-	//s_array<double> s;
-	//s.resize(dims);
-
-	//boost::container::vector<uint> index;
-	//index.push_back(1); index.push_back(2); index.push_back(0);
-	//uint i = m.get_index(index);
-
-
+	cout << m.sum(1,1);
 
 	//==================================================================================================================================
 	// Scenario initialization
