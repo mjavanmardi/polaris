@@ -20,7 +20,7 @@ namespace PopSyn
 			template<typename IndexType> void Initialize(IndexType dimensions_hh, IndexType dimensions_per)
 			{
 				this_component()->template Init<NT>();
-				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per);
+				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per,0,0);
 				((ComponentType*)this)->Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);		
 			}
 

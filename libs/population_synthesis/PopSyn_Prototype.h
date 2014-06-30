@@ -149,6 +149,8 @@ namespace PopSyn
 				linker_itf* linker = this->file_linker<linker_itf*>();
 				std::vector<int>& dims_hh = linker->hh_dimension_sizes();
 				std::vector<int>& dims_per = linker->person_dimension_sizes();
+				int dims_test_hh = linker->test_dimension_size();
+				int dims_test_per = linker->test_person_dimension_size();
 
 				//===============================================================================================================
 				#pragma region Define interfaces
@@ -247,7 +249,7 @@ namespace PopSyn
 					// Initialize the new zone
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
 					zone->ID(ID);
-					zone->template Initialize<std::vector<int>&>(dims_hh,dims_per);
+					zone->template Initialize<std::vector<int>&>(dims_hh,dims_per,dims_test_hh,dims_test_per);
 					zone->parent_reference(region);
 					zone->template Solver_Settings<solver_itf*>(solver);
 
@@ -615,6 +617,11 @@ namespace PopSyn
 				marginal_itf marginal_per_error;
 				marginal_itf marginal_per_sum;
 
+				marginal_itf test_marginal_hh_error;
+				marginal_itf test_marginal_hh_sum;
+				marginal_itf test_marginal_per_error;
+				marginal_itf test_marginal_per_sum;
+
 
 				//=============================================================================================
 				// Loop through all regions/zones and handle file output if needed
@@ -624,6 +631,11 @@ namespace PopSyn
 				marginal_hh_sum.resize(regions->begin()->second->Target_Marginal_Distribution<marginal_itf&>().dimensions(),0);
 				marginal_per_error.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
 				marginal_per_sum.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+
+				test_marginal_hh_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_hh_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_per_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_per_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
 
 				for (typename regions_itf::iterator r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
@@ -641,6 +653,15 @@ namespace PopSyn
 							marginal_itf& syn_marg_hh = zone->template Synthesized_Marginal_Distribution<marginal_itf&>();
 							marginal_itf& syn_marg_per= zone->template Synthesized_Person_Marginal_Distribution<marginal_itf&>();
 							
+							marginal_itf& test_marg_hh =		zone->template Test_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& test_marg_per =		zone->template Test_Person_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_test_marg_hh =	zone->template Synthesized_Test_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_test_marg_per=	zone->template Synthesized_Test_Person_Marginal_Distribution<marginal_itf&>();
+
+							//test_marg_hh.write(popsyn_log);
+							//syn_test_marg_hh.write(popsyn_log);
+							//test_marg_per.write(popsyn_log);
+							//syn_test_marg_per.write(popsyn_log);
 
 							for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
 							{
@@ -656,6 +677,23 @@ namespace PopSyn
 								{
 									marginal_per_error[index(i,d)] += abs(syn_marg_per[index(i,d)] - marg_per[index(i,d)]);
 									marginal_per_sum[index(i,d)] += marg_per[index(i,d)];
+								}
+							}
+
+							for (int i = 0; i < (int)test_marg_hh.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)test_marg_hh.dimensions()[i]; ++d)
+								{
+									test_marginal_hh_error[index(i,d)] += abs(syn_test_marg_hh[index(i,d)] - test_marg_hh[index(i,d)]);
+									test_marginal_hh_sum[index(i,d)] += test_marg_hh[index(i,d)];
+								}
+							}
+							for (int i = 0; i < (int)test_marg_per.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)test_marg_per.dimensions()[i]; ++d)
+								{
+									test_marginal_per_error[index(i,d)] += abs(syn_test_marg_per[index(i,d)] - test_marg_per[index(i,d)]);
+									test_marginal_per_sum[index(i,d)] += test_marg_per[index(i,d)];
 								}
 							}
 						}
@@ -691,6 +729,36 @@ namespace PopSyn
 					}
 				}
 				popsyn_log <<"Total,,"<<fixed<<total_per_error/total_per_sum*100.0<<"%"<<endl;
+				popsyn_log <<"WAAPD value for TEST household marginals:"<<setprecision(2)<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_test_hh_error = 0;
+				double total_test_hh_sum = 0;
+				for (int i = 0; i < (int)test_marginal_hh_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)test_marginal_hh_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_hh_error[index(i,d)]/test_marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_test_hh_error += test_marginal_hh_error[index(i,d)];
+						total_test_hh_sum +=test_marginal_hh_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_test_hh_error/total_test_hh_sum*100.0<<"%"<<endl<<endl;
+				popsyn_log <<"WAAPD value for TEST person marginals:"<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_test_per_error = 0;
+				double total_test_per_sum = 0;
+				for (int i = 0; i < (int)test_marginal_per_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)test_marginal_per_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_per_error[index(i,d)]/test_marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_test_per_error += test_marginal_per_error[index(i,d)];
+						total_test_per_sum +=test_marginal_per_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_test_per_error/total_test_per_sum*100.0<<"%"<<endl;
 				popsyn_log.close();
 			}
 	

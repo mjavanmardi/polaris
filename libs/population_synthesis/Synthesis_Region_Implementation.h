@@ -35,6 +35,10 @@ namespace PopSyn
 			{
 				return this->parent_reference<type_of(parent_reference)&>().network_reference<TargetType>();
 			}
+			template<typename TargetType> TargetType file_linker_reference()
+			{
+				return this->parent_reference<type_of(parent_reference)&>().file_linker<TargetType>();
+			}
 
 			// Function to initialize the google hash maps
 			template<typename TargetType> void Init()
@@ -73,6 +77,11 @@ namespace PopSyn
 					index.push_back(linker->find_index_in_dimension(i,x)); // find which marginal category the value belongs to for each dimension and save in index
 				}
 
+				// find out which test category the test control variable belongs
+				int test_index = -1;
+				if (fr.Get_Data<double>(x,linker->get_pums_column(0,true,true)))
+					test_index = linker->find_index_in_dimension(0,x,true,true);
+
 				// Create the household sample object by reading from the input file
 				typename sample_type::ID_type sample_id;
 				typename sample_type::Weight_type weight;
@@ -85,6 +94,7 @@ namespace PopSyn
 				p->Weight(weight);
 				p->template Characteristics<boost::container::vector<double>*>(&data);
 				p->Index(_Target_Joint_Distribution.get_index(index));	// save the index (converted to 1-dimensional value) into the joint distribution for this household
+				p->Test_Index(test_index);
 
 				// Update the sample and joint distribution with the current population unit
 				pair<typename Sample_Data_type::key_type,pop_unit_itf*> item = pair<typename Sample_Data_type::key_type,pop_unit_itf*>(p->template Index<typename Sample_Data_type::key_type&>(),p);
@@ -117,6 +127,10 @@ namespace PopSyn
 					fr.Get_Data<double>(x,link->get_pums_column(i,false));
 					index.push_back(link->find_index_in_dimension(i,x,false));
 				}
+				// find out which test category the test control variable belongs
+				int test_index = -1;
+				if (fr.Get_Data<double>(x,linker->get_pums_column(0,false,true)))
+					test_index = linker->find_index_in_dimension(0,x,false,true);
 
 				typename person_sample_type::ID_type sample_id;
 				typename person_sample_type::Weight_type weight=0;
@@ -132,6 +146,7 @@ namespace PopSyn
 				p->ID(sample_id);				
 				p->template Characteristics<boost::container::vector<double>*>(&data);	
 				p->Index(_Target_Person_Joint_Distribution.get_index(index));
+				p->Test_Index(test_index);
 
 				// find the household that the person belongs to and add
 				typename Temporary_Sample_Data_type::iterator sample_itr = _Temporary_Sample_Data.find(sample_id);

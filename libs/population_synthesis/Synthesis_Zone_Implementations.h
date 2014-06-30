@@ -50,6 +50,18 @@ namespace PopSyn
 					return this->parent_reference<type_of(parent_reference)&>().network_reference<TargetType>();
 				}
 			}	
+			template<typename TargetType> TargetType file_linker_reference()
+			{
+				if (_parent_reference == nullptr)
+				{
+					parent_reference_type pthis = (parent_reference_type)this;
+					pthis->file_linker_reference<TargetType>();
+				}
+				else
+				{
+					return this->parent_reference<type_of(parent_reference)&>().file_linker_reference<TargetType>();
+				}
+			}	
 		};
 
 
@@ -73,20 +85,27 @@ namespace PopSyn
 			// Containers for holding the joint and marginal distributions
 			m_container(m_array<double>,Target_Joint_Distribution, NONE,NONE);
 			m_container(s_array<double>,Target_Marginal_Distribution, NONE, NONE);
+			m_container(s_array<double>,Test_Marginal_Distribution, NONE, NONE);
 			m_container(m_array<double>,Target_Person_Joint_Distribution, NONE,NONE);
 			m_container(s_array<double>,Target_Person_Marginal_Distribution, NONE, NONE);
+			m_container(s_array<double>,Test_Person_Marginal_Distribution, NONE, NONE);
 			m_container(m_array<double>,Synthesized_Joint_Distribution, NONE,NONE);
 			m_container(s_array<double>,Synthesized_Marginal_Distribution, NONE, NONE);
+			m_container(s_array<double>,Synthesized_Test_Marginal_Distribution, NONE, NONE);
 			m_container(m_array<double>,Synthesized_Person_Joint_Distribution, NONE,NONE);
 			m_container(s_array<double>,Synthesized_Person_Marginal_Distribution, NONE, NONE);
+			m_container(s_array<double>,Synthesized_Test_Person_Marginal_Distribution, NONE, NONE);
+
 
 			//------------------------------------------------------------------------------------------
 			// Initializers which creates and intializes the data containers based on the stated dimensions of the household and person control variables
-			template<typename ContainerType> void Initialize(ContainerType dims_hh, ContainerType dims_per)
+			template<typename ContainerType> void Initialize(ContainerType dims_hh, ContainerType dims_per, int dims_hh_test, int dims_per_test)
 			{
 				// Create the dimension vectors for the hh and person distributions from linker
 				typename Target_Joint_Distribution_type::index_type dimensions_hh;
 				typename Target_Person_Joint_Distribution_type::index_type dimensions_per;
+				typename Target_Joint_Distribution_type::index_type dimensions_hh_test;
+				typename Target_Person_Joint_Distribution_type::index_type dimensions_per_test;
 
 				for (typename strip_modifiers(ContainerType)::iterator i = dims_hh.begin(); i != dims_hh.end(); ++i) 
 				{
@@ -96,17 +115,23 @@ namespace PopSyn
 				{
 					dimensions_per.push_back(*i);
 				}
+				dimensions_hh_test.push_back(dims_hh_test);
+				dimensions_per_test.push_back(dims_per_test);
 
 				//-----------------------------------------------------------------------------------------
 				// Initialize the distribution and marginals
 				this->_Target_Joint_Distribution.resize(dimensions_hh,0.0);
 				this->_Target_Marginal_Distribution.resize(dimensions_hh,0.0);
+				this->_Test_Marginal_Distribution.resize(dimensions_hh_test,0.0);
 				this->_Target_Person_Joint_Distribution.resize(dimensions_per,0.0);
 				this->_Target_Person_Marginal_Distribution.resize(dimensions_per,0.0);
+				this->_Test_Person_Marginal_Distribution.resize(dimensions_per_test,0.0);
 				this->_Synthesized_Joint_Distribution.resize(dimensions_hh,0.0);
 				this->_Synthesized_Marginal_Distribution.resize(dimensions_hh,0.0);
+				this->_Synthesized_Test_Marginal_Distribution.resize(dimensions_hh_test,0.0);
 				this->_Synthesized_Person_Joint_Distribution.resize(dimensions_per,0.0);
 				this->_Synthesized_Person_Marginal_Distribution.resize(dimensions_per,0.0);
+				this->_Synthesized_Test_Person_Marginal_Distribution.resize(dimensions_per_test,0.0);
 			}
 
 			// Create the marginal distribution for the zone and update the marginal distribution for the region from the current input file line from 'fr'
@@ -148,6 +173,33 @@ namespace PopSyn
 						if (!fr.Get_Data<double>(x,linker->get_sf3_column(i,j,false))) break;
 						_Target_Person_Marginal_Distribution[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
 						if (_parent_reference != nullptr) (*regional_person_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
+					}
+
+				}
+
+				// Finally read the test marginals
+				Test_Marginal_Distribution_type::const_dimensional_type dimensions_hh_test = _Test_Marginal_Distribution.dimensions();
+				// For each control variable dimension i
+				for (typename Test_Marginal_Distribution_type::size_type i=0; i<dimensions_hh_test.size(); i++)
+				{
+					// For each category j within control dimension i
+					for (typename Test_Marginal_Distribution_type::size_type j=0; j<dimensions_hh_test[i]; j++)
+					{
+						// read the value of marginal i,j from the input file
+						if (!fr.Get_Data<double>(x,linker->get_sf3_column(i,j,true,true))) break;
+						// set the marginal distribution value for i,j
+						_Test_Marginal_Distribution[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
+					}
+
+				}
+				Test_Person_Marginal_Distribution_type::const_dimensional_type dimensions_per_test = _Test_Person_Marginal_Distribution.dimensions();
+				for (typename Test_Person_Marginal_Distribution_type::size_type i=0; i<dimensions_per_test.size(); i++)
+				{
+					for (typename Test_Person_Marginal_Distribution_type::size_type j=0; j<dimensions_per_test[i]; j++)
+					{
+						if (!fr.Get_Data<double>(x,linker->get_sf3_column(i,j,false,true))) break;
+						_Test_Person_Marginal_Distribution[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
+
 					}
 
 				}
@@ -362,23 +414,34 @@ namespace PopSyn
 
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same)))
 			{
-				// Track the updates to the person distributions
+				typedef Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
+
+				linker_itf* linker = this->file_linker_reference<linker_itf*>();
+
+				// Track the updates to the household distributions
 				_Synthesized_Joint_Distribution[unit->Index<int>()]+=count;
 				Synthesized_Joint_Distribution_type::index_type index = _Synthesized_Joint_Distribution.get_index(unit->Index<int>());
 				for (int i=0; i< index.size(); i++)
 				{
 					_Synthesized_Marginal_Distribution(i,index[i])+=count;	
 				}
+
+				// update the test distribution if applicable
+				if (unit->Test_Index<int>() > 0) _Synthesized_Test_Marginal_Distribution(0,unit->Test_Index<int>())+=count;			
 			}
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same)))
 			{
 				// Track the updates to the person distributions
-				_Synthesized_Person_Joint_Distribution[unit->Index<int>()]+=count;
-				Synthesized_Person_Joint_Distribution_type::index_type index = _Synthesized_Person_Joint_Distribution.get_index(unit->Index<int>());
-				for (int i=0; i< index.size(); i++)
+				if (_Synthesized_Person_Joint_Distribution.size()>0)
 				{
-					_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;	
+					_Synthesized_Person_Joint_Distribution[unit->Index<int>()]+=count;
+					Synthesized_Person_Joint_Distribution_type::index_type index = _Synthesized_Person_Joint_Distribution.get_index(unit->Index<int>());
+					for (int i=0; i< index.size(); i++)
+					{
+						_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;	
+					}
 				}
+				if (unit->Test_Index<int>() >= 0) _Synthesized_Test_Person_Marginal_Distribution(0,unit->Test_Index<int>())+=count;	
 			}
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(type_of(strip_modifiers(InterfaceType)),typename MasterType::household_static_properties_type,is_same)))
 			{
@@ -532,21 +595,19 @@ namespace PopSyn
 
 				mway_itf& mway_per = this->Target_Person_Joint_Distribution<mway_itf&>();
 
-				if (mway_per.size()>0)
+				person_sample_itf* persons = stored_pop_unit->Persons_Container<person_sample_itf*>();
+				for (person_sample_itf::iterator per_itr = persons->begin(); per_itr != persons->end(); per_itr++)
 				{
-					person_sample_itf* persons = stored_pop_unit->Persons_Container<person_sample_itf*>();
-					for (person_sample_itf::iterator per_itr = persons->begin(); per_itr != persons->end(); per_itr++)
-					{
-						// update joint distribution
-						person_unit_itf* per = (person_unit_itf*)(*per_itr);
-						mway_per[per->Index<int>()]-=1;
+					// update joint distribution
+					person_unit_itf* per = (person_unit_itf*)(*per_itr);
+					if (mway_per.size()>0) mway_per[per->Index<int>()]-=1;
 
-						// Track the updates to the person distributions
-						pthis->Add_To_Synthetic_Distributions<person_unit_itf*>(per);
+					// Track the updates to the person distributions
+					pthis->Add_To_Synthetic_Distributions<person_unit_itf*>(per);
 
-						persons_remaining--;
-					}
+					persons_remaining--;
 				}
+
 			}		
 			
 			// Static versions of the agent containers

@@ -241,6 +241,7 @@ public:
 	void			resize(const_dimensional_type new_row_sizes, value_type value)
 	{
 		if (new_row_sizes.size() == 0) return;
+		if (new_row_sizes.size() == 1 && new_row_sizes[0]==0) return;
 
 		s_array<T> tmp = s_array<T>(*this);
 		this->_cleanup();
@@ -424,6 +425,7 @@ void s_array<T>::_init(const_dimensional_type row_sizes)
 
 	for (size_type i=0; i<row_sizes.size(); i++)
 	{
+		if (row_sizes[i] <= 0) THROW_SARRAY_EXCEPTION("ERROR: cannot have a dimensions with size less than or equal to 0.");
 		_row_sizes.push_back(row_sizes[i]);
 		_size +=row_sizes[i];
 	}
@@ -453,6 +455,8 @@ s_array<T>::~s_array(void)
 template <class T>
 void s_array<T>::print(ostream& stream)
 {
+	if (this->_size == 0) return;
+
 	this->begin();
 	// print 2d matrix of last 2 dimensions
 	for (uint i=0; i<_row_sizes.size(); i++)

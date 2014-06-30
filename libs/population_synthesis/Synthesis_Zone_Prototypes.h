@@ -22,9 +22,9 @@ namespace PopSyn
 			{
 				this_component()->template Initialize<TargetType>();
 			}
-			template<typename IndexType> void Initialize(IndexType dimensions_hh, IndexType dimensions_per)
+			template<typename IndexType> void Initialize(IndexType dimensions_hh, IndexType dimensions_per, int dimensions_hh_test=0, int dimensions_per_test=0)
 			{
-				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per);
+				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per,dimensions_hh_test,dimensions_per_test);
 			}
 
 			//===================================================================================================================================
@@ -178,12 +178,16 @@ namespace PopSyn
 			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			accessor(Target_Joint_Distribution, NONE, NONE);
 			accessor(Target_Marginal_Distribution, NONE, NONE);
+			accessor(Test_Marginal_Distribution, NONE, NONE);
 			accessor(Target_Person_Joint_Distribution, NONE, NONE);
 			accessor(Target_Person_Marginal_Distribution, NONE, NONE);
+			accessor(Test_Person_Marginal_Distribution, NONE, NONE);
 			accessor(Synthesized_Joint_Distribution, NONE, NONE);
 			accessor(Synthesized_Marginal_Distribution, NONE, NONE);
+			accessor(Synthesized_Test_Marginal_Distribution, NONE, NONE);
 			accessor(Synthesized_Person_Joint_Distribution, NONE, NONE);
 			accessor(Synthesized_Person_Marginal_Distribution, NONE, NONE);
+			accessor(Synthesized_Test_Person_Marginal_Distribution, NONE, NONE);
 
 			//===================================================================================================================================
 			// Accessors for the Synthesized Population (if the component is a zone) or the sample population (if it is a region)
@@ -193,6 +197,7 @@ namespace PopSyn
 			accessor(scenario_reference, NONE, NONE);				
 			accessor(network_reference, NONE, NONE);
 			accessor(parent_reference, NONE, NONE);					// Reference to the parent region which contains the zone (or the parent popsyn when prototype used for regions)
+			accessor(file_linker_reference, NONE, NONE);		
 			
 			//===================================================================================================================================
 			// OPTIONAL: Other accessors that may be of use
