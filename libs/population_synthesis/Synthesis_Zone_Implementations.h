@@ -274,6 +274,9 @@ namespace PopSyn
 				}
 			}
 
+
+			//------------------------------------------------------------------------------------------
+			// Member functions specific to the IPF routine
 			template<typename AnalysisUnitType> void Integerize_Joint_Distribution()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -338,9 +341,6 @@ namespace PopSyn
 					}
 				}
 			}
-
-
-			// member functions specific to the IPF routine
 			template<typename SampleType> double Get_Weights_For_Sample(std::vector<SampleType>& sample, std::vector<double>& sample_weights, double num_persons_remaining, requires(SampleType, check(SampleType,is_pointer)))
 			{
 				// Interface typedefs
@@ -609,7 +609,117 @@ namespace PopSyn
 				}
 
 			}		
+
+			// Method for writing the distribution results to the marginal and joint results files
+			template<typename TargetType> void Write_Distribution_Results(ofstream& marg_out, ofstream& sample_out)
+			{
+				// Interface typedefs
+				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
+				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
+				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
+				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
+				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> joint_itf;
+				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marginal_itf;
+
+				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
+
+				// write the full population results
+				if (scenario->write_full_output<bool>())
+				{
+					sample_out <<endl<<endl<<"ZONE_ID: "<<this->template ID<long long int>();
+					this->template Target_Joint_Distribution<joint_itf*>()->write(sample_out);
+					sample_out <<endl;
+					this->template Synthesized_Joint_Distribution<joint_itf*>()->write(sample_out);
+					sample_out <<endl;
+					// Add the synthesized distribution back to the target distribution as this is subtracted during the synthesis process
+					this->template Target_Person_Joint_Distribution<joint_itf&>() + this->template Synthesized_Person_Joint_Distribution<joint_itf&>();
+					this->template Target_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
+					sample_out <<endl;
+					this->template Synthesized_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
+					sample_out <<endl;
+				}
+
+				// write the marginal results
+				if (scenario->write_marginal_output<bool>())
+				{
+					marginal_itf& marg_hh =		this->template Target_Marginal_Distribution<marginal_itf&>();
+					marginal_itf& marg_per =	this->template Target_Person_Marginal_Distribution<marginal_itf&>();
+					marginal_itf& syn_marg_hh = this->template Synthesized_Marginal_Distribution<marginal_itf&>();
+					marginal_itf& syn_marg_per= this->template Synthesized_Person_Marginal_Distribution<marginal_itf&>();
+					typedef typename marginal_itf::index_type index;
+
+					marg_out <<this->template ID<long long int>()<<'\t';
+
+					//-------------------------------------------------------------
+					// Household level marginals:
+					//-------------------------------------------------------------
+					// Print original
+					for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_hh.dimensions()[i]; ++d) marg_out << marg_hh[index(i,d)]<<'\t';
+					}
+					marg_out<<'\t';
+					// Print simulated
+					for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_hh.dimensions()[i]; ++d) marg_out << syn_marg_hh[index(i,d)]<<'\t';
+					}
+					marg_out<<'\t';
+					// Print difference
+					double sum_err = 0;
+					double sum_tot = 0;
+					for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_hh.dimensions()[i]; ++d)
+						{
+							sum_err += abs(syn_marg_hh[index(i,d)] - marg_hh[index(i,d)]);
+							sum_tot += marg_hh[index(i,d)];
+							marg_out << (syn_marg_hh[index(i,d)] - marg_hh[index(i,d)]) / (marg_hh[index(i,d)])<<'\t';
+						}
+					}
+					marg_out <<"\t\t"<<sum_err/sum_tot<<"\t\t\t";
+
+					//-------------------------------------------------------------
+					// Person level marginals:
+					//-------------------------------------------------------------
+					// Print original
+					for (int i = 0; i < (int)marg_per.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_per.dimensions()[i]; ++d) marg_out << marg_per[index(i,d)]<<'\t';
+					}
+					marg_out<<'\t';
+					// Print simulated
+					for (int i = 0; i < (int)marg_per.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_per.dimensions()[i]; ++d) marg_out << syn_marg_per[index(i,d)]<<'\t';
+					}
+					marg_out<<'\t';
+					// Print difference
+					sum_err = 0;
+					sum_tot = 0;
+					for (int i = 0; i < (int)marg_per.num_dimensions(); ++i)
+					{
+						for (int d = 0; d < (int)marg_per.dimensions()[i]; ++d)
+						{
+							sum_err += abs(syn_marg_per[index(i,d)] - marg_per[index(i,d)]);
+							sum_tot += marg_per[index(i,d)];
+							marg_out << (syn_marg_per[index(i,d)] - marg_per[index(i,d)]) / (marg_per[index(i,d)])<<'\t';
+						}
+					}
+					marg_out <<"\t\t"<<sum_err/sum_tot<<endl;
+				}
+			}
 			
+			template<typename TargetType> double Calculate_Fit_Statistics()
+			{
+
+			}
+
 			// Static versions of the agent containers
 			m_container(std::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*>, Synthetic_Households_Container, NONE, NONE);
 			m_container(std::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Synthetic_Persons_Container, NONE, NONE);

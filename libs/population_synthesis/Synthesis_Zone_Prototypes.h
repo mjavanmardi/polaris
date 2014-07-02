@@ -175,6 +175,13 @@ namespace PopSyn
 			}
 
 			//===================================================================================================================================
+			// This method creates the actual agent object - if the popsyn is linked to a simulation, otherwise it returns nothing (use this for popsyns which only output the results)
+			template<typename TargetType> void Write_Distribution_Results(ofstream& marginal_outfile, ofstream& joint_outfile)
+			{
+				this_component()->Write_Distribution_Results<TargetType>(marginal_outfile, joint_outfile);
+			}
+
+			//===================================================================================================================================
 			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			accessor(Target_Joint_Distribution, NONE, NONE);
 			accessor(Target_Marginal_Distribution, NONE, NONE);
