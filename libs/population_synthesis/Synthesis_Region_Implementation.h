@@ -182,7 +182,7 @@ namespace PopSyn
 				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(typename type_of(Sample_Data))>  hh_unit_itf;
-				typedef Random_Access_Sequence< typename hh_unit_itf::type_of(Persons_Container)> person_sample_itf;
+				typedef Random_Access_Sequence< typename hh_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 
 				#pragma endregion
