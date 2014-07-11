@@ -33,33 +33,6 @@ int main(int argc, char* argv[])
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
 
-	m_array<double> m;
-	m_array<double>::index_type dims;
-	m_array<double>::index_type index;
-	dims.push_back(3);dims.push_back(3);dims.push_back(3);
-	index.push_back(0);index.push_back(0);index.push_back(0);
-	m.resize(dims,0);
-	for (int i=0; i < 3; ++i)
-	{
-		index[0] = i;
-		for (int j=0; j < 3; ++j)
-		{
-			index[1] = j;
-			for (int k=0; k < 3; ++k)
-			{
-				index[2] = k;
-				m[index] = i*dims[1]*dims[2] + j*dims[2] + k;
-			}
-		}
-	}
-
-	for (m_array<double>::iterator itr = m.begin(1,1); itr != m.end(); ++itr)
-	{
-		index = itr.get_index();
-		cout << index[0] <<","<<index[1]<<","<<index[2]<<" = "<< *itr<<endl;
-	}
-
-	cout << m.sum(1,1);
 
 	//==================================================================================================================================
 	// Scenario initialization
