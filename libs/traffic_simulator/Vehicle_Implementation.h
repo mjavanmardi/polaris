@@ -279,6 +279,9 @@ namespace Vehicle_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_on_excessive_delay<bool>())
 				{
+					float next_link_time = 0.0f;
+					float next_routed_time = 0.0f;
+
 					int current_travel_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - mp->template departed_time<Time_Seconds>();
 					int position_index = mp->template current_trajectory_position<int>();
 					_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
@@ -286,6 +289,80 @@ namespace Vehicle_Components
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
 					
+
+
+					/*
+					{
+						_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+						typename _Trajectory_Container_Interface::iterator itr;
+
+						///calculate travel time of current route
+
+						for (itr = (trajectory.begin() + (((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()+1)); itr < trajectory.end(); itr++)
+						{
+							// this is next
+							_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+							_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+
+							if (itr < trajectory.end() - 1)
+							{
+								_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
+								_Link_Interface* next_route_link = next_trajectory_unit->template link<_Link_Interface*>();
+
+								int inbound_link_id = route_link->template uuid<int>();
+								int outbound_link_id = next_route_link->template uuid<int>();
+
+								typename MasterType::network_type::long_hash_key_type long_hash_key;
+								long_hash_key.inbound_link_id = inbound_link_id;
+								long_hash_key.outbound_link_id = outbound_link_id;
+								typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+								_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+
+								float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
+								
+								next_link_time += link_turn_travel_time;
+
+								next_routed_time = trajectory_unit->template estimated_link_accepting_time<int>();
+							}
+
+							break;
+						}
+					}
+
+					// check one link ahead
+					int current_travel_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - mp->template departed_time<Time_Seconds>() + next_link_time;
+					int position_index = mp->template current_trajectory_position<int>();
+					_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
+					_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
+					
+					int routed_travel_time;
+
+					if(next_routed_time != 0.0f)
+					{
+						routed_travel_time = next_routed_time;
+					}
+					else
+					{
+						routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+					}
+					
+					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
+					
+					float would_be_current_travel_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - mp->template departed_time<Time_Seconds>();
+					float would_be_routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+					float would_be_delay_ratio = would_be_routed_travel_time > 0 ? (float)would_be_current_travel_time / (float)would_be_routed_travel_time : 0;
+
+					//cout << "switched: " << current_travel_time << " vs " << would_be_current_travel_time << " and " << routed_travel_time << " vs " << would_be_routed_travel_time << endl;
+
+					if(
+						(observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() && would_be_delay_ratio <= ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>()) ||
+						((current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() && (would_be_current_travel_time - would_be_routed_travel_time) <= ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>())
+						)
+					{
+						cout << "look ahead caused switch: " << current_travel_time << " vs " << would_be_current_travel_time << " and " << routed_travel_time << " vs " << would_be_routed_travel_time << endl;
+					}
+					*/
+
 					// three conditions:
 					// - a person's perceived delay in arriving to their destination
 					// - a sufficient amount of time spent delayed
@@ -295,6 +372,8 @@ namespace Vehicle_Components
 						(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() &&
 						( mp->estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>())
 					{
+						//cout << "switched: " << current_travel_time << " vs " << would_be_current_travel_time << " and " << routed_travel_time << " vs " << would_be_routed_travel_time << endl;
+
 						double r0 = Uniform_RNG.Next_Rand<double>();
 
 						if(r0 <= ((_Scenario_Interface*)_global_scenario)->template enroute_excessive_delay_factor<float>())
@@ -794,7 +873,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void initialize()
 			{
-				_is_integrated=false;
+				//_is_integrated=false;
 				
 				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
 

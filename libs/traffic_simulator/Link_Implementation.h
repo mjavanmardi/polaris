@@ -517,7 +517,9 @@ namespace Link_Components
 					float travel_time = float ((arrival_time - departure_time)/60.0f);
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
-					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					
+					if(vehicle->is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
 					
 					Free((typename MasterType::movement_plan_type*)mp);
@@ -647,7 +649,11 @@ namespace Link_Components
 					}
 
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
-					((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
+
+					if(vehicle->is_integrated<bool>())
+					{
+						((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
+					}
 
 				}
 			}
