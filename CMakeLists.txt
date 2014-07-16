@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 #Add capability to create visual studio solution folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-
+set(Popsyn ON)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
@@ -90,9 +90,11 @@ include_directories(libs)
 include_directories(libs/io)
 include_directories(libs/core)
 include_directories(libs/repository)
-include_directories(libs/traffic_simulator)
+
 include_directories(libs/scenario_manager)
 include_directories(libs/population_synthesis)
+include_directories(libs/activity_simulator)
+include_directories(libs/traffic_simulator)
 include_directories(apps)
 include_directories(tests)
 
@@ -100,20 +102,31 @@ include_directories(tests)
 add_subdirectory (libs/core) 
 add_subdirectory (libs/repository) 
 add_subdirectory (libs/io) 
-add_subdirectory (libs/spatial) 
-add_subdirectory (libs/routing) 
+
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
 
 
-#Apply CMake over POLARIS tests project structure
-add_subdirectory (tests/core_tests)
+
 
 #Apply CMake over POLARIS application project structure
-add_subdirectory (apps/io_demo) 
-add_subdirectory (apps/population_synthesizer)
-add_subdirectory (apps/test) 
+if (Popsyn)
+	set(Antares OFF)
+	add_subdirectory (apps/population_synthesizer)
+else()
+	add_subdirectory (apps/io_demo) 
+	add_subdirectory (apps/test) 
+	add_subdirectory (apps/ILSTDM) 
+	add_subdirectory (libs/spatial) 
+	add_subdirectory (libs/routing) 
+	add_subdirectory (libs/statewide_model)
+endif()
+
+if (Coretests)
+	#Apply CMake over POLARIS tests project structure
+	add_subdirectory (tests/core_tests)
+endif()
 
 
 if (MSVC AND Antares)
@@ -151,6 +164,9 @@ if (MSVC AND Antares)
 	#add_subdirectory (apps/test)
 endif()
 
-add_subdirectory (libs/traffic_simulator)
-add_subdirectory (apps/fixed_demand_simulator) 
-add_subdirectory (apps/integrated_abm)
+if (Popsyn)
+else()
+	add_subdirectory (libs/traffic_simulator)
+	add_subdirectory (apps/fixed_demand_simulator) 
+	add_subdirectory (apps/integrated_abm)
+endif()

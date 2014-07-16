@@ -1,9 +1,16 @@
 #include "Repository\Repository.h"
 
-
 using namespace polaris;
 
-prototype struct Mode_Chooser ADD_DEBUG_INFO
+enum Vehicle_Types
+{
+	SOV = 1,
+	HOV,
+	BUS,
+	RAIL
+};
+
+prototype struct Mode_Chooser : public Choice_Model_Components::Prototypes::Choice_Model<ComponentType>
 {
 	tag_as_prototype;
 
@@ -19,6 +26,8 @@ prototype struct Mode_Choice_Option : public Choice_Model_Components::Prototypes
 	// accessor to parent class
 	accessor(cost, NONE, NONE);
 	accessor(travel_time, NONE, NONE);
+	accessor(B_COST, NONE, NONE);
+	accessor(B_TTIME, NONE, NONE);
 };
 
 implementation struct Mode_Chooser_Implementation : public Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>
@@ -27,12 +36,12 @@ implementation struct Mode_Chooser_Implementation : public Polaris_Component<Mas
 	typedef typename Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
 	// Pointer to the Parent class
-	m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::nested_logit_model_type, Choice_Model, NONE, NONE);
+	m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::nl_model_type, Choice_Model, NONE, NONE);
 			
 	static m_data(int, choice_set_size, NONE, NONE);
 
 	// Interface definitions	
-	typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
+	typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::nl_model_type > _Choice_Model_Interface;
 	typedef Mode_Choice_Option<typename MasterType::mode_choice_option_type> _Mode_Choice_Option_Interface;
 	typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
 
@@ -149,19 +158,37 @@ implementation struct Mode_Chooser_Implementation : public Polaris_Component<Mas
 	}
 
 };
+implementation struct Mode_Choice_Nest_Impl : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Nest_Impl)>
+{
+	// Tag as Implementation
+	typedef typename Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Nest_Impl)>::Component_Type ComponentType;
+
+	//====================================================================================================================================
+	// Interface definitions
+	//------------------------------------------------------------------------------------------------------------------------------------
+
+	// Feature called from prototype and by Choice_Model
+	virtual double Calculate_Utility()
+	{
+		return 0;				
+	}
+
+	virtual void Print_Utility()
+	{
+		//return 0.0;
+	}
+};
 implementation struct Mode_Choice_Option_Impl : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Option_Impl)>
 {
 	// Tag as Implementation
 	typedef typename Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Option_Impl)>::Component_Type ComponentType;
 
-
 	// data members
-	m_data(bool, cost, NONE, NONE);
-	m_data(bool, travel_time, NONE, NONE);
-
+	m_data(float, cost, NONE, NONE);
+	m_data(float, travel_time, NONE, NONE);
+	m_data(Vehicle_Types, mode, NONE, NONE);
 
 	// PARAMETER DECLARATIONS
-	m_data(float, INCLUSIVE_VALUE, NONE, NONE);
 	m_data(float, B_COST, NONE, NONE);
 	m_data(float, B_TTIME, NONE, NONE);
 
@@ -172,9 +199,7 @@ implementation struct Mode_Choice_Option_Impl : public Choice_Model_Components::
 	// Feature called from prototype and by Choice_Model
 	virtual double Calculate_Utility()
 	{
-		double utility;
-
-
+		double utility = _B_COST * _cost + _B_TTIME * _travel_time;
 		return utility;				
 	}
 
@@ -182,140 +207,63 @@ implementation struct Mode_Choice_Option_Impl : public Choice_Model_Components::
 	{
 		//return 0.0;
 	}
-
-	// Local features
-	template<typename TargetType> TargetType Calculate_Utility_For_Known_Location()
-	{
-		person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-		scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
-
-		// external knowledge references
-		_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-		_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
-		_Activity_Locations_Container_Interface* locations = network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
-		_Skim_Interface* skim = network->template skimming_faculty<_Skim_Interface*>();
-		_Zone_Interface* dest_zone = _destination->zone<_Zone_Interface*>();
-
-		// get the travel time to the destination
-		los_itf* los;
-		if (_current_activity->Start_Is_Planned<bool>()) los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds,los_itf*>(_previous_location,_destination, _current_activity->Start_Time<Time_Seconds>());
-		else los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours,los_itf*>(_previous_location,_destination, 12.0);
-				
-				
-		// Get the differences in characteristics for transit compared to auto mode (CMAP model specified as difference)
-		float ivtt_dif = los->auto_ttime<Time_Minutes>() - los->transit_ttime<Time_Minutes>();
-		float wait_dif = -1.0 * los->transit_wait_time<Time_Minutes>();
-		float transfer_dif = -1.0 * los->transit_walk_access_time<Time_Minutes>();
-		if (los->transit_walk_access_time<Time_Minutes>() > 60.0) transfer_dif = 0;
-		float walk_time_dif = -4.0; // * los->transit_walk_access_time<Time_Minutes>();
-		float cost_dif = los->auto_distance<Miles>()*20.0 + dest_zone->Parking_Cost<Cents>() + los->auto_tolls<Cents>() - los->transit_fare<Cents>();
-
-		// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
-		if (!this->_auto_available)
-		{
-			wait_dif += 30.0;
-			transfer_dif += 2.0;
-			walk_time_dif += 2.0;
-		}
-
-		if (abs(ivtt_dif) > 1440) return -FLT_MAX;
-		float u = Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);	
-		if (u > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif);
-				
-
-		//cout << "O/D:"<<_previous_location->zone<_Zone_Interface*>()->uuid<int>() <<"/"<<_destination->zone<_Zone_Interface*>()->uuid<int>();
-		//cout << ",Auto_TT:"<<los->auto_ttime<Time_Minutes>() << ",Transit_TT:"<<los->transit_ttime<Time_Minutes>();
-		//cout <<",Transit_wait:" << -1.0* wait_dif << ",transfer_time:"<<-1.0 *transfer_dif;
-		//cout <<",Auto_cost:" << los->auto_distance<Miles>()*15.0 + dest_zone->Parking_Cost<Cents>() + los->auto_tolls<Cents>();
-		//cout <<",Transit_fare:" << los->transit_fare<Cents>() << ",utility:"<< u << endl;
-				
-		return (TargetType)u;				
-	}
-	template<typename TargetType> TargetType Calculate_Utility_For_Unknown_Location()
-	{		
-		_Zone_Interface* origin_zone = _previous_location->zone<_Zone_Interface*>();
-		float ivtt_dif = origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() - origin_zone->avg_ttime_transit<Time_Minutes>();
-		float wait_dif = -5.0; // assumed wait time of 5 minutes for transit trips
-		float transfer_dif = 0;
-		float walk_time_dif = -5.0; // assumed average walk time of 5 minutes for transit trips, given walk speed of 3 mph and max distance of 0.5 miles
-		float cost_dif = 0;
-		float utility = -1.0 * FLT_MAX;
-
-		// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
-		if (!this->_auto_available)
-		{
-			wait_dif += 30.0;
-			transfer_dif += 2.0;
-			walk_time_dif += 2.0;
-		}
-
-		// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
-		if (origin_zone->avg_ttime_transit<Time_Days>() < 1.0) utility = Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
-		else return utility;
-
-		if (utility > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif);
-
-		// Otherwise return the transit utility based on Zonal average characteristics
-		return utility;			
-	}
-	float Calculate_Utility_Value(float ivtt_dif, float wait_dif, float transfer_dif, float walk_time_dif, float cost_dif)
-	{
-		float utility;
-
-		Activity_Components::Types::ACTIVITY_TYPES activity_type = _current_activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-
-		// Split mode choice model by in/out of CBD for Home-based Work, Home-based other and non-home based
-		if (_to_CBD)
-		{
-			if (_home_based)
-			{
-				if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY)
-				{
-					utility = ivtt_dif * this->_BHW_CBD_IVTT + wait_dif * this->_BHW_CBD_WAIT + transfer_dif * this->_BHW_CBD_TRANSFER + walk_time_dif * this->_BHW_CBD_WALK + cost_dif * this->_BHW_CBD_COST + this->_BHW_CBD_BIAS;
-				}
-				else
-				{
-					utility = ivtt_dif * this->_BHO_CBD_IVTT + wait_dif * this->_BHO_CBD_WAIT + transfer_dif * this->_BHO_CBD_TRANSFER + walk_time_dif * this->_BHO_CBD_WALK + cost_dif * this->_BHO_CBD_COST + this->_BHO_CBD_BIAS;
-				}
-			}
-			else
-			{
-				utility = ivtt_dif * this->_BNH_CBD_IVTT + wait_dif * this->_BNH_CBD_WAIT + transfer_dif * this->_BNH_CBD_TRANSFER + walk_time_dif * this->_BNH_CBD_WALK + cost_dif * this->_BNH_CBD_COST + this->_BNH_CBD_BIAS;
-			}
-		}
-		else
-		{
-			if (_home_based)
-			{
-				if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY)
-				{
-					utility = ivtt_dif * this->_BHW_IVTT + wait_dif * this->_BHW_WAIT + transfer_dif * this->_BHW_TRANSFER + walk_time_dif * this->_BHW_WALK + cost_dif * this->_BHW_COST + this->_BHW_BIAS;
-				}
-				else
-				{
-					utility = ivtt_dif * this->_BHO_IVTT + wait_dif * this->_BHO_WAIT + transfer_dif * this->_BHO_TRANSFER + walk_time_dif * this->_BHO_WALK + cost_dif * this->_BHO_COST + this->_BHO_BIAS;
-				}
-			}
-			else
-			{
-				utility = ivtt_dif * this->_BNH_IVTT + wait_dif * this->_BNH_WAIT + transfer_dif * this->_BNH_TRANSFER + walk_time_dif * this->_BNH_WALK + cost_dif * this->_BNH_COST + this->_BNH_BIAS;
-			}
-		}
-		return utility;
-	}
-
 };
 
 struct MasterType
 {
 	// Choice model types
-	typedef Mode_Chooser_Implementation<MT> person_mode_chooser_type;
+	typedef Mode_Chooser_Implementation<MT> mode_chooser_type;
 	typedef Mode_Choice_Option_Impl<MT> mode_choice_option_type;
+	typedef Mode_Choice_Nest_Impl<MT> mode_choice_nest_type;
 	typedef Choice_Model_Components::Implementations::Nested_Logit_Model_Implementation<MT> nl_model_type;
 };
 
 int main()
 {
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(1000);
+	INITIALIZE_SIMULATION(cfg);
+
+
+	Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::nl_model_type>* model = (Mode_Chooser<typename MasterType::nl_model_type>*)Allocate<MasterType::nl_model_type>();
+
+	// Create the transit nest and nest options
+	Mode_Choice_Option<MasterType::mode_choice_nest_type>* transit_nest = (Mode_Choice_Option<typename MasterType::mode_choice_nest_type>*)Allocate<MasterType::mode_choice_nest_type>();
+	transit_nest->inclusive_value_parameter<double>(0.75);
+	
+	Mode_Choice_Option<MasterType::mode_choice_option_type>* bus = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
+	Mode_Choice_Option<MasterType::mode_choice_option_type>* rail = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
+	bus->B_COST<double>(-2.0);	bus->cost<double>(2.25);
+	rail->B_COST<double>(-2.0);	rail->cost<double>(2.25);
+	bus->B_TTIME<double>(-0.3);	bus->travel_time<double>(15.0);
+	rail->B_TTIME<double>(-0.2);	rail->travel_time<double>(12.0);
+	transit_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(bus);
+	transit_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(rail);
+
+	// create the auto nest and nest options
+	Mode_Choice_Option<MasterType::mode_choice_nest_type>* auto_nest = (Mode_Choice_Option<typename MasterType::mode_choice_nest_type>*)Allocate<MasterType::mode_choice_nest_type>();
+	auto_nest->inclusive_value_parameter<double>(0.5);
+
+	Mode_Choice_Option<MasterType::mode_choice_option_type>* sov = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
+	Mode_Choice_Option<MasterType::mode_choice_option_type>* hov = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
+	sov->B_COST<double>(-2.0);	sov->cost<double>(2.50);
+	hov->B_COST<double>(-2.5);	hov->cost<double>(3.00);
+	sov->B_TTIME<double>(-0.1);	sov->travel_time<double>(8.0);
+	hov->B_TTIME<double>(-0.15);	hov->travel_time<double>(13.0);
+	auto_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(sov);
+	auto_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(hov);
+
+	model->Add_Choice_Option(transit_nest);
+	model->Add_Choice_Option(auto_nest);
+
+	model->Evaluate_Choices<NT>();
+
+	cout << "SOV: "<<sov->choice_utility<float>() <<", "<<sov->choice_probability<float>()<<endl;
+	cout << "HOV: "<<hov->choice_utility<float>() <<", "<<hov->choice_probability<float>()<<endl;
+	cout << "BUS: "<<bus->choice_utility<float>() <<", "<<bus->choice_probability<float>()<<endl;
+	cout << "RAIL: "<<rail->choice_utility<float>() <<", "<<rail->choice_probability<float>()<<endl;
+	cout << "AUTO_NEST: "<<auto_nest->choice_utility<float>() <<", "<<auto_nest->choice_probability<float>()<<endl;
+	cout << "TRAN_NEST: "<<transit_nest->choice_utility<float>() <<", "<<transit_nest->choice_probability<float>()<<endl;
 
 
 	cout <<"Press 'any' key to end: ";

@@ -76,7 +76,7 @@ namespace Prototypes
 
 		accessor(Persons_Container, NONE, NONE);
 
-		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Person_Components::Concepts::Is_Person)))
+		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
 		{
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
@@ -95,7 +95,7 @@ namespace Prototypes
 			return nullptr;
 		}
 		
-		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Person_Components::Concepts::Is_Person)))
+		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
 		{
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;

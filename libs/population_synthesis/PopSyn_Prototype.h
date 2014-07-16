@@ -3,7 +3,7 @@
 #include "Population_Synthesis_Includes.h"
 #include "activity_simulator\Household_Prototype.h"
 #include "activity_simulator\Person_Prototype.h"
-
+#include <iomanip>
 
 namespace PopSyn
 {
@@ -52,7 +52,11 @@ namespace PopSyn
 					marg_filename << "marginal_distributions.xls";
 					this->Marginal_Output_Stream<ofstream&>().open(marg_filename.str(),ios_base::out);	
 				}
-						
+				
+				stringstream log_filename("");
+				log_filename << scenario->template output_dir_name<string>();
+				log_filename << "popsyn_log.csv";
+				this->Log_File<ofstream&>().open(log_filename.str(),ios_base::out);	
 
 				this_component()->template Initialize<NT>();
 
@@ -75,6 +79,15 @@ namespace PopSyn
 			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			static void Popsyn_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
+
 				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)_this;
 
 				if (iteration() == 0 || iteration() == 1)
@@ -99,6 +112,7 @@ namespace PopSyn
 					case POPSYN_SUBITERATIONS::OUTPUT:
 						pthis->Create_Agents_Event<NT>();
 						pthis->Write_Files_Event<NT>();
+						pthis->Write_Fit_Results<zone_type>();
 						response.next._iteration = 3;
 						response.next._sub_iteration = 0;
 						break;
@@ -144,6 +158,8 @@ namespace PopSyn
 				linker_itf* linker = this->file_linker<linker_itf*>();
 				std::vector<int>& dims_hh = linker->hh_dimension_sizes();
 				std::vector<int>& dims_per = linker->person_dimension_sizes();
+				int dims_test_hh = linker->test_dimension_size();
+				int dims_test_per = linker->test_person_dimension_size();
 
 				//===============================================================================================================
 				#pragma region Define interfaces
@@ -242,7 +258,7 @@ namespace PopSyn
 					// Initialize the new zone
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
 					zone->ID(ID);
-					zone->template Initialize<std::vector<int>&>(dims_hh,dims_per);
+					zone->template Initialize<std::vector<int>&>(dims_hh,dims_per,dims_test_hh,dims_test_per);
 					zone->parent_reference(region);
 					zone->template Solver_Settings<solver_itf*>(solver);
 
@@ -360,11 +376,6 @@ namespace PopSyn
 			// 4.) Create agents from synthesized results and output results - called after timing is stopped (at Iteration = 0, timestep 7)
 			template<typename TargetType> void Create_Agents_Event()
 			{
-				ofstream& sample_out = this->Output_Stream<ofstream&>();
-				ofstream& marg_out = this->Marginal_Output_Stream<ofstream&>();
-				ofstream& popsyn_log = this->Log_File<ofstream&>();
-				cout<<endl;
-			
 				//=============================================================================================
 				#pragma region Define interfaces
 				//---------------------------------------------------------------------------------------------
@@ -378,8 +389,6 @@ namespace PopSyn
 				typedef get_mapped_component_type(zone_collection_type)							zone_type;
 				typedef typename zone_type::get_type_of(Synthetic_Households_Container)			household_collection_type;
 				typedef get_component_type(household_collection_type)							household_type;
-				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
-				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
 				//---------------------------------------------------------------------------------------------
 				// Interface defines for sub_objects
@@ -391,8 +400,6 @@ namespace PopSyn
 				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type, pop_unit_itf*> sample_data_itf;
 				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
-				typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
-				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 				typedef Household_Components::Prototypes::Household<typename get_component_type(household_collection_itf)>  household_itf;		
 				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
@@ -401,7 +408,8 @@ namespace PopSyn
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 				#pragma endregion
 				
-
+				cout<<endl;
+			
 				//---------------------------------------------------------------------------------------------
 				// Start main object creation loop
 				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
@@ -438,6 +446,7 @@ namespace PopSyn
 							// i.e. creates full agents when connected to an ABM and NetworkType is defined, otherwise does nothing.
 							Object_Initialization_Handler<household_itf*,zone_itf*,network_itf*,scenario_itf*>(uuid,hh,zone,network,scenario);
 
+							// Loop through each person in the household
 							person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
 							long perid=0;
 							for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
@@ -477,6 +486,43 @@ namespace PopSyn
 				#pragma region Define interfaces
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_collection_type::mapped_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
+				#pragma endregion
+					
+				//scenario_itf* scenario = this->scenario_reference<scenario_itf*>();
+
+				//=============================================================================================
+				// Loop through all regions/zones and handle file output if needed
+				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
+				for (typename regions_itf::iterator r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				{
+					region_itf* region = r_itr->second;
+					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+					for (typename zones_itf::iterator z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					{
+						zone_itf* zone = z_itr->second;
+						zone->Write_Distribution_Results<NT>(marg_out,sample_out);
+					}
+				}
+				sample_out.close();
+				marg_out.close();
+			}
+			template<typename ZoneType> void Write_Fit_Results(requires(ZoneType,check(ZoneType, Concepts::Is_IPF_Compatible)))
+			{
+				this->timer<Counter&>().Start();
+				ofstream& popsyn_log = this->Log_File<ofstream&>();
+
+				//=============================================================================================
+				#pragma region Define interfaces
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
 				typedef get_mapped_component_type(region_collection_type)						region_type;
@@ -499,14 +545,37 @@ namespace PopSyn
 				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type>	marginal_itf;
+				typedef typename marginal_itf::index_type index;
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 				#pragma endregion
 					
 				scenario_itf* scenario = this->scenario_reference<scenario_itf*>();
 
+				marginal_itf marginal_hh_error;
+				marginal_itf marginal_hh_sum;
+				marginal_itf marginal_per_error;
+				marginal_itf marginal_per_sum;
+
+				marginal_itf test_marginal_hh_error;
+				marginal_itf test_marginal_hh_sum;
+				marginal_itf test_marginal_per_error;
+				marginal_itf test_marginal_per_sum;
+
+
 				//=============================================================================================
 				// Loop through all regions/zones and handle file output if needed
 				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
+
+				marginal_hh_error.resize(regions->begin()->second->Target_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_hh_sum.resize(regions->begin()->second->Target_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_per_error.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				marginal_per_sum.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+
+				test_marginal_hh_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_hh_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_per_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				test_marginal_per_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+
 				for (typename regions_itf::iterator r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
 					region_itf* region = r_itr->second;
@@ -515,22 +584,6 @@ namespace PopSyn
 					{
 						zone_itf* zone = z_itr->second;
 
-						// write the full population results
-						if (scenario->write_full_output<bool>())
-						{
-							sample_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-							zone->template Target_Joint_Distribution<joint_itf*>()->write(sample_out);
-							sample_out <<endl;
-							zone->template Synthesized_Joint_Distribution<joint_itf*>()->write(sample_out);
-							sample_out <<endl;
-							// Add the synthesized distribution back to the target distribution as this is subtracted during the synthesis process
-							zone->template Target_Person_Joint_Distribution<joint_itf&>() + zone->template Synthesized_Person_Joint_Distribution<joint_itf&>();
-							zone->template Target_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
-							sample_out <<endl;
-							zone->template Synthesized_Person_Joint_Distribution<joint_itf*>()->write(sample_out);
-							sample_out <<endl;
-						}
-
 						// write the marginal results
 						if (scenario->write_marginal_output<bool>())
 						{
@@ -538,36 +591,151 @@ namespace PopSyn
 							marginal_itf& marg_per =	zone->template Target_Person_Marginal_Distribution<marginal_itf&>();
 							marginal_itf& syn_marg_hh = zone->template Synthesized_Marginal_Distribution<marginal_itf&>();
 							marginal_itf& syn_marg_per= zone->template Synthesized_Person_Marginal_Distribution<marginal_itf&>();
-							typedef typename marginal_itf::index_type index;
-
-							marg_out <<"ZONE_ID,"<<zone->template ID<long long int>()<<',';
+							
+							marginal_itf& test_marg_hh =		zone->template Test_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& test_marg_per =		zone->template Test_Person_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_test_marg_hh =	zone->template Synthesized_Test_Marginal_Distribution<marginal_itf&>();
+							marginal_itf& syn_test_marg_per=	zone->template Synthesized_Test_Person_Marginal_Distribution<marginal_itf&>();
 
 							for (int i = 0; i < (int)marg_hh.num_dimensions(); ++i)
 							{
 								for (int d = 0; d < (int)marg_hh.dimensions()[i]; ++d)
 								{
-									marg_out << marg_hh[index(i,d)]<<',';
-									marg_out << syn_marg_hh[index(i,d)]<<',';
-									marg_out << (syn_marg_hh[index(i,d)] - marg_hh[index(i,d)]) / (marg_hh[index(i,d)])<<',';
+									marginal_hh_error[index(i,d)] += abs(syn_marg_hh[index(i,d)] - marg_hh[index(i,d)]);
+									marginal_hh_sum[index(i,d)] += marg_hh[index(i,d)];
 								}
 							}
-							marg_out <<',';
 							for (int i = 0; i < (int)marg_per.num_dimensions(); ++i)
 							{
 								for (int d = 0; d < (int)marg_per.dimensions()[i]; ++d)
 								{
-									marg_out << marg_per[index(i,d)]<<',';
-									marg_out << syn_marg_per[index(i,d)]<<',';
-									marg_out << (syn_marg_per[index(i,d)] - marg_per[index(i,d)]) / (marg_per[index(i,d)])<<',';
+									marginal_per_error[index(i,d)] += abs(syn_marg_per[index(i,d)] - marg_per[index(i,d)]);
+									marginal_per_sum[index(i,d)] += marg_per[index(i,d)];
 								}
 							}
-							marg_out <<endl;
+
+							for (int i = 0; i < (int)test_marg_hh.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)test_marg_hh.dimensions()[i]; ++d)
+								{
+									test_marginal_hh_error[index(i,d)] += abs(syn_test_marg_hh[index(i,d)] - test_marg_hh[index(i,d)]);
+									test_marginal_hh_sum[index(i,d)] += test_marg_hh[index(i,d)];
+								}
+							}
+							for (int i = 0; i < (int)test_marg_per.num_dimensions(); ++i)
+							{
+								for (int d = 0; d < (int)test_marg_per.dimensions()[i]; ++d)
+								{
+									test_marginal_per_error[index(i,d)] += abs(syn_test_marg_per[index(i,d)] - test_marg_per[index(i,d)]);
+									test_marginal_per_sum[index(i,d)] += test_marg_per[index(i,d)];
+								}
+							}
 						}
 					}
 				}
-				sample_out.close();
-				marg_out.close();
+				double total_hh_error = 0;
+				double total_hh_sum = 0;
+				popsyn_log <<"WAAPD value for household marginals:"<<setprecision(2)<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				for (int i = 0; i < (int)marginal_hh_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)marginal_hh_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<marginal_hh_error[index(i,d)]/marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_hh_error += marginal_hh_error[index(i,d)];
+						total_hh_sum +=marginal_hh_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_hh_error/total_hh_sum*100.0<<"%"<<endl<<endl;
+				popsyn_log <<"WAAPD value for person marginals:"<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_per_error = 0;
+				double total_per_sum = 0;
+				for (int i = 0; i < (int)marginal_per_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)marginal_per_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<marginal_per_error[index(i,d)]/marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_per_error += marginal_per_error[index(i,d)];
+						total_per_sum +=marginal_per_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_per_error/total_per_sum*100.0<<"%"<<endl;
+				popsyn_log <<"WAAPD value for TEST household marginals:"<<setprecision(2)<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_test_hh_error = 0;
+				double total_test_hh_sum = 0;
+				for (int i = 0; i < (int)test_marginal_hh_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)test_marginal_hh_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_hh_error[index(i,d)]/test_marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_test_hh_error += test_marginal_hh_error[index(i,d)];
+						total_test_hh_sum +=test_marginal_hh_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_test_hh_error/total_test_hh_sum*100.0<<"%"<<endl<<endl;
+				popsyn_log <<"WAAPD value for TEST person marginals:"<<endl;
+				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+				double total_test_per_error = 0;
+				double total_test_per_sum = 0;
+				for (int i = 0; i < (int)test_marginal_per_error.num_dimensions(); ++i)
+				{
+					for (int d = 0; d < (int)test_marginal_per_error.dimensions()[i]; ++d)
+					{
+						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_per_error[index(i,d)]/test_marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
+
+						total_test_per_error += test_marginal_per_error[index(i,d)];
+						total_test_per_sum +=test_marginal_per_sum[index(i,d)];
+					}
+				}
+				popsyn_log <<"Total,,"<<fixed<<total_test_per_error/total_test_per_sum*100.0<<"%"<<endl;
 				popsyn_log.close();
+			}
+			template<typename ZoneType> void Write_Fit_Results(requires(ZoneType,check(ZoneType, Concepts::Is_IPU_Compatible)))
+			{
+				this->timer<Counter&>().Start();
+				ofstream& popsyn_log = this->Log_File<ofstream&>();
+
+				//=============================================================================================
+				#pragma region Define interfaces
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
+				// Define iterators and get pointer to the region collection
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_mapped_component_type(region_collection_type)						region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef get_mapped_component_type(sample_collection_type)						sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
+				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_mapped_component_type(zone_collection_type)							zone_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
+
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_collection_type::mapped_type> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> households_container_itf;
+				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
+				typedef Multidimensional_Random_Access_Array<marg_dist_type>	marginal_itf;
+				typedef typename marginal_itf::index_type index;
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+				#pragma endregion
+					
+				THROW_EXCEPTION("ERROR: FIT RESULT ESTIMATION HAS NOT BEEN IMPLEMENTED FOR IPU ALGORITHM - ADD FUNCTIONALITY TO POPSYN_PROTOTYPE.");
+			}
+			template<typename ZoneType> void Write_Fit_Results(requires(ZoneType,check(ZoneType, !Concepts::Is_IPF_Compatible) && !check(ZoneType, Concepts::Is_IPU_Compatible)))
+			{
+				assert_check(ZoneType, Concepts::Is_IPF_Compatible, "Error, ZoneType must be either IPF compatible...");
+				assert_check(ZoneType, Concepts::Is_IPU_Compatible, "or ZoneType must be IPU compatible.");
 			}
 	
 			// 5.) Write output to database (at Iteration 2) - the routine differs if writing for a full abm or for stand-alone popsyn with no network

@@ -468,6 +468,7 @@ namespace polaris
 
 		void resize(const_dimensional_type n, T t){return ((ComponentType*)this)->resize(n,t);}
 		T sum(){return (((ComponentType*)this)->sum());}
+		T sum(size_type dim, size_type index){return (((ComponentType*)this)->sum(dim,index));}
 		T& back(){return (T&)(((ComponentType*)this)->back());}
 		T& back(size_type dimension){return (T&)(((ComponentType*)this)->back(dimension));}
 		T& back(size_type dimension, size_type index){return (T&)(((ComponentType*)this)->back(dimension, index));}

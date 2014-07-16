@@ -433,6 +433,7 @@ namespace Person_Components
 			accessor(ID, NONE, NONE);
 			accessor(Weight, NONE, NONE);
 			accessor(Index, NONE, NONE);
+			accessor(Test_Index, NONE, NONE);
 			//accessor(Characteristics, NONE, NONE);
 
 			// Static Census ACS type properties
