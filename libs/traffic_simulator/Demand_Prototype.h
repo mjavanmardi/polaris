@@ -222,6 +222,7 @@ namespace Demand_Components
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
 					vehicle->template router<_Routing_Interface*>(router);
+					vehicle->template is_integrated<bool>(db_itr->getType());
 					vehicle->template initialize<NT>();
 
 
