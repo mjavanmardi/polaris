@@ -282,7 +282,7 @@ namespace Person_Components
 				{
 					if (_home_based)
 					{
-						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY)
+						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 						{
 							utility = ivtt_dif * this->_BHW_CBD_IVTT + wait_dif * this->_BHW_CBD_WAIT + transfer_dif * this->_BHW_CBD_TRANSFER + walk_time_dif * this->_BHW_CBD_WALK + cost_dif * this->_BHW_CBD_COST + this->_BHW_CBD_BIAS;
 						}
@@ -300,7 +300,7 @@ namespace Person_Components
 				{
 					if (_home_based)
 					{
-						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY)
+						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 						{
 							utility = ivtt_dif * this->_BHW_IVTT + wait_dif * this->_BHW_WAIT + transfer_dif * this->_BHW_TRANSFER + walk_time_dif * this->_BHW_WALK + cost_dif * this->_BHW_COST + this->_BHW_BIAS;
 						}
@@ -558,6 +558,7 @@ namespace Person_Components
 					case Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY: { p=0.17837940715925; break;}
 					case Activity_Components::Types::PICK_UP_OR_DROP_OFF_ACTIVITY: { p=0.0739687591191153; break;}
 					case Activity_Components::Types::PRIMARY_WORK_ACTIVITY: { p=0.0637426142432775; break;}
+					case Activity_Components::Types::PART_TIME_WORK_ACTIVITY: { p=0.0637426142432775; break;}
 					case Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY: { p=0.300601437534384; break;}
 					case Activity_Components::Types::SCHOOL_ACTIVITY: { p=0.228655158483933; break;}
 					case Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY: { p=0.145728864260415; break;}

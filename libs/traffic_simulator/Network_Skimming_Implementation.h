@@ -125,9 +125,6 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			template<typename TargetType> void Initialize()
 			{
-				//TODO: remove when done testing
-				cout << "Initializing Network Skim Tables..."<<endl;
-
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
@@ -139,9 +136,6 @@ namespace Network_Skimming_Components
 					this->_auto_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
 					this->_transit_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
 				}
-
-				//TODO: remove when done testing
-				cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<endl;
 			}
 			template<typename TargetType> void Initialize(TargetType initial_data)
 			{
@@ -415,8 +409,6 @@ namespace Network_Skimming_Components
 
 				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
-					//TODO: remove when done testing
-					//cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<", for origin index: " << origin_index<<endl;
 					ttime_sorter= this->_auto_travel_time_sorter[origin_index];
 				}
 
@@ -468,8 +460,6 @@ namespace Network_Skimming_Components
 
 				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
-					//TODO: remove when done testing
-					//cout <<"Travel time sorter size: " << this->_auto_travel_time_sorter.size()<<", for origin index: " << origin_index<<endl;
 					ttime_sorter= this->_auto_travel_time_sorter[origin_index];
 				}
 
@@ -681,7 +671,6 @@ namespace Network_Skimming_Components
 				long orig_index = 0;
 				for (;orig_itr != origin_locations->end(); ++orig_itr, ++orig_index)
 				{
-					//TODO: NEED TO REDO SKIM ROUTER TO USE THE NEW ROUTER IMPLEMENTATION
 					// get the origin/destination indices
 					origin_location_itf* orig_node = (origin_location_itf*)*orig_itr;
 
@@ -823,7 +812,7 @@ namespace Network_Skimming_Components
 							Stored_Time_Type a_ttime = (Stored_Time_Type)data[i];
 							if (a_ttime > GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(720.0) || a_ttime < 0 || ISNAN(a_ttime))
 							{
-								cout <<"Warning, invalid travel auto travel time value="<<a_ttime<<" found when reading skim file, travel time reset to default value=180.0."<<endl;
+								THROW_WARNING("Warning, invalid travel auto travel time value="<<a_ttime<<" found when reading skim file, travel time reset to default value=180.0.");
 								a_ttime = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(180.0);
 							}
 							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(a_ttime);

@@ -118,7 +118,7 @@ namespace Activity_Components
 			{
 				if (value > (END)*2.0)
 				{
-					THROW_EXCEPTION("Error, invalid value when setting start-time: " << value);
+					THROW_WARNING("Error, invalid value when setting start-time: " << value);
 				}
 				else
 				{
@@ -134,7 +134,7 @@ namespace Activity_Components
 			{
 				if (value > (END)*2.0)
 				{
-					THROW_EXCEPTION("Error, invalid value when setting end-time: " << value);
+					THROW_WARNING("Error, invalid value when setting end-time: " << value);
 				}
 
 				if (maintain_duration) this->template Start_Time<TargetType>(value - this->template Duration<TargetType>());
@@ -337,12 +337,9 @@ namespace Activity_Components
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 				
-				//TODO: remove when finished testing
 				if (!this->Route_Is_Planned<bool>())
 				{
-					cout <<"ERROR: attempting to add activity to schedule before the route handler is called."<<endl;
-					int id = person->uuid<int>();
-					int test = 1;
+					THROW_EXCEPTION("ERROR: attempting to add activity to schedule before the route handler is called.");
 				}
 
 
@@ -482,7 +479,7 @@ namespace Activity_Components
 
 							if (depart + ttime > (END)*2.0)
 							{
-								THROW_EXCEPTION("Bad start time, depart="<<depart<<", ttime="<<ttime);
+								THROW_WARNING("Bad start time, depart="<<depart<<", ttime="<<ttime);
 							}
 							this->Start_Time<Simulation_Timestep_Increment>(depart + ttime);
 						}
@@ -534,6 +531,8 @@ namespace Activity_Components
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY)
 					return string("PICKUP-DROPOFF");
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+					return string("WORK");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 					return string("WORK");
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::RECREATION_ACTIVITY)
 					return string("RECREATION");
@@ -640,7 +639,7 @@ namespace Activity_Components
 				ACT1 = 0; ACT2 = 0; ACT3 = 0; ACT4 = 0; ACT5 = 0; Employed = 0; Student = 0; Male = 0; Senior = 0; TELEWORK = 0; ICT_USE = 0;
 				float AvgDur, AvgFreq;
 
-				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
+				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
 				else if (base_this->_Activity_Type == HEALTHCARE_ACTIVITY || base_this->_Activity_Type == RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
 				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
 				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
@@ -897,42 +896,6 @@ namespace Activity_Components
 				_activity_location_itf *home_loc = person->template Home_Location<_activity_location_itf*>();
 
 
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
-				//// timing variables
-				//Time_Minutes start, end, prev_end, next_start, time_before, time_after, ttime_prev_to_home, ttime_home_to_next;
-				//start = pthis->template Start_Time<Time_Minutes>();
-				//end = pthis->template Start_Time<Time_Minutes>() + pthis->template Duration<Time_Minutes>();
-
-				//// Get half-tour origin from previous planned activity and destination from next planned activity (or from home if no preceeding activities)
-				//_activity_location_itf *prev_loc, *next_loc, *home_loc;
-				
-
-				//if (bthis->template Start_Is_Planned<bool>())
-				//{
-				//	// set previous activity location, =home if no previous activity or if person can go home before current activity
-				//	this_itf* previous = person->template previous_activity_plan<Time_Seconds,this_itf*>(bthis->template Start_Time<Time_Seconds>());
-				//	if (previous == nullptr) prev_loc = home_loc;
-				//	else prev_loc = scheduler->template previous_location<_activity_location_itf**>(this);
-
-				//	// set next activity location, =home if no next activity
-				//	this_itf* next = person->template previous_activity_plan<Time_Seconds,this_itf*>(bthis->template Start_Time<Time_Seconds>());
-				//	if (next == nullptr) next_loc = home_loc;
-				//	else next_loc = scheduler->template next_location<_activity_location_itf**>(this);
-				//}
-				//// if the start time is not known, treat the tour as originating/destined for home
-				//else 
-				//{
-				//	prev_loc = home_loc;
-				//	next_loc = home_loc;
-				//}
-
 				// call destination choice - set to home of no location could be chosen
 				_activity_location_itf* dest = dest_chooser->template Choose_Destination<this_itf*,_activity_location_itf*>(pthis);
 				
@@ -978,15 +941,6 @@ namespace Activity_Components
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_mode_choice_itf* mode_chooser = planner->template Mode_Choice_Faculty<_mode_choice_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
-
-
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 248 && person->uuid<int>() == 3 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
@@ -1193,22 +1147,13 @@ namespace Activity_Components
 				_person_itf* person = base_this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 
-
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
 				// Select the location based on the activity type
 				_activity_location_itf* dest = nullptr;		
 				if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::AT_HOME_ACTIVITY)
 				{
 					dest = person->template Home_Location<_activity_location_itf*>();
 				}
-				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
 					dest = person->template Work_Location<_activity_location_itf*>();
 				}
@@ -1269,14 +1214,6 @@ namespace Activity_Components
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
 
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
 			}
@@ -1289,18 +1226,9 @@ namespace Activity_Components
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 
-
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
 				Time_Minutes duration; 	
 	
-				if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
+				if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
 				{
 					duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
 				}
@@ -1327,19 +1255,10 @@ namespace Activity_Components
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 
-				//TODO: remove when finished testing
-				_household_itf* household = person->template Household<_household_itf*>();
-				if (household->uuid<int>() == 21771 && person->uuid<int>() == 2 && this->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
-
-
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 
 				// School Activity start time (randomly between 7 and 9AM)
-				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY || act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY || act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY )
 				{
 					// interfaces
 					_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
@@ -1437,7 +1356,7 @@ namespace Activity_Components
 				ACT1 = 0; ACT2 = 0; ACT3 = 0; ACT4 = 0; ACT5 = 0; Employed = 0; Student = 0; Male = 0; Senior = 0; TELEWORK = 0; ICT_USE = 0;
 				float AvgDur, AvgFreq;
 
-				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
+				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
 				else if (base_this->_Activity_Type == HEALTHCARE_ACTIVITY || base_this->_Activity_Type == RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
 				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
 				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
@@ -1597,7 +1516,7 @@ namespace Activity_Components
 			{
 				if(start_time > (END)*2.0 || duration > END)
 				{
-					THROW_EXCEPTION("Invalid start/duration for at home activity. Start="<<start_time<<", duration="<<duration);
+					THROW_WARNING("Invalid start/duration for at home activity. Start="<<start_time<<", duration="<<duration);
 				}
 
 				//UNLOCK(this->_update_lock);

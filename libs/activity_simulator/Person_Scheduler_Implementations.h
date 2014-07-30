@@ -526,7 +526,7 @@ namespace Person_Components
 				//TODO: remove when done testing
 				if (new_end > (END)*2.0)
 				{
-					THROW_EXCEPTION("Error, invalid value when setting end_time: "<<new_end<<", act.start="<<act->Start_Time<Time_Seconds>()<<", start="<<start<<", ttime="<<ttime<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<loc->zone<_Zone_Interface*>()->uuid<int>());
+					THROW_WARNING("Error, invalid value when setting end_time: "<<new_end<<", act.start="<<act->Start_Time<Time_Seconds>()<<", start="<<start<<", ttime="<<ttime<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<loc->zone<_Zone_Interface*>()->uuid<int>());
 				}
 				prev_act->template End_Time<Time_Seconds>(new_end,false);
 			}

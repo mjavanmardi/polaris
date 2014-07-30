@@ -516,6 +516,8 @@ namespace PopSyn
 			}
 			template<typename ZoneType> void Write_Fit_Results(requires(ZoneType,check(ZoneType, Concepts::Is_IPF_Compatible)))
 			{
+				return;
+
 				this->timer<Counter&>().Start();
 				ofstream& popsyn_log = this->Log_File<ofstream&>();
 

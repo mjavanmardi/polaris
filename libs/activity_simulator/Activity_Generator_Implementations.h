@@ -79,6 +79,7 @@ namespace Person_Components
 
 			// static discretionary activity generation model
 			static float work_activity_freq[8];
+			static float part_time_work_activity_freq[8];
 			static float school_activity_freq[8];
 			static float eat_out_activity_freq[8];
 			static float errands_activity_freq[8];
@@ -178,6 +179,9 @@ namespace Person_Components
 				{
 					float num_work = work_activity_freq[person_index];
 					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) Create_Routine_Activity<ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
+
+					float num_pwork = part_time_work_activity_freq[person_index];
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) Create_Routine_Activity<ACTIVITY_TYPES>(PART_TIME_WORK_ACTIVITY,act_count, start_plan_time);
 				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
@@ -348,12 +352,6 @@ namespace Person_Components
 				// schedule the activity events based on plan times.
 				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
 
-				//TODO: remove when done testing
-				if (start_plan_time > 400)
-				{
-					int test = 1;
-				}
-
 				// set location and remove from planning stream
 				activity->Location<LocationType>(location);
 				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
@@ -391,7 +389,8 @@ namespace Person_Components
 			}
 
 		};
-		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::work_activity_freq[]= {0,0,0,1.0,0.75,0.15,0,0};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::work_activity_freq[]= {0,0,0,1.0,0,0,0,0};
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::part_time_work_activity_freq[]= {0,0,0,0,0.75,0.15,0,0};
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0,0.25};
 		
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};

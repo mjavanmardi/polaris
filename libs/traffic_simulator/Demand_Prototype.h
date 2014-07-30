@@ -223,7 +223,7 @@ namespace Demand_Components
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
 					vehicle->template router<_Routing_Interface*>(router);
 					vehicle->template initialize<NT>();
-
+					vehicle->is_integrated(false);
 
 					traveler->template uuid<int>(traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);

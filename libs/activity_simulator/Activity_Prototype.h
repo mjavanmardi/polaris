@@ -49,7 +49,8 @@ namespace Activity_Components
 			RECREATION_ACTIVITY,
 			SOCIAL_ACTIVITY,
 			CHANGE_TRANSPORTATION_ACTIVITY,
-			OTHER_ACTIVITY
+			OTHER_ACTIVITY,
+			PART_TIME_WORK_ACTIVITY=22
 		};
 
 	}
@@ -108,16 +109,6 @@ namespace Activity_Components
 					response.next._sub_iteration = END;
 					return;
 				}
-
-
-				//TODO: remove when done testing
-				if (this_ptr->Activity_Type<Types::ACTIVITY_TYPES>() == Types::PICK_UP_OR_DROP_OFF_ACTIVITY)
-				{
-					int test = iteration();
-					int test2 = sub_iteration();
-					int test3 = 0;
-				}
-
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// DURATION_PLANNING Iteration
@@ -370,28 +361,12 @@ namespace Activity_Components
 			}
 			template<typename TargetType> void Route_Planning_Event_Handler()
 			{
-				//TODO: remove when done testing
-				if (this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::PICK_UP_OR_DROP_OFF_ACTIVITY)
-				{
-					int test = iteration();
-					int test2 = sub_iteration();
-					int test3 = 0;
-				}
-
 				this->Route_Planning_Time<Revision&>()._iteration = END+1;
 				this->Route_Planning_Time<Revision&>()._sub_iteration = END+1;
 				this_component()->template Route_Planning_Event_Handler<TargetType>();
 			}
 			template<typename TargetType> void Add_Activity_To_Schedule_Event_Handler()
 			{
-				//TODO: remove when done testing
-				if (this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::PICK_UP_OR_DROP_OFF_ACTIVITY)
-				{
-					int test = iteration();
-					int test2 = sub_iteration();
-					int test3 = 0;
-				}
-
 				this_component()->template Add_Activity_To_Schedule_Event_Handler<TargetType>();
 			}
 
@@ -522,13 +497,6 @@ namespace Activity_Components
 				//---------------------
 				// set activity as valid at start of events
 				this->is_valid(true);
-
-				//TODO: remove when done testing
-				if (this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::PICK_UP_OR_DROP_OFF_ACTIVITY)
-				{
-					int test = 1;
-					test++;
-				}
 
 				// store for later use
 				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();

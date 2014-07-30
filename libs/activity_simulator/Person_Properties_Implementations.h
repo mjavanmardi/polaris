@@ -52,6 +52,7 @@ namespace Person_Components
 				a.first = Activity_Components::Types::SOCIAL_ACTIVITY;					a.second.first = 0.168f; a.second.second = 198.1f;	_average_activity_frequency_and_duration_container.insert(a);
 				a.first = Activity_Components::Types::OTHER_WORK_ACTIVITY;				a.second.first = 0.129f; a.second.second = 170.2f;	_average_activity_frequency_and_duration_container.insert(a);
 				a.first = Activity_Components::Types::PRIMARY_WORK_ACTIVITY;			a.second.first = 0.381f; a.second.second = 390.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = Activity_Components::Types::PART_TIME_WORK_ACTIVITY;			a.second.first = 0.381f; a.second.second = 390.2f;	_average_activity_frequency_and_duration_container.insert(a);
 				a.first = Activity_Components::Types::WORK_AT_HOME_ACTIVITY;			a.second.first = 0.026f; a.second.second = 560.7f;	_average_activity_frequency_and_duration_container.insert(a);		
 				a.first = Activity_Components::Types::LEISURE_ACTIVITY;					a.second.first = 0.213f; a.second.second = 142.0f;	_average_activity_frequency_and_duration_container.insert(a);	
 			}

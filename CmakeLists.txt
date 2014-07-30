@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 #Add capability to create visual studio solution folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(Popsyn ON)
+set(Popsyn OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)

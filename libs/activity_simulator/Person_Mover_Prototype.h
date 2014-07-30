@@ -102,7 +102,7 @@ namespace Prototypes
 			}
 			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
-				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()+1) //THROW_EXCEPTION("Error: movement departure time is prior to current iteration.");
+				if (movement->template departed_time<Simulation_Timestep_Increment>() < iteration()+1)
 				{
 					movement->template departed_time<Simulation_Timestep_Increment>(iteration()+1);
 				}
@@ -229,10 +229,6 @@ namespace Prototypes
 			movement_itf* movements = this->Movement<movement_itf*>();
 			location_itf* destination = movements->destination<location_itf*>();
 
-			//TODO:remove
-			/*if (destination == nullptr) cout << "Person id: " << person->Household<Household_Itf*>()->uuid<int>()<<"."<<person->uuid<int>() << ", pretrip destination check: null"<<endl;
-			else cout << "Person id: " << person->Household<Household_Itf*>()->uuid<int>()<<"."<<person->uuid<int>() << ", pretrip destination check: passed"<<endl;
-*/
 			link_itf* origin_link = movements->template origin<link_itf*>();
 			advisory_radio_itf* har = origin_link->template advisory_radio<advisory_radio_itf*>();
 			
@@ -309,12 +305,6 @@ namespace Prototypes
 	
 			// determine if destination activity is flexible
 			Activity_Components::Types::FLEXIBILITY_VALUES flexibility = activity->template Location_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
-
-
-			//TODO:remove
-			//zone_itf* destination = movement->template destination<zone_itf*>();
-			//if (destination == nullptr) cout << "Person id: " << person->Household<Household_Itf*>()->uuid<int>()<<"."<<person->uuid<int>() << ", evaluate event destination check: null"<<endl;
-			//else cout << "Person id: " << person->Household<Household_Itf*>()->uuid<int>()<<"."<<person->uuid<int>() << ", evaluate event destination check: passed"<<endl;
 
 
 			// If event affects traveler
@@ -433,6 +423,7 @@ namespace Prototypes
 
 			if (activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY ||
 				activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::PRIMARY_WORK_ACTIVITY ||
+				activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::PART_TIME_WORK_ACTIVITY ||
 				activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::SCHOOL_ACTIVITY ||
 				activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::WORK_AT_HOME_ACTIVITY)
 			{
@@ -446,17 +437,6 @@ namespace Prototypes
 				
 				if (affected_zone == destination /*|| destination == nullptr*/)
 				{
-					//TODO: Remove
-					//cout << endl << "Affected ID, destination ID: " << affected_zone->uuid<int>();
-					//if (destination != nullptr) cout << ", " << destination->uuid<int>();
-					//else
-					//{
-					//	cout <<", null";
-					//	//TODO: remove
-					//	cout <<endl<<"Why is this destination null? personid="<<person->uuid<int>() <<": type="<<activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-					//	if (activity->Location<location_itf*>() != nullptr) cout <<", zone="<<activity->Location<location_itf*>()->zone<zone_itf*>()->uuid<int>();
-					//	else cout <<", zone=null.";
-					//}
 					return true;
 				}
 			}
@@ -718,6 +698,7 @@ namespace Prototypes
 			network_itf* network = person->template network_reference<network_itf*>();
 			skim_itf* skim = network->template skimming_faculty<skim_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
+			
 
 			//=====================================================================
 			// schedule departure from destination if no following activity
@@ -900,7 +881,7 @@ namespace Prototypes
 				if(end_this+ttime_this_to_home > END || duration > END)
 				{
 					cout<<endl<<"begin_next="<<begin_next<<", end_this="<<end_this<<", ttime_this_to_home="<<ttime_this_to_home<<", ttime_home_to_next="<<ttime_home_to_next<<", min_home_duration="<<min_home_duration<<", home="<<home<<", dest="<<dest<<", LOS_start="<<end_this + ttime_this_to_home<<endl;
-					THROW_EXCEPTION("Invalid start/duration for at home activity. Start="<<end_this+ttime_this_to_home<<", duration="<<duration<<", departure time="<<end_this<<", travel time="<<ttime_this_to_home);
+					THROW_WARNING("Invalid start/duration for at home activity. Start="<<end_this+ttime_this_to_home<<", duration="<<duration<<", departure time="<<end_this<<", travel time="<<ttime_this_to_home);
 				}
 
 				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
@@ -918,14 +899,13 @@ namespace Prototypes
 				//TODO: remove when done testing
 				if (next_movement->departed_time<Time_Seconds>() > (END)*2.0)
 				{
-					THROW_EXCEPTION("Error, next_movement departure time is out of simulation time frame. next move depart time="<<next_movement->departed_time<Time_Seconds>()<<", next act start time="<<next_act->Start_Time<Time_Seconds>());
+					THROW_WARNING("Error, next_movement departure time is out of simulation time frame. next move depart time="<<next_movement->departed_time<Time_Seconds>()<<", next act start time="<<next_act->Start_Time<Time_Seconds>());
 				}
 				act->End_Time<Time_Seconds>(next_movement->departed_time<Time_Seconds>(),false);
 			}
 
 			// Finally, log the activity
 			((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
-			
 		}
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()

@@ -157,8 +157,8 @@ struct MasterType
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
-	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Full<MasterType> synthesis_zone_type;
-	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Full<MasterType> synthesis_region_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Zone_Implementation_Full<MasterType> synthesis_zone_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Region_Implementation_Full<MasterType> synthesis_region_type;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
@@ -516,7 +516,7 @@ int main(int argc,char** argv)
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize start time model
-	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data.txt");	
+	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data_new.txt");	
 	// Initialize person properties with average activity frequency and duration
 	MasterType::person_properties_type::Static_Initializer();
 

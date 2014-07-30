@@ -61,6 +61,9 @@ namespace PopSyn
 		};
 		implementation struct Polaris_Synthesis_Region_Implementation_Simple : public Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Simple),Execution_Object>, _Polaris_Synthesis_Region_Implementation<MasterType>
 		{
+			typedef _Polaris_Synthesis_Region_Implementation<MasterType> BaseType;
+			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Simple),Execution_Object>::Component_Type ComponentType;		
+
 			// Use the current line in File_Reader and the info in linker to construct a new household object
 			template<typename TargetType> void Add_Household_Sample(File_IO::File_Reader& fr, TargetType linker, requires(TargetType,check(TargetType, is_pointer)))
 			{
@@ -164,7 +167,7 @@ namespace PopSyn
 			}
 			
 			// MAIN SYNTHESIS ROUTINE:
-			template<typename TargetType> void Synthesize_Population(requires(TargetType,check_stripped_type(ComponentType,Concepts::Is_IPF_Compatible)))
+			template<typename TargetType> void Synthesize_Population(requires(TargetType,check_stripped_type(BaseType,Concepts::Is_IPF_Compatible)))
 			{
 				typedef Prototypes::Synthesis_Zone<ComponentType> base_type;
 				base_type* base_itf = (base_type*)this;
@@ -224,6 +227,7 @@ namespace PopSyn
 		};
 		implementation struct Polaris_Synthesis_Region_Implementation_Full : public Polaris_Synthesis_Region_Implementation_Simple<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Full)>
 		{
+			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Full),Execution_Object>::Component_Type ComponentType;	
 		};
 
 

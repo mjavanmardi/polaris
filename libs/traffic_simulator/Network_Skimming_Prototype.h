@@ -381,12 +381,12 @@ namespace Network_Skimming_Components
 				// call the general get los function
 				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
 
-				//TODO: remove when done testing
+				//Check for bad travel time
 				if (los_value->auto_ttime<Time_Seconds>() > END || los_value->auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->auto_ttime<Time_Seconds>()))
 				{
 					int O = this->Get_Zone_ID<LocationType>(Origin);
 					int D = this->Get_Zone_ID<LocationType>(Destination);
-					THROW_EXCEPTION("Error: travel time is greater than 1 day for auto mode, ttime="<<los_value->auto_ttime<Time_Seconds>()<<", O="<<O<<", D="<<D);
+					THROW_WARNING("Error: travel time is invalid for auto mode, ttime="<<los_value->auto_ttime<Time_Seconds>()<<", O="<<O<<", D="<<D<<endl);
 				}
 
 				// extract and return the auto travel time

@@ -75,8 +75,8 @@ namespace Person_Components
 				}
 				pair<ReturnType,ReturnType> return_val;
 
-				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data
-				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnType>(itr->second.first + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*30.0f);
+				// add random draw from between 0-5 minutes as this is the aggregation level of the start_time data
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnType>(itr->second.first - GLOBALS::Uniform_RNG.template Next_Rand<float>()*10.0f);
 				
 				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
 				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnType>(itr->second.second + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*5.0f);
@@ -157,7 +157,7 @@ namespace Person_Components
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SOCIAL_ACTIVITY,map_type()));
-
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PART_TIME_WORK_ACTIVITY,map_type()));
 
 				// add items
 				ifstream data_file;

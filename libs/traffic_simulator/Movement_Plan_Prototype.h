@@ -320,8 +320,6 @@ namespace Movement_Plan_Components
 				{
 					_Trajectory_Unit_Interface* current_pos = current_trajectory_position<_Trajectory_Unit_Interface*>();
 
-					//TODO: REMOVE WHEN DONE TESTING FOR ANTARES
-					//cout << "Current_pos:"<<current_pos<<endl;
 					if (current_pos == nullptr) return nullptr;
 					
 					TargetType link = nullptr;

@@ -143,7 +143,7 @@ namespace Person_Components
 				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
 				float thetao = zone->accessibility_employment_other<double>()/1000.0;
 
-				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
 					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
@@ -254,12 +254,6 @@ namespace Person_Components
 
 				u += log(_bias_correction);
 
-
-
-				//TODO: remove when done testing
-				//cout <<"Utility for zone "<<zone->uuid<int>() << "="<<u<<endl;
-
-
 				return u;				
 			}
 
@@ -319,7 +313,7 @@ namespace Person_Components
 				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
 				float thetao = zone->accessibility_employment_other<double>()/1000.0;
 
-				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
 					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
@@ -864,12 +858,6 @@ namespace Person_Components
 				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
 
-
-
-				//TODO: remove when done testing
-				//cout <<endl<<endl<<"Performing destination choice:"<<endl;
-
-
 				// Make choice
 				int selected_index = 0;
 				choice_model->template Evaluate_Choices<NT>();
@@ -894,11 +882,6 @@ namespace Person_Components
 				else 
 				{
 					return_ptr = choice_model->template Choice_At<_Destination_Choice_Option_Interface*>(selected_index)->template destination<TargetType>();
-
-
-
-					//TODO: remove when done testing
-					//cout <<"Chosen destination:"<<return_ptr->zone<_Zone_Interface*>()->uuid<int>();
 				}
 
 				// free memory allocated locally
@@ -1083,19 +1066,6 @@ namespace Person_Components
 				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
 
-				//TODO: remove when done testing
-				//if (avail_time < 1440 && avail_time > 0)
-				//{
-				//	cout <<endl<<"Choice set info:"<<endl;
-				//	cout << "Avail time="<<avail_time<<", time_split="<<TTIME_SPLIT<<", mode="<<mode<<", start_time="<<start_time<<", restrict="<<restrict_choice_set<<endl;
-				//	cout << "Prev act="<<prev_act<<", next_act="<<next_act<<", current_act="<<_Current_Activity<<endl;
-				//	cout << "Max_end="<<max_end<<", min_start="<<min_start<<", duration="<<_Current_Activity->Duration<Time_Minutes>()<<endl;
-				//	cout << "Prev loc="<<prev_loc<<", home_loc="<<_Parent_Person->Home_Location<_Activity_Location_Interface*>()<<", next_loc="<<next_loc<<endl;
-				//}
-
-
-
-
 				//----------------------------------------------------------------------
 				// Get the stratified availability sets
 				std::vector<_Zone_Interface*> zones_near;
@@ -1118,23 +1088,7 @@ namespace Person_Components
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
 					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
 					else available_zones[3].push_back(zone);
-				}
-
-
-				//TODO: remove when done testing
-				//if (avail_time < 1440 && avail_time > 0)
-				//{
-				//	stringstream s("");
-				//	int total=0;
-				//	for (int i=0; i<_num_strata; ++i)
-				//	{
-				//		s <<"Strata "<<i+1<<" size = " << available_zones[i].size()<<endl;
-				//		total+=available_zones[i].size();
-				//	}
-				//	cout << "Total zones in choice set="<<total<<endl;
-				//	cout << s.str();
-				//}
-				
+				}				
 
 				//----------------------------------------------------------------------
 				// Next, select zones to choose from each strata
@@ -1196,14 +1150,14 @@ namespace Person_Components
 					_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
 
 					// ignore zone if all employment slots have already been assigned to other agents
-					if (act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY && zone->employment_simulated<int>() >= zone->employment_total<int>()) continue;
+					if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) continue;
 
 					// Get random location within that zone
 					_Activity_Location_Interface* loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
 
 					// try to add a random suitable location up to ten times, if failed 10 times then ignore zone
 					int failed_attempts = 0;
-					while (failed_attempts < 10 && (act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY && !loc->is_work_location<bool>()) || (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY && !loc->is_school_location<bool>()))
+					while (failed_attempts < 10 && ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && !loc->is_work_location<bool>()) || (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY && !loc->is_school_location<bool>()))
 					{
 						loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
 						failed_attempts++;
@@ -1331,13 +1285,13 @@ namespace Person_Components
 			void Create_New_Choice_Option(boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
 			{
 				// ignore zone if all employment slots have already been assigned to other agents
-				if (act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY && zone->employment_simulated<int>() >= zone->employment_total<int>()) return;
+				if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) return;
 
 				// Get random location within that zone
 				_Activity_Location_Interface* loc;
 
 				// try to add a random suitable location, if failed then ignore zone
-				if(act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				if(act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
 					loc = zone->Get_Random_Work_Location<_Activity_Location_Interface*>();
 				}
@@ -1370,10 +1324,6 @@ namespace Person_Components
 				choice->template start_time<Time_Minutes>(start_time);
 				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				choice_set.push_back(choice);
-
-		
-				//TODO: remove when doen testing
-				if (display) cout << "Destinations: previous="<<prev_loc<<", destination="<<loc<<", next="<<next_loc<<endl;
 			}
 		};
 		#pragma region Choice option parameters

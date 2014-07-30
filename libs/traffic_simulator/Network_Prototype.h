@@ -154,10 +154,10 @@ namespace Network_Components
 				requires(LocationType,check(strip_modifiers(ReturnType), Basic_Units::Concepts::Is_Time_Value) /*&& check(typename TargetType::ParamType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)*/))
 			{			
 				//TODO: remove when complete
-				if (Start_Time > GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,TimeType>((END)*2.0) || Start_Time < 0)
-				{
-					THROW_EXCEPTION("Error: invalid start time specified for determining LOS: start="<<Start_Time<<", Origin="<<Origin->uuid<int>()<<", dest="<<Destination->uuid<int>());
-				}
+				//if (Start_Time > GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,TimeType>((END)*2.0) || Start_Time < 0)
+				//{
+				//	THROW_EXCEPTION("Error: invalid start time specified for determining LOS: start="<<Start_Time<<", Origin="<<Origin->uuid<int>()<<", dest="<<Destination->uuid<int>());
+				//}
 
 
 				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
