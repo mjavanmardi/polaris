@@ -378,7 +378,9 @@ namespace Network_Components
 						}
 
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
+						//the backward wave speed is considered constant
 						link->template backward_wave_speed<float>(backward_wave_speed);
+						//so is the jam density
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 						link->template original_maximum_flow_rate<float>(maximum_flow_rate);

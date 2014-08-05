@@ -1,6 +1,7 @@
 #pragma once
 #include "Routable_Agent.h"
 
+//contains all of the parts necessary to construct a routable graph later 
 namespace polaris
 {
 	typedef unsigned long long edge_id_type;

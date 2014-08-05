@@ -714,7 +714,7 @@ namespace Link_Components
 
 				float adjusted_lanes = ((float)_num_lanes) + ((float)_pocket_data.num_pockets)*( _pocket_data.pocket_length/_length );
 
-				_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
+				_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f; //convert mile to feet
 				_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
 
 				_link_supply = _num_vehicles_under_jam_density;
@@ -732,6 +732,7 @@ namespace Link_Components
 				_link_fftt = fftt;
 				_link_bwtt = bwtt;
 				
+				//circular queues for the simulation
 				_link_fftt_cached_simulation_interval_size = max(1,(int(ceil(float(fftt/(float(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())))))));
 				_link_bwtt_cached_simulation_interval_size = max(1,(int(ceil(float(bwtt/(float(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())))))));
 

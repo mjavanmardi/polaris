@@ -224,8 +224,10 @@ void run_with_input_from_db(char* scenario_filename);
 
 int main(int argc, char* argv[])
 {
+	//initialize the core
 	Simulation_Configuration cfg;
 	//cfg.Single_Threaded_Setup(24*60*60);
+	//nuber of iterations, number of threads, TODO: should use argv instedad
 	cfg.Multi_Threaded_Setup(24*60*60,12);
 	INITIALIZE_SIMULATION(cfg);
 
@@ -243,6 +245,7 @@ int main(int argc, char* argv[])
 	if (argc > 1 && strcmp(argv[1], "input_from_files") == 0)
 	{
 		cout << "Input from files" << endl;
+		//this feture is not supported anymore, only database inputs
 		//run_with_input_from_files();
 	}
 	else
@@ -283,10 +286,12 @@ void run_with_input_from_db(char* scenario_filename)
 
 	cout << "allocating data structures..." <<endl;	
 
+	//input from the json control file is sotred in this class
 	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
+	//interface to all of the objects related to network simulation
 	typedef Network<typename MasterType::network_type> _Network_Interface;
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;

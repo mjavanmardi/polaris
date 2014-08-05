@@ -355,13 +355,14 @@ namespace Routing_Components
 				Graph_Assembler_Connected_Edge<MT::static_graph_type>* static_graph = graph_pool->Create_New_Graph<MT::static_graph_type>();
 
 				_static_network_graph_id = static_graph->graph_id();
-
+				//contains link properties (link properties). Its is a class to be used during graph construction to do things like creating a copy, it also contains a queue of connection groups
+				//static_attribues inherit from A* and hold attributes necessary for running A*
 				Input_Edge<Types::static_attributes<MT>> input_static_edge;
-
+				//information between which links and graphs connection happens
 				Input_Connection_Group_Implementation<typename MT::static_to_static_connection_type>::_neighbor_graph_id = static_graph->graph_id();
 
 				Input_Connection_Group_Implementation<typename MT::static_to_static_connection_type>* static_to_static_connection_group = new Input_Connection_Group_Implementation<typename MT::static_to_static_connection_type>();
-	
+				//additional cost for turn movements
 				Types::static_to_static connection_attributes;
 
 
@@ -410,6 +411,7 @@ namespace Routing_Components
 						static_to_static_connection_group->_neighbor_attributes.push_back(connection_attributes);
 					}
 
+					//each edge can have multiple connection groups, like bus->walk or bus->walk. The use pattern is to put connections of the same type into separate group, each group will have a different types of elements
 					input_static_edge._connection_groups.push_back(static_to_static_connection_group);
 
 					static_graph->Add_Edge<Types::static_attributes<MT>>( &input_static_edge );
@@ -423,7 +425,7 @@ namespace Routing_Components
 
 					input_static_edge._connection_groups.clear();
 				}
-
+				//reorganizes data that holds information for a graph structure
 				Interactive_Graph<MT::static_graph_type>* routable_network_graph = static_graph->Compile_Graph<Types::static_attributes<MT>>();
 	
 				//graph_pool->Link_Graphs();
