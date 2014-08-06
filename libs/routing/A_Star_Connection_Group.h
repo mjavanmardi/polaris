@@ -4,8 +4,6 @@
 
 namespace polaris
 {
-
-
 	template<typename MasterType>
 	struct Custom_Connection_Group<MasterType,typename MasterType::static_graph_type,typename MasterType::static_graph_type,typename MasterType::static_to_static_type>
 		: public Connection_Group_Base< MasterType, typename MasterType::static_graph_type, typename MasterType::static_graph_type, typename MasterType::static_to_static_type >
@@ -13,6 +11,7 @@ namespace polaris
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
 		{
+			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
 			const Connection_Implementation* const end_connection_itr = end_forward_edges();
 
 			for(Connection_Implementation* connection_itr = forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
@@ -23,6 +22,7 @@ namespace polaris
 			return (Anonymous_Connection_Group*)end_connection_itr;
 		}
 
+		//basic A* stuff
 		template<typename AgentType>
 		void Evaluate_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
 		{

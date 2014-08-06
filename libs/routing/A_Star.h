@@ -3,6 +3,7 @@
 
 namespace polaris
 {
+	//this is not a descriptive name, this is used for any ID
 	union transit_edge_id
 	{
 		struct composite_id
@@ -114,7 +115,8 @@ namespace polaris
 
 			total_cost = out_cost.back();
 		}
-			
+		
+		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
 		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
 			(*itr)->reset();

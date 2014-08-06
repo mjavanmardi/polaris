@@ -3,6 +3,7 @@
 
 namespace polaris
 {
+	//abstract base class for any connection, everybody understands it
 	template<typename MasterType,typename Base_Edge_Type>
 	struct Anonymous_Connection_Group
 	{

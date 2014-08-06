@@ -36,10 +36,11 @@ namespace polaris
 
 		void Link_Graph()
 		{
+			//this is the way to call a function from implementation class
 			this_component()->Link_Graph();
 		}
 	};
-
+	//interface for adding edges to the graph
 	prototype struct Graph_Assembler_Connected_Edge
 	{
 		tag_as_prototype;

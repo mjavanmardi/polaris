@@ -87,7 +87,7 @@ namespace polaris
 		boost::container::deque<edge_id_type> _neighbors;
 		boost::container::deque<connection_attributes_type> _neighbor_attributes;
 	};
-
+	//ADGE ATTRIBUTES TYPES HAS TO BE AN PLAIN old data (POD) so that the copy operation at line 116 works, otherwise need to define a copy operator
 	template<typename Connection_Group_Type>
 	graph_id_type Input_Connection_Group_Implementation<Connection_Group_Type>::_neighbor_graph_id;
 

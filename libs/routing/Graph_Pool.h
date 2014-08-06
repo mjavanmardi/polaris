@@ -3,10 +3,12 @@
 
 namespace polaris
 {
+	//the highest lavel object in the library hierarchy. It contains all of the graph types, and each thread has a Graph_Pool 
+	//see NetworkModel.cpp for usage example
 	prototype struct Graph_Pool
 	{
 		tag_as_prototype;
-
+		//ComponentType is an implementation
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		
 		template<typename Graph_Type>

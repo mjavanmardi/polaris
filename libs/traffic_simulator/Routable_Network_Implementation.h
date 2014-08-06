@@ -454,9 +454,10 @@ namespace Routing_Components
 					cout << itr->edge_id /2 << endl;
 				}
 			}
-
+			//currently calls A* algorithm
 			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
+				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
 				global_edge_id start;

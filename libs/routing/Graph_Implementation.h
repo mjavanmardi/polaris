@@ -109,7 +109,7 @@ namespace polaris
 				current_edge_size += sizeof(stored_edge_type);
 
 				Input_Edge<Edge_Attributes_Type>* current_input_edge = (Input_Edge<Edge_Attributes_Type>*)(*input_itr);
-
+				//placement new operation, creats the object at the given memory location
 				new (graph_itr) stored_edge_type();
 
 				Edge<stored_edge_type>* current_edge = (Edge<stored_edge_type>*)graph_itr;
@@ -133,9 +133,9 @@ namespace polaris
 
 					current_connection_group = current_connection_group->Next_Connection_Group();
 				}
-
+				//need to know when to stop iteratigh throug the connection groups when explore thr graph
 				current_edge->end_connection_groups(current_connection_group);
-
+				//round it to the __cashe_line_size, to speed up the access
 				current_edge_size = (current_edge_size/__cache_line_size + 1)*__cache_line_size;
 
 				//current_edge->edge_size(current_edge_size);
