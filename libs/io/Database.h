@@ -175,7 +175,7 @@ inline DBPtrType open_sqlite_database(const std::string& name)
 	DBPtrType db(new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
 
 	odb::connection_ptr c (db->connection ());
-	c->execute("PRAGMA synchronous = OFF");
+	//c->execute("PRAGMA synchronous = OFF");
 	c->execute("PRAGMA journal_mode = MEMORY");
 	ifstream test;
 	if (db_inventory.size()>1)

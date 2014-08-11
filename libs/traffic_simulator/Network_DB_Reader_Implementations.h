@@ -215,7 +215,10 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 
-						
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
@@ -423,8 +426,13 @@ namespace Network_Components
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(1);
 
+
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+						
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
 
 						
 						//link->template uuid<int>(link_id_dir.id);
@@ -924,6 +932,7 @@ namespace Network_Components
 						zone->template internal_id<int>(zone_count);
 						zone->template X<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 						zone->template Y<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
+						zone->template areatype<int>(db_itr->getArea()->getArea_Type());
 						zones_container.insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
 					}
 					catch (const odb::exception& e)
@@ -1056,8 +1065,8 @@ namespace Network_Components
 						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
 						if (data_ptr == nullptr) continue;
 
-						activity_location->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(data_ptr->getX()));
-						activity_location->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(data_ptr->getY()));
+						activity_location->template x_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getX()/*)*/);
+						activity_location->template y_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getY()/*)*/);
 
 						activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
 	

@@ -32,8 +32,11 @@ namespace Activity_Location_Components
 
 			m_data(Types::LAND_USE, land_use_type, NONE, NONE);
 
-			m_data(float, x_position, NONE, NONE);
-			m_data(float, y_position, NONE, NONE);
+			//m_data(float, x_position, NONE, NONE);
+			//m_data(float, y_position, NONE, NONE);
+
+			member_component_and_feature_accessor(x_position, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			member_component_and_feature_accessor(y_position, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
 		};
 	}
 

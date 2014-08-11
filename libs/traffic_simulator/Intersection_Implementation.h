@@ -534,6 +534,8 @@ namespace Intersection_Components
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Intersection_Implementation),Execution_Object>::ComponentType ComponentType;
 
+			m_data(int, area_type, NONE, NONE);
+
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);

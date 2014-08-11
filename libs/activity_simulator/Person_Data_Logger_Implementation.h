@@ -643,7 +643,8 @@ namespace Person_Components
 				trip_rec->setHhold(hh->template uuid<int>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec->setMode(0);
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec->setMode(1);
-				else trip_rec->setMode(2);
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec->setMode(2);
+				else trip_rec->setMode(3);
 				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
 				else trip_rec->setOrigin(new_origin);
 				trip_rec->setPartition(0);
@@ -673,6 +674,8 @@ namespace Person_Components
 					act_rec->setMode ("AUTO");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
 					act_rec->setMode ("HOV");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
+					act_rec->setMode ("WALK");
 				else
 					act_rec->setMode ("TRANSIT");
 				act_rec->setType (act->template Get_Type_String<NT>());

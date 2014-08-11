@@ -74,6 +74,7 @@ namespace Zone_Components
 			m_data(double, Y, NONE, NONE);
 			m_data(float, race_percent_white, NONE, NONE);
 			m_data(float, race_percent_black, NONE, NONE);
+			m_data(int, areatype, NONE,NONE);
 
 			member_component_and_feature_accessor(average_household_income,Value,Basic_Units::Prototypes::Currency,Basic_Units::Implementations::Currency_Implementation<NT>);
 			member_component_and_feature_accessor(area,Value,Basic_Units::Prototypes::Area,Basic_Units::Implementations::Area_Implementation<NT>);

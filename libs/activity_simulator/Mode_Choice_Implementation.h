@@ -503,6 +503,7 @@ namespace Person_Components
 
 				// Add the temporary HOV correction - this should eventually be replaced by including HOV as an option in the choice model
 				if (Assign_To_HOV<ActivityItfType>(activity, selected_mode)) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+				//if (Assign_To_Walk<_Activity_Location_Interface*, ActivityItfType>(prev_location,dest_location, activity)) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::WALK;
 
 				//============================================================================================
 				//Account for touring - if previous act is not at an anchor location and not using auto, then auto not available
@@ -572,6 +573,36 @@ namespace Person_Components
 				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < p) return true;
 				else return false;
 
+			}
+			template<typename LocItfType, typename ActivityItfType> bool Assign_To_Walk(LocItfType orig, LocItfType dest, ActivityItfType act)
+			{
+				_Activity_Location_Interface* O = (_Activity_Location_Interface*)orig;
+				_Activity_Location_Interface* D = (_Activity_Location_Interface*)dest;
+
+				Meters x1 = O->x_position<Meters>();
+				Meters y1 = O->y_position<Meters>();
+
+				Meters x2 = D->x_position<Meters>();
+				Meters y2 = D->y_position<Meters>();
+
+				_Zone_Interface* dest_zone = D->zone<_Zone_Interface*>();
+				
+				// Set the maximum allowable walk distance based on area type - higher in CBD/downtown
+				Kilometers max_walk_distance = 0;
+				if (dest_zone->areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
+				else if (dest_zone->areatype<int>() == 2) max_walk_distance = 0.5;	// Downtown
+				else if (dest_zone->areatype<int>() == 3) max_walk_distance = 0.25;		// Rest of chicago
+				else if (dest_zone->areatype<int>() >= 4 && dest_zone->areatype<int>() >= 6) max_walk_distance = 0.25; // Suburban
+				else if (dest_zone->areatype<int>() == 7) max_walk_distance = 0.0;	// Exurb
+				else max_walk_distance = 0.0;											// Rural
+
+
+				Meters dist = sqrt(pow(x1-x2,2) + pow(y1-y2,2));
+				Kilometers dist_km = GLOBALS::Length_Converter.Convert_Value<Meters,Kilometers>(dist);
+
+
+				if (dist < max_walk_distance) return true;
+				else return false;
 			}
 		};
 

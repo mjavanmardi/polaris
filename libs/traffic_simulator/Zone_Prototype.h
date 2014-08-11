@@ -46,6 +46,7 @@ namespace Zone_Components
 			accessor(internal_id, NONE, NONE);
 			accessor(X, NONE, NONE);
 			accessor(Y, NONE, NONE);
+			accessor(areatype, NONE, NONE);
 
 			accessor(average_household_income, NONE, NONE);
 			accessor(race_percent_white, NONE, NONE);
@@ -149,9 +150,9 @@ namespace Zone_Components
 			{
 				Basic_Units::Currency_Variables::Dollars auto_parking_cost;
 				int id = this->uuid<int>();
-				if (id <= 47) auto_parking_cost = 15.0;
-				else if (id <= 77) auto_parking_cost = 5.0;
-				else if (id <= 350) auto_parking_cost = 1.5;
+				if (areatype<int>() == 1) auto_parking_cost = 15.0;
+				else if (areatype<int>() == 2) auto_parking_cost = 5.0;
+				else if (areatype<int>() == 3) auto_parking_cost = 1.5;
 				else auto_parking_cost = 0.0;
 
 				return GLOBALS::Currency_Converter.Convert_Value<Dollars,TargetType>(auto_parking_cost);

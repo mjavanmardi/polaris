@@ -608,11 +608,11 @@ namespace Prototypes
 			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
 			typedef Link_Components::Prototypes::Link<typename get_component_type(links)>  link_itf;
-
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones)>  zone_itf;
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->template Household<Household_Itf*>();
@@ -621,6 +621,22 @@ namespace Prototypes
 			network_itf* network = person->template network_reference<network_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
+
+
+
+			/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
+			location_itf* orig = movements->origin<location_itf*>();
+			location_itf* dest = movements->destination<location_itf*>();
+			zone_itf* dest_zone = dest->zone<zone_itf*>();
+			Miles dist = dest->distance<location_itf*,Miles>(orig);
+			Miles max_walk_distance = 0;
+			if (dest_zone->areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
+			else if (dest_zone->areatype<int>() == 2) max_walk_distance = 0.75;	// Downtown
+			else if (dest_zone->areatype<int>() == 3) max_walk_distance = 0.33;		// Rest of chicago
+			else if (dest_zone->areatype<int>() >= 4 && dest_zone->areatype<int>() >= 6) max_walk_distance = 0.33; // Suburban
+			else if (dest_zone->areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
+			else max_walk_distance = 0.0;	
+			if (dist <max_walk_distance) act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 
 
 			// If no movement involved - i.e. different activity at same location, do auto arrive

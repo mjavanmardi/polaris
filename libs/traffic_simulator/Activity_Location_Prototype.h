@@ -106,6 +106,17 @@ namespace Activity_Location_Components
 				if (this->land_use_type<Types::LAND_USE>() == Types::LAND_USE::LU_ALL || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL || this->land_use_type<Types::LAND_USE>() == Types::LU_MIXED_USE) return true;
 				else return false;
 			}
+
+			template<typename LocationType, typename DistanceType> DistanceType distance(LocationType from_loc, requires(LocationType,check(LocationType, is_pointer)))
+			{
+				DistanceType x1 = from_loc->x_position<DistanceType>();
+				DistanceType y1 = from_loc->y_position<DistanceType>();
+
+				DistanceType x2 = x_position<DistanceType>();
+				DistanceType y2 = y_position<DistanceType>();
+
+				return sqrt(pow(x1-x2,2) + pow(y1-y2,2));
+			}
 		};
 	}
 }
