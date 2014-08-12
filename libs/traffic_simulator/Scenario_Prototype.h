@@ -352,35 +352,35 @@ namespace Scenario_Components
 				ODB_IO_SOURCE,
 				FILE_IO_SOURCE,
 			};
-
+			
 			enum Type_Sub_Iteration_keys
 			{
-				START_OF_ITERATION = 0,
-				NETWORK_SNAPSHOT_SUB_ITERATION,
-				EVENTS_UPDATE_SUB_ITERATION,
-				ROUTING_SUB_ITERATION,
-				TRAVELER_SET_DEPARTURE_SUB_ITERATION,
-				RAMP_METERING_SUB_ITERATION,
-				CONTROL_SUB_ITERATION,
+				START_OF_ITERATION = 0, 
+				NETWORK_SNAPSHOT_SUB_ITERATION, //outputs the snapshot from previous iteration
+				EVENTS_UPDATE_SUB_ITERATION, //for the wether events, at this point they notify subscribing links that the event occured
+				ROUTING_SUB_ITERATION, //for any route computations
+				TRAVELER_SET_DEPARTURE_SUB_ITERATION, //traveler get pushed to the network
+				RAMP_METERING_SUB_ITERATION, //updates the ramp meeters according to current conditions
+				CONTROL_SUB_ITERATION, //traffic signal states updated
 				/* update link supply */
-				LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,
+				LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,//network simulation
 				/* 1. update allowed flow for each turn movement.
 				 * 2. transfer vehicle */
-				INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,
-				INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION,
+				INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,//network simulation
+				INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION,//network simulation
 				/* vehicles take action for transferring */
-				VEHICLE_ACTION_TRANSFER_SUB_ITERATION,
+				VEHICLE_ACTION_TRANSFER_SUB_ITERATION,//network simulation
 				/* origin link loading */
-				LINK_ORIGIN_LINK_LOADING_SUB_ITERATION,
+				LINK_ORIGIN_LINK_LOADING_SUB_ITERATION,//network simulation
 				/* vehicles take action for origin loading */
-				VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,
+				VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,//network simulation
 				/* link moving */
-				LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION,
-				INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION,
-				INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION,
-				INTERSECTION_MOE_COMPUTATION_SUB_ITERATION,
-				MOE_COMPUTATION_SUB_ITERATION,
-				MOE_VISUALIZATION_SUB_ITERATIONS,
+				LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION,//network simulation
+				INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION,//network simulation
+				INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION,//computing MOE
+				INTERSECTION_MOE_COMPUTATION_SUB_ITERATION,//computing MOE
+				MOE_COMPUTATION_SUB_ITERATION,//computing MOE
+				MOE_VISUALIZATION_SUB_ITERATIONS,//computing MOE
 				END_OF_ITERATION=40,
 			};
 			enum Demand_Sub_Iteration_keys

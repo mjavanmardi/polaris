@@ -486,7 +486,7 @@ namespace Network_Components
 				network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
 				network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
 			}
-
+			//agent mostly responsable fr output of results
 			template<typename TargetType> void initialize_network_agent()
 			{
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
@@ -1075,6 +1075,7 @@ namespace Network_Components
 					_Link_Interface* outboundLink = mvmt_itf->template outbound_link<_Link_Interface*>();
 
 					float turn_travel_penalty = 0.0f;
+					//the logic of PROHIBITED is never used in the simulation
 					if (mvmt_itf->template movement_rule<int>() == Turn_Movement_Components::Types::PROHIBITED)
 					{
 						turn_travel_penalty = INFINITY_FLOAT;

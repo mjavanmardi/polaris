@@ -92,13 +92,15 @@ namespace Routing_Components
 					THROW_EXCEPTION("Origin is undefined.");
 				}
 
-				// get a routable network
+				// get a routable network; routable_network know what thread you are
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
 				
 				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
 				unsigned int destination_id = _movement_plan->destination<Link_Interface*>()->uuid<unsigned int>();
 
+				//list of edgeid, graph_id tuples; internal edge ids
 				boost::container::deque<global_edge_id> path_container;
+				//cost of traversing each of the edges
 				boost::container::deque<float> cost_container;
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;

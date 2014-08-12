@@ -1,3 +1,5 @@
+//this is the transit routing. This file does not compile at this point, but it was checked against google's transit routing service at some point
+
 //#include "io\database.h"
 //#include "io\Supply.h"
 //#include "core\Core.h"

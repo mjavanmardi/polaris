@@ -9,6 +9,8 @@
 extern void* _global_scenario;
 extern void* _global_network;
 
+
+//IO part of reading the intersection controls is implemented in this namespace
 namespace Operation_Components
 {
 	using std::shared_ptr;
