@@ -4,10 +4,11 @@ cmake_minimum_required(VERSION 2.8)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(Popsyn OFF)
+set(Statewide ON)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares ON)
+set(Antares OFF)
 
 
 set(BUILD_DIR build)
@@ -97,6 +98,7 @@ include_directories(libs/scenario_manager)
 include_directories(libs/population_synthesis)
 include_directories(libs/activity_simulator)
 include_directories(libs/traffic_simulator)
+
 include_directories(apps)
 include_directories(tests)
 
@@ -116,14 +118,22 @@ add_subdirectory (libs/activity_simulator)
 if (Popsyn)
 	set(Antares OFF)
 	add_subdirectory (apps/population_synthesizer)
+elseif(Statewide)
+	add_subdirectory (apps/ILSTDM) 
+	add_subdirectory (libs/statewide_model)
+	add_subdirectory (libs/spatial) 
+	add_subdirectory (libs/routing) 
+	add_subdirectory (libs/traffic_simulator)
 else()
 	add_subdirectory (apps/io_demo) 
 	add_subdirectory (apps/test) 
-	# add_subdirectory (apps/ILSTDM) 
+	add_subdirectory (apps/fixed_demand_simulator) 
+	add_subdirectory (apps/integrated_abm)
+	add_subdirectory (libs/traffic_simulator)
 	add_subdirectory (libs/spatial) 
 	add_subdirectory (libs/routing) 
-	# add_subdirectory (libs/statewide_model)
 endif()
+
 
 if (Coretests)
 	#Apply CMake over POLARIS tests project structure
@@ -132,6 +142,8 @@ endif()
 
 
 if (MSVC AND Antares)
+	include_directories(libs/visual_traffic_simulator)
+
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
 	include_directories(${DEPS_DIR}/plplot/include/plplot)
 	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include)
@@ -166,9 +178,3 @@ if (MSVC AND Antares)
 	#add_subdirectory (apps/test)
 endif()
 
-if (Popsyn)
-else()
-	add_subdirectory (libs/traffic_simulator)
-	add_subdirectory (apps/fixed_demand_simulator) 
-	add_subdirectory (apps/integrated_abm)
-endif()
