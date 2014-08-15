@@ -177,7 +177,7 @@ void Antares_Implementation<MasterType,InheritanceList>::OnSaveView(wxCommandEve
 template<typename MasterType,typename InheritanceList>
 Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFrame* parent):wxFrame(parent,-1,"POLARIS")
 {
-	//---- initialize conductor ----
+	//---- initialize conductor ---- Controls the execution timing
 
 	_conductor=(conductor_type)Allocate<typename MasterType::conductor_type>();
 
@@ -187,7 +187,7 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 
 	SetIcon( wxIcon("C:\\opt\\polarisdeps\\antares\\POLARIS_Icon.ico",wxBITMAP_TYPE_ICO) );
 
-	//---- initialize aui ----
+	//---- initialize aui ---- - Part of the wxFrame object
 
 	_aui_manager.SetManagedWindow(this);
 
@@ -242,7 +242,7 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 
 	//---- initialize and add the primary widgets ----
 
-	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0};
+	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0}; // Arguments passed to GL canvas (color type, double buffer property, depth size, some other stuff...)
 
 	_canvas=(canvas_type)new type_of(canvas)(this,args);
 

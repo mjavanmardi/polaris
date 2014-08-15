@@ -28,6 +28,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		//Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, cfg.storage_offset, _target_sub_iteration);
 		Load_Event<Antares_Layer_Implementation>(&Update, cfg.storage_offset, _target_sub_iteration);
 
+
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 
 		for(unsigned int i=0;i<_storage.buffer_size;i++)
@@ -180,6 +181,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		}
 	}
 
+	// Push user data to a thread specific buffer in OpenGL compatible format - used in draw_layer function
 	template<typename TargetType> void Push_Element(void* data, int iteration, requires(TargetType,check_2(TargetType,Regular_Element,is_same)))
 	{
 		const int* geometry_itr=(const int*)data;
@@ -298,6 +300,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 			{
 				if(data_stride)
 				{
+					// Pushing back pointer to the polaris object that the graphical element stores
+					// *Note - pushing 8-byte address as two ints
 					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 					storage_reference->push_back(*geometry_itr);
@@ -1022,7 +1026,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 
 		response.next._iteration = iteration() + pthis->_storage.period;
 		response.next._sub_iteration = pthis->_target_sub_iteration;
-				
+			
 		if(pthis->_dynamic_data)
 		{
 			int reserve;

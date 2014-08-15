@@ -27,7 +27,7 @@ void* Simulation_Loop(void* package_ptr)
 	// indicate thread is ready to start the simulation
 	world->Send_Signal_To_World();
 
-	// wait until all threads are ready
+	// wait until all threads are ready - make sure no threads go into simulation before all have been created
 	world->Wait_For_Signal_From_World();
 
 	Revision next_revision = __revision_omega;

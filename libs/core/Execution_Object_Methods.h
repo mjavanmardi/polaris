@@ -86,7 +86,7 @@ namespace polaris
 	}
 
 	///----------------------------------------------------------------------------------------------------
-	/// Reschedule - Reschedule the agent
+	/// Reschedule - Reschedule the agent - current event fires at different time
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>

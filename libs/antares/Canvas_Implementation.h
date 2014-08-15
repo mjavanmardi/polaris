@@ -6,7 +6,7 @@
 #include "Canvas.h"
 
 //---------------------------------------------------------
-//	Canvas_Implementation - canvas class definition
+//	Canvas_Implementation - canvas class definition - Inherited from wxGLCanvas which process GL commands to draw
 //---------------------------------------------------------
 
 implementation class Canvas_Implementation : public Polaris_Component<MasterType,INHERIT(Canvas_Implementation),NULLTYPE>, public wxGLCanvas
@@ -181,6 +181,7 @@ Canvas_Implementation<MasterType,InheritanceList>::Canvas_Implementation(wxFrame
 
 	wxInitAllImageHandlers();
 
+	// Assign callback for navigation commands mouse/button events
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Canvas_Implementation::OnResize));
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(Canvas_Implementation::OnLeftDown));
 	Connect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
@@ -212,8 +213,8 @@ Canvas_Implementation<MasterType,InheritanceList>::Canvas_Implementation(wxFrame
 
 	//---- drawing ----
 
-	_spatial_change=true;
-	_temporal_change=false;
+	_spatial_change=true;		// indicates the user has changed the view
+	_temporal_change=false;		// indicates whether simulation has advanced in time
 	_cached_iteration=-1;
 
 
@@ -231,6 +232,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize(float xmin,fl
 {
 	Initialize_GLCanvas();
 
+	// Set canvas bounds
 	float xmid=(xmin+xmax)/2;
 	float ymid=(ymin+ymax)/2;
 	
@@ -284,13 +286,13 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 	
 	glewInit();
 
-	glClearColor(.95f,.95f,.95f,1);
-	glClearDepth(1.0f);
+	glClearColor(.95f,.95f,.95f,1); // background color
+	glClearDepth(1.0f);				
 
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);		// test for depth before drawing overlapping objects
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_POINT_SMOOTH);		
 	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
 
 	//glShadeModel(GL_SMOOTH);
@@ -302,12 +304,12 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 	//glEnable(GL_POLYGON_SMOOTH);
 	//glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
-	float anisotropic_level;
+	float anisotropic_level;		// Anisotropic filtering - look up documentation
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic_level);
 
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-	glEnable(GL_BLEND);
+	glEnable(GL_BLEND);		// makes GL process transparency properly
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -315,7 +317,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 
 	unsigned int null_texture;
 
-	glGenTextures(1,&null_texture);
+	glGenTextures(1,&null_texture);	
 
 	_texture_ids = new unsigned int[100];
 	_current_texture_index = 0;

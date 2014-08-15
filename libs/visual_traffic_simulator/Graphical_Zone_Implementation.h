@@ -11,7 +11,8 @@ namespace Zone_Components
 		{
 			RED_COLUMN, GREEN_COLUMN, BLUE_COLUMN, GRAY_COLUMN
 		};
-		
+
+#pragma pack(push,1)
 		implementation struct Quad : public Polaris_Component<MasterType,INHERIT(Quad),NULLTYPE>
 		{
 			Quad()
@@ -27,6 +28,8 @@ namespace Zone_Components
 			Point_3D<MasterType> c;
 			Point_3D<MasterType> d;
 		};
+#pragma pack(pop)
+
 #pragma pack(push,1)
 		implementation struct Column : public Polaris_Component<MasterType,INHERIT(Column),NULLTYPE>
 		{
@@ -181,7 +184,7 @@ namespace Zone_Components
 	{
 		implementation struct Graphical_Zone_Group_Implementation : public Polaris_Component<MasterType,INHERIT(Graphical_Zone_Group_Implementation),Data_Object>
 		{
-			template<typename TargetType> void accept_zone_information(Point_3D<MasterType>& coordinates, void* ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
+			template<typename CoordType, typename TargetType> void accept_zone_information(CoordType coordinates, void* ptr, typename TargetType productions, typename TargetType attractions)
 			{
 				int width = 300;
 				int height_prod = productions;
@@ -200,12 +203,12 @@ namespace Zone_Components
 				// construct and push to productions column
 				Types::Column<MasterType> origin_column = Types::Column<MasterType>(origin_col_center,width,height_prod, Types::GREEN_COLUMN);
 				origin_column.ptr = ptr;
-				origin_column.Push_To_Layer<ComponentType>(_zone_centroids);
+				origin_column.Push_To_Layer(_zone_centroids);
 
 				// construct and push to attractions column
 				Types::Column<MasterType> destination_column = Types::Column<MasterType>(destination_col_center,width,height_att, Types::BLUE_COLUMN);
 				destination_column.ptr = ptr;
-				destination_column.Push_To_Layer<ComponentType>(_zone_centroids);
+				destination_column.Push_To_Layer(_zone_centroids);
 			}
 
 			template<typename TargetType> void configure_zones_layer()
@@ -222,7 +225,6 @@ namespace Zone_Components
 				//cfg.attributes_schema.push_back("Attractions");
 				//cfg.attributes_schema.push_back("Population");
 				//cfg.attributes_schema.push_back("Available");
-
 
 				cfg.dynamic_data = true;
 				cfg.storage_period = 300;
@@ -255,15 +257,16 @@ namespace Zone_Components
 			static void Default_Zone_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				this_itf* pthis = (this_itf*)_this;
-				response.result=true;
 				response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(pthis->update_increment<Simulation_Timestep_Increment>());
+				//response.next._iteration = iteration() + pthis->update_increment<Simulation_Timestep_Increment>();
 				response.next._sub_iteration=Types::ZONE_UPDATE_SUBITERATION;
+
+				_this->Default_Zone_Event();
 			}
-			declare_event(Default_Zone_Event)
+			void Default_Zone_Event()
 			{
-				this_itf* pthis = (this_itf*)_this;
-				pthis->Push_To_Zone_Display<NULLTYPE>();
-				pthis->reset_counters<NULLTYPE>();
+				this->Push_To_Zone_Display<NULLTYPE>();
+				this->reset_counters<NULLTYPE>();
 			}		
 
 			template<typename TargetType> void Initialize()
@@ -273,8 +276,7 @@ namespace Zone_Components
 				this_itf* pthis = (this_itf*)this;
 				pthis->update_increment<Time_Minutes>(5);
 
-				//TODO
-//load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,60,Types::ZONE_UPDATE_SUBITERATION,NULLTYPE);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Default_Zone_Conditional,60,Types::ZONE_UPDATE_SUBITERATION);	
 			}
 			template<typename TargetType> void Push_To_Zone_Display()
 			{
@@ -295,8 +297,7 @@ namespace Zone_Components
 
 				int height_scale = 50;
 
-//TODO
-//				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*height_scale, att_height*height_scale);
+				_graphical_zone_group->accept_zone_information<Point_3D<MasterType>, int>(coordinate, this, prod_height*height_scale, att_height*height_scale);
 			}
 			
 			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
@@ -356,7 +357,8 @@ namespace Zone_Components
 			m_data(int, production_count_buffer, NONE, NONE);
 			m_data(int, attraction_count_buffer, NONE, NONE);
 		};
+
 		template<typename MasterType,typename InheritanceList>
-		Zone_Components::Prototypes::Graphical_Zone_Group<typename MasterType::type_of(graphical_zone_group)>* Graphical_Zone_Implementation<MasterType,InheritanceList>::_graphical_zone_group;
+		Zone_Components::Prototypes::Graphical_Zone_Group<typename MasterType::graphical_zone_group_type>* Graphical_Zone_Implementation<MasterType,InheritanceList>::_graphical_zone_group;
 	}
 }

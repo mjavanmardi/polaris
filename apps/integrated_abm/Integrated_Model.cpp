@@ -59,8 +59,8 @@ struct MasterType
 	//typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> basic_vehicle_type;
 	//typedef Vehicle_Components::Implementations::Polaris_Base_Vehicle_Implementation<M> vehicle_type;
 
-	//typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
-	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
+	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
+	//typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
 
 	typedef Antares_Intersection_Implementation<M> intersection_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
@@ -461,17 +461,18 @@ int main(int argc,char** argv)
 	// Set up graphical display
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#ifdef ANTARES
-	//define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
-	//_Zones_Container_Interface::iterator zone_itr;
-	//_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
+	typedef polaris::Pair_Associative_Container<typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
+	_Zones_Container_Interface::iterator zone_itr;
+	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
 
-	////--------------------------------------------------------------------------------------------
-	//// Graphical zone group display - integrate to graphical network when database is fixed
-	//typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
-	//zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
-	//// initialize zone static reference to the graphical zone group
-	//MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
-	//_graphical_zone_group->configure_zones_layer<NULLTYPE>();
+	//--------------------------------------------------------------------------------------------
+	// Graphical zone group display - integrate to graphical network when database is fixed
+	typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type> zone_group_interface;
+	zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
+	// initialize zone static reference to the graphical zone group
+	MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type>*)_graphical_zone_group;
+	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
 	#endif
 
 

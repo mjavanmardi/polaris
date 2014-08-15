@@ -14,9 +14,9 @@ namespace Zone_Components
 		{
 			tag_as_prototype;
 
-			template<typename ParamType, typename Param2Type> void push_zone_information(ParamType coordinates, void* this_ptr, Param2Type productions, Param2Type attractions)
+			template<typename CoordType, typename CountType> void accept_zone_information(CoordType coordinates, void* this_ptr, CountType productions, CountType attractions)
 			{
-				this_component()->template accept_zone_information<TargetType>(coordinates, this_ptr, productions, attractions);
+				this_component()->template accept_zone_information<CoordType, CountType>(coordinates, this_ptr, productions, attractions);
 			}
 			template<typename TargetType> void configure_zones_layer()
 			{

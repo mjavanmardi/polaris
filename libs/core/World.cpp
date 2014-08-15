@@ -14,7 +14,7 @@ World* _world = nullptr;
 /// Initialize - Initialize Discrete Event Engine and Memory Allocator
 ///----------------------------------------------------------------------------------------------------
 
-void World::Initialize(Simulation_Configuration& cfg)
+void World::Initialize(Simulation_Configuration& cfg) // called in the INITIALIZE_SIMULATION macro used in MAIN()
 {
 	// check for correct user input and set up world
 
@@ -74,7 +74,7 @@ void World::Initialize(Simulation_Configuration& cfg)
 		thread_information[i]._world_ptr = this;
 
 		#ifdef _MSC_VER
-			_threads[i]=CreateThread(NULL,0,Simulation_Loop,&thread_information[i],0,NULL);
+			_threads[i]=CreateThread(NULL,0,Simulation_Loop,&thread_information[i],0,NULL); // calling simulation_loop in Simulation_Thread.cpp - main thread function
 		#else
 			pthread_create(&_threads[i],NULL,Simulation_Loop,&thread_information[i]);
 		#endif
@@ -98,11 +98,14 @@ void World::Terminate()
 	delete[] _threads;
 }
 
+
+// FUNCTIONS FOR COORDINATION BETWEEN MAIN THREAD AND INDIVIDUAL SIMULATION THREADS
+
 ///----------------------------------------------------------------------------------------------------
 /// Send_Signal_To_World - Threads indicate change of execution region to World
 ///----------------------------------------------------------------------------------------------------
 
-void World::Send_Signal_To_World()
+void World::Send_Signal_To_World() // set event
 {
 	#ifdef _MSC_VER
 		// let the world know that this thread is waiting
@@ -182,7 +185,7 @@ void World::Wait_For_Signal_From_World()
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// Send_Signal_To_Threads - World indicate change of execution region to threads
+/// Send_Signal_To_Threads - World indicate change of execution region to threads - send thread_start_event to threads when world is done working
 ///----------------------------------------------------------------------------------------------------
 
 void World::Send_Signal_To_Threads()
@@ -201,10 +204,10 @@ void World::Send_Signal_To_Threads()
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// Wait_For_Signal_From_Threads - World waits for threads to release it 
+/// Wait_For_Signal_From_Threads - World waits for threads to release it - occurs when all threads send finished signal
 ///----------------------------------------------------------------------------------------------------
 
-void World::Wait_For_Signal_From_Threads()
+void World::Wait_For_Signal_From_Threads() // 
 {
 	#ifdef _MSC_VER
 		// wait for the threads to signal you
@@ -253,7 +256,7 @@ void World::Start_Turning()
 
 		Wait_For_Signal_From_Threads();
 
-		// send the world thread to the simulation engine to perform the update step
+		// send the world thread to the simulation engine to perform the update step - Update from here, because memory is allocated and all threads are idle at this point
 
 		simulation_engine->Update();
 

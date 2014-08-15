@@ -38,33 +38,27 @@ namespace Zone_Components
 				_zone_is_available=true;
 				_this_interface* pthis = (_this_interface*)this;
 				pthis->update_increment<Time_Minutes>(2);
-				//TODO
-//load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0,NULLTYPE);
-				//TODO
-				//Load_Event<ComponentType>(&ComponentType::Default_Zone_Conditional,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0);
+
+				((ComponentType*)this)->Load_Event<ComponentType>(&Default_Zone_Conditional,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0);		
 			}
 			static void Default_Zone_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				_this_interface* pthis = (_this_interface*)_this;
 
-				//response.result=true;
 				response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(pthis->update_increment<Simulation_Timestep_Increment>());
 				response.next._sub_iteration=Types::ZONE_UPDATE_SUBITERATION;
 				
 				_this->Default_Zone_Event();
 			}
 
-			//declare_event(Default_Zone_Event)
 			void Default_Zone_Event()
 			{
-				//_this_interface* pthis = (_this_interface*)_this;
-
-				//cout <<endl<<"Productions= " << pthis->production_count<int>() << ", Attractions= " << pthis->attraction_count<int>();
-				//for (int i=0; i < num_sim_threads()+1; i++)
-				//{
-				//	((ComponentType*)_this)->production_counter[i]=0;
-				//	((ComponentType*)_this)->attraction_counter[i]=0;
-				//}
+				//cout <<endl<<"Productions= " << this->production_count<int>() << ", Attractions= " << this->attraction_count<int>();
+				for (int i=0; i < num_sim_threads()+1; i++)
+				{
+					((ComponentType*)this)->production_counter[i]=0;
+					((ComponentType*)this)->attraction_counter[i]=0;
+				}
 			}
 
 			m_data(bool, zone_is_available, NONE, NONE);

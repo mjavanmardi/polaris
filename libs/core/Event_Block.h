@@ -1,6 +1,12 @@
 #pragma once
 ///----------------------------------------------------------------------------------------------------
 /// Event_Block.h - Block of execution objects in a contiguous memory space
+///
+/// SIMILAR TO EXECUTION BLOCK
+/// Except uses intrusive binary heap to store execution schedule information (ordered by next revision)
+/// Instead of striding over all objects to find ones which need to execute - uses the intrusive binary heap to get the ones which need to execute
+/// Downside comes in building the IBH - has memory overhead (48 bytes per object) and performance overhead due to the insertion of objects in the heap ordering by execution time
+/// Useful when execution by object is sparse - saves the striding over all objects
 ///----------------------------------------------------------------------------------------------------
 
 #include "Event_Object.h"

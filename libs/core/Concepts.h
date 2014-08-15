@@ -129,11 +129,11 @@ namespace polaris
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
-	///----------------------------------------------------------------------------------------------------
-	/// check_typedef_name - typedef of given name must exist
-	///----------------------------------------------------------------------------------------------------
 
-	
+
+	///----------------------------------------------------------------------------------------------------
+	/// check_typedef_name - typedef of given name must exist  **********NOT COMPATIBLE WITH MSVC2013
+	///----------------------------------------------------------------------------------------------------
 
 	#define check_typedef_name(CHECK_ALIAS,NAME)\
 	template<typename TypeChecked>\
@@ -159,7 +159,7 @@ namespace polaris
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
 	///----------------------------------------------------------------------------------------------------
-	/// check_typedef_type - typedef of given name must exist and match given type
+	/// check_typedef_type - typedef of given name must exist and match given type  **********NOT COMPATIBLE WITH MSVC2013
 	///----------------------------------------------------------------------------------------------------
 
 	#define check_typedef_type(CHECK_ALIAS,NAME,TYPE)\
@@ -321,7 +321,7 @@ namespace polaris
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
 	///----------------------------------------------------------------------------------------------------
-	/// check_template_method_name - given name must be a method template member
+	/// check_template_method_name - given name must be a method template member -- **********NOT COMPATIBLE WITH MSVC2013
 	///----------------------------------------------------------------------------------------------------
 
 	#define check_template_method_name(CHECK_ALIAS,NAME)\

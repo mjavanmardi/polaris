@@ -267,13 +267,13 @@ namespace polaris
 				LOCK(current_object->_optex_lock);
 			#endif
 
-			// Visit the OPTEX if it has requested to go this step
+			// Visit the OPTEX if it has requested to go this step (Object-Page-Type-Execution Type list)
 			// If it is the current iteration, it must be overwritten
 			if( current_object->_next_revision == this_revision )
 			{
 				// process the OPTEX
-				current_object->_event_callback(current_object,optex_conditional);
-				current_object->_next_revision = optex_conditional.next;
+				current_object->_event_callback(current_object,optex_conditional);	// Call user-defined event function
+				current_object->_next_revision = optex_conditional.next;			// update this objects next revision from the event response
 				
 				optex_conditional.next = __revision_omega;
 

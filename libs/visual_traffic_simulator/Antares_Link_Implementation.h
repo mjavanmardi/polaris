@@ -717,6 +717,7 @@ namespace Link_Components
 				//((typename MasterType::network_type*)_global_network)->_historic_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
 			}			
 
+			// Elements passed through callback as void pointers whihc represent the start of the geometry-head, the first element of which is a pointer to the actual object, making it castable to that object
 			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())

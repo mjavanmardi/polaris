@@ -1,6 +1,6 @@
 #pragma once
 ///----------------------------------------------------------------------------------------------------
-/// Event_Block_Methods.h - Block of execution objects in a contiguous memory space
+/// Event_Block_Methods.h - Block of execution objects in a contiguous memory space - where execution is sparse
 ///----------------------------------------------------------------------------------------------------
 
 #include "Event_Block.h"
@@ -273,7 +273,7 @@ namespace polaris
 		Revision cached_next_revision;
 
 		// prepare to iterate over contiguous memory
-		Byte* object_itr = (((Byte*)this)+_data_offset);
+		Byte* object_itr = (((Byte*)this)+_data_offset); // get iterator, point to first object
 		const Byte* const object_end = object_itr + _num_cells*_cell_size;
 
 		//_mm_prefetch( object_itr + _cell_size , _MM_HINT_T0 ); // Fetch 1 step ahead

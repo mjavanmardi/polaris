@@ -77,6 +77,7 @@ void Simulation_Engine::Step(Revision& out_next_revision)
 	}
 
 	// Here locking is necessary because there are cases where you may overwrite the true minimum proposed revision
+	// lock and get minimum estimate from each thread of next_revision over all execution types
 	LOCK(_ex_lock);
 		
 		if(ex_proposed_next_revision < _ex_next_revision)
@@ -116,7 +117,7 @@ void Simulation_Engine::Collect_Core_Diagnostics()
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// Update - move the clock to the next simulation event
+/// Update - move the clock to the next simulation event - point at which time advances in the simulation - by updating work->revision.
 ///----------------------------------------------------------------------------------------------------
 
 void Simulation_Engine::Update()
