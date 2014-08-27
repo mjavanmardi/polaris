@@ -39,6 +39,14 @@ namespace File_IO
 			return true;
 		}
 		template<class T>
+		bool Read_Value(T& t, long long seek_byte)
+		{
+			_file.seekg(seek_byte);
+			_file.read((char*)&t, sizeof(T));
+			if (!_file){ _file.clear(); return false;}
+			return true;
+		}
+		template<class T>
 		bool Read_Array(T* t, int num_to_read)
 		{
 			_file.read((char*)t, sizeof(T) * num_to_read);

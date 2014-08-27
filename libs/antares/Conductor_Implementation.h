@@ -28,6 +28,8 @@ public:
 
 	template<typename TargetType> void Initialize()
 	{
+		_next_iteration = -1;
+
 		QueryPerformanceFrequency(&_frequency);
 		
 		_num_records = 30;
@@ -99,11 +101,22 @@ public:
 
 	static void advance_simulation(Conductor_Implementation* _this,Event_Response& response)
 	{
-		response.next._iteration=iteration()+1;
+		Conductor_Implementation* pthis=(Conductor_Implementation*)_this;
+		if (pthis->_next_iteration >= 0)
+		{
+			response.next._iteration=pthis->_next_iteration;
+			pthis->_next_iteration = -1;
+		}
+		else
+		{
+			response.next._iteration=iteration()+1;
+		}
+
+		
 		//response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION+2;
 		response.next._sub_iteration=USHRT_MAX;
 
-		Conductor_Implementation* pthis=(Conductor_Implementation*)_this;
+		
 
 		if(pthis->_pause)
 		{
@@ -122,5 +135,6 @@ public:
 	}
 
 	m_data(bool,pause, NONE, NONE);
+	m_data(int, next_iteration, NONE, NONE);
 
 };

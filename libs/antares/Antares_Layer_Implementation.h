@@ -181,6 +181,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		}
 	}
 
+	template<typename TargetType> void Reschedule_Execution(int new_iteration)
+	{
+		Reschedule<Antares_Layer_Implementation>(new_iteration, _target_sub_iteration);
+	}
+
 	// Push user data to a thread specific buffer in OpenGL compatible format - used in draw_layer function
 	template<typename TargetType> void Push_Element(void* data, int iteration, requires(TargetType,check_2(TargetType,Regular_Element,is_same)))
 	{

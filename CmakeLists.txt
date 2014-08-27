@@ -4,11 +4,11 @@ cmake_minimum_required(VERSION 2.8)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(Popsyn OFF)
-set(Statewide ON)
+set(Statewide OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares OFF)
+set(Antares ON)
 
 
 set(BUILD_DIR build)
@@ -113,34 +113,6 @@ add_subdirectory (libs/activity_simulator)
 
 
 
-
-#Apply CMake over POLARIS application project structure
-if (Popsyn)
-	set(Antares OFF)
-	add_subdirectory (apps/population_synthesizer)
-elseif(Statewide)
-	add_subdirectory (apps/ILSTDM) 
-	add_subdirectory (libs/statewide_model)
-	add_subdirectory (libs/spatial) 
-	add_subdirectory (libs/routing) 
-	add_subdirectory (libs/traffic_simulator)
-else()
-	add_subdirectory (apps/io_demo) 
-	add_subdirectory (apps/test) 
-	add_subdirectory (apps/fixed_demand_simulator) 
-	add_subdirectory (apps/integrated_abm)
-	add_subdirectory (libs/traffic_simulator)
-	add_subdirectory (libs/spatial) 
-	add_subdirectory (libs/routing) 
-endif()
-
-
-if (Coretests)
-	#Apply CMake over POLARIS tests project structure
-	add_subdirectory (tests/core_tests)
-endif()
-
-
 if (MSVC AND Antares)
 	include_directories(libs/visual_traffic_simulator)
 
@@ -178,3 +150,31 @@ if (MSVC AND Antares)
 	#add_subdirectory (apps/test)
 endif()
 
+
+
+#Apply CMake over POLARIS application project structure
+if (Popsyn)
+	set(Antares OFF)
+	add_subdirectory (apps/population_synthesizer)
+elseif(Statewide)
+	add_subdirectory (apps/ILSTDM) 
+	add_subdirectory (libs/statewide_model)
+	add_subdirectory (libs/spatial) 
+	add_subdirectory (libs/routing) 
+	add_subdirectory (libs/traffic_simulator)
+else()
+	add_subdirectory (apps/io_demo) 
+	add_subdirectory (apps/test) 
+	add_subdirectory (apps/fixed_demand_simulator) 
+	add_subdirectory (apps/integrated_abm)
+	add_subdirectory (apps/Output_Visualizer)
+	add_subdirectory (libs/traffic_simulator)
+	add_subdirectory (libs/spatial) 
+	add_subdirectory (libs/routing) 
+endif()
+
+
+if (Coretests)
+	#Apply CMake over POLARIS tests project structure
+	add_subdirectory (tests/core_tests)
+endif()

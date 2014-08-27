@@ -1,0 +1,10 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(Output_Visualizer Output_Visualizer.cpp)
+if (MSVC AND Antares)
+	target_link_libraries(Output_Visualizer ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core Routing Visual_Traffic_Simulator)
+else()
+	target_link_libraries(Output_Visualizer ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core Routing)
+endif()
+
+set_target_properties(Output_Visualizer PROPERTIES FOLDER apps)

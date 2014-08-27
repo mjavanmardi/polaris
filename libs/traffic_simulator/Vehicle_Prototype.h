@@ -131,6 +131,10 @@ namespace Vehicle_Components
 			{
 				this_component()->template initialize< TargetType>();
 			}
+			template<typename TargetType> void initialize(int num_vehicles, float* data)
+			{
+				this_component()->template initialize< TargetType>(num_vehicles,data);
+			}
 
 			template<typename TargetType> void update_eta()
 			{

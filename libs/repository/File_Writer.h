@@ -76,10 +76,24 @@ namespace File_IO
 			_file<<S.str()<<DELIM;
 			S.str("");
 		}
+		template<typename T>
+		void Write(T &data)
+		{
+			stringstream S("");
+			S<<data;
+			_file<<S.str()<<DELIM;
+		}
 		void Write_Line(stringstream &S)
 		{
 			_file<<S.str()<<endl;
 			S.str("");
+		}
+		template<typename T>
+		void Write_Line(T &data)
+		{
+			stringstream S("");
+			S<<data;
+			_file<<S.str()<<endl;
 		}
 		void Write_Line(const char* line)
 		{

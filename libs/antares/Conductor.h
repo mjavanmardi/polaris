@@ -22,4 +22,5 @@ prototype struct Conductor
 	accessor(canvas, NONE, NONE);
 	accessor(information_panel, NONE, NONE);
 	accessor(time_panel, NONE, NONE);
+	accessor(next_iteration,NONE,NONE);
 };

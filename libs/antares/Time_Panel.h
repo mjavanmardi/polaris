@@ -23,6 +23,12 @@ prototype struct Time_Panel
 		return this_component()->Is_Running<TargetType>();
 	}
 
+	template<typename TargetType> void Enable_Time_Navigation(TargetType object_to_reschedule_when_time_changes)
+	{
+		this_component()->Enable_Time_Navigation();
+		this->object_to_reschedule<TargetType>(object_to_reschedule_when_time_changes);
+	}
+
 	accessor(play, NONE, NONE);
 	accessor(play_button, NONE, NONE);
 	accessor(pause_button, NONE, NONE);
@@ -32,4 +38,7 @@ prototype struct Time_Panel
 	accessor(canvas, NONE, NONE);
 
 	accessor(delay, NONE, NONE);
+
+	accessor(object_to_reschedule,NONE,NONE);
+	accessor(reschedule_callback,NONE,NONE);
 };

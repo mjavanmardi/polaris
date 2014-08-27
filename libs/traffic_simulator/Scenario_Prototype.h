@@ -516,6 +516,8 @@ namespace Scenario_Components
 			accessor(rng_type, NONE, NONE);
 			accessor(merging_mode, NONE, NONE);
 
+			accessor(write_visualizer_snapshot,NONE,NONE);
+
 			//===============================================
 			// Demand model parameters
 			//-----------------------------------------------
@@ -763,6 +765,11 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("write_full_output", this->write_full_output<bool*>()) != PARAMETER_FOUND) this->write_full_output<bool>(false);
 				string popsyn_control_string;
 				if (cfgReader.getParameter("popsyn_control_file", this->popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
+
+
+
+				if (cfgReader.getParameter("write_visualizer_snapshot", this->write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->write_visualizer_snapshot<bool>(false);
+
 
 				//===============================================
 				// set control parameters

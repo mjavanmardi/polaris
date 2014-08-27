@@ -24,23 +24,47 @@ public:
 	void OnPlay(wxCommandEvent& event);
     void OnStop(wxCommandEvent& event);
 	void OnSpeed(wxCommandEvent& event);
+
+	void OnBack(wxCommandEvent& event);
+	void OnBackSmall(wxCommandEvent& event);
+	void OnForward(wxCommandEvent& event);
+	void OnForwardSmall(wxCommandEvent& event);
 	
 	void OnRecord(wxCommandEvent& event);
 	void OnStopRecord(wxCommandEvent& event);
+
+	void Enable_Time_Navigation()
+	{
+		_forward_small->Enable();
+		_forward->Enable();
+		_back_small->Enable();
+		_back->Enable();
+	}
 
 	m_data(wxBitmapToggleButton*,play, NONE, NONE);
 	m_data(wxBitmap,play_button, NONE, NONE);
 	m_data(wxBitmap,pause_button, NONE, NONE);
 	m_data(wxBitmap,record_button, NONE, NONE);
 	m_data(wxBitmap,stop_button, NONE, NONE);
+	m_data(wxBitmap,back_button, NONE, NONE);
+	m_data(wxBitmap,back_small_button, NONE, NONE);
+	m_data(wxBitmap,forward_button, NONE, NONE);
+	m_data(wxBitmap,forward_small_button, NONE, NONE);
 
 	m_data(wxBitmapToggleButton*,record, NONE, NONE);
+
+	m_data(wxBitmapToggleButton*,back, NONE, NONE);
+	m_data(wxBitmapToggleButton*,back_small, NONE, NONE);
+	m_data(wxBitmapToggleButton*,forward, NONE, NONE);
+	m_data(wxBitmapToggleButton*,forward_small, NONE, NONE);
 
 	m_data(wxChoice*,speed_control, NONE, NONE);
 
 	m_data(wxBoxSizer*,sizer, NONE, NONE);
 	m_data(wxBoxSizer*,vertical_sizer, NONE, NONE);
 	m_data(wxBoxSizer*,record_sizer, NONE, NONE);
+	m_data(wxBoxSizer*,control_sizer, NONE, NONE);
+	m_data(wxBoxSizer*,control_vertical_sizer, NONE, NONE);
 	m_data(wxTextCtrl*,time_display, NONE, NONE);
 
 	m_prototype(Conductor,typename MasterType::conductor_type,conductor, NONE, NONE);
@@ -48,6 +72,10 @@ public:
 	m_prototype(Canvas,typename MasterType::canvas_type,canvas, NONE, NONE);
 
 	m_data(int,delay, NONE, NONE);
+
+	m_data(reschedule_callback_type,reschedule_callback, NONE, NONE);
+	m_data(void*,object_to_reschedule, NONE, NONE);
+
 };
 
 //---------------------------------------------------------
@@ -64,7 +92,7 @@ Time_Panel_Implementation<MasterType,InheritanceList>::Time_Panel_Implementation
 	_conductor=(conductor_type)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
 
 	//---- initialize the sizers ----
-	
+	_control_vertical_sizer=new wxBoxSizer(wxVERTICAL);
 	_sizer=new wxBoxSizer(wxHORIZONTAL);
 	_vertical_sizer=new wxBoxSizer(wxVERTICAL);
 	//_record_sizer=new wxBoxSizer(wxVERTICAL);
@@ -165,9 +193,42 @@ Time_Panel_Implementation<MasterType,InheritanceList>::Time_Panel_Implementation
 
 	//_record_sizer->Add(_record);
 
+	_control_sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	_back_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\back.png",wxBITMAP_TYPE_PNG);
+	_back = new wxBitmapToggleButton(this,wxID_ANY,_back_button,wxDefaultPosition,wxSize(62,52));
+	Connect(_back->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnBack));
+	_back->SetToolTip("Back 1 hour");
+	_control_sizer->Add(_back);
+
+	_back_small_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\skip_backward.png",wxBITMAP_TYPE_PNG);
+	_back_small = new wxBitmapToggleButton(this,wxID_ANY,_back_small_button,wxDefaultPosition,wxSize(62,52));
+	Connect(_back_small->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnBackSmall));
+	_back_small->SetToolTip("Back 1 minute");
+	_control_sizer->Add(_back_small);
+
+	_forward_small_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\skip_forward.png",wxBITMAP_TYPE_PNG);
+	_forward_small = new wxBitmapToggleButton(this,wxID_ANY,_forward_small_button,wxDefaultPosition,wxSize(62,52));
+	Connect(_forward_small->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnForwardSmall));
+	_forward_small->SetToolTip("forward 1 minute");
+	_control_sizer->Add(_forward_small);
+
+	_forward_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\forward.png",wxBITMAP_TYPE_PNG);
+	_forward = new wxBitmapToggleButton(this,wxID_ANY,_forward_button,wxDefaultPosition,wxSize(62,52));
+	Connect(_forward->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnForward));
+	_forward->SetToolTip("forward 1 hour");
+	_control_sizer->Add(_forward);
+
+	_forward_small->Disable();
+	_forward->Disable();
+	_back_small->Disable();
+	_back->Disable();
+
 	//---- set the sizer ----
+	_control_vertical_sizer->Add(_sizer);
+	_control_vertical_sizer->Add(_control_sizer);
 	
-	SetSizerAndFit(_sizer);
+	SetSizerAndFit(_control_vertical_sizer);
 }
 
 //---------------------------------------------------------
@@ -182,6 +243,71 @@ void Time_Panel_Implementation<MasterType,InheritanceList>::OnPlay(wxCommandEven
 	Refresh();
 	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
 	_conductor->pause<bool>(false);
+}
+
+
+//---------------------------------------------------------
+//	Time Navigation buttons - user presses a button
+//---------------------------------------------------------
+template<typename MasterType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,InheritanceList>::OnBack(wxCommandEvent& event)
+{
+	_back->SetValue(true);
+	Refresh();
+	int remain = iteration() % 3600;
+	if (iteration()>3600)
+	{
+		int t;
+		if (remain > 60) t = iteration() - remain;
+		else t = iteration() - remain - 3600;
+		if (_reschedule_callback != nullptr && _object_to_reschedule!=nullptr) _reschedule_callback(_object_to_reschedule,t);
+		_conductor->next_iteration<int>(t);
+	}
+}
+template<typename MasterType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,InheritanceList>::OnBackSmall(wxCommandEvent& event)
+{
+	_back_small->SetValue(true);
+	Refresh();
+	int remain = iteration() % 60;
+	if (iteration()>60)
+	{
+		int t;
+		if (remain > 5) t = iteration() - remain;
+		else t = iteration() - remain - 60;
+		if (_reschedule_callback != nullptr && _object_to_reschedule!=nullptr) _reschedule_callback(_object_to_reschedule,t);
+		_conductor->next_iteration<int>(t);
+	}
+}
+template<typename MasterType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,InheritanceList>::OnForward(wxCommandEvent& event)
+{
+	_forward->SetValue(true);
+	Refresh();
+	int remain = 3600 - iteration() % 3600;
+	if (iteration()>0)
+	{
+		int t;
+		if (remain > 60) t = iteration() + remain;
+		else t = iteration() + remain + 3600;
+		if (_reschedule_callback != nullptr && _object_to_reschedule!=nullptr) _reschedule_callback(_object_to_reschedule,t);
+		_conductor->next_iteration<int>(t);
+	}
+}
+template<typename MasterType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,InheritanceList>::OnForwardSmall(wxCommandEvent& event)
+{
+	_back_small->SetValue(true);
+	Refresh();
+	int remain = 60 - iteration() % 60;
+	if (iteration()>0)
+	{
+		int t;
+		if (remain > 5) t = iteration() + remain;
+		else t = iteration() + remain + 60;
+		if (_reschedule_callback != nullptr && _object_to_reschedule!=nullptr) _reschedule_callback(_object_to_reschedule,t);
+		_conductor->next_iteration<int>(t);
+	}
 }
 
 //---------------------------------------------------------

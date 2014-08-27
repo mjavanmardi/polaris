@@ -4,6 +4,7 @@
 #define IntegratedModelApplication
 
 #ifdef _DEBUG
+#undef ANTARES
 //#define SHOW_WARNINGS
 #else
 //#define SHOW_WARNINGS
@@ -30,6 +31,7 @@
 
 #include "Application_Includes.h"
 
+//#define INTEGRATED_MODEL
 #ifndef INTEGRATED_MODEL
 
 
@@ -58,6 +60,7 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;
 	//typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> basic_vehicle_type;
 	//typedef Vehicle_Components::Implementations::Polaris_Base_Vehicle_Implementation<M> vehicle_type;
+	typedef NULLTYPE visual_vehicle_type;
 
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 	//typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
@@ -152,8 +155,10 @@ struct MasterType
 	#ifdef ANTARES
 		//typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
+		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#else
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
+		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -538,6 +543,11 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
+	typedef Vehicle_Components::Prototypes::Vehicle_Data_Logger<MasterType::vehicle_data_logger_type> _Vehicle_Logger_Interface;	
+	_Vehicle_Logger_Interface* vlogger=(_Vehicle_Logger_Interface*)Allocate<MasterType::vehicle_data_logger_type>();
+	vlogger->Initialize<NT>();
+	_global_vehicle_logger = vlogger;
+
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
 
 
@@ -634,6 +644,8 @@ void output_object_sizes()
 #endif
 
 
+
+//#define TEST_APPLICATION
 #ifdef TEST_APPLICATION
 concept struct Concept_Test
 {
@@ -681,7 +693,6 @@ prototype struct Test_Agent
 	}
 };
 
-
 implementation struct Test_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>
 {
 	typedef typename Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>::Component_Type ComponentType;
@@ -727,8 +738,8 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
 	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
 	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
-	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
-	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
+	typedef PopSyn::Implementations::Polaris_Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
@@ -778,16 +789,56 @@ int main(int argc, char* argv[])
 		GLOBALS::Uniform_RNG.Set_Seed<int>();
 	}
 
-	//==================================================================================================================================
-	// Start population synthesis
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
-	popsyn->Initialize<_Scenario_Interface*>(scenario);
+	File_IO::File_Reader fr;
+	fr.Open("C:\\Users\\jauld\\Desktop\\POLARIS_DATA\\Chicago_CBD\\Version_5_ITS77\\snapshot.idx",false);
+
+	File_IO::Binary_File_Reader br;
+	br.Open("C:\\Users\\jauld\\Desktop\\POLARIS_DATA\\Chicago_CBD\\Version_5_ITS77\\snapshot.bin");
+
+	int time;
+	br.Read_Value<int>(time);
+	cout <<"Starting time is: " <<time;
+
+	while(fr.Read())
+	{
+		int time;
+		long long bytes;
+		fr.Get_Data<int>(time,0);
+		fr.Get_Data<long long>(bytes,1);
+
+		int val;
+		br.Read_Value<int>(val,bytes);
+		cout << "Reading binary file. Time,byte in index="<<time<<", "<<bytes<<".  Value in binary file="<<val<<endl;
+	}
+
+	//while (true)
+	//{
+	//	float f;
+	//	br.Read_Value<float>(f);
+	//	cout <<"Value: " <<f<<endl;
+	//}
+
+	int size;
+	char ans;
+
+	float* values=nullptr;
+	while (br.Read_Value(size))
+	{
+		if (size > 0)
+		{
+			values = new float[size];
+			br.Read_Array<float>(values,size);
+
+			cout <<"Read in " << size<<" values:"<<endl;
+			for (int i=0; i<size;++i) cout<<values[i]<<endl;
+		}
+		cin >> ans;
+	}
+
 
 	START();
 
-	char ans;
+	
 	cin >> ans;
 }
 #endif

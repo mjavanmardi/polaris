@@ -32,6 +32,11 @@ prototype struct Antares_Layer
 	{
 		this_component()->Initialize<TargetType>(cfg);
 	}
+
+	template<typename TargetType> void Reschedule_Execution(int new_iteration)
+	{
+		this_component()->Reschedule_Execution<TargetType>(new_iteration);
+	}
 	
 	bool Identify_One(Point_3D<typename Component_Type::Master_Type>& point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
 	{

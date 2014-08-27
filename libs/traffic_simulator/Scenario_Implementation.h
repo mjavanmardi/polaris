@@ -83,6 +83,8 @@ namespace Scenario_Components
 			m_data(fstream, output_network_snapshots_file, NONE, NONE);
 			m_data(fstream, input_network_snapshots_file, NONE, NONE);
 
+			m_data(bool, write_visualizer_snapshot, NONE, NONE);
+
 			m_data(bool, calculate_realtime_moe, NONE, NONE);
 			
 			m_data(bool, read_demand_from_database, NONE, NONE);

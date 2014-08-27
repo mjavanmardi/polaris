@@ -89,13 +89,15 @@ namespace Vehicle_Components
 		const float Vehicle_Attribute_Shape::_vehicle_height = 6.0 * 2; // height in feet
 		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.0*5.0/9.0 * 2; // height in feet
 
+
+
 		implementation struct Antares_Vehicle_Implementation:public Vehicle_Implementation<MasterType,INHERIT(Antares_Vehicle_Implementation)>
 		{
 			typedef typename Vehicle_Implementation<MasterType,INHERIT(Antares_Vehicle_Implementation)>::ComponentType ComponentType;
 			Vehicle_Attribute_Shape vehicle_shape;
 
 			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
-			
+		
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,num_vehicles, NONE, NONE);
 
 			static volatile m_data(int,vehicles_counter, NONE, NONE);
@@ -289,12 +291,15 @@ namespace Vehicle_Components
 				//float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
 				float distance_from_up = distance - _distance_to_stop_bar * (distance / link->length<float>());
 				Point_3D<MasterType> vehicle_center;
+				True_Color_RGBA<NT> vehicle_color;
 
 				vehicle_center._x = u_x + distance_from_up * cos_alpha;
 				vehicle_center._y = u_y + distance_from_up * sin_alpha;
-				
+				vehicle_color._r=0; vehicle_color._g=255; vehicle_color._b=0;
+								
 				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
-				
+
+			#pragma region VEHICLE SHAPES				
 				if (_vehicle_shapes->template draw<bool>())
 				{
 					True_Color_RGBA<NT> body_color;
@@ -1163,7 +1168,9 @@ namespace Vehicle_Components
 						_vehicle_shapes->Push_Element<Regular_Element>(&vehicle_shape);
 					}
 				}
+	#pragma endregion
 
+			#pragma region VEHICLE POINTS
 				if (_vehicle_points->template draw<bool>())
 				{
 					// display on point vehicle layer
@@ -1233,6 +1240,18 @@ namespace Vehicle_Components
 					}
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
+					vehicle_color.r(coordinate.color._r);
+					vehicle_color.g(coordinate.color._g);
+					vehicle_color.b(coordinate.color._b);
+				}
+			#pragma endregion
+
+				//TODO: log vehicle position in binary snapshot file: set up scenario parameter so this can be turned off
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface; 
+				typedef Vehicle_Components::Prototypes::Vehicle_Data_Logger< typename MasterType::vehicle_data_logger_type> _Logger_Interface;
+				if (((_Scenario_Interface*)_global_scenario)->write_visualizer_snapshot<bool>())
+				{
+					((_Logger_Interface*)_global_vehicle_logger)->Add_Record(vehicle_center,vehicle_color);
 				}
 			}
 
