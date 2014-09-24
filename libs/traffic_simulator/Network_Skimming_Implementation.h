@@ -128,7 +128,9 @@ namespace Network_Skimming_Components
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
-				this->_skim_table.resize(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()),0);
+
+				// This is not needed as we use the copy function in the initializer below which automatically resizes the array
+				//this->_skim_table.resize(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()),0);
 
 				// initialize the travel time sorter
 				for (int i=0; i < zones_container->size(); i++)
@@ -144,7 +146,21 @@ namespace Network_Skimming_Components
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				char test;
+				cout <<"...Starting skim table copy."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 				this->_skim_table.Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), initial_data);
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<"...Skim table copy complete."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 
 				// initialize the travel time sorters with the initial data
 				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
@@ -170,6 +186,12 @@ namespace Network_Skimming_Components
 					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
 					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
 				}
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<"...Skim table sorters created."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 			}
 			template<typename TargetType> bool Update_LOS()
 			{
@@ -222,8 +244,8 @@ namespace Network_Skimming_Components
 
 				// copy old values into temporary and reset the current values to zero
 				matrix<float> los_old;
-				if (scenario->template read_skim_tables<bool>())
-				{
+				//if (scenario->template read_skim_tables<bool>())
+				//{
 					pair<size_t,size_t> dims = los->dimensions();
 					los_old.resize(dims,0);
 					
@@ -235,7 +257,7 @@ namespace Network_Skimming_Components
 							((los_value_itf*)((*los)[pair<size_t,size_t>(i,j)]))->auto_ttime<Stored_Time_Type>(0.0);
 						}
 					}
-				}
+				//}
 
 
 				// fit characteristics initialized
@@ -281,7 +303,7 @@ namespace Network_Skimming_Components
 							continue;
 						}
 
-						if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, typename skimmer_itf::Component_Type::Stored_Time_Type>(2.0);
+						//if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, typename skimmer_itf::Component_Type::Stored_Time_Type>(2.0);
 						if (orig_loc == dest_node) time = 0;
 
 						// if updating of a previous skim file is specified, include the old skim value in the weighting calculation
@@ -693,6 +715,14 @@ namespace Network_Skimming_Components
 					tree_list->insert(item);
 				}
 
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				char test;
+				cout <<"Finished building skim routers..."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
+
 				Simulation_Timestep_Increment start;
 
 				//===========================================================================
@@ -737,6 +767,14 @@ namespace Network_Skimming_Components
 				float* auto_distance /*transit_sov_access_time */= new float[num_zones*num_zones]();
 				float* transit_wait_time = new float[num_zones*num_zones]();
 				float* transit_fare = new float[num_zones*num_zones]();
+
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<"Done initializing invariant matrices..."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
+
 				if (skim->template read_input<bool>() && skim->read_transit<bool>())
 				{
 					// Read transit input data if required
@@ -821,11 +859,24 @@ namespace Network_Skimming_Components
 							temp_los_array[i] = temp_los;
 						}
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
+						delete data;
 					}
 					else
 					{
 						// create LOS matrix using default values
+						//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<"Preallocation for start = " <<start <<" ...";
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 						typename MasterType::los_value_type** temp_los_array = new typename MasterType::los_value_type*[num_zones*num_zones];
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<" array allocated."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
 							typename MasterType::los_value_type* temp_los = Allocate<typename MasterType::los_value_type>();
@@ -833,7 +884,21 @@ namespace Network_Skimming_Components
 							((los_value_itf*)temp_los)->LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<" Record memory allocated."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
+				//-------------------------------------------------
+				//TODO: remove when done testing:
+				cout <<" Skim table copy complete."<<endl;
+				cin >> test;
+				cout <<test;
+				//-------------------------------------------------
+
+						// delete the temp_los_array as it is copied in the skim_table initialize statement
 					}
 
 					// add time period skim tables to the container

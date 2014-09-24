@@ -173,6 +173,9 @@ namespace Network_Skimming_Components
 				zone_origins_itf& zone_origins_count = this->template zone_origins_count<zone_origins_itf&>();
 				zone_destinations_itf& zone_destinations_count = this->template zone_destinations_count<zone_destinations_itf&>();
 
+				bool valid_skim = true;
+				stringstream errors;
+
 				//=================================================================================================
 				// Loop through zones, choose origin points to route from, and add to maps
 				typename zones_itf::iterator itr;
@@ -242,7 +245,17 @@ namespace Network_Skimming_Components
 					}
 					if (zone_origins_count.find(orig_zone->template internal_id<long>())->second == 0)
 					{
-						THROW_EXCEPTION("Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim from this zone. Location count = "<< available_locations.size());
+						for (int i=0; i<num_locations; i++)
+						{
+							origin_location_itf* loc = (origin_location_itf*)available_locations[i];
+							if (loc->template Is_Routable_Location<bool>())
+							{
+								origin_locations->push_back(loc);
+								zone_origins_count.find(orig_zone->template internal_id<long>())->second++;
+							}
+						}
+						valid_skim = false;
+						errors<<"Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim from this zone. Location count = "<< available_locations.size()<<endl;
 					}
 				}
 
@@ -314,7 +327,16 @@ namespace Network_Skimming_Components
 						//	zone_destinations_count.find(orig_zone->template internal_id<long>())->second++;
 						//}
 					}
-					if (zone_destinations_count.find(dest_zone->template internal_id<long>())->second == 0) THROW_EXCEPTION("destination zone '" << dest_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
+					if (zone_destinations_count.find(dest_zone->template internal_id<long>())->second == 0)
+					{
+						valid_skim = false;
+						errors<<"destination zone '" << dest_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone."<<endl;
+					}
+				}
+
+				if (!valid_skim)
+				{
+					THROW_EXCEPTION(errors.str());
 				}
 
 				// Based on the above selected O/D routing pairs, initialize the skim routers

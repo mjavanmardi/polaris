@@ -1034,11 +1034,17 @@ namespace Network_Components
 				
 						if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 						{
-							if(++skipped_counter%1000==0)
+							// TODO: may want to expand this so all activity locations can make left turn onto origin link
+							// try the opposite direction to account for left turns onto the origin link
+							link_id_dir.dir = abs(db_itr->getDir() - 1);
+							if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 							{
-								cout << skipped_counter << " locations skipped" << endl;
+								if(++skipped_counter%1000==0)
+								{
+									cout << skipped_counter << " locations skipped" << endl;
+								}
+								continue;		
 							}
-							continue;				
 						}
 
 						

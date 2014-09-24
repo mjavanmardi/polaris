@@ -158,7 +158,7 @@ struct MasterType
 		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#else
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
-		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
+		//typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -543,10 +543,12 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
+#ifdef ANTARES
 	typedef Vehicle_Components::Prototypes::Vehicle_Data_Logger<MasterType::vehicle_data_logger_type> _Vehicle_Logger_Interface;	
 	_Vehicle_Logger_Interface* vlogger=(_Vehicle_Logger_Interface*)Allocate<MasterType::vehicle_data_logger_type>();
 	vlogger->Initialize<NT>();
 	_global_vehicle_logger = vlogger;
+#endif
 
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
 
@@ -571,7 +573,6 @@ int main(int argc,char** argv)
 
 void output_object_sizes()
 {
-#ifdef ENABLE_MEMORY_LOGGING
 	ofstream file;
 	file.open("memory_logging_typeids.csv");
 
@@ -603,6 +604,8 @@ void output_object_sizes()
 	file << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type)<<","<<(int)MasterType::movement_plan_record_type::component_id<<endl;
 	file << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type)<<","<<(int)MasterType::trajectory_unit_type::component_id<<endl;
 	file << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type)<<","<<(int)MasterType::network_skim_type::component_id<<endl;
+	file << endl <<"los_value_type size = "<<sizeof(MasterType::los_value_type)<<","<<(int)MasterType::los_value_type::component_id<<endl;
+	file << endl <<"los_invariant_value_type size = "<<sizeof(MasterType::los_invariant_value_type)<<","<<(int)MasterType::los_invariant_value_type::component_id<<endl;
 	file << endl <<"demand_type size = "<<sizeof(MasterType::demand_type)<<","<<(int)MasterType::demand_type::component_id<<endl;
 	file << endl <<"person_type size = "<<sizeof(MasterType::person_type)<<","<<(int)MasterType::person_type::component_id<<endl;
 	file << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type)<<","<<(int)MasterType::person_planner_type::component_id<<endl;
@@ -639,7 +642,6 @@ void output_object_sizes()
 	file << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type)<<","<<(int)MasterType::base_network_event_type::component_id<<endl;
 	file << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type)<<","<<(int)MasterType::network_event_manager_type::component_id<<endl;
 	file.close();
-#endif
 }
 #endif
 
