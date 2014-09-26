@@ -297,6 +297,14 @@ struct Antares_Layer_Configuration
 		head_size_value=size;
 	}
 	
+	void Configure_Static_Quads()
+	{
+		Configure_Default();
+		primitive_type=_QUAD;
+		group_color=false;
+		group_normal=false;
+	}
+
 	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
 		Configure_Default();

@@ -232,12 +232,17 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 						glNormal3fv((GLfloat*)geometry_itr);
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
-
-					//if(primitive_texture)
-					//{
-					//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-					//	geometry_itr += sizeof(int);
-					//}
+					//TODO: uncommented this to see if I could get textures working
+					if(primitive_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						cout <<"Binding layer to texture id: " << *((int*)geometry_itr)<<endl;
+						geometry_itr += sizeof(int);
+						cout <<"First vertex(x,y,z): "<<*((float*)&geometry_itr[0])<<","<<*((float*)&geometry_itr[4])<<","<<*((float*)&geometry_itr[8])<<endl;
+						cout <<"Second vertex(x,y,z): "<<*((float*)&geometry_itr[12])<<","<<*((float*)&geometry_itr[16])<<","<<*((float*)&geometry_itr[20])<<endl;
+						cout <<"Third vertex(x,y,z): "<<*((float*)&geometry_itr[24])<<","<<*((float*)&geometry_itr[28])<<","<<*((float*)&geometry_itr[32])<<endl;
+						cout <<"Fourth vertex(x,y,z): "<<*((float*)&geometry_itr[36])<<","<<*((float*)&geometry_itr[40])<<","<<*((float*)&geometry_itr[44])<<endl;
+					}
 
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 

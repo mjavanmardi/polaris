@@ -27,7 +27,26 @@ namespace Network_Components
 			Point_3D<MasterType>* vertices;
 		};
 #pragma pack(pop)
-
+#pragma pack(push,1)
+		template<typename MasterType>
+		struct Textured_Quad
+		{
+			int texture;
+			Point_3D<MasterType> a;
+			Point_3D<MasterType> b;
+			Point_3D<MasterType> c;
+			Point_3D<MasterType> d;
+			void display()
+			{
+				cout <<"Displaying textured quad information:"<<endl;
+				cout <<"Texture id: "<<texture<<endl;
+				cout <<"Vertex A: "<<a._x<<","<<a._y<<","<<a._z<<endl;
+				cout <<"Vertex B: "<<b._x<<","<<b._y<<","<<b._z<<endl;
+				cout <<"Vertex C: "<<c._x<<","<<c._y<<","<<c._z<<endl;
+				cout <<"Vertex D: "<<d._x<<","<<d._y<<","<<d._z<<endl;
+			}
+		};
+#pragma pack(pop)
 		struct Extended_MOE_Data : public MOE_Data
 		{
 			float network_vmt;
@@ -143,7 +162,8 @@ namespace Network_Components
 			{
 				initialize_network_moe_plotting_layers<TargetType>();
 				initialize_network_map_layers<TargetType>();
-				initialize_reference_data<TargetType>();				
+				initialize_reference_data<TargetType>();	
+				initialize_tile_imagery_layer<TargetType>();
 			}
 
 			template<typename TargetType> void initialize_reference_data()
@@ -371,6 +391,47 @@ namespace Network_Components
 					link->template configure_displayed_line<NT>();
 					_link_lines->Push_Element<Regular_Element>(link->template displayed_line<Link_Line<MasterType>*>());
 				}
+			}
+
+			template<typename TargetType> void initialize_tile_imagery_layer()			
+			{
+				_tile_imagery=Allocate_New_Layer<MT>(string("Tiles"));
+
+				Antares_Layer_Configuration cfg;
+				cfg.Configure_Static_Quads();
+				cfg.grouped=false;
+				cfg.draw=true;
+				cfg.primitive_color=false;
+				cfg.primitive_texture=true;
+				cfg.storage_period = 1;
+				cfg.head_accent_size_value = 3;
+				int tex_id = cfg.Add_Texture(string("C:\\Users\\Josh\\Desktop\\downtown.png"));
+
+				_tile_imagery->Initialize<NULLTYPE>(cfg);
+
+				cout << "Tile layer texture map size="<<_tile_imagery->texture_map<boost::container::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
+
+				Textured_Quad<MasterType> tile;
+				tile.a._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(447017.9);
+				tile.a._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4637555.7);
+				tile.a._z = 0;
+				tile.d._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(447017.9);
+				tile.d._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4636059.4);
+				tile.d._z = 0;
+				tile.c._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(449360.2);
+				tile.c._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4636059.4);
+				tile.c._z = 0;
+				tile.b._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(449360.2);
+				tile.b._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4637555.7);
+				tile.b._z = 0;
+				tile.texture=tex_id;
+				Scale_Coordinates<MT>(tile.a);
+				Scale_Coordinates<MT>(tile.b);
+				Scale_Coordinates<MT>(tile.c);
+				Scale_Coordinates<MT>(tile.d);
+				tile.display();
+				_tile_imagery->Push_Element<Regular_Element>(&tile);
+
 			}
 
 
@@ -829,6 +890,7 @@ namespace Network_Components
 			
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_lines, NONE, NONE);
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,intersection_polygons, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,tile_imagery, NONE, NONE);
 	
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
@@ -846,6 +908,9 @@ namespace Network_Components
 		
 		template<typename MasterType,typename InheritanceList>
 		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_intersection_polygons;
+
+		template<typename MasterType,typename InheritanceList>
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_tile_imagery;
 	}
 }
 
