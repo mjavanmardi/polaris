@@ -135,7 +135,9 @@ namespace Buildings_Components
 					
 					i+=(2*4);
 
-					if((*((unsigned int *)&buffer[i])) < 6) push_coordinates_flag = false;
+
+					// --- this skips buildings in a complicated fashion
+					if((*((unsigned int *)&buffer[i])) < 0) push_coordinates_flag = false;
 
 					height = ((*((unsigned int *)&buffer[i]))*3.5f+10.0f)*3.28084f;
 
@@ -175,7 +177,7 @@ namespace Buildings_Components
 							current_vertex->_z = height;
 
 							Scale_Coordinates<MT>(*current_vertex);
-							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::type_of(canvas)>(*current_vertex);
+							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::canvas_type>(*current_vertex);
 
 							++current_vertex;
 
@@ -216,7 +218,7 @@ namespace Buildings_Components
 
 							Scale_Coordinates<MT>(*current_vertex);
 
-							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::type_of(canvas)>(*current_vertex);
+							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::canvas_type>(*current_vertex);
 
 							++current_vertex;
 

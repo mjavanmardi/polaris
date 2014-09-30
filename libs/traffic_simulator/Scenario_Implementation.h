@@ -100,6 +100,10 @@ namespace Scenario_Components
 			m_data(string, output_highway_cost_skim_file_path_name, NONE, NONE);
 			m_data(string, input_transit_skim_file_path_name, NONE, NONE);
 			m_data(string, output_transit_skim_file_path_name, NONE, NONE);
+			m_data(IntArray, skim_interval_endpoint_minutes, NONE, NONE);
+			m_data(int, skim_interval_length_minutes, NONE, NONE);
+			m_data(bool, do_skimming, NONE, NONE);
+			m_data(bool, use_skim_intervals, NONE, NONE);
 
 			m_data(bool, time_dependent_routing, NONE, NONE);
 
@@ -201,6 +205,10 @@ namespace Scenario_Components
 			m_data(bool, multimodal_network_input, NONE, NONE);
 
 			m_data(string, buildings_geometry_file, NONE, NONE);
+
+			m_data(string, tile_imagery_file, NONE, NONE);
+			m_data(bool, use_tile_imagery, NONE, NONE);
+			m_data(int, tile_imagery_alpha_level, NONE, NONE);
 
 			Scenario_Implementation()
 			{

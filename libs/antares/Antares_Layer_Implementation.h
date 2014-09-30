@@ -48,6 +48,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 
 		_head_texture = cfg.head_texture;
 
+		_default_texture_alpha = cfg.default_texture_alpha;
+
 		_grouped=cfg.grouped;
 			_group_color=cfg.group_color;
 			_group_normal=cfg.group_normal;
@@ -159,7 +161,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 					(*rgba_data)=(*rgb_data); ++rgb_data; ++rgba_data;
 					(*rgba_data)=(*rgb_data); ++rgb_data; ++rgba_data;
 					if(has_alpha) {(*rgba_data)=(*alpha_data); ++alpha_data; ++rgba_data;}
-					else {(*rgba_data)=255; ++rgba_data;}
+					//TODO: change back to 255 - testing higher transparency for layers
+					else {(*rgba_data)=_default_texture_alpha; ++rgba_data;}
 				}
 				
 				rgba_data -= (tex_image.GetHeight()*tex_image.GetWidth()*4);
@@ -169,6 +172,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 				delete[] rgba_data;
 
 				_texture_map.push_back(tex_id);
+				//TODO: remove when done testing
+				cout <<"Tex_id when reading layer "<<_name<<": "<<tex_id<<endl;
 			}
 			else
 			{
@@ -983,6 +988,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	m_data(bool,primitive_color, NONE, NONE);
 	m_data(bool,primitive_normal, NONE, NONE);
 	m_data(bool,primitive_texture, NONE, NONE);
+
+	m_data(unsigned char, default_texture_alpha, NONE, NONE);
 
 	m_data(int,vert_size, NONE, NONE);	
 

@@ -35,6 +35,8 @@ struct MasterType
 	
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
+	typedef NULLTYPE visual_vehicle_type;
 
 #else
 
@@ -464,7 +466,7 @@ void run_with_input_from_db(char* scenario_filename)
 		//==================================================================================================================================
 		// Network Skimming stuff
 		//----------------------------------------------------------------------------------------------------------------------------------
-		if (scenario->write_skim_tables<bool>())
+		if (scenario->do_skimming<bool>())
 		{
 			cout << "Initializing network skims..." <<endl;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
@@ -487,7 +489,7 @@ void run_with_input_from_db(char* scenario_filename)
 				}
 			}
 			skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
-			if (skimmer->write_output<bool>())
+			if (scenario->write_skim_tables<bool>())
 			{
 				if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened.");
 				if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");

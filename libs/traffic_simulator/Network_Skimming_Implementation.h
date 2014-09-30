@@ -102,7 +102,7 @@ namespace Network_Skimming_Components
 			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
 			typedef Prototypes::Network_Skimming<typename type_of(skim_reference)> skimmer_itf;
 			typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::mapped_type>::type> zone_itf;
-			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
+			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
@@ -117,8 +117,10 @@ namespace Network_Skimming_Components
 			
 
 			// vector of multimaps, one for each origin zone, which contains travel times to destination zones, sorted in ascending order
-			m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), auto_travel_time_sorter, NONE, NONE);
-			m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), transit_travel_time_sorter, NONE, NONE);
+			//m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), auto_travel_time_sorter, NONE, NONE);
+			//m_container(concat(std::vector<std::vector<std::pair<float, zone_itf*>>>), transit_travel_time_sorter, NONE, NONE);
+			m_container(concat(std::vector<std::vector<std::pair<float, unsigned short>>>), auto_travel_time_sorter, NONE, NONE);
+			m_container(concat(std::vector<std::vector<std::pair<float, unsigned short>>>), transit_travel_time_sorter, NONE, NONE);
 
 			//=============================================
 			// Primary function accessors - used to calculate/return LOS values for OD pairs
@@ -135,8 +137,8 @@ namespace Network_Skimming_Components
 				// initialize the travel time sorter
 				for (int i=0; i < zones_container->size(); i++)
 				{
-					this->_auto_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
-					this->_transit_travel_time_sorter.push_back(std::vector<std::pair<float, zone_itf*>>());
+					this->_auto_travel_time_sorter.push_back(std::vector<std::pair<float, unsigned short>>());
+					this->_transit_travel_time_sorter.push_back(std::vector<std::pair<float, unsigned short>>());
 				}
 			}
 			template<typename TargetType> void Initialize(TargetType initial_data)
@@ -151,15 +153,15 @@ namespace Network_Skimming_Components
 				//TODO: remove when done testing:
 				char test;
 				cout <<"...Starting skim table copy."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 				this->_skim_table.Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), initial_data);
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<"...Skim table copy complete."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 
 				// initialize the travel time sorters with the initial data
@@ -175,22 +177,23 @@ namespace Network_Skimming_Components
 					{
 						zone_itf* dest_zone = (zone_itf*)d_itr->second;
 						int d_index = dest_zone->internal_id<int>();
+						int d_id = dest_zone->uuid<int>();
 
 						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
 						float auto_ttime = los->auto_ttime<Time_Minutes>();
 						float transit_ttime = los->transit_ttime<Time_Minutes>();
 
-						this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
-						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));
+						this->_auto_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(auto_ttime,(unsigned short)d_id/*d_index*/));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(transit_ttime,(unsigned short)d_id/*d_index*/));
 					}
-					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
-					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
+					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
 				}
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<"...Skim table sorters created."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 			}
 			template<typename TargetType> bool Update_LOS()
@@ -361,12 +364,14 @@ namespace Network_Skimming_Components
 						float auto_ttime = los->auto_ttime<Time_Minutes>();
 						float transit_ttime = los->transit_ttime<Time_Minutes>();
 
-						this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
-						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));
+						/*this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));*/
+						this->_auto_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(auto_ttime,dest_zone->uuid<unsigned short>()));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(transit_ttime,dest_zone->uuid<unsigned short>()));
 					}
 
-					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
-					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,zone_itf*>);
+					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
+					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
 				}
 
 				return true;
@@ -427,7 +432,7 @@ namespace Network_Skimming_Components
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
 				// get appropriate sorted ttimes based on mode indicator
-				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+				std::vector<pair<float, unsigned short>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
 
 				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
@@ -438,9 +443,14 @@ namespace Network_Skimming_Components
 				// forward search - best when using small min_time
 				if (search_forward)
 				{
-					for (std::vector<pair<float, zone_itf*>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr)
+					for (std::vector<pair<float, unsigned short>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr)
 					{
-						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						//zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						unsigned short dest_id = d_itr->second;
+						zones_itf::iterator z_itr;
+						if ((z_itr = zones_container->find(dest_id))==zones_container->end()){THROW_EXCEPTION("Error, destination zone id '"<<dest_id<<"' in travel time sorter not found in zones_container.")}
+						zone_itf* dest_zone = (zone_itf*)(z_itr->second);
+
 						float ttime=d_itr->first;
 
 						if (ttime < max_time)
@@ -456,9 +466,14 @@ namespace Network_Skimming_Components
 				// backward search - best when using large min_time
 				else
 				{
-					for (std::vector<pair<float, zone_itf*>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr)
+					for (std::vector<pair<float, unsigned short>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr)
 					{
-						zone_itf* dest_zone = (zone_itf*)d_itr->second;
+						/*zone_itf* dest_zone = (zone_itf*)d_itr->second;*/
+						unsigned short dest_id = d_itr->second;
+						zones_itf::iterator z_itr;
+						if ((z_itr = zones_container->find(dest_id))==zones_container->end()){THROW_EXCEPTION("Error, destination zone id '"<<dest_id<<"' in travel time sorter not found in zones_container.")}
+						zone_itf* dest_zone = (zone_itf*)(z_itr->second);
+
 						float ttime=d_itr->first;
 
 						if (ttime >= min_time)
@@ -472,79 +487,79 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
-			template<typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Location_Indices_Within_Range(int& available_index_low, int& available_index_high, int origin_index, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
-			{
-				network_itf* network = this->network_reference<  network_itf*>();
-				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+			//template<typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Location_Indices_Within_Range(int& available_index_low, int& available_index_high, int origin_index, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			//{
+			//	network_itf* network = this->network_reference<  network_itf*>();
+			//	zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
-				// get appropriate sorted ttimes based on mode indicator
-				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+			//	// get appropriate sorted ttimes based on mode indicator
+			//	std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
 
-				if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-				{
-					ttime_sorter= this->_auto_travel_time_sorter[origin_index];
-				}
+			//	if (mode_indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			//	{
+			//		ttime_sorter= this->_auto_travel_time_sorter[origin_index];
+			//	}
 
 	
-				// forward search - best when using small min_time
-				int index_low = INT_MAX;
-				int index_high = 0;
-				if (search_forward)
-				{
-					int index = 0;
-					for (std::vector<pair<float, zone_itf*>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr, ++index)
-					{
-						zone_itf* dest_zone = (zone_itf*)d_itr->second;
-						float ttime=d_itr->first;
+			//	// forward search - best when using small min_time
+			//	int index_low = INT_MAX;
+			//	int index_high = 0;
+			//	if (search_forward)
+			//	{
+			//		int index = 0;
+			//		for (std::vector<pair<float, zone_itf*>>::iterator d_itr=ttime_sorter.begin(); d_itr!=ttime_sorter.end(); ++d_itr, ++index)
+			//		{
+			//			zone_itf* dest_zone = (zone_itf*)d_itr->second;
+			//			float ttime=d_itr->first;
 
-						if (ttime < max_time)
-						{
-							if (ttime >= min_time && index < index_low) index_low = index;
-							available_index_high = index;
-						}
-						else
-						{
-							available_index_low = index_low;
-							return;
-						}
-					}
-				}
-				// backward search - best when using large min_time
-				else
-				{
-					int index = ttime_sorter.size();
-					for (std::vector<pair<float, zone_itf*>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr, --index)
-					{
-						zone_itf* dest_zone = (zone_itf*)d_itr->second;
-						float ttime=d_itr->first;
+			//			if (ttime < max_time)
+			//			{
+			//				if (ttime >= min_time && index < index_low) index_low = index;
+			//				available_index_high = index;
+			//			}
+			//			else
+			//			{
+			//				available_index_low = index_low;
+			//				return;
+			//			}
+			//		}
+			//	}
+			//	// backward search - best when using large min_time
+			//	else
+			//	{
+			//		int index = ttime_sorter.size();
+			//		for (std::vector<pair<float, zone_itf*>>::reverse_iterator d_itr=ttime_sorter.rbegin(); d_itr!=ttime_sorter.rend(); ++d_itr, --index)
+			//		{
+			//			zone_itf* dest_zone = (zone_itf*)d_itr->second;
+			//			float ttime=d_itr->first;
 
-						if (ttime >= min_time)
-						{
-							if (ttime < max_time && index > index_high) index_high = index;
-							available_index_low = index;
-						}
-						else
-						{
-							available_index_high = index;
-							return;
-						}
-					}
-				}
-			}
-			template<typename TimeType, typename ModeType, typename ReturnLocationType> ReturnLocationType Get_Location_At_TTime_Index(int origin_index, int loc_ttime_index, requires(ReturnLocationType, check(ReturnLocationType, is_pointer) && check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
-			{
-				// make sure the indices are valid
-				if (origin_index >= this->_transit_travel_time_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
-				
-				// get appropriate sorted ttimes based on mode indicator
-				std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
+			//			if (ttime >= min_time)
+			//			{
+			//				if (ttime < max_time && index > index_high) index_high = index;
+			//				available_index_low = index;
+			//			}
+			//			else
+			//			{
+			//				available_index_high = index;
+			//				return;
+			//			}
+			//		}
+			//	}
+			//}
+			//template<typename TimeType, typename ModeType, typename ReturnLocationType> ReturnLocationType Get_Location_At_TTime_Index(int origin_index, int loc_ttime_index, requires(ReturnLocationType, check(ReturnLocationType, is_pointer) && check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
+			//{
+			//	// make sure the indices are valid
+			//	if (origin_index >= this->_transit_travel_time_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
+			//	
+			//	// get appropriate sorted ttimes based on mode indicator
+			//	std::vector<pair<float, zone_itf*>>& ttime_sorter = this->_transit_travel_time_sorter[origin_index];
 
-				if (loc_ttime_index >= ttime_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
+			//	if (loc_ttime_index >= ttime_sorter.size()) THROW_EXCEPTION("Error, index out of bounds.");
 
-				// return pointer to zone interface
-				return ttime_sorter[loc_ttime_index]->second;
-				
-			}
+			//	// return pointer to zone interface
+			//	return ttime_sorter[loc_ttime_index]->second;
+			//	
+			//}
 
 			template<typename ReturnLocationType> ReturnLocationType Get_Location_As_Needed(zone_itf* zone, requires(ReturnLocationType, check(strip_modifiers(ReturnLocationType), Zone_Components::Concepts::Is_Zone)))
 			{
@@ -577,6 +592,7 @@ namespace Network_Skimming_Components
 			// time increment at which skim tables are updated - set in the initializer
 			m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment, NONE, NONE);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time);
+			m_container(std::vector<Basic_Units::Prototypes::Time<Basic_Units::Implementations::Time_Implementation<MasterType>>*>,update_interval_list,NONE,NONE);
 
 			// time at which skim tables are next updated - set in the initializer and updated every time update is called
 			m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_scheduled_update_time, NONE, NONE);
@@ -639,6 +655,10 @@ namespace Network_Skimming_Components
 
 			template<typename TargetType> void Initialize()
 			{
+				// get scenario interface
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
 				this->_path_trees_container.set_empty_key(-1);
 				this->_path_trees_container.set_deleted_key(-2);
 
@@ -651,7 +671,7 @@ namespace Network_Skimming_Components
 				// create interface to this and set skimming parameters
 				typedef Prototypes::Network_Skimming<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
-				pthis->template update_increment<Time_Hours>(1);
+				pthis->template update_increment<Time_Minutes>(scenario->skim_interval_length_minutes<int>());
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
 				pthis->template nodes_per_zone<long>(4);
 
@@ -659,8 +679,7 @@ namespace Network_Skimming_Components
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+				
 
 				stringstream filename("");
 				filename << scenario->template output_dir_name<string>();
@@ -719,8 +738,8 @@ namespace Network_Skimming_Components
 				//TODO: remove when done testing:
 				char test;
 				cout <<"Finished building skim routers..."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 
 				Simulation_Timestep_Increment start;
@@ -771,8 +790,8 @@ namespace Network_Skimming_Components
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<"Done initializing invariant matrices..."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 
 				if (skim->template read_input<bool>() && skim->read_transit<bool>())
@@ -867,15 +886,16 @@ namespace Network_Skimming_Components
 						//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<"Preallocation for start = " <<start <<" ...";
-				cin >> test;
-				cout <<test;
+				/*cin >> test;
+				cout <<test;*/
 				//-------------------------------------------------
-						typename MasterType::los_value_type** temp_los_array = new typename MasterType::los_value_type*[num_zones*num_zones];
+				typename MasterType::los_value_type** temp_los_array = new typename MasterType::los_value_type*[num_zones*num_zones];
+				//typename MasterType::los_value_type* temp_los_array = new typename MasterType::los_value_type[num_zones*num_zones];
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<" array allocated."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
@@ -887,15 +907,15 @@ namespace Network_Skimming_Components
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<" Record memory allocated."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
 				//-------------------------------------------------
 				//TODO: remove when done testing:
 				cout <<" Skim table copy complete."<<endl;
-				cin >> test;
-				cout <<test;
+				//cin >> test;
+				//cout <<test;
 				//-------------------------------------------------
 
 						// delete the temp_los_array as it is copied in the skim_table initialize statement

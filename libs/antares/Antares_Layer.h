@@ -117,6 +117,8 @@ prototype struct Antares_Layer
 
 	accessor(x_label, NONE, NONE);
 	accessor(y_label, NONE, NONE);
+
+	accessor(default_texture_alpha, NONE, NONE);
 };
 
 template<typename MasterType>
@@ -134,7 +136,7 @@ bool Clip_Coordinates(Point_3D<typename ComponentType::Master_Type>& coordinates
 template<typename ComponentType>
 bool Clip_Coordinates(Point_3D<NT>& coordinates)
 {
-	return ((ComponentType*)canvas)->Clip_Coordinates<NT,NT>((Point_3D<ComponentType::Master_Type>&)coordinates);
+	return ((ComponentType*)canvas)->Clip_Coordinates<NT>((Point_3D<ComponentType::Master_Type>&)coordinates);
 }
 
 template<typename MasterType>
@@ -231,6 +233,8 @@ struct Antares_Layer_Configuration
 		submission_callback=nullptr;
 		selection_callback=nullptr;
 		double_click_callback=nullptr;
+
+		default_texture_alpha=255;
 	}
 	
 	void Configure_Static_Lines()
@@ -297,6 +301,14 @@ struct Antares_Layer_Configuration
 		head_size_value=size;
 	}
 	
+	void Configure_Static_Quads()
+	{
+		Configure_Default();
+		primitive_type=_QUAD;
+		group_color=false;
+		group_normal=false;
+	}
+
 	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
 		Configure_Default();
@@ -394,7 +406,8 @@ struct Antares_Layer_Configuration
 			// 1 x Point_3D<NULLTYPE> group_normal;
 		bool group_texture;
 			// 1 x int group_texture;	
-	
+	unsigned char default_texture_alpha;
+
 	bool primitive_color;
 		// 1 x True_Color_RGBA<NULLTYPE> primitive_color;
 	bool primitive_normal;

@@ -27,7 +27,26 @@ namespace Network_Components
 			Point_3D<MasterType>* vertices;
 		};
 #pragma pack(pop)
-
+#pragma pack(push,1)
+		template<typename MasterType>
+		struct Textured_Quad
+		{
+			int texture;
+			Point_3D<MasterType> a;
+			Point_3D<MasterType> b;
+			Point_3D<MasterType> c;
+			Point_3D<MasterType> d;
+			void display()
+			{
+				cout <<"Displaying textured quad information:"<<endl;
+				cout <<"Texture id: "<<texture<<endl;
+				cout <<"Vertex A: "<<a._x<<","<<a._y<<","<<a._z<<endl;
+				cout <<"Vertex B: "<<b._x<<","<<b._y<<","<<b._z<<endl;
+				cout <<"Vertex C: "<<c._x<<","<<c._y<<","<<c._z<<endl;
+				cout <<"Vertex D: "<<d._x<<","<<d._y<<","<<d._z<<endl;
+			}
+		};
+#pragma pack(pop)
 		struct Extended_MOE_Data : public MOE_Data
 		{
 			float network_vmt;
@@ -40,11 +59,8 @@ namespace Network_Components
 		//---------------------------------------------------------
 		//	Antares_Network_Implementation - network class definition
 		//---------------------------------------------------------
-#ifdef IntegratedModelApplication
+
 		implementation struct Antares_Network_Implementation:public Integrated_Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-#else
-		implementation struct Antares_Network_Implementation:public Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-#endif
 		{
 			static float _intersection_radius;
 			boost::container::vector<Point_2D<MasterType>> _network_vmt_cache;
@@ -141,9 +157,11 @@ namespace Network_Components
 
 			template<typename TargetType> void initialize_antares_layers()
 			{
+				initialize_tile_imagery_layer<TargetType>();
 				initialize_network_moe_plotting_layers<TargetType>();
 				initialize_network_map_layers<TargetType>();
-				initialize_reference_data<TargetType>();				
+				initialize_reference_data<TargetType>();	
+				
 			}
 
 			template<typename TargetType> void initialize_reference_data()
@@ -370,6 +388,138 @@ namespace Network_Components
 					_Link_Interface* link = (_Link_Interface*)(*link_itr);
 					link->template configure_displayed_line<NT>();
 					_link_lines->Push_Element<Regular_Element>(link->template displayed_line<Link_Line<MasterType>*>());
+				}
+			}
+
+			template<typename TargetType> void initialize_tile_imagery_layer()			
+			{
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface *scenario = (_Scenario_Interface*)_global_scenario;
+				
+				if (!scenario->use_tile_imagery<bool>()) return;
+
+				_tile_imagery=Allocate_New_Layer<MT>(string("Tiles"));
+
+				Antares_Layer_Configuration cfg;
+				cfg.Configure_Static_Quads();
+				cfg.grouped=false;
+				cfg.draw=true;
+				cfg.primitive_color=false;
+				cfg.primitive_texture=true;
+				//cfg.primitive_texture=false;
+				cfg.storage_period = 1;
+				cfg.head_accent_size_value = 3;
+				//int tex_id_1 = cfg.Add_Texture(string("C:\\Users\\jauld\\Desktop\\downtown.png"));
+				//int tex_id_2 = cfg.Add_Texture(string("C:\\Users\\jauld\\Desktop\\lakeside.jpg"));
+				//cfg.head_texture = cfg.Add_Texture(string("C:\\Users\\jauld\\Desktop\\downtown.png"));
+				cfg.head_color._r=255;
+				cfg.head_color._g=255;
+				cfg.head_color._b=255;
+				cfg.head_color._a=255;
+				int default_alpha = scenario->tile_imagery_alpha_level<int>();
+				if (default_alpha < 0) cfg.default_texture_alpha=0;
+				else if (default_alpha > 255) cfg.default_texture_alpha=255;
+				else cfg.default_texture_alpha=(unsigned char)default_alpha;
+				
+
+				// Read the .tiles file
+				File_IO::File_Reader fr;
+				if (!fr.Open(scenario->tile_imagery_file<string&>(),false)){THROW_EXCEPTION("Could not open the tile imagery information file at filepath="<<scenario->tile_imagery_file<string&>());}
+
+				// get directory
+				fr.Read();
+				string filepath = fr.Get_String(0);
+				filepath.append("\\");
+
+				cout <<"Tiles directory = "<<filepath<<endl;
+
+				std::vector<int> tex_ids;
+				std::vector<float*> tex_coords;
+				
+				while (fr.Read())
+				{
+					// get filepath of current tile
+					string tilename(filepath.c_str());
+					tilename.append(fr.Get_String(0));
+
+					cout << "Tilename="<<tilename<<endl;
+					int tex_id = cfg.Add_Texture(tilename);
+
+					float x_min, y_min, x_max, y_max;
+					fr.Get_Data<float>(x_min,1);
+					fr.Get_Data<float>(y_min,2);
+					fr.Get_Data<float>(x_max,3);
+					fr.Get_Data<float>(y_max,4);
+
+					float* coords = new float[4];
+					coords[0] = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(x_min);
+					coords[1] = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(y_min);
+					coords[2] = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(x_max);
+					coords[3] = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(y_max);
+
+					tex_ids.push_back(tex_id);
+					tex_coords.push_back(coords);
+				}
+
+				_tile_imagery->Initialize<NULLTYPE>(cfg);
+
+				// SIMPLE SINGLE TILE EXAMPLE downtown tile
+				//Textured_Quad<MasterType> tile;
+				//tile.d._x = 446690.0; // upper left
+				//tile.d._y = 4636580.0;
+				//tile.d._z = -10;
+				//tile.c._x = 447690.0; // upper right
+				//tile.c._y = 4636580.0;
+				//tile.c._z = -10;
+				//tile.b._x = 447690.0; // lower right
+				//tile.b._y = 4635580.0;
+				//tile.b._z = -10;
+				//tile.a._x = 446690.0; // lower left
+				//tile.a._y = 4635580.0;
+				//tile.a._z = -10;
+				//tile.texture=tex_id_2;
+				//Scale_Coordinates<MT>(tile.a);
+				//Scale_Coordinates<MT>(tile.b);
+				//Scale_Coordinates<MT>(tile.c);
+				//Scale_Coordinates<MT>(tile.d);
+				//_tile_imagery->Push_Element<Regular_Element>(&tile);
+
+				// push the drawing elements
+				int index=0;
+				for (std::vector<int>::iterator itr = tex_ids.begin(); itr != tex_ids.end(); ++itr, ++index)
+				{
+					int tex_id = *itr;
+
+					float x_min, y_min, x_max, y_max;
+					x_min = tex_coords[index][0];
+					y_min = tex_coords[index][1];
+					x_max = tex_coords[index][2];
+					y_max = tex_coords[index][3];
+
+					cout <<"Tex_id, (Xmin,Ymin;Xmax,Ymax): "<<tex_id <<"; " << x_min <<" , "<<y_min<<" ; " <<x_max<<" , " <<y_max<<endl;
+
+					// downtown tile
+					Textured_Quad<MasterType> tile;
+					tile.d._x = x_min; // upper left
+					tile.d._y = y_max;
+					tile.d._z = -10;
+					tile.c._x = x_max; // upper right
+					tile.c._y = y_max;
+					tile.c._z = -10;
+					tile.b._x = x_max; // lower right
+					tile.b._y = y_min;
+					tile.b._z = -10;
+					tile.a._x = x_min; // lower left
+					tile.a._y = y_min;
+					tile.a._z = -10;
+					tile.texture=tex_id;
+
+					Scale_Coordinates<MT>(tile.a);
+					Scale_Coordinates<MT>(tile.b);
+					Scale_Coordinates<MT>(tile.c);
+					Scale_Coordinates<MT>(tile.d);
+
+					_tile_imagery->Push_Element<Regular_Element>(&tile);
 				}
 			}
 
@@ -829,6 +979,7 @@ namespace Network_Components
 			
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_lines, NONE, NONE);
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,intersection_polygons, NONE, NONE);
+			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,tile_imagery, NONE, NONE);
 	
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
@@ -846,6 +997,9 @@ namespace Network_Components
 		
 		template<typename MasterType,typename InheritanceList>
 		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_intersection_polygons;
+
+		template<typename MasterType,typename InheritanceList>
+		Antares_Layer<typename MasterType::antares_layer_type>* Antares_Network_Implementation<MasterType,InheritanceList>::_tile_imagery;
 	}
 }
 

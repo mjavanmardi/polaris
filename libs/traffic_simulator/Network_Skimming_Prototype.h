@@ -106,6 +106,7 @@ namespace Network_Skimming_Components
 			accessor(current_skim_table, NONE, NONE);
 			// time increment at which skim tables are updated - set in the initializer
 			accessor(update_increment,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
+			accessor(update_interval_list, NONE, NONE);
 			// scheduled time at which skim tables are updated - set in the initializer
 			accessor(scheduled_update_time,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
 			// Associative Container of skim matrices, keyed on Mode Indicator values
@@ -346,21 +347,21 @@ namespace Network_Skimming_Components
 				this_component()->Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename NetworkType> void Initialize(NetworkType network_pointer, requires(NetworkType,check(NetworkType, is_pointer) && check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
 				// set the network references
-				this->template network_reference<TargetType>(network_reference);
+				this->template network_reference<NetworkType>(network_pointer);
 				
-				this->template Initialize<NULLTYPE>();
+				this->template Initialize<NT>();
 			}			
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,!check(TargetType, is_pointer) || !check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename NetworkType> void Initialize(NetworkType network_reference, requires(NetworkType,!check(NetworkType, is_pointer) || !check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
-				assert_check(TargetType, is_pointer,"TargetType is not a pointer" );
-				assert_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, is_basic_network, "TargetType is not a basic network");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
+				assert_check(NetworkType, is_pointer,"TargetType is not a pointer" );
+				assert_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, is_basic_network, "TargetType is not a basic network");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
 			}			
 			template<typename TargetType> bool Update_Skim_Tables()
 			{
