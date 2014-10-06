@@ -106,6 +106,7 @@ namespace Network_Skimming_Components
 			accessor(current_skim_table, NONE, NONE);
 			// time increment at which skim tables are updated - set in the initializer
 			accessor(update_increment,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
+			accessor(update_interval_list, NONE, NONE);
 			// scheduled time at which skim tables are updated - set in the initializer
 			accessor(scheduled_update_time,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
 			// Associative Container of skim matrices, keyed on Mode Indicator values
@@ -172,6 +173,9 @@ namespace Network_Skimming_Components
 				locations_itf& locations_container = network->template activity_locations_container<locations_itf&>();
 				zone_origins_itf& zone_origins_count = this->template zone_origins_count<zone_origins_itf&>();
 				zone_destinations_itf& zone_destinations_count = this->template zone_destinations_count<zone_destinations_itf&>();
+
+				bool valid_skim = true;
+				stringstream errors;
 
 				//=================================================================================================
 				// Loop through zones, choose origin points to route from, and add to maps
@@ -242,7 +246,17 @@ namespace Network_Skimming_Components
 					}
 					if (zone_origins_count.find(orig_zone->template internal_id<long>())->second == 0)
 					{
-						THROW_EXCEPTION("Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim from this zone. Location count = "<< available_locations.size());
+						for (int i=0; i<num_locations; i++)
+						{
+							origin_location_itf* loc = (origin_location_itf*)available_locations[i];
+							if (loc->template Is_Routable_Location<bool>())
+							{
+								origin_locations->push_back(loc);
+								zone_origins_count.find(orig_zone->template internal_id<long>())->second++;
+							}
+						}
+						valid_skim = false;
+						errors<<"Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim from this zone. Location count = "<< available_locations.size()<<endl;
 					}
 				}
 
@@ -314,7 +328,16 @@ namespace Network_Skimming_Components
 						//	zone_destinations_count.find(orig_zone->template internal_id<long>())->second++;
 						//}
 					}
-					if (zone_destinations_count.find(dest_zone->template internal_id<long>())->second == 0) THROW_EXCEPTION("destination zone '" << dest_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
+					if (zone_destinations_count.find(dest_zone->template internal_id<long>())->second == 0)
+					{
+						valid_skim = false;
+						errors<<"destination zone '" << dest_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone."<<endl;
+					}
+				}
+
+				if (!valid_skim)
+				{
+					THROW_EXCEPTION(errors.str());
 				}
 
 				// Based on the above selected O/D routing pairs, initialize the skim routers
@@ -324,21 +347,21 @@ namespace Network_Skimming_Components
 				this_component()->Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename NetworkType> void Initialize(NetworkType network_pointer, requires(NetworkType,check(NetworkType, is_pointer) && check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
 				// set the network references
-				this->template network_reference<TargetType>(network_reference);
+				this->template network_reference<NetworkType>(network_pointer);
 				
-				this->template Initialize<NULLTYPE>();
+				this->template Initialize<NT>();
 			}			
-			template<typename TargetType> void Initialize(TargetType network_reference, requires(TargetType,!check(TargetType, is_pointer) || !check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			template<typename NetworkType> void Initialize(NetworkType network_reference, requires(NetworkType,!check(NetworkType, is_pointer) || !check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
-				assert_check(TargetType, is_pointer,"TargetType is not a pointer" );
-				assert_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, is_basic_network, "TargetType is not a basic network");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
-				assert_sub_check(strip_modifiers(TargetType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
+				assert_check(NetworkType, is_pointer,"TargetType is not a pointer" );
+				assert_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, is_basic_network, "TargetType is not a basic network");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
+				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
 			}			
 			template<typename TargetType> bool Update_Skim_Tables()
 			{

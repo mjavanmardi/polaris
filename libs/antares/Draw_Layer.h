@@ -56,6 +56,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	const float texture_coordinates_map_x[4] = {0.0f,1.0f,1.0f,0.0f};
 	const float texture_coordinates_map_y[4] = {1.0f,1.0f,0.0f,0.0f};
 
+
 	const float* texture_counter_x = &texture_coordinates_map_x[0];
 	const float* texture_counter_y = &texture_coordinates_map_y[0];
 
@@ -199,7 +200,6 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 							if(texture_coordinates)
 							{
 								glTexCoord2f( *texture_counter_x, *texture_counter_y );
-
 								++texture_counter_x; ++texture_counter_y;
 							}
 
@@ -235,13 +235,11 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 					//TODO: uncommented this to see if I could get textures working
 					if(primitive_texture)
 					{
-						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-						cout <<"Binding layer to texture id: " << *((int*)geometry_itr)<<endl;
+						glEnd();
+						glBindTexture(GL_TEXTURE_2D,texture_map[ *((int*)geometry_itr) ]); // geometry_itr here is the tex_id stored with the object
+						glBegin(GL_QUADS);		
+						//cout << "Drawing for texture id="<<texture_map[ *((int*)geometry_itr) ]<<endl;
 						geometry_itr += sizeof(int);
-						cout <<"First vertex(x,y,z): "<<*((float*)&geometry_itr[0])<<","<<*((float*)&geometry_itr[4])<<","<<*((float*)&geometry_itr[8])<<endl;
-						cout <<"Second vertex(x,y,z): "<<*((float*)&geometry_itr[12])<<","<<*((float*)&geometry_itr[16])<<","<<*((float*)&geometry_itr[20])<<endl;
-						cout <<"Third vertex(x,y,z): "<<*((float*)&geometry_itr[24])<<","<<*((float*)&geometry_itr[28])<<","<<*((float*)&geometry_itr[32])<<endl;
-						cout <<"Fourth vertex(x,y,z): "<<*((float*)&geometry_itr[36])<<","<<*((float*)&geometry_itr[40])<<","<<*((float*)&geometry_itr[44])<<endl;
 					}
 
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
@@ -251,11 +249,12 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 						if(texture_coordinates)
 						{
 							glTexCoord2f( *texture_counter_x, *texture_counter_y );
-
+							//cout <<"Texture counters: "<<*texture_counter_x <<", " <<*texture_counter_y<<endl;
 							++texture_counter_x; ++texture_counter_y;
 						}
 
 						glVertex3fv((GLfloat*)geometry_itr);
+						//if(primitive_texture) cout <<"Vertex(x,y,z): "<<*((float*)&geometry_itr[0])<<","<<*((float*)&geometry_itr[4])<<","<<*((float*)&geometry_itr[8])<<endl;
 						geometry_itr += vert_size;
 					}
 

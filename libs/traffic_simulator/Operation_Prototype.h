@@ -459,8 +459,11 @@ namespace Operation_Components
 				// pass over each set of phasing movements once
 				// every iteration one set of phasing movements will be committed one or more times to control plans
 
+				try
+				{
 				for(result<Phasing>::iterator db_itr = phasing_result.begin(); db_itr != phasing_result.end();++db_itr)
 				{
+
 					shared_ptr<Signal> signal=db_itr->getSignal();
 
 					if(!net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode())){ ++skipped; continue;}
@@ -631,6 +634,11 @@ namespace Operation_Components
 
 
 
+				}
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << ex.what();
 				}
 
 

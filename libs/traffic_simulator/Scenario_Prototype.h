@@ -517,7 +517,7 @@ namespace Scenario_Components
 			accessor(merging_mode, NONE, NONE);
 
 			accessor(write_visualizer_snapshot,NONE,NONE);
-
+			
 			//===============================================
 			// Demand model parameters
 			//-----------------------------------------------
@@ -559,6 +559,8 @@ namespace Scenario_Components
 			accessor(read_network_snapshots, NONE, NONE);
 			accessor(routing_with_snapshots, NONE, NONE);
 			accessor(input_network_snapshots_file_path_name, NONE, NONE);	
+
+			// SKIMMING INFORMATION
 			accessor(write_skim_tables, NONE, NONE);
 			accessor(read_skim_tables, NONE, NONE);
 			accessor(input_highway_skim_file_path_name, NONE, NONE);	
@@ -567,6 +569,10 @@ namespace Scenario_Components
 			accessor(output_highway_cost_skim_file_path_name, NONE, NONE);
 			accessor(input_transit_skim_file_path_name, NONE, NONE);	
 			accessor(output_transit_skim_file_path_name, NONE, NONE);
+			accessor(skim_interval_endpoint_minutes, NONE, NONE);
+			accessor(skim_interval_length_minutes, NONE, NONE);
+			accessor(do_skimming, NONE, NONE);
+			accessor(use_skim_intervals, NONE, NONE);
 
 			accessor(compare_with_historic_moe, NONE, NONE);
 			accessor(historic_network_moe_file_path_name, NONE, NONE);
@@ -624,6 +630,11 @@ namespace Scenario_Components
 
 			/// antares visualization parameters
 			accessor(buildings_geometry_file, NONE, NONE);
+
+			// tile imagery parameters
+			accessor(tile_imagery_file,NONE,NONE);
+			accessor(use_tile_imagery,NONE,NONE);
+			accessor(tile_imagery_alpha_level,NONE,NONE);
 
 			template<typename TargetType> void read_scenario_data(char* filename)
 			{
@@ -746,6 +757,18 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
 
+				//===============================================
+				// tile imagery parameters
+				if (cfgReader.getParameter("tile_imagery_file", tile_imagery_file<string*>())!= PARAMETER_FOUND)
+				{
+					use_tile_imagery<bool>(false);
+					tile_imagery_file<string>("");
+				}
+				else
+				{
+					use_tile_imagery<bool>(true);
+					if (cfgReader.getParameter("tile_imagery_alpha_level", tile_imagery_alpha_level<int*>())!= PARAMETER_FOUND) tile_imagery_alpha_level<int>(255);
+				}
 
 				//===============================================
 				// Demand model parameters 
@@ -835,6 +858,8 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
+
+				// GET NETWORK SKIMMING PARAMETERS
 				if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) != PARAMETER_FOUND) this->write_skim_tables<bool>(false);
 				if (cfgReader.getParameter("read_skim_tables", this->read_skim_tables<bool*>()) != PARAMETER_FOUND) this->read_skim_tables<bool>(false);
 				if (cfgReader.getParameter("input_highway_skim_file_path_name", this->input_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_highway_skim_file_path_name<string>((string)"");
@@ -843,7 +868,25 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_highway_cost_skim_file_path_name", this->output_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
 				if (cfgReader.getParameter("input_transit_skim_file_path_name", this->input_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_transit_skim_file_path_name<string>((string)"");
 				if (cfgReader.getParameter("output_transit_skim_file_path_name", this->output_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
-
+				if (cfgReader.getParameter("skim_interval_endpoint_minutes", this->skim_interval_endpoint_minutes<IntArray*>()) != PARAMETER_FOUND)
+				{
+					use_skim_intervals<bool>(false);
+					if (cfgReader.getParameter("skim_interval_length_minutes", this->skim_interval_length_minutes<int*>()) != PARAMETER_FOUND)
+					{
+						do_skimming<bool>(false);
+						if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) == PARAMETER_FOUND)
+						{
+							THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
+						}
+					}
+					else do_skimming<bool>(true);
+				}
+				else
+				{
+					use_skim_intervals<bool>(true);
+					do_skimming<bool>(true);
+				}
+				
 
 				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");

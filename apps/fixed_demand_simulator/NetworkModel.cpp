@@ -8,9 +8,9 @@
 #define SHOW_WARNINGS
 #include "Application_Includes.h"
 
-#ifdef EXCLUDE_DEMAND
-#include "Repository/RNG_Implementations.h"
-#endif
+//#ifdef EXCLUDE_DEMAND
+//#include "Repository/RNG_Implementations.h"
+//#endif
 
 struct MasterType
 {
@@ -35,13 +35,13 @@ struct MasterType
 	
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
+	typedef NULLTYPE visual_vehicle_type;
 
 #else
-#ifndef EXCLUDE_DEMAND
+
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<MasterType> network_type;
-#else
-	typedef Network_Components::Implementations::Network_Implementation<MasterType> network_type;
-#endif
+
 	typedef Link_Components::Implementations::Link_Implementation<MasterType> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
@@ -77,6 +77,8 @@ struct MasterType
 	//TODO:ROUTING
 	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
+	typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
+
 	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 	//typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
 	
@@ -135,11 +137,15 @@ struct MasterType
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
-#ifndef EXCLUDE_DEMAND    
+//#ifndef EXCLUDE_DEMAND   
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<MasterType> network_skim_type;
-    typedef Network_Skimming_Components::Implementations::Mode_Skim_Table_Implementation<MasterType> network_mode_skim_type;
-    typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
-#endif
+	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<MasterType> los_value_type;
+	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<MasterType> los_invariant_value_type;
+
+	//typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<MasterType> network_skim_type;
+ //   typedef Network_Skimming_Components::Implementations::Mode_Skim_Table_Implementation<MasterType> network_mode_skim_type;
+ //   typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
+//#endif
 #ifdef ANTARES
 	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
@@ -456,21 +462,45 @@ void run_with_input_from_db(char* scenario_filename)
 		{
 			MasterType::link_type::subscribe_events<NT>();
 		}
-#ifndef EXCLUDE_DEMAND
+
 		//==================================================================================================================================
 		// Network Skimming stuff
 		//----------------------------------------------------------------------------------------------------------------------------------
-		define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
-		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
-		skimmer->read_input<bool>(false);
-		skimmer->write_output<bool>(scenario->write_skim_tables<bool>());
-		if (skimmer->write_output<bool>())
+		if (scenario->do_skimming<bool>())
 		{
-				skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str());
+			cout << "Initializing network skims..." <<endl;
+			typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
+			_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+			skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
+			if (skimmer->read_input<bool>())
+			{
+				skimmer->read_transit<bool>(true);
+				skimmer->read_highway_cost<bool>(true);
+				if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary highway skim file '" << scenario->input_highway_skim_file_path_name<string>() << "' could not be opened. Highway skims are required, application terminating.");
+				if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_transit_skim_file_path_name<string>().c_str()))
+				{
+					skimmer->read_transit<bool>(false);
+					cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
+				}
+				if (!skimmer->highway_cost_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_cost_skim_file_path_name<string>().c_str())) 
+				{
+					skimmer->read_highway_cost<bool>(false);
+					cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
+				}
+			}
+			skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
+			if (scenario->write_skim_tables<bool>())
+			{
+				if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened.");
+				if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
+				if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
+			}
+			skimmer->Initialize<_Network_Interface*>(network);
+			network->skimming_faculty<_network_skim_itf*>(skimmer);
 		}
-		skimmer->Initialize<_Network_Interface*>(network);
-		network->skimming_faculty<_network_skim_itf*>(skimmer);
-#endif
+
+		cout << "Network skims done." <<endl;
+
 
 
 		cout << "starting sim..." <<endl;
