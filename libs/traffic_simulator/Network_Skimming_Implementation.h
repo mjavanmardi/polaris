@@ -268,6 +268,10 @@ namespace Network_Skimming_Components
 				float sum_of_weight = 0.0;
 				float max_dev = 0.0;
 
+				stringstream skim_errors("");
+				bool has_skim_errors=false;
+
+
 				// loop through each tree router, extract travel time info and place into los_skim
 				for (;tree_itr != trees_container->end(); ++tree_itr)
 				{
@@ -294,14 +298,15 @@ namespace Network_Skimming_Components
 						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->zone<zone_itf*>()->internal_id<int>());
 						float weight = 1.0 / ((float)zone_origin_count_itr->second * (float)zone_destination_count_itr->second);
 
-						// ignore location pairs were no valid route was found travel time over 10 days
+						// ignore location pairs where no valid route was found travel time over 10 days
 						if (time > FLT_MAX/1000.0f)
 						{
 							typename links_itf::iterator link_itr = dest_node->template destination_links<links_itf*>()->begin();
 							for (;link_itr != dest_node->template destination_links<links_itf*>()->end(); ++link_itr)
 							{
 								typename links_itf::iterator orig_link_itr = orig_loc->template origin_links<links_itf*>()->begin();
-								cout << "SKIMMING ERROR, destination location ID=" << dest_node->uuid<int>() << ", link ID="  << (*link_itr)->uuid<long>()<<", is inaccessible from origin location ID="<< orig_loc->uuid<int>()<< ", link ID="  << (*orig_link_itr)->uuid<long>()<<". Check network connectivity." <<endl;
+								has_skim_errors=true;
+								skim_errors << "SKIMMING ERROR, destination location ID=" << dest_node->uuid<int>() << ", link ID="  << (*link_itr)->uuid<long>()<<", is inaccessible from origin location ID="<< orig_loc->uuid<int>()<< ", link ID="  << (*orig_link_itr)->uuid<long>()<<". Check network connectivity. Estimated ttime="<<time <<endl;
 							}
 							continue;
 						}
@@ -330,6 +335,14 @@ namespace Network_Skimming_Components
 							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
 						}
 					}
+				}
+				if (has_skim_errors)
+				{
+					File_IO::File_Writer fw;
+					fw.Open("skimming_errors.csv");
+					fw.Write(skim_errors);
+					fw.Close();
+					THROW_EXCEPTION("Error: skimming errors found. check 'skimming_errors.csv' log file for more information.");
 				}
 				if (scenario->template read_skim_tables<bool>()) 
 				{
@@ -590,9 +603,19 @@ namespace Network_Skimming_Components
 			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
 			// time increment at which skim tables are updated - set in the initializer
-			m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment, NONE, NONE);
-			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time);
-			m_container(std::vector<Basic_Units::Prototypes::Time<Basic_Units::Implementations::Time_Implementation<MasterType>>*>,update_interval_list,NONE,NONE);
+			/*m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment, NONE, NONE);
+			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time);		*/
+			template <typename TargetType> TargetType update_increment()
+			{
+				return update_increment<TargetType>(_current_increment_index);
+			}
+			template <typename TargetType> TargetType update_increment(int interval)
+			{
+				return GLOBALS::Time_Converter.Convert_Value<Time_Minutes,TargetType>(_update_interval_endpoints[interval]);
+			}
+
+			m_container(std::vector<Time_Minutes>,update_interval_endpoints,NONE,NONE);
+			m_data(int, current_increment_index,NONE,NONE);
 
 			// time at which skim tables are next updated - set in the initializer and updated every time update is called
 			m_data(Basic_Units::Implementations::Time_Implementation<MasterType>,_scheduled_update_time, NONE, NONE);
@@ -671,15 +694,46 @@ namespace Network_Skimming_Components
 				// create interface to this and set skimming parameters
 				typedef Prototypes::Network_Skimming<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
-				pthis->template update_increment<Time_Minutes>(scenario->skim_interval_length_minutes<int>());
+
+				// set up the update intervals
+				this->_current_increment_index=1;
+				if (!scenario->use_skim_intervals<bool>())
+				{
+					// Get interval length from the scenario
+					Time_Minutes increment = scenario->skim_interval_length_minutes<int>();
+					// Add endpoints to the endpoint list based on interval length
+					for (Simulation_Timestep_Increment start = 0; start <= END; start = start + GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(increment))
+					{
+						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start));
+					}
+					// Add the END endpoint if not added above
+					if (this->_update_interval_endpoints.back() != GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1))
+					{
+						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1));
+					}
+					//pthis->template update_increment<Time_Minutes>();
+				}
+				else
+				{
+					this->_update_interval_endpoints.push_back(0);
+					std::vector<int>* intervals = scenario->skim_interval_endpoint_minutes<std::vector<int>*>();
+					for (std::vector<int>::iterator itr = intervals->begin(); itr != intervals->end(); ++itr)
+					{
+						this->_update_interval_endpoints.push_back(*itr);
+					}
+					if (this->_update_interval_endpoints.back() != GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1))
+					{
+						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1));
+					}
+				}
+
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
-				pthis->template nodes_per_zone<long>(4);
+				pthis->template nodes_per_zone<long>(2);
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
-
-				
+		
 
 				stringstream filename("");
 				filename << scenario->template output_dir_name<string>();
@@ -717,13 +771,14 @@ namespace Network_Skimming_Components
 
 					// Allocate a tree_builder for each origin node		
 					tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename tree_builder_itf::Component_Type>();
+					tree_builder->parent_skimmer<skimmer_itf*>(skim);
 
 					// Set the current routable origin for the tree builder
 					tree_builder->template origin_link<link_itf*>((link_itf*)*(orig_node->template origin_links<links_itf*>()->begin()));
 					tree_builder->template network<network_itf*>(network);
 
 					// Set the start, end and update times for the router
-					tree_builder->template update_increment<Simulation_Timestep_Increment>(skim->template update_increment<Simulation_Timestep_Increment>());
+					//tree_builder->template update_increment<Simulation_Timestep_Increment>(skim->template update_increment<Simulation_Timestep_Increment>());
 					tree_builder->template start_time<Simulation_Timestep_Increment>(0);//this->start_time<Simulation_Timestep_Increment>());
 					tree_builder->template end_time<Simulation_Timestep_Increment>(END);//this->end_time<Simulation_Timestep_Increment>());
 			
@@ -742,40 +797,43 @@ namespace Network_Skimming_Components
 				//cout <<test;
 				//-------------------------------------------------
 
-				Simulation_Timestep_Increment start;
+				Simulation_Timestep_Increment start, end;
 
 				//===========================================================================
 				// FILE INPUT IF REQUESTED - set up binary file readers for skim files
 				int num_modes;
-				int num_zones, num_zones_transit, num_zones_hcost;
+				int num_zones/*, num_zones_transit, num_zones_hcost*/;
 				int update_increment;
 
 				// read for time-varying highway skims
 				File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
+				File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
+				File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
 				if (skim->template read_input<bool>())
 				{		
-					infile.Read_Value<int>(num_modes);
-					infile.Read_Value<int>(num_zones);
-					infile.Read_Value<int>(update_increment);
-					if (update_increment != skim->template update_increment<Simulation_Timestep_Increment>()) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
-					if (num_zones != zones_container->size()) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+					Read_Binary_Headers(num_modes,num_zones);
+					//infile.Read_Value<int>(num_modes);
+					//infile.Read_Value<int>(num_zones);
+					//infile.Read_Value<int>(update_increment);
+					//if (update_increment != skim->template update_increment<Simulation_Timestep_Increment>()) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
+					//if (num_zones != zones_container->size()) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
 				}
 				else
 				{
 					num_zones = (int)zones_container->size();
 				}
-				File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_input<bool>() && skim->template read_transit<bool>())
-				{		
-					transit_infile.Read_Value<int>(num_zones_transit);
-					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
-				}
-				File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_input<bool>() && skim->template read_highway_cost<bool>())
-				{		
-					highway_cost_infile.Read_Value<int>(num_zones_hcost);
-					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
-				}
+				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_input<bool>() && skim->template read_transit<bool>())
+				//{		
+				//	transit_infile.Read_Value<int>(num_zones_transit);
+				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
+				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_input<bool>() && skim->template read_highway_cost<bool>())
+				//{		
+				//	highway_cost_infile.Read_Value<int>(num_zones_hcost);
+				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
 
 				//===========================================================================
 				// create the time-invariant skim tables
@@ -846,8 +904,13 @@ namespace Network_Skimming_Components
 
 				//===========================================================================
 				// create the skim_table time periods, for basic create only a single time period skim_table
-				for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + skim->template update_increment<Simulation_Timestep_Increment>())
+				//for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + skim->template update_increment<Simulation_Timestep_Increment>())
+				for (int i=0; i<this->_update_interval_endpoints.size(); ++i)
 				{		
+					start = this->update_increment<Simulation_Timestep_Increment>(i);
+					if (i + 1 < this->_update_interval_endpoints.size()) end = this->update_increment<Simulation_Timestep_Increment>(i+1);
+					else break;
+
 					skim_table_itf* skim_table = (skim_table_itf*)Allocate<strip_modifiers(typename type_of(skims_by_time_container)::value_type)::Component_Type>();
 					skim_table->template network_reference<network_itf*>(network);
 					skim_table->template skim_reference<skimmer_itf*>(skim);
@@ -943,15 +1006,9 @@ namespace Network_Skimming_Components
 
 				//===========================================================================
 				// Initial FILE_OUTPUT IF REQUESTED
-				File_IO::Binary_File_Writer& outfile = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
 				if (skim->template write_output<bool>() == true)
 				{
-					int modes = 1;//(int)(skim->template mode_skim_table_container<modes_skim_container_itf&>().size());
-					outfile.Write_Value<int>(modes);
-					int zones = (int)zones_container->size();
-					outfile.Write_Value<int>(zones);
-					int increment = skim->template update_increment<Simulation_Timestep_Increment>();
-					outfile.Write_Value<int>(increment);
+					Write_Binary_Header();	
 				}
 
 				//===========================================================================
@@ -1048,6 +1105,62 @@ namespace Network_Skimming_Components
 					if (count_comp > 10) zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>((0.5*auto_ttime_avg_comp + 0.5*auto_ttime_offpeak_avg_comp)/attract_count_comp);
 					else zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>(9999);
 
+				}
+			}
+
+			void Write_Binary_Header()
+			{
+				network_itf* network = this->template network_reference<network_itf*>();
+				skimmer_itf* skim = (skimmer_itf*)this;
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+
+				File_IO::Binary_File_Writer& outfile = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
+				char version[] = "SKIM:V01";
+				outfile.WriteArray<char>(&version[0],8);
+				int modes = 1;//(int)(skim->template mode_skim_table_container<modes_skim_container_itf&>().size());
+				outfile.Write_Value<int>(modes);
+				int zones = (int)zones_container->size();
+				outfile.Write_Value<int>(zones);
+				std::vector<int>* intervals = skim->template update_interval_endpoints<std::vector<int>*>();
+				int num_increment = intervals->size();
+				outfile.Write_Value<int>(num_increment);
+				for (int i=1; i<num_increment; ++i)
+				{
+					int incr = (*intervals)[i];
+					outfile.Write_Value<int>(incr);
+				}
+			}
+
+			void Read_Binary_Headers(int& num_modes, int& num_zones)
+			{
+				network_itf* network = this->template network_reference<network_itf*>();
+				skimmer_itf* skim = (skimmer_itf*)this;
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+	
+				int update_increment, num_zones_transit, num_zones_hcost;
+
+				// read for time-varying highway skims
+				File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
+				infile.Read_Value<int>(num_modes);
+				infile.Read_Value<int>(num_zones);
+				infile.Read_Value<int>(update_increment);
+				Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
+				if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
+				int skimmer_num_zones = zones_container->size();
+				if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+
+
+				File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
+				if (skim->template read_transit<bool>())
+				{		
+					transit_infile.Read_Value<int>(num_zones_transit);
+					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
+				}
+				File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
+				if (skim->template read_highway_cost<bool>())
+				{		
+					highway_cost_infile.Read_Value<int>(num_zones_hcost);
+					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
 				}
 			}
 	

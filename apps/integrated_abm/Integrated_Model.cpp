@@ -288,8 +288,8 @@ int main(int argc,char** argv)
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
-	ofstream log_file("signal_log3.txt");
-	ostream output_stream(log_file.rdbuf());
+	//ofstream log_file("signal_log3.txt");
+	//ostream output_stream(log_file.rdbuf());
 	//stream_ptr = &output_stream;	
 
 	string output_dir_name = "";
@@ -491,37 +491,44 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	cout << "Initializing network skims..." <<endl;
-	typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
-	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
-	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
-	if (skimmer->read_input<bool>())
+	if (scenario->do_skimming<bool>())
 	{
-		skimmer->read_transit<bool>(true);
-		skimmer->read_highway_cost<bool>(true);
-		if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary highway skim file '" << scenario->input_highway_skim_file_path_name<string>() << "' could not be opened. Highway skims are required, application terminating.");
-		if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_transit_skim_file_path_name<string>().c_str()))
+		cout << "Initializing network skims..." <<endl;
+		typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
+		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+		skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
+		if (skimmer->read_input<bool>())
 		{
-			skimmer->read_transit<bool>(false);
-			cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
+			skimmer->read_transit<bool>(true);
+			skimmer->read_highway_cost<bool>(true);
+			if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary highway skim file '" << scenario->input_highway_skim_file_path_name<string>() << "' could not be opened. Highway skims are required, application terminating.");
+			if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_transit_skim_file_path_name<string>().c_str()))
+			{
+				skimmer->read_transit<bool>(false);
+				cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
+			}
+			if (!skimmer->highway_cost_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_cost_skim_file_path_name<string>().c_str())) 
+			{
+				skimmer->read_highway_cost<bool>(false);
+				cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
+			}
 		}
-		if (!skimmer->highway_cost_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_cost_skim_file_path_name<string>().c_str())) 
+		skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
+		if (skimmer->write_output<bool>())
 		{
-			skimmer->read_highway_cost<bool>(false);
-			cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
+			if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened.");
+			if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
+			if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
 		}
-	}
-	skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
-	if (skimmer->write_output<bool>())
-	{
-		if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened.");
-		if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
-		if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
-	}
-	skimmer->Initialize<_Network_Interface*>(network);
-	network->skimming_faculty<_network_skim_itf*>(skimmer);
+		skimmer->Initialize<_Network_Interface*>(network);
+		network->skimming_faculty<_network_skim_itf*>(skimmer);
 
-	cout << "Network skims done." <<endl;
+		cout << "Network skims done." <<endl;
+	}
+	else
+	{
+		THROW_EXCEPTION("ERROR: No network skimming properties specified in the scenario file.  Please set either 'READ_SKIM_TABLES' or 'WRITE_SKIM_TABLES' to true in order to continue.");
+	}
 
 	//==================================================================================================================================
 	// Destination choice model - set parameters

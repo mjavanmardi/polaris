@@ -891,90 +891,90 @@ namespace Person_Components
 				return return_ptr;
 			}
 
-			template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
-			{
-				// Get person context and system knowledge
-				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
-				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
+			//template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//{
+			//	// Get person context and system knowledge
+			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+			//	scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+			//	_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+			//	_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+			//	_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 
-				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
-				Current_Activity_type prev_act, next_act;
-				_Activity_Location_Interface* prev_loc, *next_loc;
-				bool restrict_choice_set = true;
-				if (this->_Current_Activity->Start_Is_Planned<bool>())
-				{
-					prev_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
-					next_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
-					// check previous act, if it is not known or if its location is not know, do not restrict current choice set
-					if (prev_act == nullptr)
-					{
-						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						restrict_choice_set = false;
-					}
-					else if (prev_act->Location_Is_Planned<bool>())
-					{
-						prev_loc = prev_act->Location<_Activity_Location_Interface*>();
-						restrict_choice_set = true;
-					}
-					else
-					{
-						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						restrict_choice_set = false;
-					}
-					// check next act, if it is not known or if its location is not know, do not restrict current choice set
-					if (next_act == nullptr)
-					{
-						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						restrict_choice_set = false;
-					}
-					else if(next_act->Location_Is_Planned<bool>())
-					{
-						next_loc = next_act->Location<_Activity_Location_Interface*>();
-						restrict_choice_set = true;
-					}
-					else
-					{
-						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						restrict_choice_set = false;
-					}
-				}
-				else
-				{
-					prev_act = nullptr;
-					next_act = nullptr;
-					prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-					next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-				}
-				
+			//	// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
+			//	Current_Activity_type prev_act, next_act;
+			//	_Activity_Location_Interface* prev_loc, *next_loc;
+			//	bool restrict_choice_set = true;
+			//	if (this->_Current_Activity->Start_Is_Planned<bool>())
+			//	{
+			//		prev_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
+			//		next_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(this->_Current_Activity->Start_Time<Time_Seconds>()));
+			//		// check previous act, if it is not known or if its location is not know, do not restrict current choice set
+			//		if (prev_act == nullptr)
+			//		{
+			//			prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = false;
+			//		}
+			//		else if (prev_act->Location_Is_Planned<bool>())
+			//		{
+			//			prev_loc = prev_act->Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = true;
+			//		}
+			//		else
+			//		{
+			//			prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = false;
+			//		}
+			//		// check next act, if it is not known or if its location is not know, do not restrict current choice set
+			//		if (next_act == nullptr)
+			//		{
+			//			next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = false;
+			//		}
+			//		else if(next_act->Location_Is_Planned<bool>())
+			//		{
+			//			next_loc = next_act->Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = true;
+			//		}
+			//		else
+			//		{
+			//			next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//			restrict_choice_set = false;
+			//		}
+			//	}
+			//	else
+			//	{
+			//		prev_act = nullptr;
+			//		next_act = nullptr;
+			//		prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//		next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//	}
+			//	
 
-				// variables used for utility calculation
-				const int size = (int)available_set->size();
-				int loc_id;
+			//	// variables used for utility calculation
+			//	const int size = (int)available_set->size();
+			//	int loc_id;
 
 
-				// select zones to choose from and estimate utility
-				for (int i=0; i<_choice_set_size; i++)
-				{
-					loc_id = (int)((Uniform_RNG.template Next_Rand<float>()*0.999999)*size);
-					_Activity_Location_Interface* loc = (_Activity_Location_Interface*)(available_set->at(loc_id));
-					
-					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
-					choice->template bias_correction<float>(1.0);
-					choice->template previous<_Activity_Location_Interface*>(prev_loc);
-					choice->template destination<_Activity_Location_Interface*>(loc);
-					choice->template next<_Activity_Location_Interface*>(next_loc);
-					choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(this->_Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>());
-					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
-					choice_set.push_back(choice);
+			//	// select zones to choose from and estimate utility
+			//	for (int i=0; i<_choice_set_size; i++)
+			//	{
+			//		loc_id = (int)((Uniform_RNG.template Next_Rand<float>()*0.999999)*size);
+			//		_Activity_Location_Interface* loc = (_Activity_Location_Interface*)(available_set->at(loc_id));
+			//		
+			//		_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+			//		choice->template bias_correction<float>(1.0);
+			//		choice->template previous<_Activity_Location_Interface*>(prev_loc);
+			//		choice->template destination<_Activity_Location_Interface*>(loc);
+			//		choice->template next<_Activity_Location_Interface*>(next_loc);
+			//		choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(this->_Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>());
+			//		choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			//		choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+			//		choice_set.push_back(choice);
 
-					
-				}
-			}
+			//		
+			//	}
+			//}
 
 			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
@@ -1121,61 +1121,62 @@ namespace Person_Components
 				}
 			}
 
-			template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
-			{
-				// Get person context and system knowledge
-				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
-				_Zone_Ids_Interface& zone_ids = network->template zone_ids_container<_Zone_Ids_Interface&>();
-				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
-				_Zones_Container_Interface::iterator zone_itr;
+			//template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//{
+			//	// Get person context and system knowledge
+			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+			//	scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+			//	_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+			//	_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+			//	_Zone_Ids_Interface& zone_ids = network->template zone_ids_container<_Zone_Ids_Interface&>();
+			//	_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
+			//	_Zones_Container_Interface::iterator zone_itr;
 
-				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
-				Current_Activity_type prev_act, *next_act;
-				_Activity_Location_Interface* prev_loc, *next_loc;
-				bool restrict_choice_set = true;
+			//	// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
+			//	Current_Activity_type prev_act, *next_act;
+			//	_Activity_Location_Interface* prev_loc, *next_loc;
+			//	bool restrict_choice_set = true;
 
-				prev_act = nullptr;
-				next_act = nullptr;
-				prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-				next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//	prev_act = nullptr;
+			//	next_act = nullptr;
+			//	prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+			//	next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
 
 
-				// select zones to choose from and estimate utility 
-				for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
-				{
-					// First choose a random zone from the zone boost::container::list
-					_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
+			//	// select zones to choose from and estimate utility 
+			//	for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
+			//	{
+			//		// First choose a random zone from the zone boost::container::list
+			//		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
 
-					// ignore zone if all employment slots have already been assigned to other agents
-					if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) continue;
+			//		// ignore zone if all employment slots have already been assigned to other agents
+			//		if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) continue;
 
-					// Get random location within that zone
-					_Activity_Location_Interface* loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
+			//		// Get random location within that zone
+			//		_Activity_Location_Interface* loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
 
-					// try to add a random suitable location up to ten times, if failed 10 times then ignore zone
-					int failed_attempts = 0;
-					while (failed_attempts < 10 && ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && !loc->is_work_location<bool>()) || (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY && !loc->is_school_location<bool>()))
-					{
-						loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
-						failed_attempts++;
-					}
-					if (failed_attempts >= 10) continue;
+			//		// try to add a random suitable location up to ten times, if failed 10 times then ignore zone
+			//		int failed_attempts = 0;
+			//		while (failed_attempts < 10 && ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && !loc->is_work_location<bool>()) || (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY && !loc->is_school_location<bool>()))
+			//		{
+			//			loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
+			//			failed_attempts++;
+			//		}
+			//		if (failed_attempts >= 10) continue;
 
-					_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
-					choice->template initialize<NT>();
-					choice->template previous<_Activity_Location_Interface*>(prev_loc);
-					choice->template destination<_Activity_Location_Interface*>(loc);
-					choice->template next<_Activity_Location_Interface*>(next_loc);
-					choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(act_type);
-					choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
-					choice_set.push_back(choice);
-				}
-			}
-			
+			//		_Destination_Choice_Option_Interface* choice = (_Destination_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
+			//		choice->template initialize<NT>();
+			//		choice->template previous<_Activity_Location_Interface*>(prev_loc);
+			//		choice->template destination<_Activity_Location_Interface*>(loc);
+			//		choice->template next<_Activity_Location_Interface*>(next_loc);
+			//		choice->template activity_type<Activity_Components::Types::ACTIVITY_TYPES>(act_type);
+			//		choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			//		choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+			//		choice_set.push_back(choice);
+			//	}
+			//}
+			//
+
 			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				int strata_size = _choice_set_size / _num_strata;

@@ -46,6 +46,7 @@ namespace Routing_Components
 				return Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment, T>(travel_times->at(destination_internal_id));
 			}
 			
+			accessor(parent_skimmer, NONE, NONE);
 			accessor(network, NONE, NONE);
 			accessor(origin_link, NONE,NONE);
 			accessor(movement_plan, NONE, NONE);

@@ -552,11 +552,17 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)&& !check_2(ReturnType, Simulation_Timestep_Increment,is_same)))
 			{
 				Value_Type convert_component_value_to_param = Time::Conversion_Factor<InputType>();
 				Value_Type convert_component_value_to_return = Time::Conversion_Factor<ReturnType>();
 				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+			}
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value) && check_2(ReturnType, Simulation_Timestep_Increment,is_same)))
+			{
+				Value_Type convert_component_value_to_param = Time::Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = Time::Conversion_Factor<ReturnType>();
+				return ReturnType(Round<int,Value_Type>((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param));
 			}
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
 			{

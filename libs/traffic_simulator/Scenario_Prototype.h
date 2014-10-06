@@ -874,7 +874,7 @@ namespace Scenario_Components
 					if (cfgReader.getParameter("skim_interval_length_minutes", this->skim_interval_length_minutes<int*>()) != PARAMETER_FOUND)
 					{
 						do_skimming<bool>(false);
-						if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) == PARAMETER_FOUND)
+						if (this->write_skim_tables<bool>())
 						{
 							THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
 						}

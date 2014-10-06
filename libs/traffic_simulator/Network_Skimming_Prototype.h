@@ -61,15 +61,19 @@ namespace Network_Skimming_Components
 				}
 				else if (sub_iteration() == Types::SUB_ITERATIONS::UPDATE)
 				{
-					//_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
 					this_ptr->Update_Skim_Tables_Event<NT>();
-					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					
+					//response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					response.next._iteration = this_ptr->template update_increment<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
-					//response.result = true;
+					
+					this_ptr->current_increment_index<int&>()++;
 				}
 				else
 				{
-					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					this_ptr->current_increment_index<int&>()++;
+					//response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					response.next._iteration = this_ptr->template update_increment<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
 					//response.result = true;
 				}
@@ -105,8 +109,9 @@ namespace Network_Skimming_Components
 			// reference to the current, completed skim table from skim_tables_container, based on simulation time, where skim_table
 			accessor(current_skim_table, NONE, NONE);
 			// time increment at which skim tables are updated - set in the initializer
-			accessor(update_increment,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
-			accessor(update_interval_list, NONE, NONE);
+			//accessor(update_increment,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
+			accessor(update_interval_endpoints, NONE, NONE);
+			accessor(current_increment_index,NONE,NONE);
 			// scheduled time at which skim tables are updated - set in the initializer
 			accessor(scheduled_update_time,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value),check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value));
 			// Associative Container of skim matrices, keyed on Mode Indicator values
@@ -377,6 +382,15 @@ namespace Network_Skimming_Components
 				// Network Skim timer
 				cout << endl<<"Network Skimming run-time: " << this->template timer<Counter&>().Stop()<<endl<<endl;
 				return true;
+			}
+
+			template<typename TargetType> TargetType update_increment()
+			{
+				return this_component()->update_increment<TargetType>();
+			}
+			template<typename TargetType> TargetType update_increment(int interval)
+			{
+				return this_component()->update_increment<TargetType>(interval);
 			}
 
 			//=============================================
