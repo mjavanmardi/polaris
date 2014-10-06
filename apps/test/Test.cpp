@@ -1,346 +1,440 @@
+#define EXCLUDE_DEMAND
+
 #include "Polaris_PCH.h"
-
-#include "traffic_simulator\User_Space.h"
-#include "activity_simulator\Activity_Simulator.h"
-#include "population_synthesis\Population_Synthesis.h"
-#include "Scenario_Implementation.h"
-
-
-
 #include "Application_Includes.h"
+#include "User_Space.h"
 
 using namespace polaris;
-//enum Vehicle_Types
-//{
-//	SOV = 1,
-//	HOV,
-//	BUS,
-//	RAIL
-//};
-//
-//prototype struct Mode_Chooser : public Choice_Model_Components::Prototypes::Choice_Model<ComponentType>
-//{
-//	tag_as_prototype;
-//
-//	template<typename ReturnType> ReturnType Choose_Mode()
-//	{
-//		return this_component()->template Choose_Mode<ActivityItfType, ReturnType>(activity);
-//	}
-//};
-//prototype struct Mode_Choice_Option : public Choice_Model_Components::Prototypes::Choice_Option<ComponentType>
-//{
-//	tag_as_prototype;
-//
-//	// accessor to parent class
-//	accessor(cost, NONE, NONE);
-//	accessor(travel_time, NONE, NONE);
-//	accessor(B_COST, NONE, NONE);
-//	accessor(B_TTIME, NONE, NONE);
-//};
-//
-//implementation struct Mode_Chooser_Implementation : public Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>
-//{
-//	// Tag as Implementation
-//	typedef typename Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
-//
-//	// Pointer to the Parent class
-//	m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::nl_model_type, Choice_Model, NONE, NONE);
-//			
-//	static m_data(int, choice_set_size, NONE, NONE);
-//
-//	// Interface definitions	
-//	typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::nl_model_type > _Choice_Model_Interface;
-//	typedef Mode_Choice_Option<typename MasterType::mode_choice_option_type> _Mode_Choice_Option_Interface;
-//	typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
-//
-//
-//	template<typename TargetType> void Initialize()
-//	{	
-//	}
-//
-//	template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity)
-//	{
-//		person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-//		scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
-//		household_itf* _Parent_Household = _Parent_Person->Household<household_itf*>();
-//		household_static_properties_itf* household_properties = _Parent_Household->Static_Properties<household_static_properties_itf*>();
-//				
-//		// If no vehicles in the household, automatically assume transit
-//		bool auto_available = true;
-//		if (household_properties->Number_of_vehicles<int>() < 1) auto_available = false;
-//
-//		// create local choice model
-//		_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
-//		boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
-//
-//		// external knowledge references
-//		_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-//		_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
-//
-//		Activity_Plan* cur_act = (Activity_Plan*)activity;
-//		Activity_Plan* prev_act, *next_act;
-//		_Activity_Location_Interface* prev_location, *next_location, *dest_location;
-//
-//		// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
-//		if (cur_act->Start_Is_Planned<bool>())
-//		{
-//			prev_act = _Parent_Person->previous_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
-//			prev_location = scheduler->previous_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
-//			if (prev_location == nullptr) prev_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-//			next_act = _Parent_Person->next_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
-//			next_location = scheduler->next_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
-//			if (next_location == nullptr) next_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-//		}
-//		// Otherwise, next activities not known, assume start and end tour location is home
-//		else
-//		{
-//			prev_act = nullptr;
-//			prev_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-//			next_act = nullptr;
-//			next_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-//		}
-//		if (cur_act->Location_Is_Planned<bool>())
-//		{
-//			dest_location = cur_act->Location<_Activity_Location_Interface*>();
-//		}
-//		else
-//		{
-//			dest_location = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-//		}
-//				
-//		//============================================================================================
-//		// add the SOV choice option
-//		_Mode_Choice_Option_Interface* choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-//		choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-//		choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
-//		choice->current_activity<ActivityItfType>(activity);
-//		choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
-//		mode_options.push_back(choice);
-//
-//		// add the transit choice option
-//		choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-//		choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-//		choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
-//		choice->current_activity<ActivityItfType>(activity);
-//		choice->destination<_Activity_Location_Interface*>(dest_location);
-//		choice->previous_activity<Activity_Plan*>(prev_act);
-//		choice->previous_location<_Activity_Location_Interface*>(prev_location);
-//		choice->next_activity<Activity_Plan*>(next_act);
-//		choice->next_location<_Activity_Location_Interface*>(next_location);
-//		choice->auto_available<bool>(auto_available);
-//		choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
-//		mode_options.push_back(choice);
-//
-//		// Make choice
-//		int selected_index = 0;
-//		choice_model->template Evaluate_Choices<NT>();
-//		_Choice_Option_Interface* selected = choice_model->template Choose<_Choice_Option_Interface*>(selected_index);
-//		Vehicle_Components::Types::Vehicle_Type_Keys selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
-//
-//		if (selected == nullptr ) {THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
-//		else selected_mode = ((_Mode_Choice_Option_Interface*)selected)->mode_type<ReturnType>();
-//
-//		// Add the temporary HOV correction - this should eventually be replaced by including HOV as an option in the choice model
-//		if (Assign_To_HOV<ActivityItfType>(activity, selected_mode)) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
-//
-//		//============================================================================================
-//		//Account for touring - if previous act is not at an anchor location and not using auto, then auto not available
-//		//-need to update to disable auto mode when not available at the anchor location as well
-//		if (prev_location != _Parent_Person->Home_Location<_Activity_Location_Interface*>() &&
-//			prev_location != _Parent_Person->Work_Location<_Activity_Location_Interface*>() &&
-//			prev_location != _Parent_Person->School_Location<_Activity_Location_Interface*>() &&
-//			prev_act != nullptr)
-//		{
-//			//if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS || prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV)
-//			//{
-//			//	if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
-//			//}
-//		}
-//
-//		// free memory allocated locally
-//		for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);
-//		Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
-//
-//		// return the chosen mode
-//		return selected_mode;
-//	}
-//
-//};
-//implementation struct Mode_Choice_Nest_Impl : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Nest_Impl)>
-//{
-//	// Tag as Implementation
-//	typedef typename Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Nest_Impl)>::Component_Type ComponentType;
-//
-//	//====================================================================================================================================
-//	// Interface definitions
-//	//------------------------------------------------------------------------------------------------------------------------------------
-//
-//	// Feature called from prototype and by Choice_Model
-//	virtual double Calculate_Utility()
-//	{
-//		return 0;				
-//	}
-//
-//	virtual void Print_Utility()
-//	{
-//		//return 0.0;
-//	}
-//};
-//implementation struct Mode_Choice_Option_Impl : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Option_Impl)>
-//{
-//	// Tag as Implementation
-//	typedef typename Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType,INHERIT(Mode_Choice_Option_Impl)>::Component_Type ComponentType;
-//
-//	// data members
-//	m_data(float, cost, NONE, NONE);
-//	m_data(float, travel_time, NONE, NONE);
-//	m_data(Vehicle_Types, mode, NONE, NONE);
-//
-//	// PARAMETER DECLARATIONS
-//	m_data(float, B_COST, NONE, NONE);
-//	m_data(float, B_TTIME, NONE, NONE);
-//
-//	//====================================================================================================================================
-//	// Interface definitions
-//	//------------------------------------------------------------------------------------------------------------------------------------
-//
-//	// Feature called from prototype and by Choice_Model
-//	virtual double Calculate_Utility()
-//	{
-//		double utility = _B_COST * _cost + _B_TTIME * _travel_time;
-//		return utility;				
-//	}
-//
-//	virtual void Print_Utility()
-//	{
-//		//return 0.0;
-//	}
-//};
-//
-//struct MasterType
-//{
-//	// Choice model types
-//	typedef Mode_Chooser_Implementation<MT> mode_chooser_type;
-//	typedef Mode_Choice_Option_Impl<MT> mode_choice_option_type;
-//	typedef Mode_Choice_Nest_Impl<MT> mode_choice_nest_type;
-//	typedef Choice_Model_Components::Implementations::Nested_Logit_Model_Implementation<MT> nl_model_type;
-//};
-//
-//int main()
-//{
-//	Simulation_Configuration cfg;
-//	cfg.Single_Threaded_Setup(1000);
-//	INITIALIZE_SIMULATION(cfg);
-//
-//
-//	Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::nl_model_type>* model = (Mode_Chooser<typename MasterType::nl_model_type>*)Allocate<MasterType::nl_model_type>();
-//
-//	// Create the transit nest and nest options
-//	Mode_Choice_Option<MasterType::mode_choice_nest_type>* transit_nest = (Mode_Choice_Option<typename MasterType::mode_choice_nest_type>*)Allocate<MasterType::mode_choice_nest_type>();
-//	transit_nest->inclusive_value_parameter<double>(0.75);
-//	
-//	Mode_Choice_Option<MasterType::mode_choice_option_type>* bus = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
-//	Mode_Choice_Option<MasterType::mode_choice_option_type>* rail = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
-//	bus->B_COST<double>(-2.0);	bus->cost<double>(2.25);
-//	rail->B_COST<double>(-2.0);	rail->cost<double>(2.25);
-//	bus->B_TTIME<double>(-0.3);	bus->travel_time<double>(15.0);
-//	rail->B_TTIME<double>(-0.2);	rail->travel_time<double>(12.0);
-//	transit_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(bus);
-//	transit_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(rail);
-//
-//	// create the auto nest and nest options
-//	Mode_Choice_Option<MasterType::mode_choice_nest_type>* auto_nest = (Mode_Choice_Option<typename MasterType::mode_choice_nest_type>*)Allocate<MasterType::mode_choice_nest_type>();
-//	auto_nest->inclusive_value_parameter<double>(0.5);
-//
-//	Mode_Choice_Option<MasterType::mode_choice_option_type>* sov = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
-//	Mode_Choice_Option<MasterType::mode_choice_option_type>* hov = (Mode_Choice_Option<typename MasterType::mode_choice_option_type>*)Allocate<MasterType::mode_choice_option_type>();
-//	sov->B_COST<double>(-2.0);	sov->cost<double>(2.50);
-//	hov->B_COST<double>(-2.5);	hov->cost<double>(3.00);
-//	sov->B_TTIME<double>(-0.1);	sov->travel_time<double>(8.0);
-//	hov->B_TTIME<double>(-0.15);	hov->travel_time<double>(13.0);
-//	auto_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(sov);
-//	auto_nest->Add_Sub_Choice_Option<Mode_Choice_Option<MasterType::mode_choice_option_type>*>(hov);
-//
-//	model->Add_Choice_Option(transit_nest);
-//	model->Add_Choice_Option(auto_nest);
-//
-//	model->Evaluate_Choices<NT>();
-//
-//	cout << "SOV: "<<sov->choice_utility<float>() <<", "<<sov->choice_probability<float>()<<endl;
-//	cout << "HOV: "<<hov->choice_utility<float>() <<", "<<hov->choice_probability<float>()<<endl;
-//	cout << "BUS: "<<bus->choice_utility<float>() <<", "<<bus->choice_probability<float>()<<endl;
-//	cout << "RAIL: "<<rail->choice_utility<float>() <<", "<<rail->choice_probability<float>()<<endl;
-//	cout << "AUTO_NEST: "<<auto_nest->choice_utility<float>() <<", "<<auto_nest->choice_probability<float>()<<endl;
-//	cout << "TRAN_NEST: "<<transit_nest->choice_utility<float>() <<", "<<transit_nest->choice_probability<float>()<<endl;
-//
-//
-//	cout <<"Press 'any' key to end: ";
-//	
-//	char end;
-//	cin >> end;
-//}
 
-int main(int argc, char** argv)
+
+
+struct MasterType
 {
-	string input_filename, output_filename;
+	typedef MasterType M;
 
-	if (argc < 2)
-	{
-		cout << "Enter input skimfile name: ";
-		cin >> input_filename;
-	}
-	else
-	{
-		input_filename = argv[1];
-	}
+	//==============================================================================================
+	#pragma region Network Types
+	//----------------------------------------------------------------------------------------------
+	#ifdef ANTARES
+	typedef Conductor_Implementation<M> conductor_type;
+	typedef Control_Panel_Implementation<M> control_panel_type;
+	typedef Time_Panel_Implementation<M> time_panel_type;
+	typedef Information_Panel_Implementation<M> information_panel_type;
+	typedef Canvas_Implementation<M> canvas_type;
+	typedef Antares_Layer_Implementation<M> antares_layer_type;
+	typedef Layer_Options_Implementation<M> layer_options_type;
+	typedef Attributes_Panel_Implementation<M> attributes_panel_type;
+	typedef Control_Dialog_Implementation<M> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
+	typedef Splash_Panel_Implementation<M> splash_panel_type;
+
+	typedef Antares_Network_Implementation<M> network_type;
+	typedef Antares_Link_Implementation<M> link_type;
+	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;
+	//typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> basic_vehicle_type;
+	//typedef Vehicle_Components::Implementations::Polaris_Base_Vehicle_Implementation<M> vehicle_type;
+	typedef NULLTYPE visual_vehicle_type;
+
+	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
+	//typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
+
+	typedef Antares_Intersection_Implementation<M> intersection_type;
+	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
+	#else
+	typedef Network_Components::Implementations::Network_Implementation<M> network_type;
+	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
+	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
+	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
+	#endif
+
+	typedef Scenario_Components::Implementations::Scenario_Implementation<M> scenario_type;
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
+	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> movement_type;
+
+	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> turn_movement_type;
+	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
+	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
+	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
+	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
+	//typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
+	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
+	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
+	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
+	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
+	typedef Operation_Components::Implementations::Operation_Implementation<M> operation_type;
+	typedef Intersection_Control_Components::Implementations::Intersection_Control_Implementation<M> intersection_control_type;
+	typedef Intersection_Control_Components::Implementations::Control_Plan_Implementation<M> control_plan_type;
+	typedef Intersection_Control_Components::Implementations::Phase_Implementation<M> phase_type;
+	typedef Intersection_Control_Components::Implementations::Phase_Movement_Implementation<M> phase_movement_type;
+	typedef Intersection_Control_Components::Implementations::Approach_Implementation<M> approach_type;
 	
-	output_filename = input_filename + ".csv";
+	typedef Analyze_Link_Group_Components::Implementations::Analyze_Link_Group_Implementation<MasterType> analyze_link_group_type;
 
-	//Network_Skimming_Components::Prototypes::Network_Skimming_Prototype<NT>::Convert_Binary_Skimfile_To_CSV<NT>(input_filename, output_filename);
+	typedef Plan_Components::Implementations::Plan_Implementation<M> plan_type;
+
+	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
+
+	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
+	//typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
+	//typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
+	//typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
+	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
 
 
-	//===========================================================================
-	// FILE INPUT IF REQUESTED
-	int num_modes;
-	int num_zones;
-	int update_increment;
+	//==============================================================================================
+	#pragma region TMC Types
+	//----------------------------------------------------------------------------------------------
+	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
+	#ifdef ANTARES
+	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
 
-	File_IO::Binary_File_Reader infile;
-	if (!infile.Open(input_filename)) 
-	{
-		int test;
-		cin >> test;
-		return 0;
-	}
+	typedef Link_Control_Components::Implementations::Antares_Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Antares_Tow_Truck_Depot<MasterType> depot_type;
+	typedef Depot_Components::Implementations::Antares_Tow_Truck<MasterType> tow_truck_type;
+
+	typedef Advisory_Radio_Components::Implementations::Antares_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
+	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+
+	typedef Sensor_Components::Implementations::Antares_Link_Sensor<MasterType> link_sensor_type;
+	typedef Buildings_Components::Implementations::Antares_Buildings_Implementation<M> buildings_type;
+	typedef Ramp_Metering_Components::Implementations::Antares_Ramp_Metering_Implementation<M> ramp_metering_type;
+	#else
+	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+
+	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Implementation<MasterType> tow_truck_type;
+
+	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+
+	typedef Sensor_Components::Implementations::Link_Sensor<MasterType> link_sensor_type;
+
+	typedef Ramp_Metering_Components::Implementations::Ramp_Metering_Implementation<M> ramp_metering_type;
+	#endif
+
+	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
+	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
+	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
+
+	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+
+
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
+	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
+	typedef Routing_Components::Types::static_to_static static_to_static_type;
+	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
 	
-	infile.Read_Value<int>(num_modes);
-	infile.Read_Value<int>(num_zones);
-	infile.Read_Value<int>(update_increment);
+	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
+	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
+	typedef Custom_Connection_Group<MasterType, time_dependent_graph_type, time_dependent_graph_type, time_dependent_to_time_dependent_type> time_dependent_to_time_dependent_connection_type;
 
-	ofstream outfile;
-	outfile.open(output_filename);
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
+};
 
-			
-	Simulation_Timestep_Increment start;
-	//===========================================================================
-	// create the skim_table time periods, for basic create only a single time period skim_table
-	for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
-	{		
-		float* data = new float[num_zones*num_zones];
-		infile.Read_Array<float>(data, num_zones*num_zones);
 
-		outfile << endl << "Skim matrix for hour: " << GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,Time_Hours>(start)<<endl;
+int main(int argc,char** argv)
+{
 
-		for (int i =0; i < num_zones; i++)
+	//==================================================================================================================================
+	// Scenario initialization
+	//----------------------------------------------------------------------------------------------------------------------------------
+	#pragma region Scenario Initialization
+	char* scenario_filename = "scenario.json";
+	if (argc >= 2) scenario_filename = argv[1];
+	int threads = 1;
+	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
+	int people_hint = 0;
+	if (argc >= 4) people_hint = std::max(atoi(argv[3]),threads);
+	Simulation_Configuration cfg;
+	cfg.Multi_Threaded_Setup(86400, threads);
+	INITIALIZE_SIMULATION(cfg);
+	#pragma endregion
+
+
+	//==================================================================================================================================
+	// NETWORK MODEL STUFF
+	//----------------------------------------------------------------------------------------------------------------------------------
+	#pragma region New network_model.cpp stuff
+	Network_Components::Types::Network_IO_Maps network_io_maps;
+	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
+
+	//===============
+	// OUTPUT OPTIONS
+	//----------------
+	ofstream log_file("signal_log3.txt");
+	ostream output_stream(log_file.rdbuf());
+	//stream_ptr = &output_stream;	
+
+	string output_dir_name = "";
+
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+
+	cout << "allocating data structures..." <<endl;	
+
+
+	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
+	_global_scenario = scenario;
+
+	typedef Network<typename MasterType::network_type> _Network_Interface;
+	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
+
+	_global_network = network;
+	network->scenario_reference<_Scenario_Interface*>(scenario);
+
+	cout << "reading scenario data..." <<endl;
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
+
+	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+
+	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+
+	cout << "reading network data..." <<endl;	
+	network->read_network_data<Net_IO_Type>(network_io_maps);
+	typedef Operation<MasterType::operation_type> _Operation_Interface;
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	operation->network_reference<_Network_Interface*>(network);
+	if (scenario->intersection_control_flag<int>() == 1) {
+		cout <<"reading intersection control data..." << endl;
+		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
+	}
+	//cout << "initializing simulation..." <<endl;	
+	network->simulation_initialize<NULLTYPE>();
+
+	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+	//typedef Demand<MasterType::demand_type> _Demand_Interface;
+	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
+	//demand->scenario_reference<_Scenario_Interface*>(scenario);
+	//demand->network_reference<_Network_Interface*>(network);
+	//cout << "reading demand data..." <<endl;
+	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
+
+	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
+
+	if (scenario->ramp_metering_flag<bool>() == true) {
+		cout <<"reading ramp metering data..." << endl;
+		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
+	}
+
+	
+
+#ifdef ANTARES
+	network->set_network_bounds<NULLTYPE>();
+	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
+	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
+	MasterType::vehicle_type::Initialize_Layer();
+	network->initialize_antares_layers<NULLTYPE>();
+	MasterType::link_type::configure_link_moes_layer();
+#endif
+
+	if(scenario->use_network_events<bool>())
+	{
+		//define_component_interface(_Network_Event_Manager_Interface, typename MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
+		typedef Network_Event_Manager<MasterType::network_event_manager_type> _Network_Event_Manager_Interface;
+		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<typename MasterType::network_event_manager_type>();
+		network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+		net_event_manager->Initialize<NT>();
+
+		if (scenario->use_tmc<bool>())
 		{
-			for (int j=0; j < num_zones; j++)
-			{
-				outfile << data[i*num_zones + j] << "," ;
-			}
-			outfile << endl;
+			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
+
+			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+			tmc->Initialize<NT>();
 		}
 	}
 
-	int test;
-	cin >> test;
+	////initialize network agents
+	cout << "initializing link agents..." <<endl;
+
+	//define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
+	
+	typedef Link<remove_pointer<_Network_Interface::get_type_of(links_container)::value_type>::type> _Link_Interface;
+	typedef Random_Access_Sequence<_Network_Interface::get_type_of(links_container),_Link_Interface*> _Links_Container_Interface;
+
+	_Links_Container_Interface::iterator links_itr;
+
+	for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
+		links_itr!=network->links_container<_Links_Container_Interface&>().end();
+		links_itr++)
+	{
+		((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
+	}
+
+	cout << "initializing intersection agents..." <<endl;
+	//define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
+	//
+	
+	typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
+	typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
+
+	_Intersections_Container_Interface::iterator intersections_itr;
+
+	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
+		intersections_itr++)
+	{
+		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+	}
+
+	cout << "initializing ramp metering agents..." <<endl;
+	//define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Prototype, NULLTYPE);
+
+	typedef Ramp_Metering<remove_pointer<_Network_Interface::get_type_of(ramp_metering_container)::value_type>::type> _Ramp_Metering_Interface;
+	typedef Random_Access_Sequence<_Network_Interface::get_type_of(ramp_metering_container),_Ramp_Metering_Interface*> _Ramp_Metering_Container_Interface;
+
+	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
+
+	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
+		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
+		ramp_metering_itr++)
+	{
+		((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
+	}
+
+	if (scenario->use_network_events<bool>())
+	{
+		MasterType::link_type::subscribe_events<NT>();
+	}
+	#pragma endregion
+	
+
+
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	#pragma region RNG initialization
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+	#pragma endregion
+
+
+
+	//==================================================================================================================================
+	// Network Skimming stuff
+	//----------------------------------------------------------------------------------------------------------------------------------
+	cout << "Initializing network validation..." <<endl;
+	typedef Network_Components::Prototypes::Network_Validation_Unit<MasterType::network_validation_unit_type> _network_validation_itf;
+	typedef Random_Access_Sequence<typename _Network_Interface::get_type_of(activity_locations_container)> locations_itf;
+	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
+	locations_itf* locations = network->activity_locations_container<locations_itf*>();
+			
+	_network_validation_itf* validator = (_network_validation_itf*)Allocate<MasterType::network_validation_unit_type>();
+
+	validator->network_reference<_Network_Interface*>(network);
+	validator->Initialize<location_itf*>((location_itf*)locations->at(0));
+
+	cout << "Network validations done." <<endl;
+
+
+	//==================================================================================================================================
+	// Start Simulation
+	//----------------------------------------------------------------------------------------------------------------------------------
+	cout <<"Starting simulation..."<<endl;
+	try	{START();}
+	catch (std::exception ex){ cout << ex.what();}
+	cout << "Finished!" << endl;
+
 }
+
+
+//==================================================
+// SKIMFILE READER APPLICATION
+//int main(int argc, char** argv)
+//{
+//	string input_filename, output_filename;
+//
+//	if (argc < 2)
+//	{
+//		cout << "Enter input skimfile name: ";
+//		cin >> input_filename;
+//	}
+//	else
+//	{
+//		input_filename = argv[1];
+//	}
+//	
+//	output_filename = input_filename + ".csv";
+//
+//	//Network_Skimming_Components::Prototypes::Network_Skimming_Prototype<NT>::Convert_Binary_Skimfile_To_CSV<NT>(input_filename, output_filename);
+//
+//
+//	//===========================================================================
+//	// FILE INPUT IF REQUESTED
+//	int num_modes;
+//	int num_zones;
+//	int update_increment;
+//
+//	File_IO::Binary_File_Reader infile;
+//	if (!infile.Open(input_filename)) 
+//	{
+//		int test;
+//		cin >> test;
+//		return 0;
+//	}
+//	
+//	infile.Read_Value<int>(num_modes);
+//	infile.Read_Value<int>(num_zones);
+//	infile.Read_Value<int>(update_increment);
+//
+//	ofstream outfile;
+//	outfile.open(output_filename);
+//
+//			
+//	Simulation_Timestep_Increment start;
+//	//===========================================================================
+//	// create the skim_table time periods, for basic create only a single time period skim_table
+//	for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
+//	{		
+//		float* data = new float[num_zones*num_zones];
+//		infile.Read_Array<float>(data, num_zones*num_zones);
+//
+//		outfile << endl << "Skim matrix for hour: " << GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,Time_Hours>(start)<<endl;
+//
+//		for (int i =0; i < num_zones; i++)
+//		{
+//			for (int j=0; j < num_zones; j++)
+//			{
+//				outfile << data[i*num_zones + j] << "," ;
+//			}
+//			outfile << endl;
+//		}
+//	}
+//
+//	int test;
+//	cin >> test;
+//}

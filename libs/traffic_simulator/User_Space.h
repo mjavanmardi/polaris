@@ -18,7 +18,7 @@ void* _global_vehicle_logger;
 #include "Intersection_Control_Implementation.h"
 #include "Ramp_Metering_Implementation.h"
 #include "Routable_Network_Implementation.h"
-#include "Vehicle_Data_Logger_Implementation.h"
+
 
 //#include "Polaris_Operation_Implementation.h"
 #include "Zone_Implementation.h"
@@ -34,6 +34,7 @@ void* _global_vehicle_logger;
 #include "Network_Implementation_Results.h"
 #ifndef EXCLUDE_DEMAND
 #include "Network_Skimming_Implementation.h"
+
 //#include "Activity_Implementations.h"
 
 
@@ -43,7 +44,7 @@ void* _global_vehicle_logger;
 //#include "Synthesis_Region_Implementation.h"
 //#include "PopSyn_Implementations.h"
 #endif
-
+#include "Network_Validator_Implementation.h"
 
 // ITS COMPONENTS
 
@@ -60,7 +61,3 @@ void* _global_vehicle_logger;
 #include "Network_Event_Implementations.h"
 #include "Analyze_Link_Group_Implementation.h"
 
-#ifndef EXCLUDE_DEMAND
-// PERSON AGENT COMPONENTS
-
-#endif

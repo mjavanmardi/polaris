@@ -17,9 +17,9 @@
 //#include "File_Reader.h"
 //#include "Repository.h"
 
-#include "traffic_simulator\User_Space.h"
-#include "activity_simulator\Activity_Simulator.h"
-#include "population_synthesis\Population_Synthesis.h"
+#include "User_Space.h"
+#include "Activity_Simulator.h"
+#include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
 
 
@@ -112,7 +112,7 @@ struct MasterType
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
-	//typedef Network_Skimming_Components::Implementations::Mode_Skim_Table_Implementation<M> network_mode_skim_type;
+	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -158,7 +158,6 @@ struct MasterType
 		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#else
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
-		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -543,10 +542,12 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
+#ifdef ANTARES
 	typedef Vehicle_Components::Prototypes::Vehicle_Data_Logger<MasterType::vehicle_data_logger_type> _Vehicle_Logger_Interface;	
 	_Vehicle_Logger_Interface* vlogger=(_Vehicle_Logger_Interface*)Allocate<MasterType::vehicle_data_logger_type>();
 	vlogger->Initialize<NT>();
 	_global_vehicle_logger = vlogger;
+#endif
 
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
 

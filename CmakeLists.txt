@@ -8,10 +8,10 @@ set(Statewide OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares ON)
+set(Antares OFF)
 
 
-set(BUILD_DIR build)
+set(BUILD_DIR build_noantares)
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
 
@@ -167,7 +167,7 @@ else()
 	add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
-	add_subdirectory (apps/Output_Visualizer)
+#	add_subdirectory (apps/Output_Visualizer)
 	add_subdirectory (libs/traffic_simulator)
 	add_subdirectory (libs/spatial) 
 	add_subdirectory (libs/routing) 
