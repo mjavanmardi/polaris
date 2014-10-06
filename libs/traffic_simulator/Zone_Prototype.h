@@ -90,7 +90,7 @@ namespace Zone_Components
 			{
 				this_component()->Initialize<TargetType>();
 			}
-			template<typename TargetType> TargetType Get_Random_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> TargetType Get_Random_Location(TargetType excluded_location=nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename get_type_of(origin_activity_locations)::value_type>::type> activity_location_itf;
 				typedef Random_Access_Sequence< typename get_type_of(origin_activity_locations),activity_location_itf*> activity_locations_itf;
@@ -99,15 +99,25 @@ namespace Zone_Components
 				
 				int size = (int)locations->size();
 
-#ifndef EXCLUDE_DEMAND
                 int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
-#else
-                int loc_index = 0;
-                cout << "error: cannot reach here when demand is not enabled!!!" << endl;
-                exit(0);
-#endif
 
-				return locations->at(loc_index);
+				TargetType return_loc = locations->at(loc_index);
+
+				if (excluded_location==nullptr)	return return_loc;
+				else
+				{
+					int num_attempts=0;
+					while (return_loc == excluded_location)
+					{
+						if (num_attempts == 10)
+						{
+							THROW_EXCEPTION("ERROR: could not choose a unique random location after 10 attempts.");
+						}
+						return_loc = Get_Random_Location<TargetType>();
+						++num_attempts;
+					}
+					return return_loc;
+				}
 			}
 			template<typename TargetType> TargetType Get_Random_Work_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{

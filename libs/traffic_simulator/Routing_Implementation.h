@@ -68,9 +68,6 @@ namespace Routing_Components
 
 			void Compute_Route()
 			{
-
-				
-
 				if (_network == nullptr)
 				{
 					THROW_EXCEPTION("Network is undefined.");

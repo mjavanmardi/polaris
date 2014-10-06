@@ -17,9 +17,9 @@
 //#include "File_Reader.h"
 //#include "Repository.h"
 
-#include "traffic_simulator\User_Space.h"
-#include "activity_simulator\Activity_Simulator.h"
-#include "population_synthesis\Population_Synthesis.h"
+#include "User_Space.h"
+#include "Activity_Simulator.h"
+#include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
 
 
@@ -112,7 +112,7 @@ struct MasterType
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
-	//typedef Network_Skimming_Components::Implementations::Mode_Skim_Table_Implementation<M> network_mode_skim_type;
+	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -158,7 +158,6 @@ struct MasterType
 		typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#else
 		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
-		//typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<M> vehicle_data_logger_type;
 	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -350,16 +349,9 @@ int main(int argc,char** argv)
 	network->set_network_bounds<NULLTYPE>();
 	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	
-	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::vehicle_type::Initialize_Layer();
+	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
-	if (scenario->buildings_geometry_file<string&>() != "")
-	{
-		MasterType::buildings_type::Initialize_Type();
-		MasterType::buildings_type* buildings_layer = Allocate<MasterType::buildings_type>();
-		buildings_layer->Initialize( scenario->buildings_geometry_file<string&>() );
-	}
 #endif
 
 	if(scenario->use_network_events<bool>())
@@ -587,6 +579,7 @@ int main(int argc,char** argv)
 
 void output_object_sizes()
 {
+#ifdef ENABLE_MEMORY_LOGGING
 	ofstream file;
 	file.open("memory_logging_typeids.csv");
 
@@ -618,8 +611,6 @@ void output_object_sizes()
 	file << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type)<<","<<(int)MasterType::movement_plan_record_type::component_id<<endl;
 	file << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type)<<","<<(int)MasterType::trajectory_unit_type::component_id<<endl;
 	file << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type)<<","<<(int)MasterType::network_skim_type::component_id<<endl;
-	file << endl <<"los_value_type size = "<<sizeof(MasterType::los_value_type)<<","<<(int)MasterType::los_value_type::component_id<<endl;
-	file << endl <<"los_invariant_value_type size = "<<sizeof(MasterType::los_invariant_value_type)<<","<<(int)MasterType::los_invariant_value_type::component_id<<endl;
 	file << endl <<"demand_type size = "<<sizeof(MasterType::demand_type)<<","<<(int)MasterType::demand_type::component_id<<endl;
 	file << endl <<"person_type size = "<<sizeof(MasterType::person_type)<<","<<(int)MasterType::person_type::component_id<<endl;
 	file << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type)<<","<<(int)MasterType::person_planner_type::component_id<<endl;
@@ -656,6 +647,7 @@ void output_object_sizes()
 	file << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type)<<","<<(int)MasterType::base_network_event_type::component_id<<endl;
 	file << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type)<<","<<(int)MasterType::network_event_manager_type::component_id<<endl;
 	file.close();
+#endif
 }
 #endif
 

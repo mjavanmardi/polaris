@@ -14,7 +14,7 @@
 #include "wxPLplotwindow.h"
 #endif
 
-#include "Io/Io.h"
+#include "Io.h"
 
 //#include "File_IO/network_models.h"
-#include "Repository/Repository.h"
+#include "Repository.h"
