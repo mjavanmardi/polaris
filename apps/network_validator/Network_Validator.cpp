@@ -3,6 +3,8 @@
 #include "Polaris_PCH.h"
 #include "Application_Includes.h"
 
+#include "Network_Validator_Implementation.h"
+
 using namespace polaris;
 
 
@@ -14,7 +16,6 @@ struct MasterType
 	//==============================================================================================
 	#pragma region Network Types
 	//----------------------------------------------------------------------------------------------
-
 	typedef Network_Components::Implementations::Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
@@ -29,13 +30,11 @@ struct MasterType
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
-
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
-
 	typedef Operation_Components::Implementations::Operation_Implementation<M> operation_type;
 	typedef Intersection_Control_Components::Implementations::Intersection_Control_Implementation<M> intersection_control_type;
 	typedef Intersection_Control_Components::Implementations::Control_Plan_Implementation<M> control_plan_type;
@@ -53,10 +52,54 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
 	typedef Network_Components::Implementations::Network_Validation_Implementation<M> network_validation_type;
 	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
-
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
+
+	//==============================================================================================
+	#pragma region TMC Types
+	//----------------------------------------------------------------------------------------------
+	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
+	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+
+	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Implementation<MasterType> tow_truck_type;
+
+	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+
+	typedef Sensor_Components::Implementations::Link_Sensor<MasterType> link_sensor_type;
+
+	typedef Ramp_Metering_Components::Implementations::Ramp_Metering_Implementation<M> ramp_metering_type;
+
+	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
+	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
+	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
+
+	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+
+
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
+	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
+	typedef Routing_Components::Types::static_to_static static_to_static_type;
+	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
+	
+	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
+	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
+	typedef Custom_Connection_Group<MasterType, time_dependent_graph_type, time_dependent_graph_type, time_dependent_to_time_dependent_type> time_dependent_to_time_dependent_connection_type;
+
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
 };
 
 

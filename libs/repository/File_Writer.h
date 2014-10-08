@@ -34,7 +34,7 @@ namespace File_IO
 			return true;
 		}
 		template<class T>
-		bool WriteArray(T* t, int num_to_write)
+		bool Write_Array(T* t, int num_to_write)
 		{
 			_file.write((char*)t, sizeof(T) * num_to_write);
 			_file.flush();
@@ -76,8 +76,15 @@ namespace File_IO
 			_file<<S.str()<<DELIM;
 			S.str("");
 		}
+		//template<typename T>
+		//void Write(T &data)
+		//{
+		//	stringstream S("");
+		//	S<<data;
+		//	_file<<S.str()<<DELIM;
+		//}
 		template<typename T>
-		void Write(T &data)
+		void Write(T data)
 		{
 			stringstream S("");
 			S<<data;
