@@ -2,7 +2,6 @@
 
 #include "Polaris_PCH.h"
 #include "Application_Includes.h"
-#include "User_Space.h"
 
 using namespace polaris;
 
@@ -84,6 +83,7 @@ struct MasterType
 	//typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	//typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	//typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
+	typedef Network_Components::Implementations::Network_Validation_Implementation<M> network_validation_type;
 	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
@@ -155,6 +155,8 @@ struct MasterType
 };
 
 
+void write_scenario_file(char* database_name, char* scenario_name);
+
 int main(int argc,char** argv)
 {
 
@@ -162,17 +164,20 @@ int main(int argc,char** argv)
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#pragma region Scenario Initialization
-	char* scenario_filename = "scenario.json";
-	if (argc >= 2) scenario_filename = argv[1];
+	char* scenario_filename = "scenario_tester.json";
+	char* database_filename = "a";
+	if (argc >= 2) database_filename = argv[1];
+	else THROW_EXCEPTION("ERROR: specify a database filename as the first command line argument.");
+	int checks = 3;
+	if (argc >= 3) checks = std::max(atoi(argv[2]),checks);
 	int threads = 1;
-	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
-	int people_hint = 0;
-	if (argc >= 4) people_hint = std::max(atoi(argv[3]),threads);
+	if (argc >= 4) threads = std::max(atoi(argv[3]),threads);
 	Simulation_Configuration cfg;
-	cfg.Multi_Threaded_Setup(86400, threads);
+	cfg.Multi_Threaded_Setup(100, threads);
 	INITIALIZE_SIMULATION(cfg);
 	#pragma endregion
 
+	write_scenario_file(database_filename, scenario_filename);
 
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
@@ -180,13 +185,6 @@ int main(int argc,char** argv)
 	#pragma region New network_model.cpp stuff
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
-
-	//===============
-	// OUTPUT OPTIONS
-	//----------------
-	ofstream log_file("signal_log3.txt");
-	ostream output_stream(log_file.rdbuf());
-	//stream_ptr = &output_stream;	
 
 	string output_dir_name = "";
 
@@ -348,17 +346,15 @@ int main(int argc,char** argv)
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	cout << "Initializing network validation..." <<endl;
-	typedef Network_Components::Prototypes::Network_Validation_Unit<MasterType::network_validation_unit_type> _network_validation_itf;
+	typedef Network_Components::Prototypes::Network_Validator<MasterType::network_validation_type> _network_validation_itf;
 	typedef Random_Access_Sequence<typename _Network_Interface::get_type_of(activity_locations_container)> locations_itf;
 	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
 	locations_itf* locations = network->activity_locations_container<locations_itf*>();
 			
-	_network_validation_itf* validator = (_network_validation_itf*)Allocate<MasterType::network_validation_unit_type>();
+	_network_validation_itf* validator = (_network_validation_itf*)Allocate<MasterType::network_validation_type>();
 
 	validator->network_reference<_Network_Interface*>(network);
-	validator->Initialize<location_itf*>((location_itf*)locations->at(0));
-
-	cout << "Network validations done." <<endl;
+	validator->Initialize<location_itf*>(checks);
 
 
 	//==================================================================================================================================
@@ -367,9 +363,38 @@ int main(int argc,char** argv)
 	cout <<"Starting simulation..."<<endl;
 	try	{START();}
 	catch (std::exception ex){ cout << ex.what();}
-	cout << "Finished!" << endl;
+	cout << "Finished! Press 'Any' key" << endl;
 
 }
+
+void write_scenario_file(char* database_name, char* scenario_name)
+{
+	// strip extension from database name
+	string db_name(database_name);
+	int pos = db_name.find('.');
+	int len = db_name.length();
+	string db(db_name.c_str());
+	string ext("");
+	if (pos != std::string::npos)
+	{
+		db = db_name.substr(0,pos);
+		ext = db_name.substr(pos+1,len-pos-1);
+
+		if (strcmp(ext.c_str(),"sqlite") != 0) THROW_EXCEPTION("ERROR: database_filename must be a sqlite file");
+	}
+
+	File_IO::File_Writer fw;
+	fw.Open(string(scenario_name));
+	fw.Write_Line("{");
+	fw.Write_Line("\t\"io_source_flag\" : \"ODB_IO_SOURCE\",");
+	stringstream s("");
+	s<<"\t\"database_name\" : \""<<db<<"\"\n}";
+	fw.Write(s);
+	fw.Close();
+
+	cout <<"Reading information from '"<<db<<"' sqlite file."<<endl;
+}
+
 
 
 //==================================================

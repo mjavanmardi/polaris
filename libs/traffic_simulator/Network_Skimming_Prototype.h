@@ -25,7 +25,7 @@ namespace Network_Skimming_Components
 		template<typename ComponentType> struct Skim_Table;
 		template<typename ComponentType> struct Location_To_Zone_Map_Item;
 
-		prototype struct Network_Skimming
+		prototype struct Network_Skimming ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

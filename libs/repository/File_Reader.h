@@ -26,6 +26,10 @@ namespace File_IO
 
 			return _open;
 		}
+		void Begin()
+		{
+			_file.seekg(0);
+		}
 		void Close()
 		{
 			_file.close();
