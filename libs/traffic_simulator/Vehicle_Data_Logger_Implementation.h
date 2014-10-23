@@ -251,7 +251,7 @@ namespace Vehicle_Components
 				}
 
 				// write out strings in the current buffer to log file and clear it
-				if (current[i].size()) this->_outfile.WriteArray<float>(&(current[i])[0],current[i].size());
+				if (current[i].size()) this->_outfile.Write_Array<float>(&(current[i])[0],current[i].size());
 				this->_bytes_written += sizeof(float) * current[i].size();
 
 				current[i].clear();

@@ -12,10 +12,15 @@
 template<typename MasterType,typename InheritanceList>
 void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer)
 {
+	
+
 	const bool draw=layer->draw<bool>();
 
 	// skip hidden layers
 	if(!draw) return;
+
+	glPushAttrib ( GL_ALL_ATTRIB_BITS );
+
 
 	const PrimitiveType primitive_type=layer->primitive_type<PrimitiveType>();	
 
@@ -64,6 +69,8 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	{
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+		glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	}
 
 	if(head_texture)
@@ -236,8 +243,13 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 					if(primitive_texture)
 					{
 						glEnd();
+						glDisable (GL_DEPTH_TEST);
 						glBindTexture(GL_TEXTURE_2D,texture_map[ *((int*)geometry_itr) ]); // geometry_itr here is the tex_id stored with the object
-						glBegin(GL_QUADS);		
+						glColor4f ( 1.0, 1.0, 1.0, 1.0 );
+						glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+						glEnable(GL_BLEND);
+						//glEnable (GL_DEPTH_TEST);
+						glBegin(GL_QUADS);
 						//cout << "Drawing for texture id="<<texture_map[ *((int*)geometry_itr) ]<<endl;
 						geometry_itr += sizeof(int);
 					}
@@ -487,4 +499,6 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	}
 
 	glDepthFunc(GL_LESS);
+
+	glPopAttrib ();
 }

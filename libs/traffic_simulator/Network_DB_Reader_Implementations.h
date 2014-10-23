@@ -921,7 +921,15 @@ namespace Network_Components
 			
 				// get zones from database
 				_Zone_Interface* zone;
-				result<polaris::io::Zone> zone_result=db->template query<polaris::io::Zone>(query<polaris::io::Zone>::true_expr);	
+				result<polaris::io::Zone> zone_result;
+				try
+				{
+					zone_result=db->template query<polaris::io::Zone>(query<polaris::io::Zone>::true_expr);	
+				}
+				catch (const odb::exception& e)
+				{
+					THROW_EXCEPTION(endl<<endl<<"ERROR: the database using outdated specification for 'Zone' table.  Please run the database through the Network Editor to bring it up to date."<<endl<<"DB error: "<< e.what()<<endl);
+				}
 
 				int zone_count = 0;
 				for(typename result<polaris::io::Zone>::iterator db_itr = zone_result.begin (); db_itr != zone_result.end (); ++db_itr, ++zone_count)
@@ -934,7 +942,34 @@ namespace Network_Components
 						zone->template internal_id<int>(zone_count);
 						zone->template X<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 						zone->template Y<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
-						zone->template areatype<int>(db_itr->getArea()->getArea_Type());
+						zone->template areatype<int>(db_itr->getArea_type()->getArea_Type());
+
+						// test - moved here from the zonelanduse read area - combining tables
+						zone->template average_household_income<Dollars>(db_itr->getHH_inc_avg());
+						zone->template race_percent_white<float>(db_itr->getPercent_white());
+						zone->template race_percent_black<float>(db_itr->getPercent_black());
+						zone->template average_household_income<Dollars>(db_itr->getHH_inc_avg());
+						zone->template area<Square_Feet>(db_itr->getArea());
+						zone->template entertainment_area<Square_Feet>(db_itr->getEntertainment_area());
+						zone->template industrial_area<Square_Feet>(db_itr->getIndustrial_area());
+						zone->template institutional_area<Square_Feet>(db_itr->getInstitutional_area());
+						zone->template mixed_use_area<Square_Feet>(db_itr->getMixed_use_area());
+						zone->template office_area<Square_Feet>(db_itr->getOffice_area());
+						zone->template other_area<Square_Feet>(db_itr->getOther_area());
+						zone->template residential_area<Square_Feet>(db_itr->getResidential_area());
+						zone->template retail_area<Square_Feet>(db_itr->getRetail_area());
+						zone->template school_area<Square_Feet>(db_itr->getSchool_area());
+						zone->template pop_households<int>(db_itr->getPop_households());
+						zone->template pop_persons<int>(db_itr->getPop_persons());
+						zone->template pop_group_quarters<int>(db_itr->getPop_group_quarters());
+						zone->template employment_total<int>(db_itr->getEmployment_total());
+						zone->template employment_retail<int>(db_itr->getEmployment_retail());
+						zone->template employment_government<int>(db_itr->getEmployment_government());
+						zone->template employment_manufacturing<int>(db_itr->getEmployment_manufacturing());
+						zone->template employment_services<int>(db_itr->getEmployment_services());
+						zone->template employment_industrial<int>(db_itr->getEmployment_industrial());
+						zone->template employment_other<int>(db_itr->getEmployment_other());
+
 						zones_container.insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
 					}
 					catch (const odb::exception& e)
@@ -951,7 +986,7 @@ namespace Network_Components
 					zone_ids_container[index]=uuid;
 				}
 
-				result<ZoneLandUse> zone_lu_result=db->template query<ZoneLandUse>(query<ZoneLandUse>::true_expr);	
+				/*result<ZoneLandUse> zone_lu_result=db->template query<ZoneLandUse>(query<ZoneLandUse>::true_expr);	
 			
 				for(typename result<ZoneLandUse>::iterator db_itr = zone_lu_result.begin (); db_itr != zone_lu_result.end (); ++db_itr)
 				{
@@ -986,7 +1021,7 @@ namespace Network_Components
 						zone->template employment_industrial<int>(db_itr->getEmployment_industrial());
 						zone->template employment_other<int>(db_itr->getEmployment_other());
 					}
-				}
+				}*/
 			}
 		
 			template<typename TargetType> void read_activity_location_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
@@ -1016,7 +1051,15 @@ namespace Network_Components
 
 				activity_locations_container.clear();
 
-				result<Location> location_result=db->query<Location>(query<Location>::true_expr);
+				result<Location> location_result;
+				try
+				{
+					location_result=db->query<Location>(query<Location>::true_expr);
+				}
+				catch (const odb::exception& e)
+				{
+					THROW_EXCEPTION(endl<<endl<<"ERROR: the database using outdated specification for 'Location' table.  Please run the database through the Network Editor to bring it up to date."<<endl<<"DB error: "<< e.what()<<endl)
+				}
 
 				_Zones_Container_Interface* zones = _network_reference->template zones_container<_Zones_Container_Interface*>();
 				typename _Zones_Container_Interface::iterator zone_itr;
@@ -1070,16 +1113,19 @@ namespace Network_Components
 						activity_location->template internal_id<int>(counter);
 
 
-						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
-						if (data_ptr == nullptr) continue;
+						//shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
+						//if (data_ptr == nullptr) continue;
 
-						activity_location->template x_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getX()/*)*/);
-						activity_location->template y_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getY()/*)*/);
-
-						activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
+						//activity_location->template x_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getX()/*)*/);
+						//activity_location->template y_position<Meters>(/*_scenario_reference->template meterToFoot<NULLTYPE>(*/data_ptr->getY()/*)*/);
+						//activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
+						activity_location->template x_position<Meters>(db_itr->getX());
+						activity_location->template y_position<Meters>(db_itr->getY());
+						activity_location->template census_zone_id<long long>(db_itr->getCensus_Zone());
 	
 						// set the location land use code
-						const char* land_use = data_ptr->getLand_Use().c_str();
+						//const char* land_use = data_ptr->getLand_Use().c_str();
+						const char* land_use = db_itr->getLand_Use().c_str();
 
 						Activity_Location_Components::Types::LAND_USE code;
 						if (strcmp(land_use,"ALL")==0)

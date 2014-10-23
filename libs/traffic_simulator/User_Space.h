@@ -50,3 +50,6 @@ void* _global_vehicle_logger;
 #include "Network_Event_Implementations.h"
 #include "Analyze_Link_Group_Implementation.h"
 
+#ifdef ANTARES
+#include "Vehicle_Data_Logger_Implementation.h"
+#endif

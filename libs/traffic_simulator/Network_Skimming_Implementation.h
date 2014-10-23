@@ -1116,12 +1116,12 @@ namespace Network_Skimming_Components
 				outfile.Write_Value<int>(modes);
 				int zones = (int)zones_container->size();
 				outfile.Write_Value<int>(zones);
-				std::vector<int>* intervals = skim->template update_interval_endpoints<std::vector<int>*>();
+				std::vector<Time_Minutes>* intervals = skim->template update_interval_endpoints<std::vector<Time_Minutes>*>();
 				char begin_intervals[] = "BINT";
 				outfile.Write_Array<char>(&begin_intervals[0],4);
-				int num_increment = intervals->size();
+				int num_increment = intervals->size()-1;
 				outfile.Write_Value<int>(num_increment);
-				for (int i=1; i<num_increment; ++i)
+				for (int i=1; i<=num_increment; ++i)
 				{
 					int incr = (*intervals)[i];
 					outfile.Write_Value<int>(incr);
@@ -1130,7 +1130,7 @@ namespace Network_Skimming_Components
 				outfile.Write_Array<char>(&end_intervals[0],4);
 			}
 
-			void Read_Binary_Headers(int& num_modes, int& num_zones)
+			void Read_Binary_Headers(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
 				// read for time-varying highway skims
 				File_IO::Binary_File_Reader& infile = highway_input_file<File_IO::Binary_File_Reader&>();
@@ -1143,105 +1143,157 @@ namespace Network_Skimming_Components
 				if (strcmp(version,"SKIM:V01")==0)
 				{
 					this->_file_version='1';
-					Read_Binary_Headers_V1(num_modes,num_zones);
+					Read_Binary_Headers_V1(num_modes,num_zones,return_intervals,perform_checks);
 				}
 				else
 				{
 					this->_file_version='0';
-					Read_Binary_Headers_Unversioned(num_modes,num_zones);
+					Read_Binary_Headers_Unversioned(num_modes,num_zones,return_intervals,perform_checks);
 				}
 				delete version;
 
 			}
 	
-			void Read_Binary_Headers_Unversioned(int& num_modes, int& num_zones)
+			void Read_Binary_Headers_Unversioned(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr,bool perform_checks=true)
 			{
-				network_itf* network = this->template network_reference<network_itf*>();
-				skimmer_itf* skim = (skimmer_itf*)this;
-				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+				//network_itf* network = this->template network_reference<network_itf*>();
+				//skimmer_itf* skim = (skimmer_itf*)this;
+				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
 	
 				int update_increment, num_zones_transit, num_zones_hcost;
 
 				// read for time-varying highway skims
-				File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
-				infile.Begin();
+				//File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
+				_highway_input_file.Begin();
 
 				// get versioning info
-				infile.Read_Value<int>(num_modes);
-				infile.Read_Value<int>(num_zones);
-				infile.Read_Value<int>(update_increment);
-				Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
-				if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
-				int skimmer_num_zones = zones_container->size();
-				if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+				_highway_input_file.Read_Value<int>(num_modes);
+				_highway_input_file.Read_Value<int>(num_zones);
+				_highway_input_file.Read_Value<int>(update_increment);
+
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, update_increment);
+				//Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
+				//if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
+				//int skimmer_num_zones = zones_container->size();
+				//if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
 
 
-				File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_transit<bool>())
-				{		
-					transit_infile.Read_Value<int>(num_zones_transit);
-					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
-				}
-				File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_highway_cost<bool>())
-				{		
-					highway_cost_infile.Read_Value<int>(num_zones_hcost);
-					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
-				}
+				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_transit<bool>())
+				//{		
+				//	transit_infile.Read_Value<int>(num_zones_transit);
+				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
+				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_highway_cost<bool>())
+				//{		
+				//	highway_cost_infile.Read_Value<int>(num_zones_hcost);
+				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
 			}
 
-			void Read_Binary_Headers_V1(int& num_modes, int& num_zones)
+			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
+			{
+				//network_itf* network = this->template network_reference<network_itf*>();
+				//skimmer_itf* skim = (skimmer_itf*)this;
+				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
+	
+				int num_intervals, num_zones_transit, num_zones_hcost;
+				update_interval_endpoints_type intervals;
+				char* tag = new char[4];
+	
+				// read for time-varying highway skims
+				//File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
+
+				// header info
+				_highway_input_file.Read_Value<int>(num_modes);
+				_highway_input_file.Read_Value<int>(num_zones);
+
+				//// header validation checks - number of zones
+				//int skimmer_num_zones = zones_container->size();
+				//if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+				
+				// header validation checks - read each interval endpoint entry and verify that the are the same as specified in scenario
+				_highway_input_file.Read_Array<char>(tag,4);
+				if (strcmp(tag,"BINT")!=0) THROW_EXCEPTION("ERROR: Begin intervals tag 'BINT' missing from binary file, possible versioning issue.");
+
+				_highway_input_file.Read_Value<int>(num_intervals);
+
+				for (int i=0; i<num_intervals; i++)
+				{
+					int endpoint;
+					_highway_input_file.Read_Value<int>(endpoint);
+					intervals.push_back(endpoint);
+					//Time_Minutes skimmer_endpoint = (Time_Minutes)_update_interval_endpoints[i];
+					//if (endpoint != (int)skimmer_endpoint) THROW_EXCEPTION("ERROR: Input skim file update endpoint does not match the endpoint specified in scenario at position "<<i<<".");
+				}
+				_highway_input_file.Read_Array<char>(tag,4);
+				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
+
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals);
+
+				// return the read in interval values if requested
+				if (return_intervals != nullptr)
+				{
+					return_intervals->clear();
+					for (int i=0; i<intervals.size(); i++) return_intervals->push_back(intervals[i]);
+				}
+
+				// header validation checks for transit and cost skims - make sure number of zones specified correctly
+				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_transit<bool>())
+				//{		
+				//	transit_infile.Read_Value<int>(num_zones_transit);
+				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
+				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
+				//if (skim->template read_highway_cost<bool>())
+				//{		
+				//	highway_cost_infile.Read_Value<int>(num_zones_hcost);
+				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
+				//}
+
+				delete tag;
+			}
+
+			void Do_Header_Validation_Checks(int num_modes, int num_zones, update_interval_endpoints_type* intervals, int increment=0)
 			{
 				network_itf* network = this->template network_reference<network_itf*>();
 				skimmer_itf* skim = (skimmer_itf*)this;
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
-	
-				int num_intervals, num_zones_transit, num_zones_hcost;
-				char* tag = new char[4];
-	
-				// read for time-varying highway skims
-				File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
-
-				// header info
-				infile.Read_Value<int>(num_modes);
-				infile.Read_Value<int>(num_zones);
-				infile.Read_Value<int>(num_intervals);
-
 
 				// header validation checks - number of zones
 				int skimmer_num_zones = zones_container->size();
 				if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
-				
-				// header validation checks - read each interval endpoint entry and verify that the are the same as specified in scenario
-				infile.Read_Array<char>(tag,4);
-				if (strcmp(tag,"BINT")!=0) THROW_EXCEPTION("ERROR: Begin intervals tag 'BINT' missing from binary file, possible versioning issue.");
-				if (num_intervals != _update_interval_endpoints.size()) THROW_EXCEPTION("ERROR: Number of intervals in Input skim file does not match the intervals specified in scenario.");
-				for (int i=0; i<num_intervals; i++)
-				{
-					int endpoint;
-					infile.Read_Value<int>(endpoint);
-					Time_Minutes skimmer_endpoint = (Time_Minutes)_update_interval_endpoints[i];
-					if (endpoint != (int)skimmer_endpoint) THROW_EXCEPTION("ERROR: Input skim file update endpoint does not match the endpoint specified in scenario at position "<<i<<".");
-				}
-				infile.Read_Array<char>(tag,4);
-				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
 
+				// header validation checks - number of update increments or length of update increment
+				if (intervals != nullptr)
+				{
+					if (intervals->size() != _update_interval_endpoints.size()) THROW_EXCEPTION("ERROR: Number of intervals in Input skim file does not match the intervals specified in scenario.");
+					for (int i=0; i<intervals->size(); i++)
+					{
+						if ((*intervals)[i] != (int)_update_interval_endpoints[i]) THROW_EXCEPTION("ERROR: Input skim file update endpoint does not match the endpoint specified in scenario at position "<<i<<".");
+					}
+				}
+				else
+				{
+					Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
+					if (increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
+				}
 
 				// header validation checks for transit and cost skims - make sure number of zones specified correctly
-				File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_transit<bool>())
+				if (read_transit<bool>())
 				{		
-					transit_infile.Read_Value<int>(num_zones_transit);
+					int num_zones_transit;
+					_transit_input_file.Read_Value<int>(num_zones_transit);
 					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
 				}
-				File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				if (skim->template read_highway_cost<bool>())
+				if (read_highway_cost<bool>())
 				{		
-					highway_cost_infile.Read_Value<int>(num_zones_hcost);
-					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
+					int num_zones_hcost;
+					_highway_cost_input_file.Read_Value<int>(num_zones_hcost);
+					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_hcost<<" and Highway="<<num_zones);
 				}
-
-				delete tag;
 			}
 
 			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))

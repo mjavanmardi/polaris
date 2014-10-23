@@ -5,6 +5,7 @@
 #pragma once
 #include "Dependencies.h"
 #include "Traffic_Simulator\Network_Implementation.h"
+#include "Scenario_Prototype.h"
 //#include "Antares\Canvas.h"
 //#include "Information_Panel.h"
 
@@ -157,13 +158,14 @@ namespace Network_Components
 					}
 				}
 			}
-
+			
 			template<typename TargetType> void initialize_antares_layers()
 			{
+				cout << "LOADING ANTARES LAYERS 8...";
+				initialize_tile_imagery_layer<TargetType>();
 				initialize_network_moe_plotting_layers<TargetType>();
 				initialize_network_map_layers<TargetType>();
 				initialize_reference_data<TargetType>();	
-				initialize_tile_imagery_layer<TargetType>();
 			}
 
 			template<typename TargetType> void initialize_reference_data()
@@ -395,6 +397,9 @@ namespace Network_Components
 
 			template<typename TargetType> void initialize_tile_imagery_layer()			
 			{
+				typedef  Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type>  _Scenario_Interface;
+				_Scenario_Interface* scenario = ((_Scenario_Interface*)_global_scenario);
+
 				_tile_imagery=Allocate_New_Layer<MT>(string("Tiles"));
 
 				Antares_Layer_Configuration cfg;
@@ -405,32 +410,65 @@ namespace Network_Components
 				cfg.primitive_texture=true;
 				cfg.storage_period = 1;
 				cfg.head_accent_size_value = 3;
-				int tex_id = cfg.Add_Texture(string("C:\\Users\\Josh\\Desktop\\downtown.png"));
+				cfg.default_texture_alpha = scenario->tile_imagery_alpha_level<int>();
+				
+				// Open tile description file
+				File_IO::File_Reader fr;
+				string filename = scenario->tile_imagery_file<string>();
+				fr.Open(filename,false);
+				fr.Read();
+				string tilepath = fr.Get_String(0);
+				if (tilepath.back() != '\\') tilepath.append("\\");
+				std::vector<Textured_Quad<MasterType>> tiles;
+
+				while (fr.Read())
+				{
+					string tilename = fr.Get_String(0); tilename.insert(0,tilepath);
+					cout << tilename<<endl;
+					int tex_id = cfg.Add_Texture(tilename);			
+
+					//cout << "Tile layer texture map size="<<_tile_imagery->texture_map<boost::container::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
+
+					// read positioning information from tile file
+					float xmin, xmax,ymin,ymax,z;
+					fr.Get_Data(xmin,1);
+					fr.Get_Data(ymin,2);
+					fr.Get_Data(xmax,3);
+					fr.Get_Data(ymax,4);
+					fr.Get_Data(z,5);
+					z=0;
+
+					// Create the textured quad at the given position
+					Textured_Quad<MasterType> tile;
+					tile.d._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(xmin); // upper left
+					tile.d._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(ymax);
+					tile.d._z = z;
+					tile.c._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(xmax); // upper right
+					tile.c._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(ymax);
+					tile.c._z = z;
+					tile.b._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(xmax); // lower right
+					tile.b._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(ymin);
+					tile.b._z = z;
+					tile.a._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(xmin); // lower left
+					tile.a._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(ymin);
+					tile.a._z = z;
+					
+					tile.texture=tex_id;
+					Scale_Coordinates<MT>(tile.a);
+					Scale_Coordinates<MT>(tile.b);
+					Scale_Coordinates<MT>(tile.c);
+					Scale_Coordinates<MT>(tile.d);
+
+					tiles.push_back(tile);
+				}
 
 				_tile_imagery->Initialize<NULLTYPE>(cfg);
 
-				cout << "Tile layer texture map size="<<_tile_imagery->texture_map<boost::container::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
-
-				Textured_Quad<MasterType> tile;
-				tile.a._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(447017.9);
-				tile.a._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4637555.7);
-				tile.a._z = 0;
-				tile.d._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(447017.9);
-				tile.d._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4636059.4);
-				tile.d._z = 0;
-				tile.c._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(449360.2);
-				tile.c._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4636059.4);
-				tile.c._z = 0;
-				tile.b._x = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(449360.2);
-				tile.b._y = GLOBALS::Length_Converter.Convert_Value<Meters,Feet>(4637555.7);
-				tile.b._z = 0;
-				tile.texture=tex_id;
-				Scale_Coordinates<MT>(tile.a);
-				Scale_Coordinates<MT>(tile.b);
-				Scale_Coordinates<MT>(tile.c);
-				Scale_Coordinates<MT>(tile.d);
-				tile.display();
-				_tile_imagery->Push_Element<Regular_Element>(&tile);
+				for (int i=0; i<tiles.size(); i++)
+				{
+					_tile_imagery->Push_Element<Regular_Element>(&tiles[i]);
+				}
+				
 
 			}
 

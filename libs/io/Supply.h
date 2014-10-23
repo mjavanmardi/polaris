@@ -15,7 +15,7 @@ class MetaData;
 class Tags;
 class Node;
 class Zone;
-class ZoneLandUse;
+//class ZoneLandUse;
 class Shape;
 class Link;
 class Pocket;
@@ -192,25 +192,25 @@ class Zone
 public:
 	// Default Constructor
 	Zone () {}        
-	Zone (int zone_, shared_ptr<ZoneLandUse> zone_land_use_, double x_, double y_, double z_, shared_ptr<Area_Type> area_, double min_x_, double min_y_, double max_x_, double max_y_)
-	: zone (zone_), zone_land_use (zone_land_use_), x (x_), y (y_), z (z_), area (area_), min_x (min_x_), min_y (min_y_), max_x (max_x_), max_y (max_y_)
+	Zone (int zone_, /*shared_ptr<ZoneLandUse> zone_land_use_,*/ double x_, double y_, double z_, shared_ptr<Area_Type> area_type_, double min_x_, double min_y_, double max_x_, double max_y_, float area_,  float entertainment_area_,  float industrial_area_,  float institutional_area_,  float mixed_use_area_,  float office_area_,  float other_area_,  float residential_area_,  float retail_area_,  float school_area_,  int pop_households_,  int pop_persons_,  int pop_group_quarters_,  int employment_total_,  int employment_retail_,  int employment_government_,  int employment_manufacturing_,  int employment_services_,  int employment_industrial_,  int employment_other_)
+	: zone (zone_), /*zone_land_use (zone_land_use_),*/ x (x_), y (y_), z (z_), area_type (area_type_), min_x (min_x_), min_y (min_y_), max_x (max_x_), max_y (max_y_), area(area_), entertainment_area(entertainment_area_), industrial_area(industrial_area_), institutional_area(institutional_area_), mixed_use_area(mixed_use_area_), office_area(office_area_), other_area(other_area_), residential_area(residential_area_), retail_area(retail_area_), school_area(school_area_), pop_households(pop_households_), pop_persons(pop_persons_), pop_group_quarters(pop_group_quarters_), employment_total(employment_total_), employment_retail(employment_retail_), employment_government(employment_government_), employment_manufacturing(employment_manufacturing_), employment_services(employment_services_), employment_industrial(employment_industrial_), employment_other(employment_other_)
 	{
 	}
 	//Accessors
 	const int& getPrimaryKey () const {return zone;}
 	const int& getZone () const {return zone;}
 	void setZone (const int& zone_) {zone = zone_;}
-	const shared_ptr<ZoneLandUse>& getZone_Land_Use () const {return zone_land_use;}
-	void setZone_Land_Use (const shared_ptr<ZoneLandUse>& zone_land_use_) {zone_land_use = zone_land_use_;}
+	//const shared_ptr<ZoneLandUse>& getZone_Land_Use () const {return zone_land_use;}
+	//void setZone_Land_Use (const shared_ptr<ZoneLandUse>& zone_land_use_) {zone_land_use = zone_land_use_;}
 	const double& getX () const {return x;}
 	void setX (const double& x_) {x = x_;}
 	const double& getY () const {return y;}
 	void setY (const double& y_) {y = y_;}
 	const double& getZ () const {return z;}
 	void setZ (const double& z_) {z = z_;}
-	void setArea (const int& area_, InputContainer& container) {area = container.Area_Types[area_];}
-	const shared_ptr<Area_Type>& getArea () const {return area;}
-	void setArea (const shared_ptr<Area_Type>& area_) {area = area_;}
+	void setArea_type (const int& area_type_, InputContainer& container) {area_type = container.Area_Types[area_type_];}
+	const shared_ptr<Area_Type>& getArea_type () const {return area_type;}
+	void setArea_type (const shared_ptr<Area_Type>& area_type_) {area_type = area_type_;}
 	const double& getMin_X () const {return min_x;}
 	void setMin_X (const double& min_x_) {min_x = min_x_;}
 	const double& getMin_Y () const {return min_y;}
@@ -219,40 +219,7 @@ public:
 	void setMax_X (const double& max_x_) {max_x = max_x_;}
 	const double& getMax_Y () const {return max_y;}
 	void setMax_Y (const double& max_y_) {max_y = max_y_;}
-//Data Fields
-private:
-	friend class odb::access;
-	#pragma db id
-	int zone;
-	shared_ptr<ZoneLandUse> zone_land_use;
-	double x;
-	double y;
-	double z;
-	shared_ptr<Area_Type> area;
-	double min_x;
-	double min_y;
-	double max_x;
-	double max_y;
-	#pragma db index member(zone)
-};
-
-#pragma db object
-class ZoneLandUse
-{
-public:
-	// Default Constructor
-	ZoneLandUse () {}        
-	ZoneLandUse (int zone_,  float area_,  float entertainment_area_,  float industrial_area_,  float institutional_area_,  float mixed_use_area_,  float office_area_,  float other_area_,  float residential_area_,  float retail_area_,  float school_area_,  int pop_households_,  int pop_persons_,  int pop_group_quarters_,  int employment_total_,  int employment_retail_,  int employment_government_,  int employment_manufacturing_,  int employment_services_,  int employment_industrial_,  int employment_other_)
-	: zone(zone_), area(area_), entertainment_area(entertainment_area_), industrial_area(industrial_area_), institutional_area(institutional_area_), mixed_use_area(mixed_use_area_), office_area(office_area_), other_area(other_area_), residential_area(residential_area_), retail_area(retail_area_), school_area(school_area_), pop_households(pop_households_), pop_persons(pop_persons_), pop_group_quarters(pop_group_quarters_), employment_total(employment_total_), employment_retail(employment_retail_), employment_government(employment_government_), employment_manufacturing(employment_manufacturing_), employment_services(employment_services_), employment_industrial(employment_industrial_), employment_other(employment_other_)
-	{
-	}
-	//Accessors
-
-	const int& getPrimaryKey () const {return zone;}
-	const int& getZone() const{return zone;}
-	void setZone(const int& zone_){zone= zone_;}
-
-	const float& getPercent_white() const{return percent_white;}
+		const float& getPercent_white() const{return percent_white;}
 	void setPercent_white(const float& percent_white_){percent_white= percent_white_;}
 	const float& getPercent_black() const{return percent_black;}
 	void setPercent_black(const float& percent_black_){percent_black= percent_black_;}
@@ -299,13 +266,20 @@ public:
 	void setEmployment_industrial(const int& employment_industrial_){employment_industrial= employment_industrial_;}
 	const int& getEmployment_other() const{return employment_other;}
 	void setEmployment_other(const int& employment_other_){employment_other= employment_other_;}
-
-	
-//Data Fields	
-private:	
+//Data Fields
+private:
 	friend class odb::access;
 	#pragma db id
 	int zone;
+	//shared_ptr<ZoneLandUse> zone_land_use;
+	double x;
+	double y;
+	double z;
+	shared_ptr<Area_Type> area_type;
+	double min_x;
+	double min_y;
+	double max_x;
+	double max_y;
 	float percent_white;
 	float percent_black;
 	float hh_inc_avg;
@@ -329,61 +303,103 @@ private:
 	int employment_services;
 	int employment_industrial;
 	int employment_other;
+	#pragma db index member(zone)
 };
 
-#pragma db object
-class LocationData
-{
-public:
-	// Default Constructor
-	LocationData () {}        
-	LocationData (int location_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
-	: location (location_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
-	{
-	}
-	//Accessors
-	const int& getPrimaryKey () const {return location;}
-	const int& getLocation () const {return location;}
-	void setLocation (const int& location_) {location = location_;}
-	const int& getTruck_Org () const {return truck_org;}
-	void setTruck_Org (const int& truck_org_) {truck_org = truck_org_;}
-	const int& getTruck_Des () const {return truck_des;}
-	void setTruck_Des (const int& truck_des_) {truck_des = truck_des_;}
-	const int& getAuto_Org () const {return auto_org;}
-	void setAuto_Org (const int& auto_org_) {auto_org = auto_org_;}
-	const int& getAuto_Des () const {return auto_des;}
-	void setAuto_Des (const int& auto_des_) {auto_des = auto_des_;}
-	const int& getTransit () const {return transit;}
-	void setTransit (const int& transit_) {transit = transit_;}
-	const int& getAreatype () const {return areatype;}
-	void setAreatype (const int& areatype_) {areatype = areatype_;}
-	const std::string& getNotes () const {return notes;}
-	void setNotes (const std::string& notes_) {notes = notes_;}
-	const double& getCensus_Zone () const {return census_zone;}
-	void setCensus_Zone (const double& census_zone_) {census_zone = census_zone_;}
-	const double& getX () const {return x;}
-	void setX (const double& x_) {x = x_;}
-	const double& getY () const {return y;}
-	void setY (const double& y_) {y = y_;}
-	const std::string& getLand_Use () const {return land_use;}
-	void setLand_Use (const std::string& land_use_) {land_use = land_use_;}
-//Data Fields
-private:
-	friend class odb::access;
-	#pragma db id
-	int location;
-	int truck_org;
-	int truck_des;
-	int auto_org;
-	int auto_des;
-	int transit;
-	int areatype;
-	std::string notes;
-	double census_zone;
-	double x;
-	double y;
-	std::string land_use;
-};
+//#pragma db object
+//class ZoneLandUse
+//{
+//public:
+//	// Default Constructor
+//	ZoneLandUse () {}        
+//	ZoneLandUse (int zone_,  float area_,  float entertainment_area_,  float industrial_area_,  float institutional_area_,  float mixed_use_area_,  float office_area_,  float other_area_,  float residential_area_,  float retail_area_,  float school_area_,  int pop_households_,  int pop_persons_,  int pop_group_quarters_,  int employment_total_,  int employment_retail_,  int employment_government_,  int employment_manufacturing_,  int employment_services_,  int employment_industrial_,  int employment_other_)
+//	: zone(zone_), area(area_), entertainment_area(entertainment_area_), industrial_area(industrial_area_), institutional_area(institutional_area_), mixed_use_area(mixed_use_area_), office_area(office_area_), other_area(other_area_), residential_area(residential_area_), retail_area(retail_area_), school_area(school_area_), pop_households(pop_households_), pop_persons(pop_persons_), pop_group_quarters(pop_group_quarters_), employment_total(employment_total_), employment_retail(employment_retail_), employment_government(employment_government_), employment_manufacturing(employment_manufacturing_), employment_services(employment_services_), employment_industrial(employment_industrial_), employment_other(employment_other_)
+//	{
+//	}
+//	//Accessors
+//
+//	const int& getPrimaryKey () const {return zone;}
+//	const int& getZone() const{return zone;}
+//	void setZone(const int& zone_){zone= zone_;}
+//
+//	const float& getPercent_white() const{return percent_white;}
+//	void setPercent_white(const float& percent_white_){percent_white= percent_white_;}
+//	const float& getPercent_black() const{return percent_black;}
+//	void setPercent_black(const float& percent_black_){percent_black= percent_black_;}
+//	const float& getHH_inc_avg() const{return hh_inc_avg;}
+//	void setHH_inc_avg(const float& hh_inc_avg_){hh_inc_avg= hh_inc_avg_;}
+//
+//	const float& getArea() const{return area;}
+//	void setArea(const float& area_){area= area_;}
+//	const float& getEntertainment_area() const{return entertainment_area;}
+//	void setEntertainment_area(const float& entertainment_area_){entertainment_area= entertainment_area_;}
+//	const float& getIndustrial_area() const{return industrial_area;}
+//	void setIndustrial_area(const float& industrial_area_){industrial_area= industrial_area_;}
+//	const float& getInstitutional_area() const{return institutional_area;}
+//	void setInstitutional_area(const float& institutional_area_){institutional_area= institutional_area_;}
+//	const float& getMixed_use_area() const{return mixed_use_area;}
+//	void setMixed_use_area(const float& mixed_use_area_){mixed_use_area= mixed_use_area_;}
+//	const float& getOffice_area() const{return office_area;}
+//	void setOffice_area(const float& office_area_){office_area= office_area_;}
+//	const float& getOther_area() const{return other_area;}
+//	void setOther_area(const float& other_area_){other_area= other_area_;}
+//	const float& getResidential_area() const{return residential_area;}
+//	void setResidential_area(const float& residential_area_){residential_area= residential_area_;}
+//	const float& getRetail_area() const{return retail_area;}
+//	void setRetail_area(const float& retail_area_){retail_area= retail_area_;}
+//	const float& getSchool_area() const{return school_area;}
+//	void setSchool_area(const float& school_area_){school_area= school_area_;}
+//	const int& getPop_households() const{return pop_households;}
+//	void setPop_households(const int& pop_households_){pop_households= pop_households_;}
+//	const int& getPop_persons() const{return pop_persons;}
+//	void setPop_persons(const int& pop_persons_){pop_persons= pop_persons_;}
+//	const int& getPop_group_quarters() const{return pop_group_quarters;}
+//	void setPop_group_quarters(const int& pop_group_quarters_){pop_group_quarters= pop_group_quarters_;}
+//	const int& getEmployment_total() const{return employment_total;}
+//	void setEmployment_total(const int& employment_total_){employment_total= employment_total_;}
+//	const int& getEmployment_retail() const{return employment_retail;}
+//	void setEmployment_retail(const int& employment_retail_){employment_retail= employment_retail_;}
+//	const int& getEmployment_government() const{return employment_government;}
+//	void setEmployment_government(const int& employment_government_){employment_government= employment_government_;}
+//	const int& getEmployment_manufacturing() const{return employment_manufacturing;}
+//	void setEmployment_manufacturing(const int& employment_manufacturing_){employment_manufacturing= employment_manufacturing_;}
+//	const int& getEmployment_services() const{return employment_services;}
+//	void setEmployment_services(const int& employment_services_){employment_services= employment_services_;}
+//	const int& getEmployment_industrial() const{return employment_industrial;}
+//	void setEmployment_industrial(const int& employment_industrial_){employment_industrial= employment_industrial_;}
+//	const int& getEmployment_other() const{return employment_other;}
+//	void setEmployment_other(const int& employment_other_){employment_other= employment_other_;}
+//
+//	
+////Data Fields	
+//private:	
+//	friend class odb::access;
+//	#pragma db id
+//	int zone;
+//	float percent_white;
+//	float percent_black;
+//	float hh_inc_avg;
+//	float area;
+//	float entertainment_area;
+//	float industrial_area;
+//	float institutional_area;
+//	float mixed_use_area;
+//	float office_area;
+//	float other_area;
+//	float residential_area;
+//	float retail_area;
+//	float school_area;
+//	int pop_households;
+//	int pop_persons;
+//	int pop_group_quarters;
+//	int employment_total;
+//	int employment_retail;
+//	int employment_government;
+//	int employment_manufacturing;
+//	int employment_services;
+//	int employment_industrial;
+//	int employment_other;
+//};
 
 
 #pragma db object //table("SHAPE")
@@ -827,8 +843,10 @@ class Location
 public:
 	// Default Constructor
 	Location () {}        
-	Location (int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_, shared_ptr<LocationData> location_data_)
-	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), location_data (location_data_)
+	Location (int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_, /*shared_ptr<LocationData> location_data_,*/
+			 int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
+	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), /*location_data (location_data_)*/
+	  truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), area_type (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
 	{
 	}
 	//Accessors
@@ -847,8 +865,30 @@ public:
 	void setZone (const int& zone_, InputContainer& container) {zone = container.Zones[zone_];}
 	const shared_ptr<Zone>& getZone () const {return zone;}
 	void setZone (const shared_ptr<Zone>& zone_) {zone = zone_;}
-	const shared_ptr<LocationData>& getLocation_Data () const {return location_data;}
-	void setLocation_Data (const shared_ptr<LocationData>& location_data_) {location_data = location_data_;}
+	const int& getTruck_Org () const {return truck_org;}
+	void setTruck_Org (const int& truck_org_) {truck_org = truck_org_;}
+	const int& getTruck_Des () const {return truck_des;}
+	void setTruck_Des (const int& truck_des_) {truck_des = truck_des_;}
+	const int& getAuto_Org () const {return auto_org;}
+	void setAuto_Org (const int& auto_org_) {auto_org = auto_org_;}
+	const int& getAuto_Des () const {return auto_des;}
+	void setAuto_Des (const int& auto_des_) {auto_des = auto_des_;}
+	const int& getTransit () const {return transit;}
+	void setTransit (const int& transit_) {transit = transit_;}
+	const int& getAreatype () const {return area_type;}
+	void setAreatype (const int& areatype_) {area_type = areatype_;}
+	const std::string& getNotes () const {return notes;}
+	void setNotes (const std::string& notes_) {notes = notes_;}
+	const double& getCensus_Zone () const {return census_zone;}
+	void setCensus_Zone (const double& census_zone_) {census_zone = census_zone_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_) {x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_) {y = y_;}
+	const std::string& getLand_Use () const {return land_use;}
+	void setLand_Use (const std::string& land_use_) {land_use = land_use_;}
+	//const shared_ptr<LocationData>& getLocation_Data () const {return location_data;}
+	//void setLocation_Data (const shared_ptr<LocationData>& location_data_) {location_data = location_data_;}
 //Data Fields
 private:
 	friend class odb::access;
@@ -859,9 +899,73 @@ private:
 	double offset;
 	double setback;
 	shared_ptr<Zone> zone;
-	shared_ptr<LocationData> location_data;
+	int truck_org;
+	int truck_des;
+	int auto_org;
+	int auto_des;
+	int transit;
+	int area_type;
+	std::string notes;
+	double census_zone;
+	double x;
+	double y;
+	std::string land_use;
+	//shared_ptr<LocationData> location_data;
 	#pragma db index member(location)
 };
+//#pragma db object
+//class LocationData
+//{
+//public:
+//	// Default Constructor
+//	LocationData () {}        
+//	LocationData (int location_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
+//	: location (location_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
+//	{
+//	}
+//	//Accessors
+//	const int& getPrimaryKey () const {return location;}
+//	const int& getLocation () const {return location;}
+//	void setLocation (const int& location_) {location = location_;}
+//	const int& getTruck_Org () const {return truck_org;}
+//	void setTruck_Org (const int& truck_org_) {truck_org = truck_org_;}
+//	const int& getTruck_Des () const {return truck_des;}
+//	void setTruck_Des (const int& truck_des_) {truck_des = truck_des_;}
+//	const int& getAuto_Org () const {return auto_org;}
+//	void setAuto_Org (const int& auto_org_) {auto_org = auto_org_;}
+//	const int& getAuto_Des () const {return auto_des;}
+//	void setAuto_Des (const int& auto_des_) {auto_des = auto_des_;}
+//	const int& getTransit () const {return transit;}
+//	void setTransit (const int& transit_) {transit = transit_;}
+//	const int& getAreatype () const {return areatype;}
+//	void setAreatype (const int& areatype_) {areatype = areatype_;}
+//	const std::string& getNotes () const {return notes;}
+//	void setNotes (const std::string& notes_) {notes = notes_;}
+//	const double& getCensus_Zone () const {return census_zone;}
+//	void setCensus_Zone (const double& census_zone_) {census_zone = census_zone_;}
+//	const double& getX () const {return x;}
+//	void setX (const double& x_) {x = x_;}
+//	const double& getY () const {return y;}
+//	void setY (const double& y_) {y = y_;}
+//	const std::string& getLand_Use () const {return land_use;}
+//	void setLand_Use (const std::string& land_use_) {land_use = land_use_;}
+////Data Fields
+//private:
+//	friend class odb::access;
+//	#pragma db id
+//	int location;
+//	int truck_org;
+//	int truck_des;
+//	int auto_org;
+//	int auto_des;
+//	int transit;
+//	int areatype;
+//	std::string notes;
+//	double census_zone;
+//	double x;
+//	double y;
+//	std::string land_use;
+//};
 
 #pragma db object //table("ACCESS")
 class Access

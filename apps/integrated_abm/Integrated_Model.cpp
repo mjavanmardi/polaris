@@ -112,7 +112,6 @@ struct MasterType
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
-	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
