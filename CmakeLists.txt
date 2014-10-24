@@ -8,10 +8,10 @@ set(Statewide OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares OFF)
+set(Antares ON)
 
 
-set(BUILD_DIR build_noantares)
+set(BUILD_DIR build)
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
 

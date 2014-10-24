@@ -173,7 +173,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 
 				_texture_map.push_back(tex_id);
 				//TODO: remove when done testing
-				cout <<"Tex_id when reading layer "<<_name<<": "<<tex_id<<endl;
+				//cout <<"Tex_id when reading layer "<<_name<<": "<<tex_id<<endl;
 			}
 			else
 			{

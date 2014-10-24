@@ -348,8 +348,10 @@ int main(int argc,char** argv)
 	network->set_network_bounds<NULLTYPE>();
 	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	MasterType::vehicle_type::Initialize_Layer();
+	
 	network->initialize_antares_layers<NULLTYPE>();
+	MasterType::vehicle_type::Initialize_Layer();
+
 	MasterType::link_type::configure_link_moes_layer();
 #endif
 
@@ -553,6 +555,10 @@ int main(int argc,char** argv)
 	_Vehicle_Logger_Interface* vlogger=(_Vehicle_Logger_Interface*)Allocate<MasterType::vehicle_data_logger_type>();
 	vlogger->Initialize<NT>();
 	_global_vehicle_logger = vlogger;
+
+	MasterType::buildings_type::Initialize_Type();
+	MasterType::buildings_type* buildings = Allocate<MasterType::buildings_type>();
+	buildings->Initialize(scenario->buildings_geometry_file<string&>());
 #endif
 
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();

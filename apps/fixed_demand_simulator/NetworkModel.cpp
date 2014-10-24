@@ -372,8 +372,10 @@ void run_with_input_from_db(char* scenario_filename)
 		network->set_network_bounds<NULLTYPE>();
 		Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 		START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-		MasterType::vehicle_type::Initialize_Layer();
+		
 		network->initialize_antares_layers<NULLTYPE>();
+		MasterType::vehicle_type::Initialize_Layer();
+
 		MasterType::link_type::configure_link_moes_layer();
 #endif
 	//==================================================================================================================================

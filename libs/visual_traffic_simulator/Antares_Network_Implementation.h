@@ -424,7 +424,7 @@ namespace Network_Components
 				while (fr.Read())
 				{
 					string tilename = fr.Get_String(0); tilename.insert(0,tilepath);
-					cout << tilename<<endl;
+					//cout << tilename<<endl;
 					int tex_id = cfg.Add_Texture(tilename);			
 
 					//cout << "Tile layer texture map size="<<_tile_imagery->texture_map<boost::container::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
