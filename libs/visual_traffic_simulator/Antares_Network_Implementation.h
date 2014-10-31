@@ -400,6 +400,8 @@ namespace Network_Components
 				typedef  Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type>  _Scenario_Interface;
 				_Scenario_Interface* scenario = ((_Scenario_Interface*)_global_scenario);
 
+				if (!scenario->use_tile_imagery<bool>()) return;
+
 				_tile_imagery=Allocate_New_Layer<MT>(string("Tiles"));
 
 				Antares_Layer_Configuration cfg;

@@ -79,6 +79,9 @@ namespace Buildings_Components
 				unsigned int floats=0;
 				float coord=0;
 				float height=0;
+				unsigned char r=0;
+				unsigned char g=0;
+				unsigned char b=0;
 
 				unsigned char name_len=0;
 
@@ -131,19 +134,27 @@ namespace Buildings_Components
 					//---- skip the bbdg ----
 					i+=4;
 
-					//---- skip to stories field ----
+					//---- skip the counter and number fields----
 					
 					i+=(2*4);
 
 
-					// --- this skips buildings in a complicated fashion
+					// --- this skips buildings in a complicated fashion (get stories
 					if((*((unsigned int *)&buffer[i])) < 0) push_coordinates_flag = false;
+					height = ((*((unsigned int *)&buffer[i]))*3.5f + 5.0f/*+10.0f*/)*3.28084f;
+					i+=4;
 
-					height = ((*((unsigned int *)&buffer[i]))*3.5f+10.0f)*3.28084f;
+					// get units field to do coloring (temp solution) - skip alpha stored at the first position (argb)
+					r = (unsigned char)buffer[i];
+					g = (unsigned char)buffer[i+1];
+					b = (unsigned char)buffer[i+2];
+					if (r > 0) building_group->color._r = r;
+					if (g > 0) building_group->color._g = g;
+					if (b > 0) building_group->color._b = b;
 
 					//---- skip to name field ----
 
-					i+=(3*4+4*4);
+					i+=(2*4+4*4);
 
 					name_len=(unsigned char)buffer[i];
 
@@ -178,7 +189,6 @@ namespace Buildings_Components
 
 							Scale_Coordinates<MT>(*current_vertex);
 							push_coordinates_flag = push_coordinates_flag && !Clip_Coordinates<typename MasterType::canvas_type>(*current_vertex);
-
 							++current_vertex;
 
 							if(j%6==5)
