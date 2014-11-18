@@ -7,6 +7,8 @@
 #include <sstream>
 #include "Traffic_Simulator\Vehicle_Implementation.h"
 
+
+
 namespace Vehicle_Components
 {
 	namespace Types
@@ -83,11 +85,12 @@ namespace Vehicle_Components
 		//const float Vehicle_Attribute_Shape::_vehicle_height = 6.583 * 3; // height in feet
 		//const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.583*2.0/3.0 * 3; // height in feet
 
-		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 6.775 * 2; // rear width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_front_width = 6.775 * 2; // front width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_length = 17 * 2; // length in feet
-		const float Vehicle_Attribute_Shape::_vehicle_height = 6.0 * 2; // height in feet
-		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.0*5.0/9.0 * 2; // height in feet
+		const float Vehicle_Attribute_Shape_size_factor = 3.0;
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 6.775 * 2 * Vehicle_Attribute_Shape_size_factor; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 6.775 * 2 * Vehicle_Attribute_Shape_size_factor; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 17 * 2* Vehicle_Attribute_Shape_size_factor; // length in feet
+		const float Vehicle_Attribute_Shape::_vehicle_height = 6.0 * 2* Vehicle_Attribute_Shape_size_factor; // height in feet
+		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.0*5.0/9.0 * 2* Vehicle_Attribute_Shape_size_factor; // height in feet
 
 
 
@@ -95,6 +98,7 @@ namespace Vehicle_Components
 		{
 			typedef typename Vehicle_Implementation<MasterType,INHERIT(Antares_Vehicle_Implementation)>::ComponentType ComponentType;
 			Vehicle_Attribute_Shape vehicle_shape;
+			True_Color_RGBA<NT> vehicle_color;
 
 			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
 		
@@ -257,6 +261,9 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void display_vehicle_position()
 			{
+				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
+				Scenario_Interface* scenario = (Scenario_Interface*)_global_scenario;
+
 				if(vehicle_shape.data == nullptr)
 				{
 					if(_internal_id % 10 < 2)
@@ -267,6 +274,11 @@ namespace Vehicle_Components
 					{
 						vehicle_shape.Initialize(11);
 					}
+
+					// set random vehicle color
+					vehicle_color._r = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
+					vehicle_color._g = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
+					vehicle_color._b = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
 				}
 
 				if (_movement_plan == nullptr) return;
@@ -291,11 +303,11 @@ namespace Vehicle_Components
 				//float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
 				float distance_from_up = distance - _distance_to_stop_bar * (distance / link->length<float>());
 				Point_3D<MasterType> vehicle_center;
-				True_Color_RGBA<NT> vehicle_color;
+				//True_Color_RGBA<NT> vehicle_color;
 
 				vehicle_center._x = u_x + distance_from_up * cos_alpha;
 				vehicle_center._y = u_y + distance_from_up * sin_alpha;
-				vehicle_color._r=0; vehicle_color._g=255; vehicle_color._b=0;
+				//vehicle_color._r=0; vehicle_color._g=255; vehicle_color._b=0;
 								
 				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
 
@@ -307,8 +319,8 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
-#ifdef INCLUDE_DEMAND
-					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
+#ifdef IntegratedModelApplication
+					Person<typename ComponentType::type_of(traveler)>* person=(Person<typename ComponentType::type_of(traveler)>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
 					{
@@ -355,6 +367,13 @@ namespace Vehicle_Components
 						body_color._b *= color_scale;
 					}
 
+					if (scenario->color_cars_randomly<bool>())
+					{
+						body_color._r = vehicle_color._r;
+						body_color._g = vehicle_color._g;
+						body_color._b = vehicle_color._b;
+					}
+
 
 					if(_internal_id % 10 < 2)
 					{
@@ -362,7 +381,7 @@ namespace Vehicle_Components
 //TODO
 //						// Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
 
-						const float size_factor = 1.3f;
+						const float size_factor = 1.0f;
 
 						// display on shape vehicle layer
 						float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length*size_factor / 2.0f) * cos_alpha;
@@ -611,7 +630,7 @@ namespace Vehicle_Components
 					}
 					else if(_internal_id % 10 < 4)
 					{
-						const float size_factor = 1.2f;
+						const float size_factor = 1.0f;
 
 						vehicle_shape.ptr = this;
 //TODO
@@ -1191,8 +1210,8 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
-#ifdef INCLUDE_DEMAND
-					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
+#ifdef IntegratedModelApplication
+					Person<typename ComponentType::type_of(traveler)>* person=(Person<typename ComponentType::type_of(traveler)>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
 					{
@@ -1237,6 +1256,13 @@ namespace Vehicle_Components
 						coordinate.color._r *= color_scale;
 						coordinate.color._g *= color_scale;
 						coordinate.color._b *= color_scale;
+					}
+
+					if (scenario->color_cars_randomly<bool>())
+					{
+						coordinate.color._r = vehicle_color._r;
+						coordinate.color._g = vehicle_color._g;
+						coordinate.color._b = vehicle_color._b;
 					}
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
@@ -1511,19 +1537,29 @@ namespace Vehicle_Components
 
 				display_route<NT>();
 
-#ifdef INCLUDE_DEMAND
+#ifdef IntegratedModelApplication
 				if (((ComponentType*)this)->_is_integrated)
 				{
 					if (_locations_layer->template draw<bool>())
 					{
-
+											// Activity Attributes
 						typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
+						typedef Zone<typename MasterType::zone_type> zone_interface;
+						typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> activity_interface;
+						typedef Person<typename get_type_of(traveler)> traveler_itf;
+						typedef Household<typename traveler_itf::get_type_of(Household)> household_itf;
+						typedef Person_Planner<typename traveler_itf::get_type_of(Planning_Faculty)> planner_itf;
+						typedef Person_Scheduler<typename traveler_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
+						typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+						typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+						typedef Back_Insertion_Sequence<typename traveler_itf::get_type_of(Activity_Record_Container)> Discarded_Activity_Plans;
 
-						Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
-						Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-						Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
+						traveler_itf* person=(traveler_itf*)_traveler;
+						household_itf* household = person->Household<household_itf*>();
+						planner_itf* planner=person->Planning_Faculty<planner_itf* >();
+						scheduler_itf* scheduler = person->Scheduling_Faculty<scheduler_itf*>();
 
-						boost::container::list<typename MasterType::activity_type*>* activities = scheduler->Activity_Container<list<typename MasterType::activity_type*>*>();
+						Activity_Plans* activities = scheduler->Activity_Container<Activity_Plans*>();
 						Activity_Location_Interface* previous_location;
 
 						//cout << endl <<endl<< "Num activities="<<activities->size();
@@ -1534,26 +1570,26 @@ namespace Vehicle_Components
 						{
 							previous_location = person->Home_Location<Activity_Location_Interface*>();
 							int prev_end, current_start, current_end;
-							Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Planner<typename MasterType::activity_type>*)(*(activities->begin()));
+							Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*)(*(activities->begin()));
 							prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
 
-							display_location<typename MasterType::vehicle_type,NT,NT>(previous_location, previous_location,0,0, prev_end, false );
+							display_location<typename MasterType::vehicle_type>(previous_location, previous_location,0,0, prev_end, false );
 						
-							for(boost::container::list<typename MasterType::activity_type*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+							for(Activity_Plans::iterator itr=activities->begin();itr!=activities->end();itr++)
 							{
-								Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Planner<typename MasterType::activity_type>*)(*itr);
+								Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>* activity_planner = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*)(*itr);
 								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
 								current_start = activity_planner->Start_Time<Time_Minutes>();
 								current_end = activity_planner->End_Time<Time_Minutes>();
 
-								display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location,prev_end,current_start, current_end, false );
+								display_location<typename MasterType::vehicle_type>( activity_planner->Location<Activity_Location_Interface*>(), previous_location,prev_end,current_start, current_end, false );
 								prev_end = current_end; //current_start + activity_planner->Duration<Time_Minutes>();
 								previous_location = activity_planner->Location<Activity_Location_Interface*>();
 							}
-							display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, 1440, false );
+							display_location<typename MasterType::vehicle_type>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, 1440, false );
 						}
 
-						boost::container::list<typename MasterType::activity_record_type*>* discarded_activities = person->Activity_Record_Container<list<typename MasterType::activity_record_type*>*>();
+						Discarded_Activity_Plans* discarded_activities = person->Activity_Record_Container<Discarded_Activity_Plans*>();
 
 						//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
@@ -1561,16 +1597,16 @@ namespace Vehicle_Components
 						{
 							previous_location = person->Home_Location<Activity_Location_Interface*>();
 
-							for(boost::container::list<typename MasterType::activity_record_type*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
+							for(Discarded_Activity_Plans::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
 							{
-								Activity_Planner<typename MasterType::activity_record_type>* activity_planner = (Activity_Planner<typename MasterType::activity_record_type>*)(*itr);
+								Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>* activity_planner = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*)(*itr);
 								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
 
-								display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
+								display_location<typename MasterType::vehicle_type>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
 								previous_location = activity_planner->Location<Activity_Location_Interface*>();
 							}
 
-							display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
+							display_location<typename MasterType::vehicle_type>( person->Home_Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
 						}
 					}	
 				}
@@ -1679,31 +1715,41 @@ namespace Vehicle_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-#ifdef INCLUDE_DEMAND
+#ifdef IntegratedModelApplication
 				if (((ComponentType*)this)->_is_integrated)
 				{
 					// Activity Attributes
 					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
-					typedef Zone<typename type_of(MasterType::zone)> zone_interface;
-					typedef Activity_Planner<typename MasterType::activity_type> activity_interface;
+					typedef Zone<typename MasterType::zone_type> zone_interface;
+					typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> activity_interface;
+					typedef Person<typename get_type_of(traveler)> traveler_itf;
+					typedef Household<typename traveler_itf::get_type_of(Household)> household_itf;
+					typedef Person_Planner<typename traveler_itf::get_type_of(Planning_Faculty)> planner_itf;
+					typedef Person_Scheduler<typename traveler_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
+					typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+					typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
 
-					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
-					Household<typename ComponentType::traveler_type::type_of(Household)>* household = person->Household<Household<typename ComponentType::traveler_type::type_of(Household)>*>();
-					Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-					Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
+					traveler_itf* person=(traveler_itf*)_traveler;
+					household_itf* household = person->Household<household_itf*>();
+					planner_itf* planner=person->Planning_Faculty<planner_itf* >();
+					scheduler_itf* scheduler = person->Scheduling_Faculty<scheduler_itf*>();
 
 					key_value_pair.first="Person ID";
 					s.str("");
-					s << household->uuid<int>() <<"."<<person->uuid<int>();
+					//s << household->uuid<int>() <<"."<<person->uuid<int>();
+
 					key_value_pair.second = s.str();
 					bucket.push_back(key_value_pair);
 
-					boost::container::list<activity_interface*>* activities = scheduler->Activity_Container<list<activity_interface*>*>();
+					Activity_Plans* acts = scheduler->Activity_Container<Activity_Plans*>();
+					
+					//boost::container::list<activity_interface*>* activities = scheduler->Activity_Container<boost::container::list<activity_interface*>*>();
 
 					stringstream ss("");
 					time_str;
 					int i = 1;
-					for (typename boost::container::list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+					//for (typename boost::container::list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+					for (Activity_Plans::iterator itr = acts->begin(); itr != acts->end(); ++itr, ++i)
 					{
 						// blank space
 						key_value_pair.first="";
@@ -1910,8 +1956,8 @@ namespace Vehicle_Components
 				float radius = 200;
 				Point_3D<MasterType> center;
 
-				center._x = location->x_position<float>();
-				center._y = location->y_position<float>();
+				center._x = location->x_position<Feet>();
+				center._y = location->y_position<Feet>();
 				center._z = 0;
 				
 				current_vertex = &vertices[0];
@@ -1948,8 +1994,8 @@ namespace Vehicle_Components
 				if(previous_location!=nullptr)
 				{
 					Point_3D<MasterType> start;
-					start._x = previous_location->x_position<float>();
-					start._y = previous_location->y_position<float>();
+					start._x = previous_location->x_position<Feet>();
+					start._y = previous_location->y_position<Feet>();
 					start._z = previous_act_end;
 
 					//cout <<endl<< "Unscaled previous location: "<<previous_location->x_position<float>()<<","<<previous_location->y_position<float>()<<endl;
@@ -1957,8 +2003,8 @@ namespace Vehicle_Components
 					Scale_Coordinates<MT>(start);
 
 					Point_3D<MasterType> end;
-					end._x = location->x_position<float>();
-					end._y = location->y_position<float>();
+					end._x = location->x_position<Feet>();
+					end._y = location->y_position<Feet>();
 					end._z = current_act_start;
 
 					//cout << "Unscaled current location: "<<location->x_position<float>()<<","<<location->y_position<float>()<<endl;
@@ -1973,11 +2019,11 @@ namespace Vehicle_Components
 					mid._z = (start._z + end._z)/2;
 
 					Point_3D<MasterType> start_act, end_act;
-					start_act._x = location->x_position<float>();
-					start_act._y = location->y_position<float>();
+					start_act._x = location->x_position<Feet>();
+					start_act._y = location->y_position<Feet>();
 					start_act._z = current_act_start;
-					end_act._x = location->x_position<float>();
-					end_act._y = location->y_position<float>();
+					end_act._x = location->x_position<Feet>();
+					end_act._y = location->y_position<Feet>();
 					end_act._z = current_act_end;
 
 					Scale_Coordinates<MT>(start_act);

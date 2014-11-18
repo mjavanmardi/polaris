@@ -60,11 +60,11 @@ namespace Network_Components
 		//---------------------------------------------------------
 		//	Antares_Network_Implementation - network class definition
 		//---------------------------------------------------------
-#ifdef IntegratedModelApplication
+//#ifdef IntegratedModelApplication
 		implementation struct Antares_Network_Implementation:public Integrated_Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-#else
-		implementation struct Antares_Network_Implementation:public Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-#endif
+//#else
+//		implementation struct Antares_Network_Implementation:public Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
+//#endif
 		{
 			static float _intersection_radius;
 			boost::container::vector<Point_2D<MasterType>> _network_vmt_cache;
@@ -161,7 +161,6 @@ namespace Network_Components
 			
 			template<typename TargetType> void initialize_antares_layers()
 			{
-				cout << "LOADING ANTARES LAYERS 8...";
 				initialize_tile_imagery_layer<TargetType>();
 				initialize_network_moe_plotting_layers<TargetType>();
 				initialize_network_map_layers<TargetType>();

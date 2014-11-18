@@ -15,8 +15,8 @@ namespace polaris
 #endif
 }
 
-void* operator new ( size_t size ) { return tc_malloc( size ); }
-void* operator new[] ( size_t size ) { return tc_malloc( size ); }
+//void* operator new ( size_t size ) { return tc_malloc( size ); }
+//void* operator new[] ( size_t size ) { return tc_malloc( size ); }
 
-void operator delete ( void* ptr ) { tc_free( ptr ); }
-void operator delete[] ( void* ptr ) { tc_free( ptr ); }
+//void operator delete ( void* ptr ) { tc_free( ptr ); }
+//void operator delete[] ( void* ptr ) { tc_free( ptr ); }
