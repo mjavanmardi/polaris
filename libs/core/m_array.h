@@ -775,7 +775,7 @@ public:
 		pair<size_type,size_type> new_dimensions = pair<size_type,size_type>(rows,cols);
 		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
-		this->_init(new_dimensions);
+		//this->_init(new_dimensions);
 		*this = matrix<T>(new_dimensions, value);
 		this->_nrow = rows; this->_ncol = cols;
 
@@ -793,7 +793,7 @@ public:
 	{
 		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
-		this->_init(new_dimensions);
+		//this->_init(new_dimensions);
 		*this = matrix<T>(new_dimensions, value);
 
 		for (size_type i=0; i<_size; i++) _data[i]=value;

@@ -630,6 +630,7 @@ namespace Scenario_Components
 
 			/// antares visualization parameters
 			accessor(buildings_geometry_file, NONE, NONE);
+			accessor(use_buildings,NONE,NONE);
 
 			// tile imagery parameters
 			accessor(tile_imagery_file,NONE,NONE);
@@ -936,7 +937,12 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
 				
-				if (cfgReader.getParameter("buildings_geometry_file", buildings_geometry_file<string*>())!= PARAMETER_FOUND) buildings_geometry_file<string&>()="";
+				if (cfgReader.getParameter("buildings_geometry_file", buildings_geometry_file<string*>())!= PARAMETER_FOUND)
+				{
+					use_buildings(false);
+					buildings_geometry_file<string&>()="";
+				}
+				else use_buildings(true);
 				
 
 				//output_dir_name<string&>() = "";

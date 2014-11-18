@@ -51,15 +51,29 @@ namespace File_IO
 			return true;
 		}
 		template<class T>
-		bool Read_Array(T* t, int num_to_read)
+		bool Read_Value(T& t, int offset, ios_base::seekdir dir)
 		{
-			_file.read((char*)t, sizeof(T) * num_to_read);
+			_file.seekg(offset, dir);
+			_file.read((char*)&t, sizeof(T));
 			if (!_file){ _file.clear(); return false;}
 			return true;
 		}
+		template<class T>
+		bool Read_Array(T* t, int num_to_read)
+		{
+			int size = sizeof(T) * num_to_read;
+			_file.read((char*)t, size);
+			if (!_file){ _file.clear(); return false;}
+			return true;
+		}
+
+		char Version(){return _version;}
+		void Version(char version){_version=version;}
+
 	protected:
 		ifstream _file;
 		bool _open;
+		char _version;
 	};
 
 	class File_Reader

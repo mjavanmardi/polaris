@@ -12,6 +12,8 @@
 
 #undef ENABLE_WARNINGS
 
+#define ENABLE_DEBUG_MESSAGES
+
 #include "Polaris_PCH.h"
 //#include "core\Core.h"
 //#include "File_Reader.h"
@@ -556,9 +558,12 @@ int main(int argc,char** argv)
 	vlogger->Initialize<NT>();
 	_global_vehicle_logger = vlogger;
 
-	MasterType::buildings_type::Initialize_Type();
-	MasterType::buildings_type* buildings = Allocate<MasterType::buildings_type>();
-	buildings->Initialize(scenario->buildings_geometry_file<string&>());
+	if (scenario->use_buildings<bool>())
+	{
+		MasterType::buildings_type::Initialize_Type();
+		MasterType::buildings_type* buildings = Allocate<MasterType::buildings_type>();
+		buildings->Initialize(scenario->buildings_geometry_file<string&>());
+	}
 #endif
 
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();

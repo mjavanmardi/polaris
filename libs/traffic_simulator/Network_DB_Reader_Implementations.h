@@ -918,7 +918,7 @@ namespace Network_Components
 				zones_container.set_empty_key(-1);
 				zones_container.set_deleted_key(-2);
 				typename _Zones_Container_Interface::iterator zone_itr;
-			
+		
 				// get zones from database
 				_Zone_Interface* zone;
 				result<polaris::io::Zone> zone_result;
@@ -977,6 +977,7 @@ namespace Network_Components
 						cout << e.what()<<endl;
 					}
 				}
+
 				zone_ids_container.resize(zone_count);
 				for(zone_itr = zones_container.begin(); zone_itr != zones_container.end (); ++zone_itr)
 				{
@@ -985,43 +986,6 @@ namespace Network_Components
 					int uuid = zone->uuid<int>();
 					zone_ids_container[index]=uuid;
 				}
-
-				/*result<ZoneLandUse> zone_lu_result=db->template query<ZoneLandUse>(query<ZoneLandUse>::true_expr);	
-			
-				for(typename result<ZoneLandUse>::iterator db_itr = zone_lu_result.begin (); db_itr != zone_lu_result.end (); ++db_itr)
-				{
-					int zone_id = db_itr->getZone();
-					zone_itr = zones_container.find(zone_id);
-
-					if (zone_itr != zones_container.end())
-					{
-						zone = zone_itr->second;
-						zone->template average_household_income<Dollars>(db_itr->getHH_inc_avg());
-						zone->template race_percent_white<float>(db_itr->getPercent_white());
-						zone->template race_percent_black<float>(db_itr->getPercent_black());
-						zone->template average_household_income<Dollars>(db_itr->getHH_inc_avg());
-						zone->template area<Square_Feet>(db_itr->getArea());
-						zone->template entertainment_area<Square_Feet>(db_itr->getEntertainment_area());
-						zone->template industrial_area<Square_Feet>(db_itr->getIndustrial_area());
-						zone->template institutional_area<Square_Feet>(db_itr->getInstitutional_area());
-						zone->template mixed_use_area<Square_Feet>(db_itr->getMixed_use_area());
-						zone->template office_area<Square_Feet>(db_itr->getOffice_area());
-						zone->template other_area<Square_Feet>(db_itr->getOther_area());
-						zone->template residential_area<Square_Feet>(db_itr->getResidential_area());
-						zone->template retail_area<Square_Feet>(db_itr->getRetail_area());
-						zone->template school_area<Square_Feet>(db_itr->getSchool_area());
-						zone->template pop_households<int>(db_itr->getPop_households());
-						zone->template pop_persons<int>(db_itr->getPop_persons());
-						zone->template pop_group_quarters<int>(db_itr->getPop_group_quarters());
-						zone->template employment_total<int>(db_itr->getEmployment_total());
-						zone->template employment_retail<int>(db_itr->getEmployment_retail());
-						zone->template employment_government<int>(db_itr->getEmployment_government());
-						zone->template employment_manufacturing<int>(db_itr->getEmployment_manufacturing());
-						zone->template employment_services<int>(db_itr->getEmployment_services());
-						zone->template employment_industrial<int>(db_itr->getEmployment_industrial());
-						zone->template employment_other<int>(db_itr->getEmployment_other());
-					}
-				}*/
 			}
 		
 			template<typename TargetType> void read_activity_location_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)

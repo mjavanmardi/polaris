@@ -178,7 +178,7 @@ namespace Person_Components
 				// Add basic traveler properties							
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
-
+				_has_done_replanning=false;
 				
 			}
 			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)

@@ -701,9 +701,9 @@ namespace Network_Skimming_Components
 			{
 				this_component()->Read_Binary_Headers(num_modes, num_zones, intervals, perform_checks);
 			}
-			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))
+			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, File_IO::Binary_File_Reader& file, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				this_component()->Read_Binary_Data<TargetType>(data_ptr, num_zones);
+				this_component()->Read_Binary_Data<TargetType>(data_ptr, file, num_zones);
 			}
 
 			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
