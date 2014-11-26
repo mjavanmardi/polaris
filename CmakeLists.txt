@@ -8,7 +8,7 @@ set(Statewide OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares ON)
+set(Antares OFF)
 
 
 set(BUILD_DIR build)

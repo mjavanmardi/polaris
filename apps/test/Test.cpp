@@ -156,10 +156,51 @@ struct MasterType
 };
 
 
+#include <iostream>
+#include <string>
+
+char *
+bad_strdup(const char *s)
+{
+  char s2[10000];
+  strncpy(s2, s, 10000);
+  return s2;
+}
+
+int
+main(int argc, char *argv[])
+{
+  //char *s2 = bad_strdup("this is a test");
+  //char *s1 = bad_strdup("eat my lunch");
+	int *p1 = nullptr;
+	for (int i=0; i<100000; i++)
+	{
+		p1 = new int[20]();
+
+		*p1 = 5;
+
+		//cout <<p1 << ": " << *p1<<endl;
+
+		delete p1;
+	}
+	delete p1;
+	cout <<p1 << ": " << *p1<<endl;
+
+	//cout << "s2 = " << s2 << endl;
+
+	char test;
+	cin >> test;
+}
+
+
+
 //==================================================
 // SKIMFILE READER APPLICATION
-int main(int argc, char** argv)
+/*int main(int argc, char** argv)
 {
+	char test;
+	cin >> test;
+
 	string input_filename, output_filename;
 
 	if (argc < 2)
@@ -229,3 +270,4 @@ int main(int argc, char** argv)
 	int test;
 	cin >> test;
 }
+*/
