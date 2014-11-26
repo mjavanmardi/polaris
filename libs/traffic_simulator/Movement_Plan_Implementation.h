@@ -51,6 +51,12 @@ namespace Movement_Plan_Components
 			{
 				TargetType pos = nullptr;
 				if (_trajectory_container.size() ==0) return nullptr;
+				if (_current_trajectory_index >= _trajectory_container.size())
+				{
+					cout<<"Error: current_trajectory_index greater than trajectory size."<<endl;
+					cout<<"index="<<_current_trajectory_index<<", size="<<_trajectory_container.size()<<endl;
+					return nullptr;
+				}
 
 				try
 				{

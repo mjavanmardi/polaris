@@ -276,9 +276,9 @@ namespace Vehicle_Components
 					}
 
 					// set random vehicle color
-					vehicle_color._r = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
-					vehicle_color._g = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
-					vehicle_color._b = GLOBALS::Uniform_RNG.Next_Rand<float>()*255;
+					vehicle_color._r = GLOBALS::Uniform_RNG.Next_Rand<float>()*175;
+					vehicle_color._g = GLOBALS::Uniform_RNG.Next_Rand<float>()*175;
+					vehicle_color._b = GLOBALS::Uniform_RNG.Next_Rand<float>()*175;
 				}
 
 				if (_movement_plan == nullptr) return;
@@ -311,6 +311,9 @@ namespace Vehicle_Components
 								
 				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
 
+				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> _Zone_Interface;
+				_Zone_Interface* zone = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Zone_Interface*>();
+
 			#pragma region VEHICLE SHAPES				
 				if (_vehicle_shapes->template draw<bool>())
 				{
@@ -319,9 +322,9 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename MasterType::activity_location_type> Activity_Location_Interface;
-#ifdef IntegratedModelApplication
-					Person<typename ComponentType::type_of(traveler)>* person=(Person<typename ComponentType::type_of(traveler)>*)_traveler;				
-					
+
+#ifdef IntegratedModelApplication		
+					Person<typename ComponentType::type_of(traveler)>* person=(Person<typename ComponentType::type_of(traveler)>*)_traveler;	
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
 					{
 						body_color._r = 0;
@@ -372,6 +375,14 @@ namespace Vehicle_Components
 						body_color._r = vehicle_color._r;
 						body_color._g = vehicle_color._g;
 						body_color._b = vehicle_color._b;
+					}
+
+					// CAV coloration for lakeside model only - remove when done
+					if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
+					{
+						body_color._r = 255;
+						body_color._g = 255;
+						body_color._b = 0;
 					}
 
 
@@ -1264,6 +1275,15 @@ namespace Vehicle_Components
 						coordinate.color._g = vehicle_color._g;
 						coordinate.color._b = vehicle_color._b;
 					}
+
+					// CAV coloration for lakeside model only - remove when done
+					if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
+					{
+						coordinate.color._r = 255;
+						coordinate.color._g = 255;
+						coordinate.color._b = 0;
+					}
+
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 					vehicle_color.r(coordinate.color._r);

@@ -269,9 +269,9 @@ namespace Buildings_Components
 				}
 
 				delete[] buffer;
-
-				delete building_group;
+		
 				delete[] building_group->data;
+				delete building_group;
 			}
 
 			static void Initialize_Type()

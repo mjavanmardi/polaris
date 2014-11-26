@@ -418,12 +418,13 @@ namespace Network_Skimming_Components
 
 
 				File_IO::Binary_File_Writer& bw = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
-				char* btag = "BMAT";
+				char btag[] = "BMAT";
+				//char* btag = "BMAT";
 				bw.Write_Array<char>(btag,4);
 				bw.Write_Array<float>(values, (int)(zones->size() * zones->size()));
-				char* etag = "EMAT";
+				char etag[] = "EMAT";
 				bw.Write_Array<char>(etag,4);
-				delete values;
+				delete[] values;
 
 				//ofstream outfile;
 				//stringstream filename;
@@ -890,14 +891,14 @@ namespace Network_Skimming_Components
 					temp_invariant_los_array[i] = temp_los;
 				}
 
-				// Delete the temp tables to free memroy
-				delete auto_tolls;
-				delete auto_parking_cost;
-				delete transit_ttime;
-				delete transit_walk_access_time;
-				delete auto_distance /*transit_sov_access_time*/;
-				delete transit_wait_time;
-				delete transit_fare;
+				// Delete the temp tables to free memory
+				delete[] auto_tolls;
+				delete[] auto_parking_cost;
+				delete[] transit_ttime;
+				delete[] transit_walk_access_time;
+				delete[] auto_distance /*transit_sov_access_time*/;
+				delete[] transit_wait_time;
+				delete[] transit_fare;
 				
 
 				
@@ -942,7 +943,7 @@ namespace Network_Skimming_Components
 							temp_los_array[i] = temp_los;
 						}
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
-						delete data;
+						delete[] data;
 					}
 					else
 					{
