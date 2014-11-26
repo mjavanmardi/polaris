@@ -202,6 +202,8 @@ main(int argc, char *argv[])
 	cin >> test;
 
 	string input_filename, output_filename;
+	bool Transit=false;
+	bool Update=false;
 
 	if (argc < 2)
 	{
@@ -212,8 +214,21 @@ main(int argc, char *argv[])
 	{
 		input_filename = argv[1];
 	}
-	
-	output_filename = input_filename + ".csv";
+
+	if (argc >= 3)
+	{
+		if (strcmp(argv[2],"-t")==0)
+		{
+			cout << argv[2]<<endl;
+			Transit = true;
+		}
+		else if (strcmp(argv[2],"-tb")==0)
+		{
+			cout << argv[2]<<endl;
+			Transit = true;
+			Update = true;
+		}
+	}
 
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(1, 1);
@@ -224,45 +239,184 @@ main(int argc, char *argv[])
 	typedef skim_interface::get_type_of(update_interval_endpoints) intervals_type;
 
 	skim_interface* skimmer = (skim_interface*)Allocate<MasterType::network_skim_type>();
-	if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(input_filename)) THROW_EXCEPTION("Error: input binary highway skim file '" << input_filename << "' could not be opened. Highway skims are required, application terminating.");
-
-
+	
 	int num_modes;
 	int num_zones;
-	int update_increment;
-	intervals_type intervals;
-
-	skimmer->Read_Binary_Headers<intervals_type*>(num_modes, num_zones, &intervals, false);
-
 
 	ofstream outfile;
-	outfile.open(output_filename);
-
-			
-	Simulation_Timestep_Increment start;
-	//===========================================================================
-	// create the skim_table time periods, for basic create only a single time period skim_table
-
-	for (int i=0; i < intervals.size(); ++i)
+	if (!Update)
 	{
-		if (intervals[i]>GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Time_Minutes>(1440)) break;
-		if (i > 0)
+		output_filename = input_filename + ".csv";
+		outfile.open(output_filename);
+	}
+
+	File_IO::Binary_File_Writer binary_outfile;
+	if (Update)
+	{
+		output_filename = input_filename + "_new.bin";
+		binary_outfile.Open(output_filename);
+	}
+
+	if (Transit)
+	{	
+		cout <<"Do transit skim file read..."<<endl;
+
+		if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(input_filename)) THROW_EXCEPTION("Error: input binary transit skim file '" << input_filename << "' could not be opened. Highway skims are required, application terminating.");
+		File_IO::Binary_File_Reader& transit_infile = skimmer->transit_input_file<File_IO::Binary_File_Reader&>();
+
+
+		transit_infile.Read_Value<int>(num_zones);
+		
+		//===========================================================================
+		// create the time-invariant skim tables
+		float* transit_ttime = new float[num_zones*num_zones]();
+		float* transit_walk_access_time = new float[num_zones*num_zones]();
+		float* auto_distance /*transit_sov_access_time */= new float[num_zones*num_zones]();
+		float* transit_wait_time = new float[num_zones*num_zones]();
+		float* transit_fare = new float[num_zones*num_zones]();
+
+		if (!Update)
 		{
-			if (intervals[i] == intervals[i-1]) break;
-		}
 
-		float* data = new float[num_zones*num_zones];
-		skimmer->Read_Binary_Data<float*>(data,num_zones);
-
-		outfile << endl << "Skim matrix for hour: " << GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,Time_Hours>(intervals[i])<<endl;
-
-		for (int i =0; i < num_zones; i++)
-		{
-			for (int j=0; j < num_zones; j++)
+			// Read transit input data if required
+			transit_infile.Read_Array<float>(transit_ttime, num_zones*num_zones);
+			outfile <<"Transit Time:"<<endl;
+			for (int i =0; i < num_zones; i++)
 			{
-				outfile << data[i*num_zones + j] << "," ;
+				for (int j=0; j < num_zones; j++) outfile << transit_ttime[i*num_zones + j] << "," ;
+				outfile << endl;
 			}
-			outfile << endl;
+
+			transit_infile.Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
+			outfile <<endl<<"Transit Walk Access Time:"<<endl;
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++) outfile << transit_walk_access_time[i*num_zones + j] << "," ;
+				outfile << endl;
+			}
+
+			transit_infile.Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
+			outfile <<endl<<"Auto Distance:"<<endl;
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++) outfile << auto_distance[i*num_zones + j] << "," ;
+				outfile << endl;
+			}
+
+			transit_infile.Read_Array<float>(transit_wait_time, num_zones*num_zones);
+			outfile <<endl<<"Transit Wait TIme:"<<endl;
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++) outfile << transit_wait_time[i*num_zones + j] << "," ;
+				outfile << endl;
+			}
+
+			transit_infile.Read_Array<float>(transit_fare, num_zones*num_zones);
+			outfile <<endl<<"Transit Fare:"<<endl;
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++) outfile << transit_fare[i*num_zones + j] << "," ;
+				outfile << endl;
+			}
+		}
+		else
+		{
+			
+			int new_zones = num_zones+1;
+			binary_outfile.Write_Value<int>(new_zones);
+
+			cout << "Read original data."<<endl;
+			transit_infile.Read_Array<float>(transit_ttime, num_zones*num_zones);
+			transit_infile.Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
+			transit_infile.Read_Array<float>(auto_distance, num_zones*num_zones);
+			transit_infile.Read_Array<float>(transit_wait_time, num_zones*num_zones);
+			transit_infile.Read_Array<float>(transit_fare, num_zones*num_zones);
+
+			matrix<float>::index_type index, new_index;
+			index.first=num_zones; index.second=num_zones;
+			new_index.first=new_zones; new_index.second=new_zones;
+
+			matrix<float> ttime = matrix<float>(new_index,0);
+			matrix<float> walk = matrix<float>(new_index,0);
+			matrix<float> distance= matrix<float>(new_index,0);
+			matrix<float> wait= matrix<float>(new_index,0);
+			matrix<float> fare= matrix<float>(new_index,0);
+			
+
+			cout << "Copy to new arrays."<<endl;
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++)
+				{
+					ttime(i,j) = transit_ttime[i*num_zones+j];
+					walk(i,j) = transit_walk_access_time[i*num_zones+j];
+					distance(i,j) = auto_distance[i*num_zones+j];
+					wait(i,j) = transit_wait_time[i*num_zones+j];
+					fare(i,j) = transit_fare[i*num_zones+j];
+				}
+			}
+
+			cout << "Update new zone."<<endl;
+			//update new zone to match zone 256 accessibility
+			for (int i =0; i < num_zones; i++)
+			{
+				ttime(i,new_zones-1) = transit_ttime[i*num_zones+256];
+				ttime(new_zones-1,i) = transit_ttime[(256)*num_zones+i];
+				walk(i,new_zones-1) = transit_walk_access_time[i*num_zones+256];
+				walk(new_zones-1,i) = transit_walk_access_time[(256)*num_zones+i];
+				distance(i,new_zones-1) = auto_distance[i*num_zones+256];
+				distance(new_zones-1,i) = auto_distance[(256)*num_zones+i];
+				wait(i,new_zones-1) = transit_wait_time[i*num_zones+256];
+				wait(new_zones-1,i) = transit_wait_time[(256)*num_zones+i];
+				fare(i,new_zones-1) = transit_fare[i*num_zones+256];
+				fare(new_zones-1,i) = transit_fare[(256)*num_zones+i];
+			}
+
+			cout << "Write binary file."<<endl;
+			binary_outfile.Write_Array<float>(ttime.get_data_pointer(),new_zones*new_zones);
+			binary_outfile.Write_Array<float>(walk.get_data_pointer(),new_zones*new_zones);
+			binary_outfile.Write_Array<float>(distance.get_data_pointer(),new_zones*new_zones);
+			binary_outfile.Write_Array<float>(wait.get_data_pointer(),new_zones*new_zones);
+			binary_outfile.Write_Array<float>(fare.get_data_pointer(),new_zones*new_zones);
+			
+		}
+	}
+
+	else
+	{
+		int update_increment;
+		intervals_type intervals;
+
+		if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(input_filename)) THROW_EXCEPTION("Error: input binary highway skim file '" << input_filename << "' could not be opened. Highway skims are required, application terminating.");
+
+		skimmer->Read_Binary_Headers<intervals_type*>(num_modes, num_zones, &intervals, false);
+
+
+		Simulation_Timestep_Increment start;
+		//===========================================================================
+		// create the skim_table time periods, for basic create only a single time period skim_table
+
+		for (int i=0; i < skimmer->_update_interval_endpoints.size(); ++i)
+		{
+			if (skimmer->_update_interval_endpoints[i]>GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Time_Minutes>(1440)) break;
+			if (i > 0)
+			{
+				if (skimmer->_update_interval_endpoints[i] == skimmer->_update_interval_endpoints[i-1]) break;
+			}
+
+			float* data = new float[num_zones*num_zones];
+			skimmer->Read_Binary_Data<float*>(data,skimmer->highway_input_file<File_IO::Binary_File_Reader&>(),num_zones);
+
+			outfile << endl << "Skim matrix for hour: " << GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,Time_Hours>(intervals[i])<<endl;
+
+			for (int i =0; i < num_zones; i++)
+			{
+				for (int j=0; j < num_zones; j++)
+				{
+					outfile << data[i*num_zones + j] << "," ;
+				}
+				outfile << endl;
+			}
 		}
 	}
 

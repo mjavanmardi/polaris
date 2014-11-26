@@ -49,8 +49,8 @@ namespace Person_Components
 			m_data(int, Activity_Count, NONE, NONE);
 
 			//Containers for activity planning events and movement planning events
-			//m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
-			m_prototype_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
+			m_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
+			//m_prototype_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
 			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
 			// Interface definitions
@@ -69,7 +69,7 @@ namespace Person_Components
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence<typename type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type_test(Activity_Container)> Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
 			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 
 			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container)> Movement_Plans;
@@ -710,7 +710,7 @@ namespace Person_Components
 			template<typename TargetType> TargetType Sort_Activity_Schedule()
 			{
 				Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();
-				boost::container::list<typename MasterType::activity_type*>* acts = (list<typename MasterType::activity_type*>*)activities;
+				std::list<typename MasterType::activity_type*>* acts = (std::list<typename MasterType::activity_type*>*)activities;
 
 				acts->sort(comparer);
 				

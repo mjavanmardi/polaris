@@ -630,6 +630,8 @@ namespace Scenario_Components
 
 			/// antares visualization parameters
 			accessor(buildings_geometry_file, NONE, NONE);
+			accessor(use_buildings,NONE,NONE);
+			accessor(color_cars_randomly,NONE,NONE);
 
 			// tile imagery parameters
 			accessor(tile_imagery_file,NONE,NONE);
@@ -769,6 +771,8 @@ namespace Scenario_Components
 					use_tile_imagery<bool>(true);
 					if (cfgReader.getParameter("tile_imagery_alpha_level", tile_imagery_alpha_level<int*>())!= PARAMETER_FOUND) tile_imagery_alpha_level<int>(255);
 				}
+
+				if (cfgReader.getParameter("color_cars_randomly", color_cars_randomly<bool*>())!= PARAMETER_FOUND) color_cars_randomly(false);
 
 				//===============================================
 				// Demand model parameters 
@@ -936,7 +940,12 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
 				
-				if (cfgReader.getParameter("buildings_geometry_file", buildings_geometry_file<string*>())!= PARAMETER_FOUND) buildings_geometry_file<string&>()="";
+				if (cfgReader.getParameter("buildings_geometry_file", buildings_geometry_file<string*>())!= PARAMETER_FOUND)
+				{
+					use_buildings(false);
+					buildings_geometry_file<string&>()="";
+				}
+				else use_buildings(true);
 				
 
 				//output_dir_name<string&>() = "";

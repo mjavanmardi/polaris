@@ -51,8 +51,8 @@ namespace Activity_Components
 			typedef Person_Components::Prototypes::Person<typename _planning_itf::get_type_of(Parent_Person)> _person_itf;
 			typedef Person_Components::Prototypes::Person_Perception<typename _person_itf::get_type_of(Perception_Faculty)> _perception_itf;
 			typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
-			//typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
-			typedef Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type> _scheduler_itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename _person_itf::get_type_of(Scheduling_Faculty)> _scheduler_itf;
+			//typedef Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type> _scheduler_itf;
 			typedef Person_Components::Prototypes::Activity_Generator< typename MasterType::activity_generator_type> _generator_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Properties)> _properties_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Static_Properties)> _static_properties_itf;
@@ -75,8 +75,8 @@ namespace Activity_Components
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 		
-			typedef typename _scheduler_itf::Component_Type ctype;
-			typedef Back_Insertion_Sequence< typename ctype::type_of(Activity_Container)> _activity_plans_container_itf;
+			//typedef typename _scheduler_itf::Component_Type ctype;
+			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Activity_Container)> _activity_plans_container_itf;
 			typedef Prototypes::Activity_Planner<ComponentType> _activity_plan_itf;
 
 			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container)> _movement_plans_container_itf;

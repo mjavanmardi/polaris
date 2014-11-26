@@ -10,7 +10,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// Enables the memory log to be constructed
 	///----------------------------------------------------------------------------------------------------
-	//#define ENABLE_MEMORY_LOGGING
+	#define ENABLE_MEMORY_LOGGING
 
 	///----------------------------------------------------------------------------------------------------
 	/// MESSAGES - Enable / Disable various categories of runtime messages

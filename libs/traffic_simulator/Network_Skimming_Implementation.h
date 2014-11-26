@@ -418,12 +418,13 @@ namespace Network_Skimming_Components
 
 
 				File_IO::Binary_File_Writer& bw = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
-				char* btag = "BMAT";
+				char btag[] = "BMAT";
+				//char* btag = "BMAT";
 				bw.Write_Array<char>(btag,4);
 				bw.Write_Array<float>(values, (int)(zones->size() * zones->size()));
-				char* etag = "EMAT";
+				char etag[] = "EMAT";
 				bw.Write_Array<char>(etag,4);
-				delete values;
+				delete[] values;
 
 				//ofstream outfile;
 				//stringstream filename;
@@ -639,7 +640,7 @@ namespace Network_Skimming_Components
 			m_data(bool, read_input, NONE, NONE);
 			m_data(bool, read_transit, NONE, NONE);
 			m_data(bool, read_highway_cost, NONE, NONE);
-			m_data(char, file_version,NONE,NONE);
+
 			m_data(File_IO::Binary_File_Writer, highway_output_file, NONE, NONE);
 			m_data(File_IO::Binary_File_Reader, highway_input_file, NONE, NONE);
 			m_data(File_IO::Binary_File_Writer, highway_cost_output_file, NONE, NONE);
@@ -683,7 +684,8 @@ namespace Network_Skimming_Components
 			template<typename TargetType> void Initialize()
 			{
 				// set the versioning info
-				this->_file_version='1';
+				this->_highway_input_file.Version('1');
+				this->_transit_input_file.Version('1');
 
 				// get scenario interface
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -703,20 +705,23 @@ namespace Network_Skimming_Components
 				this_itf* pthis = (this_itf*)this;
 
 				// set up the update intervals
-				this->_current_increment_index=1;
+				this->_current_increment_index=0;
 				if (!scenario->use_skim_intervals<bool>())
 				{
 					// Get interval length from the scenario
-					Time_Minutes increment = scenario->skim_interval_length_minutes<int>();
+					Simulation_Timestep_Increment increment = Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>((Time_Minutes)scenario->skim_interval_length_minutes<int>()));
+					
 					// Add endpoints to the endpoint list based on interval length
-					for (Simulation_Timestep_Increment start = 0; start <= END; start = start + GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(increment))
+					for (Simulation_Timestep_Increment start = 0; start + increment < END-1; start = start + increment)
 					{
-						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start));
+						//DEBUG_MESSAGE("Adding skim interval @ " <<Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start+increment)));
+						this->_update_interval_endpoints.push_back(Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start+increment)));
 					}
 					// Add the END endpoint if not added above
-					if (this->_update_interval_endpoints.back() != GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1))
+					if (this->_update_interval_endpoints.back() != Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)))
 					{
-						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1));
+						//DEBUG_MESSAGE("Adding skim interval @ " <<Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)));
+						this->_update_interval_endpoints.push_back(Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)));
 					}
 					//pthis->template update_increment<Time_Minutes>();
 				}
@@ -886,14 +891,14 @@ namespace Network_Skimming_Components
 					temp_invariant_los_array[i] = temp_los;
 				}
 
-				// Delete the temp tables to free memroy
-				delete auto_tolls;
-				delete auto_parking_cost;
-				delete transit_ttime;
-				delete transit_walk_access_time;
-				delete auto_distance /*transit_sov_access_time*/;
-				delete transit_wait_time;
-				delete transit_fare;
+				// Delete the temp tables to free memory
+				delete[] auto_tolls;
+				delete[] auto_parking_cost;
+				delete[] transit_ttime;
+				delete[] transit_walk_access_time;
+				delete[] auto_distance /*transit_sov_access_time*/;
+				delete[] transit_wait_time;
+				delete[] transit_fare;
 				
 
 				
@@ -903,21 +908,21 @@ namespace Network_Skimming_Components
 				//for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + skim->template update_increment<Simulation_Timestep_Increment>())
 				for (int i=0; i<this->_update_interval_endpoints.size(); ++i)
 				{		
-					start = this->update_increment<Simulation_Timestep_Increment>(i);
-					if (i + 1 < this->_update_interval_endpoints.size()) end = this->update_increment<Simulation_Timestep_Increment>(i+1);
-					else break;
+					if (i>0) start = this->update_increment<Simulation_Timestep_Increment>(i-1);
+					else start = 0;
+					end = this->update_increment<Simulation_Timestep_Increment>(i);
 
 					skim_table_itf* skim_table = (skim_table_itf*)Allocate<strip_modifiers(typename type_of(skims_by_time_container)::value_type)::Component_Type>();
 					skim_table->template network_reference<network_itf*>(network);
 					skim_table->template skim_reference<skimmer_itf*>(skim);
 					skim_table->template start_time<Simulation_Timestep_Increment>(start);
-					skim_table->template end_time<Simulation_Timestep_Increment>(start + skim->template update_increment<Simulation_Timestep_Increment>());
+					skim_table->template end_time<Simulation_Timestep_Increment>(end);
 
 					if (skim->template read_input<bool>())
 					{
 						// Get raw auto travel time data from binary file
 						float* data = new float[num_zones*num_zones];
-						this->Read_Binary_Data<float*>(data,num_zones);
+						this->Read_Binary_Data<float*>(data,infile,num_zones);
 						//infile.Read_Array<float>(data, num_zones*num_zones);
 
 						// create LOS matrix using raw input data
@@ -938,7 +943,7 @@ namespace Network_Skimming_Components
 							temp_los_array[i] = temp_los;
 						}
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
-						delete data;
+						delete[] data;
 					}
 					else
 					{
@@ -1112,16 +1117,24 @@ namespace Network_Skimming_Components
 				File_IO::Binary_File_Writer& outfile = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
 				char version[] = "SKIM:V01";
 				outfile.Write_Array<char>(&version[0],8);
-				int modes = 1;//(int)(skim->template mode_skim_table_container<modes_skim_container_itf&>().size());
-				outfile.Write_Value<int>(modes);
+				char begin_zones[] = "BZON";
+				outfile.Write_Array<char>(&begin_zones[0],4);
 				int zones = (int)zones_container->size();
 				outfile.Write_Value<int>(zones);
+				for (zones_itf::iterator itr = zones_container->begin(); itr != zones_container->end(); ++itr)
+				{
+					zone_itf* zone = (zone_itf*)(itr->second);
+					outfile.Write_Value<int>(zone->uuid<int&>());
+					outfile.Write_Value<int>(zone->internal_id<int&>());
+				}
+				char end_zones[] = "EZON";
+				outfile.Write_Array<char>(&end_zones[0],4);
 				std::vector<Time_Minutes>* intervals = skim->template update_interval_endpoints<std::vector<Time_Minutes>*>();
 				char begin_intervals[] = "BINT";
 				outfile.Write_Array<char>(&begin_intervals[0],4);
-				int num_increment = intervals->size()-1;
+				int num_increment = intervals->size();
 				outfile.Write_Value<int>(num_increment);
-				for (int i=1; i<=num_increment; ++i)
+				for (int i=0; i<num_increment; ++i)
 				{
 					int incr = (*intervals)[i];
 					outfile.Write_Value<int>(incr);
@@ -1136,22 +1149,22 @@ namespace Network_Skimming_Components
 				File_IO::Binary_File_Reader& infile = highway_input_file<File_IO::Binary_File_Reader&>();
 
 				// get versioning info
-				char* version = new char[8];
+				char version[9];
 				infile.Read_Array<char>(version, 8);
+				version[8]='\0';
+
 
 				// call associated read function
 				if (strcmp(version,"SKIM:V01")==0)
 				{
-					this->_file_version='1';
+					this->_highway_input_file.Version('1');
 					Read_Binary_Headers_V1(num_modes,num_zones,return_intervals,perform_checks);
 				}
 				else
 				{
-					this->_file_version='0';
+					this->_highway_input_file.Version('0');
 					Read_Binary_Headers_Unversioned(num_modes,num_zones,return_intervals,perform_checks);
 				}
-				delete version;
-
 			}
 	
 			void Read_Binary_Headers_Unversioned(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr,bool perform_checks=true)
@@ -1171,7 +1184,7 @@ namespace Network_Skimming_Components
 				_highway_input_file.Read_Value<int>(num_zones);
 				_highway_input_file.Read_Value<int>(update_increment);
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, update_increment);
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, nullptr, update_increment);
 				//Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
 				//if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
 				//int skimmer_num_zones = zones_container->size();
@@ -1194,25 +1207,34 @@ namespace Network_Skimming_Components
 
 			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
-				//network_itf* network = this->template network_reference<network_itf*>();
-				//skimmer_itf* skim = (skimmer_itf*)this;
-				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
-	
 				int num_intervals, num_zones_transit, num_zones_hcost;
 				update_interval_endpoints_type intervals;
-				char* tag = new char[4];
-	
-				// read for time-varying highway skims
-				//File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
+				std::vector<pair<int,int>> return_zones_container;
 
-				// header info
-				_highway_input_file.Read_Value<int>(num_modes);
-				_highway_input_file.Read_Value<int>(num_zones);
+				char tag[5]; tag[4]='\0';
 
-				//// header validation checks - number of zones
-				//int skimmer_num_zones = zones_container->size();
-				//if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
-				
+				// check if zone tag exists
+				_highway_input_file.Read_Array<char>(tag,4);
+				if (strcmp(tag,"BZON")==0)
+				{
+					_highway_input_file.Read_Value<int>(num_zones);
+					for (int i=0; i<num_zones; i++)
+					{
+						int id, index;
+						_highway_input_file.Read_Value<int>(id);
+						_highway_input_file.Read_Value<int>(index);
+						return_zones_container.push_back(pair<int,int>(id,index));
+					}
+					_highway_input_file.Read_Array<char>(tag,4);
+					if (strcmp(tag,"EZON")!=0) THROW_EXCEPTION("ERROR: End zone information tag 'EZON' missing from binary file, possible versioning issue.");
+				}
+				else
+				{
+					// header info
+					_highway_input_file.Read_Value<int>(num_modes,-4,ios_base::cur);
+					_highway_input_file.Read_Value<int>(num_zones);
+				}
+
 				// header validation checks - read each interval endpoint entry and verify that the are the same as specified in scenario
 				_highway_input_file.Read_Array<char>(tag,4);
 				if (strcmp(tag,"BINT")!=0) THROW_EXCEPTION("ERROR: Begin intervals tag 'BINT' missing from binary file, possible versioning issue.");
@@ -1224,13 +1246,11 @@ namespace Network_Skimming_Components
 					int endpoint;
 					_highway_input_file.Read_Value<int>(endpoint);
 					intervals.push_back(endpoint);
-					//Time_Minutes skimmer_endpoint = (Time_Minutes)_update_interval_endpoints[i];
-					//if (endpoint != (int)skimmer_endpoint) THROW_EXCEPTION("ERROR: Input skim file update endpoint does not match the endpoint specified in scenario at position "<<i<<".");
 				}
 				_highway_input_file.Read_Array<char>(tag,4);
 				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals);
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals, &return_zones_container);
 
 				// return the read in interval values if requested
 				if (return_intervals != nullptr)
@@ -1238,25 +1258,9 @@ namespace Network_Skimming_Components
 					return_intervals->clear();
 					for (int i=0; i<intervals.size(); i++) return_intervals->push_back(intervals[i]);
 				}
-
-				// header validation checks for transit and cost skims - make sure number of zones specified correctly
-				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_transit<bool>())
-				//{		
-				//	transit_infile.Read_Value<int>(num_zones_transit);
-				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
-				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_highway_cost<bool>())
-				//{		
-				//	highway_cost_infile.Read_Value<int>(num_zones_hcost);
-				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
-
-				delete tag;
 			}
 
-			void Do_Header_Validation_Checks(int num_modes, int num_zones, update_interval_endpoints_type* intervals, int increment=0)
+			void Do_Header_Validation_Checks(int num_modes, int num_zones, update_interval_endpoints_type* intervals, std::vector<pair<int,int>>* return_zones_container, int increment=0)
 			{
 				network_itf* network = this->template network_reference<network_itf*>();
 				skimmer_itf* skim = (skimmer_itf*)this;
@@ -1281,6 +1285,20 @@ namespace Network_Skimming_Components
 					if (increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
 				}
 
+				// zone id validation checks
+				if (return_zones_container->size() != 0)
+				{
+					for (std::vector<pair<int,int>>::iterator itr = return_zones_container->begin(); itr != return_zones_container->end(); ++itr)
+					{
+						int id = (*itr).first;
+						int index = (*itr).second;
+
+						zones_itf::iterator zitr;
+						if ((zitr = zones_container->find(id)) == zones_container->end()) THROW_EXCEPTION("ERROR: Zone id from skim file not found in network zones container.");
+						if (zitr->second->internal_id<int>() != index) THROW_EXCEPTION("ERROR: Zone id in skim file has different index than same zone id in network zones container.");
+					}
+				}
+
 				// header validation checks for transit and cost skims - make sure number of zones specified correctly
 				if (read_transit<bool>())
 				{		
@@ -1296,27 +1314,26 @@ namespace Network_Skimming_Components
 				}
 			}
 
-			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))
+			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, File_IO::Binary_File_Reader& file, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				char* tag = new char[4];
+				char tag[5]; tag[4]='\0';
 
 				// Read validation tag before and after data read
-				if (_file_version != '0')
+				if (file.Version() != '0')
 				{
-					_highway_input_file.Read_Array<char>(tag,4);
+					file.Read_Array<char>(tag,4);
 					if (strcmp(tag,"BMAT")!=0) THROW_EXCEPTION("ERROR: Begin matrix tag 'BMAT' missing from binary file, possible versioning issue.");
 				}
 
 				// Main data read
-				_highway_input_file.Read_Array<strip_modifiers(TargetType)>(data_ptr, num_zones*num_zones);
+				file.Read_Array<strip_modifiers(TargetType)>(data_ptr, num_zones*num_zones);
 
 				// Read validation tag before and after data read
-				if (_file_version != '0')
+				if (file.Version() != '0')
 				{
-					_highway_input_file.Read_Array<char>(tag,4);
+					file.Read_Array<char>(tag,4);
 					if (strcmp(tag,"EMAT")!=0) THROW_EXCEPTION("ERROR: End matrix tag 'EMAT' missing from binary file, possible versioning issue.");
 				}
-				delete tag;
 			}
 	
 		};

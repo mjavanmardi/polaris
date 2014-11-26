@@ -205,6 +205,9 @@ namespace Scenario_Components
 			m_data(bool, multimodal_network_input, NONE, NONE);
 
 			m_data(string, buildings_geometry_file, NONE, NONE);
+			m_data(bool, use_buildings,NONE,NONE);
+
+			m_data(bool, color_cars_randomly,NONE,NONE);
 
 			m_data(string, tile_imagery_file, NONE, NONE);
 			m_data(bool, use_tile_imagery, NONE, NONE);

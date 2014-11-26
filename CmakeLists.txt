@@ -51,7 +51,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 		message(STATUS ""${libtcmalloc})
 	endif()
 	
-	if (MSVC)
+	if (FALSE)#MSVC)
 		add_definitions(/Zi)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
