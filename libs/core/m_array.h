@@ -897,7 +897,7 @@ protected:
 	void _copy(const matrix& obj);
 	void _cleanup()
 	{
-		if (_size > 0) delete _data;
+		if (_size > 0) delete[] _data;
 		_size=0;
 		_ndim=0;
 		_dim_sizes.first=0; _dim_sizes.second=0;
