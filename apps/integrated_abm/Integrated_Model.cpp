@@ -1,9 +1,16 @@
 //#define SHOW_WARNINGS
 //#define ENABLE_STACK_TRACE
 //#define ANTARES
+
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
+
 #define IntegratedModelApplication
 
 #ifdef _DEBUG
+
 #undef ANTARES
 //#define SHOW_WARNINGS
 #else
@@ -12,7 +19,7 @@
 
 #undef ENABLE_WARNINGS
 
-#define ENABLE_DEBUG_MESSAGES
+//#define ENABLE_DEBUG_MESSAGES
 
 #include "Polaris_PCH.h"
 //#include "core\Core.h"
@@ -240,6 +247,7 @@ void output_object_sizes();
 
 int main(int argc,char** argv)
 {
+	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
 	//==================================================================================================================================
 	// Scenario initialization

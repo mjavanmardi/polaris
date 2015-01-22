@@ -243,8 +243,6 @@ public:
 		if (new_row_sizes.size() == 0) return;
 		if (new_row_sizes.size() == 1 && new_row_sizes[0]==0) return;
 
-		cout<<"Resizing....Dims:"<<new_row_sizes.size()<<", value="<<value<<", data_ptr="<<this->_data<<", this_ptr="<<this;
-
 		s_array<T> tmp = s_array<T>(*this);
 		this->_cleanup();
 		//this->_init(new_row_sizes);
@@ -274,11 +272,10 @@ public:
 			}
 			else (*itr) = value;		
 		}*/
-		cout<<"...done."<<endl;
 	}
 
 	// MArray constructors/destructor
-	s_array (void){_size = 0;_ndim=0;_data=nullptr;}
+	s_array (void){_size = 0;_data=nullptr;}
 	s_array (const_dimensional_type row_sizes);
 	s_array (const_dimensional_type row_sizes, T init_val);
 	s_array (const s_array& obj);
@@ -330,7 +327,7 @@ public:
 	const_size_type size() {return _size;}
 	const_size_type size(size_type row_index) {return _row_sizes[row_index];}
 	const_dimensional_type dimensions(){return _row_sizes;}
-	const_size_type num_dimensions(){return _ndim;}
+	size_type num_dimensions(){return _row_sizes.size();}
 
 	// display member
 	void print(ostream& stream);
@@ -343,7 +340,6 @@ protected:
 	boost::container::vector<size_type> _row_sizes;
 	index_type _cursor;
 	size_type _size;
-	size_type _ndim;
 	pointer _data;
 
 	void _init(const_dimensional_type row_sizes);
@@ -440,7 +436,6 @@ void s_array<T>::_init(const_dimensional_type row_sizes)
 	_size = 1;
 	_cursor.first = 0;
 	_cursor.second = 0;
-	_ndim = (size_type)row_sizes.size();
 
 	for (size_type i=0; i<row_sizes.size(); i++)
 	{
