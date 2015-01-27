@@ -44,18 +44,18 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
-				if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
+				if (sub_iteration() == Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION)
 				{
 					this_ptr->Activity_Generation_Event<NT>();
 					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
-					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION;
+					response.next._sub_iteration = Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION;
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// No valid events scheduled - skip to next iteration
 				else
 				{
 					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
-					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION;
+					response.next._sub_iteration = Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION;
 				}
 
 				// set next planning time for other functions to use
@@ -88,7 +88,7 @@ namespace Person_Components
 				this_component()->Initialize< TargetType>();
 
 				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
-				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION);
 			}
 
 			template<typename TargetType, typename LocationType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location)

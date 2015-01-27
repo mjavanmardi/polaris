@@ -148,7 +148,7 @@ public:
 	const shared_ptr<Household> getHousehold () const {return household;}
 	void setHousehold (const shared_ptr<Household> household_) {household = household_;}
 	const unsigned int& getPrimaryKey () const {return person;}
-	const unsigned int& getperson () const {return person;}
+	const unsigned int& getPerson () const {return person;}
 	//Data Fields
 private:
 	friend class odb::access;
@@ -211,7 +211,7 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, shared_ptr<Trip> trip_)
+	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, /*shared_ptr<Person>*/int person_, /*shared_ptr<Trip>*/unsigned long trip_)
 	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
 	{
 	}
@@ -232,10 +232,14 @@ public:
 	void setMode (const std::string& mode_) {mode = mode_;}
 	const std::string& getType () const {return type;}
 	void setType (const std::string& type_) {type = type_;}
-	const shared_ptr<Person> getPerson () const {return person;}
+	/*const shared_ptr<Person> getPerson () const {return person;}
 	void setPerson (const shared_ptr<Person> person_) {person = person_;}
 	const shared_ptr<Trip> getTrip () const {return trip;}
-	void setTrip (const shared_ptr<Trip> trip_) {trip = trip_;}
+	void setTrip (const shared_ptr<Trip> trip_) {trip = trip_;}*/
+	const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}
+	const unsigned long& getTrip () const {return trip;}
+	void setTrip (const unsigned long& trip_){trip = trip_;}
 	//Data Fields
 private:
 	friend class odb::access;
@@ -247,8 +251,10 @@ private:
 	std::string mode;
 	std::string type;
 	#pragma db not_null
-	shared_ptr<Person> person;
-	shared_ptr<Trip> trip;
+	//shared_ptr<Person> person;
+	//shared_ptr<Trip> trip;
+	int person;
+	unsigned long trip;
 };
 
 

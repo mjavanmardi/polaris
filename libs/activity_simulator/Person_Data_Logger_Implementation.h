@@ -19,10 +19,16 @@ namespace Person_Components
 			boost::container::vector<int>* ttime_distribution;
 			boost::container::vector<string>* output_data;
 			boost::container::vector<string>* output_data_buffer;
-			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_records;
-			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_records_buffer;
-			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_records;
-			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_records_buffer;
+
+			//std::vector<shared_ptr<polaris::io::Trip>>* trip_records;
+			//std::vector<shared_ptr<polaris::io::Trip>>* trip_records_buffer;
+			//std::vector<shared_ptr<polaris::io::Activity>>* activity_records;
+			//std::vector<shared_ptr<polaris::io::Activity>>* activity_records_buffer;
+			std::vector<polaris::io::Trip*>* trip_records;
+			std::vector<polaris::io::Trip*>* trip_records_buffer;
+			std::vector<polaris::io::Activity*>* activity_records;
+			std::vector<polaris::io::Activity*>* activity_records_buffer;
+
 			//boost::container::vector<int> planned_acts[num_sim_threads()];
 			//boost::container::vector<int> executed_acts[num_sim_threads()];
 			//boost::container::vector<int> ttime_distribution[num_sim_threads()];
@@ -44,10 +50,14 @@ namespace Person_Components
 
 			boost::container::vector<string>* buff;
 			boost::container::vector<string>* current;
-			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_buff;
-			boost::container::vector<shared_ptr<polaris::io::Trip>>* trip_current;
-			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_buff;
-			boost::container::vector<shared_ptr<polaris::io::Activity>>* activity_current;
+			/*std::vector<shared_ptr<polaris::io::Trip>>* trip_buff;
+			std::vector<shared_ptr<polaris::io::Trip>>* trip_current;
+			std::vector<shared_ptr<polaris::io::Activity>>* activity_buff;
+			std::vector<shared_ptr<polaris::io::Activity>>* activity_current;*/
+			//std::vector<polaris::io::Trip*>* trip_buff;
+			//std::vector<polaris::io::Trip*>* trip_current;
+			//std::vector<polaris::io::Activity*>* activity_buff;
+			//std::vector<polaris::io::Activity*>* activity_current;
 
 			m_data(ofstream, log, NONE, NONE);
 			m_data(string, filename, NONE, NONE);
@@ -78,10 +88,16 @@ namespace Person_Components
 				ttime_distribution = new boost::container::vector<int>[num_sim_threads()];
 				output_data = new boost::container::vector<string>[num_sim_threads()];
 				output_data_buffer = new boost::container::vector<string>[num_sim_threads()];
-				trip_records = new boost::container::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
-				trip_records_buffer = new boost::container::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
-				activity_records = new boost::container::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
-				activity_records_buffer = new boost::container::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
+
+				//trip_records = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
+				//trip_records_buffer = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
+				//activity_records = new std::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
+				//activity_records_buffer = new std::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
+				trip_records = new std::vector<polaris::io::Trip*>[num_sim_threads()];
+				trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
+				activity_records = new std::vector<polaris::io::Activity*>[num_sim_threads()];
+				activity_records_buffer = new std::vector<polaris::io::Activity*>[num_sim_threads()];
+
 				expected_ttime = new float[num_sim_threads()];
 				routed_ttime = new float[num_sim_threads()];
 				actual_ttime = new float[num_sim_threads()];
@@ -110,17 +126,17 @@ namespace Person_Components
 				
 
 				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
-				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
+				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,Scenario_Components::Types::OUTPUT_WRITING_SUB_ITERATION);
 
 				// Initialize pointers to data buffers
 				buff = output_data_buffer;
 				current = output_data;
 
-				trip_buff = trip_records_buffer;
-				trip_current = trip_records;
+				//trip_buff = trip_records_buffer;
+				//trip_current = trip_records;
 
-				activity_buff = activity_records_buffer;
-				activity_current = activity_records;
+				//activity_buff = activity_records_buffer;
+				//activity_current = activity_records;
 
 
 				// Initialize log file
@@ -369,24 +385,26 @@ namespace Person_Components
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
 
-					boost::container::vector<shared_ptr<polaris::io::Trip>>* tmp_trip = pthis->trip_buff;
-					pthis->trip_buff = pthis->trip_current;
-					pthis->trip_current = tmp_trip;
+					//std::vector<shared_ptr<polaris::io::Trip>>* tmp_trip = pthis->trip_buff;
+					std::vector<polaris::io::Trip*>* tmp_trip = pthis->trip_records_buffer;
+					pthis->trip_records_buffer = pthis->trip_records;
+					pthis->trip_records = tmp_trip;
 
-					boost::container::vector<shared_ptr<polaris::io::Activity>>* tmp_act = pthis->activity_buff;
-					pthis->activity_buff = pthis->activity_current;
-					pthis->activity_current = tmp_act;
+					//std::vector<shared_ptr<polaris::io::Activity>>* tmp_act = pthis->activity_buff;
+					std::vector<polaris::io::Activity*>* tmp_act = pthis->activity_records_buffer;
+					pthis->activity_records_buffer = pthis->activity_records;
+					pthis->activity_records = tmp_act;
 
-					response.next._iteration = iteration();
-					response.next._sub_iteration = 1;
+					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._sub_iteration = 0;
 					pthis->Write_Data_To_File_Event<NT>();
 				}
-				else if (sub_iteration() < (int)num_sim_threads())
-				{
-					response.next._iteration = iteration();
-					response.next._sub_iteration = sub_iteration()+1;
-					pthis->Write_Data_To_File_Event<NT>();
-				}
+				//else if (sub_iteration() < (int)num_sim_threads())
+				//{
+				//	response.next._iteration = iteration();
+				//	response.next._sub_iteration = sub_iteration()+1;
+				//	pthis->Write_Data_To_File_Event<NT>();
+				//}
 				else
 				{
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
@@ -396,99 +414,124 @@ namespace Person_Components
 
 			template<typename TargetType> void Write_Data_To_File_Event()
 			{
-				int i = sub_iteration();
-
-				// write out strings in the current buffer to log file and clear it
-				for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
+				for (int i=0; i< (int)num_sim_threads(); ++i)
 				{
-					this->_log << '\n' << *itr;
-				}
-				current[i].clear();
+					cout <<"Writing data for thread " << i;
 
-				// do aggregated file writing on first subiteration
-				if (i == 0)
-				{
-					// display the ttime and executed activity count distributions once
-					this->_ttime_file << iteration();
-					for (int j=0; j < 25; j++)
+					// write out strings in the current buffer to log file and clear it
+					for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 					{
-						int count = 0;
-						for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
+						this->_log << '\n' << *itr;
+					}
+					current[i].clear();
+
+					// do aggregated file writing on first subiteration
+					if (i == 0)
+					{
+						// display the ttime and executed activity count distributions once
+						this->_ttime_file << iteration();
+						for (int j=0; j < 25; j++)
 						{
-							count += ttime_distribution[k][j];
+							int count = 0;
+							for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
+							{
+								count += ttime_distribution[k][j];
+							}
+							this->_ttime_file <<","<< count;
 						}
-						this->_ttime_file <<","<< count;
-					}
-					this->_ttime_file << endl;
+						this->_ttime_file << endl;
 
-					this->_executed_acts_file << iteration();
-					for (int j=0; j < 20; j++)
-					{
-						int count = 0;
-						for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
+						this->_executed_acts_file << iteration();
+						for (int j=0; j < 20; j++)
 						{
-							count += executed_acts[k][j];
+							int count = 0;
+							for (int k=0; k < (int)num_sim_threads(); k++) // collect value over all threads
+							{
+								count += executed_acts[k][j];
+							}
+							this->_executed_acts_file <<","<< count;
 						}
-						this->_executed_acts_file <<","<< count;
-					}
-					this->_executed_acts_file << endl;
+						this->_executed_acts_file << endl;
 
 
-					//=================================================================================
-					// write to the Demand MOE File
-					this->_demand_moe_file << iteration() << "," << this->_activity_time_lost;
+						//=================================================================================
+						// write to the Demand MOE File
+						this->_demand_moe_file << iteration() << "," << this->_activity_time_lost;
 
-					// write the cancelled activities 
-					this->_demand_moe_file << "," << this->_cancelled_activities;
+						// write the cancelled activities 
+						this->_demand_moe_file << "," << this->_cancelled_activities;
 
-					// write the average expected and actual travel times over the current interval
-					float actual_ttime_sum=0;
-					float routed_ttime_sum=0;
-					float expected_ttime_sum=0;
-					float acts_in_interval = 0;
-					for (int i=0; i < (int)num_sim_threads(); i++)
-					{
-						actual_ttime_sum += actual_ttime[i];
-						expected_ttime_sum += expected_ttime[i];
-						routed_ttime_sum += routed_ttime[i];
-						acts_in_interval += num_acts_in_interval[i];
-						actual_ttime[i]=0;
-						expected_ttime[i]=0;
-						routed_ttime[i]=0;
-						num_acts_in_interval[i]=0;
-					}
-					this->_demand_moe_file << "," << acts_in_interval;
-					this->_demand_moe_file << "," << expected_ttime_sum / acts_in_interval;
-					this->_demand_moe_file << "," << routed_ttime_sum / acts_in_interval;
-					this->_demand_moe_file << "," << actual_ttime_sum / acts_in_interval<<endl;
-				}
-
-
-				// database write for external trips
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-				if (scenario->template write_demand_to_database<bool>())
-				{
-					try
-					{
-						odb::transaction t(this->_db_ptr->begin());
-						for (boost::container::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+						// write the average expected and actual travel times over the current interval
+						float actual_ttime_sum=0;
+						float routed_ttime_sum=0;
+						float expected_ttime_sum=0;
+						float acts_in_interval = 0;
+						for (int j=0; j < (int)num_sim_threads(); j++)
 						{
-							this->_db_ptr->persist(*itr);
+							actual_ttime_sum += actual_ttime[j];
+							expected_ttime_sum += expected_ttime[j];
+							routed_ttime_sum += routed_ttime[j];
+							acts_in_interval += num_acts_in_interval[j];
+							actual_ttime[j]=0;
+							expected_ttime[j]=0;
+							routed_ttime[j]=0;
+							num_acts_in_interval[j]=0;
 						}
-						for (boost::container::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
-						{
-							this->_db_ptr->persist(*itr);
-						}
-						t.commit();
-					}
-					catch (odb::sqlite::database_exception ex)
-					{
-						cout << ex.message()<<". DB error in person_data_logger_implementation, line 477."<<endl;
+						this->_demand_moe_file << "," << acts_in_interval;
+						this->_demand_moe_file << "," << expected_ttime_sum / acts_in_interval;
+						this->_demand_moe_file << "," << routed_ttime_sum / acts_in_interval;
+						this->_demand_moe_file << "," << actual_ttime_sum / acts_in_interval<<endl;
 					}
 
-					trip_current[i].clear();
-					activity_current[i].clear();
+
+					// database write for external trips
+					typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+					if (scenario->template write_demand_to_database<bool>())
+					{
+						try
+						{
+							odb::transaction t(this->_db_ptr->begin());
+							/*for (std::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+							{
+								this->_db_ptr->persist(*itr);
+							}
+							for (std::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
+							{
+								this->_db_ptr->persist(*itr);
+							}*/
+							for (std::vector<polaris::io::Trip*>::iterator itr = trip_records[i].begin(); itr != trip_records[i].end(); ++itr)
+							{
+								this->_db_ptr->persist(*(*itr));
+							}
+							for (std::vector<polaris::io::Activity*>::iterator itr = activity_records[i].begin(); itr != activity_records[i].end(); ++itr)
+							{
+								this->_db_ptr->persist(*(*itr));
+							}
+							t.commit();
+						}
+						catch (odb::sqlite::database_exception ex)
+						{
+							cout << ex.message()<<". DB error in person_data_logger_implementation, line 519."<<endl;
+						}
+
+						try
+						{
+							cout <<". Clearing buffer of "<<trip_records[i].size()<<" trips ";
+							for (std::vector<polaris::io::Trip*>::iterator t_itr = trip_records[i].begin(); t_itr != trip_records[i].end(); ++t_itr) delete *t_itr;
+							cout <<" and "<<activity_records[i].size()<<" activities. ";
+							for (std::vector<polaris::io::Activity*>::iterator a_itr = activity_records[i].begin(); a_itr != activity_records[i].end(); ++a_itr) delete *a_itr;
+						}
+						catch (std::exception ex)
+						{
+							cout << ex.what()<<". Error in person_data_logger_implementation, line 531."<<endl;
+						}
+
+						cout <<"Clearing is ";
+						trip_records[i].clear();
+						activity_records[i].clear();
+						cout <<" Done."<<endl;
+					}
 				}
 			}
 			template<typename TargetType> void Write_Summary_Data_To_File()
@@ -630,8 +673,10 @@ namespace Person_Components
 			
 
 				//==============================================================================================
-				// write trips, only if it represents a valid movement (i.e. not the null first trip of the day)		
-				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
+				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
+				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
+				polaris::io::Trip* trip_rec = new polaris::io::Trip();
+
 				trip_rec->setConstraint(0);
 				trip_rec->setPerson(person->template uuid<int>());
 				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
@@ -656,14 +701,13 @@ namespace Person_Components
 				trip_rec->setPriority(0);
 				trip_rec->setVehicle(9);
 				trip_rec->setType(1);
-				// add trip to the buffer for the current thread
-				trip_buff[__thread_id].push_back(trip_rec);
-				
-
+					
 
 				//==============================================================================================
-				// write activity to database
-				shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
+				// create activity record
+				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
+				polaris::io::Activity* act_rec = new polaris::io::Activity();
+
 				if (new_destination<0)
 					act_rec->setLocation_Id(dest->template uuid<int>());
 				else 
@@ -679,9 +723,14 @@ namespace Person_Components
 				else
 					act_rec->setMode ("TRANSIT");
 				act_rec->setType (act->template Get_Type_String<NT>());
-				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
-				act_rec->setTrip (trip_rec);			
-				activity_buff[__thread_id].push_back(act_rec);
+				//act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
+				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
+				//act_rec->setTrip (trip_rec);	
+				act_rec->setTrip (trip_rec->getTrip_Id());	
+
+				// add trip and activity to the buffer for the current thread
+				trip_records_buffer[__thread_id].push_back(trip_rec);
+				activity_records_buffer[__thread_id].push_back(act_rec);
 			}
 		};
 	}

@@ -12,12 +12,12 @@ namespace Person_Components
 {
 	namespace Types
 	{
-		enum PLANNING_ITERATION_STEP_KEYS
-		{
-			ACTIVITY_GENERATION=19,
-			ACTIVITY_PLANNING,
-			MOVEMENT_PLANNING,
-		};
+		//enum PLANNING_ITERATION_STEP_KEYS
+		//{
+		//	ACTIVITY_GENERATION=19,
+		//	ACTIVITY_PLANNING=20,
+		//	MOVEMENT_PLANNING=21,
+		//};
 	}
 
 	namespace Concepts
@@ -88,12 +88,12 @@ namespace Person_Components
 					// If activity generation is to be performed, do that next
 					if(this_ptr->template Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.template Current_Time<Time_Seconds>()) 
 					{	
-						this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,response);
+						this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION,response);
 					}
 					else if (move_itr != movement_plans->end())
 					{
 						if (movement->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
-							this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,response);
+							this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION,response);
 						else
 							this_ptr->template Go_To_Next_Iteration<NT>(response);
 					}
@@ -106,16 +106,16 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
-				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
+				else if (sub_iteration() == Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION)
 				{
-					this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,response);
+					this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION,response);
 
 					this_ptr->Activity_Generation_Event<NT>();
 				}
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future subiteration() schedule
-				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
+				else if (sub_iteration() == Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION)
 				{
 					this_ptr->template Go_To_Next_Iteration<NT>(response);
 
@@ -131,7 +131,7 @@ namespace Person_Components
 				// set next planning time for other functions to use
 				this_ptr->template Next_Planning_Time<Simulation_Timestep_Increment>(iteration() + this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>());
 			}
-			template<typename TargetType> void Go_To_Subiteration(Person_Components::Types::PLANNING_ITERATION_STEP_KEYS subiteration, Event_Response& response)
+			template<typename TargetType> void Go_To_Subiteration(Scenario_Components::Types::Demand_Sub_Iteration_keys subiteration, Event_Response& response)
 			{
 				response.next._iteration = iteration();
 				response.next._sub_iteration = subiteration;
