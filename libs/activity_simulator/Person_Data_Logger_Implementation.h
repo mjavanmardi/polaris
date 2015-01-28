@@ -19,45 +19,20 @@ namespace Person_Components
 			boost::container::vector<int>* ttime_distribution;
 			boost::container::vector<string>* output_data;
 			boost::container::vector<string>* output_data_buffer;
+			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
+			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
 
-			//std::vector<shared_ptr<polaris::io::Trip>>* trip_records;
-			//std::vector<shared_ptr<polaris::io::Trip>>* trip_records_buffer;
-			//std::vector<shared_ptr<polaris::io::Activity>>* activity_records;
-			//std::vector<shared_ptr<polaris::io::Activity>>* activity_records_buffer;
-			std::vector<polaris::io::Trip*>* trip_records;
-			std::vector<polaris::io::Trip*>* trip_records_buffer;
-			std::vector<polaris::io::Activity*>* activity_records;
-			std::vector<polaris::io::Activity*>* activity_records_buffer;
 
-			//boost::container::vector<int> planned_acts[num_sim_threads()];
-			//boost::container::vector<int> executed_acts[num_sim_threads()];
-			//boost::container::vector<int> ttime_distribution[num_sim_threads()];
-			//boost::container::vector<string> output_data[num_sim_threads()];
-			//boost::container::vector<string> output_data_buffer[num_sim_threads()];
-			//boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records[num_sim_threads()];
-			//boost::container::vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[num_sim_threads()];
-			//boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records[num_sim_threads()];
-			//boost::container::vector<shared_ptr<polaris::io::Activity>> activity_records_buffer[num_sim_threads()];
 
 			float* expected_ttime;
 			float* routed_ttime;
 			float* actual_ttime;
 			int* num_acts_in_interval;
-			//float expected_ttime[num_sim_threads()];
-			//float routed_ttime[num_sim_threads()];
-			//float actual_ttime[num_sim_threads()];
-			//int num_acts_in_interval[num_sim_threads()];
+
 
 			boost::container::vector<string>* buff;
 			boost::container::vector<string>* current;
-			/*std::vector<shared_ptr<polaris::io::Trip>>* trip_buff;
-			std::vector<shared_ptr<polaris::io::Trip>>* trip_current;
-			std::vector<shared_ptr<polaris::io::Activity>>* activity_buff;
-			std::vector<shared_ptr<polaris::io::Activity>>* activity_current;*/
-			//std::vector<polaris::io::Trip*>* trip_buff;
-			//std::vector<polaris::io::Trip*>* trip_current;
-			//std::vector<polaris::io::Activity*>* activity_buff;
-			//std::vector<polaris::io::Activity*>* activity_current;
+
 
 			m_data(ofstream, log, NONE, NONE);
 			m_data(string, filename, NONE, NONE);
@@ -93,10 +68,10 @@ namespace Person_Components
 				//trip_records_buffer = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
 				//activity_records = new std::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
 				//activity_records_buffer = new std::vector<shared_ptr<polaris::io::Activity>>[num_sim_threads()];
-				trip_records = new std::vector<polaris::io::Trip*>[num_sim_threads()];
-				trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
-				activity_records = new std::vector<polaris::io::Activity*>[num_sim_threads()];
-				activity_records_buffer = new std::vector<polaris::io::Activity*>[num_sim_threads()];
+				//trip_records = new std::vector<polaris::io::Trip*>[num_sim_threads()];
+				//trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
+				activity_records = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
+				activity_records_buffer = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 
 				expected_ttime = new float[num_sim_threads()];
 				routed_ttime = new float[num_sim_threads()];
@@ -386,12 +361,12 @@ namespace Person_Components
 					pthis->current = tmp;
 
 					//std::vector<shared_ptr<polaris::io::Trip>>* tmp_trip = pthis->trip_buff;
-					std::vector<polaris::io::Trip*>* tmp_trip = pthis->trip_records_buffer;
-					pthis->trip_records_buffer = pthis->trip_records;
-					pthis->trip_records = tmp_trip;
+					//std::vector<polaris::io::Trip*>* tmp_trip = pthis->trip_records_buffer;
+					//pthis->trip_records_buffer = pthis->trip_records;
+					//pthis->trip_records = tmp_trip;
 
 					//std::vector<shared_ptr<polaris::io::Activity>>* tmp_act = pthis->activity_buff;
-					std::vector<polaris::io::Activity*>* tmp_act = pthis->activity_records_buffer;
+					std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* tmp_act = pthis->activity_records_buffer;
 					pthis->activity_records_buffer = pthis->activity_records;
 					pthis->activity_records = tmp_act;
 
@@ -416,7 +391,6 @@ namespace Person_Components
 			{
 				for (int i=0; i< (int)num_sim_threads(); ++i)
 				{
-					cout <<"Writing data for thread " << i;
 
 					// write out strings in the current buffer to log file and clear it
 					for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
@@ -492,21 +466,15 @@ namespace Person_Components
 						try
 						{
 							odb::transaction t(this->_db_ptr->begin());
-							/*for (std::vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+
+							// iterate over trip-activity pairs and push to database
+							for (std::vector<pair<polaris::io::Trip,polaris::io::Activity>>::iterator itr = activity_records[i].begin(); itr != activity_records[i].end(); ++itr)
 							{
-								this->_db_ptr->persist(*itr);
-							}
-							for (std::vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
-							{
-								this->_db_ptr->persist(*itr);
-							}*/
-							for (std::vector<polaris::io::Trip*>::iterator itr = trip_records[i].begin(); itr != trip_records[i].end(); ++itr)
-							{
-								this->_db_ptr->persist(*(*itr));
-							}
-							for (std::vector<polaris::io::Activity*>::iterator itr = activity_records[i].begin(); itr != activity_records[i].end(); ++itr)
-							{
-								this->_db_ptr->persist(*(*itr));
+								polaris::io::Trip& t = itr->first;
+								polaris::io::Activity& a = itr->second;
+								unsigned long t_id = this->_db_ptr->persist(t);
+								a.setTrip (t_id);
+								this->_db_ptr->persist(a);
 							}
 							t.commit();
 						}
@@ -515,22 +483,8 @@ namespace Person_Components
 							cout << ex.message()<<". DB error in person_data_logger_implementation, line 519."<<endl;
 						}
 
-						try
-						{
-							cout <<". Clearing buffer of "<<trip_records[i].size()<<" trips ";
-							for (std::vector<polaris::io::Trip*>::iterator t_itr = trip_records[i].begin(); t_itr != trip_records[i].end(); ++t_itr) delete *t_itr;
-							cout <<" and "<<activity_records[i].size()<<" activities. ";
-							for (std::vector<polaris::io::Activity*>::iterator a_itr = activity_records[i].begin(); a_itr != activity_records[i].end(); ++a_itr) delete *a_itr;
-						}
-						catch (std::exception ex)
-						{
-							cout << ex.what()<<". Error in person_data_logger_implementation, line 531."<<endl;
-						}
-
-						cout <<"Clearing is ";
-						trip_records[i].clear();
+						// erase buffer
 						activity_records[i].clear();
-						cout <<" Done."<<endl;
 					}
 				}
 			}
@@ -675,62 +629,63 @@ namespace Person_Components
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
-				polaris::io::Trip* trip_rec = new polaris::io::Trip();
-
-				trip_rec->setConstraint(0);
-				trip_rec->setPerson(person->template uuid<int>());
-				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
-				if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
-				else trip_rec->setDestination(new_destination);
-				trip_rec->setDuration(act->template Duration<Time_Seconds>());
-				//trip_rec->setEnd(act->template End_Time<Time_Seconds>());
-				trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
-				trip_rec->setHhold(hh->template uuid<int>());
-				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec->setMode(0);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec->setMode(1);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec->setMode(2);
-				else trip_rec->setMode(3);
-				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
-				else trip_rec->setOrigin(new_origin);
-				trip_rec->setPartition(0);
-				trip_rec->setPassengers(0);
-				trip_rec->setPurpose(0);
-				//trip_rec->setStart(act->template Start_Time<Time_Seconds>());
-				trip_rec->setStart(move->template departed_time<Time_Seconds>());
-				trip_rec->setTour(0);
-				trip_rec->setPriority(0);
-				trip_rec->setVehicle(9);
-				trip_rec->setType(1);
+				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
+				polaris::io::Trip trip_rec;
+				trip_rec.setConstraint(0);
+				trip_rec.setPerson(person->template uuid<int>());
+				trip_rec.setTrip(act->template Activity_Plan_ID<int>());
+				if (new_destination<0) trip_rec.setDestination(dest->template uuid<int>());
+				else trip_rec.setDestination(new_destination);
+				trip_rec.setDuration(act->template Duration<Time_Seconds>());
+				//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
+				trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+				trip_rec.setHhold(hh->template uuid<int>());
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec.setMode(0);
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
+				else trip_rec.setMode(3);
+				if (new_origin <0) trip_rec.setOrigin(orig->template uuid<int>());
+				else trip_rec.setOrigin(new_origin);
+				trip_rec.setPartition(0);
+				trip_rec.setPassengers(0);
+				trip_rec.setPurpose(0);
+				//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
+				trip_rec.setStart(move->template departed_time<Time_Seconds>());
+				trip_rec.setTour(0);
+				trip_rec.setPriority(0);
+				trip_rec.setVehicle(9);
+				trip_rec.setType(1);
 					
 
 				//==============================================================================================
 				// create activity record
 				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
-				polaris::io::Activity* act_rec = new polaris::io::Activity();
+				//polaris::io::Activity* act_rec = new polaris::io::Activity();
+				polaris::io::Activity act_rec;
 
 				if (new_destination<0)
-					act_rec->setLocation_Id(dest->template uuid<int>());
+					act_rec.setLocation_Id(dest->template uuid<int>());
 				else 
-					act_rec->setLocation_Id(new_destination);
-				act_rec->setStart_Time (act->template Start_Time<Time_Seconds>());
-				act_rec->setDuration (act->template Duration<Time_Seconds>());
+					act_rec.setLocation_Id(new_destination);
+				act_rec.setStart_Time (act->template Start_Time<Time_Seconds>());
+				act_rec.setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-					act_rec->setMode ("AUTO");
+					act_rec.setMode ("AUTO");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
-					act_rec->setMode ("HOV");
+					act_rec.setMode ("HOV");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
-					act_rec->setMode ("WALK");
+					act_rec.setMode ("WALK");
 				else
-					act_rec->setMode ("TRANSIT");
-				act_rec->setType (act->template Get_Type_String<NT>());
-				//act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
-				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
-				//act_rec->setTrip (trip_rec);	
-				act_rec->setTrip (trip_rec->getTrip_Id());	
+					act_rec.setMode ("TRANSIT");
+				act_rec.setType (act->template Get_Type_String<NT>());
+				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
+				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
+				//act_rec.setTrip (trip_rec);	
+				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
 
 				// add trip and activity to the buffer for the current thread
-				trip_records_buffer[__thread_id].push_back(trip_rec);
-				activity_records_buffer[__thread_id].push_back(act_rec);
+				//trip_records_buffer[__thread_id].push_back(trip_rec);
+				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec,act_rec));
 			}
 		};
 	}
