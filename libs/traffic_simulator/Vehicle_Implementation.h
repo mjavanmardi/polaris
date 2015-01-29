@@ -287,9 +287,24 @@ namespace Vehicle_Components
 					_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
 					_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+									
+					// check to make sure that next link in the trajectory is not jammed
+					//_Link_Interface* next_link = mp->next_link<_Link_Interface*>();
+					if (position_index+2<traj_container.size())
+					{
+						_Trajectory_Unit_Interface* next_traj_unit = traj_container[position_index+2];
+						_Link_Interface* next_link = next_traj_unit->link<_Link_Interface*>();
+						int next_routed_travel_time = next_traj_unit->template estimated_link_accepting_time<int>();
+						
+						int diff = next_routed_travel_time - routed_travel_time;
+						routed_travel_time = next_routed_travel_time;
+
+						current_travel_time += next_link_travel_time<float>();
+						//if (current_travel_time >= 36000) cout <<"Next link id: " << next_link->uuid<int>()<<". Next link travel time: " << next_link_travel_time<float>()<<", routed time = "<<diff<<", delay ratio: " << (float)current_travel_time / (float)routed_travel_time<<endl;
+					}
+
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
 					
-
 
 					/*
 					{
@@ -369,16 +384,16 @@ namespace Vehicle_Components
 					// - sufficiently far from their destination in absolute terms
 
 					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() &&
-						(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() &&
-						( mp->estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>())
+						(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() /*&&
+						( mp->estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>()*/)
 					{
-						//cout << "switched: " << current_travel_time << " vs " << would_be_current_travel_time << " and " << routed_travel_time << " vs " << would_be_routed_travel_time << endl;
+						//cout << "switched: " << current_travel_time << " vs " << routed_travel_time << endl;
 
 						double r0 = Uniform_RNG.Next_Rand<double>();
 
 						if(r0 <= ((_Scenario_Interface*)_global_scenario)->template enroute_excessive_delay_factor<float>())
 						{
-							//cout << "vehicle id: " << vehicle->uuid<int>() << ", departure time: " << mp->template departed_time<Time_Seconds>() <<"current trajectory position: " << position_index << ", current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
+							//cout << "vehicle id: " << uuid<int>() << ", departure time: " << mp->template departed_time<Time_Seconds>() <<"current trajectory position: " << position_index << ", current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
 							enroute_switching_decision = true;
 							cause_for_switching = Scenario_Components::Types::Cause_For_Enroute_Switching::EXCESSIVE_DELAY;
 						}
@@ -446,6 +461,66 @@ namespace Vehicle_Components
 					enroute_switching<NULLTYPE>(cause_for_switching);
 					_last_enroute_switching_route_check_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>(); 
 				}
+			}
+
+			template<typename TargetType> TargetType next_link_travel_time()
+			{
+				//_Movement_Plan_Interface* mp = (_Movement_Plan_Interface*)_movement_plan;
+				//
+				//_Link_Interface* origin_link = mp->template current_link<_Link_Interface*>();
+
+				//int position_index = mp->template current_trajectory_position<int>();
+
+				//_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
+				//_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index+1];
+				//
+				/////calculate travel time of current route
+				//_Link_Interface* route_link = mp->template current_link<_Link_Interface*>();
+				//_Link_Interface* next_route_link = mp->next_link<_Link_Interface*>();
+				//// return 0 if we are at the end of the trajectory
+				//if (next_route_link==nullptr) return 0.0;
+
+				//int inbound_link_id = route_link->template uuid<int>();
+				//int outbound_link_id = next_route_link->template uuid<int>();
+				//typename MasterType::network_type::long_hash_key_type long_hash_key;
+				//long_hash_key.inbound_link_id = inbound_link_id;
+				//long_hash_key.outbound_link_id = outbound_link_id;
+				//typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+				//_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+				//return regular_movement->template forward_link_turn_travel_time<float>();
+
+				float current_travel_time = 0.0;
+
+				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+				typename _Trajectory_Container_Interface::iterator itr;
+
+				_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Link_Interface*>();
+				
+				///calculate travel time of current route
+				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr <= (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()) + 2; itr++)
+				{
+					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+					_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+
+					if (itr < trajectory.end() - 1)
+					{
+						_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
+						_Link_Interface* next_route_link = next_trajectory_unit->template link<_Link_Interface*>();
+
+						int inbound_link_id = route_link->template uuid<int>();
+						int outbound_link_id = next_route_link->template uuid<int>();
+
+						typename MasterType::network_type::long_hash_key_type long_hash_key;
+						long_hash_key.inbound_link_id = inbound_link_id;
+						long_hash_key.outbound_link_id = outbound_link_id;
+						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+						float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
+						current_travel_time += link_turn_travel_time;
+					}
+				}
+
+				return current_travel_time;
 			}
 
 			template<typename TargetType> void unload()

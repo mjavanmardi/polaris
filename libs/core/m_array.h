@@ -326,7 +326,7 @@ public:
 	const_size_type size() {return _size;}
 	const_size_type size(size_type dimension) {return _dim_sizes[dimension];}
 	const_index_type dimensions(){return _dim_sizes;}
-	const_size_type num_dimensions() {return _ndim;}
+	size_type num_dimensions() {return _dim_sizes.size();}
 	value_type sum()
 	{
 		value_type _sum = 0;
@@ -361,7 +361,7 @@ public:
 	{
 		size_type ind=0;
 
-		if (index.size() != _ndim)
+		if (index.size() != _dim_sizes.size())
 		{
 			THROW_MATRIX_EXCEPTION("Error, incorrect number of dimensions in index.");
 		}
@@ -412,7 +412,6 @@ public:
 protected:
 	index_type _dim_sizes;
 	index_type _cursor;
-	size_type _ndim;
 	size_type _size;
 	pointer _data;
 
@@ -423,7 +422,6 @@ protected:
 		//cout <<endl<< "cleanup 1, ";
 		if (_size > 0) delete[] _data;
 		_size=0;
-		_ndim=0;
 		//cout << "cleanup 2, ";
 		if (_dim_sizes.size() > 0) _dim_sizes.clear();
 		//cout << "cleanup 3, ";
@@ -434,7 +432,7 @@ protected:
 
 	bool valid_index(const_index_type index)
 	{
-		if (index.size() != _ndim)
+		if (index.size() != _dim_sizes.size())
 		{
 			return false;
 		}
@@ -463,7 +461,6 @@ m_array<T>::m_array (void)
 {
 	_dim_sizes.clear();
 	_cursor.clear();
-	_ndim=0;
 	_size=0;
 	_data=nullptr;
 	//index_type dims;
@@ -503,7 +500,6 @@ void m_array<T>::_copy(const m_array<T>& obj)
 	//cout <<endl<< "copy 1, ";
 	_dim_sizes.clear();
 	_cursor.clear();
-	_ndim = obj._ndim;
 	_size = obj._size;
 
 	//cout << "copy 2, ";
@@ -531,10 +527,10 @@ void m_array<T>::Init(const_index_type dim_sizes)
 template <class T>
 void m_array<T>::_init(const_index_type dim_sizes)
 {
-	_ndim = (size_type)dim_sizes.size();
+	//_ndim = (size_type)dim_sizes.size();
 	_size = 1;
 
-	for (size_type i=0; i<_ndim; i++)
+	for (size_type i=0; i<dim_sizes.size(); i++)
 	{
 		_dim_sizes.push_back(dim_sizes[i]);
 		_cursor.push_back(0);
@@ -607,13 +603,13 @@ void m_array<T>::print(ostream& stream)
 template <class T>
 void m_array<T>::print(ostream& stream, int n)
 {
-	if (n == _ndim-2)
+	if (n == _dim_sizes.size()-2)
 	{	
 		// print header for higher dimensions
-		if(_ndim>2)
+		if(_dim_sizes.size()>2)
 		{
 			stream<<"Higher Dimensions: ";
-			for (uint k=0; k<_ndim-2; k++) stream<<"D"<<k<<"="<<_cursor[k]<<",";
+			for (uint k=0; k<_dim_sizes.size()-2; k++) stream<<"D"<<k<<"="<<_cursor[k]<<",";
 			stream<<endl;
 		}
 
@@ -771,7 +767,7 @@ public:
 	bool			empty(){ return (_size==0);}
 	void			clear(){_cleanup();}
 	void			resize(size_type rows, size_type cols, value_type value)
-	{
+	{ 
 		pair<size_type,size_type> new_dimensions = pair<size_type,size_type>(rows,cols);
 		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
@@ -863,7 +859,7 @@ public:
 		THROW_MATRIX_EXCEPTION("Error, can not request dimension size for dimension higher than 1");
 	}
 	const_index_type dimensions(){return _dim_sizes;}
-	const size_type& num_dimensions() {return _ndim;}
+	const size_type& num_dimensions() {return 2;}
 	const size_type& num_rows() {return _nrow;}
 	const size_type& num_cols() {return _ncol;}
 
@@ -887,7 +883,6 @@ public:
 protected:
 	index_type _dim_sizes;
 	index_type _cursor;
-	size_type _ndim;
 	size_type _nrow;
 	size_type _ncol;
 	size_type _size;
@@ -897,9 +892,8 @@ protected:
 	void _copy(const matrix& obj);
 	void _cleanup()
 	{
-		if (_size > 0) delete _data;
+		if (_size > 0) delete[] _data;
 		_size=0;
-		_ndim=0;
 		_dim_sizes.first=0; _dim_sizes.second=0;
 		_cursor_start();
 	}
@@ -952,7 +946,6 @@ template <class T>
 void matrix<T>::Copy(const_index_type dim_sizes, T* mem_to_copy)
 {
 	_cleanup();
-	_ndim = 2;
 	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
 	_size = dim_sizes.first * dim_sizes.second;
 	_nrow = dim_sizes.first;
@@ -965,7 +958,6 @@ void matrix<T>::_copy(const matrix<T>& obj)
 	this->_cursor_start();
 	this->_dim_sizes.first = obj._dim_sizes.first; this->_dim_sizes.second=obj._dim_sizes.second;
 
-	_ndim = 2;
 	_size = obj._size;
 	_nrow = obj._nrow;
 	_ncol = obj._ncol;
@@ -983,7 +975,6 @@ void matrix<T>::Init(const_index_type dim_sizes)
 template <class T>
 void matrix<T>::_init(const_index_type dim_sizes)
 {
-	_ndim = 2;
 	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
 	_size = dim_sizes.first * dim_sizes.second;
 	_nrow = dim_sizes.first;

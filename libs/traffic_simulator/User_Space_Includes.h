@@ -4,6 +4,7 @@
 #include "../Repository/Repository.h"
 #include "User_Space_Forward_Declaration.h"
 #include "Traffic_Simulator_Concepts.h"
+#include "Traffic_Simulator_Types.h"
 
 
 //#include "RngStream.h"
@@ -28,91 +29,6 @@ using namespace __gnu_cxx;
 
 #define WHILE_PRINT(value)
 //#define WHILE_PRINT(value) cout << value
-
-
-#ifdef HIDE
-//================================================================================================================================================================
-//================================= TEMPORARY CORE METASTRUCTURE UPDATES =========================================================================================
-//================================================================================================================================================================
-#pragma region TEMP_CORE
-
-typedef unsigned long ulong;
-
-
-
-///======================================================================================
-/// RTTI STUFF - in production
-
-#define m_prototype_RTTI(Null_Prototype<FEATURE_NAME>, NUM_OVERLOADS, OVERLOAD_INDICATOR_NAME_1, OVERLOAD_MATCHING_CONCEPT_1, ...)\
-	protected:\
-	void* _##FEATURE_NAME;\
-	public:\
-	tag_getter_setter(FEATURE_NAME);\
-	enum OVERLOAD_INDICATORS{ OVERLOAD_INDICATOR_NAME_1,\
-	create_overload_names(NUM_OVERLOADS,__VA_ARGS__)};\
-	OVERLOAD_INDICATORS overload_indicator;\
-	_m_prototype_RTTI_add_setter(Null_Prototype<FEATURE_NAME>, OVERLOAD_INDICATOR_NAME_1, OVERLOAD_MATCHING_CONCEPT_1)\
-	add_setter(NUM_OVERLOADS,FEATURE_NAME,__VA_ARGS__)\
-	error_handler_RTTI(NUM_OVERLOADS,FEATURE_NAME,OVERLOAD_MATCHING_CONCEPT_1,__VA_ARGS__);\
-	template<typename TargetType> OVERLOAD_INDICATORS FEATURE_NAME##_get_type(){return overload_indicator;}
-
-
-#define _m_prototype_RTTI_add_setter(Null_Prototype<FEATURE_NAME>, OVERLOAD_INDICATOR_NAME, OVERLOAD_CONCEPT)\
-	template<typename TargetType> void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,strip_modifiers(TargetType), Is_Polaris_Component) && OVERLOAD_CONCEPT))\
-	{\
-		_##FEATURE_NAME = (void*)value;\
-		overload_indicator = OVERLOAD_INDICATOR_NAME;\
-	}
-#define _error_handler_RTTI(FEATURE_NAME, CONCEPTS)\
-	template<typename TargetType> void FEATURE_NAME(TargetType value,call_requirements(!(requires(TargetType,strip_modifiers(TargetType), Is_Polaris_Component) && (CONCEPTS))))\
-	{\
-		assert_requirements(strip_modifiers(TargetType),Is_Polaris_Component,"TargetType is not a Polaris Component");\
-		static_assert(false,"\n\n\n[--------- None of " #FEATURE_NAME" setter requirements from {"#CONCEPTS"} were matched---------]\n\n");\
-	}
-
-
-#define create_overload_names(N,...) create_overload_names_##N##_((__VA_ARGS__))
-#define create_overload_names_2_(ARGS) create_overload_names_2 ARGS
-#define create_overload_names_2(NAME) NAME
-#define create_overload_names_3_(ARGS) create_overload_names_3 ARGS
-#define create_overload_names_3(NAME,CONCEPT,NAME2) NAME, NAME2
-#define create_overload_names_4_(ARGS) create_overload_names_4 ARGS
-#define create_overload_names_4(NAME,CONCEPT,NAME2,CONCEPT2,NAME3) NAME, NAME2, NAME3
-#define create_overload_names_5_(ARGS) create_overload_names_5 ARGS
-#define create_overload_names_5(NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4) NAME,NAME2,NAME3,NAME4
-#define create_overload_names_6_(ARGS) create_overload_names_6 ARGS
-#define create_overload_names_6(NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4,NAME5) NAME,NAME2,NAME3,NAME4,NAME5
-
-
-#define add_setter(N,...) add_setter_##N##_((__VA_ARGS__))
-#define add_setter_2_(ARGS) add_setter_2 ARGS
-#define add_setter_2(Null_Prototype<FEATURE_NAME>, NAME, CONCEPT) _m_prototype_RTTI_add_setter(FEATURE_NAME, NAME, CONCEPT)
-#define add_setter_3_(ARGS) add_setter_3 ARGS
-#define add_setter_3(Null_Prototype<FEATURE_NAME>, NAME,CONCEPT,NAME2, CONCEPT2) _m_prototype_RTTI_add_setter(FEATURE_NAME, NAME, CONCEPT) _member_component_RTTI_add_setter(FEATURE_NAME, NAME2, CONCEPT2)
-#define add_setter_4_(ARGS) add_setter_4 ARGS
-#define add_setter_4(Null_Prototype<FEATURE_NAME>, NAME,CONCEPT,NAME2,CONCEPT2,NAME3, CONCEPT3) _m_prototype_RTTI_add_setter(FEATURE_NAME, NAME, CONCEPT) _member_component_RTTI_add_setter(FEATURE_NAME, NAME2, CONCEPT2) _member_component_RTTI_add_setter(FEATURE_NAME, NAME3, CONCEPT3)
-#define add_setter_5_(ARGS) add_setter_5 ARGS
-#define add_setter_5(Null_Prototype<FEATURE_NAME>, NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4, CONCEPT4) _m_prototype_RTTI_add_setter(FEATURE_NAME, NAME, CONCEPT) _member_component_RTTI_add_setter(FEATURE_NAME, NAME2, CONCEPT2) _member_component_RTTI_add_setter(FEATURE_NAME, NAME3, CONCEPT3) _member_component_RTTI_add_setter(FEATURE_NAME, NAME4, CONCEPT4)
-#define add_setter_6_(ARGS) add_setter_6 ARGS
-#define add_setter_6(Null_Prototype<FEATURE_NAME>, NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4,NAME5, CONCEPT5) _m_prototype_RTTI_add_setter(FEATURE_NAME, NAME, CONCEPT) _member_component_RTTI_add_setter(FEATURE_NAME, NAME2, CONCEPT2) _member_component_RTTI_add_setter(FEATURE_NAME, NAME3, CONCEPT3) _member_component_RTTI_add_setter(FEATURE_NAME, NAME4, CONCEPT4) _member_component_RTTI_add_setter(FEATURE_NAME, NAME5, CONCEPT5)
-
-#define error_handler_RTTI(N,...) error_handler_RTTI_##N##_((__VA_ARGS__))
-#define error_handler_RTTI_2_(ARGS) error_handler_RTTI_2 ARGS
-#define error_handler_RTTI_2(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2))
-#define error_handler_RTTI_3_(ARGS) error_handler_RTTI_3 ARGS
-#define error_handler_RTTI_3(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2) || (CONCEPT3))
-#define error_handler_RTTI_4_(ARGS) error_handler_RTTI_4 ARGS
-#define error_handler_RTTI_4(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2)|| (CONCEPT3)|| (CONCEPT4))
-#define error_handler_RTTI_5_(ARGS) error_handler_RTTI_5 ARGS
-#define error_handler_RTTI_5(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4,NAME5,CONCEPT5) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2)|| (CONCEPT3)|| (CONCEPT4)|| (CONCEPT5))
-#define error_handler_RTTI_6_(ARGS) error_handler_RTTI_6 ARGS
-#define error_handler_RTTI_6(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4,NAME5,CONCEPT5,NAME6,CONCEPT6) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2)|| (CONCEPT3)|| (CONCEPT4)|| (CONCEPT5)|| (CONCEPT6))
-
-//================================================================================================================================================================
-//================================================================================================================================================================
-//================================================================================================================================================================
-#pragma endregion
-#endif
 
 
 #ifdef _MSC_VER
@@ -181,4 +97,264 @@ public:
 
 #ifndef _MSC_VER
 #define FLT_MAX	3.402823466e+38F	/* max value */
+#endif
+
+#define INFINITY_FLOAT 9999999
+
+//left substring
+string left(string s, int pos)
+{
+	s = s.substr(0,pos);
+	return s;
+};
+
+//right substring
+string right(string s, int pos)
+{
+	s = s.substr(pos,(int)s.size());
+	return s;
+};
+
+//extract substring
+string substring(string s, int pos1, int pos2)
+{
+	s = s.substr(pos1, pos2);
+	return s;
+};
+
+//convert hh:mm:ss to seconds
+int convert_hhmmss_to_seconds(string hhmmss)
+{
+	string hh,mm,ss;
+	//int pos = (int) hhmmss.find(":");
+	int pos = 2;
+	hh = left(hhmmss,pos);
+	hhmmss = right(hhmmss,pos+1);
+
+	//pos = (int) hhmmss.find(":");
+	pos = 2;
+	mm = left(hhmmss,pos);
+	ss = right(hhmmss,pos+1);
+	int h = stoi(hh);
+	int m = stoi(mm);
+	int s = stoi(ss);
+
+	int time_in_seconds = h*3600 + m*60 + s;
+	
+	return time_in_seconds;
+};
+
+//convert hh:mm:ss to seconds
+int convert_hhmm_to_seconds(string hhmm)
+{
+	string hh,mm;
+	int pos = 2;
+
+	hh = left(hhmm,pos);
+	mm = right(hhmm,pos+1);
+	
+	int h = stoi(hh);
+	int m = stoi(mm);
+
+	int time_in_seconds = h*3600 + m*60;
+	
+	return time_in_seconds;
+};
+
+void string_split(boost::container::vector<std::string>& results, const std::string &source, const int fields)
+{
+	results.clear();
+	results.resize(fields);
+
+	const char* s = source.c_str();
+	const char* s2;
+	int count;
+	int pos = 0;
+	while (pos < fields)
+	{
+		count = 0;
+		while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
+		if (*s == '\0')
+		{
+			break;
+		}
+		s2 = s;
+		while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
+		{
+			s2++;
+			count++;
+		}
+		results[pos].assign(s, count);
+		s = s2;
+		pos++;
+	}
+};
+
+void string_split(boost::container::vector<std::string>& results, const std::string &source)
+{
+	results.clear();
+
+	const char* s = source.c_str();
+	const char* s2;
+	int count;
+	while (true)
+	{
+		count = 0;
+		while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
+		if (*s == '\0')
+		{
+			break;
+		}
+		s2 = s;
+		while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
+		{
+			s2++;
+			count++;
+		}
+		string str;
+		str.assign(s, count);
+		results.push_back(str);
+		s = s2;
+	}
+};
+
+//convert seconds to hh:mm:ss
+string convert_seconds_to_hhmmss(int time_in_seconds)
+{
+	long long h = time_in_seconds/3600;
+	time_in_seconds = time_in_seconds%3600;
+	long long m = time_in_seconds/60;
+	time_in_seconds = time_in_seconds%60;
+	long long s = time_in_seconds;
+	string hh = to_string(h);
+	if (hh.size()==1)
+	{
+		hh = "0" + hh;
+	}
+	string mm = to_string(m);
+	if (mm.size()==1)
+	{
+		mm = "0" + mm;
+	}
+
+	string ss = to_string(s);
+	if (ss.size()==1)
+	{
+		ss = "0" + ss;
+	}
+
+	string hhmmss = hh + ":" + mm + ":" + ss;
+	return hhmmss;
+};
+
+string convert_seconds_to_hhmm(int time_in_seconds)
+{
+	long long h = time_in_seconds/3600;
+	time_in_seconds = time_in_seconds%3600;
+	long long m = time_in_seconds/60;
+	time_in_seconds = time_in_seconds%60;
+	long long s = time_in_seconds;
+	string hh = to_string(h);
+	if (hh.size()==1)
+	{
+		hh = "0" + hh;
+	}
+	string mm = to_string(m);
+	if (mm.size()==1)
+	{
+		mm = "0" + mm;
+	}
+
+	string ss = to_string(s);
+	if (ss.size()==1)
+	{
+		ss = "0" + ss;
+	}
+
+	string hhmm = hh + ":" + mm;
+	return hhmm;
+};
+
+void calculate_mean_standard_deviation(const boost::container::vector<float>& data_array, float& mean, float& standard_deviation)
+{
+	int array_size = int(data_array.size());
+	if (array_size>1)
+	{
+		mean = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			mean += data_array[i];
+		}
+		mean = float (mean/(float(array_size)));
+		standard_deviation = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			standard_deviation += (data_array[i] - mean)*(data_array[i] - mean);
+		}
+
+		standard_deviation = float(sqrt(double(standard_deviation/float(array_size-1))));
+	}
+	else
+	{
+		if (array_size ==1)
+		{
+			mean = data_array[0];
+			standard_deviation = 0.0f;
+		}
+		else
+		{
+			mean = 0.0f;
+			standard_deviation = 0.0f;
+		}
+	}
+};
+
+void calculate_mean(const boost::container::vector<float>& data_array, float& mean)
+{
+	int array_size = int(data_array.size());
+	if (array_size>1)
+	{
+		mean = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			mean += data_array[i];
+		}
+		mean = float (mean/(float(array_size)));
+	}
+	else
+	{
+		if (array_size ==1)
+		{
+			mean = data_array[0];
+		}
+		else
+		{
+			mean = 0.0f;
+		}
+	}
+};
+
+#ifdef __GNUC__
+	double get_current_cpu_time_in_seconds()
+	{
+		struct timespec current_cpu_time;
+		double current_cpu_time_in_seconds;
+		clock_gettime(CLOCK_REALTIME, &current_cpu_time);
+
+		current_cpu_time_in_seconds = (double)((current_cpu_time.tv_sec * 1000000000 + current_cpu_time.tv_nsec)) / 1000000000.0;
+		return current_cpu_time_in_seconds;
+	};
+#else
+	double get_current_cpu_time_in_seconds()
+	{
+		LARGE_INTEGER current_cpu_time;
+		LARGE_INTEGER query_performance_frequency;
+		double current_cpu_time_in_seconds;
+
+		QueryPerformanceFrequency(&query_performance_frequency);
+		QueryPerformanceCounter(&current_cpu_time);
+
+		current_cpu_time_in_seconds =(double) (current_cpu_time.QuadPart/((double)query_performance_frequency.QuadPart));	
+		return current_cpu_time_in_seconds;
+	};
 #endif

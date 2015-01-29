@@ -230,11 +230,18 @@ void run_with_input_from_db(char* scenario_filename);
 
 int main(int argc, char* argv[])
 {
+	char* scenario_filename = "scenario.json";
+	if (argc >= 2) scenario_filename = argv[1];
+
+	int num_threads = 1;
+	if (argc >= 3) num_threads = std::max(atoi(argv[2]),num_threads);
+
+	cout << "Running NetworkModel" << endl;
+
 	//initialize the core
 	Simulation_Configuration cfg;
-	//cfg.Single_Threaded_Setup(24*60*60);
 	//nuber of iterations, number of threads, TODO: should use argv instedad
-	cfg.Multi_Threaded_Setup(24*60*60,12);
+	cfg.Multi_Threaded_Setup(24*60*60,num_threads);
 	INITIALIZE_SIMULATION(cfg);
 
     Average_Execution_Objects_Hint<MasterType::routing_type>(27784950);
@@ -244,23 +251,8 @@ int main(int argc, char* argv[])
 #ifdef ANTARES
 	Average_Execution_Objects_Hint<MasterType::antares_layer_type>(10);
 #endif
-	char* scenario_filename = "scenario.json";
-	if (argc >= 2) scenario_filename = argv[1];
 
-	cout << "Running NetworkModel" << endl;
-	if (argc > 1 && strcmp(argv[1], "input_from_files") == 0)
-	{
-		cout << "Input from files" << endl;
-		//this feture is not supported anymore, only database inputs
-		//run_with_input_from_files();
-	}
-	else
-	{
-
-		cout << "Input from DB" << endl;
-		run_with_input_from_db(scenario_filename);
-
-	}
+	run_with_input_from_db(scenario_filename);
 }
 
 

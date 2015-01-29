@@ -23,6 +23,10 @@ namespace PopSyn
 
 			template<typename TargetType> void Initialize()
 			{
+				this->_ID=0;
+				this->_Sample_Data.clear();
+				this->_parent_reference=nullptr;
+				this->_Solver_Settings=nullptr;
 			}
 
 			// pass through functions to access the Top-level class scenario/network
@@ -101,6 +105,9 @@ namespace PopSyn
 			// Initializers which creates and intializes the data containers based on the stated dimensions of the household and person control variables
 			template<typename ContainerType> void Initialize(ContainerType dims_hh, ContainerType dims_per, int dims_hh_test, int dims_per_test)
 			{
+				// Call base initializer
+				_Synthesis_Zone_Base_Implementation<MasterType>::Initialize<NT>();
+
 				// Create the dimension vectors for the hh and person distributions from linker
 				typename Target_Joint_Distribution_type::index_type dimensions_hh;
 				typename Target_Person_Joint_Distribution_type::index_type dimensions_per;

@@ -86,7 +86,7 @@ namespace Prototypes
 			}
 
 			// DO PRE-TRIP PLANNING, THEN SCHEDULE NEXT ITERATION FOR DEPARTURE TIME
-			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION)
+			else if (sub_iteration() == Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION)
 			{
 				response.next._iteration = iteration();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION;
@@ -152,7 +152,7 @@ namespace Prototypes
 			int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<TimeType>(iteration()+1);
 			if (departure_time > iteration() + 2) 
 			{	
-				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION);
 				//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
 			}
 			else 

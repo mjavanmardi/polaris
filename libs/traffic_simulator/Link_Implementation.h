@@ -1143,7 +1143,9 @@ namespace Link_Components
 			template<typename TargetType> float free_flow_speed_estimate()
 			{
 				float ffspd = -1.0f;
-				if (_speed_limit < 40) 
+				if (_speed_limit <= 0.0)
+					ffspd = 0.0001f;
+				else if (_speed_limit < 40) 
 					ffspd = _speed_limit + 5;
 				else if (_speed_limit >= 40 && _speed_limit < 50) 
 					ffspd = _speed_limit + 7;

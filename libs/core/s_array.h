@@ -245,12 +245,24 @@ public:
 
 		s_array<T> tmp = s_array<T>(*this);
 		this->_cleanup();
-		this->_init(new_row_sizes);
-		//*this = s_array<T>(new_row_sizes,value);
+		//this->_init(new_row_sizes);
+		*this = s_array<T>(new_row_sizes, value);
 
-		iterator itr = this->begin();
+		//cout<<", new data_ptr="<<this->_data<<", this_ptr="<<this;
 
-		for (itr; itr != this->end(); ++itr)
+		//iterator itr = this->begin();
+
+		//cout<<", new data_ptr="<<this->_data<<", this_ptr="<<this;
+
+		for (int i = 0; i < tmp.num_dimensions(); ++i)
+		{
+			for (int j=0; j < tmp.dimensions()[i]; ++j)
+			{
+				this->operator()(i,j) = tmp(i,j);
+			}
+		}
+
+		/*for (itr; itr != this->end(); ++itr)
 		{
 			const_index_type index = itr.get_index();
 			if (tmp.valid_index(index))
@@ -259,11 +271,11 @@ public:
 				(*itr) = tmp._data[i];
 			}
 			else (*itr) = value;		
-		}
+		}*/
 	}
 
 	// MArray constructors/destructor
-	s_array (void){_size = 0;_ndim=0;_data=nullptr;}
+	s_array (void){_size = 0;_data=nullptr;}
 	s_array (const_dimensional_type row_sizes);
 	s_array (const_dimensional_type row_sizes, T init_val);
 	s_array (const s_array& obj);
@@ -315,23 +327,26 @@ public:
 	const_size_type size() {return _size;}
 	const_size_type size(size_type row_index) {return _row_sizes[row_index];}
 	const_dimensional_type dimensions(){return _row_sizes;}
-	const_size_type num_dimensions(){return _ndim;}
+	size_type num_dimensions(){return _row_sizes.size();}
 
 	// display member
 	void print(ostream& stream);
+	void print_address()
+	{
+		cout <<"ADDR: "<<_data<<endl;
+	}
 
 protected:
 	boost::container::vector<size_type> _row_sizes;
 	index_type _cursor;
 	size_type _size;
-	size_type _ndim;
 	pointer _data;
 
 	void _init(const_dimensional_type row_sizes);
 	void _copy(const s_array& obj);
 	void _cleanup()
 	{
-		if (_size > 0) delete _data;
+		if (_size > 0) delete[] _data;
 		_size=0;
 		_row_sizes.clear();
 		_cursor.first=0; _cursor.second=0;
@@ -421,7 +436,6 @@ void s_array<T>::_init(const_dimensional_type row_sizes)
 	_size = 1;
 	_cursor.first = 0;
 	_cursor.second = 0;
-	_ndim = (size_type)row_sizes.size();
 
 	for (size_type i=0; i<row_sizes.size(); i++)
 	{
