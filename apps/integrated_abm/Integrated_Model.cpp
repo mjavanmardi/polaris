@@ -159,6 +159,7 @@ struct MasterType
 	typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
+	typedef Hazard_Model_Components::Implementations::Additive_Weibull_Baseline_Hazard_Implementation<MT> hazard_model_type;
 	
 	#ifdef ANTARES
 		//typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
@@ -281,7 +282,19 @@ int main(int argc,char** argv)
 
 	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
 
-	
+	typedef Hazard_Model_Components::Prototypes::Hazard_Model<MasterType::hazard_model_type> hazard_model_itf;
+	hazard_model_itf* hazard = (hazard_model_itf*)Allocate<MasterType::hazard_model_type>();
+	hazard->Initialize(0.21,0.39,1.16,0.57);
+
+	for (float i=0.25; i<14; i+=0.25)
+	{
+		cout << i <<","<<hazard->Evaluate_Baseline_Hazard<float,Time_Days>(i)<<endl;
+	}
+
+	float start=1.0;
+	float end = 1.25;
+	float betaX = 3.0;
+	hazard->Evaluate_Failure_Probability<float,Time_Days>(start,end,betaX);
 	
 
 	//==================================================================================================================================

@@ -75,7 +75,7 @@ namespace Person_Components
 			}
 
 			local_check_template_method_name(Has_Initialize,Initialize);
-			template<typename TargetType> void Initialize(/*requires(TargetType,check(ComponentType, Has_Initialize))*/)
+			template<typename TargetType> void Initialize()
 			{
 				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 
