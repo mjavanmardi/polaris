@@ -67,11 +67,19 @@ namespace Hazard_Model_Components
 			{	
 				return this_component()->Evaluate_Baseline_Hazard<TargetType,TimeType>(t);
 			}	
+			template<typename TargetType, typename TimeType> TargetType Evaluate_Survival(TimeType t, TargetType BX)
+			{
+				return this_component()->Evaluate_Survival<TargetType,TimeType>(t, BX);
+			}
 			template<typename TargetType, typename TimeType> TargetType Evaluate_Failure_Probability(TimeType t1, TimeType t2, TargetType BetaX)
 			{	
 				return this_component()->Evaluate_Failure_Probability<TargetType,TimeType>(t1,t2,BetaX);
-			}	
-			
+			}
+
+			template<typename TargetType, typename TimeType> TimeType Evaluate_Inverse_Survival(TargetType p, TargetType BetaX)
+			{	
+				return this_component()->Evaluate_Inverse_Survival<TargetType,TimeType>(p,BetaX);
+			}
 
 
 

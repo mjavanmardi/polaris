@@ -13,13 +13,56 @@ namespace Hazard_Model_Components
 	{
 		implementation struct Hazard_Model_Implementation : public Polaris_Component<MT,INHERIT(Hazard_Model_Implementation),Data_Object>
 		{
+			typedef Prototypes::Hazard_Model<ComponentType> this_itf;
+
 			template<typename TargetType, typename TimeType> TargetType Evaluate_Failure_Probability(TimeType t1, TimeType t2, TargetType BX)
 			{	
-				typedef Prototypes::Hazard_Model<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				double S0 = pthis->Evaluate_Survival(t1,BX);
 				double S1 = pthis->Evaluate_Survival(t2,BX);
 				return (S0-S1) / S1;
+			}
+
+			template<typename TargetType, typename TimeType> TimeType Evaluate_Inverse_Survival(TargetType p, TargetType BX)
+			{
+				this_itf* pthis = (this_itf*)this;
+
+				TimeType t_l = 0.0;
+				TimeType t_r = 20.0;
+				TimeType t_mid;
+				double TOL = 1.0 / 1440.0;
+				int iter = 0;
+				int Maxiter = 200;
+
+				// Get endpoint function values
+				double F_l, F_r, F_mid;
+				F_l = pthis->Evaluate_Survival(t_l,BX) - p;
+				F_r = pthis->Evaluate_Survival(t_r,BX) - p;
+
+				// move negative endpoint further if function doesnt cross zero
+				while (F_r > 0)
+				{
+					t_r = t_r * 2.0;
+					F_r = pthis->Evaluate_Survival(t_r,BX) - p;
+				}
+
+				while (t_r - t_l > TOL)
+				{
+					// Get endpoint function values
+					F_l = pthis->Evaluate_Survival(t_l,BX) - p;
+					F_r = pthis->Evaluate_Survival(t_r,BX) - p;
+
+					// calculate function value at bisection point
+					t_mid = (t_r - t_l) / 2.0 + t_l;
+					F_mid = pthis->Evaluate_Survival(t_mid,BX) - p;
+					if (F_mid > 0) t_l = t_mid;
+					else t_r = t_mid;
+					
+					// Throw exception if no root was found within limit
+					if (iter >= Maxiter) THROW_EXCEPTION("ERROR: root-finder failed during initialization of last activity times.");
+					iter++;
+				}
+				return t_mid;
 			}
 		};
 
@@ -52,6 +95,7 @@ namespace Hazard_Model_Components
 				//			exp (			-	C				*  exp(-Bx)			  * t^gamma  )
 				return std::exp(-1.0*(std::exp(-1.0*_constant)) * std::exp(-1.0 * BX) * std::pow(t,_gamma) );
 			}
+
 		};
 
 		implementation struct Additive_Weibull_Baseline_Hazard_Implementation : public Weibull_Baseline_Hazard_Implementation<MT,INHERIT(Additive_Weibull_Baseline_Hazard_Implementation)>

@@ -278,24 +278,38 @@ int main(int argc,char** argv)
 		Average_Execution_Objects_Hint<MasterType::person_mover_type>(people_hint);
 	}
 
-	//polaris::_type_counter.resize(__all_components->size(),threads+1,0);
 
-	//Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
 
 	typedef Hazard_Model_Components::Prototypes::Hazard_Model<MasterType::hazard_model_type> hazard_model_itf;
 	hazard_model_itf* hazard = (hazard_model_itf*)Allocate<MasterType::hazard_model_type>();
 	hazard->Initialize(0.21,0.39,1.16,0.57);
 
-	for (float i=0.25; i<14; i+=0.25)
-	{
-		cout << i <<","<<hazard->Evaluate_Baseline_Hazard<float,Time_Days>(i)<<endl;
-	}
 
 	float start=1.0;
 	float end = 1.25;
-	float betaX = 3.0;
-	hazard->Evaluate_Failure_Probability<float,Time_Days>(start,end,betaX);
-	
+	float betaX = 0.0;
+	//hazard->Evaluate_Failure_Probability<float,Time_Days>(start,end,betaX);
+
+	cout <<0.863172976106552<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.863172976106552,betaX)<<endl;
+	cout <<0.813077385380346<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.813077385380346,betaX)<<endl;
+	cout <<0.770961671535304<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.770961671535304,betaX)<<endl;
+	cout <<0.684937902991435<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.684937902991435,betaX)<<endl;
+	cout <<0.633437028856208<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.633437028856208,betaX)<<endl;
+	cout <<0.565350290085205<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.565350290085205,betaX)<<endl;
+	cout <<0.513897898373442<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.513897898373442,betaX)<<endl;
+	cout <<0.47052452258316<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.47052452258316,betaX)<<endl;
+	cout <<0.432392906345357<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.432392906345357,betaX)<<endl;
+	cout <<0.398171648584007<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.398171648584007,betaX)<<endl;
+	cout <<0.367105579623833<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.367105579623833,betaX)<<endl;
+	cout <<0.33870887024242<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.33870887024242,betaX)<<endl;
+	cout <<0.312639118817964<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.312639118817964,betaX)<<endl;
+	cout <<0.288637901280263<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.288637901280263,betaX)<<endl;
+	cout <<0.129140762883458<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.129140762883458,betaX)<<endl;
+	cout <<0.0563957856440104<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.0563957856440104,betaX)<<endl;
+	cout <<0.0239999441963992<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.0239999441963992,betaX)<<endl;
+	cout <<0.00997746020295199<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.00997746020295199,betaX)<<endl;
+	cout <<0.00406215210642316<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.00406215210642316,betaX)<<endl;
+
 
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
