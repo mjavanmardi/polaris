@@ -416,31 +416,28 @@ namespace PopSyn
 				network_itf* network = this->network_reference<network_itf*>();
 				scenario_itf* scenario = this->scenario_reference<scenario_itf*>();
 				
-				typename regions_itf::iterator r_itr;
-				typename zones_itf::iterator z_itr;
-				typename household_collection_itf::iterator p_itr;
-
+								
 				// initialize all of the synthesized individuals and assign unique ids
 				long uuid = 0; // globally unique person id
 				int counter = 0;
 
 				// Loop through all regions
-				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				for (typename regions_itf::iterator r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
 					region_itf* region = (region_itf*)r_itr->second;
 					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 
 					// loop through zones in each region
-					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					for (typename zones_itf::iterator z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_itf* zone = (zone_itf*)z_itr->second;
 
 						// loop through each synthesized person
 						household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
-						for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+						for (typename household_collection_itf::iterator h_itr = households->begin(); h_itr != households->end(); ++h_itr)
 						{
 							// initialize the hh - allocates all hh subcomponents
-							household_itf* hh = (household_itf*)*p_itr;
+							household_itf* hh = (household_itf*)*h_itr;
 
 							// call the object initialization handler which passes the object the appropriate base class, based on the analysis type
 							// i.e. creates full agents when connected to an ABM and NetworkType is defined, otherwise does nothing.
@@ -459,7 +456,17 @@ namespace PopSyn
 								Object_Initialization_Handler<person_itf*,zone_itf*,network_itf*,scenario_itf*>(perid,person,zone,network,scenario);
 								++perid;
 								++counter;
+
+#ifdef DEBUG_1
+								++r_itr;++z_itr;++h_itr;++p_itr;
+								regions->erase(r_itr,regions->end());
+								zones->erase(z_itr,zones->end());
+								households->erase(h_itr,households->end());
+								persons->erase(p_itr,persons->end());
+								return;
+#endif
 							}
+
 
 							++uuid;
 						}
