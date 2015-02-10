@@ -254,9 +254,9 @@ public:
 
 		//cout<<", new data_ptr="<<this->_data<<", this_ptr="<<this;
 
-		for (int i = 0; i < tmp.num_dimensions(); ++i)
+		for (size_type i = 0; i < tmp.num_dimensions(); ++i)
 		{
-			for (int j=0; j < tmp.dimensions()[i]; ++j)
+			for (size_type j=0; j < tmp.dimensions()[i]; ++j)
 			{
 				this->operator()(i,j) = tmp(i,j);
 			}

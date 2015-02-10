@@ -7,7 +7,7 @@
 //#include "windows\gperftools\tcmalloc.h"
 
 
-#define ENABLE_MEMORY_LOGGING
+//#define ENABLE_MEMORY_LOGGING
 
 
 namespace polaris
@@ -57,12 +57,14 @@ namespace polaris
 		_type_counter(i,j)-=sizeof(DataType);
 #endif
 		((DataType::component_manager)->Free(ptr));
+		ptr = nullptr;
 	}
 
 	template<typename DataType>
 	void Free_Array( DataType* ptr )
 	{
 		((DataType::component_manager)->Free_Array(ptr));
+		ptr = nullptr;
 	}
 	
 	///----------------------------------------------------------------------------------------------------
@@ -73,6 +75,7 @@ namespace polaris
 	void Lazy_Free( DataType* ptr )
 	{
 		((DataType::component_manager)->Lazy_Free(ptr));
+		ptr = nullptr;
 	}
 }
 

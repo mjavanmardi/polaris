@@ -74,7 +74,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	void Execution_Block::Lazy_Free(DataType* ptr)
+	void Execution_Block::Lazy_Free(DataType* cell)
 	{
 		// Safe mode locks the execution object for increased thread safety
 		#ifdef SAFE_MODE

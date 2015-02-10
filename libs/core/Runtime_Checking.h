@@ -10,7 +10,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// Enables the memory log to be constructed
 	///----------------------------------------------------------------------------------------------------
-	#define ENABLE_MEMORY_LOGGING
+	//#define ENABLE_MEMORY_LOGGING
 
 	///----------------------------------------------------------------------------------------------------
 	/// MESSAGES - Enable / Disable various categories of runtime messages
@@ -71,7 +71,7 @@ namespace polaris
 	#ifdef ENABLE_WARNINGS
 		#define THROW_WARNING(...) cout << "\n" << "WARNING: "<< __FILE__ << " at " << __LINE__ << "\n\t" << __VA_ARGS__ << endl;
 	#else 
-		#define THROW_WARNING(...) ;
+		#define THROW_WARNING(...) int RANDOM_THING_WHICH_IS_OPTIMIZED_OUT=0;
 	#endif
 
 	#ifdef ENABLE_EXCEPTIONS

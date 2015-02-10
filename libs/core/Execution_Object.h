@@ -25,6 +25,9 @@ namespace polaris
 
 		unsigned int _component_id;
 		int _uuid;
+	private:
+		Base_Object(const Base_Object&);
+		void operator=(const Base_Object&);
 	};
 	
 	///----------------------------------------------------------------------------------------------------

@@ -42,6 +42,7 @@ namespace polaris
 	void Data_Component_Manager<DataType>::Free( DataType* ptr )
 	{
 		delete ptr;
+		ptr = nullptr;
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -52,6 +53,7 @@ namespace polaris
 	void Data_Component_Manager<DataType>::Lazy_Free( DataType* ptr )
 	{
 		delete ptr;
+		ptr = nullptr;
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -62,5 +64,6 @@ namespace polaris
 	void Data_Component_Manager<DataType>::Free_Array( DataType* ptr )
 	{
 		delete[] ptr;
+		ptr = nullptr;
 	}
 }

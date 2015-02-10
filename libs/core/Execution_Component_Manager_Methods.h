@@ -274,7 +274,7 @@ namespace polaris
 	template<typename DataType>
 	void Execution_Component_Manager<DataType>::Lazy_Free( DataType* ptr )
 	{
-		ptr->_execution_block->Lazy_Free(ptr);
+		ptr->execution_block()->Lazy_Free(ptr);
 	}
 
 	///----------------------------------------------------------------------------------------------------

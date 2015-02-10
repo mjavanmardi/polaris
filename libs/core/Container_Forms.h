@@ -429,7 +429,7 @@ namespace polaris
 
 		size_type size(size_type dimension){return ((ComponentType*)this)->size(dimension);}
 
-		const_size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
+		size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
 
 		const_dimensional_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
@@ -641,9 +641,9 @@ namespace polaris
 		//void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
 
 		size_type erase (key_type& key){return ((ComponentType*)this)->erase(key);}
-		iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+		void erase(iterator p){((ComponentType*)this)->erase(p);}
 		
-		iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+		void erase(iterator p, iterator q){((ComponentType*)this)->erase(p,q);}
 
 		void clear(){return ((ComponentType*)this)->clear();}
 

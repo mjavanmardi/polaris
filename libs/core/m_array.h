@@ -773,13 +773,13 @@ public:
 		this->_cleanup();
 		//this->_init(new_dimensions);
 		*this = matrix<T>(new_dimensions, value);
-		this->_nrow = rows; this->_ncol = cols;
+//		this->_nrow = rows; this->_ncol = cols;
 
 		iterator itr = this->begin();
 
-		for (uint i = 0; i < tmp._nrow; ++i)
+		for (uint i = 0; i < tmp.num_rows(); ++i)
 		{
-			for (uint j = 0; j < tmp._ncol; ++j)
+			for (uint j = 0; j < tmp.num_cols(); ++j)
 			{
 				this->operator()(i,j) = tmp(i,j);
 			}
@@ -789,15 +789,13 @@ public:
 	{
 		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
-		//this->_init(new_dimensions);
 		*this = matrix<T>(new_dimensions, value);
-
 		for (size_type i=0; i<_size; i++) _data[i]=value;
 	}
 
 
 	// MArray constructors/destructor
-	matrix (void){_size = 0;_nrow=0; _ncol=0;}
+	matrix (void){_size = 0;_dim_sizes.first=0; _dim_sizes.second=0; _data=nullptr;}
 	matrix (const_index_type dim_sizes);
 	matrix (const_index_type dim_sizes, T init_val);
 	matrix (const matrix& obj);
@@ -845,46 +843,40 @@ public:
 		}
 		return _data[index];
 	} 
-	matrix operator*(const matrix& obj);
-	matrix& operator*(const T& value);
-	void scale(const T& value);
 	pointer get_data_pointer(){return _data;}
 	
 	// Property access members
-	const size_type& size() {return _size;}
-	const size_type& size(size_type dimension) 
+	const size_type& size() const {return _size;}
+	const size_type& size(size_type dimension) const 
 	{
-		if (dimension==0) return _nrow;
-		if (dimension==1) return _ncol;
+		if (dimension==0) return _dim_sizes.first;
+		if (dimension==1) return _dim_sizes.second;
 		THROW_MATRIX_EXCEPTION("Error, can not request dimension size for dimension higher than 1");
 	}
-	const_index_type dimensions(){return _dim_sizes;}
+	const_index_type dimensions() const {return _dim_sizes;}
 	const size_type& num_dimensions() {return 2;}
-	const size_type& num_rows() {return _nrow;}
-	const size_type& num_cols() {return _ncol;}
+	const size_type& num_rows() const {return _dim_sizes.first;}
+	const size_type& num_cols() const {return _dim_sizes.second;}
 
 	// display member
 	void print(ostream& stream);
 
 	// Arithmetic members
 	void cholesky(matrix& LU);
+	matrix operator*(const matrix& obj);
+	matrix& operator*(const T& value);
+	void scale(const T& value);
+	void transpose();
 
 	size_type get_index(const_index_type index) const
 	{
-		size_type ind=0;
-
-		if (index.first >= _nrow || index.second >= _ncol)
-		{
-			THROW_MATRIX_EXCEPTION("Error, index ("<<index.first<<","<<index.second<<") was outside of matrix bounds {"<<_nrow<<","<<_ncol<<"}" << endl);
-		}
-		ind = index.first *_ncol + index.second;
-		return ind;
+		if (index.first >= _dim_sizes.first || index.second >= _dim_sizes.second) THROW_MATRIX_EXCEPTION("Error, index ("<<index.first<<","<<index.second<<") was outside of matrix bounds {"<<_dim_sizes.first<<","<<_dim_sizes.second<<"}" << endl);
+		return index.first *_dim_sizes.second + index.second;
 	}
+
 protected:
 	index_type _dim_sizes;
 	index_type _cursor;
-	size_type _nrow;
-	size_type _ncol;
 	size_type _size;
 	pointer _data;
 
@@ -901,7 +893,7 @@ protected:
 
 	bool valid_index(const_index_type index)
 	{
-		if (index.first < _nrow && index.second << _ncol) return true;
+		if (index.first < _dim_sizes.first && index.second << _dim_sizes.second) return true;
 		return false;
 	}
 	void _cursor_start()
@@ -910,8 +902,8 @@ protected:
 	}
 	void _cursor_end()
 	{
-		_cursor.first = _nrow-1;
-		_cursor.second = _ncol-1;
+		_cursor.first = _dim_sizes.first-1;
+		_cursor.second = _dim_sizes.second-1;
 	}
 
 	void print(ostream& stream, int n);
@@ -948,8 +940,6 @@ void matrix<T>::Copy(const_index_type dim_sizes, T* mem_to_copy)
 	_cleanup();
 	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
 	_size = dim_sizes.first * dim_sizes.second;
-	_nrow = dim_sizes.first;
-	_ncol = dim_sizes.second;
 	_data = mem_to_copy;
 }
 template <class T>
@@ -957,13 +947,8 @@ void matrix<T>::_copy(const matrix<T>& obj)
 {
 	this->_cursor_start();
 	this->_dim_sizes.first = obj._dim_sizes.first; this->_dim_sizes.second=obj._dim_sizes.second;
-
 	_size = obj._size;
-	_nrow = obj._nrow;
-	_ncol = obj._ncol;
-
 	_data = new T[_size];
-
 	for (size_type i=0; i<_size; i++) _data[i] = obj._data[i];
 }
 template <class T>
@@ -977,9 +962,6 @@ void matrix<T>::_init(const_index_type dim_sizes)
 {
 	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
 	_size = dim_sizes.first * dim_sizes.second;
-	_nrow = dim_sizes.first;
-	_ncol = dim_sizes.second;
-
 	_data = new value_type[_size];
 }
 template <class T>
@@ -992,46 +974,7 @@ matrix<T>& matrix<T>::operator=(const matrix<T>& obj)
 	}
 	return *this;
 }
-template <class T>
-matrix<T> matrix<T>::operator*(const matrix<T>& obj)
-{
-	// check appropriate conditions
-	if (this->_ncol != obj._nrow) THROW_MATRIX_EXCEPTION("ERROR: matrix rows != matrix columns in multiplication.");
 
-	matrix<T> m = matrix<T>(matrix<T>::index_type(this->_nrow, obj._ncol),0);
-
-	for (uint i = 0; i < this->_nrow; i++)
-	{
-		for (uint j = 0; j < obj._ncol; j++)
-		{
-			for (uint k = 0; k < this->_ncol; k++) m(i,j) += (*this)(i,k) * obj(k,j);		
-		}
-	}
-	return m;
-}
-template <class T>
-matrix<T>& matrix<T>::operator*(const T& value)
-{
-	for (uint i = 0; i < this->_nrow; i++)
-	{
-		for (uint j = 0; j < this->_ncol; j++)
-		{
-			(*this)(i,j) = (*this)(i,j) * value;		
-		}
-	}
-	return *this;
-}
-template <class T>
-void matrix<T>::scale(const T& value)
-{
-	for (uint i = 0; i < this->_nrow; i++)
-	{
-		for (uint j = 0; j < this->_ncol; j++)
-		{
-			(*this)(i,j) = (*this)(i,j) * value;		
-		}
-	}
-}
 
 // M_array destructor
 template <class T>
@@ -1074,14 +1017,62 @@ void matrix<T>::print(ostream& stream, int n)
 
 // Arithmetic functions
 template <class T>
+matrix<T> matrix<T>::operator*(const matrix<T>& obj)
+{
+	// check appropriate conditions
+	if (this->num_cols() != obj.num_rows()) THROW_MATRIX_EXCEPTION("ERROR: matrix rows != matrix columns in multiplication.");
+
+	matrix<T> m = matrix<T>(matrix<T>::index_type(this->num_rows(), obj.num_cols()),0);
+
+	for (uint i = 0; i < this->num_rows(); i++)
+	{
+		for (uint j = 0; j < obj.num_cols(); j++)
+		{
+			for (uint k = 0; k < this->num_cols(); k++) m(i,j) += (*this)(i,k) * obj(k,j);		
+		}
+	}
+	return m;
+}
+template <class T>
+matrix<T>& matrix<T>::operator*(const T& value)
+{
+	for (uint i = 0; i < this->_nrow; i++)
+	{
+		for (uint j = 0; j < this->_ncol; j++)
+		{
+			(*this)(i,j) = (*this)(i,j) * value;		
+		}
+	}
+	return *this;
+}
+template <class T>
+void matrix<T>::scale(const T& value)
+{
+	for (uint i = 0; i < this->num_rows(); i++)
+	{
+		for (uint j = 0; j < this->num_cols(); j++)
+		{
+			(*this)(i,j) = (*this)(i,j) * value;		
+		}
+	}
+}
+template <class T>
+void matrix<T>::transpose()
+{
+	size_type ncol=_dim_sizes.second;
+	_dim_sizes.second = _dim_sizes.first;
+	_dim_sizes.first = ncol;
+	
+}
+template <class T>
 void matrix<T>::cholesky(matrix<T>& LU)
 {
-	assert(_nrow == _ncol);
+	assert(_dim_sizes.first == _dim_sizes.second);
 	
 	// Initialize the sqrt matrix
-	LU.resize(_nrow,_ncol, 0.0);
+	LU.resize(_dim_sizes.first,_dim_sizes.second, 0.0);
 
-	int d = this->_nrow;
+	int d = this->_dim_sizes.first;
 	double diff;
 
 	for(int k=0; k<d; ++k)

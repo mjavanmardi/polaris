@@ -84,7 +84,7 @@ void World::Initialize(Simulation_Configuration& cfg) // called in the INITIALIZ
 	Wait_For_Signal_From_Threads();
 
 	#ifdef ENABLE_MEMORY_LOGGING
-		polaris::_type_counter.resize(__all_components->size(),_num_sim_threads+1,0);
+		polaris::_type_counter.resize((matrix<long long>::size_type)__all_components->size(),_num_sim_threads+1,0);
 	#endif
 }
 
@@ -273,13 +273,13 @@ void World::Start_Turning()
 			{
 				//_mem_log_file << "Iteration: " << iteration();
 				//polaris::_type_counter.print(_mem_log_file);
-				for (int i=0; i<polaris::_type_counter.num_rows(); i++)
+				for (uint i=0; i<polaris::_type_counter.num_rows(); i++)
 				{
 					float kbytes=0;
 					_mem_log_file<<i<<","<<iteration()<<",";
-					for (int j=0; j<polaris::_type_counter.num_cols(); j++)
+					for (uint j=0; j<polaris::_type_counter.num_cols(); j++)
 					{
-						kbytes+=polaris::_type_counter(i,j)/1024.0;
+						kbytes+=(float)(polaris::_type_counter(i,j)/1024.0);
 					}
 					_mem_log_file<<kbytes<<endl;
 				}
@@ -301,8 +301,9 @@ void World::Start_Turning()
 			break;
 		}
 	}
-
+#ifdef ENABLE_MEMORY_LOGGING
 	_mem_log_file.close();
+#endif
 }
 
 
