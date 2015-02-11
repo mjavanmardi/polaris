@@ -1201,7 +1201,7 @@ namespace Network_Components
 						activity_locations_container.push_back(activity_location);
 						++counter;
 					}
-					catch (const odb::exception& e) {THROW_WARNING(e.what()); continue;}
+					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
 

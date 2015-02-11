@@ -54,7 +54,7 @@ namespace Zone_Components
 			void Default_Zone_Event()
 			{
 				//cout <<endl<<"Productions= " << this->production_count<int>() << ", Attractions= " << this->attraction_count<int>();
-				for (int i=0; i < num_sim_threads()+1; i++)
+				for (uint i=0; i < num_sim_threads()+1; i++)
 				{
 					((ComponentType*)this)->production_counter[i]=0;
 					((ComponentType*)this)->attraction_counter[i]=0;

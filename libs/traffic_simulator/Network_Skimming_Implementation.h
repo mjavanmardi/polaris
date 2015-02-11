@@ -149,20 +149,7 @@ namespace Network_Skimming_Components
 				network_itf* network = this->network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
-				//-------------------------------------------------
-				//TODO: remove when done testing:
-				char test;
-				cout <<"...Starting skim table copy."<<endl;
-				//cin >> test;
-				//cout <<test;
-				//-------------------------------------------------
 				this->_skim_table.Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), initial_data);
-				//-------------------------------------------------
-				//TODO: remove when done testing:
-				cout <<"...Skim table copy complete."<<endl;
-				//cin >> test;
-				//cout <<test;
-				//-------------------------------------------------
 
 				// initialize the travel time sorters with the initial data
 				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
@@ -189,12 +176,6 @@ namespace Network_Skimming_Components
 					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
 					sort(this->_transit_travel_time_sorter[o_index].begin(), this->_transit_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
 				}
-				//-------------------------------------------------
-				//TODO: remove when done testing:
-				cout <<"...Skim table sorters created."<<endl;
-				//cin >> test;
-				//cout <<test;
-				//-------------------------------------------------
 			}
 			template<typename TargetType> bool Update_LOS()
 			{
@@ -799,14 +780,6 @@ namespace Network_Skimming_Components
 					tree_list->insert(item);
 				}
 
-				//-------------------------------------------------
-				//TODO: remove when done testing:
-				char test;
-				cout <<"Finished building skim routers..."<<endl;
-				//cin >> test;
-				//cout <<test;
-				//-------------------------------------------------
-
 				Simulation_Timestep_Increment start, end;
 				int num_modes;
 				int num_zones;
@@ -1173,7 +1146,7 @@ namespace Network_Skimming_Components
 				//skimmer_itf* skim = (skimmer_itf*)this;
 				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
 	
-				int update_increment, num_zones_transit, num_zones_hcost;
+				int update_increment;//, num_zones_transit, num_zones_hcost;
 
 				// read for time-varying highway skims
 				//File_IO::Binary_File_Reader& infile = skim->template highway_input_file<File_IO::Binary_File_Reader&>();
@@ -1207,7 +1180,7 @@ namespace Network_Skimming_Components
 
 			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
-				int num_intervals, num_zones_transit, num_zones_hcost;
+				int num_intervals;//, num_zones_transit, num_zones_hcost;
 				update_interval_endpoints_type intervals;
 				std::vector<pair<int,int>> return_zones_container;
 
