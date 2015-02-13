@@ -134,6 +134,17 @@ namespace Movement_Plan_Components
 				//_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 				_trajectory_container[_current_trajectory_index]->_enter_time = iteration();
 			}
+
+			void Display_Movement()
+			{
+				cout<<endl<<"---------------------------------------"<<endl;
+				cout<<"Departure="<<this->__departed_time._Value<<endl;
+				cout<<"Origin="<<this->_origin_location<<endl;
+				cout<<"Destination="<<this->_destination_location<<endl;
+				cout<<"Trajectory length="<<this->_trajectory_container.size()<<endl;
+				cout<<"Plan time="<<this->__planning_time._Value<<endl;
+				cout<<"---------------------------------------"<<endl;
+			}
 			
 			int _current_trajectory_index;
 			m_data(bool, valid_trajectory, NONE, NONE);

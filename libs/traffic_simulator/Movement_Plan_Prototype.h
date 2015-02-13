@@ -63,6 +63,12 @@ namespace Movement_Plan_Components
 			accessor(route_length, NONE, NONE);
 			accessor(entry_time, NONE, NONE);
 
+			void Free_Movement()
+			{
+				this->clear_trajectory();
+				Lazy_Free<Component_Type>(this_component());
+			}
+
 			// overloaded origin and destination, depending on targetType
 			template<typename TargetType> void origin(TargetType activity_location, requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
@@ -156,7 +162,8 @@ namespace Movement_Plan_Components
 				
 
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
-				trajectory.clear();
+				//trajectory.clear();
+				clear_trajectory();
 
 				typename boost::container::deque<global_edge_id>::iterator itr;
 				typename boost::container::deque<float>::iterator arrival_time_itr;
@@ -222,7 +229,8 @@ namespace Movement_Plan_Components
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				
 				//erase 
-				trajectory.erase(trajectory.begin() + current_trajectory_position<int&>() + 1,trajectory.end());
+				//trajectory.erase(trajectory.begin() + current_trajectory_position<int&>() + 1,trajectory.end());
+				clear_trajectory(current_trajectory_position<int&>() + 1);
 				
 				// add the time entering the current link to the relative estimated arrival time for the new trajectory_unit links
 				int stored_ttime = trajectory[current_trajectory_position<int&>()]->template enter_time<int>() - (int)this->departed_time<Time_Seconds>();
@@ -254,6 +262,43 @@ namespace Movement_Plan_Components
 				//}
 				number_of_switches<int&>()++;
 				update_route_length<NT>();
+			}
+
+			void clear_trajectory()
+			{
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
+				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+
+				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
+
+				// Free the allocated memory in the trajectory, if exists
+				for (Trajectory_Container_Interface::iterator itr = trajectory.begin(); itr != trajectory.end(); ++itr)
+				{
+					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+				}
+				trajectory.clear();
+
+				typedef typename Trajectory_Container_Interface::Component_Type trajectory_container_type;
+				trajectory_container_type().swap((trajectory_container_type&)trajectory);
+			}
+			void clear_trajectory(int offset)
+			{
+				// get interface to trajectory
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
+				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
+
+				// validate offset
+				if (offset >= trajectory.size()) THROW_EXCEPTION("Error, invalid begining offset for clearing the trajectory, must be less than the container size.");
+
+				// Free the allocated memory in the trajectory, if exists
+				for (Trajectory_Container_Interface::iterator itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
+				{
+					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+				}
+
+				//erase 
+				trajectory.erase(trajectory.begin()+offset,trajectory.end());
 			}
 
 			template<typename TargetType> void update_route_length()
@@ -381,6 +426,11 @@ namespace Movement_Plan_Components
 					route_link_exit_time = trajectory_container<_Trajectory_Container_Interface&>()[trajectory_unit_index]->template enter_time<int>() + trajectory_container<_Trajectory_Container_Interface&>()[trajectory_unit_index]->template delayed_time<int>();
 				}
 				return route_link_exit_time;
+			}
+
+			void Display_Movement()
+			{
+				this_component()->Display_Movement();
 			}
 		};
 	}

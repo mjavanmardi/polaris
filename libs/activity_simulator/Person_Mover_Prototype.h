@@ -51,9 +51,11 @@ namespace Prototypes
 			_Person_Mover_Interface* pthis =(_Person_Mover_Interface*)_pthis;
 
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+			typedef Household_Components::Prototypes::Household< typename person_itf::get_type_of(Household)> household_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle< typename person_itf::get_type_of(vehicle)> vehicle_itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+
 
 			movement_itf* movement = pthis->template Movement<movement_itf*>();
 			person_itf* person = pthis->template Parent_Person<person_itf*>();
@@ -644,6 +646,10 @@ namespace Prototypes
 			{
 				this->Schedule_Artificial_Arrival_Event<NT>();
 			}
+			else if (movements->template origin<link_itf*>() == movements->template destination<link_itf*>())
+			{
+				this->Schedule_Artificial_Arrival_Event<NT>();
+			}
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
 			else if (movements->template valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
 			{
@@ -688,7 +694,9 @@ namespace Prototypes
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 			typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 			typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> Scheduler_Itf;
+			typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> Scheduler_Itf;
 			typedef Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planner_Itf;
+			typedef Person_Components::Prototypes::Activity_Generator< typename Planner_Itf::get_type_of(Activity_Generation_Faculty)> Generator_Itf;
 			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
 			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
@@ -704,26 +712,32 @@ namespace Prototypes
 			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_container_itf)>  turn_itf;
 			
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->Household<Household_Itf*>();
 			Planner_Itf* planner = person->template Planning_Faculty<Planner_Itf*>();
-			Routing_Itf* itf= person->template router<Routing_Itf*>();	
+			Routing_Itf* itf= person->template router<Routing_Itf*>();
+			Generator_Itf* generator = planner->template Activity_Generation_Faculty<Generator_Itf*>();
 			Scheduler_Itf* scheduler = person->template Scheduling_Faculty<Scheduler_Itf*>();
 			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 			network_itf* network = person->template network_reference<network_itf*>();
 			skim_itf* skim = network->template skimming_faculty<skim_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
-			
+	
+
+			if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
+			{
+				DEBUG_MESSAGE("Debugging...");
+				person->Display_Activities(cout);
+			}
+			//
 
 			//=====================================================================
 			// schedule departure from destination if no following activity
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
 			movements->arrived_time<Simulation_Timestep_Increment>(iteration());
 			location_itf* destination = movements->destination<location_itf*>();
-			//=====================================================================
-			// remove from the scheduler movement container
-			scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 
 
 			//=====================================================================
@@ -776,7 +790,7 @@ namespace Prototypes
 						if (next_act->End_Time<Time_Seconds>() - next_act->Minimum_Duration<Time_Seconds>() - next_act->Expected_Travel_Time<Time_Seconds>() < new_end)
 						{
 							scheduler->Remove_Activity_Plan<Activity_Itf*>(next_act);
-							scheduler->Remove_Movement_Plan<movement_itf*>(next_movement);
+							//scheduler->Remove_Movement_Plan<movement_itf*>(next_movement);
 							activity_deleted=true;
 							THROW_WARNING("Activity Plan removed due to late arrival at preceding activity: ");
 						}
@@ -821,6 +835,22 @@ namespace Prototypes
 
 			typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
 			
+			// error checking - a scheduled activity should not have a null movement	
+			if (next_act != nullptr)
+			{
+				if (next_act->template movement_plan<movement_itf*>() == nullptr)
+				{
+					cout << "ERROR: movement plan for scheduled activity should not be null."<<endl;
+					cout << "ACT:";
+					act->Display_Activity();
+					cout << endl;
+					cout << "NEXT ACT:";
+					next_act->Display_Activity();
+					cout << "PRINT SCHEDULE:";
+					person->Display_Activities(cout);
+
+				}
+			}
 
 
 			// Define time window after current activity is completed
@@ -845,6 +875,12 @@ namespace Prototypes
 				}
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
 
+				//=====================================================================
+				// updated the person scheduler to make this activity the current activity for future planning 
+				// then remove from the scheduler activity and movement containers
+				scheduler->Update_Current_Activity<Activity_Itf*>(act);
+				scheduler->Remove_Activity_Plan<Activity_Itf*>(act);
+				//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 				return;
 			}
 
@@ -852,23 +888,20 @@ namespace Prototypes
 			if (next_act == nullptr)
 			{
 				// GENERATE A NEW AT HOME ACTIVITY
-				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
-				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
-				new_act->template Parent_Planner<Planner_Itf*>(planner);
-				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
 				Time_Seconds min_home_duration = 86400 - (end_this+ttime_this_to_home);
 				Time_Seconds new_start = end_this+ttime_this_to_home;
 				// Ignore travelers who return home after the simulation day is over
-				if (new_start > END || (float)min_home_duration < 0)
+				if (new_start < END && (float)min_home_duration > 0)
 				{
-					Free<typename ComponentType::Master_Type::at_home_activity_plan_type>((typename ComponentType::Master_Type::at_home_activity_plan_type*)new_act);
+					at_home_activity_itf* new_act = generator->Create_Home_Activity<at_home_activity_itf*,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,new_start, min_home_duration,act->template Mode<MODE>());
 				}
-				else
-				{
-					new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,new_start, min_home_duration,act->template Mode<MODE>());
-					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
-				}
-
+				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
+				//=====================================================================
+				// updated the person scheduler to make this activity the current activity for future planning 
+				// then remove from the scheduler activity and movement containers
+				scheduler->Update_Current_Activity<Activity_Itf*>(act);
+				scheduler->Remove_Activity_Plan<Activity_Itf*>(act);
+				//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 				return;
 			}
 			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
@@ -888,10 +921,13 @@ namespace Prototypes
 			{
 				// GENERATE A NEW AT HOME ACTIVITY
 				Time_Seconds duration = (begin_next - ttime_home_to_next) - (end_this + ttime_this_to_home);
-				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
-				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
-				new_act->template Parent_Planner<Planner_Itf*>(planner);
-				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
+
+				//typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
+				//at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
+				//new_act->template Parent_Planner<Planner_Itf*>(planner);
+				//new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
+
+				at_home_activity_itf* new_act = generator->Create_Home_Activity<at_home_activity_itf*,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 
 				//TODO: remove when done testing
 				if(end_this+ttime_this_to_home > END || duration > END)
@@ -900,7 +936,7 @@ namespace Prototypes
 					THROW_WARNING("Invalid start/duration for at home activity. Start="<<end_this+ttime_this_to_home<<", duration="<<duration<<", departure time="<<end_this<<", travel time="<<ttime_this_to_home);
 				}
 
-				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
+				//new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 			}
 
 			//=====================================================================
@@ -922,6 +958,14 @@ namespace Prototypes
 
 			// Finally, log the activity
 			((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
+
+
+			//=====================================================================
+			// updated the person scheduler to make this activity the current activity for future planning 
+			// then remove from the scheduler activity and movement containers
+			scheduler->Update_Current_Activity<Activity_Itf*>(act);
+			scheduler->Remove_Activity_Plan<Activity_Itf*>(act);
+			//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 		}
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()

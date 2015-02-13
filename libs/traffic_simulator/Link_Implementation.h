@@ -725,6 +725,10 @@ namespace Link_Components
 				_link_origin_cumulative_departed_vehicles = 0;
 				_link_upstream_cumulative_arrived_vehicles = 0;
 				_link_upstream_cumulative_vehicles = 0;
+				this->_link_downstream_cumulative_arrived_vehicles = 0;
+				this->_link_downstream_cumulative_vehicles = 0;
+				this->_link_downstream_departed_vehicles = 0;
+				this->_link_destination_cumulative_arrived_vehicles=0;
 				
 				////bwtt and fftt
 				float bwtt = (float) (_length/(_backward_wave_speed*5280.0/3600.0)); // in seconds

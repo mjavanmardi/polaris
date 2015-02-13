@@ -7,10 +7,32 @@
 
 using namespace polaris;
 
+prototype struct Agent
+{
+	tag_as_prototype;
+
+	template<typename T> void Initialize()
+	{
+		this_component()->Initialize<T>();
+	}
+};
+implementation struct Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Agent_Implementation),Execution_Object>
+{
+	template<typename T> void Initialize()
+	{
+		Load_Event<ComponentType>(&Agent_Event,0,0);
+	}
+	static void Agent_Event(ComponentType* _this,Event_Response& response)
+	{
+		response.next._iteration = END;
+		response.next._sub_iteration = END;
+	}
+};
 
 struct MasterType
 {
 	typedef MasterType M;
+	typedef Agent_Implementation<M> agent_type;
 
 	//==============================================================================================
 	#pragma region Network Types
@@ -156,44 +178,76 @@ struct MasterType
 };
 
 
-#include <iostream>
-#include <string>
+void Correlated_Rands_Test();
 
-char *
-bad_strdup(const char *s)
+int main(int argc, char *argv[])
 {
-  char s2[10000];
-  strncpy(s2, s, 10000);
-  return s2;
-}
+	//----------------------------------------------------------
+	// Initialize basic simulation using dummy execution agent
+	Simulation_Configuration cfg;
+	cfg.Multi_Threaded_Setup(100, 2);
+	INITIALIZE_SIMULATION(cfg);
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	GLOBALS::Normal_RNG.Set_Seed<int>();
+	GLOBALS::Uniform_RNG.Set_Seed<int>();
+	Agent<MasterType::agent_type>* agent = (Agent<MasterType::agent_type>*)Allocate<MasterType::agent_type>();
 
-int
-main(int argc, char *argv[])
-{
-  //char *s2 = bad_strdup("this is a test");
-  //char *s1 = bad_strdup("eat my lunch");
-	int *p1 = nullptr;
-	for (int i=0; i<100000; i++)
-	{
-		p1 = new int[20]();
 
-		*p1 = 5;
-
-		//cout <<p1 << ": " << *p1<<endl;
-
-		delete p1;
-	}
-	delete p1;
-	cout <<p1 << ": " << *p1<<endl;
-
-	//cout << "s2 = " << s2 << endl;
+	//----------------------------------------------------------
+	// Perform tests
+	Correlated_Rands_Test();
 
 	char test;
 	cin >> test;
 }
 
 
+void Correlated_Rands_Test()
+{
+	typedef matrix<double> M;
+	const int N = 1000000;
+	M rands = M(M::index_type(N,3));
 
+	M sigma = M(M::index_type(3,3),0);
+	sigma(0,0) = 1.0;
+	sigma(1,0) = 0.2; sigma(1,1) = 1.0;
+	sigma(2,0) = 0.4; sigma(2,1) = -0.5; sigma (2,2) = 1.0;
+
+	std::vector<double> avg(3);
+
+	for (int i=0; i<N; ++i)
+	{
+		std::vector<double> rand;
+		GLOBALS::Uniform_RNG.Correlated_Rands(rand,sigma);
+		rands(i,0) = rand[0]; rands(i,1) = rand[1]; rands(i,2) = rand[2];
+		avg[0] += rand[0]/(double)N; avg[1] += rand[1]/(double)N; avg[2] += rand[2]/(double)N;
+	}
+
+	M corr = M(M::index_type(3,3),0);
+	for (int i=0; i<3; ++i)
+	{
+		for (int j=0; j<3; ++j)
+		{
+			double sum_xy=0;
+			double sum_x2=0;
+			double sum_y2=0;
+			for (int n=0; n<N; ++n)
+			{
+				sum_xy += (rands(n,i) - avg[i]) * (rands(n,j) - avg[j]);
+				sum_x2 += (rands(n,i) - avg[i]) * (rands(n,i) - avg[i]);
+				sum_y2 += (rands(n,j) - avg[j]) * (rands(n,j) - avg[j]);
+			}
+			corr(i,j) = sum_xy / sqrt(sum_x2 * sum_y2);
+		}
+	}
+	corr.print(cout);
+}
+
+
+
+
+#ifdef HIDE
 //==================================================
 // SKIMFILE READER APPLICATION
 /*int main(int argc, char** argv)
@@ -425,3 +479,4 @@ main(int argc, char *argv[])
 	cin >> test;
 }
 */
+#endif

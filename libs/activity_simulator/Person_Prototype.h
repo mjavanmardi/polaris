@@ -74,7 +74,7 @@ namespace Prototypes
 			if (iteration() == pthis->template First_Iteration<Simulation_Timestep_Increment>())
 			{
 				Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
-				response.next._iteration = first_plan_time;
+				response.next._iteration = Round<int,Basic_Units::Time_Value_Type>(first_plan_time);
 				response.next._sub_iteration = 0;
 				pthis->Set_Locations_Event<NT>();
 			}
@@ -174,7 +174,6 @@ namespace Prototypes
 
 			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 
-			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
 			((ComponentType*)this)->Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
@@ -490,6 +489,35 @@ namespace Prototypes
 				}
 			}
 			return false;
+		}
+
+		// Print current state of activity schedule
+		void Display_Activities(ostream& out)
+		{
+			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
+			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Movement_Plans)> Movement_Plan;
+			typedef Household_Components::Prototypes::Household<typename get_type_of(Household)> _household_itf;
+
+			cout <<endl<<"**************************************************************************************************"<<endl;
+			cout <<"Printing activities for (Household,person): "<<this->Household<_household_itf*>()->uuid<int>()<<","<<this->uuid<int>()<<endl;
+				
+			Activity_Plans& activities = this->Scheduling_Faculty<scheduler_itf*>()->Activity_Container<Activity_Plans&>();
+			for (Activity_Plans::iterator itr = activities.begin(); itr != activities.end(); ++itr)
+			{
+				Activity_Plan* act = (Activity_Plan*)(*itr);
+				act->Display_Activity();
+			}
+
+			Movement_Plans& moves = this->Scheduling_Faculty<scheduler_itf*>()->Movement_Plans_Container<Movement_Plans&>();
+			for (Movement_Plans::iterator itr = moves.begin(); itr != moves.end(); ++itr)
+			{
+				Movement_Plan* move = (Movement_Plan*)(*itr);
+				move->Display_Movement();
+			}
+
 		}
 
 		// PASS-THROUGH FEATURES OF SUB-COMPONENTS

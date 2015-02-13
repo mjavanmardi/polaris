@@ -327,7 +327,7 @@ namespace Choice_Model_Components
 				for (typename choice_options_itf::iterator itr = choices->begin(); itr != choices->end(); ++itr, ++p_itr)
 				{
 					cumulative_probability += *p_itr;
-					if (ISNAN(cumulative_probability)) THROW_WARNING("WARNING: p is not a number. p=" << *p_itr << ", cum_p="<<cumulative_probability << ", index="<<i);
+					//if (ISNAN(cumulative_probability)) THROW_WARNING("WARNING: p is not a number. p=" << *p_itr << ", cum_p="<<cumulative_probability << ", index="<<i);
 					if (rand < cumulative_probability) 
 					{
 						selected_index = i;

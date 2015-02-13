@@ -34,11 +34,11 @@ namespace Person_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Person_Scheduler //ADD_DEBUG_INFO
+		prototype struct Person_Scheduler
 		{
 			tag_as_prototype;
 
-			typedef Person_Scheduler<ComponentType> This_Type;
+			typedef Person_Scheduler<Component_Type> This_Type;
 			
 			// accessor to parent class
 			accessor(Parent_Person, NONE, NONE);
@@ -87,7 +87,10 @@ namespace Person_Components
 				return this_component()->previous_location<TargetType,ReturnType>(current_activity);
 			}
 			
-			
+			template<typename ActivityPtrType> void Update_Current_Activity(ActivityPtrType current_act)
+			{
+				this_component()->Update_Current_Activity(current_act);
+			}
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans=false)
 			{
 				return this_component()->Resolve_Timing_Conflict<TargetType>(current_activity, update_movement_plans);

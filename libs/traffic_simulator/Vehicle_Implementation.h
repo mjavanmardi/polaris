@@ -527,9 +527,9 @@ namespace Vehicle_Components
 			{
 				_simulation_status = Types::Vehicle_Status_Keys::OUT_NETWORK;
 				
-				int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template departed_time<Time_Seconds>();
-				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				float travel_time = float ((current_time - departure_time)/3600.0f);
+				//int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template departed_time<Time_Seconds>();
+				//int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				//float travel_time = float ((current_time - departure_time)/3600.0f);
 
 				//((_Network_Interface*)_global_network)->template increase_out_network_vht_vehicle_based<NT>(travel_time);
 				 
@@ -548,13 +548,14 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void clear_trajectory()
 			{
-				_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-				for (int i = 0; i < (int)trajectory.size(); i++)
-				{
-					Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
-				}
-				typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
-				trajectory_container_type().swap((trajectory_container_type&)trajectory);
+				//_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+				//for (int i = 0; i < (int)trajectory.size(); i++)
+				//{
+				//	Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
+				//}
+				//trajectory.clear();
+				//typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
+				//trajectory_container_type().swap((trajectory_container_type&)trajectory);
 
 			}
 

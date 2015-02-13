@@ -17,6 +17,13 @@ namespace Person_Components
 			typedef typename MasterType::weather_network_event_type weather_network_event_type;
 			typedef typename MasterType::accident_network_event_type accident_network_event_type;
 
+			Person_Mover_Implementation()
+			{
+				_Movement_Scheduled=false;
+				_Artificial_Movement_Scheduled=false;
+				_Replanning_Needed=false;
+			}
+
 			m_prototype(Prototypes::Person,typename MasterType::person_type,Parent_Person, NONE, NONE);
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type,Movement, NONE, NONE);
 			m_data(bool, Movement_Scheduled, NONE, NONE);

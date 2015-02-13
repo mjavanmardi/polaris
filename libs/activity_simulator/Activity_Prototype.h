@@ -225,7 +225,6 @@ namespace Activity_Components
 				else if (this_ptr->Is_Current_Iteration(this_ptr->template Route_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
-					//_pthis->Swap_Event((Event)&Activity_Planner::Route_Planning_Event<NULLTYPE>);
 					this_ptr->template Route_Planning_Event_Handler<NT>();
 					this_ptr->template Route_Planning_Time<Revision&>()._iteration = END;
 					this_ptr->template Route_Planning_Time<Revision&>()._sub_iteration = END;
@@ -245,12 +244,17 @@ namespace Activity_Components
 				else if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
 					// add activity to schedule
-					//_pthis->Swap_Event((Event)&Activity_Planner::Add_Activity_To_Schedule_Event<NULLTYPE>);
 					response.next._iteration = END;
 					response.next._sub_iteration = END;
 					this_ptr->template Add_Activity_To_Schedule_Event_Handler<NT>();
 				}
-				// catch any subiteration()s which have been modified (currenlty limited to routing, which can be changed by start_time_plan iteration)
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Deletion_Time<Revision&>()))
+				{
+					response.next._iteration = END;
+					response.next._sub_iteration = END;
+					this_ptr->template Deletion_Event_Handler<NT>();
+				}
+				// catch any subiteration()s which have been modified (currently limited to routing, which can be changed by start_time_plan iteration)
 				// this will hit only if start time plan iteration is called immidiately
 				// also used to catch deleted activities and remove them from event scheduling
 				else
@@ -273,7 +277,7 @@ namespace Activity_Components
 				response.next._iteration = revision._iteration;
 				response.next._sub_iteration = revision._sub_iteration;
 			}
-			template<typename TargetType> void Unschedule_Activity_Events()
+			template<typename TargetType> void Free_Activity()
 			{
 				// set activity to invalid so further execution will not continue
 				this->is_valid(false);
@@ -287,6 +291,8 @@ namespace Activity_Components
 				Revision& location = this->Location_Planning_Time<Revision&>();
 				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
 				Revision& route = this->Route_Planning_Time<Revision&>();
+				Revision& deletion = this->Deletion_Time<Revision&>();
+
 				persons._iteration = END+1;
 				persons._sub_iteration = END+1;
 				mode._iteration = END+1;
@@ -299,7 +305,9 @@ namespace Activity_Components
 				start_time._sub_iteration = END+1;
 				route._iteration = END+1;
 				route._sub_iteration = END+1;
-				this_component()->Reschedule<ComponentType>(END+1, END+1);
+				deletion._iteration = iteration()+1;
+				deletion._sub_iteration = 0;
+				this_component()->Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
 			}
 			template<typename TargetType> bool Is_Minimum_Plan_Time(TargetType plan_time, requires(TargetType,check_2(TargetType, Revision,is_same)))
 			{
@@ -369,6 +377,11 @@ namespace Activity_Components
 			{
 				this_component()->template Add_Activity_To_Schedule_Event_Handler<TargetType>();
 			}
+			template<typename TargetType> void Deletion_Event_Handler()
+			{
+				// Free the activity when convenient
+				this_component()->template Deletion_Event_Handler<TargetType>();
+			}
 
 			//===========================================
 			// Fundamental activity 'meta-attributes'
@@ -381,6 +394,7 @@ namespace Activity_Components
 			accessor(Start_Time_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			accessor(Duration_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			accessor(Involved_Persons_Planning_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			accessor(Deletion_Time, check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			accessor(Route_Planning_Time, NONE, NONE/*check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same)*/);
 			accessor(Location_Plan_Horizon, NONE, NONE);
 			accessor(Location_Flexibility, NONE, NONE);
@@ -445,39 +459,54 @@ namespace Activity_Components
 				// call initializer
 				this_component()->template Copy<TargetType>(activity);
 			}
-			template<typename TargetType> void Initialize(TargetType activity/*, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Activity_Plan_Prototype))*/)
+			template<typename TargetType> void Initialize(TargetType activity_type, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// call initializer
-				this_component()->template Initialize<TargetType>(activity);
+				this_component()->template Initialize<TargetType>(activity_type);
+			}
+			template<typename TargetType> void Initialize(TargetType activity_type, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Activity_Plan_Prototype)))
+			{
+				this->Activity_Type<TargetType>(activity_type);
+				this->Duration<Time_Seconds>(END);
+				this->Start_Time<Time_Seconds>(END);
+				this->Location<Activity_Location_Components::Prototypes::Activity_Location<NT>*>(nullptr);
+				this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				this->movement_plan<Movement_Plan_Components::Prototypes::Movement_Plan<NT>*>(nullptr);
+
+				// initialize the deletion revision - updated when the Free_Activity event fires
+				Revision &delete_time = this->Deletion_Time< Revision&>();
+				delete_time._iteration = END;
+				delete_time._sub_iteration = END;
 			}
 			template<typename ActivitytypeType, typename TimeType> void Initialize(ActivitytypeType act_type, TimeType planning_time, requires(ActivitytypeType,check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same)))
 			{
-
-				this_component()->template Initialize< ActivitytypeType>(act_type);
+				this->Initialize< ActivitytypeType>(act_type);
 				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<TimeType>(planning_time);
 				// store for later use
-				Schedule_Activity_Events<NT>();
+				//Schedule_Activity_Events<NT>();
 			}
 			template<typename ActivitytypeType, typename TimeType> void Initialize(ActivitytypeType act_type, TimeType planning_time, requires(ActivitytypeType,!check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same)))
 			{
 				assert_check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same, "ActivitytypeType must be an ActivityType enumerator");
 			}
-			template<typename TimeType, typename ModeType> void Initialize(TimeType start_time, TimeType duration, ModeType mode)
+			template<typename ActivitytypeType, typename TimeType, typename ModeType> void Initialize(ActivitytypeType act_type, TimeType start_time, TimeType duration, ModeType mode)
 			{
+				this->Initialize< ActivitytypeType>(act_type);
 				this_component()->template Initialize<TimeType,ModeType>(start_time,duration,mode);
 				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<Simulation_Timestep_Increment>(iteration());
 				// store for later use
-				Schedule_Activity_Events<NT>();
+				//Schedule_Activity_Events<NT>();
 			}
-			template<typename TimeType, typename ModeType> void Initialize(TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
+			template<typename ActivitytypeType, typename TimeType, typename ModeType> void Initialize(ActivitytypeType act_type, TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
 			{
+				this->Initialize< ActivitytypeType>(act_type);
 				this_component()->template Initialize<TimeType, ModeType>(departure_time,start_time,duration,mode);
 				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<Simulation_Timestep_Increment>(iteration());
 				// store for later use
-				Schedule_Activity_Events<NT>();
+				//Schedule_Activity_Events<NT>();
 			}
 			
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time)
@@ -589,6 +618,11 @@ namespace Activity_Components
 			template<typename TargetType> bool Route_Is_Planned()
 			{
 				return this_component()->Route_Is_Planned<TargetType>();
+			}
+
+			void Display_Activity()
+			{
+				this_component()->Display_Activity();
 			}
 		};
 	}

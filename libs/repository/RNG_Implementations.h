@@ -116,9 +116,46 @@ namespace RNG_Components
 				return (TargetType) _distribution(GrandBaseType::_generator);
 			}
 
+			template<typename TargetType> static TargetType Cumulative_Distribution(TargetType x, TargetType Mu, TargetType S)
+			{
+				return Phi(x, Mu, S);
+			}
+
 			m_data(normal_distribution<double>, distribution, NONE, NONE);
 			m_data(double, location, NONE, NONE);
 			m_data(double, scale, NONE, NONE);
+
+		private:
+			template<typename TargetType> static TargetType erf(TargetType z)
+			{
+				TargetType t = 1.0 / (1.0 + 0.5 * abs(z));
+
+				// use Horner's method
+				TargetType ans = 1 - t * exp(-z * z - 1.26551223 +
+													t * (1.00002368 +
+													t * (0.37409196 +
+													t * (0.09678418 +
+													t * (-0.18628806 +
+													t * (0.27886807 +
+													t * (-1.13520398 +
+													t * (1.48851587 +
+													t * (-0.82215223 +
+													t * (0.17087277))))))))));
+				if (z >= 0) return ans;
+				else return -ans;
+			}
+
+			// cumulative normal distribution
+			template<typename TargetType> static TargetType Phi(TargetType z)
+			{
+				return 0.5 * (1.0 + erf(z / (sqrt(2.0))));
+			}
+
+			// cumulative normal distribution with mean mu and std deviation sigma
+			template<typename TargetType> static TargetType Phi(TargetType z, TargetType mu, TargetType sigma)
+			{
+				return Phi((z - mu) / sigma);
+			}
 		};
 
 		implementation struct RngStream_Implementation : public Polaris_Component<MasterType,INHERIT(RngStream_Implementation),Data_Object>
@@ -182,6 +219,15 @@ namespace GLOBALS
 				rng->Initialize<int>(abs(std::sin((float)i+1)*(float)INT_MAX));
 			}
 		}
+		void Initialize_Single_Threaded()
+		{
+			//TODO: Initialize after start up
+			thread_rng = new RNG_type[1];
+		
+			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+			rng_itf* rng = (rng_itf*)&this->thread_rng[0];
+			rng->Initialize<int>(abs(std::sin((float)i+1)*(float)INT_MAX));
+		}
 
 		template <typename TargetType>
 		void Set_Seed(TargetType random_seed)
@@ -240,6 +286,17 @@ namespace GLOBALS
 			return x;
 		}
 
+		template <typename TargetType>
+		void Correlated_Rands(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
+		{
+			GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
+			
+			for (int i=0; i<Sigma.num_rows();++i)
+			{
+				correlated_random_values[i] = RNG_Components::Implementations::MT_Normal_Double<NT>::Cumulative_Distribution<TargetType>(correlated_random_values[i],0,1);
+			}
+		}
+
 	private:
 		 RNG_type* thread_rng;
 	};
@@ -265,6 +322,16 @@ namespace GLOBALS
 				rng->Initialize<int>(seed);
 			}
 		}
+		void Initialize_Single_Threaded()
+		{
+			//TODO: Initialize after start up
+			thread_rng = new RNG_type[1];
+		
+			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+			rng_itf* rng = (rng_itf*)&this->thread_rng[0];
+			rng->Initialize<int>(abs(std::sin((float)i+1)*(float)INT_MAX));
+		}
+
 
 		template <typename TargetType>
 		void Set_Seed(TargetType random_seed)
@@ -300,7 +367,7 @@ namespace GLOBALS
 
 
 		template <typename TargetType>
-		void Correlated_Rands(boost::container::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
+		void Correlated_Norms(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
 		{
 			correlated_random_values.clear();
 

@@ -209,8 +209,11 @@ namespace Person_Components
 					if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.template Current_Time<Simulation_Timestep_Increment>() &&
 						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
-
-						//if (ComponentType::_write_activity_files) ComponentType::logs[__thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
+						if (parent->uuid<int>() == 3 && household->uuid<int>() == 946)
+						{
+							DEBUG_MESSAGE("Debugging...");
+							parent->Display_Activities(cout);
+						}
 				
 						// make sure vehicle is not already being simulated, skip movement if it is
 						if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)

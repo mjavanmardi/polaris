@@ -1,47 +1,37 @@
-//#define SHOW_WARNINGS
-//#define ENABLE_STACK_TRACE
-//#define ANTARES
-
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
-
-
-#define IntegratedModelApplication
-
-#ifdef _DEBUG
-
-#undef ANTARES
-//#define SHOW_WARNINGS
-#else
-//#define SHOW_WARNINGS
+//=========================================
+// Inclusion of C-run time debugging
+//#define MEM_DEBUG
+#ifdef MEM_DEBUG
+	#define _CRTDBG_MAP_ALLOC
+	#include <stdlib.h>
+	#include <crtdbg.h>
 #endif
 
-#undef ENABLE_WARNINGS
+//#define IntegratedModelApplication
 
+//=========================================
+// Debug build options
+#ifdef _DEBUG
+	//#define DEBUG_1
+	#ifdef MEM_DEBUG
+		#undef free
+	#endif
+	#undef ANTARES
+#endif
+
+//=========================================
+// Miscellaneous warning and error message printing options
+#undef ENABLE_WARNINGS
 //#define ENABLE_DEBUG_MESSAGES
+//#define SHOW_WARNINGS
+
 
 #include "Polaris_PCH.h"
-//#include "core\Core.h"
-//#include "File_Reader.h"
-//#include "Repository.h"
-
 #include "User_Space.h"
 #include "Activity_Simulator.h"
 #include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
-
-
-// SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
-#ifdef _DEBUG
-//#define DEBUG_1
-#endif
-
-
 #include "Application_Includes.h"
-
-//#define INTEGRATED_MODEL
-#ifndef INTEGRATED_MODEL
 
 
 struct MasterType
@@ -244,11 +234,11 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
-void output_object_sizes();
-
 int main(int argc,char** argv)
 {
-	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	#ifdef MEM_DEBUG
+		_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	#endif
 
 	//==================================================================================================================================
 	// Scenario initialization
@@ -279,38 +269,6 @@ int main(int argc,char** argv)
 	}
 
 
-
-	typedef Hazard_Model_Components::Prototypes::Hazard_Model<MasterType::hazard_model_type> hazard_model_itf;
-	hazard_model_itf* hazard = (hazard_model_itf*)Allocate<MasterType::hazard_model_type>();
-	hazard->Initialize(0.21,0.39,1.16,0.57);
-
-
-	float start=1.0;
-	float end = 1.25;
-	float betaX = 0.0;
-	//hazard->Evaluate_Failure_Probability<float,Time_Days>(start,end,betaX);
-
-	cout <<0.863172976106552<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.863172976106552,betaX)<<endl;
-	cout <<0.813077385380346<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.813077385380346,betaX)<<endl;
-	cout <<0.770961671535304<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.770961671535304,betaX)<<endl;
-	cout <<0.684937902991435<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.684937902991435,betaX)<<endl;
-	cout <<0.633437028856208<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.633437028856208,betaX)<<endl;
-	cout <<0.565350290085205<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.565350290085205,betaX)<<endl;
-	cout <<0.513897898373442<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.513897898373442,betaX)<<endl;
-	cout <<0.47052452258316<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.47052452258316,betaX)<<endl;
-	cout <<0.432392906345357<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.432392906345357,betaX)<<endl;
-	cout <<0.398171648584007<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.398171648584007,betaX)<<endl;
-	cout <<0.367105579623833<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.367105579623833,betaX)<<endl;
-	cout <<0.33870887024242<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.33870887024242,betaX)<<endl;
-	cout <<0.312639118817964<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.312639118817964,betaX)<<endl;
-	cout <<0.288637901280263<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.288637901280263,betaX)<<endl;
-	cout <<0.129140762883458<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.129140762883458,betaX)<<endl;
-	cout <<0.0563957856440104<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.0563957856440104,betaX)<<endl;
-	cout <<0.0239999441963992<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.0239999441963992,betaX)<<endl;
-	cout <<0.00997746020295199<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.00997746020295199,betaX)<<endl;
-	cout <<0.00406215210642316<<","<<hazard->Evaluate_Inverse_Survival<float,Time_Days>(0.00406215210642316,betaX)<<endl;
-
-
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -318,15 +276,9 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
-	output_object_sizes();
-
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
-	//ofstream log_file("signal_log3.txt");
-	//ostream output_stream(log_file.rdbuf());
-	//stream_ptr = &output_stream;	
-
 	string output_dir_name = "";
 
 	GLOBALS::Normal_RNG.Initialize();
@@ -465,24 +417,6 @@ int main(int argc,char** argv)
 	#pragma endregion
 	
 
-
-	//==================================================================================================================================
-	// EXTERNAL Demand
-	//----------------------------------------------------------------------------------------------------------------------------------
-
-	if (scenario->read_demand_from_database<bool>())
-	{
-		typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
-		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-		demand->scenario_reference<_Scenario_Interface*>(scenario);
-		demand->network_reference<_Network_Interface*>(network);
-		cout << "reading external demand data..." <<endl;
-		demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	}
-
-	
-
-
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
@@ -496,6 +430,20 @@ int main(int argc,char** argv)
 	{
 		GLOBALS::Normal_RNG.Set_Seed<int>();
 		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+
+
+	//==================================================================================================================================
+	// EXTERNAL Demand
+	//----------------------------------------------------------------------------------------------------------------------------------
+	if (scenario->read_demand_from_database<bool>())
+	{
+		typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
+		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+		demand->scenario_reference<_Scenario_Interface*>(scenario);
+		demand->network_reference<_Network_Interface*>(network);
+		cout << "reading external demand data..." <<endl;
+		demand->read_demand_data<Net_IO_Type>(network_io_maps);
 	}
 	
 
@@ -526,6 +474,9 @@ int main(int argc,char** argv)
 		cout << "Initializing network skims..." <<endl;
 		typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
 		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+
+
+
 		skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 		if (skimmer->read_input<bool>())
 		{
@@ -543,6 +494,12 @@ int main(int argc,char** argv)
 				cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
 			}
 		}
+		else
+		{
+			skimmer->read_transit<bool>(false);
+			skimmer->read_highway_cost<bool>(false);
+		}
+
 		skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
 		if (skimmer->write_output<bool>())
 		{
@@ -617,281 +574,89 @@ int main(int argc,char** argv)
 	{
 		cout << ex.what();
 	}
+	
+	#ifdef MEM_DEBUG
+		_CrtDumpMemoryLeaks();
+	#endif
 
 	cout << "Finished!" << endl;
-	//system("PAUSE");
 }
 
-void output_object_sizes()
-{
-#ifdef ENABLE_MEMORY_LOGGING
-	ofstream file;
-	file.open("memory_logging_typeids.csv");
-
-	file << endl <<"network_type size = "<<sizeof(MasterType::network_type)<<","<<(int)MasterType::network_type::component_id<<endl;
-	file << endl <<"link_type size = "<<sizeof(MasterType::link_type)<<","<<(int)MasterType::link_type::component_id<<endl;
-	file << endl <<"intersection_type size = "<<sizeof(MasterType::intersection_type)<<","<<(int)MasterType::intersection_type::component_id<<endl;
-	file << endl <<"vehicle_type size = "<<sizeof(MasterType::vehicle_type)<<","<<(int)MasterType::vehicle_type::component_id<<endl;
-	file << endl <<"zone_type size = "<<sizeof(MasterType::zone_type)<<","<<(int)MasterType::zone_type::component_id<<endl;
-	file << endl <<"scenario_type size = "<<sizeof(MasterType::scenario_type)<<","<<(int)MasterType::scenario_type::component_id<<endl;
-	file << endl <<"network_db_reader_type size = "<<sizeof(MasterType::network_db_reader_type)<<","<<(int)MasterType::network_db_reader_type::component_id<<endl;
-	file << endl <<"movement_type size = "<<sizeof(MasterType::movement_type)<<","<<(int)MasterType::movement_type::component_id<<endl;
-	file << endl <<"turn_movement_type size = "<<sizeof(MasterType::turn_movement_type)<<","<<(int)MasterType::turn_movement_type::component_id<<endl;
-	file << endl <<"routable_network_type size = "<<sizeof(MasterType::routable_network_type)<<","<<(int)MasterType::routable_network_type::component_id<<endl;
-	file << endl <<"routing_type size = "<<sizeof(MasterType::routing_type)<<","<<(int)MasterType::routing_type::component_id<<endl;
-	file << endl <<"skim_routing_type size = "<<sizeof(MasterType::skim_routing_type)<<","<<(int)MasterType::skim_routing_type::component_id<<endl;
-	file << endl <<"activity_location_type size = "<<sizeof(MasterType::activity_location_type)<<","<<(int)MasterType::activity_location_type::component_id<<endl;
-	file << endl <<"traveler_type size = "<<sizeof(MasterType::traveler_type)<<","<<(int)MasterType::traveler_type::component_id<<endl;
-	file << endl <<"switch_decision_data_type size = "<<sizeof(MasterType::switch_decision_data_type)<<","<<(int)MasterType::switch_decision_data_type::component_id<<endl;
-	file << endl <<"inbound_outbound_movements_type size = "<<sizeof(MasterType::inbound_outbound_movements_type)<<","<<(int)MasterType::inbound_outbound_movements_type::component_id<<endl;
-	file << endl <<"outbound_inbound_movements_type size = "<<sizeof(MasterType::outbound_inbound_movements_type)<<","<<(int)MasterType::outbound_inbound_movements_type::component_id<<endl;
-	file << endl <<"operation_type size = "<<sizeof(MasterType::operation_type)<<","<<(int)MasterType::operation_type::component_id<<endl;
-	file << endl <<"intersection_control_type size = "<<sizeof(MasterType::intersection_control_type)<<","<<(int)MasterType::intersection_control_type::component_id<<endl;
-	file << endl <<"control_plan_type size = "<<sizeof(MasterType::control_plan_type)<<","<<(int)MasterType::control_plan_type::component_id<<endl;
-	file << endl <<"phase_type size = "<<sizeof(MasterType::phase_type)<<","<<(int)MasterType::phase_type::component_id<<endl;
-	file << endl <<"phase_movement_type size = "<<sizeof(MasterType::phase_movement_type)<<","<<(int)MasterType::phase_movement_type::component_id<<endl;
-	file << endl <<"approach_type size = "<<sizeof(MasterType::approach_type)<<","<<(int)MasterType::approach_type::component_id<<endl;
-	file << endl <<"plan_type size = "<<sizeof(MasterType::plan_type)<<","<<(int)MasterType::plan_type::component_id<<endl;
-	file << endl <<"movement_plan_type size = "<<sizeof(MasterType::movement_plan_type)<<","<<(int)MasterType::movement_plan_type::component_id<<endl;
-	file << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type)<<","<<(int)MasterType::movement_plan_record_type::component_id<<endl;
-	file << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type)<<","<<(int)MasterType::trajectory_unit_type::component_id<<endl;
-	file << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type)<<","<<(int)MasterType::network_skim_type::component_id<<endl;
-	file << endl <<"demand_type size = "<<sizeof(MasterType::demand_type)<<","<<(int)MasterType::demand_type::component_id<<endl;
-	file << endl <<"person_type size = "<<sizeof(MasterType::person_type)<<","<<(int)MasterType::person_type::component_id<<endl;
-	file << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type)<<","<<(int)MasterType::person_planner_type::component_id<<endl;
-	file << endl <<"person_mover_type size = "<<sizeof(MasterType::person_mover_type)<<","<<(int)MasterType::person_mover_type::component_id<<endl;
-	file << endl <<"person_scheduler_type size = "<<sizeof(MasterType::person_scheduler_type)<<","<<(int)MasterType::person_scheduler_type::component_id<<endl;
-	file << endl <<"person_perception_type size = "<<sizeof(MasterType::person_perception_type)<<","<<(int)MasterType::person_perception_type::component_id<<endl;
-	file << endl <<"activity_generator_type size = "<<sizeof(MasterType::activity_generator_type)<<","<<(int)MasterType::activity_generator_type::component_id<<endl;
-	file << endl <<"person_properties_type size = "<<sizeof(MasterType::person_properties_type)<<","<<(int)MasterType::person_properties_type::component_id<<endl;
-	file << endl <<"person_static_properties_type size = "<<sizeof(MasterType::person_static_properties_type)<<","<<(int)MasterType::person_static_properties_type::component_id<<endl;
-	file << endl <<"person_data_logger_type size = "<<sizeof(MasterType::person_data_logger_type)<<","<<(int)MasterType::person_data_logger_type::component_id<<endl;
-	file << endl <<"activity_type size = "<<sizeof(MasterType::activity_type)<<","<<(int)MasterType::activity_type::component_id<<endl;
-	file << endl <<"activity_plan_type size = "<<sizeof(MasterType::activity_plan_type)<<","<<(int)MasterType::activity_plan_type::component_id<<endl;
-	file << endl <<"routine_activity_plan_type size = "<<sizeof(MasterType::routine_activity_plan_type)<<","<<(int)MasterType::routine_activity_plan_type::component_id<<endl;
-	file << endl <<"at_home_activity_plan_type size = "<<sizeof(MasterType::at_home_activity_plan_type)<<","<<(int)MasterType::at_home_activity_plan_type::component_id<<endl;
-	file << endl <<"activity_record_type size = "<<sizeof(MasterType::activity_record_type)<<","<<(int)MasterType::activity_record_type::component_id<<endl;
-	file << endl <<"activity_timing_chooser_type size = "<<sizeof(MasterType::activity_timing_chooser_type)<<","<<(int)MasterType::activity_timing_chooser_type::component_id<<endl;
-	file << endl <<"person_destination_chooser_type size = "<<sizeof(MasterType::person_destination_chooser_type)<<","<<(int)MasterType::person_destination_chooser_type::component_id<<endl;
-	file << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type)<<","<<(int)MasterType::person_destination_choice_option_type::component_id<<endl;
-	file << endl <<"synthesis zone size = "<<sizeof(MasterType::synthesis_zone_type)<<","<<(int)MasterType::synthesis_zone_type::component_id<<endl;
-	file << endl <<"region size = "<<sizeof(MasterType::synthesis_region_type)<<","<<(int)MasterType::synthesis_region_type::component_id<<endl;
-	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::solver_settings_type)<<","<<(int)MasterType::solver_settings_type::component_id<<endl;
-	file << endl <<"popsyn_solver size = "<<sizeof(MasterType::population_synthesis_type)<<","<<(int)MasterType::population_synthesis_type::component_id<<endl;
-	file << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type)<<","<<(int)MasterType::traffic_management_center_type::component_id<<endl;
-	file << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type)<<","<<(int)MasterType::weather_network_event_type::component_id<<endl;
-	file << endl <<"accident_network_event_type size = "<<sizeof(MasterType::accident_network_event_type)<<","<<(int)MasterType::accident_network_event_type::component_id<<endl;
-	file << endl <<"congestion_network_event_type size = "<<sizeof(MasterType::congestion_network_event_type)<<","<<(int)MasterType::congestion_network_event_type::component_id<<endl;
-	file << endl <<"lane_closure_network_event_type size = "<<sizeof(MasterType::lane_closure_network_event_type)<<","<<(int)MasterType::lane_closure_network_event_type::component_id<<endl;
-	file << endl <<"link_control_type size = "<<sizeof(MasterType::link_control_type)<<","<<(int)MasterType::link_control_type::component_id<<endl;
-	file << endl <<"depot_type size = "<<sizeof(MasterType::depot_type)<<","<<(int)MasterType::depot_type::component_id<<endl;
-	file << endl <<"advisory_radio_type size = "<<sizeof(MasterType::advisory_radio_type)<<","<<(int)MasterType::advisory_radio_type::component_id<<endl;
-	file << endl <<"variable_word_sign_type size = "<<sizeof(MasterType::variable_word_sign_type)<<","<<(int)MasterType::variable_word_sign_type::component_id<<endl;
-	file << endl <<"variable_speed_sign_type size = "<<sizeof(MasterType::variable_speed_sign_type)<<","<<(int)MasterType::variable_speed_sign_type::component_id<<endl;
-	file << endl <<"link_sensor_type size = "<<sizeof(MasterType::link_sensor_type)<<","<<(int)MasterType::link_sensor_type::component_id<<endl;
-	file << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type)<<","<<(int)MasterType::base_network_event_type::component_id<<endl;
-	file << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type)<<","<<(int)MasterType::network_event_manager_type::component_id<<endl;
-	file.close();
-#endif
-}
-#endif
-
-
-
-//#define TEST_APPLICATION
-#ifdef TEST_APPLICATION
-concept struct Concept_Test
-{
-	check_typedef_name(name1_check,name1);
-	check_typedef_name(name2_check,name2);
-	define_sub_check(name1_subcheck, name1_check);
-	define_sub_check(name2_subcheck, name2_check);
-	define_default_check(name1_subcheck && name2_subcheck);
-};
-
-prototype struct Test_Agent
-{
-	tag_as_prototype;
-
-	bool Test_Function(string arg1, bool arg2=true, string arg3="test")
-	{
-		return true;
-	}
-
-	template<typename T> void Initialize()
-	{
-		this_component()->Initialize<T>();
-	}
-	define_feature_exists_check(test_feature, test_feature_exists);
-	template<typename T> void test_feature(requires(T,check(ComponentType,test_feature_exists)))
-	{
-		this_component()->test_feature<T>();
-	}
-	template<typename T> void test_feature(requires(T,!check(ComponentType,test_feature_exists)))
-	{
-		assert_check(ComponentType,test_feature_exists,"Test feature does not exist.");
-	}
-	template<typename T> void test_concept(requires(T,sub_check(ComponentType,Concept_Test, name1_subcheck)))
-	{
-		cout <<"good - name 1";
-	}
-	template<typename T> void test_concept(requires(T,!sub_check(ComponentType,Concept_Test, name1_subcheck) && sub_check(ComponentType,Concept_Test, name2_subcheck)))
-	{
-		cout <<"good - name 2";
-	}
-	template<typename T> void test_concept(requires(T,!sub_check(ComponentType,Concept_Test, name1_subcheck) && !sub_check(ComponentType,Concept_Test, name2_subcheck)))
-	{
-		assert_sub_check(ComponentType,Concept_Test, name1_subcheck,"Error, Concept_test name1 failed.");
-		assert_sub_check(ComponentType,Concept_Test, name2_subcheck,"Error, Concept_test name2 failed.");
-	}
-};
-
-implementation struct Test_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>
-{
-	typedef typename Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>::Component_Type ComponentType;
-	typedef Test_Agent<ComponentType> agent_itf;
-
-	typedef double name1;
-	typedef double name2;
-
-	template<typename T> void Initialize()
-	{
-		Load_Event<ComponentType>(&ComponentType::Agent_Event,1,0);
-			
-	}
-	static void Agent_Event(ComponentType* _this,Event_Response& response)
-	{
-		agent_itf* _this_ptr=(agent_itf*)_this;
-		
-		if (iteration() % 100 == 0)
-		{
-			cout <<"The iteration is: "<< iteration() <<". The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes."<<endl;
-			response.next._iteration=iteration()+1;
-			response.next._sub_iteration = 0;
-		}
-		
-		else
-		{
-			response.next._iteration=iteration()+1;
-			response.next._sub_iteration = 0;
-		}
-	}
-};
-
-implementation struct Inherited_Agent_Implementation : public Test_Agent_Implementation<MasterType,INHERIT(Inherited_Agent_Implementation)>
-{
-	typedef typename Test_Agent_Implementation<MasterType,INHERIT(Inherited_Agent_Implementation)>::Component_Type ComponentType;
-	typedef Test_Agent<ComponentType> agent_itf;
-
-
-};
-
-struct MasterType
-{
-	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
-	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
-	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
-	typedef PopSyn::Implementations::Polaris_Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
-	typedef PopSyn::Implementations::Polaris_Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
-	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
-	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
-	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
-	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
-	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
-	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
-	typedef NULLCOMPONENT household_type;
-	typedef NULLTYPE person_type;
-	typedef NULLTYPE network_type;
-};
+//void output_object_sizes()
+//{
+//#ifdef ENABLE_MEMORY_LOGGING
+//	ofstream file;
+//	file.open("memory_logging_typeids.csv");
+//
+//	file << endl <<"network_type size = "<<sizeof(MasterType::network_type)<<","<<(int)MasterType::network_type::component_id<<endl;
+//	file << endl <<"link_type size = "<<sizeof(MasterType::link_type)<<","<<(int)MasterType::link_type::component_id<<endl;
+//	file << endl <<"intersection_type size = "<<sizeof(MasterType::intersection_type)<<","<<(int)MasterType::intersection_type::component_id<<endl;
+//	file << endl <<"vehicle_type size = "<<sizeof(MasterType::vehicle_type)<<","<<(int)MasterType::vehicle_type::component_id<<endl;
+//	file << endl <<"zone_type size = "<<sizeof(MasterType::zone_type)<<","<<(int)MasterType::zone_type::component_id<<endl;
+//	file << endl <<"scenario_type size = "<<sizeof(MasterType::scenario_type)<<","<<(int)MasterType::scenario_type::component_id<<endl;
+//	file << endl <<"network_db_reader_type size = "<<sizeof(MasterType::network_db_reader_type)<<","<<(int)MasterType::network_db_reader_type::component_id<<endl;
+//	file << endl <<"movement_type size = "<<sizeof(MasterType::movement_type)<<","<<(int)MasterType::movement_type::component_id<<endl;
+//	file << endl <<"turn_movement_type size = "<<sizeof(MasterType::turn_movement_type)<<","<<(int)MasterType::turn_movement_type::component_id<<endl;
+//	file << endl <<"routable_network_type size = "<<sizeof(MasterType::routable_network_type)<<","<<(int)MasterType::routable_network_type::component_id<<endl;
+//	file << endl <<"routing_type size = "<<sizeof(MasterType::routing_type)<<","<<(int)MasterType::routing_type::component_id<<endl;
+//	file << endl <<"skim_routing_type size = "<<sizeof(MasterType::skim_routing_type)<<","<<(int)MasterType::skim_routing_type::component_id<<endl;
+//	file << endl <<"activity_location_type size = "<<sizeof(MasterType::activity_location_type)<<","<<(int)MasterType::activity_location_type::component_id<<endl;
+//	file << endl <<"traveler_type size = "<<sizeof(MasterType::traveler_type)<<","<<(int)MasterType::traveler_type::component_id<<endl;
+//	file << endl <<"switch_decision_data_type size = "<<sizeof(MasterType::switch_decision_data_type)<<","<<(int)MasterType::switch_decision_data_type::component_id<<endl;
+//	file << endl <<"inbound_outbound_movements_type size = "<<sizeof(MasterType::inbound_outbound_movements_type)<<","<<(int)MasterType::inbound_outbound_movements_type::component_id<<endl;
+//	file << endl <<"outbound_inbound_movements_type size = "<<sizeof(MasterType::outbound_inbound_movements_type)<<","<<(int)MasterType::outbound_inbound_movements_type::component_id<<endl;
+//	file << endl <<"operation_type size = "<<sizeof(MasterType::operation_type)<<","<<(int)MasterType::operation_type::component_id<<endl;
+//	file << endl <<"intersection_control_type size = "<<sizeof(MasterType::intersection_control_type)<<","<<(int)MasterType::intersection_control_type::component_id<<endl;
+//	file << endl <<"control_plan_type size = "<<sizeof(MasterType::control_plan_type)<<","<<(int)MasterType::control_plan_type::component_id<<endl;
+//	file << endl <<"phase_type size = "<<sizeof(MasterType::phase_type)<<","<<(int)MasterType::phase_type::component_id<<endl;
+//	file << endl <<"phase_movement_type size = "<<sizeof(MasterType::phase_movement_type)<<","<<(int)MasterType::phase_movement_type::component_id<<endl;
+//	file << endl <<"approach_type size = "<<sizeof(MasterType::approach_type)<<","<<(int)MasterType::approach_type::component_id<<endl;
+//	file << endl <<"plan_type size = "<<sizeof(MasterType::plan_type)<<","<<(int)MasterType::plan_type::component_id<<endl;
+//	file << endl <<"movement_plan_type size = "<<sizeof(MasterType::movement_plan_type)<<","<<(int)MasterType::movement_plan_type::component_id<<endl;
+//	file << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type)<<","<<(int)MasterType::movement_plan_record_type::component_id<<endl;
+//	file << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type)<<","<<(int)MasterType::trajectory_unit_type::component_id<<endl;
+//	file << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type)<<","<<(int)MasterType::network_skim_type::component_id<<endl;
+//	file << endl <<"demand_type size = "<<sizeof(MasterType::demand_type)<<","<<(int)MasterType::demand_type::component_id<<endl;
+//	file << endl <<"person_type size = "<<sizeof(MasterType::person_type)<<","<<(int)MasterType::person_type::component_id<<endl;
+//	file << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type)<<","<<(int)MasterType::person_planner_type::component_id<<endl;
+//	file << endl <<"person_mover_type size = "<<sizeof(MasterType::person_mover_type)<<","<<(int)MasterType::person_mover_type::component_id<<endl;
+//	file << endl <<"person_scheduler_type size = "<<sizeof(MasterType::person_scheduler_type)<<","<<(int)MasterType::person_scheduler_type::component_id<<endl;
+//	file << endl <<"person_perception_type size = "<<sizeof(MasterType::person_perception_type)<<","<<(int)MasterType::person_perception_type::component_id<<endl;
+//	file << endl <<"activity_generator_type size = "<<sizeof(MasterType::activity_generator_type)<<","<<(int)MasterType::activity_generator_type::component_id<<endl;
+//	file << endl <<"person_properties_type size = "<<sizeof(MasterType::person_properties_type)<<","<<(int)MasterType::person_properties_type::component_id<<endl;
+//	file << endl <<"person_static_properties_type size = "<<sizeof(MasterType::person_static_properties_type)<<","<<(int)MasterType::person_static_properties_type::component_id<<endl;
+//	file << endl <<"person_data_logger_type size = "<<sizeof(MasterType::person_data_logger_type)<<","<<(int)MasterType::person_data_logger_type::component_id<<endl;
+//	file << endl <<"activity_type size = "<<sizeof(MasterType::activity_type)<<","<<(int)MasterType::activity_type::component_id<<endl;
+//	file << endl <<"activity_plan_type size = "<<sizeof(MasterType::activity_plan_type)<<","<<(int)MasterType::activity_plan_type::component_id<<endl;
+//	file << endl <<"routine_activity_plan_type size = "<<sizeof(MasterType::routine_activity_plan_type)<<","<<(int)MasterType::routine_activity_plan_type::component_id<<endl;
+//	file << endl <<"at_home_activity_plan_type size = "<<sizeof(MasterType::at_home_activity_plan_type)<<","<<(int)MasterType::at_home_activity_plan_type::component_id<<endl;
+//	file << endl <<"activity_record_type size = "<<sizeof(MasterType::activity_record_type)<<","<<(int)MasterType::activity_record_type::component_id<<endl;
+//	file << endl <<"activity_timing_chooser_type size = "<<sizeof(MasterType::activity_timing_chooser_type)<<","<<(int)MasterType::activity_timing_chooser_type::component_id<<endl;
+//	file << endl <<"person_destination_chooser_type size = "<<sizeof(MasterType::person_destination_chooser_type)<<","<<(int)MasterType::person_destination_chooser_type::component_id<<endl;
+//	file << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type)<<","<<(int)MasterType::person_destination_choice_option_type::component_id<<endl;
+//	file << endl <<"synthesis zone size = "<<sizeof(MasterType::synthesis_zone_type)<<","<<(int)MasterType::synthesis_zone_type::component_id<<endl;
+//	file << endl <<"region size = "<<sizeof(MasterType::synthesis_region_type)<<","<<(int)MasterType::synthesis_region_type::component_id<<endl;
+//	file << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::solver_settings_type)<<","<<(int)MasterType::solver_settings_type::component_id<<endl;
+//	file << endl <<"popsyn_solver size = "<<sizeof(MasterType::population_synthesis_type)<<","<<(int)MasterType::population_synthesis_type::component_id<<endl;
+//	file << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type)<<","<<(int)MasterType::traffic_management_center_type::component_id<<endl;
+//	file << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type)<<","<<(int)MasterType::weather_network_event_type::component_id<<endl;
+//	file << endl <<"accident_network_event_type size = "<<sizeof(MasterType::accident_network_event_type)<<","<<(int)MasterType::accident_network_event_type::component_id<<endl;
+//	file << endl <<"congestion_network_event_type size = "<<sizeof(MasterType::congestion_network_event_type)<<","<<(int)MasterType::congestion_network_event_type::component_id<<endl;
+//	file << endl <<"lane_closure_network_event_type size = "<<sizeof(MasterType::lane_closure_network_event_type)<<","<<(int)MasterType::lane_closure_network_event_type::component_id<<endl;
+//	file << endl <<"link_control_type size = "<<sizeof(MasterType::link_control_type)<<","<<(int)MasterType::link_control_type::component_id<<endl;
+//	file << endl <<"depot_type size = "<<sizeof(MasterType::depot_type)<<","<<(int)MasterType::depot_type::component_id<<endl;
+//	file << endl <<"advisory_radio_type size = "<<sizeof(MasterType::advisory_radio_type)<<","<<(int)MasterType::advisory_radio_type::component_id<<endl;
+//	file << endl <<"variable_word_sign_type size = "<<sizeof(MasterType::variable_word_sign_type)<<","<<(int)MasterType::variable_word_sign_type::component_id<<endl;
+//	file << endl <<"variable_speed_sign_type size = "<<sizeof(MasterType::variable_speed_sign_type)<<","<<(int)MasterType::variable_speed_sign_type::component_id<<endl;
+//	file << endl <<"link_sensor_type size = "<<sizeof(MasterType::link_sensor_type)<<","<<(int)MasterType::link_sensor_type::component_id<<endl;
+//	file << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type)<<","<<(int)MasterType::base_network_event_type::component_id<<endl;
+//	file << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type)<<","<<(int)MasterType::network_event_manager_type::component_id<<endl;
+//	file.close();
+//#endif
+//}
+//
 
 
 
 
-int main(int argc, char* argv[])
-{
-	Simulation_Configuration cfg;
-	cfg.Single_Threaded_Setup(1000);
-	INITIALIZE_SIMULATION(cfg);
 
-
-	//==================================================================================================================================
-	// Scenario initialization
-	//----------------------------------------------------------------------------------------------------------------------------------
-	char* scenario_filename = "scenario.json";
-	if (argc >= 2) scenario_filename = argv[1];
-	typedef Scenario_Components::Prototypes::Scenario<MasterType::scenario_type> _Scenario_Interface;
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
-	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
-
-
-	//==================================================================================================================================
-	// Initialize global randon number generators - if seed set to zero or left blank use system time
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	int seed = scenario->iseed<int>();
-	GLOBALS::Normal_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Initialize();
-	if (seed != 0)
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
-	}
-	else
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
-	}
-
-	File_IO::File_Reader fr;
-	fr.Open("C:\\Users\\jauld\\Desktop\\POLARIS_DATA\\Chicago_CBD\\Version_5_ITS77\\snapshot.idx",false);
-
-	File_IO::Binary_File_Reader br;
-	br.Open("C:\\Users\\jauld\\Desktop\\POLARIS_DATA\\Chicago_CBD\\Version_5_ITS77\\snapshot.bin");
-
-	int time;
-	br.Read_Value<int>(time);
-	cout <<"Starting time is: " <<time;
-
-	while(fr.Read())
-	{
-		int time;
-		long long bytes;
-		fr.Get_Data<int>(time,0);
-		fr.Get_Data<long long>(bytes,1);
-
-		int val;
-		br.Read_Value<int>(val,bytes);
-		cout << "Reading binary file. Time,byte in index="<<time<<", "<<bytes<<".  Value in binary file="<<val<<endl;
-	}
-
-	//while (true)
-	//{
-	//	float f;
-	//	br.Read_Value<float>(f);
-	//	cout <<"Value: " <<f<<endl;
-	//}
-
-	int size;
-	char ans;
-
-	float* values=nullptr;
-	while (br.Read_Value(size))
-	{
-		if (size > 0)
-		{
-			values = new float[size];
-			br.Read_Array<float>(values,size);
-
-			cout <<"Read in " << size<<" values:"<<endl;
-			for (int i=0; i<size;++i) cout<<values[i]<<endl;
-		}
-		cin >> ans;
-	}
-
-
-	START();
-
-	
-	cin >> ans;
-}
-#endif

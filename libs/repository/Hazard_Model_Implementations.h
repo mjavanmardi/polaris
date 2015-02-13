@@ -81,6 +81,7 @@ namespace Hazard_Model_Components
 
 			template<typename TargetType> void Initialize(TargetType gamma, TargetType constant)
 			{	
+				if (gamma<=0) THROW_EXCEPTION("Error: gamma value '"<<gamma<<"' not supported for Weibull hazard function.  Must be greater than 0.")
 				this->_gamma=gamma;
 				this->_constant=constant;
 			}	
@@ -117,6 +118,7 @@ namespace Hazard_Model_Components
 
 			template<typename TargetType> void Initialize(TargetType gamma_e, TargetType constant_e, TargetType gamma_l, TargetType constant_l)
 			{	
+				if (gamma_l<=0) THROW_EXCEPTION("Error: gamma_l value '"<<gamma_l<<"' not supported for Weibull hazard function.  Must be greater than 0.")
 				Base_Type::Initialize(gamma_e, constant_e);
 				this->_l_gamma=gamma_l;
 				this->_l_constant=constant_l;

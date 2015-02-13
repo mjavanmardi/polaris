@@ -53,6 +53,8 @@ namespace Person_Components
 			//m_prototype_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
 			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
+
 			// Interface definitions
 			typedef Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(Perception_Faculty)::type_of(Scenario)> _Scenario_Interface;
@@ -84,26 +86,30 @@ namespace Person_Components
 			// member features
 			template<typename TargetType> void Initialize()
 			{
-
+				this->_Current_Activity = (Current_Activity_type)Allocate<type_of(Current_Activity)>();
+			}
+			template<typename ActivityType> void Update_Current_Activity(ActivityType current_act)
+			{
+				this->_Current_Activity->Copy<ActivityType>(current_act);
 			}
 
 			// scheduling features - move to Person_Scheduler eventually
-			template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
-			{
-				// Define interfaces to the container members of the class			
-				Movement_Plans* movement_plans = this->template Movement_Plans_Container< Movement_Plans*>();
-				typename Movement_Plans::iterator itr;
-				if ((itr = movement_plans->find(iteration())) != movement_plans->end()) return (TargetType)*itr;
-				else return NULL;
-			}
-			template<typename TargetType> TargetType current_activity_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
-			{
-				// Define interfaces to the container members of the class
-				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
-				typename Activity_Plans::iterator itr;
-				if ((itr = activity_plans->find(iteration())) != activity_plans->end()) return (TargetType)*itr;
-				else return NULL;
-			}
+			//template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
+			//{
+			//	// Define interfaces to the container members of the class			
+			//	Movement_Plans* movement_plans = this->template Movement_Plans_Container< Movement_Plans*>();
+			//	typename Movement_Plans::iterator itr;
+			//	if ((itr = movement_plans->find(iteration())) != movement_plans->end()) return (TargetType)*itr;
+			//	else return NULL;
+			//}
+			//template<typename TargetType> TargetType current_activity_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			//{
+			//	// Define interfaces to the container members of the class
+			//	Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
+			//	typename Activity_Plans::iterator itr;
+			//	if ((itr = activity_plans->find(iteration())) != activity_plans->end()) return (TargetType)*itr;
+			//	else return NULL;
+			//}
 
 			template<typename TimeType,  typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, check(strip_modifiers(TimeType),Is_Time_Value)))
 			{
@@ -126,7 +132,20 @@ namespace Person_Components
 						previous = act;
 					}
 				}
-				return (ReturnType)previous;
+
+				// return either previous activity in the schedule (or the current activity if previous activity has already been removed
+				if (previous == nullptr)
+				{
+					return (ReturnType)_Current_Activity;
+				}
+				else if (this->_Current_Activity->Start_Time<Time_Seconds>() > previous->Start_Time<Time_Seconds>())
+				{
+					return (ReturnType)_Current_Activity;
+				}
+				else
+				{
+					return (ReturnType)previous;
+				}
 			}
 			template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType current_act,requires(ParamType, check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
@@ -553,7 +572,7 @@ namespace Person_Components
 				if (!added)
 				{
 					//cout << endl << "activity not added: " << act->Activity_Plan_ID<int>() << endl;
-					act->template Unschedule_Activity_Events<NT>();
+					//act->template Unschedule_Activity_Events<NT>();
 					this->template Remove_Activity_Plan<Activity_Plan*>(act);
 
 					// if the failed movement addition represents a return home activity, advance the departure time of the following activity so no gaps left in schedule
@@ -621,31 +640,22 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Remove_Movement_Plan(TargetType movement_plan, requires(TargetType,check(TargetType,is_pointer)))
 			{
-				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
-				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
-
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
-
-				// print to log file if requested
-				//if (_write_activity_files) 
-				//{			
-				//	stringstream s;	
-				//	s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->template Activity_Plan_ID<int>() << ", " << act->template Activity_Type<ACTIVITY_TYPES>();
-				//	this->Write_To_Log<stringstream&>(s);
-				//}
 
 				Movement_Plans* movements = this->Movement_Plans_Container<Movement_Plans*>();		
 				
 				typename Movement_Plans::iterator itr = movements->begin();
-
 				for (; itr != movements->end(); ++itr)
 				{
 					if (*itr == move)
 					{
 						movements->erase(itr);
-						break;
+						return;
 					}
 				}
+
+				//THROW_EXCEPTION("Error: this movement plan not found in the movemen_plans_container.")
+
 			}
 		
 			
@@ -667,27 +677,24 @@ namespace Person_Components
 				Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
 				activities->push_back(act);
 				_Activity_Count++;
-			}
+			}		
 			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
-				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
-				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
 
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
+				Movement_Plan* move = act->movement_plan<Movement_Plan*>();
+				
+				// if movement plan is not null check for refreence mismatch, then remove from schedule
+				if (move != nullptr)
+				{
+					if (act != move->destination_activity_reference<Activity_Plan*>() ) THROW_EXCEPTION("ERROR: mismatch between movement and activity references when deleting activity plan.");
+					Remove_Movement_Plan(move);
+				}
 
-				// print to log file if requested
-				//if (_write_activity_files) 
-				//{			
-				//	stringstream s;	
-				//	s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->template Activity_Plan_ID<int>() << ", " << act->template Activity_Type<ACTIVITY_TYPES>();
-				//	this->Write_To_Log<stringstream&>(s);
-				//}
-
+				// Then remove activity - calls activity free function, which deletes the memory for movement plan
 				Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
 				
-				typename Activity_Plans::iterator itr = activities->begin();
-
-				for (; itr != activities->end(); ++itr)
+				for (Activity_Plans::iterator itr = activities->begin(); itr != activities->end(); ++itr)
 				{
 					if (*itr == act)
 					{
@@ -695,8 +702,31 @@ namespace Person_Components
 						break;
 					}
 				}
+				// Free the activity using interface
+				act->Free_Activity<NT>();
 			}
-		
+			//template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+			//{
+			//	Activity_Plan* act = (Activity_Plan*)activity_plan;
+
+			//	Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
+			//	
+			//	typename Activity_Plans::iterator itr = activities->begin();
+
+			//	for (; itr != activities->end(); ++itr)
+			//	{
+			//		if (*itr == act)
+			//		{
+			//			activities->erase(itr);
+			//			break;
+			//		}
+			//	}
+
+			//	act->Free_Activity<NT>();
+			//	
+			//	//THROW_EXCEPTION("Error: this activity plan not found in the Activity_Container.")
+			//}	
+
 			static bool comparer(typename MasterType::activity_type* act1, typename MasterType::activity_type* act2)
 			{
 				//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;

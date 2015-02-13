@@ -23,6 +23,7 @@ namespace Person_Components
 
 			// Interface definitions
 			typedef Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _Person_Interface;
+			typedef Household_Components::Prototypes::Household< typename _Person_Interface::get_type_of(Household)> _Household_Interface;
 			typedef Prototypes::Person_Scheduler< typename _Person_Interface::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
 			
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
@@ -74,6 +75,8 @@ namespace Person_Components
 				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
 
+				activity->Schedule_Activity_Events<NT>();
+
 				this->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
 				activity_count++;
 				return activity;
@@ -88,6 +91,8 @@ namespace Person_Components
 				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
 
+				activity->Schedule_Activity_Events<NT>();
+
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
 				return activity;
@@ -96,14 +101,9 @@ namespace Person_Components
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
 				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-
-
 				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
 
-				activity->template Initialize<ACTIVITY_TYPES>(act_type);
-				activity->Set_Meta_Attributes<void>();
-				// schedule the activity events based on plan times.
-				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+				activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
 
 				// set location and remove from planning stream
 				activity->Location<LocationType>(location);
@@ -122,10 +122,10 @@ namespace Person_Components
 
 				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
 
-				activity->template Initialize<ACTIVITY_TYPES>(act_type);
-				activity->Set_Meta_Attributes<void>();
+				activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
+				//activity->Set_Meta_Attributes<void>();
 				// schedule the activity events based on plan times.
-				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
 
 				// set location and remove from planning stream
 				activity->Location<LocationType>(location);
@@ -142,17 +142,17 @@ namespace Person_Components
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
 				return activity;
 			}
-			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
+			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
 				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 
 				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
 
-				activity->template Initialize<ACTIVITY_TYPES>(act_type);
-				activity->Set_Meta_Attributes<void>();
+				activity->template Initialize<ACTIVITY_TYPES, TimeType>(act_type, start_plan_time);
+				//activity->Set_Meta_Attributes<void>();
 				// schedule the activity events based on plan times.
-				activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
 
 				// set location and remove from planning stream
 				activity->Location<LocationType>(location);
@@ -178,17 +178,33 @@ namespace Person_Components
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
 				return activity;
 			}
-			template<typename TargetType> void Create_Home_Activity(int& activity_count)
+			template<typename TargetType> At_Home_Activity_Plan* Create_Home_Activity(int& activity_count)
 			{
 				At_Home_Activity_Plan* activity = (At_Home_Activity_Plan*)Allocate<typename Master_Type::at_home_activity_plan_type>();
 				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 				activity->template Activity_Plan_ID<int>(activity_count);
 
-				activity->template Initialize<Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				activity->Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
 				activity_count++;
+				return activity;
 			}
+			template<typename ReturnType, typename TimeType, typename ModeType> ReturnType Create_Home_Activity(TimeType departure_time, TimeType start, TimeType duration, ModeType mode)
+			{
+				At_Home_Activity_Plan* activity = (At_Home_Activity_Plan*)Allocate<typename Master_Type::at_home_activity_plan_type>();
+				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+100);
+
+				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,departure_time,start,duration,mode);
+				activity->Schedule_Activity_Events<NT>();
+
+				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
+
+				return (ReturnType)activity;
+			}
+			
 		};
 
 
@@ -321,7 +337,8 @@ namespace Person_Components
 
 				//=========================================================================================================================
 				// Initialize person with at-home activity
-				Create_Home_Activity<NT>(act_count);
+				At_Home_Activity_Plan* home_act = Create_Home_Activity<NT>(act_count);
+				scheduler->Update_Current_Activity(home_act);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 

@@ -41,7 +41,7 @@ namespace Activity_Components
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 
 			static m_data(int, Route_Planning_Count, NONE, NONE);
-			static m_data(_lock, update_lock, NONE, NONE);
+			//static m_data(_lock, update_lock, NONE, NONE);
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -168,6 +168,7 @@ namespace Activity_Components
 			m_data(Revision,Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
+			m_data(Revision,Deletion_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
 			//m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			//m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
@@ -184,16 +185,23 @@ namespace Activity_Components
 			template<typename TargetType> bool Route_Is_Planned(){return (_Route_Planning_Time._iteration >=(int)END && _Route_Planning_Time._sub_iteration >= (int)END);}
 
 			// Basic Activity Events - Plan route and add to schedule
-			template<typename TargetType> void Initialize(TargetType act_type)
-			{
-				UNLOCK(this->_update_lock);
-				this_itf* pthis = (this_itf*)this;
-				pthis->Activity_Type<TargetType>(act_type);
-				pthis->Duration<Time_Seconds>(END);
-				pthis->Start_Time<Time_Seconds>(END);
-				pthis->Location<_activity_location_itf*>(nullptr);
-				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-			}
+			//template<typename TargetType> void Initialize(TargetType act_type)
+			//{
+			//	this_itf* pthis = (this_itf*)this;
+			//	pthis->Activity_Type<TargetType>(act_type);
+			//	pthis->Duration<Time_Seconds>(END);
+			//	pthis->Start_Time<Time_Seconds>(END);
+			//	pthis->Location<_activity_location_itf*>(nullptr);
+			//	pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			//	pthis->movement_plan<_movement_plan_itf*>(nullptr);
+
+			//	// initialize the deletion revision - updated when the Free_Activity event fires
+			//	Set_Attribute_Planning_Times(END);
+
+			//	Revision &delete_time = this->Deletion_Time<  Revision&>();
+			//	delete_time._iteration = END;
+			//	delete_time._sub_iteration = END;
+			//}
 
 			template<typename TargetType> void Copy(TargetType activity)
 			{
@@ -229,6 +237,7 @@ namespace Activity_Components
 				pthis->Duration_Planning_Time(obj->Duration_Planning_Time<Revision>());		
 				pthis->Involved_Persons_Planning_Time(obj->Involved_Persons_Planning_Time<Revision>());		
 				pthis->Route_Planning_Time(obj->Route_Planning_Time<Revision>());		
+				pthis->Deletion_Time(obj->Deletion_Time<Revision>());
 			}
 
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
@@ -268,6 +277,14 @@ namespace Activity_Components
 				_network_itf* network = person->template network_reference<_network_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+
+
+
+				if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
+				{
+					DEBUG_MESSAGE("Debugging...");
+					person->Display_Activities(cout);
+				}
 
 
 				// Create movement plan and give it an ID
@@ -335,6 +352,14 @@ namespace Activity_Components
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+
+
+				if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
+				{
+					DEBUG_MESSAGE("Debugging...");
+					person->Display_Activities(cout);
+				}
+
 
 				
 				if (!this->Route_Is_Planned<bool>())
@@ -424,6 +449,16 @@ namespace Activity_Components
 					scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 				}
 			}		
+			template<typename TargetType> void Deletion_Event_Handler()
+			{
+				// Free movement through interface
+				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
+//				move->Free_Movement();
+
+				// Free this when able
+				Lazy_Free<ComponentType>((ComponentType*)this);
+			}	
+
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)
 			{
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
@@ -451,7 +486,7 @@ namespace Activity_Components
 						{
 							_link_itf* o_link =move->template origin<_link_itf*>();
 							_link_itf* d_link =move->template destination<_link_itf*>();
-							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<int>()) << "." << concat(this->Activity_Plan_ID< int>()) <<", " << concat(this->Activity_Type< ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
+							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->dbid<int>() << ", dir="<<o_link->direction<int>()<<" : dest_link="<< d_link->dbid<int>()<<", dir="<<o_link->direction<int>());
 							return;
 						}
 						
@@ -502,8 +537,10 @@ namespace Activity_Components
 			}
 			template<typename TargetType> void Arrive_At_Activity()
 			{
+
 				// Person has arrived at activity destination
 				_Parent_Planner->template Parent_Person<_person_itf*>()->template Arrive_At_Destination<NT>();
+
 			}
 			template<typename TargetType> void Depart_From_Activity()
 			{
@@ -549,6 +586,38 @@ namespace Activity_Components
 				else
 					return string ("OTHER");
 			}		
+
+			void Display_Activity()
+			{
+				cout <<endl<<"---------------------------------------"<<endl;
+				cout <<"ACTIVITY: ID = "<<this->_Activity_Plan_ID<<endl;
+				cout <<"Type = "<<this->Get_Type_String<NT>()<<endl;
+				cout <<endl;
+				cout <<"Duration = "<<this->__Duration._Value<<endl;
+				cout <<"Location ptr = "<<this->_Location<<endl;
+				cout <<"Mode = "<<this->_Mode<<endl;
+				cout <<"Movement ptr = "<<this->_movement_plan<<endl;
+				cout <<"Parent ptr = "<<this->_Parent_Planner<<endl;
+				cout <<"Start time = "<<this->___Start_Time._Value<<endl;
+				cout <<"Expected travel time = "<<this->__Expected_Travel_Time._Value<<endl;
+				cout <<"Actual Travel Time = "<<this->__Actual_Travel_Time._Value<<endl;
+				cout <<"Is Valid = "<<this->_is_valid<<endl;
+				cout <<endl;
+				cout <<"Start plan iteration = "<<this->_Start_Time_Planning_Time._iteration<<","<<this->_Start_Time_Planning_Time._sub_iteration<<endl;
+				cout <<"Route plan iteration = "<<this->_Route_Planning_Time._iteration<<","<<this->_Route_Planning_Time._sub_iteration<<endl;
+				cout <<"Mode plan iteration = "<<this->_Mode_Planning_Time._iteration<<","<<this->_Mode_Planning_Time._sub_iteration<<endl;
+				cout <<"Location plan iteration = "<<this->_Location_Planning_Time._iteration<<","<<this->_Location_Planning_Time._sub_iteration<<endl;
+				cout <<"Persons plan iteration = "<<this->_Involved_Persons_Planning_Time._iteration<<","<<this->_Involved_Persons_Planning_Time._sub_iteration<<endl;
+				cout <<"Duration plan iteration = "<<this->_Duration_Planning_Time._iteration<<","<<this->_Duration_Planning_Time._sub_iteration<<endl;
+				cout <<"Delete iteration = "<<this->_Deletion_Time._iteration<<","<<this->_Deletion_Time._sub_iteration<<endl;
+				cout <<endl;
+				cout <<"Duration flexibility = "<<this->_Duration_Flexibility<<endl;
+				cout <<"Persons flexibility = "<<this->_Involved_Persons_Flexibility<<endl;
+				cout <<"Location flexibility = "<<this->_Location_Flexibility<<endl;
+				cout <<"Mode flexibility = "<<this->_Mode_Flexibility<<endl;
+				cout <<"Start flexibility = "<<this->_Start_Time_Flexibility<<endl;
+				cout <<"---------------------------------------"<<endl;
+			}
 		};
 
 
@@ -608,18 +677,6 @@ namespace Activity_Components
 			m_data(Types::PLAN_HORIZON_VALUES, Involved_Persons_Plan_Horizon, NONE, NONE);
 			//m_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility, NONE, NONE);
 
-			// Activity methods
-			template<typename TargetType> void Initialize(TargetType act_type)
-			{
-				//UNLOCK(this->_update_lock);
-				this_itf* pthis = (this_itf*)this;
-				pthis->template Activity_Type<TargetType>(act_type);
-				pthis->template Duration<Time_Seconds>(END);
-				pthis->template Start_Time<Time_Seconds>(END);
-				pthis->template Location<_activity_location_itf*>(nullptr);
-				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-			}
-
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
 				//===========================================================================================================================
@@ -651,7 +708,7 @@ namespace Activity_Components
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
 				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
-				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Days>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -693,8 +750,8 @@ namespace Activity_Components
 				}
 
 				// Set correlated random variables
-				boost::container::vector<double> rand;
-				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand, Sigma);
+				std::vector<double> rand;
+				GLOBALS::Uniform_RNG.template Correlated_Rands<double>(rand, Sigma);
 
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
@@ -793,16 +850,16 @@ namespace Activity_Components
 				// Get probabilities of each response level
 				for (int i = 0; i < 5; i++)
 				{
-					P_pmod[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 0] - xB_pmod, 0, 1);
-					P_pper[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 1] - xB_pper, 0, 1);
-					P_ploc[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 2] - xB_ploc, 0, 1);
-					P_ptim[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 3] - xB_ptim, 0, 1);
-					P_pdur[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 4] - xB_pdur, 0, 1);
+					P_pmod[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2(i + 1, 0) - xB_pmod, 0, 1);
+					P_pper[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2(i + 1, 1) - xB_pper, 0, 1);
+					P_ploc[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2(i + 1, 2) - xB_ploc, 0, 1);
+					P_ptim[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2(i + 1, 3) - xB_ptim, 0, 1);
+					P_pdur[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2(i + 1, 4) - xB_pdur, 0, 1);
 				}
 
 				// Set correlated random variables
-				boost::container::vector<double> rand2;
-				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand2, Sigma2);
+				std::vector<double> rand2;
+				GLOBALS::Uniform_RNG.template Correlated_Rands<double>(rand2, Sigma2);
 
 				// Set attribute plan horizon values
 				for (int i = 0; i < 5; i++)
@@ -908,7 +965,7 @@ namespace Activity_Components
 				else
 				{
 					// Delete the activity from schedule if no location chosen
-					pthis->template Unschedule_Activity_Events<NT>();
+					//pthis->template Free_Activity<NT>();
 					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
 
 					/*dest = home_loc;
@@ -1069,12 +1126,6 @@ namespace Activity_Components
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
-		/*	typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
-
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
-			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-		*/
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -1106,17 +1157,6 @@ namespace Activity_Components
 				return Types::PLAN_HORIZON_VALUES::ROUTINE;
 			}
 
-			// Activity methods
-			template<typename TargetType> void Initialize(TargetType act_type)
-			{
-				//UNLOCK(this->_update_lock);
-				this_itf* pthis = (this_itf*)this;
-				pthis->template Activity_Type<TargetType>(act_type);
-				pthis->template Duration<Time_Seconds>(END);
-				pthis->template Start_Time<Time_Seconds>(END);
-				pthis->template Location<_activity_location_itf*>(nullptr);
-				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-			}
 
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -1283,7 +1323,7 @@ namespace Activity_Components
 				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
 				if (!is_scheduled) 
 				{
-					pthis->template Unschedule_Activity_Events<NT>();
+					//pthis->template Free_Activity<NT>();
 					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
 				}
 
@@ -1410,8 +1450,8 @@ namespace Activity_Components
 				}
 
 				// Set correlated random variables
-				boost::container::vector<double> rand;
-				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand, Sigma);
+				std::vector<double> rand;
+				GLOBALS::Uniform_RNG.Correlated_Rands<double>(rand, Sigma);
 
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
@@ -1467,12 +1507,6 @@ namespace Activity_Components
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
 			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
-		/*	typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
-
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
-			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-		*/
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -1514,18 +1548,18 @@ namespace Activity_Components
 			// Activity methods
 			template<typename TimeType, typename ModeType> void Initialize(TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
 			{
+				// reasonableness checking
 				if(start_time > (END)*2.0 || duration > END)
 				{
 					THROW_WARNING("Invalid start/duration for at home activity. Start="<<start_time<<", duration="<<duration);
 				}
 
-				//UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
 
 				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				
-				pthis->template Activity_Type<Types::ACTIVITY_TYPES>(Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY);
+				//pthis->template Activity_Type<Types::ACTIVITY_TYPES>(Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY);
 				pthis->template Duration<TimeType>(duration);
 				pthis->template Start_Time<TimeType>(start_time);
 				pthis->template Location<_activity_location_itf*>(person->template Home_Location<_activity_location_itf*>());
@@ -1618,7 +1652,6 @@ namespace Activity_Components
 		// Static activity plan member initialization
 		//-----------------------------------------------------------------------
 		template<typename MasterType, typename InheritanceList> int Basic_Activity_Plan_Implementation<MasterType,InheritanceList>::_Route_Planning_Count=0;
-		template<typename MasterType, typename InheritanceList> _lock Basic_Activity_Plan_Implementation<MasterType,  InheritanceList>::_update_lock = 0;
 	}
 }
 

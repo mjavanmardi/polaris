@@ -533,9 +533,13 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value) && !check_2(strip_modifiers(TargetType), Simulation_Timestep_Increment,is_same)))
 			{
 				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
+			}
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value) && check_2(strip_modifiers(TargetType), Simulation_Timestep_Increment,is_same)))
+			{
+				return TargetType(Round<int,Value_Type>(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>()));
 			}
 			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
