@@ -7,6 +7,7 @@
 
 using namespace polaris;
 
+// Test agent
 prototype struct Agent
 {
 	tag_as_prototype;
