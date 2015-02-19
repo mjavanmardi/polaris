@@ -751,6 +751,12 @@ namespace polaris
 		else return false;
 	}
 
+	template<typename T> bool Ptr_Comparer(T p1, T p2)
+	{
+		if (*p1 < *p2) return true;
+		else return false;
+	}
+
 	///----------------------------------------------------------------------------------------------------
 	/// container_accessor - implements the standard get / set accessors for a container
 	///		includes a tagless check on whether the implementation has corresponding accessors

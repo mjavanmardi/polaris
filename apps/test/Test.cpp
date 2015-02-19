@@ -16,24 +16,52 @@ prototype struct Agent
 	{
 		this_component()->Initialize<T>();
 	}
+
+	void Reschedule_Agent()
+	{
+		this_component()->Reschedule<ComponentType>(iteration(), 0);
+	}
 };
-implementation struct Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Agent_Implementation),Execution_Object>
+implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
 {
 	template<typename T> void Initialize()
 	{
-		Load_Event<ComponentType>(&Agent_Event,0,0);
+		Load_Event<ComponentType>(&Agent_Event,1,0);
 	}
 	static void Agent_Event(ComponentType* _this,Event_Response& response)
 	{
+		cout <<"BASE_AGENT: event fired at " << iteration();
 		response.next._iteration = END;
 		response.next._sub_iteration = END;
+		cout <<", next event to fire at " << response.next._iteration<<endl;
 	}
+};
+implementation struct Helper_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Helper_Agent_Implementation),Execution_Object>
+{
+	template<typename T> void Initialize()
+	{
+		_base_agent=(base_agent_type)Allocate<type_of(base_agent)>();
+		_base_agent->Initialize<NT>();
+
+		Load_Event<ComponentType>(&Agent_Event,5,0);
+	}
+	static void Agent_Event(ComponentType* _this,Event_Response& response)
+	{
+		cout <<"HELPER_AGENT: event fired at " << iteration();
+		response.next._iteration = END;
+		response.next._sub_iteration = END;
+		cout <<", next event to fire at " << response.next._iteration<<endl;
+		_this->_base_agent->Reschedule_Agent();
+	}
+
+	m_prototype(Agent,typename MasterType::base_agent_type,base_agent,NONE,NONE);
 };
 
 struct MasterType
 {
 	typedef MasterType M;
-	typedef Agent_Implementation<M> agent_type;
+	typedef Base_Agent_Implementation<M> base_agent_type;
+	typedef Helper_Agent_Implementation<M> helper_agent_type;
 
 	//==============================================================================================
 	#pragma region Network Types
@@ -186,19 +214,22 @@ int main(int argc, char *argv[])
 	//----------------------------------------------------------
 	// Initialize basic simulation using dummy execution agent
 	Simulation_Configuration cfg;
-	cfg.Multi_Threaded_Setup(100, 2);
+	cfg.Multi_Threaded_Setup(100, 1);
 	INITIALIZE_SIMULATION(cfg);
 	GLOBALS::Normal_RNG.Initialize();
 	GLOBALS::Uniform_RNG.Initialize();
 	GLOBALS::Normal_RNG.Set_Seed<int>();
 	GLOBALS::Uniform_RNG.Set_Seed<int>();
-	Agent<MasterType::agent_type>* agent = (Agent<MasterType::agent_type>*)Allocate<MasterType::agent_type>();
+
+	Agent<MasterType::helper_agent_type>* agent = (Agent<MasterType::helper_agent_type>*)Allocate<MasterType::helper_agent_type>();
+	agent->Initialize<NT>();
 
 
 	//----------------------------------------------------------
 	// Perform tests
-	Correlated_Rands_Test();
+	//Correlated_Rands_Test();
 
+	START();
 	char test;
 	cin >> test;
 }

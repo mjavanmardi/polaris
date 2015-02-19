@@ -533,8 +533,8 @@ namespace Vehicle_Components
 
 				//((_Network_Interface*)_global_network)->template increase_out_network_vht_vehicle_based<NT>(travel_time);
 				 
-				if (!((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
-					clear_trajectory<TargetType>();
+				//if (!((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
+					//clear_trajectory<TargetType>();
 			}
 
 			template<typename TargetType> void update_vht()
