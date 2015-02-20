@@ -503,6 +503,9 @@ namespace Prototypes
 
 			cout <<endl<<"**************************************************************************************************"<<endl;
 			cout <<"Printing activities for (Household,person): "<<this->Household<_household_itf*>()->uuid<int>()<<","<<this->uuid<int>()<<endl;
+
+			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
+			scheduler->Current_Activity<Activity_Plan*>()->Display_Activity();
 				
 			Activity_Plans& activities = this->Scheduling_Faculty<scheduler_itf*>()->Activity_Container<Activity_Plans&>();
 			for (Activity_Plans::iterator itr = activities.begin(); itr != activities.end(); ++itr)

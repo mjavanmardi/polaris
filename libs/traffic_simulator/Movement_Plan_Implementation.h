@@ -138,6 +138,7 @@ namespace Movement_Plan_Components
 			void Display_Movement()
 			{
 				cout<<endl<<"---------------------------------------"<<endl;
+				cout <<"Ptr="<<this<<endl;
 				cout<<"Departure="<<this->__departed_time._Value<<endl;
 				cout<<"Origin="<<this->_origin_location<<endl;
 				cout<<"Destination="<<this->_destination_location<<endl;

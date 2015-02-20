@@ -590,6 +590,7 @@ namespace Activity_Components
 			void Display_Activity()
 			{
 				cout <<endl<<"---------------------------------------"<<endl;
+				cout <<"Ptr="<<this<<endl;
 				cout <<"ACTIVITY: ID = "<<this->_Activity_Plan_ID<<endl;
 				cout <<"Type = "<<this->Get_Type_String<NT>()<<endl;
 				cout <<endl;
