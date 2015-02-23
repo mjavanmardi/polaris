@@ -65,6 +65,7 @@ namespace Movement_Plan_Components
 
 			void Free_Movement()
 			{
+				if (this == nullptr) return;
 				this->clear_trajectory();
 				Lazy_Free<Component_Type>(this_component());
 			}

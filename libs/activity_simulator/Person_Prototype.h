@@ -498,7 +498,7 @@ namespace Prototypes
 			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
 			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Movement_Plans)> Movement_Plan;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;
 			typedef Household_Components::Prototypes::Household<typename get_type_of(Household)> _household_itf;
 
 			cout <<endl<<"**************************************************************************************************"<<endl;
