@@ -12,7 +12,7 @@
 //=========================================
 // Debug build options
 #ifdef _DEBUG
-	#define DEBUG_1
+	//#define DEBUG_1
 	#ifdef MEM_DEBUG
 		#undef free
 	#endif

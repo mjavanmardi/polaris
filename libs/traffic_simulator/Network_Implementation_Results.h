@@ -414,8 +414,9 @@ namespace Network_Components
 					<< scenario->template network_cumulative_switched_decisions_ITS_informed<int>() << ","
                     << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
 					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
-					<< physicalMemoryUsedByProcess/1000000 << ","
-					<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0) << ","
+					<< getCurrentRSS()/1000000 << ","
+					//<< physicalMemoryUsedByProcess/1000000 << ","
+					//<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0) << ","
                     <<endl;
 		}
 

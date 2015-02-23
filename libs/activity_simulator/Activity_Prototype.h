@@ -102,6 +102,17 @@ namespace Activity_Components
 				int actid = this_ptr->Activity_Plan_ID<int>();
 
 				//---------------------
+				//typedef Person_Components::Prototypes::Person_Planner<Parent_Planner_component_type> _planning_itf;
+				//typedef Person_Components::Prototypes::Person<typename _planning_itf::get_type_of(Parent_Person)> _person_itf;
+				//typedef Household_Components::Prototypes::Household< typename _person_itf::get_type_of(Household)> _household_itf;
+				//_person_itf* person = _this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				//_household_itf* household = person->template Household<_household_itf*>();
+				//if (person->uuid<int>() == 0 && household->uuid<int>() == 247)
+				//{
+				//	DEBUG_MESSAGE("Debugging...");
+				//	person->Display_Activities(cout);
+				//}
+
 				// check if activity is valid, if not, remove from schedule
 				//if (!this_ptr->is_valid<bool>())
 				//{
@@ -126,6 +137,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -148,6 +160,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -170,6 +183,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -192,6 +206,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -214,6 +229,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -235,6 +251,7 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))			 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>());
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>());
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Deletion_Time<Revision&>()))					 this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Deletion_Time<Revision&>());
 					else
 					{
 						response.next._iteration = iteration()+5;
@@ -602,7 +619,6 @@ namespace Activity_Components
 				deletion._iteration = iteration()+2;
 				deletion._sub_iteration = 0;
 				//((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Deletion_Event_Controller,deletion._iteration, deletion._sub_iteration);
-				cout << "Scheduling activity '"<<this <<"' for deletion at " << deletion._iteration <<"."<<deletion._sub_iteration<<endl;
 				this_component()->Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
 			}
 			

@@ -280,11 +280,11 @@ namespace Activity_Components
 
 
 
-				if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
-				{
-					DEBUG_MESSAGE("Debugging...");
-					person->Display_Activities(cout);
-				}
+				//if (person->uuid<int>() == 0 && household->uuid<int>() == 247)
+				//{
+				//	DEBUG_MESSAGE("Debugging...");
+				//	person->Display_Activities(cout);
+				//}
 
 
 				// Create movement plan and give it an ID
@@ -354,11 +354,11 @@ namespace Activity_Components
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 
-				if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
-				{
-					DEBUG_MESSAGE("Debugging...");
-					person->Display_Activities(cout);
-				}
+				//if (person->uuid<int>() == 0 && household->uuid<int>() == 247)
+				//{
+				//	DEBUG_MESSAGE("Debugging...");
+				//	person->Display_Activities(cout);
+				//}
 
 
 				
@@ -456,7 +456,7 @@ namespace Activity_Components
 				move->Free_Movement();
 
 				// Free this when able
-				Lazy_Free<ComponentType>((ComponentType*)this);
+				Free<ComponentType>((ComponentType*)this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)

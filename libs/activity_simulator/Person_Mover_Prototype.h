@@ -726,11 +726,11 @@ namespace Prototypes
 			movement_itf* movements = this->Movement<movement_itf*>();
 	
 
-			if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
-			{
-				DEBUG_MESSAGE("Debugging...");
-				person->Display_Activities(cout);
-			}
+			//if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
+			//{
+			//	DEBUG_MESSAGE("Debugging...");
+			//	person->Display_Activities(cout);
+			//}
 			//
 
 			//=====================================================================
