@@ -291,7 +291,7 @@ namespace GLOBALS
 		{
 			GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
 			
-			for (int i=0; i<Sigma.num_rows();++i)
+			for (uint i=0; i<Sigma.num_rows();++i)
 			{
 				correlated_random_values[i] = RNG_Components::Implementations::MT_Normal_Double<NT>::Cumulative_Distribution<TargetType>(correlated_random_values[i],0,1);
 			}

@@ -78,7 +78,7 @@ namespace polaris
 	{
 		// Safe mode locks the execution object for increased thread safety
 		#ifdef SAFE_MODE
-			LOCK(ptr->_optex_lock);
+			LOCK(cell->_optex_lock);
 		#elif defined ENABLE_WARNINGS
 			if( cell->Visiting() && _thread_processing!=__thread_id )
 			{
@@ -89,7 +89,7 @@ namespace polaris
 		cell->_next_revision = FREE;
 
 		#ifdef SAFE_MODE
-			UNLOCK(ptr->_optex_lock);
+			UNLOCK(cell->_optex_lock);
 		#endif
 	}
 

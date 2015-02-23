@@ -453,7 +453,7 @@ namespace Activity_Components
 			{
 				// Free movement through interface
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
-//				move->Free_Movement();
+				move->Free_Movement();
 
 				// Free this when able
 				Lazy_Free<ComponentType>((ComponentType*)this);
@@ -590,6 +590,7 @@ namespace Activity_Components
 			void Display_Activity()
 			{
 				cout <<endl<<"---------------------------------------"<<endl;
+				cout <<"Ptr="<<this<<endl;
 				cout <<"ACTIVITY: ID = "<<this->_Activity_Plan_ID<<endl;
 				cout <<"Type = "<<this->Get_Type_String<NT>()<<endl;
 				cout <<endl;
@@ -903,18 +904,33 @@ namespace Activity_Components
 				int mode_sub = (int)(this->_Mode_Plan_Horizon);
 				int inv_sub = (int)(this->_Involved_Persons_Plan_Horizon);
 				int start_sub = (int)(this->_Start_Time_Plan_Horizon);
-			
+
+				std::vector<int*> order;
+				order.push_back(&dur_sub); 
+				order.push_back(&loc_sub);
+				order.push_back(&mode_sub);
+				order.push_back(&inv_sub);
+				order.push_back(&start_sub);
+				sort(order.begin(), order.end(), Ptr_Comparer<int*>);
+				for (int i=0; i<order.size(); i++) (*(order[i]))=i+1;
+
 				// give intrinsic order when simultaneous plan horizons are specified
-				if (start_sub == dur_sub) dur_sub++;
-				if (start_sub == loc_sub) loc_sub++;
-				if (start_sub == mode_sub) mode_sub++;
-				if (start_sub == inv_sub) inv_sub++;
-				if (dur_sub == loc_sub) loc_sub++;
-				if (dur_sub == mode_sub) mode_sub++;
-				if (dur_sub == inv_sub) inv_sub++;
-				if (loc_sub == mode_sub) mode_sub++;
-				if (loc_sub == inv_sub) inv_sub++;
-				if (mode_sub == inv_sub) inv_sub++;
+				//if (start_sub == dur_sub) dur_sub++;
+				//if (start_sub == loc_sub) loc_sub++;
+				//if (start_sub == mode_sub) mode_sub++;
+				//if (start_sub == inv_sub) inv_sub++;
+				//if (dur_sub == loc_sub) loc_sub++;
+				//if (dur_sub == mode_sub) mode_sub++;
+				//if (dur_sub == inv_sub) inv_sub++;
+				//if (dur_sub == start_sub) start_sub++;
+				//if (loc_sub == mode_sub) mode_sub++;
+				//if (loc_sub == inv_sub) inv_sub++;
+				//if (loc_sub == dur_sub) dur_sub++;
+				//if (loc_sub == start_sub) start_sub++;
+				//if (mode_sub == inv_sub) inv_sub++;
+				//if (mode_sub == loc_sub) loc_sub++;
+				//if (mode_sub == dur_sub) dur_sub++;
+				//if (mode_sub == start_sub) start_sub++;
 
 				int route_sub = max(start_sub,max(dur_sub,max(loc_sub,max(mode_sub,inv_sub)))) + 1;
 

@@ -95,7 +95,7 @@ namespace Activity_Components
 				//----------------------------------------------
 				typedef Activity_Planner<ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
-				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
+				_Activity_Interface* this_ptr=(_Activity_Interface*)_this;
 				
 	
 				int id =  this_ptr->Parent_ID<int>();
@@ -103,12 +103,12 @@ namespace Activity_Components
 
 				//---------------------
 				// check if activity is valid, if not, remove from schedule
-				if (!this_ptr->is_valid<bool>())
-				{
-					response.next._iteration = END;
-					response.next._sub_iteration = END;
-					return;
-				}
+				//if (!this_ptr->is_valid<bool>())
+				//{
+				//	response.next._iteration = END;
+				//	response.next._sub_iteration = END;
+				//	return;
+				//}
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// DURATION_PLANNING Iteration
@@ -272,42 +272,34 @@ namespace Activity_Components
 					}
 				}
 			}
+			static void Activity_Deletion_Event_Controller(ComponentType* _this,Event_Response& response)
+			{		
+			
+				//----------------------------------------------
+				typedef Activity_Planner<ComponentType> _Activity_Interface;
+				ComponentType* _pthis = (ComponentType*)_this;
+				_Activity_Interface* this_ptr=(_Activity_Interface*)_this;
+				
+				cout << "Deleting activity '"<<_this <<"' at " << iteration() <<"."<<sub_iteration()<<endl;
+
+				if (this_ptr->Is_Current_Iteration(this_ptr->template Deletion_Time<Revision&>()))
+				{
+					response.next._iteration = END;
+					response.next._sub_iteration = END;
+					this_ptr->template Deletion_Event_Handler<NT>();
+				}
+				// catch any subiteration()s which have been modified (currently limited to routing, which can be changed by start_time_plan iteration)
+				// this will hit only if start time plan iteration is called immidiately
+				// also used to catch deleted activities and remove them from event scheduling
+				else
+				{
+					THROW_EXCEPTION("ERROR: only the deletion action should load this event.");
+				}
+			}
 			template<typename TargetType> void Set_As_Next_Revison(Event_Response& response, Revision& revision)
 			{
 				response.next._iteration = revision._iteration;
 				response.next._sub_iteration = revision._sub_iteration;
-			}
-			template<typename TargetType> void Free_Activity()
-			{
-				// set activity to invalid so further execution will not continue
-				this->is_valid(false);
-
-				int cur_iteration = iteration();
-				int cur_sub_iteration = sub_iteration();
-
-				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();
-				Revision& mode = this->Mode_Planning_Time<Revision&>();
-				Revision& duration = this->Duration_Planning_Time<Revision&>();
-				Revision& location = this->Location_Planning_Time<Revision&>();
-				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
-				Revision& route = this->Route_Planning_Time<Revision&>();
-				Revision& deletion = this->Deletion_Time<Revision&>();
-
-				persons._iteration = END+1;
-				persons._sub_iteration = END+1;
-				mode._iteration = END+1;
-				mode._sub_iteration = END+1;
-				duration._iteration = END+1;
-				duration._sub_iteration = END+1;
-				location._iteration = END+1;
-				location._sub_iteration = END+1;
-				start_time._iteration = END+1;
-				start_time._sub_iteration = END+1;
-				route._iteration = END+1;
-				route._sub_iteration = END+1;
-				deletion._iteration = iteration()+1;
-				deletion._sub_iteration = 0;
-				this_component()->Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
 			}
 			template<typename TargetType> bool Is_Minimum_Plan_Time(TargetType plan_time, requires(TargetType,check_2(TargetType, Revision,is_same)))
 			{
@@ -578,7 +570,42 @@ namespace Activity_Components
 				}
 
 			}
+			
+			template<typename TargetType> void Free_Activity()
+			{
+				// set activity to invalid so further execution will not continue
+				this->is_valid(false);
 
+				int cur_iteration = iteration();
+				int cur_sub_iteration = sub_iteration();
+
+				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();
+				Revision& mode = this->Mode_Planning_Time<Revision&>();
+				Revision& duration = this->Duration_Planning_Time<Revision&>();
+				Revision& location = this->Location_Planning_Time<Revision&>();
+				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
+				Revision& route = this->Route_Planning_Time<Revision&>();
+				Revision& deletion = this->Deletion_Time<Revision&>();
+
+				persons._iteration = END+1;
+				persons._sub_iteration = END+1;
+				mode._iteration = END+1;
+				mode._sub_iteration = END+1;
+				duration._iteration = END+1;
+				duration._sub_iteration = END+1;
+				location._iteration = END+1;
+				location._sub_iteration = END+1;
+				start_time._iteration = END+1;
+				start_time._sub_iteration = END+1;
+				route._iteration = END+1;
+				route._sub_iteration = END+1;
+				deletion._iteration = iteration()+2;
+				deletion._sub_iteration = 0;
+				//((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Deletion_Event_Controller,deletion._iteration, deletion._sub_iteration);
+				cout << "Scheduling activity '"<<this <<"' for deletion at " << deletion._iteration <<"."<<deletion._sub_iteration<<endl;
+				this_component()->Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
+			}
+			
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
 				this_component()->Set_Meta_Attributes<TargetType>();

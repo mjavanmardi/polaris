@@ -13,12 +13,14 @@ namespace polaris
 	/// Initialize - Initialize the execution block, set execution characteristics to an unscheduled state
 	///----------------------------------------------------------------------------------------------------
 
-	void Execution_Block::Initialize()
+	void Execution_Block::Initialize(void* component_manager_ptr)
 	{
 		// Set up the block to an unscheduled state
 		_ptex_next_revision = __revision_omega;
 		_ptex_next_next_revision = __revision_omega;
 		_activated = false;
+
+		_component_manager = component_manager_ptr;
 
 		// Set up block's members
 		_ptex_threads_counter = 0;

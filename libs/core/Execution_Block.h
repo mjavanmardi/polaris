@@ -13,7 +13,7 @@ namespace polaris
 	public:
 		Execution_Block(unsigned int cell_size,unsigned int num_cells):_cell_size(cell_size),_num_cells(num_cells){}
 
-		void Initialize();
+		void Initialize(void* component_manager_ptr);
 
 		//----------------------------------------------------------------------------------------------------
 		// Memory-related functions
@@ -67,6 +67,8 @@ namespace polaris
 
 		static const unsigned int _data_offset;
 
+		inline void* component_manager(void){ return _component_manager; }
+
 	private:
 
 		inline void Update(); // Encourage inlining this function, it will be called many times
@@ -90,5 +92,7 @@ namespace polaris
 
 		unsigned int _num_allocated;
 		bool _activated;
+
+		void* _component_manager;
 	};
 }

@@ -522,7 +522,7 @@ namespace Link_Components
 					
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
 					
-					Free((typename MasterType::movement_plan_type*)mp);
+					//Free((typename MasterType::movement_plan_type*)mp);
 				}
 				else
 				{

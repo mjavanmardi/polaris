@@ -54,6 +54,7 @@ namespace Person_Components
 
 			accessor(current_movement_plan, NONE, NONE);
 			accessor(current_activity_plan, NONE, NONE);
+			accessor(Current_Activity, NONE, NONE);
 			
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType,check(strip_modifiers(ParamType),Is_Time_Value)))
 			{

@@ -107,7 +107,8 @@ namespace polaris
 			_world->simulation_engine()->Update_Schedule(update_revision);
 			
 			// Update the TEX
-			DataType::component_manager->Update_Schedule(update_revision);
+			//DataType::component_manager->Update_Schedule(update_revision);
+			((DataType::Component_Manager_Type*)_execution_block->component_manager())->Update_Schedule(update_revision);
 
 			// Update the PTEX
 			_execution_block->Update_Schedule(update_revision);

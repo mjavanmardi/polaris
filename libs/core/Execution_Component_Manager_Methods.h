@@ -168,7 +168,7 @@ namespace polaris
 			Execution_Block* new_block=(Execution_Block*)block_memory;
 
 			// Initialization of the new block
-			new_block->Initialize( );
+			new_block->Initialize(this );
 
 			// Thread takes ownership of the block and pushes it into its' free cells of type
 			new_block->memory_managed_by(__thread_id);

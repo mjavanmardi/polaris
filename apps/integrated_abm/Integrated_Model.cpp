@@ -1,18 +1,18 @@
 //=========================================
 // Inclusion of C-run time debugging
 //#define MEM_DEBUG
-#ifdef MEM_DEBUG
-	#define _CRTDBG_MAP_ALLOC
-	#include <stdlib.h>
-	#include <crtdbg.h>
-#endif
+//#ifdef MEM_DEBUG
+//	#define _CRTDBG_MAP_ALLOC
+//	#include <stdlib.h>
+//	#include <crtdbg.h>
+//#endif
 
 //#define IntegratedModelApplication
 
 //=========================================
 // Debug build options
 #ifdef _DEBUG
-	//#define DEBUG_1
+	#define DEBUG_1
 	#ifdef MEM_DEBUG
 		#undef free
 	#endif
