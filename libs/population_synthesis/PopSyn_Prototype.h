@@ -748,154 +748,155 @@ namespace PopSyn
 			}
 	
 			// 5.) Write output to database (at Iteration 2) - the routine differs if writing for a full abm or for stand-alone popsyn with no network
-			template<typename TargetType> void Output_Popsyn_To_DB_Event(requires(TargetType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
-			{
-				Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)this;
+			//template<typename TargetType> void Output_Popsyn_To_DB_Event(requires(TargetType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			//{
+			//	Population_Synthesizer<ComponentType>* pthis = (Population_Synthesizer<ComponentType>*)this;
 
-				//=============================================================================================
-				#pragma region Define interfaces
-				//---------------------------------------------------------------------------------------------
-				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename get_mapped_component_type(region_collection_type)		region_type;
-				typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
-				typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
-				typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
-				typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
-				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-				typedef typename get_component_type(household_collection_type)			household_type;
-				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
-				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
+			//	//=============================================================================================
+			//	#pragma region Define interfaces
+			//	//---------------------------------------------------------------------------------------------
+			//	typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+			//	typedef typename get_mapped_component_type(region_collection_type)		region_type;
+			//	typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
+			//	typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
+			//	typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
+			//	typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
+			//	typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
+			//	typedef typename get_component_type(household_collection_type)			household_type;
+			//	typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+			//	typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
-				//---------------------------------------------------------------------------------------------
-				// Interface defines for sub_objects
-				typedef Pair_Associative_Container<region_collection_type> regions_itf;
-				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
-				
-				typedef Pair_Associative_Container<zone_collection_type> zones_itf;
-				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
-				
-				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
-				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
-				
-				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
-				
-				typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
-				typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
+			//	//---------------------------------------------------------------------------------------------
+			//	// Interface defines for sub_objects
+			//	typedef Pair_Associative_Container<region_collection_type> regions_itf;
+			//	typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+			//	
+			//	typedef Pair_Associative_Container<zone_collection_type> zones_itf;
+			//	typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+			//	
+			//	typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
+			//	typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
+			//	
+			//	typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
+			//	typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+			//	
+			//	typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
+			//	typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
 
-				typedef Random_Access_Sequence<household_collection_type> household_collection_itf;
-				typedef Household_Components::Prototypes::Household<household_type>  household_itf;
-				
-				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
-				typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
-				
-				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container)> activity_location_ids_itf;
-				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
-				
-				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
-				
-				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+			//	typedef Random_Access_Sequence<household_collection_type> household_collection_itf;
+			//	typedef Household_Components::Prototypes::Household<household_type>  household_itf;
+			//	
+			//	typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
+			//	typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+			//	
+			//	typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container)> activity_location_ids_itf;
+			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+			//	typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+			//	
+			//	typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+			//	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+			//	
+			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
+			//	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
 
-				#pragma endregion			
-				//---------------------------------------------------------------------------------------------
+			//	#pragma endregion			
+			//	//---------------------------------------------------------------------------------------------
 
-				//=============================================================================================
-				// Loop through all regions/zones and write each synthesized agent to the database
-				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
-				network_itf* network = pthis->network_reference<network_itf*>();
-				scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
-				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
-				
-				// EXIT if no request to write the demand to database
-				if (!scenario->template write_demand_to_database<bool>()) return;
+			//	//=============================================================================================
+			//	// Loop through all regions/zones and write each synthesized agent to the database
+			//	regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+			//	network_itf* network = pthis->network_reference<network_itf*>();
+			//	scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
+			//	activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+			//	
+			//	// EXIT if no request to write the demand to database
+			//	if (!scenario->template write_demand_to_database<bool>()) return;
 
-				
-				try
-				{
-					// Start database transaction
-					string name(scenario->template output_demand_database_name<string&>());
-					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
-					odb::transaction t(db->begin());
-				
+			//	
+			//	try
+			//	{
+			//		// Start database transaction
+			//		string name(scenario->template output_demand_database_name<string&>());
+			//		unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
+			//		odb::transaction t(db->begin());
+			//	
 
-					typename regions_itf::iterator r_itr;
-					typename zones_itf::iterator z_itr;
-					typename household_collection_itf::iterator p_itr;
-					int counter = 0;
+			//		typename regions_itf::iterator r_itr;
+			//		typename zones_itf::iterator z_itr;
+			//		typename household_collection_itf::iterator p_itr;
+			//		int counter = 0;
 
-					// Loop through all regions
-					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
-					{
-						region_itf* region = r_itr->second;
-						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
-						// loop through zones in each region
-						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
-						{
-							zone_itf* zone = z_itr->second;
-							activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
+			//		// Loop through all regions
+			//		for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+			//		{
+			//			region_itf* region = r_itr->second;
+			//			zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+			//			// loop through zones in each region
+			//			for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+			//			{
+			//				zone_itf* zone = z_itr->second;
+			//				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
-							// loop through each synthesized person
-							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
-							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
-							{
-								// update synthesizing persons counter
-								if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
-								household_itf* hh = *p_itr;
-								pop_unit_itf* hh_unit = hh->template Static_Properties<pop_unit_itf*>();
-							
-								// create household record
-								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
-								hh_rec->setHhold(hh->template uuid<int>());
-								hh_rec->setPersons(hh_unit->template Household_size<int>());
-								hh_rec->setWorkers(hh_unit->template Number_of_workers<int>());
-								hh_rec->setVehicles(hh_unit->template Number_of_vehicles<int>());
-								hh_rec->setLocation(hh->template Home_Location<activity_location_itf*>()->template uuid<int>());
-								//push to database
-								db->persist(hh_rec);
+			//				// loop through each synthesized person
+			//				household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
+			//				for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+			//				{
+			//					// update synthesizing persons counter
+			//					if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+			//					household_itf* hh = *p_itr;
+			//					pop_unit_itf* hh_unit = hh->template Static_Properties<pop_unit_itf*>();
+			//				
+			//					// create household record
+			//					shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
+			//					hh_rec->setHhold(hh->template uuid<int>());
+			//					hh_rec->setPersons(hh_unit->template Household_size<int>());
+			//					hh_rec->setWorkers(hh_unit->template Number_of_workers<int>());
+			//					hh_rec->setVehicles(hh_unit->template Number_of_vehicles<int>());
+			//					hh_rec->setLocation(hh->template Home_Location<activity_location_itf*>()->template uuid<int>());
+			//					//push to database
+			//					db->persist(hh_rec);
 
-								person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
+			//					person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
 
-								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
-								{		
-									person_itf* person = (person_itf*)(*p_itr);
+			//					for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+			//					{		
+			//						person_itf* person = (person_itf*)(*p_itr);
 
-									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
-									per_rec->setId(person->template uuid<int>());
-									if (person->template School_Location<int>() >= 0)
-										per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
-									else
-										per_rec->setSchool_Location_Id(0);
-									if (person->template Work_Location<int>() >= 0)
-										per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
-									else
-										per_rec->setWork_Location_Id(0);
-									person_unit_itf* p = person->Static_Properties<person_unit_itf*>();
-									per_rec->setAge(p->Age<int>());
-									per_rec->setHousehold(hh_rec);
-									//push to database
-									db->persist(per_rec);
+			//						shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
+			//						per_rec->setId(person->template uuid<int>());
+			//						if (person->template School_Location<int>() >= 0)
+			//							per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
+			//						else
+			//							per_rec->setSchool_Location_Id(0);
+			//						if (person->template Work_Location<int>() >= 0)
+			//							per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
+			//						else
+			//							per_rec->setWork_Location_Id(0);
+			//						person_unit_itf* p = person->Static_Properties<person_unit_itf*>();
+			//						per_rec->setAge(p->Age<int>());
+			//						per_rec->setHousehold(hh_rec);
+			//						//push to database
+			//						db->persist(per_rec);
 
-									person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
+			//						person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
 
-									counter++;
-								}
+			//						counter++;
+			//					}
 
-							}
-						}
-					}
-					t.commit();
-				}
-				catch (odb::sqlite::database_exception ex)
-				{
-					cout << endl << ex.what()<<". DB error in popsyn_prototype.h, line 954."<<endl;
-				}
+			//				}
+			//			}
+			//		}
+			//		t.commit();
+			//	}
+			//	catch (odb::sqlite::database_exception ex)
+			//	{
+			//		cout << endl << ex.what()<<". DB error in popsyn_prototype.h, line 954."<<endl;
+			//	}
 
-				cout << endl<<"Results output runtime (s): " << this->timer<Counter&>().Stop()/1000.0<<endl;
-			}
-			template<typename TargetType> void Output_Popsyn_To_DB_Event(requires(TargetType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			//	cout << endl<<"Results output runtime (s): " << this->timer<Counter&>().Stop()/1000.0<<endl;
+			//}	
+			//
+			template<typename TargetType> void Output_Popsyn_To_DB_Event(/*requires(TargetType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network))*/)
 			{
 				//=============================================================================================
 				#pragma region Define interfaces
@@ -909,6 +910,8 @@ namespace PopSyn
 				typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
 				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
 				typedef typename get_component_type(household_collection_type)			household_type;
+				typedef typename household_type::get_type_of(Persons_Container)			person_collection_type;
+				typedef typename get_component_type(person_collection_type)				person_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
@@ -924,8 +927,10 @@ namespace PopSyn
 				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
-				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> person_collection_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				/*typedef Random_Access_Sequence<typename household_itf::type_of(Persons_Container)> person_collection_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;*/
+				typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
+				//typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
 				typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
@@ -946,8 +951,7 @@ namespace PopSyn
 				try
 				{
 					// Start database transaction
-					string name(scenario->template output_popsyn_database_name<string&>());
-					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
+					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<scenario_itf*>(scenario)));
 					odb::transaction t(db->begin());
 				
 
@@ -970,17 +974,13 @@ namespace PopSyn
 							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
 							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
 							{
-								household_itf* hh = (household_itf*)*p_itr;
+								household_type* hh = (household_type*)*p_itr;
 
 								// create household record using the ACS properties
-								shared_ptr<polaris::io::Synthetic_Household> hh_rec(new polaris::io::Synthetic_Household());
+								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
 								hh_rec->setHhold(uuid);
-								hh_rec->setPersons(hh->template Household_size<int>());
-								hh_rec->setWorkers(hh->template Number_of_workers<int>());
-								hh_rec->setVehicles(hh->template Number_of_vehicles<int>());
-								hh_rec->setLocation(zone->ID<long long>());
-								hh_rec->setIncome(hh->Income<Basic_Units::Currency_Variables::Dollars>());
-								hh_rec->setType(hh->Household_type<int>());
+								Set_HH_Record_Location<household_type*,zone_itf*>(hh_rec,hh,zone);
+								Fill_HH_Record<typename get_type_of(network_reference),household_type*,zone_itf*>(hh_rec,hh,zone);
 
 								//push to database
 								db->persist(hh_rec);
@@ -992,28 +992,14 @@ namespace PopSyn
 									// update synthesizing persons counter
 									if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
 
-									person_itf* person = (person_itf*)(*p_itr);
+									person_type* person = (person_type*)(*p_itr);
 
-									shared_ptr<polaris::io::Synthetic_Person> per_rec(new polaris::io::Synthetic_Person());
+									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
 									per_rec->setId(perid);
-									per_rec->setAge(person->Age<int>());
-									per_rec->setEducation(person->Educational_Attainment<int>());
-									per_rec->setEmployment(person->Employment_Status<int>());
-									per_rec->setGender(person->Gender<int>());
-									per_rec->setIncome(person->Income<Dollars>());
-									per_rec->setIndustry(person->Employment_Industry<int>());
-									per_rec->setJourney_to_work_arrival_time(person->Journey_To_Work_Arrival_Time<Time_Minutes>());
-									per_rec->setJourney_to_work_mode(person->Journey_To_Work_Mode<int>());
-									per_rec->setJourney_to_work_travel_time(person->Journey_To_Work_Travel_Time<Time_Minutes>());
-									per_rec->setJourney_to_work_vehicle_occupancy(person->Journey_To_Work_Vehicle_Occupancy<int>());
-									per_rec->setMarital_status(person->Marital_Status<int>());
-									per_rec->setRace(person->Race<int>());
-									per_rec->setSchool_enrollment(person->School_Enrollment<int>());
-									per_rec->setSchool_grade_level(person->School_Grade_Level<int>());
-									per_rec->setWorker_class(person->Class_of_worker<int>());
-									per_rec->setWork_hours(person->Work_Hours<Time_Hours>());
 									per_rec->setHousehold(hh_rec);
-
+									Set_Person_Record_Locations<person_type*,zone_itf*>(per_rec,person,zone);
+									Fill_Person_Record<typename get_type_of(network_reference),person_type*,zone_itf*>(per_rec,person,zone);
+									
 									//push to database
 									db->persist(per_rec);
 									counter++;
@@ -1034,6 +1020,99 @@ namespace PopSyn
 				}
 
 				cout << endl<<"Results output runtime (s): " << this->timer<Counter&>().Stop()/1000.0<<endl;
+			}
+			template<typename ScenarioType> string Get_Output_DB_Name(ScenarioType scenario, requires(ScenarioType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network) && check(ScenarioType, is_pointer)))
+			{
+				string name(scenario->template output_demand_database_name<string&>());
+				return name;
+			}
+			template<typename ScenarioType> string Get_Output_DB_Name(ScenarioType scenario, requires(ScenarioType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network) && check(ScenarioType, is_pointer)))
+			{
+				string name(scenario->template output_popsyn_database_name<string&>());
+				return name;
+			}
+
+			template<typename NetworkType, typename HHType, typename ZoneType> void Fill_HH_Record(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Household_Components::Prototypes::Household_Properties<typename strip_modifiers(HHType)::get_type_of(Static_Properties)> household_itf;
+
+				Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->Static_Properties<household_itf*>(),zone);
+			}
+			template<typename NetworkType, typename HHType, typename ZoneType> void Fill_HH_Record(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				hh_rec->setPersons(hh->template Household_size<int>());
+				hh_rec->setWorkers(hh->template Number_of_workers<int>());
+				hh_rec->setVehicles(hh->template Number_of_vehicles<int>());
+				hh_rec->setIncome(hh->Income<Basic_Units::Currency_Variables::Dollars>());
+				hh_rec->setType(hh->Household_type<int>());
+			}
+			template<typename HHType, typename ZoneType> void Set_HH_Record_Location(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Household_Components::Prototypes::Household<typename strip_modifiers(HHType)> household_itf;
+				
+				household_itf* hh_itf = (household_itf*)hh;
+				hh_rec->setLocation(hh_itf->Home_Location<activity_location_itf*>()->template uuid<int>());
+			}
+			template<typename HHType, typename ZoneType> void Set_HH_Record_Location(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				hh_rec->setLocation(zone->ID<long long>());
+			}
+			template<typename NetworkType, typename PerType, typename ZoneType> void Fill_Person_Record(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename strip_modifiers(PerType)::get_type_of(Static_Properties)> person_itf;
+
+				Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->Static_Properties<person_itf*>(),zone);
+				person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
+			}
+			template<typename NetworkType, typename PerType, typename ZoneType> void Fill_Person_Record(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				per_rec->setAge(person->Age<int>());
+				per_rec->setEducation(person->Educational_Attainment<int>());
+				per_rec->setEmployment(person->Employment_Status<int>());
+				per_rec->setGender(person->Gender<int>());
+				per_rec->setIncome(person->Income<Dollars>());
+				per_rec->setIndustry(person->Employment_Industry<int>());
+				per_rec->setJourney_to_work_arrival_time(person->Journey_To_Work_Arrival_Time<Time_Minutes>());
+				per_rec->setJourney_to_work_mode(person->Journey_To_Work_Mode<int>());
+				per_rec->setJourney_to_work_travel_time(person->Journey_To_Work_Travel_Time<Time_Minutes>());
+				per_rec->setJourney_to_work_vehicle_occupancy(person->Journey_To_Work_Vehicle_Occupancy<int>());
+				per_rec->setMarital_status(person->Marital_Status<int>());
+				per_rec->setRace(person->Race<int>());
+				per_rec->setSchool_enrollment(person->School_Enrollment<int>());
+				per_rec->setSchool_grade_level(person->School_Grade_Level<int>());
+				per_rec->setWorker_class(person->Class_of_worker<int>());
+				per_rec->setWork_hours(person->Work_Hours<Time_Hours>());
+			}
+			template<typename PerType, typename ZoneType> void Set_Person_Record_Locations(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
+				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Person_Components::Prototypes::Person<typename strip_modifiers(PerType)> person_itf;
+				person_itf* per_itf = (person_itf*)person;
+
+				if (per_itf->template School_Location<int>() >= 0)
+					per_rec->setSchool_Location_Id(per_itf->template School_Location<activity_location_itf*>()->template uuid<int>());
+				else
+					per_rec->setSchool_Location_Id(0);
+				if (per_itf->template Work_Location<int>() >= 0)
+					per_rec->setWork_Location_Id(per_itf->template Work_Location<activity_location_itf*>()->template uuid<int>());
+				else
+					per_rec->setWork_Location_Id(0);
+			}
+			template<typename PerType, typename ZoneType> void Set_Person_Record_Locations(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				per_rec->setSchool_Location_Id(0);
+				per_rec->setWork_Location_Id(0);
 			}
 
 			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

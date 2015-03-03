@@ -1176,12 +1176,18 @@ namespace Network_Components
 							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						}
-						if (code == Activity_Location_Components::Types::LU_BUSINESS || code == Activity_Location_Components::Types::LU_CIVIC_RELIGIOUS || code == Activity_Location_Components::Types::LU_INDUSTRIAL || code == Activity_Location_Components::Types::LU_SHOPPING || code == Activity_Location_Components::Types::LU_MEDICAL)
+						if (code == Activity_Location_Components::Types::LU_CIVIC_RELIGIOUS)
+						{
+							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template school_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (code == Activity_Location_Components::Types::LU_BUSINESS || code == Activity_Location_Components::Types::LU_INDUSTRIAL || code == Activity_Location_Components::Types::LU_SHOPPING || code == Activity_Location_Components::Types::LU_MEDICAL)
 						{
 							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						}
-						if (code == Activity_Location_Components::Types::LU_CULTURAL || code == Activity_Location_Components::Types::LU_CIVIC_RELIGIOUS || code == Activity_Location_Components::Types::LU_SHOPPING || code == Activity_Location_Components::Types::LU_MEDICAL)
+						if (code == Activity_Location_Components::Types::LU_CULTURAL || code == Activity_Location_Components::Types::LU_CIVIC_RELIGIOUS)
 						{
 							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
