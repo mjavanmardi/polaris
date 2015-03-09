@@ -375,14 +375,14 @@ namespace Vehicle_Components
 						body_color._r = vehicle_color._r;
 						body_color._g = vehicle_color._g;
 						body_color._b = vehicle_color._b;
-					}
 
-					// CAV coloration for lakeside model only - remove when done
-					if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
-					{
-						body_color._r = 255;
-						body_color._g = 255;
-						body_color._b = 0;
+						// CAV coloration for lakeside model only - remove when done
+						//if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
+						//{
+						//	body_color._r = 255;
+						//	body_color._g = 255;
+						//	body_color._b = 0;
+						//}
 					}
 
 
@@ -1274,16 +1274,15 @@ namespace Vehicle_Components
 						coordinate.color._r = vehicle_color._r;
 						coordinate.color._g = vehicle_color._g;
 						coordinate.color._b = vehicle_color._b;
-					}
 
-					// CAV coloration for lakeside model only - remove when done
-					if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
-					{
-						coordinate.color._r = 255;
-						coordinate.color._g = 255;
-						coordinate.color._b = 0;
+						// CAV coloration for lakeside model only - remove when done
+						if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
+						{
+							coordinate.color._r = 255;
+							coordinate.color._g = 255;
+							coordinate.color._b = 0;
+						}
 					}
-
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 					vehicle_color.r(coordinate.color._r);

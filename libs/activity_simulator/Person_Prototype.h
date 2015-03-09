@@ -118,6 +118,7 @@ namespace Prototypes
 			Activities* activities = scheduler->template Activity_Container<Activities*>();
 			Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
 
+#ifdef ANTARES
 			for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
 			{
 				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
@@ -130,6 +131,8 @@ namespace Prototypes
 			}
 			
 			pthis->Sort_Activity_Records<void>();
+#endif
+			
 
 			//// exit if no activity output is specified
 			//scenario_itf* scenario = (scenario_itf*)_global_scenario;

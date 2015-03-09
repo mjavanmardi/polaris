@@ -10,17 +10,19 @@ import argparse
 ######################################################################################
 # Place code to work with Skims in this funcxtion
 ######################################################################################	
-def Main(skims, highway_skim_file, transit_skim_file):
+def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, origin_list, dest_list):
 
 	do_highway = GetHighwaySkims(highway_skim_file, skims)
 	do_transit = GetTransitSkims(transit_skim_file, skims)
 	
-	skims.print_header_info()
-	skims.print_skims()
+	#skims.print_header_info()
+	#skims.print_skims()
 
-	WriteHighwaySkimsV1(highway_skim_file, skims)
-	WriteTransitSkimsV1(transit_skim_file, skims)
-
+	if do_highway and write_bin: WriteHighwaySkimsV1(highway_skim_file, skims)
+	if do_transit and write_bin: WriteTransitSkimsV1(transit_skim_file, skims)
+	
+	if do_highway and write_csv: WriteHighwaySkimsV1_CSV(highway_skim_file, skims, origin_list, dest_list)
+	if do_transit and write_csv: WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list)
 
 ######################################################################################
 # Skim Functions - do not modify anything below this section
@@ -49,8 +51,9 @@ def GetHighwaySkims(highway_skim_file, skims):
 		zones = struct.unpack("i",infile.read(4))[0]
 		for i in range(zones):
 			id, index = struct.unpack("ii",infile.read(8))
-			if id not in skims.zone_map.keys():
-				skims.zone_map[id] = index
+			if id not in skims.zone_id_to_index_map.keys():
+				skims.zone_id_to_index_map[id] = index
+				skims.zone_index_to_id_map[index] = id
 			else:
 				print "Error, zone id was found more than once in zone map."
 		Check_Tag(infile,"EZON",exit=True)
@@ -111,10 +114,10 @@ def GetTransitSkims(transit_skim_file, skims):
 		tzones = struct.unpack("i",infile.read(4))[0]
 		for i in range(zones):
 			id, index = struct.unpack("ii",infile.read(8))
-			if id not in skims.zone_map.keys():
+			if id not in skims.zone_id_to_index_map.keys():
 				print "Error: zone id found in transit file that does not exist in highway file"
 			else:
-				if skims.zone_map[id] != index:
+				if skims.zone_id_to_index_map[id] != index:
 					print "Error: zone id has a different index in transit file from that found in highway file"
 		tag = struct.unpack("<4s",infile.read(4))[0]
 		Check_Tag(infile,"EZON",exit=True)
@@ -175,10 +178,10 @@ def WriteHighwaySkimsV1(highway_skim_file, skims):
 	outfile.write(struct.pack("<8s","SKIM:V01"))
 	
 	# Write zone identification info if available, othwerise write old-style zone info
-	if len(skims.zone_map) > 0:
+	if len(skims.zone_id_to_index_map) > 0:
 		outfile.write(struct.pack("<4s","BZON"))
 		outfile.write(struct.pack("i",skims.num_zones))
-		for id, index in skims.zone_map.items():
+		for id, index in skims.zone_id_to_index_map.items():
 			outfile.write(struct.pack("ii",id, index))
 		outfile.write(struct.pack("<4s","EZON"))
 	else:
@@ -204,10 +207,77 @@ def WriteTransitSkimsV1(transit_skim_file, skims):
 	outfile.write(vtag)
 	
 	# Write zone identification info if available, othwerise write old-style zone info
+	if len(skims.zone_id_to_index_map) > 0:
+		outfile.write(struct.pack("<4s","BZON"))
+		outfile.write(struct.pack("i",skims.num_tzones))
+		for id, index in skims.zone_id_to_index_map.items():
+			outfile.write(struct.pack("ii",id, index))
+		outfile.write(struct.pack("<4s","EZON"))
+	else:
+		outfile.write(struct.pack("ii",1, skims.num_tzones))
+	
+	btag = struct.pack("<4s","BMAT")
+	etag = struct.pack("<4s","EMAT")
+	
+	outfile.write(btag)
+	skims.transit_ttime.tofile(outfile)
+	outfile.write(etag)
+	
+	outfile.write(btag)
+	skims.transit_walk_access_time.tofile(outfile)
+	outfile.write(etag)
+	
+	outfile.write(btag)
+	skims.auto_distance.tofile(outfile)
+	outfile.write(etag)
+	
+	outfile.write(btag)
+	skims.transit_wait_time.tofile(outfile)
+	outfile.write(etag)
+	
+	outfile.write(btag)
+	skims.transit_fare.tofile(outfile)
+	outfile.write(etag)
+
+def WriteHighwaySkimsV1_CSV(highway_skim_file, skims, origin_list, dest_list):
+	with open(highway_skim_file + '.csv', 'w') as outfile:	
+	
+		# Update the origin and destination lists
+		if origin_list is None: origin_list = sorted(skims.zone_id_to_index_map.keys())
+		if dest_list is None: dest_list = sorted(skims.zone_id_to_index_map.keys())
+		
+		# Write intervals
+		for interval in sorted(skims.auto_skims.keys()):
+			outfile.write("Skim for interval" + str(interval) + '\n')	
+			# Write skim matrix for each interval
+			outfile.write(',')
+			
+			# write destination zone headers (if in dest list)
+			for i in dest_list:
+				outfile.write(str(i) + ',')			
+			outfile.write('\n')
+			
+			for i in origin_list:
+				outfile.write(str(i) + ',')
+				for j in dest_list:
+					i_id = skims.zone_id_to_index_map[i]
+					j_id = skims.zone_id_to_index_map[j]
+					outfile.write(str(skims.auto_skims[interval][i_id,j_id]) + ',')
+				outfile.write('\n')
+			outfile.write('\n')
+		outfile.write('\n')
+
+def WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list):
+	outfile = open(transit_skim_file + 'new.bin', 'wb')
+	
+	vtag = struct.pack("<8s","SKIM:V01")
+	outfile.write(vtag)
+	
+	# Write zone identification info if available, othwerise write old-style zone info
 	if len(skims.zone_map) > 0:
 		outfile.write(struct.pack("<4s","BZON"))
 		outfile.write(struct.pack("i",skims.num_tzones))
-		for id, index in skims.zone_map.items():
+		for id, index in skims.zone_id_to_index_map.items():
 			outfile.write(struct.pack("ii",id, index))
 		outfile.write(struct.pack("<4s","EZON"))
 	else:
@@ -241,7 +311,8 @@ def WriteTransitSkimsV1(transit_skim_file, skims):
 class Skim_Results:
 	def __init__(self):
 		self.auto_skims = {}
-		self.zone_map = {}
+		self.zone_id_to_index_map = {}
+		self.zone_index_to_id_map = {}
 		self.transit_ttime = numpy.matrix(0)
 		self.transit_walk_access_time = numpy.matrix(0)
 		self.auto_distance = numpy.matrix(0)
@@ -252,7 +323,7 @@ class Skim_Results:
 		self.intervals=[]
 	def print_header_info(self):
 		print "Zone info (id, index):"
-		for id, index in self.zone_map.items():
+		for id, index in self.zone_id_to_index_map.items():
 			print id, index
 		print "\r\nInterval info:"
 		print "Number of intervals = " + str(len(self.auto_skims.keys())) + ":"
@@ -287,9 +358,18 @@ skims = Skim_Results()
 # parse the command line args
 parser = argparse.ArgumentParser(description='Process the skim data')
 parser.add_argument('-auto_skim_file', default='highway_skim_file.bin')
-parser.add_argument('-transit_skim_file', default='chicago_transit_skims.bin')
+parser.add_argument('-transit_skim_file', default='')
+parser.add_argument('-csv', action='store_const', const=1)
+parser.add_argument('-bin', action='store_const', const=1)
+parser.add_argument('-origin_list', type=int, nargs='*')
+parser.add_argument('-destination_list', type=int, nargs='*')
 args = parser.parse_args()
 
-Main(skims, args.auto_skim_file, args.transit_skim_file)
+write_csv=False
+if args.csv==1: write_csv=True
+write_bin=False
+if args.bin==1: write_bin=True
+if write_csv==False: write_bin=True
 
-#raw_input("Press any key")
+Main(skims, args.auto_skim_file, args.transit_skim_file, write_bin, write_csv, args.origin_list, args.destination_list)
+

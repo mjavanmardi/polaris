@@ -1,4 +1,4 @@
-Attach 'C:\Users\jauld\Desktop\Chicago_Network\chicago-Supply.sqlite' as supply
+Attach 'C:\Users\jauld\Desktop\Chicago_Network\chicago-Supply.sqlite' as supply;
 
 --############################################################
 -- GENERATE TRAVEL TIME DISTRIBUTION
