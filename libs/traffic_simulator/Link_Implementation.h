@@ -518,7 +518,15 @@ namespace Link_Components
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
 					
-					if(vehicle->is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					// decrement the in-network vehicles counter
+					if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
+					{
+						if(vehicle->is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					}
+					else
+					{
+						((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					}
 					
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
 					
@@ -650,7 +658,13 @@ namespace Link_Components
 
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
 
-					if(vehicle->is_integrated<bool>())
+
+					// increment the in-network vehicles counter
+					if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
+					{
+						if(vehicle->is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
+					}
+					else
 					{
 						((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
 					}

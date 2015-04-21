@@ -32,6 +32,7 @@ namespace Movement_Plan_Components
 			accessor(enter_time, NONE, NONE);
 			accessor(enter_interval_index, NONE, NONE);
 			accessor(estimated_link_accepting_time, NONE, NONE);
+			accessor(intersection_delay_time, NONE, NONE);
 			template<typename TargetType> TargetType exit_time()
 			{
 				return (TargetType)(enter_time<int>() + delayed_time<float>());
@@ -412,6 +413,21 @@ namespace Movement_Plan_Components
 				return (TargetType)current_trajectory_position<_Trajectory_Unit_Interface*>()->template enter_time<TargetType>();
 			}
 
+			template<typename TargetType> void update_current_link_intersection_delay(int intersection_delay)
+			{
+				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+
+				current_trajectory_position<_Trajectory_Unit_Interface*>()->template intersection_delay_time<int&>() += intersection_delay;
+			}
+
+			template<typename TargetType> void set_current_link_intersection_delay(int intersection_delay)
+			{
+				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+
+				current_trajectory_position<_Trajectory_Unit_Interface*>()->template intersection_delay_time<int>(intersection_delay);
+			}
 			template<typename TargetType> int get_route_link_exit_time(int trajectory_unit_index)
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;

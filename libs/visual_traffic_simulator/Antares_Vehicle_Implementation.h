@@ -1276,12 +1276,12 @@ namespace Vehicle_Components
 						coordinate.color._b = vehicle_color._b;
 
 						// CAV coloration for lakeside model only - remove when done
-						if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
-						{
-							coordinate.color._r = 255;
-							coordinate.color._g = 255;
-							coordinate.color._b = 0;
-						}
+						//if (((ComponentType*)this)->_is_integrated && zone->uuid<int>() < 47)
+						//{
+						//	coordinate.color._r = 255;
+						//	coordinate.color._g = 255;
+						//	coordinate.color._b = 0;
+						//}
 					}
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);

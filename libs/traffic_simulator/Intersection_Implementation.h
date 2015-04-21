@@ -955,7 +955,7 @@ namespace Intersection_Components
 						{
 							float current_distance = ((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>();
 							float new_distance = max(0.0f,(current_distance - travel_distance));
-							//((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>(new_distance); 
+							((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>(new_distance); 
 							((_Vehicle_Interface*)(*vehicle_itr))->template local_speed<float>(link_speed);
 						}
 					}

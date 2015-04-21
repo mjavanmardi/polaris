@@ -48,9 +48,11 @@ namespace Scenario_Components
 
 			accessor(current_day_index, NONE, NONE);
 			
+			/// If set to true, only the integrated vehicles are counted for the in-network output
+			accessor(count_integrated_in_network_vehicles_only, NONE, NONE);
 
 			//accessor(output_writer, NONE, NONE);
-
+			
 			accessor(network_cumulative_loaded_vehicles, NONE, NONE);
 			accessor(network_cumulative_departed_vehicles, NONE, NONE);
 			accessor(network_in_network_vehicles, NONE, NONE);
@@ -68,6 +70,7 @@ namespace Scenario_Components
 				
 			accessor(vehicle_trajectory_file_name, NONE, NONE);
 			accessor(vehicle_trajectory_file, NONE, NONE);
+			accessor(vehicle_trajectory_sample_rate, NONE, NONE);
 
 			accessor(routed_path_file_name, NONE, NONE);
 			accessor(routed_path_file, NONE, NONE);
@@ -195,6 +198,7 @@ namespace Scenario_Components
 
 			accessor(use_tmc, NONE, NONE);
 			accessor(use_network_events, NONE, NONE);
+			accessor(accident_event_duration_reduction, NONE, NONE);
 
 			accessor(DB_output_link_moe_for_assignment_interval, NONE, NONE);
 			
@@ -439,13 +443,16 @@ namespace Scenario_Components
 			    operation_time_in_seconds<double>(0.0);
 			    output_time_in_seconds<double>(0.0);
 
-				// set I/O parameters
+				// set I/O parameters		
+				if (cfgReader.getParameter("count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool*>())!= PARAMETER_FOUND) count_integrated_in_network_vehicles_only<bool>(false);
+
 				if (cfgReader.getParameter("output_dir_name", output_dir_name<string*>())!= PARAMETER_FOUND) output_dir_name<string>("");
 				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
 				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
 				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
 				if (cfgReader.getParameter("write_node_control_state", write_node_control_state<bool*>())!= PARAMETER_FOUND) write_node_control_state<bool>(false);
 				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
+				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
 				if (cfgReader.getParameter("write_network_link_flow", write_network_link_flow<bool*>())!= PARAMETER_FOUND) write_network_link_flow<bool>(false);
 				if (cfgReader.getParameter("write_network_link_turn_time", write_network_link_turn_time<bool*>())!= PARAMETER_FOUND) write_network_link_turn_time<bool>(false);
 				if (cfgReader.getParameter("write_output_summary", write_output_summary<bool*>())!= PARAMETER_FOUND) write_output_summary<bool>(true);
@@ -532,7 +539,8 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
 				
-
+				if (cfgReader.getParameter("accident_event_duration_reduction", accident_event_duration_reduction<double*>())!= PARAMETER_FOUND) accident_event_duration_reduction<double>(1.0);
+				
 
 				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
 				
@@ -698,32 +706,40 @@ namespace Scenario_Components
 					vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
 					if(vehicle_trajectory_file<fstream&>().is_open()) 
 					{ 
-						vehicle_trajectory_file<fstream&>() 
-							<< "vehicle" <<  ","
-							<< "origin_zone " <<  ","
-							<< "destination_zone" << ","
-							<< "origin_activity_location" << ","
-							<< "destination_activity_location" << ","
-							<< "origin_link" << ","
-							<< "destination_link" << ","
-							<< "num_links" << ","
-							<< "departure_time" << ","
-							<< "arrival_time" << ","
-							<< "travel_time" << ","
-							<< "routed_travel_time" << ","
-							<< "travel_time_ratio" << ","
-							<< "trip_length" << ","
-							<< "num_switches" << ","
-							<< "loading_delay" << ","
-							<< "entry_queue_length" << ","
-							<<endl;
+						//vehicle_trajectory_file<fstream&>() 
+						//	<< "vehicle" <<  ","
+						//	<< "origin_zone " <<  ","
+						//	<< "destination_zone" << ","
+						//	<< "origin_activity_location" << ","
+						//	<< "destination_activity_location" << ","
+						//	<< "origin_link" << ","
+						//	<< "destination_link" << ","
+						//	<< "num_links" << ","
+						//	<< "departure_time" << ","
+						//	<< "arrival_time" << ","
+						//	<< "travel_time" << ","
+						//	<< "routed_travel_time" << ","
+						//	<< "travel_time_ratio" << ","
+						//	<< "trip_length" << ","
+						//	<< "num_switches" << ","
+						//	<< "loading_delay" << ","
+						//	<< "entry_queue_length" << ","
+						//	<<endl;
 
 						vehicle_trajectory_file<fstream&>() 
+							<< "vehicle" <<  ","
 							<< "link_number" <<  ","
-							<< "link_id " <<  ","
+							<< "link_id" <<  ","
+							<< "link_dir" << ","
 							<< "entering_time" << ","
 							<< "travel_time" << ","
-							<< "delayed_time"
+							<< "start_position" << ","
+							<< "length" << ","
+							//<< "delayed_time"<< ","
+							<< "actual_speed"<< ","
+							<< "free_flow_speed"<< ","
+							<< "stopped_time"<<","
+							<< "stop_position"
 							<<endl;
 					}
 					else
