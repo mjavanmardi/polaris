@@ -59,8 +59,8 @@ namespace Network_Components
 					while(num_arrived_vehicls_of_a_link)
 					{
 						// check whether to sampel this vehicle
-						float r = GLOBALS::Uniform_RNG.Next_Rand<float>();
-						float x = scenario_reference<_Scenario_Interface*>()->vehicle_trajectory_sample_rate<float>();
+						float r = GLOBALS::Uniform_RNG. template Next_Rand<float>();
+						float x = scenario_reference<_Scenario_Interface*>()->template vehicle_trajectory_sample_rate<float>();
 						if (r < x)
 						{
 							_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
@@ -137,14 +137,14 @@ namespace Network_Components
 										<<route_link_travel_time << ","
 										//<<route_link_delayed_time << ","
 										<<start<<","
-										<<route_link->length<float>()<<","
-										<<(route_link->length<float>()/5280.0)/((route_link_travel_time - trajectory_unit->intersection_delay_time<float>())/3600.0) << ","
-										<<route_link->free_flow_speed<float>() << ","
-										<<trajectory_unit->intersection_delay_time<float>() << ","
-										<<start + route_link->length<float>()<<","
+										<<route_link->template length<float>()<<","
+										<<(route_link->template length<float>()/5280.0)/((route_link_travel_time - trajectory_unit->template intersection_delay_time<float>())/3600.0) << ","
+										<<route_link->template free_flow_speed<float>() << ","
+										<<trajectory_unit->template intersection_delay_time<float>() << ","
+										<<start + route_link->template length<float>()<<","
 										<<endl;
 								}
-								start += route_link->length<float>();
+								start += route_link->template length<float>();
 							}
 						}
 
@@ -828,7 +828,7 @@ namespace Network_Components
 			// for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 			// {
 				// _link_component_type* link = (_link_component_type*)(*link_itr);
-				// fprintf_s(((_Scenario_Interface*)_global_scenario)->out_link_moe_file<FILE*>(),
+				// fprintf_s(((_Scenario_Interface*)_global_scenario)->template out_link_moe_file<FILE*>(),
 					// "%s,%d,%d,%d,%d,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					// convert_seconds_to_hhmmss(time).c_str(),
 					// time,
@@ -858,7 +858,7 @@ namespace Network_Components
 			// for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
 			// {
 				// _movement_component_type* movement = (_movement_component_type*)(*movement_itr);
-				// fprintf_s(((_Scenario_Interface*)_global_scenario)->out_link_moe_file<FILE*>(),
+				// fprintf_s(((_Scenario_Interface*)_global_scenario)->template out_link_moe_file<FILE*>(),
 					// "%s,%d,%d,%d,%d,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					// convert_seconds_to_hhmmss(time).c_str(),
 					// time,
@@ -875,7 +875,7 @@ namespace Network_Components
 			// }
 			// // output network moe
 
-			// fprintf_s(((_Scenario_Interface*)_global_scenario)->out_network_moe_file<FILE*>(),
+			// fprintf_s(((_Scenario_Interface*)_global_scenario)->template out_network_moe_file<FILE*>(),
 				// "%s,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 				// convert_seconds_to_hhmmss(time).c_str(),
 				// time,

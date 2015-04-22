@@ -143,7 +143,7 @@ namespace Network_Skimming_Components
 			}
 			template<typename TargetType> void Initialize(TargetType initial_data)
 			{
-				this->Initialize<NT>();
+				this->template Initialize<NT>();
 
 				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
 				network_itf* network = this->network_reference<  network_itf*>();
@@ -155,7 +155,7 @@ namespace Network_Skimming_Components
 				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
 				{
 					zone_itf* orig_zone = (zone_itf*)o_itr->second;
-					int o_index = orig_zone->internal_id<int>();
+					int o_index = orig_zone->template internal_id<int>();
 
 					this->_auto_travel_time_sorter[o_index].clear();
 					this->_transit_travel_time_sorter[o_index].clear();
@@ -163,8 +163,8 @@ namespace Network_Skimming_Components
 					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
 					{
 						zone_itf* dest_zone = (zone_itf*)d_itr->second;
-						int d_index = dest_zone->internal_id<int>();
-						int d_id = dest_zone->uuid<int>();
+						int d_index = dest_zone->template internal_id<int>();
+						int d_id = dest_zone->template uuid<int>();
 
 						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
 						float auto_ttime = los->auto_ttime<Time_Minutes>();
@@ -261,13 +261,13 @@ namespace Network_Skimming_Components
 
 					// get the origin activity location from the stored index in the route-tree map item
 					origin_location_itf* orig_loc = origin_locations->at(orig_index);
-					int orig_zone_index = orig_loc->zone<zone_itf*>()->internal_id<int>();
+					int orig_zone_index = orig_loc->zone<zone_itf*>()->template internal_id<int>();
 
 					// search each link for required links from destination_map and update LOS table with the results
 					for (dest_itr = destination_locations->begin(); dest_itr !=destination_locations->end(); ++dest_itr)
 					{
 						destination_location_itf* dest_node = *dest_itr;
-						int dest_zone_index = dest_node->zone<zone_itf*>()->internal_id<int>();
+						int dest_zone_index = dest_node->zone<zone_itf*>()->template internal_id<int>();
 
 						long dest_link_index = (*(dest_node->template destination_links<links_itf*>()->begin()))->template internal_id<long>();
 						long dest_link_id = (*(dest_node->template destination_links<links_itf*>()->begin()))->template uuid<long>();
@@ -275,8 +275,8 @@ namespace Network_Skimming_Components
 						link_itf* dest_link = network->template links_container<links_itf&>()[dest_link_index];
 						
 						// calculate weight based on number of routed od pairs as not all o/d zones will have the full number of origin/destination locations
-						zone_origin_count_itr = skim->template zone_origins_count<zone_location_count_itf&>().find(orig_loc->zone<zone_itf*>()->internal_id<int>());
-						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->zone<zone_itf*>()->internal_id<int>());
+						zone_origin_count_itr = skim->template zone_origins_count<zone_location_count_itf&>().find(orig_loc->zone<zone_itf*>()->template internal_id<int>());
+						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->zone<zone_itf*>()->template internal_id<int>());
 						float weight = 1.0 / ((float)zone_origin_count_itr->second * (float)zone_destination_count_itr->second);
 
 						// ignore location pairs where no valid route was found travel time over 10 days
@@ -287,7 +287,7 @@ namespace Network_Skimming_Components
 							{
 								typename links_itf::iterator orig_link_itr = orig_loc->template origin_links<links_itf*>()->begin();
 								has_skim_errors=true;
-								skim_errors << "SKIMMING ERROR, destination location ID=" << dest_node->uuid<int>() << ", link ID="  << (*link_itr)->uuid<long>()<<", is inaccessible from origin location ID="<< orig_loc->uuid<int>()<< ", link ID="  << (*orig_link_itr)->uuid<long>()<<". Check network connectivity. Estimated ttime="<<time <<endl;
+								skim_errors << "SKIMMING ERROR, destination location ID=" << dest_node->template uuid<int>() << ", link ID="  << (*link_itr)->template uuid<long>()<<", is inaccessible from origin location ID="<< orig_loc->template uuid<int>()<< ", link ID="  << (*orig_link_itr)->template uuid<long>()<<". Check network connectivity. Estimated ttime="<<time <<endl;
 							}
 							continue;
 						}
@@ -344,7 +344,7 @@ namespace Network_Skimming_Components
 				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
 				{
 					zone_itf* orig_zone = (zone_itf*)(o_itr->second);
-					int o_index = orig_zone->internal_id<int>();
+					int o_index = orig_zone->template internal_id<int>();
 
 					this->_auto_travel_time_sorter[o_index].clear();
 					this->_transit_travel_time_sorter[o_index].clear();
@@ -352,7 +352,7 @@ namespace Network_Skimming_Components
 					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
 					{
 						zone_itf* dest_zone = (zone_itf*)(d_itr->second);
-						int d_index = dest_zone->internal_id<int>();
+						int d_index = dest_zone->template internal_id<int>();
 
 						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
 						float auto_ttime = los->auto_ttime<Time_Minutes>();
@@ -401,10 +401,10 @@ namespace Network_Skimming_Components
 				File_IO::Binary_File_Writer& bw = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
 				char btag[] = "BMAT";
 				//char* btag = "BMAT";
-				bw.Write_Array<char>(btag,4);
-				bw.Write_Array<float>(values, (int)(zones->size() * zones->size()));
+				bw.template Write_Array<char>(btag,4);
+				bw.template Write_Array<float>(values, (int)(zones->size() * zones->size()));
 				char etag[] = "EMAT";
-				bw.Write_Array<char>(etag,4);
+				bw.template Write_Array<char>(etag,4);
 				delete[] values;
 
 				//ofstream outfile;
@@ -565,7 +565,7 @@ namespace Network_Skimming_Components
 			}
 			template<typename ReturnLocationType> ReturnLocationType Get_Location_As_Needed(zone_itf* zone, requires(ReturnLocationType, check(strip_modifiers(ReturnLocationType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				zone->Get_Random_Location<ReturnLocationType>();
+				zone->template Get_Random_Location<ReturnLocationType>();
 				return ;
 			}
 		};
@@ -687,10 +687,10 @@ namespace Network_Skimming_Components
 
 				// set up the update intervals
 				this->_current_increment_index=0;
-				if (!scenario->use_skim_intervals<bool>())
+				if (!scenario->template use_skim_intervals<bool>())
 				{
 					// Get interval length from the scenario
-					Simulation_Timestep_Increment increment = Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>((Time_Minutes)scenario->skim_interval_length_minutes<int>()));
+					Simulation_Timestep_Increment increment = Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>((Time_Minutes)scenario->template skim_interval_length_minutes<int>()));
 					
 					// Add endpoints to the endpoint list based on interval length
 					for (Simulation_Timestep_Increment start = 0; start + increment < END-1; start = start + increment)
@@ -812,13 +812,13 @@ namespace Network_Skimming_Components
 				//-------------------------------------------------
 
 				// Read transit input data if required
-				if (skim->read_transit<bool>())
+				if (skim->template read_transit<bool>())
 				{	
-					transit_infile.Read_Array<float>(transit_ttime, num_zones*num_zones);
-					transit_infile.Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
-					transit_infile.Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
-					transit_infile.Read_Array<float>(transit_wait_time, num_zones*num_zones);
-					transit_infile.Read_Array<float>(transit_fare, num_zones*num_zones);
+					transit_infile.template Read_Array<float>(transit_ttime, num_zones*num_zones);
+					transit_infile.template Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
+					transit_infile.template Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
+					transit_infile.template Read_Array<float>(transit_wait_time, num_zones*num_zones);
+					transit_infile.template Read_Array<float>(transit_fare, num_zones*num_zones);
 
 				}
 				// otherwise initialize to unavailable
@@ -835,10 +835,10 @@ namespace Network_Skimming_Components
 				}
 
 				// Get raw auto travel time data from binary file for time-invariant fields - move down into time loop below if these become time varying
-				if (skim->read_highway_cost<bool>() && skim->template read_input<bool>())
+				if (skim->template read_highway_cost<bool>() && skim->template read_input<bool>())
 				{
-					highway_cost_infile.Read_Array<float>(auto_tolls, num_zones*num_zones);
-					highway_cost_infile.Read_Array<float>(auto_parking_cost, num_zones*num_zones);
+					highway_cost_infile.template Read_Array<float>(auto_tolls, num_zones*num_zones);
+					highway_cost_infile.template Read_Array<float>(auto_parking_cost, num_zones*num_zones);
 				}
 				else
 				{
@@ -895,8 +895,8 @@ namespace Network_Skimming_Components
 					{
 						// Get raw auto travel time data from binary file
 						float* data = new float[num_zones*num_zones];
-						this->Read_Binary_Data<float*>(data,infile,num_zones);
-						//infile.Read_Array<float>(data, num_zones*num_zones);
+						this->template Read_Binary_Data<float*>(data,infile,num_zones);
+						//infile.template Read_Array<float>(data, num_zones*num_zones);
 
 						// create LOS matrix using raw input data
 						typename MasterType::los_value_type** temp_los_array = new typename MasterType::los_value_type*[num_zones*num_zones];
@@ -970,10 +970,10 @@ namespace Network_Skimming_Components
 					zone_itf* zone = (zone_itf*)(zone_itr->second);
 					los_value_itf* los = skim->Get_LOS<zone_itf*,los_value_itf*>(zone, zone);
 
-					if (los->auto_distance<Miles>() > 1000)
+					if (los->template auto_distance<Miles>() > 1000)
 					{
 						Miles new_distance = sqrt(zone->area<Square_Miles>())/2.0*1.2;
-						los->auto_distance<Miles>(new_distance);
+						los->template auto_distance<Miles>(new_distance);
 					}
 				}
 
@@ -1032,14 +1032,14 @@ namespace Network_Skimming_Components
 						Time_Minutes ttime_transit = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
 
 						// update the accessibilty factors: (1/Nz-1) * (sum(Emp * exp(alpha*ttime)))
-						C_gov += Nz_inv * dzone->employment_government<float>() * exp(alpha*ttime_auto_peak);
-						C_man += Nz_inv * dzone->employment_manufacturing<float>() * exp(alpha*ttime_auto_peak);
-						C_ret += Nz_inv * dzone->employment_retail<float>() * exp(alpha*ttime_auto_peak);
-						C_ser += Nz_inv * dzone->employment_services<float>() * exp(alpha*ttime_auto_peak);
-						C_ind += Nz_inv * dzone->employment_industrial<float>() * exp(alpha*ttime_auto_peak);
-						C_oth += Nz_inv * dzone->employment_other<float>() * exp(alpha*ttime_auto_peak);
+						C_gov += Nz_inv * dzone->template employment_government<float>() * exp(alpha*ttime_auto_peak);
+						C_man += Nz_inv * dzone->template employment_manufacturing<float>() * exp(alpha*ttime_auto_peak);
+						C_ret += Nz_inv * dzone->template employment_retail<float>() * exp(alpha*ttime_auto_peak);
+						C_ser += Nz_inv * dzone->template employment_services<float>() * exp(alpha*ttime_auto_peak);
+						C_ind += Nz_inv * dzone->template employment_industrial<float>() * exp(alpha*ttime_auto_peak);
+						C_oth += Nz_inv * dzone->template employment_other<float>() * exp(alpha*ttime_auto_peak);
 
-						float attract = dzone->employment_total<float>() + dzone->pop_persons<float>();
+						float attract = dzone->template employment_total<float>() + dzone->template pop_persons<float>();
 
 						// update the average travel time from 'zone' for transit and auto if transit is available
 						if (ttime_transit < 1440 && ttime_auto_peak < 1440)
@@ -1089,31 +1089,31 @@ namespace Network_Skimming_Components
 
 				File_IO::Binary_File_Writer& outfile = skim->template highway_output_file<File_IO::Binary_File_Writer&>();
 				char version[] = "SKIM:V01";
-				outfile.Write_Array<char>(&version[0],8);
+				outfile.template Write_Array<char>(&version[0],8);
 				char begin_zones[] = "BZON";
-				outfile.Write_Array<char>(&begin_zones[0],4);
+				outfile.template Write_Array<char>(&begin_zones[0],4);
 				int zones = (int)zones_container->size();
-				outfile.Write_Value<int>(zones);
+				outfile.template Write_Value<int>(zones);
 				for (zones_itf::iterator itr = zones_container->begin(); itr != zones_container->end(); ++itr)
 				{
 					zone_itf* zone = (zone_itf*)(itr->second);
-					outfile.Write_Value<int>(zone->uuid<int&>());
-					outfile.Write_Value<int>(zone->internal_id<int&>());
+					outfile.template Write_Value<int>(zone->uuid<int&>());
+					outfile.template Write_Value<int>(zone->internal_id<int&>());
 				}
 				char end_zones[] = "EZON";
-				outfile.Write_Array<char>(&end_zones[0],4);
+				outfile.template Write_Array<char>(&end_zones[0],4);
 				std::vector<Time_Minutes>* intervals = skim->template update_interval_endpoints<std::vector<Time_Minutes>*>();
 				char begin_intervals[] = "BINT";
-				outfile.Write_Array<char>(&begin_intervals[0],4);
+				outfile.template Write_Array<char>(&begin_intervals[0],4);
 				int num_increment = intervals->size();
-				outfile.Write_Value<int>(num_increment);
+				outfile.template Write_Value<int>(num_increment);
 				for (int i=0; i<num_increment; ++i)
 				{
 					int incr = (*intervals)[i];
-					outfile.Write_Value<int>(incr);
+					outfile.template Write_Value<int>(incr);
 				}
 				char end_intervals[] = "EINT";
-				outfile.Write_Array<char>(&end_intervals[0],4);
+				outfile.template Write_Array<char>(&end_intervals[0],4);
 			}
 
 			void Read_Binary_Headers(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
@@ -1123,7 +1123,7 @@ namespace Network_Skimming_Components
 
 				// get versioning info
 				char version[9];
-				infile.Read_Array<char>(version, 8);
+				infile.template Read_Array<char>(version, 8);
 				version[8]='\0';
 
 
@@ -1153,9 +1153,9 @@ namespace Network_Skimming_Components
 				_highway_input_file.Begin();
 
 				// get versioning info
-				_highway_input_file.Read_Value<int>(num_modes);
-				_highway_input_file.Read_Value<int>(num_zones);
-				_highway_input_file.Read_Value<int>(update_increment);
+				_highway_input_file.template Read_Value<int>(num_modes);
+				_highway_input_file.template Read_Value<int>(num_zones);
+				_highway_input_file.template Read_Value<int>(update_increment);
 
 				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, nullptr, update_increment);
 				//Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
@@ -1167,13 +1167,13 @@ namespace Network_Skimming_Components
 				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
 				//if (skim->template read_transit<bool>())
 				//{		
-				//	transit_infile.Read_Value<int>(num_zones_transit);
+				//	transit_infile.template Read_Value<int>(num_zones_transit);
 				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
 				//}
 				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
 				//if (skim->template read_highway_cost<bool>())
 				//{		
-				//	highway_cost_infile.Read_Value<int>(num_zones_hcost);
+				//	highway_cost_infile.template Read_Value<int>(num_zones_hcost);
 				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
 				//}
 			}
@@ -1187,40 +1187,40 @@ namespace Network_Skimming_Components
 				char tag[5]; tag[4]='\0';
 
 				// check if zone tag exists
-				_highway_input_file.Read_Array<char>(tag,4);
+				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"BZON")==0)
 				{
-					_highway_input_file.Read_Value<int>(num_zones);
+					_highway_input_file.template Read_Value<int>(num_zones);
 					for (int i=0; i<num_zones; i++)
 					{
 						int id, index;
-						_highway_input_file.Read_Value<int>(id);
-						_highway_input_file.Read_Value<int>(index);
+						_highway_input_file.template Read_Value<int>(id);
+						_highway_input_file.template Read_Value<int>(index);
 						return_zones_container.push_back(pair<int,int>(id,index));
 					}
-					_highway_input_file.Read_Array<char>(tag,4);
+					_highway_input_file.template Read_Array<char>(tag,4);
 					if (strcmp(tag,"EZON")!=0) THROW_EXCEPTION("ERROR: End zone information tag 'EZON' missing from binary file, possible versioning issue.");
 				}
 				else
 				{
 					// header info
-					_highway_input_file.Read_Value<int>(num_modes,-4,ios_base::cur);
-					_highway_input_file.Read_Value<int>(num_zones);
+					_highway_input_file.template Read_Value<int>(num_modes,-4,ios_base::cur);
+					_highway_input_file.template Read_Value<int>(num_zones);
 				}
 
 				// header validation checks - read each interval endpoint entry and verify that the are the same as specified in scenario
-				_highway_input_file.Read_Array<char>(tag,4);
+				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"BINT")!=0) THROW_EXCEPTION("ERROR: Begin intervals tag 'BINT' missing from binary file, possible versioning issue.");
 
-				_highway_input_file.Read_Value<int>(num_intervals);
+				_highway_input_file.template Read_Value<int>(num_intervals);
 
 				for (int i=0; i<num_intervals; i++)
 				{
 					int endpoint;
-					_highway_input_file.Read_Value<int>(endpoint);
+					_highway_input_file.template Read_Value<int>(endpoint);
 					intervals.push_back(endpoint);
 				}
-				_highway_input_file.Read_Array<char>(tag,4);
+				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
 
 				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals, &return_zones_container);
@@ -1268,7 +1268,7 @@ namespace Network_Skimming_Components
 
 						zones_itf::iterator zitr;
 						if ((zitr = zones_container->find(id)) == zones_container->end()) THROW_EXCEPTION("ERROR: Zone id from skim file not found in network zones container.");
-						if (zitr->second->internal_id<int>() != index) THROW_EXCEPTION("ERROR: Zone id in skim file has different index than same zone id in network zones container.");
+						if (zitr->second->template internal_id<int>() != index) THROW_EXCEPTION("ERROR: Zone id in skim file has different index than same zone id in network zones container.");
 					}
 				}
 
@@ -1276,13 +1276,13 @@ namespace Network_Skimming_Components
 				if (read_transit<bool>())
 				{		
 					int num_zones_transit;
-					_transit_input_file.Read_Value<int>(num_zones_transit);
+					_transit_input_file.template Read_Value<int>(num_zones_transit);
 					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
 				}
 				if (read_highway_cost<bool>())
 				{		
 					int num_zones_hcost;
-					_highway_cost_input_file.Read_Value<int>(num_zones_hcost);
+					_highway_cost_input_file.template Read_Value<int>(num_zones_hcost);
 					if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_hcost<<" and Highway="<<num_zones);
 				}
 			}
@@ -1294,7 +1294,7 @@ namespace Network_Skimming_Components
 				// Read validation tag before and after data read
 				if (file.Version() != '0')
 				{
-					file.Read_Array<char>(tag,4);
+					file.template Read_Array<char>(tag,4);
 					if (strcmp(tag,"BMAT")!=0) THROW_EXCEPTION("ERROR: Begin matrix tag 'BMAT' missing from binary file, possible versioning issue.");
 				}
 
@@ -1304,7 +1304,7 @@ namespace Network_Skimming_Components
 				// Read validation tag before and after data read
 				if (file.Version() != '0')
 				{
-					file.Read_Array<char>(tag,4);
+					file.template Read_Array<char>(tag,4);
 					if (strcmp(tag,"EMAT")!=0) THROW_EXCEPTION("ERROR: End matrix tag 'EMAT' missing from binary file, possible versioning issue.");
 				}
 			}

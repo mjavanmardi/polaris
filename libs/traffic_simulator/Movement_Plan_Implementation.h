@@ -205,7 +205,7 @@ namespace Movement_Plan_Components
 				}
 
 				// copy valid movement at time of creation
-				_valid_trajectory = move->valid_trajectory<bool>();
+				_valid_trajectory = move->template valid_trajectory<bool>();
 
 				// copy pointer to the activity reference from original movement plan
 				_destination_activity_reference = move->destination_activity_reference<destination_activity_reference_interface*>();

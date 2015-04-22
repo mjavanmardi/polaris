@@ -376,26 +376,26 @@ namespace Scenario_Components
 
 				//===============================================
 				// Demand model parameters 
-				if (cfgReader.getParameter("write_activity_output", this->write_activity_output<bool*>()) != PARAMETER_FOUND) this->write_activity_output<bool>(false);
-				if (cfgReader.getParameter("aggregate_routing", this->aggregate_routing<bool*>()) != PARAMETER_FOUND) this->aggregate_routing<bool>(false);
-				if (cfgReader.getParameter("do_planner_routing", this->do_planner_routing<bool*>()) != PARAMETER_FOUND) this->do_planner_routing<bool>(false);		
-				if (cfgReader.getParameter("write_demand_to_database", this->write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->write_demand_to_database<bool>(false);
-				if (cfgReader.getParameter("read_demand_from_database", this->read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->read_demand_from_database<bool>(false);
+				if (cfgReader.getParameter("write_activity_output", this->template write_activity_output<bool*>()) != PARAMETER_FOUND) this->template write_activity_output<bool>(false);
+				if (cfgReader.getParameter("aggregate_routing", this->template aggregate_routing<bool*>()) != PARAMETER_FOUND) this->template aggregate_routing<bool>(false);
+				if (cfgReader.getParameter("do_planner_routing", this->template do_planner_routing<bool*>()) != PARAMETER_FOUND) this->template do_planner_routing<bool>(false);		
+				if (cfgReader.getParameter("write_demand_to_database", this->template write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->template write_demand_to_database<bool>(false);
+				if (cfgReader.getParameter("read_demand_from_database", this->template read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->template read_demand_from_database<bool>(false);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
-				if (cfgReader.getParameter("percent_to_synthesize", this->percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->percent_to_synthesize<double>(1.0);
-				if (cfgReader.getParameter("ipf_tolerance", this->ipf_tolerance<double*>()) != PARAMETER_FOUND) this->ipf_tolerance<double>(0.01);
-				if (cfgReader.getParameter("marginal_tolerance", this->marginal_tolerance<int*>()) != PARAMETER_FOUND) this->marginal_tolerance<int>(5);
-				if (cfgReader.getParameter("maximum_iterations", this->maximum_iterations<int*>()) != PARAMETER_FOUND) this->maximum_iterations<int>(100);
-				if (cfgReader.getParameter("write_marginal_output", this->write_marginal_output<bool*>()) != PARAMETER_FOUND) this->write_marginal_output<bool>(false);
-				if (cfgReader.getParameter("write_full_output", this->write_full_output<bool*>()) != PARAMETER_FOUND) this->write_full_output<bool>(false);
+				if (cfgReader.getParameter("percent_to_synthesize", this->template percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->template percent_to_synthesize<double>(1.0);
+				if (cfgReader.getParameter("ipf_tolerance", this->template ipf_tolerance<double*>()) != PARAMETER_FOUND) this->template ipf_tolerance<double>(0.01);
+				if (cfgReader.getParameter("marginal_tolerance", this->template marginal_tolerance<int*>()) != PARAMETER_FOUND) this->template marginal_tolerance<int>(5);
+				if (cfgReader.getParameter("maximum_iterations", this->template maximum_iterations<int*>()) != PARAMETER_FOUND) this->template maximum_iterations<int>(100);
+				if (cfgReader.getParameter("write_marginal_output", this->template write_marginal_output<bool*>()) != PARAMETER_FOUND) this->template write_marginal_output<bool>(false);
+				if (cfgReader.getParameter("write_full_output", this->template write_full_output<bool*>()) != PARAMETER_FOUND) this->template write_full_output<bool>(false);
 				string popsyn_control_string;
-				if (cfgReader.getParameter("popsyn_control_file", this->popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
+				if (cfgReader.getParameter("popsyn_control_file", this->template popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->template popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
 
 
 
-				if (cfgReader.getParameter("write_visualizer_snapshot", this->write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->write_visualizer_snapshot<bool>(false);
+				if (cfgReader.getParameter("write_visualizer_snapshot", this->template write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->template write_visualizer_snapshot<bool>(false);
 
 
 				//===============================================
@@ -467,21 +467,21 @@ namespace Scenario_Components
 				
 
 				// GET NETWORK SKIMMING PARAMETERS
-				if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) != PARAMETER_FOUND) this->write_skim_tables<bool>(false);
-				if (cfgReader.getParameter("read_skim_tables", this->read_skim_tables<bool*>()) != PARAMETER_FOUND) this->read_skim_tables<bool>(false);
-				if (cfgReader.getParameter("input_highway_skim_file_path_name", this->input_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_highway_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_highway_skim_file_path_name", this->output_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_highway_skim_file_path_name<string>((string)"highway_skim_file_out.txt");
-				if (cfgReader.getParameter("input_highway_cost_skim_file_path_name", this->input_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_highway_cost_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_highway_cost_skim_file_path_name", this->output_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
-				if (cfgReader.getParameter("input_transit_skim_file_path_name", this->input_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_transit_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_transit_skim_file_path_name", this->output_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
-				if (cfgReader.getParameter("skim_interval_endpoint_minutes", this->skim_interval_endpoint_minutes<IntArray*>()) != PARAMETER_FOUND)
+				if (cfgReader.getParameter("write_skim_tables", this->template write_skim_tables<bool*>()) != PARAMETER_FOUND) this->template write_skim_tables<bool>(false);
+				if (cfgReader.getParameter("read_skim_tables", this->template read_skim_tables<bool*>()) != PARAMETER_FOUND) this->template read_skim_tables<bool>(false);
+				if (cfgReader.getParameter("input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_highway_skim_file_path_name<string>((string)"");
+				if (cfgReader.getParameter("output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_highway_skim_file_path_name<string>((string)"highway_skim_file_out.txt");
+				if (cfgReader.getParameter("input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_highway_cost_skim_file_path_name<string>((string)"");
+				if (cfgReader.getParameter("output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
+				if (cfgReader.getParameter("input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_transit_skim_file_path_name<string>((string)"");
+				if (cfgReader.getParameter("output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
+				if (cfgReader.getParameter("skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<IntArray*>()) != PARAMETER_FOUND)
 				{
 					use_skim_intervals<bool>(false);
-					if (cfgReader.getParameter("skim_interval_length_minutes", this->skim_interval_length_minutes<int*>()) != PARAMETER_FOUND)
+					if (cfgReader.getParameter("skim_interval_length_minutes", this->template skim_interval_length_minutes<int*>()) != PARAMETER_FOUND)
 					{
 						do_skimming<bool>(false);
-						if (this->write_skim_tables<bool>())
+						if (this->template write_skim_tables<bool>())
 						{
 							THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
 						}
@@ -700,7 +700,7 @@ namespace Scenario_Components
 
 
 				//vehicle trajectory
-				if (this->write_vehicle_trajectory<bool>())
+				if (this->template write_vehicle_trajectory<bool>())
 				{
 					vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
 					vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
@@ -785,7 +785,7 @@ namespace Scenario_Components
 				//}
 
 				//link flow pattern
-				if (this->write_network_link_flow<bool>())
+				if (this->template write_network_link_flow<bool>())
 				{
 					network_link_flow_file_name<string&>().assign(output_dir_name<string&>() + "network_link_flow.csv");
 					network_link_flow_file<fstream&>().open(network_link_flow_file_name<string&>(),fstream::out);
@@ -817,7 +817,7 @@ namespace Scenario_Components
 				}
 
 				//link turn times
-				if (this->write_network_link_turn_time<bool>())
+				if (this->template write_network_link_turn_time<bool>())
 				{
 					network_link_turn_time_file_name<string&>() = output_dir_name<string&>() + "network_link_turn_time.csv";
 					network_link_turn_time_file<fstream&>().open(network_link_turn_time_file_name<string&>(),fstream::out);
@@ -861,7 +861,7 @@ namespace Scenario_Components
 
 
 				//operation control
-				if (this->write_node_control_state<bool>())
+				if (this->template write_node_control_state<bool>())
 				{
 					network_node_control_state_file_name<string&>() = output_dir_name<string&>() + "node_control_state.csv";
 					network_node_control_state_file<fstream&>().open(network_node_control_state_file_name<string&>(),fstream::out);
@@ -948,7 +948,7 @@ namespace Scenario_Components
 				}
 
 				//vehicle_transfer
-				/*if (this->write_vehicle_transfer_file<bool>())
+				/*if (this->template write_vehicle_transfer_file<bool>())
 				{
 					vehicle_transfer_file_name<string&>() = output_dir_name<string&>() + "vehicle_transfer.csv";
 					vehicle_transfer_file<fstream&>().open(vehicle_transfer_file_name<string&>(),fstream::out);
@@ -984,21 +984,21 @@ namespace Scenario_Components
 				}*/
 
 				//real-time moe
-				if (this->output_network_moe_for_simulation_interval<bool>())
+				if (this->template output_network_moe_for_simulation_interval<bool>())
 				{
 					string out_realtime_network_moe_file_name = output_dir_name<string&>() + "realtime_moe_network.csv";
 					out_realtime_network_moe_file<fstream&>().open(out_realtime_network_moe_file_name, fstream::out);
 					out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_queue_length,network_vmt,network_vht,network_cumulative_loaded_vehicles,network_cumulative_departed_vehicles,network_in_network_vehicles,network_cumulative_arrived_vehicles\n";
 				}
 				//link
-				if (this->output_link_moe_for_simulation_interval<bool>())
+				if (this->template output_link_moe_for_simulation_interval<bool>())
 				{
 					string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
 					out_realtime_link_moe_file<fstream&>().open(out_realtime_link_moe_file_name, fstream::out);
 					out_realtime_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
 				}
 				//movement
-				if (this->output_turn_movement_moe_for_simulation_interval<bool>())
+				if (this->template output_turn_movement_moe_for_simulation_interval<bool>())
 				{
 					string out_realtime_movement_moe_file_name = output_dir_name<string&>() + "realtime_moe_movement.csv";
 					out_realtime_movement_moe_file<fstream&>().open(out_realtime_movement_moe_file_name, fstream::out);
@@ -1006,7 +1006,7 @@ namespace Scenario_Components
 				}
 				//moe
 				//network
-				if (this->output_network_moe_for_assignment_interval<bool>())
+				if (this->template output_network_moe_for_assignment_interval<bool>())
 				{
 					string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
 					out_network_moe_file<fstream&>().open(out_network_moe_file_name, fstream::out);
@@ -1014,21 +1014,21 @@ namespace Scenario_Components
 					out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vmt,vht\n";
 				}
 				//link
-				if (this->output_link_moe_for_assignment_interval<bool>())
+				if (this->template output_link_moe_for_assignment_interval<bool>())
 				{
 					string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
 					out_link_moe_file<fstream&>().open(out_link_moe_file_name, fstream::out);
 					out_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
 				}
 				//movement
-				if (this->output_turn_movement_moe_for_assignment_interval<bool>())
+				if (this->template output_turn_movement_moe_for_assignment_interval<bool>())
 				{
 					string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
 					out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
 					out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
 				}
 				//routable network snapshot
-				if (this->write_network_snapshots<bool>())
+				if (this->template write_network_snapshots<bool>())
 				{
 					string routable_network_snapshots_file_name = output_dir_name<string&>() + "output_network_snapshots";
 					output_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::out);

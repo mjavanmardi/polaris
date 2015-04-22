@@ -422,7 +422,7 @@ namespace Routing_Components
 //					//TODO
 ////load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 //					
-//					this_component()->Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+//					this_component()->template Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 //				}
 //			}
 //
@@ -436,7 +436,7 @@ namespace Routing_Components
 //					//TODO
 ////load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 //					
-//					this_component()->Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+//					this_component()->template Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 //				}
 //			}
 //#ifndef EXCLUDE_DEMAND
@@ -661,14 +661,14 @@ namespace Routing_Components
 //				//typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(links_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
 //
 //				typename _Routable_Links_Container_Interface::iterator link_itr;
-//				//cout << "origin_link = " << origin_link->internal_id<int>() << endl;
+//				//cout << "origin_link = " << origin_link->template internal_id<int>() << endl;
 //
 //				// for each link, store its travel time
 //				for(link_itr=_this_ptr->template routable_network<_Routable_Network_Interface*>()->template links_container<_Routable_Links_Container_Interface&>().begin();link_itr!=_this_ptr->template routable_network<_Routable_Network_Interface*>()->template links_container<_Routable_Links_Container_Interface&>().end();link_itr++)
 //				{
 //					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
 //					travel_times->at(link_ptr->template internal_id<int>()) = link_ptr->template label_cost<float>();
-//					//cout << "link " << link_ptr->internal_id<int>() << ", path_cost=" << link_ptr->label_cost<float>() << endl;
+//					//cout << "link " << link_ptr->template internal_id<int>() << ", path_cost=" << link_ptr->template label_cost<float>() << endl;
 //				}				
 //			}
 //		};

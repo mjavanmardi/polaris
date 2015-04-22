@@ -53,7 +53,7 @@ namespace Network_Skimming_Components
 				else if (sub_iteration() == Types::SUB_ITERATIONS::PROCESS)
 				{
 					//_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
-					this_ptr->Process_Skim_Trees_Event<NT>();
+					this_ptr->template Process_Skim_Trees_Event<NT>();
 					response.next._iteration = iteration();
 					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
 					
@@ -61,7 +61,7 @@ namespace Network_Skimming_Components
 				}
 				else if (sub_iteration() == Types::SUB_ITERATIONS::UPDATE)
 				{
-					this_ptr->Update_Skim_Tables_Event<NT>();
+					this_ptr->template Update_Skim_Tables_Event<NT>();
 					
 					//response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
 					response.next._iteration = this_ptr->template update_increment<Simulation_Timestep_Increment>();
@@ -194,7 +194,7 @@ namespace Network_Skimming_Components
 					zone_origins_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
 					
 					// Add all locations to boost::container::list if less than the number required
-					if (num_locations <= this->nodes_per_zone<int>())
+					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
 						{
@@ -216,10 +216,10 @@ namespace Network_Skimming_Components
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((origin_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
-						while (available_locations_temp.size() > 0 && num_successful < this->nodes_per_zone<int>())
+						while (available_locations_temp.size() > 0 && num_successful < this->template nodes_per_zone<int>())
 						{
 							// get interface to the location
-							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
+							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							origin_location_itf* loc = (origin_location_itf*)available_locations_temp[rand_loc_index];
 
 							// If the location does not have valid links or is already in the boost::container::list, skip
@@ -233,16 +233,16 @@ namespace Network_Skimming_Components
 						}
 
 
-						//for (int i=0; i<this->nodes_per_zone<int>(); i++)
+						//for (int i=0; i<this->template nodes_per_zone<int>(); i++)
 						//{
 						//	// get interface to the location
-						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<double>() - 0.0001) * (double)num_locations);
+						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	origin_location_itf* loc = (origin_location_itf*)available_locations[rand_loc_index];
 
 						//	// If the location does not have valid links or is already in the boost::container::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
-						//		cout << "Location not routable: " << loc->uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
+						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
 						//		i--; num_unsuccessful++;
 						//	}
 						//	origin_locations->push_back(loc);
@@ -275,7 +275,7 @@ namespace Network_Skimming_Components
 					zone_destinations_count.insert(pair<long,int>(dest_zone->template internal_id<long>(),0));
 					
 					// Add all locations to boost::container::list if less than the number required
-					if (num_locations <= this->nodes_per_zone<int>())
+					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
 						{
@@ -299,10 +299,10 @@ namespace Network_Skimming_Components
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((destination_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
-						while (available_locations_temp.size() > 0 && num_successful < this->nodes_per_zone<int>())
+						while (available_locations_temp.size() > 0 && num_successful < this->template nodes_per_zone<int>())
 						{
 							// get interface to the location
-							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
+							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							destination_location_itf* loc = (destination_location_itf*)available_locations_temp[rand_loc_index];
 
 							// If the location does not have valid links or is already in the boost::container::list, skip
@@ -317,16 +317,16 @@ namespace Network_Skimming_Components
 
 						//int num_successful = 0;
 						//// make nodes_per_zone attempts to pick origin locations
-						//for (int i=0; i<this->nodes_per_zone<int>(); i++)
+						//for (int i=0; i<this->template nodes_per_zone<int>(); i++)
 						//{
 						//	// get interface to the location
-						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<double>() - 0.0001) * (double)num_locations);
+						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	destination_location_itf* loc = (destination_location_itf*)available_locations[rand_loc_index];
 
 						//	// If the location does not have valid links or is already in the boost::container::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
-						//		cout << "Location not routable: " << loc->uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
+						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
 						//		continue;
 						//	}
 						//	destination_locations->push_back(loc);
@@ -346,10 +346,10 @@ namespace Network_Skimming_Components
 				}
 
 				// Based on the above selected O/D routing pairs, initialize the skim routers
-				this_component()->Initialize_Skims<TargetType>();
+				this_component()->template Initialize_Skims<TargetType>();
 
 				// Load the skim updating event, which recalculates network skims at every Update interval (set in implementation)
-				this_component()->Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
+				this_component()->template Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
 			template<typename NetworkType> void Initialize(NetworkType network_pointer, requires(NetworkType,check(NetworkType, is_pointer) && check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
@@ -371,12 +371,12 @@ namespace Network_Skimming_Components
 			template<typename TargetType> bool Update_Skim_Tables()
 			{
 				//// Update each modal_skim
-				this->Update_LOS<NULLTYPE>();
+				this->template Update_LOS<NULLTYPE>();
 
 				// Output network skims
-				if (this->write_output<bool>())
+				if (this->template write_output<bool>())
 				{
-					this->Write_LOS<NULLTYPE>();
+					this->template Write_LOS<NULLTYPE>();
 				}
 
 				// Network Skim timer
@@ -386,11 +386,11 @@ namespace Network_Skimming_Components
 
 			template<typename TargetType> TargetType update_increment()
 			{
-				return this_component()->update_increment<TargetType>();
+				return this_component()->template update_increment<TargetType>();
 			}
 			template<typename TargetType> TargetType update_increment(int interval)
 			{
-				return this_component()->update_increment<TargetType>(interval);
+				return this_component()->template update_increment<TargetType>(interval);
 			}
 
 			//=============================================
@@ -421,16 +421,16 @@ namespace Network_Skimming_Components
 				//Check for bad travel time
 				if (los_value->auto_ttime<Time_Seconds>() > END || los_value->auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->auto_ttime<Time_Seconds>()))
 				{
-					int O = this->Get_Zone_ID<LocationType>(Origin);
-					int D = this->Get_Zone_ID<LocationType>(Destination);
+					int O = this->template Get_Zone_ID<LocationType>(Origin);
+					int D = this->template Get_Zone_ID<LocationType>(Destination);
 					THROW_WARNING("Error: travel time is invalid for auto mode, ttime="<<los_value->auto_ttime<Time_Seconds>()<<", O="<<O<<", D="<<D<<endl);
 				}
 
 				// extract and return the auto travel time
-				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->auto_ttime<ReturnType>();
-				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->auto_distance<Miles>()/15.0); // assume bike speed of 15MPH
-				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->auto_distance<Miles>()/3.0/0.9); // assume walk speed of 3MPH and reduce walk distance by 10%
-				else return (los_value->transit_ttime<ReturnType>() + los_value->transit_wait_time<ReturnType>() + los_value->transit_walk_access_time<ReturnType>());
+				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->template auto_ttime<ReturnType>();
+				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->template auto_distance<Miles>()/15.0); // assume bike speed of 15MPH
+				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->template auto_distance<Miles>()/3.0/0.9); // assume walk speed of 3MPH and reduce walk distance by 10%
+				else return (los_value->template transit_ttime<ReturnType>() + los_value->template transit_wait_time<ReturnType>() + los_value->template transit_walk_access_time<ReturnType>());
 				
 			}
 			
@@ -459,15 +459,15 @@ namespace Network_Skimming_Components
 				zone_itf *orig_zone, *dest_zone;
 
 				// Extract zone ID information from the input origin/destination type (either location or zone)
-				int Origin_Zone_ID = this->Get_Zone_ID<LocationType>(Origin);
-				int Destination_Zone_ID = this->Get_Zone_ID<LocationType>(Destination);
+				int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(Origin);
+				int Destination_Zone_ID = this->template Get_Zone_ID<LocationType>(Destination);
 
 				// Do a lookup to make sure the zone is in the network (may be able to remove this)
 				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
-				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << Origin->uuid<int>()<<","<<Origin->internal_id<int>());
+				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << Origin->template uuid<int>()<<","<<Origin->template internal_id<int>());
 
 				if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = (zone_itf *)(zone_itr->second);}
-				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found for Destination uuid,internal_id: "<<Destination->uuid<int>()<<","<<Destination->internal_id<int>()<<", mem location: "<<Destination);
+				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found for Destination uuid,internal_id: "<<Destination->template uuid<int>()<<","<<Destination->template internal_id<int>()<<", mem location: "<<Destination);
 
 				//============================================================
 				// Transferred code here from former mode_skim_prototype
@@ -522,11 +522,11 @@ namespace Network_Skimming_Components
 				zone_itf *orig_zone;
 
 				// Extract zone ID information from the input origin/destination type (either location or zone)
-				int Origin_Zone_ID = this->Get_Zone_ID<LocationType>(origin);
+				int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(origin);
 
 				// Do a lookup to make sure the zone is in the network (may be able to remove this)
 				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
-				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->uuid<int>()<<","<<origin->internal_id<int>());
+				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->template uuid<int>()<<","<<origin->template internal_id<int>());
 
 				//============================================================
 				// Transferred code here from former mode_skim_prototype
@@ -551,7 +551,7 @@ namespace Network_Skimming_Components
 					if (skim_table->template end_time<TimeType>() > remain)
 					{
 						////
-						skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
+						skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->template internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
 						
 						return;
 					}
@@ -574,11 +574,11 @@ namespace Network_Skimming_Components
 			//	zone_itf *orig_zone;
 
 			//	// Extract zone ID information from the input origin/destination type (either location or zone)
-			//	int Origin_Zone_ID = this->Get_Zone_ID<LocationType>(origin);
+			//	int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(origin);
 
 			//	// Do a lookup to make sure the zone is in the network (may be able to remove this)
 			//	if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
-			//	else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->uuid<int>()<<","<<origin->internal_id<int>());
+			//	else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->template uuid<int>()<<","<<origin->template internal_id<int>());
 
 			//	//============================================================
 			//	// Transferred code here from former mode_skim_prototype
@@ -603,7 +603,7 @@ namespace Network_Skimming_Components
 			//		if (skim_table->template end_time<TimeType>() > remain)
 			//		{
 			//			////
-			//			skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
+			//			skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->template internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
 			//			
 			//			return;
 			//		}
@@ -661,9 +661,9 @@ namespace Network_Skimming_Components
 				//===========================================================================
 				// Read Header
 				int num_modes, num_zones, update_increment;
-				infile.Read_Value<int>(num_modes);
-				infile.Read_Value<int>(num_zones);
-				infile.Read_Value<int>(update_increment);
+				infile.template Read_Value<int>(num_modes);
+				infile.template Read_Value<int>(num_zones);
+				infile.template Read_Value<int>(update_increment);
 				
 				//===========================================================================
 				// create the skim_table time periods, for basic create only a single time period skim_table
@@ -673,7 +673,7 @@ namespace Network_Skimming_Components
 
 
 
-					infile.Read_Array<float>(data, num_zones*num_zones);
+					infile.template Read_Array<float>(data, num_zones*num_zones);
 
 
 					boost::container::vector<float> temp(data,data+num_zones*num_zones);
@@ -703,7 +703,7 @@ namespace Network_Skimming_Components
 			}
 			template<typename TargetType> void Read_Binary_Data(TargetType data_ptr, File_IO::Binary_File_Reader& file, int num_zones, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				this_component()->Read_Binary_Data<TargetType>(data_ptr, file, num_zones);
+				this_component()->template Read_Binary_Data<TargetType>(data_ptr, file, num_zones);
 			}
 
 			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
@@ -835,12 +835,12 @@ namespace Network_Skimming_Components
 
 			template<typename TargetType> bool Update_LOS()
 			{
-				return this_component()->Update_LOS<TargetType>();
+				return this_component()->template Update_LOS<TargetType>();
 			}
 
 			template<typename TargetType> void Write_LOS()
 			{
-				this_component()->Write_LOS<TargetType>();
+				this_component()->template Write_LOS<TargetType>();
 			}
 
 			template<typename ParamType, typename ReturnType> ReturnType Get_LOS(ParamType Origin_Index, ParamType Destination_Index)

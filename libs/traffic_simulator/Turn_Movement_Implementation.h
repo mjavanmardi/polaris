@@ -286,7 +286,7 @@ namespace Turn_Movement_Components
 				{
 					if(transfer_flow_turn_movement > 0.0)
 					{
-						double rng = Uniform_RNG.Next_Rand<double>();//rng_stream.RandU01();
+						double rng = Uniform_RNG.template Next_Rand<double>();//rng_stream.RandU01();
 						if(rng<=transfer_flow_turn_movement)
 						{//partial vehicle, incomplete implementation
 							++num_transfer_vehicles_of_turn_movement;
@@ -475,7 +475,7 @@ namespace Turn_Movement_Components
                     float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;
                     Di = max(Di, 0.0f);
                     signal_control_penalty = max(8.0f, Du + Di);
-					//if(((_link_component_type*)_inbound_link)->uuid<int>() == 104) cout << _movement_transferred << endl;
+					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
                 }
                 _turn_travel_penalty += signal_control_penalty;
 

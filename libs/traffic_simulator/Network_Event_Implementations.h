@@ -276,7 +276,7 @@ namespace Network_Event_Components
 
 		implementation struct Weather_Network_Event : public Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>
 		{
-			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<NT>(obj);}
+			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::template Initialize_Type<NT>(obj);}
 
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>*)this)->template Start<NT>();}
@@ -369,7 +369,7 @@ namespace Network_Event_Components
 		implementation struct Accident_Network_Event : public Base_Network_Event<MasterType,INHERIT(Accident_Network_Event)>
 		{
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<NT>(obj);}
+			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::template Initialize_Type<NT>(obj);}
 			
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Accident_Network_Event)>*)this)->template Start<NT>();}
@@ -431,7 +431,7 @@ namespace Network_Event_Components
 
 		implementation struct Congestion_Network_Event : public Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>
 		{
-			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<NT>(obj);}
+			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::template Initialize_Type<NT>(obj);}
 			
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Start<NT>();}
@@ -469,7 +469,7 @@ namespace Network_Event_Components
 		
 		implementation struct Lane_Closure_Network_Event : public Base_Network_Event<MasterType,INHERIT(Lane_Closure_Network_Event)>
 		{
-			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<NT>(obj);}
+			//template<typename TargetType> static void Initialize_Type(void* obj){Base_Network_Event::template Initialize_Type<NT>(obj);}
 		
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Lane_Closure_Network_Event)>*)this)->template Start<NT>();}

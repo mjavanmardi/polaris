@@ -339,9 +339,9 @@ namespace Traffic_Management_Center_Components
 				//		}
 				//	}
 
-				//	new_event->Initialize<MasterType>(iteration(), iteration() + 5*60, affected_links);
+				//	new_event->template Initialize<MasterType>(iteration(), iteration() + 5*60, affected_links);
 
-				//	new_event->Start<NT>();
+				//	new_event->template Start<NT>();
 
 				//	affected_links.clear();
 				//}
@@ -413,7 +413,7 @@ namespace Traffic_Management_Center_Components
 				Detector1DU<double> detector;
 				boost::container::vector<double> training_data;
 
-				result<LinkMOE> rmoe(db->query<LinkMOE>(query<LinkMOE>::true_expr));
+				result<LinkMOE> rmoe(db->template query<LinkMOE>(query<LinkMOE>::true_expr));
 
 				
 				for (auto it = (rmoe.begin()); it!= rmoe.end(); ++it  )

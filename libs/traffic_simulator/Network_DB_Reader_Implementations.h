@@ -245,7 +245,7 @@ namespace Network_Components
 						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ab()+0.5f);
 						link->template free_flow_speed<float>(ffspd);
 
-						float speed_limit_estimate = link->speed_limit_estimate<NT>();
+						float speed_limit_estimate = link->template speed_limit_estimate<NT>();
 						
 						//if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
 						//{
@@ -464,7 +464,7 @@ namespace Network_Components
 						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ba()+0.5f);
 						link->template free_flow_speed<float>(ffspd);
 
-						float speed_limit_estimate = link->speed_limit_estimate<NT>();
+						float speed_limit_estimate = link->template speed_limit_estimate<NT>();
 						
 						//if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
 						//{
@@ -472,7 +472,7 @@ namespace Network_Components
 
 						//	if(ffspd < 65.0f)
 						//	{
-						//		//cout << "ffspd updated on: " << link->dbid<int>() << "," << 65.0f - ffspd << endl;
+						//		//cout << "ffspd updated on: " << link->template dbid<int>() << "," << 65.0f - ffspd << endl;
 						//		ffspd = 65.0f;
 						//		speed_limit_estimate = 55.0f;
 						//		link->template free_flow_speed<float>(ffspd);
@@ -982,8 +982,8 @@ namespace Network_Components
 				for(zone_itr = zones_container.begin(); zone_itr != zones_container.end (); ++zone_itr)
 				{
 					zone = (_Zone_Interface*)zone_itr->second;
-					int index = zone->internal_id<int>();
-					int uuid = zone->uuid<int>();
+					int index = zone->template internal_id<int>();
+					int uuid = zone->template uuid<int>();
 					zone_ids_container[index]=uuid;
 				}
 			}
@@ -1018,7 +1018,7 @@ namespace Network_Components
 				result<Location> location_result;
 				try
 				{
-					location_result=db->query<Location>(query<Location>::true_expr);
+					location_result=db->template query<Location>(query<Location>::true_expr);
 				}
 				catch (const odb::exception& e)
 				{

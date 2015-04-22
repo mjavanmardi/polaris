@@ -43,11 +43,11 @@ namespace Routing_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template routing_with_snapshots<bool>())
 				{
-					this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+					this_component()->template Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 				}
 				else
 				{
-					this_component()->Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
+					this_component()->template Load_Event<ComponentType>(&Compute_Route_Condition,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 				}
 			}
 
@@ -104,7 +104,7 @@ namespace Routing_Components
 
 				float best_route_time_to_destination = 0.0f;
 
-				if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 					best_route_time_to_destination = routable_network->compute_static_network_path(origin_id,destination_id,path_container,cost_container);
 				}
@@ -151,14 +151,14 @@ namespace Routing_Components
 
 			template <typename TargetType> TargetType update_increment()
 			{
-				return this->_parent_skimmer->update_increment<TargetType>();
+				return this->_parent_skimmer->template update_increment<TargetType>();
 			}
 
 			//============================================================================================
 			/// Events and event handling
 			void Schedule_Route_Computation(Simulation_Timestep_Increment time_to_depart, Simulation_Timestep_Increment planning_time)
 			{
-				this_component()->Load_Event<ComponentType>(&Compute_Route_Event_Controller,time_to_depart,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING);
+				this_component()->template Load_Event<ComponentType>(&Compute_Route_Event_Controller,time_to_depart,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING);
 			}
 			
 			static void Compute_Route_Event_Controller(ComponentType* _this,Event_Response& response)

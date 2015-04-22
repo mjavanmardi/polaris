@@ -146,7 +146,7 @@ namespace Demand_Components
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 					// perform demand reduction
-					if (GLOBALS::Uniform_RNG.Next_Rand<float>() > demand_percentage) continue;
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() > demand_percentage) continue;
 
 					trip_id = db_itr->getPrimaryKey();
 

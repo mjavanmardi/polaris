@@ -266,23 +266,23 @@ namespace Routing_Components
 		
 					Intersection_Interface* downstream_intersection = current_link->downstream_intersection<Intersection_Interface*>();
 
-					input_time_dependent_edge._x = downstream_intersection->x_position<float>();
-					input_time_dependent_edge._y = downstream_intersection->y_position<float>();
+					input_time_dependent_edge._x = downstream_intersection->template x_position<float>();
+					input_time_dependent_edge._y = downstream_intersection->template y_position<float>();
 					input_time_dependent_edge._edge_id = current_link->uuid<unsigned int>();
 
-					input_time_dependent_edge._cost = current_link->travel_time<float>();
-					input_time_dependent_edge._time_cost = current_link->travel_time<float>();
+					input_time_dependent_edge._cost = current_link->template travel_time<float>();
+					input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
 					
 					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
 					
-					if(_link_id_to_moe_data.count(current_link->dbid<int>()))
+					if(_link_id_to_moe_data.count(current_link->template dbid<int>()))
 					{
-						input_time_dependent_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->dbid<int>()]);
+						input_time_dependent_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template dbid<int>()]);
 					}
 					else
 					{
 						input_time_dependent_edge._moe_ptr = nullptr;
-						//cout << "unable to find a corresponding moe for link: " << current_link->dbid<int>() << endl;
+						//cout << "unable to find a corresponding moe for link: " << current_link->template dbid<int>() << endl;
 						//exit(0);
 					}
 
@@ -302,7 +302,7 @@ namespace Routing_Components
 					{
 						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
 
-						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->uuid<int>();
+						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->template uuid<int>();
 
 						time_dependent_to_time_dependent_connection_group->_neighbors.push_back(neighbor_id);
 
@@ -376,12 +376,12 @@ namespace Routing_Components
 		
 					Intersection_Interface* downstream_intersection = current_link->downstream_intersection<Intersection_Interface*>();
 
-					input_static_edge._x = downstream_intersection->x_position<float>();
-					input_static_edge._y = downstream_intersection->y_position<float>();
+					input_static_edge._x = downstream_intersection->template x_position<float>();
+					input_static_edge._y = downstream_intersection->template y_position<float>();
 					input_static_edge._edge_id = current_link->uuid<unsigned int>();
 
-					input_static_edge._cost = current_link->travel_time<float>();
-					input_static_edge._time_cost = current_link->travel_time<float>();
+					input_static_edge._cost = current_link->template travel_time<float>();
+					input_static_edge._time_cost = current_link->template travel_time<float>();
 					
 					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
 					
@@ -401,7 +401,7 @@ namespace Routing_Components
 					{
 						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
 
-						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->uuid<int>();
+						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->template uuid<int>();
 
 						static_to_static_connection_group->_neighbors.push_back(neighbor_id);
 
@@ -563,7 +563,7 @@ namespace Routing_Components
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 
 
-				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 
 					global_edge_id edge_lookup;

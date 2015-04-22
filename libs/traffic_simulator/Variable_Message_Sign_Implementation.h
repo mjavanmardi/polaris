@@ -14,7 +14,7 @@ namespace Variable_Message_Sign_Components
 		//{
 		//	template<typename TargetType> void Initialize(weak_ptr<polaris::io::Instance>& instance)
 		//	{
-		//		Simple_Advisory_ITS::Initialize<TargetType>();
+		//		Simple_Advisory_ITS::template Initialize<TargetType>();
 
 		//		using namespace polaris::io;
 		//		
