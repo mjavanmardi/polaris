@@ -156,7 +156,7 @@ namespace Network_Components
 				//TODO: remove when complete
 				//if (Start_Time > GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,TimeType>((END)*2.0) || Start_Time < 0)
 				//{
-				//	THROW_EXCEPTION("Error: invalid start time specified for determining LOS: start="<<Start_Time<<", Origin="<<Origin->uuid<int>()<<", dest="<<Destination->uuid<int>());
+				//	THROW_EXCEPTION("Error: invalid start time specified for determining LOS: start="<<Start_Time<<", Origin="<<Origin->template uuid<int>()<<", dest="<<Destination->template uuid<int>());
 				//}
 
 
@@ -349,7 +349,7 @@ namespace Network_Components
 				
 				int size = (int)locations->size();
 
-                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+                int loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * size);
 
 				TargetType return_loc = (TargetType)locations->at(loc_index);
 

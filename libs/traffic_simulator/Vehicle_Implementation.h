@@ -300,7 +300,7 @@ namespace Vehicle_Components
 						routed_travel_time = next_routed_travel_time;
 
 						current_travel_time += next_link_travel_time<float>();
-						//if (current_travel_time >= 36000) cout <<"Next link id: " << next_link->uuid<int>()<<". Next link travel time: " << next_link_travel_time<float>()<<", routed time = "<<diff<<", delay ratio: " << (float)current_travel_time / (float)routed_travel_time<<endl;
+						//if (current_travel_time >= 36000) cout <<"Next link id: " << next_link->template uuid<int>()<<". Next link travel time: " << next_link_travel_time<float>()<<", routed time = "<<diff<<", delay ratio: " << (float)current_travel_time / (float)routed_travel_time<<endl;
 					}
 
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
@@ -385,11 +385,11 @@ namespace Vehicle_Components
 
 					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() &&
 						(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() /*&&
-						( mp->estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>()*/)
+						( mp->template estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>()*/)
 					{
 						//cout << "switched: " << current_travel_time << " vs " << routed_travel_time << endl;
 
-						double r0 = Uniform_RNG.Next_Rand<double>();
+						double r0 = Uniform_RNG.template Next_Rand<double>();
 
 						if(r0 <= ((_Scenario_Interface*)_global_scenario)->template enroute_excessive_delay_factor<float>())
 						{
@@ -405,7 +405,7 @@ namespace Vehicle_Components
 
 					if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
 					{///case 1: with realtime information
-						double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+						double r1 = Uniform_RNG.template Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
 						if (r1 <= _information_compliance_rate) 
 						{
 							enroute_switching_decision = true;
@@ -414,7 +414,7 @@ namespace Vehicle_Components
 					}
 					else if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
 					{///case 2: no realtime information
-						double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+						double r1 = Uniform_RNG.template Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
 						if (r1 <= _information_compliance_rate)
 						{
 
@@ -736,13 +736,13 @@ namespace Vehicle_Components
 
 				float best_route_time_to_destination = 0.0f;
 
-				//if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				//if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				//{
-					best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),path_container,cumulative_cost_container);
+					best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->template uuid<int>(),destination_link->template uuid<int>(),path_container,cumulative_cost_container);
 				//}
 				//else
 				//{
-				//	best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),iteration(),path_container,cumulative_cost_container);
+				//	best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_link->template uuid<int>(),destination_link->template uuid<int>(),iteration(),path_container,cumulative_cost_container);
 				//}
 
 
@@ -753,7 +753,7 @@ namespace Vehicle_Components
 					if (path_container.size() == 0)
 					{
 						//THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-						THROW_EXCEPTION("no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>() << endl);
+						THROW_EXCEPTION("no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>() << endl);
 					}
 					
 					//This code doesn't reliably verify that the path is new
@@ -841,9 +841,9 @@ namespace Vehicle_Components
 						//		
 						//			cost_sum+=current;
 
-						//			cout << link->uuid<int>() << " to " << next_link->uuid<int>() << "," << cost_sum << "," << current << endl;
+						//			cout << link->template uuid<int>() << " to " << next_link->template uuid<int>() << "," << cost_sum << "," << current << endl;
 
-						//			cout << regular_movement->inbound_link<_Link_Interface*>()->uuid<int>() << " to " << regular_movement->outbound_link<_Link_Interface*>()->uuid<int>() << "," << regular_movement->template forward_link_turn_travel_time<float>() << endl;
+						//			cout << regular_movement->inbound_link<_Link_Interface*>()->template uuid<int>() << " to " << regular_movement->outbound_link<_Link_Interface*>()->template uuid<int>() << "," << regular_movement->template forward_link_turn_travel_time<float>() << endl;
 
 						//			cout << "Outbound turn movements summary: " << endl;
 
@@ -853,7 +853,7 @@ namespace Vehicle_Components
 						//			{
 						//				Movement<typename MasterType::turn_movement_type>* current_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
 
-						//				cout << current_movement->inbound_link<_Link_Interface*>()->uuid<int>() << "," << current_movement->outbound_link<_Link_Interface*>()->uuid<int>() << "," << current_movement->forward_link_turn_travel_time<float>() << endl;
+						//				cout << current_movement->inbound_link<_Link_Interface*>()->template uuid<int>() << "," << current_movement->outbound_link<_Link_Interface*>()->template uuid<int>() << "," << current_movement->template forward_link_turn_travel_time<float>() << endl;
 						//			}
 						//		}
 						//	}
@@ -890,7 +890,7 @@ namespace Vehicle_Components
 						//		
 						//			cost_sum+=current;
 
-						//			cout << route_link->uuid<int>() << " to " << next_route_link->uuid<int>() << "," << cost_sum << "," << current << endl;
+						//			cout << route_link->template uuid<int>() << " to " << next_route_link->template uuid<int>() << "," << cost_sum << "," << current << endl;
 						//		}
 						//	}
 						}
@@ -910,7 +910,7 @@ namespace Vehicle_Components
 				//	if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 				//	{
 				//		THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-				//		THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+				//		THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
 				//	}
 				//	
 				//	typename _Reversed_Path_Container_Interface::iterator itr;
@@ -960,7 +960,7 @@ namespace Vehicle_Components
 				//_rng_stream.SetSeed(seed);
 				double r1;
 				///information capability
-				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
+				r1 = Uniform_RNG.template Next_Rand<double>();//_rng_stream.RandU01();
 				if (r1 <= ((_Scenario_Interface*)_global_scenario)->template realtime_informed_vehicle_market_share<double>())
 				{
 					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION;
@@ -975,7 +975,7 @@ namespace Vehicle_Components
 				_information_compliance_rate = r1;
 
 				///rib
-				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
+				r1 = Uniform_RNG.template Next_Rand<double>();//_rng_stream.RandU01();
 				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_band_route_choice_mean<double>();
 				double a = 0.0;
 				double b = 2.0*mean;
@@ -983,7 +983,7 @@ namespace Vehicle_Components
 				_relative_indifference_band_route_choice = rib;
 
 				///mtts
-				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
+				r1 = Uniform_RNG.template Next_Rand<double>();//_rng_stream.RandU01();
 				mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
 				a = 0.5 * mean;
 				b = a + 2.0*mean;

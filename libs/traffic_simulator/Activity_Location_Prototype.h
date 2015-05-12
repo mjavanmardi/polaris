@@ -88,7 +88,7 @@ namespace Activity_Location_Components
 			{
 				// Location is routable only if it has a valid origin/destination link and is not a transit stop
 				bool routable_location = Has_Valid_Origin_Link<NT>() /*&& Has_Valid_Destination_Link<NT>()*/ && land_use_type<Types::LAND_USE>() != Types::TRANSIT_STOP && land_use_type<Types::LAND_USE>() != Types::LU_NONE;
-				//if (!routable_location) cout << "Warning: location id "<<this->uuid<int>() <<", is not a routable activity location."<<endl;
+				//if (!routable_location) cout << "Warning: location id "<<this->template uuid<int>() <<", is not a routable activity location."<<endl;
 				return routable_location;
 			}
 			template<typename TargetType> bool is_work_location()
@@ -109,8 +109,8 @@ namespace Activity_Location_Components
 
 			template<typename LocationType, typename DistanceType> DistanceType distance(LocationType from_loc, requires(LocationType,check(LocationType, is_pointer)))
 			{
-				DistanceType x1 = from_loc->x_position<DistanceType>();
-				DistanceType y1 = from_loc->y_position<DistanceType>();
+				DistanceType x1 = from_loc->template x_position<DistanceType>();
+				DistanceType y1 = from_loc->template y_position<DistanceType>();
 
 				DistanceType x2 = x_position<DistanceType>();
 				DistanceType y2 = y_position<DistanceType>();

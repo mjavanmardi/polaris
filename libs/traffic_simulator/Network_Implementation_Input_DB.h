@@ -326,7 +326,7 @@ namespace Network_Components
 
 				turn_movement->template inbound_link<_Link_Interface*>(link);
 
-				int target_intersection_id=((_Intersection_Interface&)link->template downstream_intersection<_Intersection_Interface&>() ).internal_id<int>();
+				int target_intersection_id=((_Intersection_Interface&)link->template downstream_intersection<_Intersection_Interface&>() ).template internal_id<int>();
 
 
 				link_id_dir.id=db_itr->getTo_Link()->getLink();
@@ -336,7 +336,7 @@ namespace Network_Components
 				{
 					link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
-					if(((_Intersection_Interface&)link->template upstream_intersection<_Intersection_Interface&>() ).internal_id<int>()!=target_intersection_id)
+					if(((_Intersection_Interface&)link->template upstream_intersection<_Intersection_Interface&>() ).template internal_id<int>()!=target_intersection_id)
 					{
 						link_id_dir.dir=1;
 						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));

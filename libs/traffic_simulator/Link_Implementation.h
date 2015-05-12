@@ -445,15 +445,15 @@ namespace Link_Components
 					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
 
 
-					turn_movement->update_state<NT>();
+					turn_movement->template update_state<NT>();
 					
 					int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 
 					//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 					{	
-						float cost_update = turn_movement->forward_link_turn_travel_time<float>();
+						float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
 
-						//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->dbid<int>() == 85584)
+						//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
 						//{
 						//	cout << cost_update << endl;
 						//}
@@ -518,7 +518,15 @@ namespace Link_Components
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
 					
-					if(vehicle->is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					// decrement the in-network vehicles counter
+					if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
+					{
+						if(vehicle->template is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					}
+					else
+					{
+						((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					}
 					
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
 					
@@ -606,7 +614,7 @@ namespace Link_Components
 
 						if (link_origin_departed_flow_allowed>0.0)
 						{//partial vehicle
-							double rng = Uniform_RNG.Next_Rand<double>();//rng_stream.RandU01();
+							double rng = Uniform_RNG.template Next_Rand<double>();//rng_stream.RandU01();
 							if(rng<=link_origin_departed_flow_allowed)
 							{//partial vehicle, incomplete implementation
 								++num_link_origin_departed_vehicles_allowed;
@@ -650,7 +658,13 @@ namespace Link_Components
 
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
 
-					if(vehicle->is_integrated<bool>())
+
+					// increment the in-network vehicles counter
+					if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
+					{
+						if(vehicle->template is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
+					}
+					else
 					{
 						((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
 					}

@@ -39,7 +39,7 @@ namespace Zone_Components
 				_this_interface* pthis = (_this_interface*)this;
 				pthis->update_increment<Time_Minutes>(2);
 
-				((ComponentType*)this)->Load_Event<ComponentType>(&Default_Zone_Conditional,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0);		
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Default_Zone_Conditional,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0);		
 			}
 			static void Default_Zone_Conditional(ComponentType* _this,Event_Response& response)
 			{
@@ -53,7 +53,7 @@ namespace Zone_Components
 
 			void Default_Zone_Event()
 			{
-				//cout <<endl<<"Productions= " << this->production_count<int>() << ", Attractions= " << this->attraction_count<int>();
+				//cout <<endl<<"Productions= " << this->template production_count<int>() << ", Attractions= " << this->template attraction_count<int>();
 				for (uint i=0; i < num_sim_threads()+1; i++)
 				{
 					((ComponentType*)this)->production_counter[i]=0;

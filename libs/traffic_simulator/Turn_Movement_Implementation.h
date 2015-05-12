@@ -286,7 +286,7 @@ namespace Turn_Movement_Components
 				{
 					if(transfer_flow_turn_movement > 0.0)
 					{
-						double rng = Uniform_RNG.Next_Rand<double>();//rng_stream.RandU01();
+						double rng = Uniform_RNG.template Next_Rand<double>();//rng_stream.RandU01();
 						if(rng<=transfer_flow_turn_movement)
 						{//partial vehicle, incomplete implementation
 							++num_transfer_vehicles_of_turn_movement;
@@ -306,6 +306,13 @@ namespace Turn_Movement_Components
 					push_vehicles_to_outbound_link<NULLTYPE>(num_transfer_vehicles_of_turn_movement);
 					//float delay=_outbound_link_arrived_time_based_experienced_link_turn_travel_delay/((float)num_transfer_vehicles_of_turn_movement);
 					//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
+
+					// reset vehicle intersection delays for the link to zero, once it starts moving again
+					for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+					{
+						_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
+						vehicle->template movement_plan<_Movement_Plan_Interface*>()->template set_current_link_intersection_delay<int>(0);
+					}
 				}
 				else
 				{
@@ -327,6 +334,14 @@ namespace Turn_Movement_Components
 								t_minus_one = (current_simulation_interval_index-1)%((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 								float delay = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() + _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_minus_one];
 								_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = delay;
+
+								// update vehicles currently being delayed by the signal
+								
+								for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+								{
+									_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
+									vehicle->template movement_plan<_Movement_Plan_Interface*>()->template update_current_link_intersection_delay<int>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+								}
 							}
 							else
 							{
@@ -347,6 +362,9 @@ namespace Turn_Movement_Components
 
 					//update vehicle state: transfer to next link
 					int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
+					// set the intersection delay experience by the vehicle
+					//vehicle->template movement_plan<_Movement_Plan_Interface*>()->template set_current_link_intersection_delay<int>(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+
 					//int delayed_time = max(0, int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
 					//int delayed_time = max(0, (int)((float)iteration() - (float)enter_time - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
 					int delayed_time = max(0,    (int)ceil(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<float>() - (float)enter_time - ((_Link_Interface*)_inbound_link)->template link_fftt<float>())   );
@@ -457,7 +475,7 @@ namespace Turn_Movement_Components
                     float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;
                     Di = max(Di, 0.0f);
                     signal_control_penalty = max(8.0f, Du + Di);
-					//if(((_link_component_type*)_inbound_link)->uuid<int>() == 104) cout << _movement_transferred << endl;
+					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
                 }
                 _turn_travel_penalty += signal_control_penalty;
 

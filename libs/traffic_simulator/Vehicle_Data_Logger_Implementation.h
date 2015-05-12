@@ -73,7 +73,7 @@ namespace Vehicle_Components
 					int logging_time=0;
 					this->_infile.Read_Value(logging_time);
 					this->Next_Logging_Time<Simulation_Timestep_Increment>(logging_time);
-					this->Load_Event<ComponentType>(&Reading_Event_Controller,logging_time,0);
+					this->template Load_Event<ComponentType>(&Reading_Event_Controller,logging_time,0);
 
 					// open input index and read in
 					stringstream idx_name("");
@@ -85,7 +85,7 @@ namespace Vehicle_Components
 					{
 						int time;
 						long long bytes;
-						this->_in_index_file.Get_Data<int>(time,0);
+						this->_in_index_file.template Get_Data<int>(time,0);
 						this->_in_index_file.Get_Data<long long>(bytes,1);
 						if ((idx_itr = this->index.find(time)) == this->index.end())
 						{
@@ -105,7 +105,7 @@ namespace Vehicle_Components
 					this->_outfile.Write_Value(first_time);
 					this->_bytes_written += sizeof(int);
 					
-					this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
+					this->template Load_Event<ComponentType>(&Logging_Event_Controller,first_time,0);
 
 					// open output index
 					stringstream idx_name("");
@@ -122,7 +122,7 @@ namespace Vehicle_Components
 			{
 				typedef typename MasterType::visual_vehicle_type vehicle_interface;
 				_vehicle_layer = Allocate<typename MasterType::visual_vehicle_type>();
-				_vehicle_layer->Initialize<NT>(iter);
+				_vehicle_layer->template Initialize<NT>(iter);
 			}
 			template<typename LayerType> void Initialize_Layer(int iter, requires(LayerType,check_2(strip_modifiers(LayerType),NT,is_same)))
 			{
@@ -161,8 +161,8 @@ namespace Vehicle_Components
 			{
 				typedef typename MasterType::vehicle_data_logger_type this_type;
 				cout << "Rescheduling the logging to new iteration: "<<new_iteration<<endl;
-				((this_type*)obj)->Reschedule<ComponentType>(new_iteration,0);
-				((this_type*)obj)->_vehicle_layer->Reschedule_Execution<NT>(new_iteration);
+				((this_type*)obj)->template Reschedule<ComponentType>(new_iteration,0);
+				((this_type*)obj)->_vehicle_layer->template Reschedule_Execution<NT>(new_iteration);
 			}
 
 			static void Logging_Event_Controller(ComponentType* _this,Event_Response& response)
@@ -184,13 +184,13 @@ namespace Vehicle_Components
 
 					response.next._iteration = iteration();
 					response.next._sub_iteration = 1;
-					pthis->Write_Data_To_File_Event<NT>();
+					pthis->template Write_Data_To_File_Event<NT>();
 				}
 				else if (sub_iteration() < (int)num_sim_threads())
 				{
 					response.next._iteration = iteration();
 					response.next._sub_iteration = sub_iteration()+1;
-					pthis->Write_Data_To_File_Event<NT>();
+					pthis->template Write_Data_To_File_Event<NT>();
 				}
 				else
 				{
@@ -212,7 +212,7 @@ namespace Vehicle_Components
 				// swap buffer and current for output strings and trip records
 				if(sub_iteration() == 0)
 				{				
-					pthis->Read_Data_From_File_Event<NT>();
+					pthis->template Read_Data_From_File_Event<NT>();
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
 				}
@@ -240,18 +240,18 @@ namespace Vehicle_Components
 				{
 					// first log the iteration number in the snapshot file, for validation purposes
 					int iter = iteration();
-					this->_outfile.Write_Value<int>(iter);
+					this->_outfile.template Write_Value<int>(iter);
 					this->_bytes_written += sizeof(int);
 
 					// next, log the size of the block to be written for this timestep, so it can be read in as one block of data later
 					int size=0;
 					for (int j=0; j<(int)num_sim_threads();++j) size += current[j].size();
-					this->_outfile.Write_Value<int>(size);
+					this->_outfile.template Write_Value<int>(size);
 					this->_bytes_written += sizeof(int);
 				}
 
 				// write out strings in the current buffer to log file and clear it
-				if (current[i].size()) this->_outfile.Write_Array<float>(&(current[i])[0],current[i].size());
+				if (current[i].size()) this->_outfile.template Write_Array<float>(&(current[i])[0],current[i].size());
 				this->_bytes_written += sizeof(float) * current[i].size();
 
 				current[i].clear();
@@ -290,11 +290,11 @@ namespace Vehicle_Components
 				if (size > 0)
 				{
 					values = new float[size];
-					this->_infile.Read_Array<float>(values,size);
+					this->_infile.template Read_Array<float>(values,size);
 
 					/*typedef typename MasterType::visual_vehicle_type vehicle_interface;
 					vehicle_interface* veh_itf = (vehicle_interface*)Allocate<typename MasterType::visual_vehicle_type>();*/
-					_vehicle_layer->Update<NT>(size,values);
+					_vehicle_layer->template Update<NT>(size,values);
 				}
 			}
 			template<typename TargetType> void Read_Data_From_File_Event(requires(TargetType,check_2(typename MasterType::visual_vehicle_type,NT,is_same)))

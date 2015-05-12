@@ -34,6 +34,7 @@ namespace Scenario_Components
 			m_data(int, num_threads, NONE, NONE);
 
 			m_data(double, demand_reduction_factor, NONE, NONE);
+			m_data(bool, count_integrated_in_network_vehicles_only, NONE, NONE);
 
 			m_data(int, planning_horizon, NONE, NONE);
 			m_data(int, num_simulation_intervals, NONE, NONE);
@@ -50,6 +51,7 @@ namespace Scenario_Components
 				
 			m_data(string, vehicle_trajectory_file_name, NONE, NONE);
 			m_data(fstream, vehicle_trajectory_file, NONE, NONE);
+			m_data(double, vehicle_trajectory_sample_rate, NONE, NONE);
 
 			m_data(string, routed_path_file_name, NONE, NONE);
 			m_data(fstream, routed_path_file, NONE, NONE);
@@ -212,6 +214,8 @@ namespace Scenario_Components
 			m_data(string, tile_imagery_file, NONE, NONE);
 			m_data(bool, use_tile_imagery, NONE, NONE);
 			m_data(int, tile_imagery_alpha_level, NONE, NONE);
+
+			m_data(double, accident_event_duration_reduction, NONE, NONE);
 
 			Scenario_Implementation()
 			{

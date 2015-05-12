@@ -21,6 +21,7 @@ namespace Movement_Plan_Components
 			m_data(int, enter_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, enter_interval_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, estimated_link_accepting_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, intersection_delay_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic)); 
 			
 			m_prototype(Null_Prototype,typename MasterType::link_type, link, NONE, NONE);
 
@@ -29,6 +30,7 @@ namespace Movement_Plan_Components
 				_link = (Null_Prototype<typename MasterType::link_type>*)(type_of(link)*)link_val;
 				_enter_time = 0.0;
 				_delayed_time=0.0;
+				_intersection_delay_time=0.0;
 			}
 
 		};
@@ -203,7 +205,7 @@ namespace Movement_Plan_Components
 				}
 
 				// copy valid movement at time of creation
-				_valid_trajectory = move->valid_trajectory<bool>();
+				_valid_trajectory = move->template valid_trajectory<bool>();
 
 				// copy pointer to the activity reference from original movement plan
 				_destination_activity_reference = move->destination_activity_reference<destination_activity_reference_interface*>();

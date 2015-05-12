@@ -1181,7 +1181,7 @@ namespace Intersection_Control_Components
 				//TODO
 //load_event(ComponentType,Newells_Conditional,Compute_Step_Control,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION,NULLTYPE);
 			
-				this_component()->Load_Event<ComponentType>(&Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION);
+				this_component()->template Load_Event<ComponentType>(&Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION);
 			}
 
 			static void Newells_Conditional(ComponentType* _this,Event_Response& response)
@@ -1196,7 +1196,7 @@ namespace Intersection_Control_Components
 				{
 					//_pthis->Swap_Event((Event)&Intersection_Control::Compute_Step_Control<NULLTYPE>);
 					
-					_this_ptr->Compute_Step_Control<NULLTYPE>();
+					_this_ptr->template Compute_Step_Control<NULLTYPE>();
 					
 					//response.result=true;
 					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();

@@ -32,6 +32,7 @@ namespace Movement_Plan_Components
 			accessor(enter_time, NONE, NONE);
 			accessor(enter_interval_index, NONE, NONE);
 			accessor(estimated_link_accepting_time, NONE, NONE);
+			accessor(intersection_delay_time, NONE, NONE);
 			template<typename TargetType> TargetType exit_time()
 			{
 				return (TargetType)(enter_time<int>() + delayed_time<float>());
@@ -112,7 +113,7 @@ namespace Movement_Plan_Components
 				typedef  Activity_Location_Components::Prototypes::Activity_Location< typename get_type_of(origin_location)> _Location_Interface;
 				_Location_Interface* origin_loc = this->origin<_Location_Interface*>();
 
-				return origin_loc->zone<TargetType>();
+				return origin_loc->template zone<TargetType>();
 			}
 			/*template<typename TargetType> void destination(TargetType zone, requires(TargetType,check(strip_modifiers(TargetType),Zone_Components::Concepts::Is_Zone)))
 			{
@@ -123,14 +124,14 @@ namespace Movement_Plan_Components
 				typedef  Activity_Location_Components::Prototypes::Activity_Location< typename get_type_of(origin_location)> _Location_Interface;
 				_Location_Interface* dest_loc = this->destination<_Location_Interface*>();
 
-				return dest_loc->zone<TargetType>();
+				return dest_loc->template zone<TargetType>();
 			}
 
 #ifndef EXCLUDE_DEMAND 
 			define_feature_exists_check(Initialize, Initialize_exists);
 			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType,Initialize_exists)))
 			{
-				this_component()->Initialize<TargetType>();
+				this_component()->template Initialize<TargetType>();
 			}
 			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Initialize_exists)))
 			{
@@ -138,7 +139,7 @@ namespace Movement_Plan_Components
 			}
 			template<typename TargetType> void Initialize(TargetType movement_to_copy, requires(TargetType,check(ComponentType,Initialize_exists)))
 			{
-				this_component()->Initialize<TargetType>(movement_to_copy);
+				this_component()->template Initialize<TargetType>(movement_to_copy);
 			}
 			template<typename TargetType> void Initialize(TargetType movement_to_copy, requires(TargetType,!check(ComponentType,Initialize_exists)))
 			{
@@ -195,7 +196,7 @@ namespace Movement_Plan_Components
 				//{
 				//	Trajectory_Unit_Interface* trajectory_unit = (Trajectory_Unit_Interface*)(*itr);
 
-				//	paths << trajectory_unit->link<Link_Interface*>()->uuid<int>() << ":" << trajectory_unit->estimated_link_accepting_time<int>() << ", ";
+				//	paths << trajectory_unit->link<Link_Interface*>()->template uuid<int>() << ":" << trajectory_unit->template estimated_link_accepting_time<int>() << ", ";
 				//}
 
 				//paths << endl;
@@ -412,6 +413,21 @@ namespace Movement_Plan_Components
 				return (TargetType)current_trajectory_position<_Trajectory_Unit_Interface*>()->template enter_time<TargetType>();
 			}
 
+			template<typename TargetType> void update_current_link_intersection_delay(int intersection_delay)
+			{
+				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+
+				current_trajectory_position<_Trajectory_Unit_Interface*>()->template intersection_delay_time<int&>() += intersection_delay;
+			}
+
+			template<typename TargetType> void set_current_link_intersection_delay(int intersection_delay)
+			{
+				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+
+				current_trajectory_position<_Trajectory_Unit_Interface*>()->template intersection_delay_time<int>(intersection_delay);
+			}
 			template<typename TargetType> int get_route_link_exit_time(int trajectory_unit_index)
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;

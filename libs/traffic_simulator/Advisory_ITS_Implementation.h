@@ -32,7 +32,7 @@ namespace Advisory_ITS_Components
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
 							_covered_links.push_back( (Link_Interface*)(*vitr) );
-							//if(flag) cout << "pushing HAR to: " << ((Link_Interface*)(*vitr))->internal_id<int>();
+							//if(flag) cout << "pushing HAR to: " << ((Link_Interface*)(*vitr))->template internal_id<int>();
 							((Link_Interface*)(*vitr))->template Push_ITS< ComponentType* >( (ComponentType*)this);
 						}
 					}

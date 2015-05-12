@@ -20,22 +20,22 @@ namespace Advisory_Radio_Components
 		//	
 		//	template<typename TargetType> static void Initialize_Type(TargetType configuration)
 		//	{
-		//		ComponentType::Initialize_Type<TargetType>(configuration);
+		//		ComponentType::template Initialize_Type<TargetType>(configuration);
 		//	}
 		//	
 		//	template<typename TargetType> void Initialize(TargetType configuration)
 		//	{
-		//		ComponentType::Initialize<TargetType>(configuration);
+		//		ComponentType::template Initialize<TargetType>(configuration);
 		//	}
 		//	
 		//	template<typename TargetType> void Push_Network_Events(boost::container::vector<Network_Event<TargetType,NT>*>& network_events)
 		//	{
-		//		this_component()->Accept_Network_Events<TargetType>(network_events);
+		//		this_component()->template Accept_Network_Events<TargetType>(network_events);
 		//	}
 
 		//	template<typename TargetType> void Get_Messages(boost::container::vector<Network_Event<TargetType>*>& bucket)
 		//	{
-		//		this_component()->Get_Messages<TargetType>(bucket);
+		//		this_component()->template Get_Messages<TargetType>(bucket);
 		//	}
 
 		//	accessor(x_position, NONE, NONE);

@@ -76,6 +76,12 @@ public:
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
 
+	const int& getSchool_Location_Id () const {return school_location_id;}
+	void setSchool_Location_Id (const int& school_location_id_) {school_location_id = school_location_id_;}
+
+	const int& getWork_Location_Id () const {return work_location_id;}
+	void setWork_Location_Id (const int& work_location_id_) {work_location_id = work_location_id_;}
+
 	const int& getAge () const {return age;}
 	void setAge (const int& age_) {age = age_;}
 
@@ -134,6 +140,8 @@ private:
 	#pragma db id auto
 	unsigned int person;
 	int id;
+	int school_location_id;
+	int work_location_id;
 	int age;
 	int worker_class;
 	int education;

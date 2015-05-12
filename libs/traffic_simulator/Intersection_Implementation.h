@@ -339,7 +339,7 @@ namespace Intersection_Components
 
 				_Link_Interface* link = (_Link_Interface*)_inbound_link_reference;
 				
-				int num_lanes = link->num_lanes<int>();
+				int num_lanes = link->template num_lanes<int>();
 				
 				// skip non-arterial/local links
 
@@ -380,21 +380,21 @@ namespace Intersection_Components
 					{
 						outbound_movement=(_Movement_Interface*)(*outbound_itr);
 						
-						total_demand += outbound_movement->movement_demand<float>();
+						total_demand += outbound_movement->template movement_demand<float>();
 
 						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
 						if(type == U_TURN || type == LEFT_TURN)
 						{
-							left_demand += outbound_movement->movement_demand<float>();
+							left_demand += outbound_movement->template movement_demand<float>();
 						}
 						else if(type == RIGHT_TURN)
 						{
-							right_demand += outbound_movement->movement_demand<float>();
+							right_demand += outbound_movement->template movement_demand<float>();
 						}
 						else if(type == THROUGH_TURN)
 						{
-							through_demand += outbound_movement->movement_demand<float>();
+							through_demand += outbound_movement->template movement_demand<float>();
 						}
 					}
 
@@ -420,7 +420,7 @@ namespace Intersection_Components
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
 
 							// movement gets fraction of capacity proportional to fraction of demand
-							movement_supply = outbound_movement->movement_supply<float>();
+							movement_supply = outbound_movement->template movement_supply<float>();
 
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
@@ -428,19 +428,19 @@ namespace Intersection_Components
 
 							if(type == THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->movement_demand<float>() / total_demand ) ));
+								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, total_capacity * ( outbound_movement->movement_demand<float>() / total_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) )));
 							}
 
-							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( total_capacity * ( outbound_movement->movement_demand<float>() / total_demand));
-							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=total_demand)
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand));
+							//if(movement_supply < outbound_movement->template movement_supply<float>() && movement_supply!=0.0f && outbound_movement->template movement_demand<float>()!=total_demand)
 							//{
-							//	cout << "Left and Right Missing: " << outbound_movement->movement_supply<float>() << "," << total_capacity << "," << outbound_movement->movement_demand<float>() << "," << total_demand << "," << movement_supply << endl;
+							//	cout << "Left and Right Missing: " << outbound_movement->template movement_supply<float>() << "," << total_capacity << "," << outbound_movement->template movement_demand<float>() << "," << total_demand << "," << movement_supply << endl;
 							//}
-							outbound_movement->movement_supply<float>(movement_supply);
+							outbound_movement->template movement_supply<float>(movement_supply);
 						}
 					}
 					else if(!pocket_data->num_pockets_right)
@@ -464,26 +464,26 @@ namespace Intersection_Components
 							}
 
 							// movement gets fraction of capacity proportional to fraction of demand
-							movement_supply = outbound_movement->movement_supply<float>();
+							movement_supply = outbound_movement->template movement_supply<float>();
 								
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
 							if(type == THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) ));
+								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
 							}
 
-							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand));
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));
 
-							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=shared_demand)
+							//if(movement_supply < outbound_movement->template movement_supply<float>() && movement_supply!=0.0f && outbound_movement->template movement_demand<float>()!=shared_demand)
 							//{
-							//	cout << "Right Missing: " << outbound_movement->movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
+							//	cout << "Right Missing: " << outbound_movement->template movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->template movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
 							//}
-							outbound_movement->movement_supply<float>(movement_supply);
+							outbound_movement->template movement_supply<float>(movement_supply);
 						}
 					}
 					else if(!pocket_data->num_pockets_left)
@@ -504,26 +504,26 @@ namespace Intersection_Components
 							}
 
 							// movement gets fraction of capacity proportional to fraction of demand
-							movement_supply = outbound_movement->movement_supply<float>();
+							movement_supply = outbound_movement->template movement_supply<float>();
 							
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 							if(type == THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) ));
+								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
 							}
 							
-							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->movement_demand<float>() / shared_demand));
+							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));
 
-							//if(movement_supply < outbound_movement->movement_supply<float>() && movement_supply!=0.0f && outbound_movement->movement_demand<float>()!=shared_demand)
+							//if(movement_supply < outbound_movement->template movement_supply<float>() && movement_supply!=0.0f && outbound_movement->template movement_demand<float>()!=shared_demand)
 							//{
-							//	cout << "Left Missing: " << outbound_movement->movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
+							//	cout << "Left Missing: " << outbound_movement->template movement_supply<float>() << "," << shared_capacity << "," << outbound_movement->template movement_demand<float>() << "," << shared_demand << "," << movement_supply << endl;
 							//}
 
-							outbound_movement->movement_supply<float>(movement_supply);
+							outbound_movement->template movement_supply<float>(movement_supply);
 						}
 					}
 				}
@@ -872,7 +872,7 @@ namespace Intersection_Components
 					inbound_link_component->realtime_link_moe_data.link_travel_delay = avg_turn_penalty / 60.0f;
 					//link travel time
 					inbound_link_component->realtime_link_moe_data.link_travel_time = (inbound_link_component->_link_fftt + avg_turn_penalty) /60.0f;
-					inbound_link->calculate_moe_for_simulation_interval<NULLTYPE>();
+					inbound_link->template calculate_moe_for_simulation_interval<NULLTYPE>();
 				}
 			}
 
@@ -929,7 +929,7 @@ namespace Intersection_Components
 					}
 					inbound_link_component->link_moe_data.link_travel_delay = avg_turn_penalty;
 					inbound_link_component->link_moe_data.link_travel_delay_standard_deviation = avg_turn_penalty_standard_deviation;
-					inbound_link->calculate_moe_for_assignment_interval<NULLTYPE>();
+					inbound_link->template calculate_moe_for_assignment_interval<NULLTYPE>();
 				}
 			}
 			
@@ -955,7 +955,7 @@ namespace Intersection_Components
 						{
 							float current_distance = ((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>();
 							float new_distance = max(0.0f,(current_distance - travel_distance));
-							//((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>(new_distance); 
+							((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>(new_distance); 
 							((_Vehicle_Interface*)(*vehicle_itr))->template local_speed<float>(link_speed);
 						}
 					}

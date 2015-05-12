@@ -88,7 +88,7 @@ namespace Zone_Components
 			accessor(update_increment, NONE, NONE);
 			template<typename TargetType> void Initialize()
 			{
-				this_component()->Initialize<TargetType>();
+				this_component()->template Initialize<TargetType>();
 			}
 			template<typename TargetType> TargetType Get_Random_Location(TargetType excluded_location=nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
@@ -99,7 +99,7 @@ namespace Zone_Components
 				
 				int size = (int)locations->size();
 
-                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+                int loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * size);
 
 				TargetType return_loc = locations->at(loc_index);
 
@@ -129,7 +129,7 @@ namespace Zone_Components
 				int size = (int)locations->size();
 				if (size == 0) return nullptr;
 
-                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+                int loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * size);
 				return locations->at(loc_index);
 			}
 			template<typename TargetType> TargetType Get_Random_School_Location(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
@@ -142,7 +142,7 @@ namespace Zone_Components
 				int size = (int)locations->size();
 				if (size == 0) return nullptr;
 
-                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+                int loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * size);
 				return locations->at(loc_index);
 			}
 			
@@ -159,7 +159,7 @@ namespace Zone_Components
 			template<typename TargetType> TargetType Parking_Cost(requires(TargetType,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Currency_Value)))
 			{
 				Basic_Units::Currency_Variables::Dollars auto_parking_cost;
-				int id = this->uuid<int>();
+				int id = this->template uuid<int>();
 				if (areatype<int>() == 1) auto_parking_cost = 15.0;
 				else if (areatype<int>() == 2) auto_parking_cost = 5.0;
 				else if (areatype<int>() == 3) auto_parking_cost = 1.5;
@@ -171,19 +171,19 @@ namespace Zone_Components
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total
             template<typename T> void production_count(T count)
 			{
-				this_component()->production_count<T>(count);
+				this_component()->template production_count<T>(count);
 			}
 			template<typename T> T production_count()
 			{
-				return this_component()->production_count<T>();
+				return this_component()->template production_count<T>();
 			}
 			template<typename T> void attraction_count(T count)
 			{
-				this_component()->attraction_count<T>(count);
+				this_component()->template attraction_count<T>(count);
 			}
 			template<typename T> T attraction_count()
 			{
-				return this_component()->attraction_count<T>();
+				return this_component()->template attraction_count<T>();
 			}
 
 			accessor(employment_simulated, NONE, NONE);

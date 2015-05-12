@@ -166,7 +166,7 @@ namespace Person_Components
 
 				// Create and Initialize the vehicle		
 				_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
-				_vehicle->template uuid<int>(id);
+				_vehicle->template uuid<int>(this->_Household->uuid<int>()*100 + id);
 				_vehicle->template internal_id<int>(id);
 				_vehicle->template traveler<ComponentType*>(this);
 				_vehicle->template router<router_interface*>(_router);

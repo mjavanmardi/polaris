@@ -291,13 +291,15 @@ namespace Person_Components
 					//H = home->template uuid<int>();
 					//if(is_external_internal_trip(O,D,H)) 
 					//{
-					//	int new_origin = get_nearest_external_location<zone_itf*>(orig);
-					//	Push_To_Demand_Database<TargetType>(act_record, new_origin);
+					//	//int new_origin = get_nearest_external_location<zone_itf*>(orig);
+					//	//Push_To_Demand_Database<TargetType>(act_record, new_origin);
+					//	Push_To_Demand_Database<TargetType>(act_record);
 					//}
 					//else if (is_internal_external_trip(O,D,H))
 					//{
-					//	int new_destination = get_nearest_external_location<zone_itf*>(dest);
-					//	Push_To_Demand_Database<TargetType>(act_record, -1, new_destination);
+					//	//int new_destination = get_nearest_external_location<zone_itf*>(dest);
+					//	//Push_To_Demand_Database<TargetType>(act_record, -1, new_destination);
+					//	Push_To_Demand_Database<TargetType>(act_record);
 					//}
 				}
 				//----------------------------------------------------------

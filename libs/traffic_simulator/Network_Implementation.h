@@ -454,8 +454,8 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 
-				//network_moe_data.starting_time = ((_Network_Interface*)this)->start_of_current_simulation_interval_absolute<int>();
-				//network_moe_data.ending_time = network_moe_data.starting_time + ((_Scenario_Interface*)_global_scenario)->assignment_interval_length<int>();
+				//network_moe_data.starting_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
+				//network_moe_data.ending_time = network_moe_data.starting_time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>();
 	
 				network_moe_data.assignment_calculation_time = 0.0;
 				network_moe_data.simulation_calculation_time = 0.0f;
@@ -729,7 +729,7 @@ namespace Network_Components
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();
-					//((typename MasterType::network_type*)_this_ptr)->add_in_network_to_VHT<NT>();
+					//((typename MasterType::network_type*)_this_ptr)->template add_in_network_to_VHT<NT>();
 					//cout << "final vht = " << ((typename MasterType::network_type*)_this_ptr)->_network_vht_in_network_based << endl;
 					exit(0);
 				}
@@ -1060,7 +1060,7 @@ namespace Network_Components
 					link_travel_time = max((float)1.0,link_travel_time);
 
 					link->template travel_time<float>(link_travel_time);
-					//link->num_lanes<float>(link_travel_time);
+					//link->template num_lanes<float>(link_travel_time);
 				}
 		
 				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(turn_movements_container)::value_type>::type>  _Turn_Movement_Interface;
@@ -1094,7 +1094,7 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 
 
-				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 					MasterType::routable_network_type::initialize_moe_data();
 				}
@@ -1107,7 +1107,7 @@ namespace Network_Components
 				routable_network->construct_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
 
 
-				if(((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 					routable_network->construct_time_dependent_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
 				}
@@ -1122,7 +1122,7 @@ namespace Network_Components
 				}
 
 				//
-				//if(!((_Scenario_Interface*)_global_scenario)->time_dependent_routing<bool>())
+				//if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				//{
 				//	time_dependent_routable_network = (Routable_Network<typename MasterType::time_dependent_routable_network_type>*)Allocate<MasterType::time_dependent_routable_network_type>();
 
