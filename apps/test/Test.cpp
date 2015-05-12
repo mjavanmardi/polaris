@@ -1,4 +1,6 @@
+#ifdef ANTARES
 #include "Antares/Antares.h"
+#endif
 #include "repository/Repository.h"
 using namespace polaris;
 
@@ -7,11 +9,16 @@ using namespace polaris;
 prototype struct Agent ADD_DEBUG_INFO
 {
 	tag_as_prototype;
+
 	template<typename T> void Initialize(int i)
 	{
 		this_component()->Initialize(i);
 		this_component()->Load_Event<ComponentType>(&Agent_Event,1,0);
 	}
+
+	accessor(data,NONE,NONE);
+	accessor(something_else,NONE,NONE);
+
 	static void Agent_Event(ComponentType* _this,Event_Response& response)
 	{
 
@@ -20,7 +27,8 @@ prototype struct Agent ADD_DEBUG_INFO
 		_this->Do_Event(response);
 	}
 };
-implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
+#ifdef ANTARES
+implementation struct Antares_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Antares_Agent_Implementation),Execution_Object>
 {
 	// Member data
 	m_data(int,data,NONE,NONE);
@@ -73,14 +81,42 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 		_base_agent_layer->Push_Element<Regular_Element>(&p);
 	}
 };
-// As antares layers are static they also need to be defined outside of the class body, NOTE* this is true for any static member variable
-template<typename MasterType,typename InheritanceList> Antares_Layer<typename MasterType::antares_layer_type>* Base_Agent_Implementation<MasterType,InheritanceList>::_base_agent_layer;
+#endif
+implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
+{
+	// Member data
+	m_data(int,data,NONE,NONE);
+	m_data(float,x,NONE,NONE);
+	m_data(float,y,NONE,NONE);
+
+	// Member functions
+	static void Initialize_Type()
+	{
+
+	}
+	void Initialize(int i)
+	{
+		// set initial values for member variables
+		_data = 1;
+		_x = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
+		_y = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
+	}
+	void Do_Event(Event_Response& response)
+	{
+		// Code to execute when the event fires
+		_x += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>() - 0.5);
+		_y += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>()  - 0.5);
+		cout <<"X="<<_x<<", Y="<<_y<<endl;
+	}
+};
+
 
 
 struct MasterType
 {
 	//=================================================================================
 	// REQUIRED ANTARES TYPES
+	#ifdef ANTARES
 	typedef Conductor_Implementation<MasterType> conductor_type;
 	typedef Control_Panel_Implementation<MasterType> control_panel_type;
 	typedef Time_Panel_Implementation<MasterType> time_panel_type;
@@ -93,9 +129,9 @@ struct MasterType
 	typedef Information_Page_Implementation<MasterType> information_page_type;
 	typedef Splash_Panel_Implementation<MasterType> splash_panel_type;
 	//=================================================================================
-
+	#endif
 	typedef MasterType M;
-	typedef Base_Agent_Implementation<M> base_agent_type;
+	typedef Base_Agent_Implementation<M> agent_type;
 	// Add all of the types used in your code here
 };
 
@@ -110,8 +146,9 @@ int main(int argc, char *argv[])
 
 
 	// initialize the visualizer environment
+	#ifdef ANTARES
 	START_UI(MasterType,0,0,1000,1000);
-
+	#endif
 
 	// Standard initialization of random number generator
 	GLOBALS::Uniform_RNG.Initialize();
@@ -123,15 +160,15 @@ int main(int argc, char *argv[])
 	// Your code here
 
 	// Initialize drawing layers - always need to call static initializer functions this way
-	MasterType::base_agent_type::Initialize_Type();
+	MasterType::agent_type::Initialize_Type();
 
 	// define an interface to use
-	typedef Agent<MasterType::base_agent_type> agent_itf;
+	typedef Agent<MasterType::agent_type> agent_itf;
 	
 	// Create agents and initialize them
-	for (int i = 0; i < 1500; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
-		agent_itf* main_agent = (agent_itf*)Allocate<MasterType::base_agent_type>();
+		agent_itf* main_agent = (agent_itf*)Allocate<MasterType::agent_type>();
 		main_agent->Initialize<NT>(i);
 	}
 
