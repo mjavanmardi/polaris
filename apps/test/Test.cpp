@@ -14,6 +14,7 @@ prototype struct Agent ADD_DEBUG_INFO
 	}
 	static void Agent_Event(ComponentType* _this,Event_Response& response)
 	{
+
 		response.next._iteration = iteration() + 1;
 		response.next._sub_iteration = 0;
 		_this->Do_Event(response);
@@ -21,28 +22,14 @@ prototype struct Agent ADD_DEBUG_INFO
 };
 implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
 {
-	void Initialize(int i)
-	{
-		_data = 1;
-		_x = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
-		_y = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
-
-		int r = i % 255;
-		_color.r(255-r); _color.g(0); _color.b(r);
-	}
-	void Do_Event(Event_Response& response)
-	{
-		//cout <<"BASE_AGENT: event fired at " << iteration()<<", next event to fire at " << response.next._iteration<<endl;
-		_x += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>() - 0.5);
-		_y += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>()  - 0.5);
-		Draw();
-	}
+	// Member data
 	m_data(int,data,NONE,NONE);
 	m_data(float,x,NONE,NONE);
 	m_data(float,y,NONE,NONE);
 	m_data(True_Color_RGB<NT>,color,NONE,NONE);
+	static Antares_Layer<typename MasterType::antares_layer_type>* _base_agent_layer;
 
-	// Functions
+	// static initializer for the type - call once at program start to initialize static variables
 	static void Initialize_Type()
 	{
 		_base_agent_layer = Allocate_New_Layer<MT>(string("Base Agent"));
@@ -55,7 +42,25 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 		cfg.draw=true;
 		_base_agent_layer->Initialize<NT>(cfg);
 	}
-	// Drawing functions for 3D vehicle layer
+
+	// Member functions
+	void Initialize(int i)
+	{
+		// set initial values for member variables
+		_data = 1;
+		_x = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
+		_y = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
+
+		int r = i % 255;
+		_color.r(255-r); _color.g(0); _color.b(r);
+	}
+	void Do_Event(Event_Response& response)
+	{
+		// Code to execute when the event fires
+		_x += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>() - 0.5);
+		_y += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>()  - 0.5);
+		Draw();
+	}
 	void Draw()
 	{
 		Point_Element_Colored p;
@@ -67,7 +72,6 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 		Scale_Coordinates<MT>(p._point);
 		_base_agent_layer->Push_Element<Regular_Element>(&p);
 	}
-	static Antares_Layer<typename MasterType::antares_layer_type>* _base_agent_layer;
 };
 // As antares layers are static they also need to be defined outside of the class body, NOTE* this is true for any static member variable
 template<typename MasterType,typename InheritanceList> Antares_Layer<typename MasterType::antares_layer_type>* Base_Agent_Implementation<MasterType,InheritanceList>::_base_agent_layer;
@@ -118,18 +122,13 @@ int main(int argc, char *argv[])
 	//----------------------------------------------------------
 	// Your code here
 
-
-
-	//typedef Helper<MasterType::helper_type> helper_itf;
-	//helper_itf* main_agent = (helper_itf*)Allocate<MasterType::helper_type>();
-
-	
-	//---------------------------------------------------
 	// Initialize drawing layers - always need to call static initializer functions this way
 	MasterType::base_agent_type::Initialize_Type();
 
+	// define an interface to use
 	typedef Agent<MasterType::base_agent_type> agent_itf;
-
+	
+	// Create agents and initialize them
 	for (int i = 0; i < 1500; ++i)
 	{
 		agent_itf* main_agent = (agent_itf*)Allocate<MasterType::base_agent_type>();
