@@ -8,10 +8,10 @@ set(Statewide OFF)
 
 #options to be used while running cmake
 #option(Antares "Build with Antares" ON)
-set(Antares OFF)
+set(Antares ON)
 
 
-set(BUILD_DIR build)
+set(BUILD_DIR build_antares)
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
 
@@ -51,7 +51,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 		message(STATUS ""${libtcmalloc})
 	endif()
 	
-	if (FALSE)#MSVC)
+	if (MSVC)
 		add_definitions(/Zi)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
