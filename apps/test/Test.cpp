@@ -1,5 +1,4 @@
-
-#include "Polaris_PCH.h"
+#include "Antares/Antares.h"
 using namespace polaris;
 
 
@@ -14,23 +13,28 @@ prototype struct Agent ADD_DEBUG_INFO
 	}
 	static void Agent_Event(ComponentType* _this,Event_Response& response)
 	{
-		if (iteration() != 20)
+		if (iteration() < 20)
 		{
 			response.next._iteration = 20;
 			response.next._sub_iteration = 0;
+			_this->Do_Event(response);
 		}
 		else
 		{
 			response.next._iteration = END;
 			response.next._sub_iteration = END;
 		}
-		_this->Do_Event();
+		
 	}
 	void Reschedule_Agent(int iter)
 	{
-		// Everything works fine until here - I think I need some way from RTTI instead of this_component() to make sure
-		// the correct Execution_Component_Manager gets updated.
 		this_component()->Reschedule<ComponentType>(iter, 0);
+	}
+	void Reschedule_Agent(int iter, Event_Response& response)
+	{
+		this_component()->Reschedule<ComponentType>(iter, 0);
+		response.next._iteration = iter;
+		response.next._sub_iteration = 0;
 	}
 };
 implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
@@ -39,11 +43,248 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 	{
 		_data = 1;
 	}
-	void Do_Event()
+	void Do_Event(Event_Response& response)
 	{
-		cout <<"BASE_AGENT: event fired at " << iteration()<<endl;
+		cout <<"BASE_AGENT: event fired at " << iteration()<<", next event to fire at " << response.next._iteration<<endl;
 	}
 	m_data(int,data,NONE,NONE);
+
+	// Functions
+	static void Initialize_Type()
+	{
+		_base_agent_layer = Allocate_New_Layer<MT>(string("Base Agent"));
+
+		Antares_Layer_Configuration cfg =;
+		cfg.Configure_Dynamic_Points();
+		_base_agent_layer->Initialize<NT>(cfg);
+	}
+	// Drawing functions for 3D vehicle layer
+	void Draw(float rotation_rad, True_Color_RGBA<NT> _color)
+	{
+		/// DRAW BOTTOM ///
+		float x = _centroid._x;
+		float y = _centroid._y;
+		float z = 5.0f;
+		Quad_Element_Colored bottom_elem;
+		bottom_elem._color._r = _color._r;
+		bottom_elem._color._g = _color._g;
+		bottom_elem._color._b = _color._b;
+		bottom_elem._color._a = _color._a;
+
+		float cosa = cos(this->_current_link->heading());
+		float sina = sin(this->_current_link->heading());
+
+		bottom_elem._v1._x = x + _length/2.0 * cosa - _width/2.0 * sina ;
+		bottom_elem._v1._y = y + _length/2.0 * sina + _width/2.0 * cosa ;
+		bottom_elem._v1._z = z;
+		bottom_elem._v2._x = x - _length/2.0 * cosa - _width/2.0  * sina;
+		bottom_elem._v2._y = y - _length/2.0 * sina + _width/2.0  * cosa;
+		bottom_elem._v2._z = z;
+		bottom_elem._v3._x = x - _length/2.0 * cosa + _width/2.0 * sina;
+		bottom_elem._v3._y = y - _length/2.0 * sina - _width/2.0 * cosa;
+		bottom_elem._v3._z = z;
+		bottom_elem._v4._x = x + _length/2.0 * cosa + _width/2.0 * sina;
+		bottom_elem._v4._y = y + _length/2.0 * sina - _width/2.0 * cosa;
+		bottom_elem._v4._z = z;
+
+		Scale_Coordinates<MT>(bottom_elem._v1);
+		Scale_Coordinates<MT>(bottom_elem._v2);
+		Scale_Coordinates<MT>(bottom_elem._v3);
+		Scale_Coordinates<MT>(bottom_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&bottom_elem);
+
+
+		/// DRAW TOP ///
+		Quad_Element_Colored top_elem;
+		top_elem._color._r = _color._r;
+		top_elem._color._g = _color._g;
+		top_elem._color._b = _color._b;
+		top_elem._color._a = _color._a;
+
+		top_elem._v1._x = x + (_length/2.0- 30.0) * cosa - _width/2.0 * sina ;
+		top_elem._v1._y = y + (_length/2.0- 30.0) * sina + _width/2.0 * cosa;
+		top_elem._v1._z = z + _height;
+		top_elem._v2._x = x - _length/2.0 * cosa - _width/2.0 * sina ;
+		top_elem._v2._y = y - _length/2.0 * sina + _width/2.0 * cosa;
+		top_elem._v2._z = z + _height;
+		top_elem._v3._x = x - _length/2.0 * cosa + _width/2.0 * sina ;
+		top_elem._v3._y = y - _length/2.0 * sina - _width/2.0 * cosa;
+		top_elem._v3._z = z + _height;
+		top_elem._v4._x = x + (_length/2.0 - 30.0) * cosa + _width/2.0 * sina ;
+		top_elem._v4._y = y + (_length/2.0 - 30.0) * sina - _width/2.0 * cosa;
+		top_elem._v4._z = z + _height;
+
+		Scale_Coordinates<MT>(top_elem._v1);
+		Scale_Coordinates<MT>(top_elem._v2);
+		Scale_Coordinates<MT>(top_elem._v3);
+		Scale_Coordinates<MT>(top_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&top_elem);
+
+		/// DRAW FRONT ///
+		Quad_Element_Colored front_elem;
+		front_elem._color._r = _color._r;
+		front_elem._color._g = _color._g;
+		front_elem._color._b = _color._b;
+		front_elem._color._a = _color._a;
+
+		front_elem._v1._x = x + _length/2.0 * cosa - _width/2.0 * sina; //_length/2.0;
+		front_elem._v1._y = y + _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		front_elem._v1._z = z;
+		front_elem._v2._x = x + (_length/2.0 - 15.0) * cosa - _width/2.0 * sina; //(_length/2.0 - 15.0)
+		front_elem._v2._y = y + (_length/2.0 - 15.0) * sina + _width/2.0 * cosa;//_width/2.0;
+		front_elem._v2._z = z + _height/2.0;
+		front_elem._v3._x = x + (_length/2.0 - 15.0) * cosa + _width/2.0 * sina;//_length/2.0 - 15.0;
+		front_elem._v3._y = y + (_length/2.0 - 15.0) * sina - _width/2.0 * cosa;//-_width/2.0;
+		front_elem._v3._z = z + _height/2.0;
+		front_elem._v4._x = x + _length/2.0 * cosa + _width/2.0 * sina; //_length/2.0;
+		front_elem._v4._y = y + _length/2.0 * sina - _width/2.0 * cosa; //-_width/2.0;
+		front_elem._v4._z = z;
+
+		Scale_Coordinates<MT>(front_elem._v1);
+		Scale_Coordinates<MT>(front_elem._v2);
+		Scale_Coordinates<MT>(front_elem._v3);
+		Scale_Coordinates<MT>(front_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&front_elem);
+
+		/// DRAW FRONT ///
+		Quad_Element_Colored front_window_elem;
+		front_window_elem._color._r = 170;
+		front_window_elem._color._g = 170;
+		front_window_elem._color._b = 255;
+		front_window_elem._color._a = 255;
+
+		front_window_elem._v1._x = x + (_length/2.0 - 15.0) * cosa - _width/2.0 * sina;//_length/2.0 - 15.0;
+		front_window_elem._v1._y = y + (_length/2.0 - 15.0) * sina + _width/2.0 * cosa;//_width/2.0;
+		front_window_elem._v1._z = z + _height/2.0;
+		front_window_elem._v2._x = x + (_length/2.0 - 30.0) * cosa - _width/2.0 * sina;//_length/2.0 - 30.0;
+		front_window_elem._v2._y = y + (_length/2.0 - 30.0) * sina + _width/2.0 * cosa;//_width/2.0;
+		front_window_elem._v2._z = z + _height;
+		front_window_elem._v3._x = x + (_length/2.0 - 30.0) * cosa + _width/2.0 * sina;//_length/2.0 - 30.0;
+		front_window_elem._v3._y = y + (_length/2.0 - 30.0) * sina - _width/2.0 * cosa;//- _width/2.0;
+		front_window_elem._v3._z = z + _height;
+		front_window_elem._v4._x = x + (_length/2.0 - 15.0) * cosa + _width/2.0 * sina;//_length/2.0 - 15.0;
+		front_window_elem._v4._y = y + (_length/2.0 - 15.0) * sina - _width/2.0 * cosa;//- _width/2.0;
+		front_window_elem._v4._z = z + _height/2.0;
+
+		Scale_Coordinates<MT>(front_window_elem._v1);
+		Scale_Coordinates<MT>(front_window_elem._v2);
+		Scale_Coordinates<MT>(front_window_elem._v3);
+		Scale_Coordinates<MT>(front_window_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&front_window_elem);
+
+		/// DRAW PASSENGER SIDE ///
+		Quad_Element_Colored pass_elem;
+		pass_elem._color._r = _color._r;
+		pass_elem._color._g = _color._g;
+		pass_elem._color._b = _color._b-20;
+		pass_elem._color._a = _color._a;
+
+		pass_elem._v1._x = x + _length/2.0 * cosa + _width/2.0 * sina; //_length/2.0;
+		pass_elem._v1._y = y + _length/2.0 * sina - _width/2.0 * cosa;//- _width/2.0;
+		pass_elem._v1._z = z;
+		pass_elem._v2._x = x + (_length/2.0 - 30.0) * cosa + _width/2.0 * sina;//_length/2.0 - 30.0;
+		pass_elem._v2._y = y + (_length/2.0 - 30.0) * sina - _width/2.0 * cosa;//- _width/2.0;
+		pass_elem._v2._z = z + _height;
+		pass_elem._v3._x = x - _length/2.0 * cosa + _width/2.0 * sina;// - _length/2.0;
+		pass_elem._v3._y = y - _length/2.0 * sina - _width/2.0 * cosa;// - _width/2.0;
+		pass_elem._v3._z = z + _height;
+		pass_elem._v4._x = x - _length/2.0 * cosa + _width/2.0 * sina;//- _length/2.0;
+		pass_elem._v4._y = y - _length/2.0 * sina - _width/2.0 * cosa;//- _width/2.0;
+		pass_elem._v4._z = z;
+
+		Scale_Coordinates<MT>(pass_elem._v1);
+		Scale_Coordinates<MT>(pass_elem._v2);
+		Scale_Coordinates<MT>(pass_elem._v3);
+		Scale_Coordinates<MT>(pass_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&pass_elem);
+
+		/// DRAW DRIVER SIDE ///
+		Quad_Element_Colored driver_elem;
+		driver_elem._color._r = _color._r;
+		driver_elem._color._g = _color._g;
+		driver_elem._color._b = _color._b-20;
+		driver_elem._color._a = _color._a;
+
+		driver_elem._v1._x = x + _length/2.0 * cosa - _width/2.0 * sina; //_length/2.0;
+		driver_elem._v1._y = y + _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		driver_elem._v1._z = z;
+		driver_elem._v2._x = x + (_length/2.0 - 30.0) * cosa - _width/2.0 * sina; //_length/2.0 - 30.0;
+		driver_elem._v2._y = y + (_length/2.0 - 30.0) * sina + _width/2.0 * cosa; //_width/2.0;
+		driver_elem._v2._z = z + _height;
+		driver_elem._v3._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		driver_elem._v3._y = y - _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		driver_elem._v3._z = z + _height;
+		driver_elem._v4._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		driver_elem._v4._y = y - _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		driver_elem._v4._z = z;
+
+		Scale_Coordinates<MT>(driver_elem._v1);
+		Scale_Coordinates<MT>(driver_elem._v2);
+		Scale_Coordinates<MT>(driver_elem._v3);
+		Scale_Coordinates<MT>(driver_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&driver_elem);
+
+		/// DRAW BACK SIDE ///
+		Quad_Element_Colored back_elem;
+		back_elem._color._r = _color._r;
+		back_elem._color._g = _color._g;
+		back_elem._color._b = _color._b;
+		back_elem._color._a = _color._a;
+
+		back_elem._v1._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		back_elem._v1._y = y - _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		back_elem._v1._z = z;
+		back_elem._v2._x = x - _length/2.0 * cosa + _width/2.0 * sina; //- _length/2.0;
+		back_elem._v2._y = y - _length/2.0 * sina - _width/2.0 * cosa; //- _width/2.0;
+		back_elem._v2._z = z;
+		back_elem._v3._x = x - _length/2.0 * cosa + _width/2.0 * sina; //- _length/2.0;
+		back_elem._v3._y = y - _length/2.0 * sina - _width/2.0 * cosa; //- _width/2.0;
+		back_elem._v3._z = z + _height/2.0;
+		back_elem._v4._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		back_elem._v4._y = y - _length/2.0 * sina + _width/2.0 * cosa;  //_width/2.0;
+		back_elem._v4._z = z + _height/2.0;
+
+		Scale_Coordinates<MT>(back_elem._v1);
+		Scale_Coordinates<MT>(back_elem._v2);
+		Scale_Coordinates<MT>(back_elem._v3);
+		Scale_Coordinates<MT>(back_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&back_elem);
+
+		/// DRAW BACK SIDE WINDOW ///
+		Quad_Element_Colored back_window_elem;
+		back_window_elem._color._r = 170;
+		back_window_elem._color._g = 170;
+		back_window_elem._color._b = 255;
+		back_window_elem._color._a = 255;
+
+		back_window_elem._v1._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		back_window_elem._v1._y = y - _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		back_window_elem._v1._z = z + _height/2.0;
+		back_window_elem._v2._x = x - _length/2.0 * cosa + _width/2.0 * sina; //- _length/2.0;
+		back_window_elem._v2._y = y - _length/2.0 * sina - _width/2.0 * cosa; //- _width/2.0;
+		back_window_elem._v2._z = z + _height/2.0;
+		back_window_elem._v3._x = x - _length/2.0 * cosa + _width/2.0 * sina; //- _length/2.0;
+		back_window_elem._v3._y = y - _length/2.0 * sina - _width/2.0 * cosa; //- _width/2.0;
+		back_window_elem._v3._z = z + _height;
+		back_window_elem._v4._x = x - _length/2.0 * cosa - _width/2.0 * sina; //- _length/2.0;
+		back_window_elem._v4._y = y - _length/2.0 * sina + _width/2.0 * cosa; //_width/2.0;
+		back_window_elem._v4._z = z + _height;
+
+		Scale_Coordinates<MT>(back_window_elem._v1);
+		Scale_Coordinates<MT>(back_window_elem._v2);
+		Scale_Coordinates<MT>(back_window_elem._v3);
+		Scale_Coordinates<MT>(back_window_elem._v4);
+
+		_vehicles_layer->Push_Element<Regular_Element>(&back_window_elem);
+	}
+	static Antares_Layer<typename MasterType::antares_layer_type>* _base_agent_layer;
 };
 implementation struct Derived_Agent_Implementation : public Base_Agent_Implementation<MasterType,INHERIT(Derived_Agent_Implementation)>
 {
@@ -52,11 +293,11 @@ implementation struct Derived_Agent_Implementation : public Base_Agent_Implement
 	{
 		_data = 5;
 	}
-	void Do_Event()
+	void Do_Event(Event_Response& response)
 	{
-		cout <<"DERIVED_AGENT: event fired at " << iteration()<<endl;
+		cout <<"DERIVED_AGENT: event fired at " << iteration()<<", next event to fire at " << response.next._iteration<<endl;
 		this_itf* pthis = (this_itf*)this;
-		pthis->Reschedule_Agent(26);
+		pthis->Reschedule_Agent(iteration()+5, response);
 	}
 };
 
@@ -120,10 +361,25 @@ implementation struct Helper_Implementation : public Polaris_Component<MasterTyp
 
 struct MasterType
 {
+	//=================================================================================
+	// REQUIRED ANTARES TYPES
+	typedef Conductor_Implementation<MasterType> conductor_type;
+	typedef Control_Panel_Implementation<MasterType> control_panel_type;
+	typedef Time_Panel_Implementation<MasterType> time_panel_type;
+	typedef Information_Panel_Implementation<MasterType> information_panel_type;
+	typedef Canvas_Implementation<MasterType> canvas_type;
+	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
+	typedef Splash_Panel_Implementation<MasterType> splash_panel_type;
+	//=================================================================================
+
 	typedef MasterType M;
 	typedef Base_Agent_Implementation<M> base_agent_type;
 	typedef Derived_Agent_Implementation<M> derived_agent_type;
-	
+	typedef Helper_Implementation<M> helper_type;
 	// Add all of the types used in your code here
 };
 
@@ -137,24 +393,17 @@ int main(int argc, char *argv[])
 	INITIALIZE_SIMULATION(cfg);
 
 
-	//-------------------------------------------------------------
-	// Initialize random variable generators
-	GLOBALS::Normal_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Initialize();
-	GLOBALS::Normal_RNG.Set_Seed<int>();
-	GLOBALS::Uniform_RNG.Set_Seed<int>();
+	// initialize the visualizer environment
+	START_UI(MasterType,0,0,1000,1000);
 
 
 	//----------------------------------------------------------
 	// Your code here
-	typedef Agent<MasterType::base_agent_type> base_itf;
-	typedef Agent<MasterType::derived_agent_type> derived_itf;
+	typedef Helper<MasterType::helper_type> helper_itf;
 
-	base_itf* agent1 = (base_itf*)Allocate<MasterType::base_agent_type>();
-	derived_itf* agent2 = (derived_itf*)Allocate<MasterType::derived_agent_type>();
+	helper_itf* main_agent = (helper_itf*)Allocate<MasterType::helper_type>();
 
-	agent1->Initialize<NT>();
-	agent2->Initialize<NT>();
+	main_agent->Initialize<NT>();
 
 
 	START();
