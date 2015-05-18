@@ -10,13 +10,21 @@ prototype struct Agent ADD_DEBUG_INFO
 {
 	tag_as_prototype;
 
-	template<typename T> void Initialize(int i)
+
+	template<typename T> void Initialize(T i, requires(T,check(strip_modifiers(T),is_integral)))
 	{
 		this_component()->Initialize(i);
 		this_component()->Load_Event<ComponentType>(&Agent_Event,1,0);
 	}
+	template<typename T> void Initialize(T i, requires(T,!check(strip_modifiers(T),is_integral)))
+	{
+		cout <<"OOPS, NOT AN INTEGRAL DATA TYPE.";
+	}
 
-	accessor(data,NONE,NONE);
+	accessor(data,check(strip_modifiers(TargetType),is_integral),check(strip_modifiers(TargetType),is_integral));
+	accessor(x,NONE,NONE);
+	accessor(y,NONE,NONE);
+	accessor(my_agent,NONE,NONE);
 	accessor(something_else,NONE,NONE);
 
 	static void Agent_Event(ComponentType* _this,Event_Response& response)
@@ -24,7 +32,7 @@ prototype struct Agent ADD_DEBUG_INFO
 
 		response.next._iteration = iteration() + 1;
 		response.next._sub_iteration = 0;
-		_this->Do_Event(response);
+		_this->Do_Event();
 	}
 };
 #ifdef ANTARES
@@ -101,16 +109,61 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 		_x = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
 		_y = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
 	}
-	void Do_Event(Event_Response& response)
+	void Do_Event()
 	{
 		// Code to execute when the event fires
 		_x += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>() - 0.5);
 		_y += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>()  - 0.5);
-		cout <<"X="<<_x<<", Y="<<_y<<endl;
+		//cout <<"X="<<_x<<", Y="<<_y<<endl;
+	}
+};
+implementation struct Other_Agent_Implementation : public Base_Agent_Implementation<MasterType,INHERIT(Other_Agent_Implementation)>
+{
+	typedef Base_Agent_Implementation<MasterType,INHERIT(Other_Agent_Implementation)> base_type;
+	// Member data
+
+	m_data(float,z,NONE,NONE);
+	m_prototype(Agent, typename MasterType::agent_type, my_agent, NONE,NONE);
+			
+	member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length,Basic_Units::Implementations::Length_Implementation<NT>);
+
+	// Member functions
+	static void Initialize_Type()
+	{
+
+	}
+	void Initialize(int i)
+	{
+		this->length<Basic_Units::Length_Variables::Feet>(10.0);
+
+		base_type::Initialize(i);
+
+		// set initial values for member variables
+		_z = GLOBALS::Uniform_RNG.Next_Rand<float>()*10;
+	}
+	void Do_Event()
+	{
+		// Code to execute when the event fires
+		float d_x = base_type::_x - this->_my_agent->x<float>();
+		float d_y = base_type::_y - this->_my_agent->y<float>();
+		float len = sqrt(pow(d_x,2) + pow(d_y,2));
+
+		base_type::_x += d_x/len*10;
+		base_type::_y += d_y/len*10;
+
+		cout << "Base Agent is at {"<<this->_my_agent->x<float>() << ", " <<this->_my_agent->y<float>() << "} ; Agent is at " <<base_type::_x << ", " <<base_type::_y<<endl;
 	}
 };
 
-
+implementation struct Some_Other_Thing : public Polaris_Component<MasterType,INHERIT(Some_Other_Thing),Execution_Object>
+{
+	m_data(int,stuff,NONE,NONE);
+	m_data(int,x,NONE,NONE);
+	void Do_Event()
+	{
+		// Code to execute when the event fires
+	}
+};
 
 struct MasterType
 {
@@ -132,6 +185,8 @@ struct MasterType
 	#endif
 	typedef MasterType M;
 	typedef Base_Agent_Implementation<M> agent_type;
+	typedef Other_Agent_Implementation<M> other_agent_type;
+	typedef Some_Other_Thing<M> some_other_type;
 	// Add all of the types used in your code here
 };
 
@@ -164,12 +219,20 @@ int main(int argc, char *argv[])
 
 	// define an interface to use
 	typedef Agent<MasterType::agent_type> agent_itf;
+	typedef Agent<MasterType::other_agent_type> other_agent_itf;
 	
 	// Create agents and initialize them
 	for (int i = 0; i < 1; ++i)
 	{
-		agent_itf* main_agent = (agent_itf*)Allocate<MasterType::agent_type>();
-		main_agent->Initialize<NT>(i);
+		agent_itf* base_agent = (agent_itf*)Allocate<MasterType::agent_type>();
+		base_agent->Initialize<int>(i);
+
+		other_agent_itf* other_agent = (other_agent_itf*)Allocate<MasterType::other_agent_type>();
+		other_agent->Initialize<int>(i);
+		other_agent->my_agent(base_agent);
+
+		Agent<MasterType::some_other_type>* other_thing = (Agent<MasterType::some_other_type>*)Allocate<MasterType::some_other_type>();
+		other_thing->x<int>(1);
 	}
 
 
