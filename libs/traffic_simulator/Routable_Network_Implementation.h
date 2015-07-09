@@ -160,8 +160,14 @@ namespace Routing_Components
 				using namespace polaris::io;
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 
-				string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
-				unique_ptr<database> db (open_sqlite_database (name));
+				string name(polaris::io::make_name(((_Scenario_Interface*)_global_scenario)->template historical_results_database_name<string&>(), polaris::io::db_inventory[1]));
+				if (name == "")
+				{
+					cout << "Error: historical results database name is required for time-dependent routing.  Use the 'historical_results_database_name' key in the scenario file.";
+					assert(false);
+				}
+				//string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				shared_ptr<database> db (open_sqlite_database_single<shared_ptr<database>>(name));
 				transaction t(db->begin());
 				result<LinkMOE> moe_result=db->template query<LinkMOE>(query<LinkMOE>::true_expr);
 				
@@ -225,7 +231,7 @@ namespace Routing_Components
 
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
-				typedef Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Link_Components::Prototypes::Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
 				typedef Random_Access_Sequence<Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
 				typedef Intersection<remove_pointer<Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
@@ -274,10 +280,16 @@ namespace Routing_Components
 					input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
 					
 					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
-					
-					if(_link_id_to_moe_data.count(current_link->template dbid<int>()))
+
+					cout <<endl<<"Trying to find "<<current_link->template uuid<int>()<<" in list:"<<endl;
+					for (boost::unordered::unordered_map<int,int>::iterator itr = _link_id_to_moe_data.begin(); itr != _link_id_to_moe_data.end(); ++itr)
 					{
-						input_time_dependent_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template dbid<int>()]);
+						cout <<itr->first<<","<<itr->second<<endl;
+					}
+					
+					if(_link_id_to_moe_data.count(current_link->template uuid<int>()))
+					{
+						input_time_dependent_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template uuid<int>()]);
 					}
 					else
 					{
@@ -340,7 +352,7 @@ namespace Routing_Components
 			{
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
-				typedef Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Link_Components::Prototypes::Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
 				typedef Random_Access_Sequence<Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
 				typedef Intersection<remove_pointer<Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 

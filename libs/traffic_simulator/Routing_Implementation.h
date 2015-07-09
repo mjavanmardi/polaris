@@ -38,6 +38,7 @@ namespace Routing_Components
 			{
 				// if planning time is not set, use the departure time as the time to route
 				if (planning_time==0) planning_time = time_to_depart;
+				_departure_time = time_to_depart;
 
 				typedef Scenario<typename Component_Type::Master_Type::scenario_type> _Scenario_Interface;
 
@@ -110,7 +111,7 @@ namespace Routing_Components
 				}
 				else
 				{
-					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_id,iteration(),path_container,cost_container);
+					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_id,_departure_time/*iteration()*/,path_container,cost_container);
 				}
 
 

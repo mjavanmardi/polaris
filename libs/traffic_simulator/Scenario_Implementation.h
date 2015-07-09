@@ -19,6 +19,7 @@ namespace Scenario_Components
 			m_data(string, output_results_database_name, NONE, NONE);
 			m_data(string, output_demand_database_name, NONE, NONE);
 			m_data(string, output_popsyn_database_name, NONE, NONE);
+			m_data(string, historical_results_database_name, NONE, NONE);
 
 			m_data(int, simulation_interval_length, NONE, NONE);
 			m_data(int, assignment_interval_length, NONE, NONE);
@@ -52,6 +53,9 @@ namespace Scenario_Components
 			m_data(string, vehicle_trajectory_file_name, NONE, NONE);
 			m_data(fstream, vehicle_trajectory_file, NONE, NONE);
 			m_data(double, vehicle_trajectory_sample_rate, NONE, NONE);
+			m_data(string, vehicle_tracking_list_file_name, NONE, NONE);
+			m_container(std::unordered_set<int>, vehicle_tracking_list, NONE, NONE);
+			m_data(bool, use_vehicle_tracking_list, NONE, NONE);
 
 			m_data(string, routed_path_file_name, NONE, NONE);
 			m_data(fstream, routed_path_file, NONE, NONE);

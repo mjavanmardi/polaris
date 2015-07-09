@@ -530,6 +530,10 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::HEAVY_RAILWAY);
 						}
+						else if(facility_type=="EXTERNAL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::EXTERNAL);
+						}
 						else
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);

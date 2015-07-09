@@ -1,0 +1,10 @@
+Event ID	Link	Start	End	Note
+40	17546	57180	60980	Accident On Adams at State
+41	17047	33600	38370	Accident On Wacker at Jackson
+42	30006	38580	42380	Accident on Circle Interchange
+43	17629	31320	35120	Accident on LSD at North
+44	30051	73320	77120	Accident on I-94 at Ogden
+45	16287	30120	34990	Accident on I-94 at Milwaukee
+46	15491	61440	67990	Accident on 290W at California
+47	30027	58440	64458	Accident on I-55S W after Dan Ryan
+48	14863	61440	65240	Accident on 290W at Homan

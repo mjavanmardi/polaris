@@ -53,17 +53,18 @@ namespace Network_Components
 			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 			{
 				_Link_Interface* destination_link = (_Link_Interface*)(*link_itr);
+
 				int num_arrived_vehicls_of_a_link = (int)destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().size();
 				if (num_arrived_vehicls_of_a_link > 0)
-				{//output vehicle trajectory
+				{
+					//output vehicle trajectory
 					while(num_arrived_vehicls_of_a_link)
 					{
 						// check whether to sampel this vehicle
-						float r = GLOBALS::Uniform_RNG. template Next_Rand<float>();
-						float x = scenario_reference<_Scenario_Interface*>()->template vehicle_trajectory_sample_rate<float>();
-						if (r < x)
-						{
-							_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
+						_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
+
+						if (vehicle->write_trajectory())
+						{	
 							_Movement_Plan_Interface* movement_plan = vehicle->template movement_plan<_Movement_Plan_Interface*>();
 							
 							int vehicle_id = vehicle->template uuid<int>();
@@ -126,7 +127,7 @@ namespace Network_Components
 
 								path_delayed_time+=route_link_delayed_time;
 					
-								if (route_link_travel_time > 0)
+								if (route_link_travel_time > 0 && route_link->link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
 								{
 									vehicle_trajectory_file
 										<< vehicle_id << ","
@@ -143,8 +144,10 @@ namespace Network_Components
 										<<trajectory_unit->template intersection_delay_time<float>() << ","
 										<<start + route_link->template length<float>()<<","
 										<<endl;
+
+									start += route_link->template length<float>();
 								}
-								start += route_link->template length<float>();
+								
 							}
 						}
 
@@ -751,7 +754,7 @@ namespace Network_Components
 		 void Network_Implementation<MasterType,InheritanceList>::read_analyze_link_groups()
 			{
 				typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
+				typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer<typename  type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 

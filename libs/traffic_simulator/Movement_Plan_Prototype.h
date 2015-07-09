@@ -150,7 +150,6 @@ namespace Movement_Plan_Components
 			{
 				//TODO: check that this has been correctly translated!
 
-
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  Trajectory_Unit_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), Trajectory_Unit_Interface*> Trajectory_Container_Interface;
 
@@ -178,7 +177,6 @@ namespace Movement_Plan_Components
 					
 
 					vehicle_trajectory_data->template Initialize<Link_Interface*>( link );
-
 
 					if (arrival_time_itr != arrival_time_container.begin()) vehicle_trajectory_data->template estimated_link_accepting_time<int>( *(arrival_time_itr /*- 1*/) );
 					else vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);

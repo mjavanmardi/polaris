@@ -82,6 +82,8 @@ namespace Vehicle_Components
 			accessor(entry_queue_length, NONE, NONE);
 			accessor(suggested_action, NONE, NONE);
 
+			typed_accessor(bool,write_trajectory);
+
 			template<typename TargetType> void advance()
 			{
 				typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(movement_plan)> _Movement_Plan_Interface;

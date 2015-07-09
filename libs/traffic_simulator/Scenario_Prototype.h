@@ -18,7 +18,7 @@ namespace Scenario_Components
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
 			accessor(output_popsyn_database_name, NONE, NONE);
-
+			accessor(historical_results_database_name, NONE, NONE);
 
 			accessor(simulation_interval_length, NONE, NONE);
 			accessor(assignment_interval_length, NONE, NONE);
@@ -68,9 +68,13 @@ namespace Scenario_Components
 			accessor(input_dir_name, NONE, NONE);
 			accessor(output_dir_name, NONE, NONE);
 				
+			// accessors for vehicle trajectory tracking, use either random selection or list-based selection for tracking vehicles
 			accessor(vehicle_trajectory_file_name, NONE, NONE);
 			accessor(vehicle_trajectory_file, NONE, NONE);
 			accessor(vehicle_trajectory_sample_rate, NONE, NONE);
+			accessor(vehicle_tracking_list_file_name, NONE, NONE);
+			accessor(vehicle_tracking_list, NONE, NONE);
+			accessor(use_vehicle_tracking_list, NONE, NONE);
 
 			accessor(routed_path_file_name, NONE, NONE);
 			accessor(routed_path_file, NONE, NONE);
@@ -414,6 +418,7 @@ namespace Scenario_Components
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
 					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago");
+					if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
 				} 
 				else
 				{
@@ -451,8 +456,6 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
 				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
 				if (cfgReader.getParameter("write_node_control_state", write_node_control_state<bool*>())!= PARAMETER_FOUND) write_node_control_state<bool>(false);
-				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
-				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
 				if (cfgReader.getParameter("write_network_link_flow", write_network_link_flow<bool*>())!= PARAMETER_FOUND) write_network_link_flow<bool>(false);
 				if (cfgReader.getParameter("write_network_link_turn_time", write_network_link_turn_time<bool*>())!= PARAMETER_FOUND) write_network_link_turn_time<bool>(false);
 				if (cfgReader.getParameter("write_output_summary", write_output_summary<bool*>())!= PARAMETER_FOUND) write_output_summary<bool>(true);
@@ -465,6 +468,29 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
+				//===============================================
+				// Vehicle trajectory tracking parameters
+				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
+				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
+				if (cfgReader.getParameter("vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<string*>())!= PARAMETER_FOUND)
+				{
+					use_vehicle_tracking_list<bool>(false);
+				}
+				else
+				{
+					vehicle_trajectory_sample_rate<double>(0.0);
+					use_vehicle_tracking_list<bool>(true);
+					File_IO::File_Reader fr;
+					fr.Open(this->vehicle_tracking_list_file_name<string>(),false);
+					while (fr.Read())
+					{
+						int vehid = 0;
+						fr.Get_Data<int>(vehid,0);
+						std::unordered_set<int>::iterator itr = vehicle_tracking_list<std::unordered_set<int>&>().find(vehid);
+						if (itr == vehicle_tracking_list<std::unordered_set<int>&>().end()) this->vehicle_tracking_list<std::unordered_set<int>&>().insert(vehid);
+					}
+					cout <<endl<<"Tracking "<<vehicle_tracking_list<std::unordered_set<int>&>().size()<<" vehicles."<<endl;
+				}
 
 				// GET NETWORK SKIMMING PARAMETERS
 				if (cfgReader.getParameter("write_skim_tables", this->template write_skim_tables<bool*>()) != PARAMETER_FOUND) this->template write_skim_tables<bool>(false);

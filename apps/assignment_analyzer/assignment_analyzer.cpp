@@ -3,7 +3,7 @@
 #include "Polaris_PCH.h"
 #include "Application_Includes.h"
 
-#include "Network_Validator_Implementation.h"
+#include "Trip_Implementation.h"
 
 using namespace polaris;
 
@@ -50,8 +50,10 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
-	typedef Network_Components::Implementations::Network_Validation_Implementation<M> network_validation_type;
-	typedef Network_Components::Implementations::Network_Validation_Unit_Implementation<M> network_validation_unit_type;
+
+
+	typedef Trip_Components::Implementations::Routed_Trip_Implementation<M> trip_type;
+	typedef Trip_Components::Implementations::Assignment_Analyzer_Implementation<M> assignment_analyzer_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -102,10 +104,17 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
+void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, File_IO::File_Info& historical_db);
 
-void write_scenario_file(char* database_name, char* scenario_name);
-
-
+//==============================================================================================
+// Main Batch_Router function
+// This routine expects 2 (or optionally 3) call line arguments:
+// argv[1] = database_filename: the filepath to the supply database containing the network information
+// argv[2] = historical_results_database_name: the filepath to the database containing the historical network MOE data
+// argv[3] = trips_filename: filepath to a delimited data file containing the list of trips to be routed in the following format:
+// argv[4] = num_threads: defaults to 1 if not present, more than 1 runs multithreaded mode
+//	1			2							3															4										5
+//	Trip_ID		Mode ('Auto', 'Transit')	Origin Location (location id code from supply database)		Destination Location (same as origin)	Departure time
 int main(int argc,char** argv)
 {
 
@@ -113,20 +122,30 @@ int main(int argc,char** argv)
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#pragma region Scenario Initialization
-	char* scenario_filename = "scenario_tester.json";
-	char* database_filename = "a";
-	if (argc >= 2) database_filename = argv[1];
-	else THROW_EXCEPTION("ERROR: specify a database filename as the first command line argument.");
-	int checks = 3;
-	if (argc >= 3) checks = std::max(atoi(argv[2]),checks);
+	char* scenario_filename = "scenario_router.json";
+	char* database_filename = "";
+	char* results_database_filename = "";
+
+	if (argc < 3) THROW_EXCEPTION("ERROR: specify a database filename as the first command line argument, results database as the second argument.");
+	
+	database_filename = argv[1];
+	results_database_filename = argv[2];
+
+	File_IO::File_Info db(database_filename);
+	File_IO::File_Info results_db(results_database_filename);
+	File_IO::File_Info scenario_file(scenario_filename);
+
 	int threads = 1;
-	if (argc >= 4) threads = std::max(atoi(argv[3]),threads);
+	if (argc >= 5) threads = std::max(atoi(argv[4]),threads);
+
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(100, threads);
 	INITIALIZE_SIMULATION(cfg);
+
+	write_scenario_file(scenario_file, db, results_db);
 	#pragma endregion
 
-	write_scenario_file(database_filename, scenario_filename);
+	
 
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
@@ -292,18 +311,43 @@ int main(int argc,char** argv)
 
 
 	//==================================================================================================================================
-	// Network Skimming stuff
+	// Batch Routing stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	cout << "Initializing network validation..." <<endl;
-	typedef Network_Components::Prototypes::Network_Validator<MasterType::network_validation_type> _network_validation_itf;
-	typedef Random_Access_Sequence<typename _Network_Interface::get_type_of(activity_locations_container)> locations_itf;
-	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
-	locations_itf* locations = network->activity_locations_container<locations_itf*>();
-			
-	_network_validation_itf* validator = (_network_validation_itf*)Allocate<MasterType::network_validation_type>();
+	typedef Trip_Components::Prototypes::Assignment_Analyzer<typename MasterType::assignment_analyzer_type> _Analyzer_Interface;
+	_Analyzer_Interface* analyzer=(_Analyzer_Interface*)Allocate<typename MasterType::assignment_analyzer_type>();
 
-	validator->network_reference<_Network_Interface*>(network);
-	validator->Initialize<location_itf*>(checks);
+	analyzer->network_reference<_Network_Interface*>(network);
+	analyzer->read_trip_data();
+	
+	// activity location map - link the location id to the actual object pointer
+	//typedef Random_Access_Sequence< _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
+	//typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
+	//typedef Batch_Router_Components::Prototypes::Routed_Trip<typename MasterType::trip_type> _Trip_Interface;
+
+	//_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();
+	//dense_hash_map<int,_Activity_Location_Interface*> activity_id_to_ptr;
+	//activity_id_to_ptr.set_empty_key(-1);
+	//activity_id_to_ptr.set_deleted_key(-2);
+	//for(_Activity_Locations_Container_Interface::iterator activity_locations_itr=activity_locations.begin();activity_locations_itr!=activity_locations.end();activity_locations_itr++)
+	//{
+	//	_Activity_Location_Interface& activity_location=(_Activity_Location_Interface&)**activity_locations_itr;
+	//	activity_id_to_ptr[activity_location.template uuid<int>()]=&activity_location;
+	//}
+
+	// Read the input data file
+	//File_IO::File_Reader fr;
+	//fr.Open(input_filename,true,",\t");
+	//while (fr.Read())
+	//{
+	//	int trip_id = fr.Get_Int(0);
+	//	string mode = fr.Get_String(1);
+	//	int orig = fr.Get_Int(2);
+	//	int dest = fr.Get_Int(3);
+	//	int time = fr.Get_Int(4);
+
+	//	_Trip_Interface* trip=(_Trip_Interface*)Allocate<typename MasterType::trip_type>();
+	//	trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
+	//}
 
 
 	//==================================================================================================================================
@@ -316,30 +360,40 @@ int main(int argc,char** argv)
 
 }
 
-void write_scenario_file(char* database_name, char* scenario_name)
-{
-	// strip extension from database name
-	string db_name(database_name);
-	int pos = db_name.find('.');
-	int len = db_name.length();
-	string db(db_name.c_str());
-	string ext("");
-	if (pos != std::string::npos)
-	{
-		db = db_name.substr(0,pos);
-		ext = db_name.substr(pos+1,len-pos-1);
 
-		if (strcmp(ext.c_str(),"sqlite") != 0) THROW_EXCEPTION("ERROR: database_filename must be a sqlite file");
-	}
+
+void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, File_IO::File_Info& historical_db)
+{
+	// strip out the extension and db schema info (just retain the base db name - until this is changed in the DB schema - which it should be.)
+	string database_name("");
+	if (db.Is_File_Type("sqlite"))
+		database_name = db.db_name();
+	else if (!db.Has_Extension())
+		database_name = db.full_name();
+	else
+		THROW_EXCEPTION("ERROR, the input db should be specified as either a .sqlite file or an extensionless db name.");
+	string historical_db_name("");
+	if (historical_db.Is_File_Type("sqlite"))
+		historical_db_name = historical_db.db_name();
+	else if (!historical_db.Has_Extension())
+		historical_db_name = historical_db.full_name();
+	else
+		THROW_EXCEPTION("ERROR, the historical db should be specified as either a .sqlite file or an extensionless db name.");
+
+	//if (!historical_db.Is_File_Type("sqlite")) THROW_EXCEPTION("ERROR: historical database_filename must be a .sqlite file");
+	if (!scenario.Is_File_Type("json")) THROW_EXCEPTION("ERROR: scenario filename must be a .json file");
 
 	File_IO::File_Writer fw;
-	fw.Open(string(scenario_name));
+	fw.Open(scenario.full_name());
 	fw.Write_Line("{");
+	fw.Write_Line("\t\"output_dir_name\" : \"batch_router\",");
 	fw.Write_Line("\t\"io_source_flag\" : \"ODB_IO_SOURCE\",");
 	stringstream s("");
-	s<<"\t\"database_name\" : \""<<db<<"\"\n}";
-	fw.Write(s);
+	s<<"\t\"database_name\" : \""<<database_name<<"\",";
+	fw.Write_Line(s);
+	s.clear(); s.str("");
+	s<<"\t\"historical_results_database_name\" : \""<<historical_db_name<<"\",";
+	fw.Write_Line(s);
+	fw.Write_Line("\t\"time_dependent_routing\" : true\n}");
 	fw.Close();
-
-	cout <<"Reading information from '"<<db<<"' sqlite file."<<endl;
 }
