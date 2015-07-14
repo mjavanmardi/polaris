@@ -44,6 +44,7 @@ namespace Trip_Components
 			typedef strip_modifiers(origin_type) location_interface;
 
 			m_data(int, trip_id, NONE, NONE);
+			m_data(int, veh_id, NONE, NONE);
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode, NONE,NONE);
 
 			member_component_and_feature_accessor(departure_time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
@@ -52,7 +53,9 @@ namespace Trip_Components
 
 			m_data(bool, link_failure,NONE,NONE);
 			m_data(bool, turn_failure,NONE,NONE);
+			m_data(bool, results_processed,NONE,NONE);
 
+			
 			m_container(concat(std::vector<pair<bool,location_interface*>>),origin_routing_results, NONE, NONE);
 			m_container(concat(std::vector<pair<bool,location_interface*>>),destination_routing_results, NONE, NONE);
 
@@ -70,31 +73,8 @@ namespace Trip_Components
 			typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
 			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 
-			/*template<typename TargetType> void Get_Results()
-			{
-				_Movement_Plan_Interface* movement = this->_router->movement_plan<_Movement_Plan_Interface*>();
+			m_container(boost::container::vector<typename get_component_type(_Trajectory_Container_Interface)*>, result_trajectory, NONE,NONE);
 
-				if (movement->valid_trajectory<bool>())
-				{
-					cout <<"Travel time for trip was "<< movement->routed_travel_time<float>()<<endl;
-					cout <<"Link.dir: travel time"<<endl;
-					
-					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
-
-					for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
-					{
-						_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
-						link_itf* link = tu->link<link_itf*>();
-						cout << link->dbid<int>()<<"."<<link->direction<int>()<<": "<<tu->estimated_link_accepting_time<int>()<<endl;
-					}					
-				}
-				else
-				{
-					cout<<"Error: movement was not routable."<<endl;
-				}
-				
-			}
-			*/
 		};
 	}
 

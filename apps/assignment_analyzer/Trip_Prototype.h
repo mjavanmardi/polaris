@@ -49,6 +49,7 @@ namespace Trip_Components
 
 				int counter = -1;
 				int trip_id = 0;
+				int veh_id = 0;
 
 				try
 				{
@@ -95,6 +96,10 @@ namespace Trip_Components
 					for(odb::result<polaris::io::Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 					{
 						trip_id = db_itr->getPrimaryKey();
+						veh_id = db_itr->getHhold()*100 + db_itr->getPerson();
+						int mode = db_itr->getMode();
+						if (mode > 0) continue;
+
 						if (++counter % 100000 == 0) cout << counter << " trips processed" << endl;
 
 						// Get the departure and OD info from DB, and validate them
@@ -123,6 +128,7 @@ namespace Trip_Components
 						_Trip_Interface* trip=(_Trip_Interface*)Allocate<typename MasterType::trip_type>();
 						trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(trip_id, network,activity_id_to_ptr[org_key], activity_id_to_ptr[dst_key],departed_time);
 						trip->input_travel_time<Simulation_Timestep_Increment>(travel_time);
+						trip->veh_id(veh_id);
 						trips->push_back(trip);
 					}
 				}
@@ -138,6 +144,9 @@ namespace Trip_Components
 				typedef  Routed_Trip< typename get_component_type(_Trips_Container_Interface)> _Trip_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename _Trip_Interface::get_type_of(origin)>  _Activity_Location_Interface;
+				typedef Random_Access_Sequence<typename _Trip_Interface::get_type_of(result_trajectory)> _Trajectory_Container_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				
 
 				string filename(((_Scenario_Interface*)_global_scenario)->template historical_results_database_name<string&>());
 				string extension("-assignment_analysis.csv");
@@ -146,7 +155,7 @@ namespace Trip_Components
 				File_IO::File_Writer fh;
 				fh.Open(filename);
 				stringstream out("");
-				fh.Write_Line("Trip_ID,TTime_minimum,TTime_simulated");
+				fh.Write_Line("Record_Type,Trip_ID,Veh_ID,O,D,Depart,TTime_minimum,TTime_simulated,TTimes(T)/Links(L)");
 
 				_Trips_Container_Interface* trips = this->routed_trips_container<_Trips_Container_Interface*>();
 
@@ -162,7 +171,9 @@ namespace Trip_Components
 					ttime_min += trip->result_travel_time<Simulation_Timestep_Increment>();
 					ttime_sim += trip->input_travel_time<Simulation_Timestep_Increment>();
 
-					out<<trip->trip_id<int>()<<","<<o->uuid<int>()<<","<<d->uuid<int>()<<","<<trip->result_travel_time<Time_Minutes>()<<","<<trip->input_travel_time<Time_Minutes>();
+					out<<"T,"<<trip->trip_id<int>()<<","<<trip->veh_id<int>()<<","<<o->uuid<int>()<<","<<d->uuid<int>()<<","<<trip->departure_time<Simulation_Timestep_Increment>()<<","<<trip->result_travel_time<Time_Minutes>()<<","<<trip->input_travel_time<Time_Minutes>()<<","<<trip->Print_Trajectory_Times();
+					fh.Write_Line(out);
+					out<<"L,"<<trip->trip_id<int>()<<","<<trip->veh_id<int>()<<","<<o->uuid<int>()<<","<<d->uuid<int>()<<","<<trip->departure_time<Simulation_Timestep_Increment>()<<","<<trip->result_travel_time<Time_Minutes>()<<","<<trip->input_travel_time<Time_Minutes>()<<","<<trip->Print_Trajectory_Links();
 					fh.Write_Line(out);
 				}
 
@@ -172,7 +183,7 @@ namespace Trip_Components
 
 		};
 
-		prototype struct Routed_Trip
+		prototype struct Routed_Trip ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -197,6 +208,7 @@ namespace Trip_Components
 			//---------------------------------------------
 			// links back to the network to be skimmed
 			accessor(trip_id,NONE,NONE);
+			accessor(veh_id,NONE,NONE);
 			accessor(network_reference,NONE,NONE);
 			accessor(router,NONE,NONE);
 			accessor(origin,NONE,NONE);
@@ -209,6 +221,7 @@ namespace Trip_Components
 			accessor(result_trajectory,NONE,NONE);
 			accessor(link_failure,NONE,NONE);
 			accessor(turn_failure,NONE,NONE);
+			accessor(results_processed,NONE,NONE);
 
 			//=============================================
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
@@ -230,6 +243,7 @@ namespace Trip_Components
 
 				this->network_reference<_Network_Interface*>(network_ref);
 				this->trip_id(Trip_Id);
+				this->results_processed(false);
 				_Network_Interface* network=network_reference<_Network_Interface*>();
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 				_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();
@@ -281,7 +295,7 @@ namespace Trip_Components
 				router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 				
 				// Get a random timestep in which to perform route calculation
-				Simulation_Timestep_Increment dt = GLOBALS::Uniform_RNG.Next_Rand<double>() * (END - 6 -iteration());
+				Simulation_Timestep_Increment dt = GLOBALS::Uniform_RNG.Next_Rand<double>() * (END - 10 -iteration());
 				Simulation_Timestep_Increment t = GLOBALS::Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(dt);
 
 				// Schedule routing at timestep t + 1
@@ -303,6 +317,8 @@ namespace Trip_Components
 				typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
 				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 				
+				this->results_processed(true);
+
 				_Routing_Interface* router = this->router<_Routing_Interface*>();
 				_Movement_Plan_Interface* movement = router->movement_plan<_Movement_Plan_Interface*>();
 
@@ -310,7 +326,14 @@ namespace Trip_Components
 				{
 					this->result_travel_time<Simulation_Timestep_Increment>(movement->routed_travel_time<float>());
 										
-					//_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+
+					if (trajectory->size() == 0)
+					{
+						cout <<"Error: null trajectory.";
+					}
+
+					this->result_trajectory(trajectory);
 
 					//for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
 					//{
@@ -324,6 +347,52 @@ namespace Trip_Components
 					cout<<"Error: movement was not routable."<<endl;
 				}
 				
+			}
+
+			string Print_Trajectory_Times()
+			{
+				typedef Random_Access_Sequence<get_type_of(result_trajectory)> _Trajectory_Container_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Link_Components::Prototypes::Link<typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+
+				stringstream result("");
+
+				_Trajectory_Container_Interface* trajectory = result_trajectory<_Trajectory_Container_Interface*>();
+
+				for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+				{
+					_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
+					_Link_Interface* link = tu->link<_Link_Interface*>();
+					result<<link->dbid<int>()<<"."<<link->direction<int>()<<",";
+				}
+				return result.str();
+			}
+			string Print_Trajectory_Links()
+			{
+				typedef Random_Access_Sequence<get_type_of(result_trajectory)> _Trajectory_Container_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Link_Components::Prototypes::Link<typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+
+				stringstream result("");
+
+				_Trajectory_Container_Interface* trajectory = result_trajectory<_Trajectory_Container_Interface*>();
+
+				if (trajectory->size() == 0)
+				{
+					cout <<"Error: null trajectory.";
+				}
+
+				_Trajectory_Container_Interface::iterator itr = trajectory->begin();
+				++itr;
+				int stored_time = 0;
+				for (; itr != trajectory->end(); ++itr)
+				{
+					_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
+					_Link_Interface* link = tu->link<_Link_Interface*>();
+					result<<tu->estimated_link_accepting_time<int>()-stored_time<<",";
+					stored_time = tu->estimated_link_accepting_time<int>();
+				}
+				return result.str();
 			}
 			
 		};
