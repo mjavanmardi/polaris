@@ -7,15 +7,15 @@
 #include "car.h"
 #include "road.h"
 
-std::vector<float> speedDistribInQueue(int nbPlace, int nbImplementation);
+std::vector<double> speedDistribInQueue(int nbPlace, int nbImplementation);
 
-std::vector<float> speedDistribOutQueue(int nbImplementation, int duration, float vMax, float accMax);
+std::vector<double> speedDistribOutQueue(int nbImplementation, int duration, double vMax, double accMax);
 
 void moving_in_queue(std::ofstream& fichier, int nbImplementation, int nbPlace);
 
 void staying_in_queue(std::ofstream& fichier, int nbImplementation);
 
-void moving_out_of_queue(std::ofstream& fichier, int nbImplementation, int duration, int maxspeed, float accMax);
+void moving_out_of_queue(std::ofstream& fichier, int nbImplementation, int duration, int maxspeed, double accMax);
 
 void progressionOf(Car C, std::ofstream& file, bool q);
 

@@ -5,7 +5,7 @@
 #include "road.h"
 #include "car.h"
 
-int lastCarProba(float proba, float weight);
+int lastCarProba(double proba, double weight);
 
 int numberOfAllowedCars(Queue Q, int timestep);
 

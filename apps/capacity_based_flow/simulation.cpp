@@ -11,7 +11,9 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car> Cars, i
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
 		vector<vector<int>> movingCars = preProcess(Roads, timestep);
-		
+		if(t >= 230)
+			cout << endl;
+
 	//### Release cars from traveling areas into queues (Common or Individual)
 		travelingAreaToQueues(Roads, timestep);
 

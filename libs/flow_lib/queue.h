@@ -10,14 +10,14 @@ class Queue {
 public:
 	//### Constructors & Destructors ###
 	Queue();
-	Queue(int ID, float _maxLength, float _distanceBetweenCars, std::map<int,float> _capacities);
+	Queue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> _capacities);
 	~Queue();
 
 	//### Getters ###
 	int ID();
-	float length();
+	double length();
 	std::vector<Car> getQueue();
-	std::map<int, float> getCapacities();
+	std::map<int, double> getCapacities();
 
 	//### Setters ###
 	
@@ -29,20 +29,20 @@ public:
 
 	void moveFakeCars(int timestep);
 
-
+	std::vector<int> nextNodes;
 private:
 	//### Constant parameters ###
 	int queueID;
-	float maxLength;
-	float distanceBetweenCars;
-	std::vector<int> nextNodes;
-	std::map<int, float> capacities;		//int of next node && capacity value to this next node
+	double maxLength;
+	double distanceBetweenCars;
+	
+	std::map<int, double> capacities;		//int of next node && capacity value to this next node
 
 	//### Cars in queue ###
 	std::vector<Car> cars;
 
 	//### Outputs ###
-	std::vector<float> lengthOverTime;
+	std::vector<double> lengthOverTime;
 
 
 };	 

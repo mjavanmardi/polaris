@@ -6,11 +6,11 @@ class Car {
 public:
 	//### Constructors & Destructors ###
 	Car();
-	Car::Car(bool _fake, int _carNumber, float _carLength, int _reacDuration, int _enterTime, int _enterNode, int _exitNode, float _maximumAcceleration);
+	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _maximumAcceleration);
 	~Car();
 
 	//### Getters ###
-	float length();
+	double length();
 	int number();
 	int enteringTime();
 	int enteringNode();
@@ -22,13 +22,13 @@ public:
 	bool existence();
 	int reactIter();
 	int reactDuration();
-	float distanceInTA();
-	float accMax();
+	double distanceInTA();
+	double accMax();
 	std::vector<int> prog();
-	float maxSpeed(int road);
+	double maxSpeed(int road);
 
 	//### Setters ###
-	void iterDistanceInTA(float length);			// Traveled distance in Traveling Area
+	void iterDistanceInTA(double length);			// Traveled distance in Traveling Area
 	void initDistanceInTA();
 
 	void iterProg(int iter);					// Progression of the car : State(in OR out [of the queue]) ; if(in the queue), gives the position
@@ -36,28 +36,28 @@ public:
 	void initReactIter();						// Reaction time when the car upfront moves
 	void iterReactIter(int k);
 
-	void addSpeed(float speed);
+	void addSpeed(double speed);
 
 private:
 	//### Constant parameters ###
 	bool fake;
 	int carNumber;
-	float carLength;
+	double carLength;
 	int reacDuration;
 	int enterTime;
 	int enterNode;
 	int exitNode;
-	float maximumAcceleration;
+	double maximumAcceleration;
 	std::vector<int> path;
 
 	//### Iterators ###
 	int reacIter;
 	int position;
-	float distInTA;
+	double distInTA;
 
 	//### Outputs ###
 	std::vector<int> progression;
-	std::vector<float> maxSpeeds;	//Max speeds depending on roads => needed for the outputs
+	std::vector<double> maxSpeeds;	//Max speeds depending on roads => needed for the outputs
 
 
 };

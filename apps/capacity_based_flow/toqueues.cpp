@@ -9,6 +9,8 @@ void TAToQueues(Road& R, int timestep) {
 		it->iterProg(0);
 		if(it->distanceInTA() < R.distanceToTravelInTA((*it)))		// The car has to reach its queue (Individual or common)
 			it->iterDistanceInTA(R.speedMax()*timestep);
+		// !!! SOME TIME IS ADDED TO FAKE THE FACT THAT THE CAR WAS NOT TRAVELING AT VMAX 
+		// !!! BUT, BESIDES THE TIME ADDED< THE CAR SHOULD REALLY WAIT THIS TIME AND NOT BE IN THE SYSTEM ANYMORE
 		else {																// The car has reached its queue (Individual or common)
 			it->initDistanceInTA();															//The traveled distance is initialized
 			int addedTime = timeToAdd(R.speedMax(), it->accMax(), it->distanceInTA() );		//Some time is added to the cars 
@@ -26,9 +28,9 @@ void travelingAreaToQueues(map<int, Road>& Roads, int timestep) {
 	}
 }
 
-int timeToAdd(float speedMax, float accMax, float distanceInTA) {
-	float timeCar = speedMax / accMax;
-	float timeVmax = distanceInTA / speedMax;
+int timeToAdd(double speedMax, double accMax, double distanceInTA) {
+	double timeCar = speedMax / accMax;
+	double timeVmax = distanceInTA / speedMax;
 
 	int addedTime;
 	if(timeCar<timeVmax)

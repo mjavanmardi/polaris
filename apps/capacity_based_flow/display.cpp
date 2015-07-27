@@ -43,15 +43,19 @@ void printRoad(Road R) {
 	map<int, Queue> queues = R.indivQueues();
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		if(it->second.getQueue().size() != 0) {
-			cout << endl << "Road(" << R.nodeA() << "," << R.nodeB() << ")";
+			cout << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
-		if(R.getLastQueue().size() != 0) {
-			cout << endl << "Road(" << R.nodeA() << "," << R.nodeB() << ")";
+		if(R.getCommonQueue().size() != 0) {
+			cout << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 		if(R.getTA().size() != 0) {
-			cout << endl << "Road(" << R.nodeA() << "," << R.nodeB() << ")";
+			cout << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
+			break;
+		}
+		if(R.getLastQueue().size() != 0) {
+			cout << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 	}

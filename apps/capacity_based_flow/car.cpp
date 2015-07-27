@@ -8,14 +8,12 @@ Car::Car() {		//Constructor used for fake cars in the queues
 	carLength = 5;
 }
 
-Car::Car(bool _fake, int _carNumber, float _carLength, int _reacDuration, int _enterTime, int _enterNode, int _exitNode, float _maximumAcceleration) {
+Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _maximumAcceleration) {
 	fake = _fake;
 	carNumber = _carNumber;
 	carLength = _carLength;
 	reacDuration = _reacDuration;
 	enterTime = _enterTime;
-	enterNode = _enterNode;
-	exitNode = _exitNode;
 	maximumAcceleration = _maximumAcceleration;
 
 	progression.clear();
@@ -24,12 +22,16 @@ Car::Car(bool _fake, int _carNumber, float _carLength, int _reacDuration, int _e
 	distInTA = 0;
 
 	path.clear();
-	path.push_back(1);
-	path.push_back(2);
-	path.push_back(3);
-	path.push_back(4);
-	path.push_back(5);
+	path.push_back(83938);
+	path.push_back(83939);
+	path.push_back(83941);
+	path.push_back(83937);
+	path.push_back(83936);
+	path.push_back(83935);
+	path.push_back(83943);
 
+	enterNode = 83938;
+	exitNode = 83935;
 }
 
 Car::~Car() {
@@ -39,7 +41,7 @@ Car::~Car() {
 
 //### Getters ###
 
-float Car::length() {
+double Car::length() {
 	return carLength;
 }
 
@@ -90,11 +92,11 @@ int Car::reactDuration() {
 	return reacDuration;
 }
 
-float Car::distanceInTA() {
+double Car::distanceInTA() {
 	return distInTA;
 }
 
-float Car::accMax() {
+double Car::accMax() {
 	return maximumAcceleration;
 }
 
@@ -102,14 +104,14 @@ vector<int> Car::prog() {
 	return progression;
 }
 
-float Car::maxSpeed(int road) {
+double Car::maxSpeed(int road) {
 	return maxSpeeds[road];
 }
 
 
 //### Setters ###
 
-void Car::iterDistanceInTA(float length) {
+void Car::iterDistanceInTA(double length) {
 	distInTA += length;
 }
 
@@ -133,6 +135,6 @@ void Car::iterReactIter(int k) {
 	reacIter += k;
 }
 
-void Car::addSpeed(float speed) {
+void Car::addSpeed(double speed) {
 	maxSpeeds.push_back(speed);
 }

@@ -7,7 +7,9 @@ Road::Road(){
 
 }
 
-Road::Road(int anode, int bnode, float _maximumSpeed, float _totalLength, float _distanceBetweenCars) {
+Road::Road(int ID, int link,  int anode, int bnode, double _maximumSpeed, double _totalLength, double _distanceBetweenCars) {
+	roadID = ID;
+	roadLink = link;
 	Anode = anode;
 	Bnode = bnode;
 	maximumSpeed = _maximumSpeed;
@@ -25,13 +27,23 @@ Road::~Road() {
 
 }
 
-void Road::addQueue(int ID, float _maxLength, float _distanceBetweenCars, map<int,float> capacities) {
+void Road::addQueue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> capacities) {
 	Queue Q(ID, _maxLength, _distanceBetweenCars, capacities);
 	queues[ID] = Q;
 }
 
 
 //### Getters ###
+
+int Road::ID() {
+
+	return roadID;
+}
+
+int Road::link() {
+	return roadLink;
+}
+
 int Road::nodeA(){
 	return Anode;
 }
@@ -40,12 +52,12 @@ int Road::nodeB(){
 	return Bnode;
 }
 
-float Road::speedMax() {
+double Road::speedMax() {
 	return maximumSpeed;
 }
 
-float Road::getMaxIndivQueueLength(){
-	float max = 0;
+double Road::getMaxIndivQueueLength(){
+	double max = 0;
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		if(it->second.length() > max)
 			max = it->second.length();
@@ -62,15 +74,15 @@ int Road::getMaxIndivQueueSize() {
 	return max;
 }
 
-float Road::getCommonQueueLength() {
-	float commonQueueLength = 0;
+double Road::getCommonQueueLength() {
+	double commonQueueLength = 0;
 	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it ++) {
 		commonQueueLength = it->length() + distanceBetweenCars;
 	}
-	return commonQueueLength/(float)queues.size();
+	return commonQueueLength/(double)queues.size();
 }
 
-float Road::getMaxCommonQueueLength() {
+double Road::getMaxCommonQueueLength() {
 	return totalLength - getMaxIndivQueueLength();
 }
 
@@ -93,7 +105,6 @@ vector<Car> Road::getCommonQueue() {
 vector<Car>& Road::getTA() {
 	return travelingArea;
 }
-
 
 
 //### Dynamic Methods ###
@@ -145,7 +156,7 @@ void Road::iterQueuesProg(int timestep) {
 	int iter = 0;
 	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it++) {
 		if(it->existence()) {
-			float div = (float) iter / (float) queues.size();
+			double div = (double) iter / (double) queues.size();
 			it->iterProg(numberOfCars + (int)floor(div) );
 			iter += 1;
 		}
@@ -155,8 +166,8 @@ void Road::iterQueuesProg(int timestep) {
 	lengthOverTime.push_back( getMaxIndivQueueLength() + getCommonQueueLength() );
 }
 
-float Road::distanceToTravelInTA(Car C) {
-	float distance;
+double Road::distanceToTravelInTA(Car C) {
+	double distance;
 	if(C.Node() != C.exitingNode()) {
 		if(commonQueue.size() != 0)
 			distance = totalLength - getCommonQueueLength() - getMaxIndivQueueLength();

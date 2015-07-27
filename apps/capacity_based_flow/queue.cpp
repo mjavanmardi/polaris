@@ -6,7 +6,8 @@ using namespace std;
 Queue::Queue() {
 
 }
-Queue::Queue(int ID, float _maxLength, float _distanceBetweenCars, map<int,float> _capacities) {
+
+Queue::Queue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> _capacities) {
 	queueID = ID;
 	maxLength = _maxLength;
 	distanceBetweenCars = _distanceBetweenCars;
@@ -15,7 +16,7 @@ Queue::Queue(int ID, float _maxLength, float _distanceBetweenCars, map<int,float
 	cars.clear();
 	lengthOverTime.clear();
 	nextNodes.clear();
-	for(map<int, float>::iterator it = _capacities.begin() ; it != _capacities.end() ; it++) {
+	for(map<int, double>::iterator it = _capacities.begin() ; it != _capacities.end() ; it++) {
 		nextNodes.push_back(it->first);
 	}
 }
@@ -30,8 +31,8 @@ int Queue::ID() {
 	return queueID;
 }
 
-float Queue::length() {
-	float queueLength = 0;
+double Queue::length() {
+	double queueLength = 0;
 	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
 		queueLength += it->length() + distanceBetweenCars;
 	}
@@ -42,7 +43,7 @@ vector<Car> Queue::getQueue() {
 	return cars;
 }
 
-map<int, float> Queue::getCapacities() {
+map<int, double> Queue::getCapacities() {
 	return capacities;
 }
 
@@ -68,7 +69,7 @@ int Queue::weight(int nextNode) {
 
 void Queue::iterCarsProg() {
 	int iter = 1;
-	float queueLength = 0;
+	double queueLength = 0;
 	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
 		if(it->existence()) {
 			it->iterProg(iter);

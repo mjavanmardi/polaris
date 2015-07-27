@@ -6,4 +6,4 @@ void TAToQueues(Road& R, int timestep);
 
 void travelingAreaToQueues(std::map<int, Road>& Roads, int timestep);
 
-int timeToAdd(float speedMax, float accMax, float distanceInTA);
+int timeToAdd(double speedMax, double accMax, double distanceInTA);

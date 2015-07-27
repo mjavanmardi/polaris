@@ -2,40 +2,40 @@
 
 using namespace std;
 
-vector<float> speedDistribInQueue(int nbPlace, int nbImplementation) {		//ADD THE TIMESTEP AS A PARAMETER
-	vector<float> speedProfil;
+vector<double> speedDistribInQueue(int nbPlace, int nbImplementation) {		//ADD THE TIMESTEP AS A PARAMETER
+	vector<double> speedProfil;
 	for(int i=0 ; i< nbImplementation ; i++) {
-		float t = (float)i/(float)nbImplementation - 0.5;
-		float speed = nbPlace*(60*t*t*t*t - 30*t*t +3.75);
+		double t = (double)i/(double)nbImplementation - 0.5;
+		double speed = nbPlace*(60*t*t*t*t - 30*t*t +3.75);
 		speedProfil.push_back(speed);
 	}
 	return speedProfil;
 }
 
-vector<float> speedDistribOutQueue(int nbImplementation, int duration, float vMax, float accMax) {
-	vector<float> speedProfil;
+vector<double> speedDistribOutQueue(int nbImplementation, int duration, double vMax, double accMax) {
+	vector<double> speedProfil;
 	if(duration/2 < ceil(vMax/accMax)) { // The car does not reach Vmax
 		for(int i = - duration/2 ; i< duration/2 * nbImplementation ; i++) {
-			float z = (float) i/ (float)nbImplementation;
-			float Vup = accMax * duration /2;
-			float speed = 46 * Vup *z*z*z*z/(duration*duration*duration*duration) - 8*Vup *z*z / (duration*duration) + Vup;\
+			double z = (double) i/ (double)nbImplementation;
+			double Vup = accMax * duration /2;
+			double speed = 46 * Vup *z*z*z*z/(duration*duration*duration*duration) - 8*Vup *z*z / (duration*duration) + Vup;\
 			speedProfil.push_back(speed);
 		}
 	}
 	else { // The car reaches Vmax
 		int accDuration = ceil(vMax/accMax);
-		float t = vMax/accMax;
+		double t = vMax/accMax;
 		for(int i = 0 ; i< accDuration*nbImplementation ; i++) {
-			float z = (float) i/nbImplementation;
-			float speed = - vMax *z*z*z*z / (t*t*t*t) +2*vMax / (t*t)*z*z;
+			double z = (double) i/nbImplementation;
+			double speed = - vMax *z*z*z*z / (t*t*t*t) +2*vMax / (t*t)*z*z;
 			speedProfil.push_back(speed);
 		}
 		for(int i = 0 ; i< (duration - 2*accDuration)*nbImplementation ; i++) { //More than 0 loop due to the "else" condition
 			speedProfil.push_back(vMax);
 		}
 		for(int i = accDuration*nbImplementation ; i > 0 ; i--) {
-			float z = (float) i/nbImplementation;
-			float speed = - vMax *z*z*z*z / (t*t*t*t) +2*vMax / (t*t)*z*z;
+			double z = (double) i/nbImplementation;
+			double speed = - vMax *z*z*z*z / (t*t*t*t) +2*vMax / (t*t)*z*z;
 			speedProfil.push_back(speed);
 		}
 	}
@@ -43,8 +43,8 @@ vector<float> speedDistribOutQueue(int nbImplementation, int duration, float vMa
 }
 
 void moving_in_queue(ofstream& fichier, int nbImplementation, int nbPlace) { 
-	vector<float> speed = speedDistribInQueue(nbPlace, nbImplementation);
-	for(vector<float>::iterator it = speed.begin() ; it != speed.end() ; it++) {
+	vector<double> speed = speedDistribInQueue(nbPlace, nbImplementation);
+	for(vector<double>::iterator it = speed.begin() ; it != speed.end() ; it++) {
 		fichier << (*it) << ", ";
 	}
 }
@@ -55,9 +55,9 @@ void staying_in_queue(ofstream& fichier, int nbImplementation) {
 	}
 }
 
-void moving_out_of_queue(ofstream& fichier, int nbImplementation, int duration, int maxspeed, float accMax) {
-	vector<float> speed = speedDistribOutQueue(nbImplementation, duration, maxspeed, accMax);
-	for(vector<float>::iterator it = speed.begin() ; it != speed.end() ; it++) {
+void moving_out_of_queue(ofstream& fichier, int nbImplementation, int duration, int maxspeed, double accMax) {
+	vector<double> speed = speedDistribOutQueue(nbImplementation, duration, maxspeed, accMax);
+	for(vector<double>::iterator it = speed.begin() ; it != speed.end() ; it++) {
 		fichier << (*it) << ",";
 	}
 }

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int lastCarProba(float proba, float weight) {
+int lastCarProba(double proba, double weight) {
 	int lastCar = 0;
 
 	srand(rand()*rand()*time(NULL));
@@ -16,23 +16,23 @@ int lastCarProba(float proba, float weight) {
 
 int numberOfAllowedCars(Queue Q, int timestep) {
 	int realNumberOfCars = 0;
-	map<int, float> capac = Q.getCapacities();
+	map<int, double> capac = Q.getCapacities();
 	
 	//### Get the biggest capactiy ; so that it'll be used as reference capacity to release cars ###
-	float capacMin = 0;
-	for(map<int, float>::iterator it = capac.begin() ; it != capac.end() ; it++) {
+	double capacMin = 0;
+	for(map<int, double>::iterator it = capac.begin() ; it != capac.end() ; it++) {
 		if((*it).second < capacMin || capacMin == 0)
 			capacMin = (*it).second;
 	}
-	float minNumberOfCars = capacMin * timestep /3600;
+	double minNumberOfCars = capacMin * timestep /3600;
 
 	//### Calculate how many cars are released ###
 	bool q = true;
 	int iter = 0;
 	while(q) {
 		Car C = Q.getQueue()[iter];
-		float absCapacity = capac[C.nextNode()];
-		float carWeight = capacMin/absCapacity;
+		double absCapacity = capac[C.nextNode()];
+		double carWeight = capacMin/absCapacity;
 		if(minNumberOfCars > carWeight) {
 			iter += 1;
 			minNumberOfCars -= carWeight;
