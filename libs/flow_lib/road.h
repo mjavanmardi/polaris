@@ -31,6 +31,7 @@ public:
 	std::vector<Car> getLastQueue();
 	std::vector<Car> getCommonQueue();
 	std::vector<Car>& getTA();
+	std::vector<double> getLengthOverTime();
 
 	//### Dynamic Methods ###
 	int selectIndividualQueue(int nextNode, bool& q);		// Select the queue where the car is going to go if its heading to nextNode ; q explicit if such a queue exist

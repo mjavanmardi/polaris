@@ -106,6 +106,10 @@ vector<Car>& Road::getTA() {
 	return travelingArea;
 }
 
+vector<double> Road::getLengthOverTime() {
+	return lengthOverTime;
+}
+
 
 //### Dynamic Methods ###
 

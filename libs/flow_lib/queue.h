@@ -19,23 +19,20 @@ public:
 	std::vector<Car> getQueue();
 	std::map<int, double> getCapacities();
 
-	//### Setters ###
-	
 	//### Dynamic methods ###
 	int weight(int nextNode);
 	void iterCarsProg();
 	void addCar(Car C);
 	void removeCar();
-
 	void moveFakeCars(int timestep);
 
-	std::vector<int> nextNodes;
+	
 private:
 	//### Constant parameters ###
 	int queueID;
 	double maxLength;
 	double distanceBetweenCars;
-	
+	std::vector<int> nextNodes;
 	std::map<int, double> capacities;		//int of next node && capacity value to this next node
 
 	//### Cars in queue ###
