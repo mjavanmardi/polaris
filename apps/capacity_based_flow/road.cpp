@@ -35,39 +35,28 @@ void Road::addQueue(int ID, double _maxLength, double _distanceBetweenCars, map<
 
 //### Getters ###
 
-int Road::ID() {
+int Road::ID() {return roadID;}
 
-	return roadID;
-}
+int Road::link() {return roadLink;}
 
-int Road::link() {
-	return roadLink;
-}
+int Road::nodeA(){return Anode;}
 
-int Road::nodeA(){
-	return Anode;
-}
+int Road::nodeB(){return Bnode;}
 
-int Road::nodeB(){
-	return Bnode;
-}
+double Road::speedMax() {return maximumSpeed;}
 
-double Road::speedMax() {
-	return maximumSpeed;
-}
-
-double Road::getMaxIndivQueueLength(){
-	double max = 0;
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
+double Road::getMaxIndivQueueLength(){	// Length in meters
+	double max = 0;		
+	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the maximal length
 		if(it->second.length() > max)
 			max = it->second.length();
 	}
 	return max;
 }
 
-int Road::getMaxIndivQueueSize() {
+int Road::getMaxIndivQueueSize() {		// Size in number of cars
 	int max = 0;
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
+	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the one with the larger number of cars
 		if(it->second.getQueue().size() > max)
 			max = it->second.getQueue().size();
 	}
@@ -76,46 +65,34 @@ int Road::getMaxIndivQueueSize() {
 
 double Road::getCommonQueueLength() {
 	double commonQueueLength = 0;
-	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it ++) {
+	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it ++) {		// Loop over the common queue to count its length, adding "distanceBetweenCars" to have a space between them
 		commonQueueLength = it->length() + distanceBetweenCars;
 	}
-	return commonQueueLength/(double)queues.size();
+	return commonQueueLength/(double)queues.size();			// The total length is divided by the number of queues = number of lanes on the road. The output is in meter;
 }
 
-double Road::getMaxCommonQueueLength() {
-	return totalLength - getMaxIndivQueueLength();
-}
+double Road::getMaxCommonQueueLength() {return totalLength - getMaxIndivQueueLength();}
 
-map<int, Queue> Road::indivQueues() {
-	return queues;
-}
+map<int, Queue> Road::indivQueues() {return queues;}
 
-Queue Road::getQueue(int ID) {
-	return queues[ID];
-}
+Queue Road::getQueue(int ID) {return queues[ID];}
 
-vector<Car> Road::getLastQueue(){
-	return lastQueue;
-}
+vector<Car> Road::getLastQueue(){return lastQueue;}
 
-vector<Car> Road::getCommonQueue() {
-	return commonQueue;
-}
+vector<Car> Road::getCommonQueue() {return commonQueue;}
 
-vector<Car>& Road::getTA() {
-	return travelingArea;
-}
+vector<Car>& Road::getTA() {return travelingArea;}
 
-vector<double> Road::getLengthOverTime() {
-	return lengthOverTime;
-}
+vector<double> Road::getLengthOverTime() {return lengthOverTime;}
 
 
 //### Dynamic Methods ###
 
 int Road::selectIndividualQueue(int nextNode, bool& q){
+	// nextNode is the node where the car is going. It the car is on Road(NodeA,NodeB) and goes to Road(B,C), it represents C
+	// The boolean returns true if a road has been found (Not being ealready full of cars)
 	int queueID = 0;
-	int minWeight = 10000;
+	int minWeight = 10000;		// Initialization to get a queue
 	q = false;
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		if(it->second.weight(nextNode) < minWeight) {
@@ -128,14 +105,14 @@ int Road::selectIndividualQueue(int nextNode, bool& q){
 }
 
 void Road::commonToIndividualQueue() {
-	int iter = 0;
+	int iter = 0;		// Iterator which stops when it gets to the second layer of cars in the common queue
 	while(commonQueue.size() != 0) {
-		if(iter == queues.size() || iter == commonQueue.size() )
+		if(iter == queues.size() || iter == commonQueue.size() )	// If the first layer has already been screened (iter == queues.size() ) or it got to the end (commonQueue.size()), the loop is broken/stopped
 			break;
 
 		Car C = commonQueue[0+iter];
 		bool q = false;
-		int ID = selectIndividualQueue(C.nextNode(), q);
+		int ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
 		if (q) {
 			queues[ID].getQueue().push_back(C);
 			commonQueue.erase(commonQueue.begin()+iter);
@@ -150,7 +127,7 @@ void Road::iterQueuesProg(int timestep) {
 	//### Move Fake Cars in the individual Queues  &&  Iterate Queues length & Cars progression ###
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		moveFakeCars(it->first, timestep);
-		it->second.iterCarsProg();
+		it->second.iterCarsProg();		// Iterate Queues length & Cars progression
 
 	}
 
@@ -185,7 +162,7 @@ double Road::distanceToTravelInTA(Car C) {
 		}
 	}
 	else {
-		distance = totalLength;
+		distance = totalLength; // If the car enters its last road, it has to go through all the road (Independantly of cars being on the road -> It assumes that the exiting roads are quite the same for every cars so they are just stored in the last queue)
 	}
 	return distance;
 }

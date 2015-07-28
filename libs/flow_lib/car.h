@@ -28,7 +28,7 @@ public:
 	double maxSpeed(int road);
 
 	//### Setters ###
-	void iterDistanceInTA(double length);			// Traveled distance in Traveling Area
+	void iterDistanceInTA(double length);		// Traveled distance in Traveling Area
 	void initDistanceInTA();
 
 	void iterProg(int iter);					// Progression of the car : State(in OR out [of the queue]) ; if(in the queue), gives the position
