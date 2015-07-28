@@ -10,6 +10,7 @@ set(Statewide OFF)
 #option(Antares "Build with Antares" ON)
 set(Antares OFF)
 
+option(CapacityFlow "Build Capacity based Flow Simulator" ON)
 
 set(BUILD_DIR build)
 
@@ -93,6 +94,8 @@ include_directories(libs)
 include_directories(libs/io)
 include_directories(libs/core)
 include_directories(libs/repository)
+include_directories(libs/flow_lib)
+
 
 include_directories(libs/scenario_manager)
 include_directories(libs/population_synthesis)
@@ -180,4 +183,9 @@ endif()
 if (Coretests)
 	#Apply CMake over POLARIS tests project structure
 	add_subdirectory (tests/core_tests)
+endif()
+
+if (CapacityFlow)
+	add_subdirectory(libs/flow_lib)
+	add_subdirectory(apps/capacity_based_flow)
 endif()
