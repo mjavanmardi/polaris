@@ -65,6 +65,14 @@ int main( int argc, char** argv)
 		}
 	}
 
+	//gets an interator for the link table
+	//result<polaris::io::Link> link_result=db->template query<polaris::io::Link>(query<polaris::io::Link>::true_expr);
 
+	//iterate over link records
+/*	for(typename result<polaris::io::Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
+				{
+				//acceess a member of the link object (column)
+				db_itr is a reference to object of type link
+					const string& facility_type=db_itr->getType()->getLink_Type()*/;
 	return 0;
 }
