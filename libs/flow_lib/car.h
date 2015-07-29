@@ -13,7 +13,8 @@ public:
 	double length();
 	int number();
 	int enteringTime();
-	int enteringNode();
+	int enteringNodeA();
+	int enteringNodeB();
 	int exitingNode();
 	int lastNode();
 	int Node();
@@ -45,7 +46,8 @@ private:
 	double carLength;
 	int reacDuration;
 	int enterTime;
-	int enterNode;
+	int enterNodeA;
+	int enterNodeB;
 	int exitNode;
 	double maximumAcceleration;
 	std::vector<int> path;

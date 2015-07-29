@@ -10,13 +10,15 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	int reacDuration = 1;				// Default Value
 	double maximumAcceleration = 2;		// Default Value
 	int _enteringTime = enteringTime;
-	int enteringNode;
+	int enteringNodeA;
+	int enteringNodeB;
 	int exitingNode;
 	bool a = false;
 	bool b = false;
 	for(int i = 0 ; i < location.size() ; i++) {
 		if(origin == location[i]) {
-			enteringNode =  nodeA[i];
+			enteringNodeA = nodeA[i];
+			enteringNodeB = nodeB[i];
 			a = true;
 		}
 		if(destination == location[i]) {
@@ -26,6 +28,7 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 		if(a && b)
 			break;
 	}
+	//### NEED TO ADD enteringNodeA && enteringNodeB
 	Car C(fake, carNumber, carLength, reacDuration, enteringTime, maximumAcceleration);
 	return C;
 }
