@@ -13,7 +13,8 @@ public:
 	double length();
 	int number();
 	int enteringTime();
-	int enteringNode();
+	int enteringNodeA();
+	int enteringNodeB();
 	int exitingNode();
 	int lastNode();
 	int Node();
@@ -28,7 +29,7 @@ public:
 	double maxSpeed(int road);
 
 	//### Setters ###
-	void iterDistanceInTA(double length);			// Traveled distance in Traveling Area
+	void iterDistanceInTA(double length);		// Traveled distance in Traveling Area
 	void initDistanceInTA();
 
 	void iterProg(int iter);					// Progression of the car : State(in OR out [of the queue]) ; if(in the queue), gives the position
@@ -38,6 +39,14 @@ public:
 
 	void addSpeed(double speed);
 
+
+	friend bool operator< (Car & C1, Car & C2) {
+		if(C1.enterTime < C2.enterTime)
+			return true;
+		else
+			return false;
+	}
+
 private:
 	//### Constant parameters ###
 	bool fake;
@@ -45,7 +54,8 @@ private:
 	double carLength;
 	int reacDuration;
 	int enterTime;
-	int enterNode;
+	int enterNodeA;
+	int enterNodeB;
 	int exitNode;
 	double maximumAcceleration;
 	std::vector<int> path;

@@ -30,8 +30,9 @@ Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _
 	path.push_back(83935);
 	path.push_back(83943);
 
-	enterNode = 83938;
-	exitNode = 83935;
+	enterNodeA = 83938;
+	enterNodeB = 83939;
+	exitNode = 83943;
 }
 
 Car::~Car() {
@@ -53,8 +54,11 @@ int Car::enteringTime() {
 	return enterTime;
 }
 
-int Car::enteringNode() {
-	return enterNode;
+int Car::enteringNodeA() {
+	return enterNodeA;
+}
+int Car::enteringNodeB() {
+	return enterNodeB;
 }
 
 int Car::exitingNode() {

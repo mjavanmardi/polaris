@@ -1,4 +1,4 @@
-#include "import.h"
+#include "importNetwork.h"
 
 using namespace std;
 
@@ -47,18 +47,6 @@ void importLanes(Road& R, bool q, int lane, double grade, vector<int> link, vect
 		
 		for(int j = 0 ; j < dir.size() ; j++) {
 			bool laneOK = verifyLane(i, lanes[j]);
-
-			/*if(R.link() == 86274 && link[j] == 86274) {
-			cout << endl << "Road link : " << R.link() << " -- Connection link : " << link[j];
-			cout << endl << "Road dirc : " << q << " -- Connection dirc : " << dir[j];
-			cout << endl << "Road lane : " << i << " -- Connection lanes : " << lanes[j] << " -- Lane OK " << laneOK ;
-			cout << endl << "toNode : " << toNode[j];
-			if(R.link() == link[j] && q == dir[j] && laneOK) {
-				cout << endl << "lol";
-				cout << endl;
-			}
-			}*/
-
 			if(R.link() == link[j] && q == dir[j] && laneOK) {	//Verify if the same link, same direction and same lanes inside
 				int toNode;
 				if(toNodeA[j] == R.nodeB())

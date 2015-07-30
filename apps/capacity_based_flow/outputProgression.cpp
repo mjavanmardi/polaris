@@ -1,4 +1,4 @@
-#include "output.h"
+#include "outputProgression.h"
 
 using namespace std;
 
