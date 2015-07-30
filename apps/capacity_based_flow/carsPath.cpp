@@ -7,3 +7,13 @@ using namespace std;
 //
 // The easiest algorithm doing that may be Dijkstra
 //
+
+
+
+void sortCars(vector<Car>& Cars) {
+	sort(Cars.begin(), Cars.end());
+}
+
+void preprocessCars(vector<Car>& Cars) { 
+	sortCars(Cars);
+}

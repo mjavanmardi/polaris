@@ -33,7 +33,7 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	return C;
 }
 
-void preprocessLocations(result<polaris::io::Location> locations, vector<int>& location, vector<int>& nodeA, vector<int>&nodeB) {
+void preprocessLocations(result<polaris::io::Location> locations, vector<int>& location, vector<int>& nodeA, vector<int>& nodeB) {
 	for(result<polaris::io::Location>::iterator it = locations.begin() ; it != locations.end() ; it++) {
 		location.push_back(it->getLocation());
 		Link L = *it->getLink();

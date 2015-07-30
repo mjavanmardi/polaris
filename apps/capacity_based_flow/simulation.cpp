@@ -4,8 +4,14 @@ using namespace std;
 
 
 
-void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car> Cars, int timestep, vector<int> timestepsToPrint, bool q, int superior) {
+void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, int timestep, vector<int> timestepsToPrint, bool q, int superior) {
 	for(int t = 0 ; t < modelisationTime ; t++) {
+	
+		if(t>=10) {
+				cout << endl << t;
+				cout << endl;
+		}
+
 	//### Add new cars into the system
 		addNewCars(Cars, Roads, t, timestep);
 

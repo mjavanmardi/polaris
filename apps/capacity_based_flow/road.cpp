@@ -149,19 +149,19 @@ void Road::iterQueuesProg(int timestep) {
 
 double Road::distanceToTravelInTA(Car C) {
 	double distance;
-	if(C.Node() != C.exitingNode()) {
-		if(commonQueue.size() != 0)
+	if(C.Node() != C.exitingNode()) {	// It is not the last road where the car is traveling on		
+		if(commonQueue.size() != 0)			// There are cars in the common queue
 			distance = totalLength - getCommonQueueLength() - getMaxIndivQueueLength();
-		else {
+		else {								// There is no cars in the common queue
 			bool q = false;
 			int queueID = selectIndividualQueue(C.nextNode(), q);
-			if(q)
+			if(q)	// If q = true, it means that there is at least one lane that can host the car (Meaning having the turning movement the car is looking for and not being full)
 				distance = totalLength - queues[queueID].length();
-			else
+			else	// If q = false, it means that there all the queues having the dedicated turning movement 
 				distance = totalLength - getMaxIndivQueueLength();
 		}
 	}
-	else {
+	else {				// The car is traveling on its last road. It's going to exit the network
 		distance = totalLength; // If the car enters its last road, it has to go through all the road (Independantly of cars being on the road -> It assumes that the exiting roads are quite the same for every cars so they are just stored in the last queue)
 	}
 	return distance;

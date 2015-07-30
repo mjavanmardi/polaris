@@ -39,6 +39,14 @@ public:
 
 	void addSpeed(double speed);
 
+
+	friend bool operator< (Car & C1, Car & C2) {
+		if(C1.enterTime < C2.enterTime)
+			return true;
+		else
+			return false;
+	}
+
 private:
 	//### Constant parameters ###
 	bool fake;

@@ -31,7 +31,8 @@ Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _
 	path.push_back(83943);
 
 	enterNodeA = 83938;
-	exitNode = 83935;
+	enterNodeB = 83939;
+	exitNode = 83943;
 }
 
 Car::~Car() {
