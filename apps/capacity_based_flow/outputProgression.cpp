@@ -13,6 +13,10 @@ vector<double> speedDistribInQueue(int nbPlace, int nbImplementation) {		//ADD T
 }
 
 vector<double> speedDistribOutQueue(int nbImplementation, int duration, double vMax, double accMax) {
+	// !!! THIS PART HAS TO BE REWROTE !!!
+	// THE OUTPUT VECTOR SIZE SHOULD BE EQUAL TO THE DURATION * nbImplementation 
+	// WHICH IS NOT TRUE IN THIS MODEL!!
+	
 	vector<double> speedProfil;
 	if(duration/2 < ceil(vMax/accMax)) { // The car does not reach Vmax
 		for(int i = - duration/2 ; i< duration/2 * nbImplementation ; i++) {
@@ -82,7 +86,7 @@ void progressionOf(Car C, ofstream& fichier, bool q) {
 					duration += 1;
 					it += 1;
 				}
-				moving_out_of_queue(fichier, nbImplementation, duration, C.maxSpeed(road), C.accMax() );
+				moving_out_of_queue(fichier, nbImplementation, duration, C.maxSpeed(road), C.accMean() );
 				road += 1;
 			}
 			else {

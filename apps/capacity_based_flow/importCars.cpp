@@ -8,7 +8,8 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	int number = carNumber;
 	double carLength = 4;				// Default Value
 	int reacDuration = 1;				// Default Value
-	double maximumAcceleration = 2;		// Default Value
+	double meanAcceleration = 2;		// Default Value
+	double meanDecceleration = 3;		// Default Value
 	int _enteringTime = enteringTime;
 	int enteringNodeA;
 	int enteringNodeB;
@@ -29,7 +30,7 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 			break;
 	}
 	//### NEED TO ADD enteringNodeA && enteringNodeB
-	Car C(fake, carNumber, carLength, reacDuration, enteringTime, maximumAcceleration);
+	Car C(fake, carNumber, carLength, reacDuration, enteringTime, meanAcceleration, meanDecceleration);
 	return C;
 }
 
