@@ -4,14 +4,9 @@ using namespace std;
 
 
 
-void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, int timestep, vector<int> timestepsToPrint, bool q, int superior) {
+void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, int timestep, vector<int> timestepsToPrint, int superior) {
 	for(int t = 0 ; t < modelisationTime ; t++) {
 	
-		if(t>=10) {
-				cout << endl << t;
-				cout << endl;
-		}
-
 	//### Add new cars into the system
 		addNewCars(Cars, Roads, t, timestep);
 
@@ -25,6 +20,6 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 		queuesToTravelingAreas(Roads, movingCars, timestep);
 
 	//### Display the network state if needed
-		printRoads(t, Roads, timestepsToPrint, q, superior);
+		printRoads(t, Roads, timestepsToPrint, superior);
 	}
 }

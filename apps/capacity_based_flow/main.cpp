@@ -17,24 +17,14 @@ int main() {
 
 //### Import the SQLITE database and initialize the network ###
 	map<int, Road> Roads = openRoad(db_path);
-	
 	vector<Car>& Cars = openCars(db_path);
 	preprocessCars(Cars);
-	// CALCULATE_THE_PATH_OF_CARS(Cars); SHOULD BE DONE in the carsPath.h/cpp files
-
-	//### THIS NEXT PART IS HERE TILL THERE IS NO PROCESS IN "CARSPATH" TO CALCULATE THE PATH OUT OF THE ENTERING AND EXITING NODE ###
-	//vector<Car> Cars;
-	//Car C(false, 1, 5, 1, 1, 2);
-	//Cars.push_back(C);
-	//### END OF THE TEMPORARY SECTION
-
-//### Simulation
-	bool q = true;
-	int superior = 0;
+	
+//### Simulation ###
+	int superior = 300;
 	vector<int> timestepsToPrint;
 	timestepsToPrint.push_back(modelisationTime-1);
-	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, q, superior);
-
+	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior);
 
 //### Outputs ###
 	ofstream file1, file2;

@@ -42,44 +42,23 @@ Car::~Car() {
 
 //### Getters ###
 
-double Car::length() {
-	return carLength;
-}
+double Car::length() {return carLength;}
 
-int Car::number() {
-	return carNumber;
-}
+int Car::number() {	return carNumber;}
 
-int Car::enteringTime() {
-	return enterTime;
-}
+int Car::enteringTime() {return enterTime;}
 
-int Car::enteringNodeA() {
-	return enterNodeA;
-}
-int Car::enteringNodeB() {
-	return enterNodeB;
-}
+int Car::enteringNodeA() { return enterNodeA;}
 
-int Car::exitingNode() {
-	return exitNode;
-}
+int Car::enteringNodeB() { return enterNodeB; }
 
-int Car::lastNode() {
-	return exitNode;
-}
+int Car::exitingNode() { return exitNode; }
 
-int Car::Node() {
-	return path[position];
-}
+int Car::Node() { return path[position]; }
 
-int Car::nextNode() {
-	return path[position+1];
-}
+int Car::nextNode() { return path[position+1]; }
 
-int Car::prevNode() {
-	return path[position-1];
-}
+int Car::prevNode() { return path[position-1]; }
 
 bool Car::existence() {
 	if(fake)
@@ -88,29 +67,17 @@ bool Car::existence() {
 		return true;
 }
 
-int Car::reactIter() {
-	return reacIter;
-}
+int Car::reactIter() { return reacIter; }
 
-int Car::reactDuration() {
-	return reacDuration;
-}
+int Car::reactDuration() { return reacDuration; }
 
-double Car::distanceInTA() {
-	return distInTA;
-}
+double Car::distanceInTA() { return distInTA; }
 
-double Car::accMax() {
-	return maximumAcceleration;
-}
+double Car::accMax() { return maximumAcceleration; }
 
-vector<int> Car::prog() {
-	return progression;
-}
+vector<int> Car::prog() { return progression; }
 
-double Car::maxSpeed(int road) {
-	return maxSpeeds[road];
-}
+double Car::maxSpeed(int road) { return maxSpeeds[road]; }
 
 
 //### Setters ###
@@ -141,4 +108,8 @@ void Car::iterReactIter(int k) {
 
 void Car::addSpeed(double speed) {
 	maxSpeeds.push_back(speed);
+}
+
+void Car::postponedEnteringTime(int timestep){
+	enterTime += timestep;
 }

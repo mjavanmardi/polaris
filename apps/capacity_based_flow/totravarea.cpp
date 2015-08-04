@@ -4,6 +4,7 @@ using namespace std;
 
 
 vector<pair<int,int>> selectCars(int j, int k, vector<vector<int>> Cars) {
+	//### REMINDER ### vector<vector<int>>Cars : Node i . Node j . Queue ID . nextNode(Car[0]) . nextNode(Car[1]) . nextNode(Car[2]) ...
 	vector<pair<int,int>> selectedCars;
 	for(vector<vector<int>>::iterator it = Cars.begin() ; it != Cars.end() ; it++) {
 		if(it->at(1) == j && it->at(3) == k) {		//If the car comes from R(.,j) && goes to k
@@ -14,6 +15,7 @@ vector<pair<int,int>> selectCars(int j, int k, vector<vector<int>> Cars) {
 		}
 	}
 	return selectedCars;
+	//Returns the cars going to Road(j,k) within the vector selectedCars <Node i, Queue ID>
 }
 
 void sampleCars(vector<pair<int,int>>& selectedCars) {
@@ -48,7 +50,7 @@ void releaseCars(Road& R, map<int, Road>& Roads, vector<pair<int,int>> sampledCa
 				movingCars.push_back((*it));
 			}
 			else {																		// First Car is not fake
-				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength()) {				// Check if there is room left
+				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength() + (R.getTA().size()/R.indivQueues().size())) {				// Check if there is room left
 					Car movingCar = Roads[roadID].getQueue(queueID).getQueue()[0];				// Get the first car of the previous road at the right queue
 					R.addCarToTA(movingCar);													// Add the car to the next Traveling Area
 					Roads[roadID].removeCarFromQueue(queueID, timestep); 						// Remove the car from the previous road ; Already includes fake car moving
@@ -63,7 +65,7 @@ void releaseCars(Road& R, map<int, Road>& Roads, vector<pair<int,int>> sampledCa
 
 void deleteStuckCars(vector<int>& car, vector<pair<int,int>> stuckCars, bool& stuck) {
 	for(vector<pair<int,int>>::iterator it = stuckCars.begin() ; it != stuckCars.end() ; it++) {
-		if(it->first == car[0] && it->second == car[1]) {	//Node i and Queue ID of car correspond to the moving car
+		if(it->first == car[0] && it->second == car[2]) {	//Node i and Queue ID of car correspond to the moving car
 			stuck = true;
 			break;
 		}
@@ -91,23 +93,25 @@ void deleteCars(vector<vector<int>>& Cars,	vector<pair<int, int>> movingCars, ve
 				deleteMovingCars((*it), movingCars, moving);
 				if(moving == false) 
 					deleteStuckCars((*it), stuckCars, stuck);
-			
+
 				//### Increase iterator
 				if(moving == true) {
-					if(it->size() == 3)
+					if(it->size() == 3) {
 						Cars.erase(it);
+						break;
+					}
 					else
 						it++;
 				}
 				else if(stuck == true) {
 					Cars.erase(it);
+					break;
 				}
-				else {
+				else 
 					it++;
-				}
 				//###
 			}
-			else
+			else 
 				it++;
 		}
 		if(Cars.size() == 0)
@@ -118,8 +122,9 @@ void deleteCars(vector<vector<int>>& Cars,	vector<pair<int, int>> movingCars, ve
 void queuesToTravelingAreas(map<int, Road>& Roads, vector<vector<int>> Cars, int timestep) {
 	while(Cars.size() != 0) {
 		for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
+			//### REMINDER ### vector<vector<int>>Cars : Only the cars that are allowed to cross an intersection based on the capacity.
 			//### REMINDER ### vector<vector<int>>Cars : Node i . Node j . Queue ID . nextNode(Car[0]) . nextNode(Car[1]) . nextNode(Car[2]) ...
-		
+
 			//### Select first cars going to R(j,k) ; selectedCars < Node i . Queue ID >
 			vector<pair<int, int>> selectedCars = selectCars(it->second.nodeA(), it->second.nodeB(), Cars);
 
