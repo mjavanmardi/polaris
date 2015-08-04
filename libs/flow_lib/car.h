@@ -6,7 +6,7 @@ class Car {
 public:
 	//### Constructors & Destructors ###
 	Car();
-	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _maximumAcceleration);
+	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration);
 	~Car();
 
 	//### Getters ###
@@ -20,10 +20,12 @@ public:
 	int nextNode();			// Returns C
 	int prevNode();			// Returns A
 	bool existence();		// There are fake cars in the networks that model the car reaction time. (Existence = true) => Not a fake car.
+	double speed();
 	int reactIter();		// Iterator to know how long the car has waited while he car ahead of it has moved
 	int reactDuration();	// Reaction time of the vehicle/driver
 	double distanceInTA();	// Distance already traveled by the car in the traveling area
-	double accMax();		// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d
+	double accMean();		// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d
+	double deccMean();
 	std::vector<int> prog();// Store the progression state of the car (0: out of the queue /\ 1:first car in the queue /\ 2 ; second car in the queue /\ ...)
 	double maxSpeed(int road);	//
 
@@ -35,6 +37,8 @@ public:
 	void iterPosition();
 	void initReactIter();					// Reaction time when the car upfront moves
 	void iterReactIter(int k);
+	void initSpeed();
+	void iterSpeed(double newSpeed);
 
 	void addSpeed(double speed);
 	void postponedEnteringTime(int timestep);
@@ -57,7 +61,9 @@ private:
 	int enterNodeA;
 	int enterNodeB;
 	int exitNode;
-	double maximumAcceleration;
+	double meanAcceleration;
+	double meanDecceleration;
+	double carSpeed;
 	std::vector<int> path;
 
 	//### Iterators ###

@@ -8,18 +8,20 @@ Car::Car() {		//Constructor used for fake cars in the queues
 	carLength = 5;
 }
 
-Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _maximumAcceleration) {
+Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration) {
 	fake = _fake;
 	carNumber = _carNumber;
 	carLength = _carLength;
 	reacDuration = _reacDuration;
 	enterTime = _enterTime;
-	maximumAcceleration = _maximumAcceleration;
+	meanAcceleration = _meanAcceleration;
+	meanDecceleration = _meanDecceleration;
 
 	progression.clear();
 	reacIter = 0;
 	position = 0;
 	distInTA = 0;
+	carSpeed = 0;
 
 	path.clear();
 	path.push_back(83938);
@@ -67,13 +69,17 @@ bool Car::existence() {
 		return true;
 }
 
+double Car::speed() { return carSpeed; }
+
 int Car::reactIter() { return reacIter; }
 
 int Car::reactDuration() { return reacDuration; }
 
 double Car::distanceInTA() { return distInTA; }
 
-double Car::accMax() { return maximumAcceleration; }
+double Car::accMean() { return meanAcceleration; }
+
+double Car::deccMean() { return meanDecceleration; }
 
 vector<int> Car::prog() { return progression; }
 
@@ -104,6 +110,13 @@ void Car::initReactIter() {
 
 void Car::iterReactIter(int k) {
 	reacIter += k;
+}
+
+void Car::initSpeed() {
+	carSpeed = 0;
+}
+void Car::iterSpeed(double newSpeed) {
+	carSpeed = newSpeed;
 }
 
 void Car::addSpeed(double speed) {
