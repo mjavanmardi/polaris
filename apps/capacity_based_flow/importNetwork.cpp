@@ -72,7 +72,7 @@ pair<Road,Road> importRoad(polaris::io::Link db_itr, int ID, vector<int> link, v
 	int bnode = db_itr.getNode_B()->getNode();
 	double maxSpeed_AB = db_itr.getSpeed_Ab();
 	double maxSpeed_BA = db_itr.getSpeed_Ba();
-	double totalLength = db_itr.getLength() + db_itr.getSetback_A() + db_itr.getSetback_B();
+	double totalLength = db_itr.getLength() + db_itr.getSetback_B();
 	double distanceBetweenCars = (double) 1;		//Default value for the distance between cars
 	
 // ### Road Initialization  ###

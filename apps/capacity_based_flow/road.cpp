@@ -168,7 +168,7 @@ double Road::distanceToTravelInTA(Car C) {
 }
 
 void Road::addCarToQueue(Car C){
-	if(C.Node() == C.lastNode())	//Last Road of the car
+	if(C.Node() == C.exitingNode())	//Last Road of the car
 		lastQueue.push_back(C);
 	else {							//Not last road of the car
 		bool q = false;
@@ -192,8 +192,8 @@ void Road::addCarToTA(Car& C) {
 }
 
 void Road::removeCarsFromTA(std::vector<int> carNumbers) {
-	vector<Car> newTA;
 	while(carNumbers.size() != 0) {
+		vector<Car> newTA;
 		for(vector<Car>::iterator it = travelingArea.begin() ; it != travelingArea.end() ; it++) {
 			if(it->number() != carNumbers[0])
 				newTA.push_back((*it));
