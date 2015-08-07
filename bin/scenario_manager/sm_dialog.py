@@ -36,16 +36,29 @@ class SMDialog(QtGui.QMainWindow):
 		self.ui.runView.hideColumn(0)
 		self.ui.runView.hideColumn(5)
 		self.ui.runView.hideColumn(6)
+		self.connect(self.studyModel, QtCore.SIGNAL("primeInsert(QSqlRecord)"), self.insertStudyRow)
 	def addStudy(self):
-		# max_id = self.conn.execute("select max(id) from study").fetchone()[0]
-		# if max_id is None:
-			# max_id = 0
-		# d = str(datetime.datetime.now())[0:16]
+		max_id = self.conn.execute("select max(id) from study").fetchone()[0]
+		if max_id is None:
+			max_id = 0
+		d = str(datetime.datetime.now())[0:16]
 		# self.conn.execute("insert into study values (?,?,?,?,?)",(max_id+1, max_id+1, None, d, None,))
 		# self.conn.commit()
-		# self.study = max_id+1
+		self.study = max_id+1
 		# self.ui.runView.dataChanged()
-		self.studyModel.insertRows(self.studyModel.rowCount(), 1)
+		QtCore.QSqlRecord record = self.studyModel.record();
+		record.setValue(1,QVariant(max_id+1));
+		record.setValue(2,QVariant(max_id+1));
+		record.setValue(2,QVariant(tr("")));
+		record.setValue(2,QVariant(tr(d)));
+		self.studyModel.insertRows(self.studyModel.rowCount(), 1, record)
+		# self.studyModel.record(1).value("id")
+		# index = QtCore.QModelIndex()
+		# index.column = 1;
+		# print self.studyModel.data(,1)
+	def insertStudyRow(self, record):
+		print "LALALA"
+		# print record
 	def addRun(self):
 		if self.study is None:
 			self.addStudy()
