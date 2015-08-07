@@ -1,0 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(Batch_Router ${cppfiles} ${hppfiles})
+target_link_libraries(Batch_Router ${libtcmalloc} ${iolibs} Scenario_Manager Core Routing)
+set_target_properties(Batch_Router PROPERTIES FOLDER apps)

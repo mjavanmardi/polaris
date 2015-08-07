@@ -5,6 +5,90 @@
 
 namespace File_IO
 {
+	struct File_Info
+	{
+		File_Info(char* filepath)
+		{
+			_full_name.assign(filepath);
+			//std::replace(_full_name.begin(), _full_name.end(),'\\','/');
+			int len = _full_name.length();
+
+			// get path
+			int pathpos = _full_name.find_last_of("\\/");
+			if (pathpos != _full_name.npos)
+			{
+				_path = _full_name.substr(0,pathpos);
+			}
+			else
+			{
+				pathpos = -1;
+				_path.assign("");
+			}
+
+			// get extension	
+			int pos = _full_name.find('.');
+			if (pos != std::string::npos)
+			{
+				if (pos <= pathpos){THROW_EXCEPTION("ERROR: file "<<filepath<<" improperly specified.");}			
+				_extension = _full_name.substr(pos+1,len-pos-1);
+			}
+			else
+			{
+				pos = len;
+				_extension.assign("");
+			}
+
+			_name = _full_name.substr(pathpos+1,pos-pathpos-1);
+
+			// if sqlite database, find higher level db name (i.e. strip off -Supply, -Result, etc.)
+			if (Is_File_Type("sqlite"))
+			{
+				int dbpos = _full_name.find('-');
+				if (dbpos != std::string::npos)
+				{
+					_db_name = _full_name.substr(0,dbpos);
+				}
+				else
+				{
+					_db_name.assign("");
+				}
+			}
+		}
+		bool Is_File_Type(char* extension)
+		{
+			return (strcmp(_extension.c_str(),extension) == 0);
+		}
+		bool Has_Extension()
+		{
+			return !_extension.empty();
+		}
+		string full_name()
+		{
+			return _full_name;
+		}
+		string path()
+		{
+			return _path;
+		}
+		string name()
+		{
+			return _name;
+		}
+		string db_name()
+		{
+			return _db_name;
+		}
+		string extension()
+		{
+			return _extension;
+		}
+	private:
+		string _path;
+		string _name;
+		string _extension;
+		string _full_name;
+		string _db_name;
+	};
 
 	//---------------------------------------------------------
 	//	FILE READER 
@@ -121,13 +205,23 @@ namespace File_IO
 			std::getline(_file,line);
 			_string_data.clear();
 			tokenize(line, _string_data, _delims);
-			if (_string_data.size() < _header.size())
+			if (_string_data.size() < _header.size() && _header.size() > 0)
 			{
 				return Read();
 			}
 			return ret_val;
 		}
-		int Get_Int(int column);
+		int Get_Int(int column)
+		{
+			int x;
+			if (column >= _string_data.size()) 
+			{
+				return false;
+			}
+			istringstream iss(_string_data[column]);
+			iss>>x;
+			return x;
+		}
 		template<class T>
 		bool Get_Data(T& t, int column)
 		{

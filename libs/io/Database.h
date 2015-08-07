@@ -180,7 +180,7 @@ inline DBPtrType open_sqlite_database(const std::string& name)
 	ifstream test;
 	if (db_inventory.size()>1)
 	{
-		for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
+		for (std::vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
 		{
 			test.open(make_name(name, *it).c_str());
 			if(test.is_open())

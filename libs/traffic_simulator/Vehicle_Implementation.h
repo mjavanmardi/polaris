@@ -35,7 +35,7 @@ namespace Vehicle_Components
 			m_data(bool, its_switch, NONE, NONE);
 			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
 
-
+			m_data(bool, write_trajectory,NONE,NONE);
 
 			typedef typename Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>::ComponentType ComponentType;
 			
@@ -992,6 +992,31 @@ namespace Vehicle_Components
 				///
 				_last_enroute_switching_route_check_time = 0;
 				//Initialize<TargetType>();
+
+				// determine if we track this vehicle for trajectory writing
+				_write_trajectory = false;
+				if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_list<bool>())
+				{
+					std::unordered_set<int>& tracking_list = ((_Scenario_Interface*)_global_scenario)->vehicle_tracking_list<std::unordered_set<int>&>();
+					std::unordered_set<int>::iterator itr = tracking_list.find(_uuid);
+					if (itr != tracking_list.end())
+					{
+						_write_trajectory = true;
+					}
+				}
+				else
+				{
+					float x = ((_Scenario_Interface*)_global_scenario)->template vehicle_trajectory_sample_rate<float>();
+					if (x < 0.99999999)
+					{
+						float r = GLOBALS::Uniform_RNG. template Next_Rand<float>();
+						if (r < x) _write_trajectory = true;
+					}
+					else
+					{
+						_write_trajectory = true;
+					}
+				}
 			}
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination)

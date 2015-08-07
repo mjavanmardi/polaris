@@ -9,6 +9,9 @@
 *-odb.ixx
 *-odb.hxx
 *-odb.cxx
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 share/io/out/*
 
 # Build results

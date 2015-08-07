@@ -75,6 +75,7 @@ namespace File_IO
 		{
 			_file<<S.str()<<DELIM;
 			S.str("");
+			S.clear();
 		}
 		//template<typename T>
 		//void Write(T &data)
@@ -94,6 +95,7 @@ namespace File_IO
 		{
 			_file<<S.str()<<endl;
 			S.str("");
+			S.clear();
 		}
 		template<typename T>
 		void Write_Line(T &data)

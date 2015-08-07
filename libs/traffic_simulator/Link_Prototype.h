@@ -18,6 +18,7 @@ namespace Link_Components
 			WALKWAY,
 			BIKEWAY,
 			WATERWAY,
+			EXTERNAL
 		};
 	}
 

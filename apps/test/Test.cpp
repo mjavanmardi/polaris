@@ -96,27 +96,57 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 	m_data(int,data,NONE,NONE);
 	m_data(float,x,NONE,NONE);
 	m_data(float,y,NONE,NONE);
+	m_prototype(Agent, typename MasterType::other_agent_type, my_agent, NONE,NONE);
+	m_data(True_Color_RGB<NT>,color,NONE,NONE);
+	static Antares_Layer<typename MasterType::antares_layer_type>* _base_agent_layer;
 
-	// Member functions
+	// static initializer for the type - call once at program start to initialize static variables
 	static void Initialize_Type()
 	{
-
+		_base_agent_layer = Allocate_New_Layer<MT>(string("Base Agent"));
+		Antares_Layer_Configuration cfg;
+		cfg.Configure_Dynamic_Points();
+		cfg.Configure_Dynamic_Points();
+		cfg.target_sub_iteration = 1;
+		cfg.head_size_value = 20;
+		cfg.primitive_color = true;
+		cfg.draw=true;
+		_base_agent_layer->Initialize<NT>(cfg);
 	}
+
 	void Initialize(int i)
 	{
 		// set initial values for member variables
 		_data = 1;
 		_x = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
 		_y = GLOBALS::Uniform_RNG.Next_Rand<float>()*1000;
+		_color.r(255); _color.g(0); _color.b(0);
 	}
 	void Do_Event()
 	{
 		// Code to execute when the event fires
 		_x += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>() - 0.5);
 		_y += 150.0 * (GLOBALS::Uniform_RNG.Next_Rand<float>()  - 0.5);
-		//cout <<"X="<<_x<<", Y="<<_y<<endl;
+		if (_x >= 1000) _x = 1000;
+		if (_x <= -1000) _x = -1000;
+		if (_y >= 500) _y = 500;
+		if (_y <= -500) _y = -500;
+		
+		Draw();
+	}
+	void Draw()
+	{
+		Point_Element_Colored p;
+		p._point.x(_x);
+		p._point.y(_y);
+		p._color._r=_color._r;
+		p._color._g=_color._g;
+		p._color._b=_color._b;
+		Scale_Coordinates<MT>(p._point);
+		_base_agent_layer->Push_Element<Regular_Element>(&p);
 	}
 };
+template<typename MasterType,typename InheritanceList> Antares_Layer<typename MasterType::antares_layer_type>* Base_Agent_Implementation<MasterType,InheritanceList>::_base_agent_layer;
 implementation struct Other_Agent_Implementation : public Base_Agent_Implementation<MasterType,INHERIT(Other_Agent_Implementation)>
 {
 	typedef Base_Agent_Implementation<MasterType,INHERIT(Other_Agent_Implementation)> base_type;
@@ -127,11 +157,23 @@ implementation struct Other_Agent_Implementation : public Base_Agent_Implementat
 			
 	member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length,Basic_Units::Implementations::Length_Implementation<NT>);
 
-	// Member functions
+	m_data(True_Color_RGB<NT>,color,NONE,NONE);
+	static Antares_Layer<typename MasterType::antares_layer_type>* _other_agent_layer;
+
+	// static initializer for the type - call once at program start to initialize static variables
 	static void Initialize_Type()
 	{
-
+		_base_agent_layer = Allocate_New_Layer<MT>(string("Other Agent"));
+		Antares_Layer_Configuration cfg;
+		cfg.Configure_Dynamic_Points();
+		cfg.Configure_Dynamic_Points();
+		cfg.target_sub_iteration = 1;
+		cfg.head_size_value = 20;
+		cfg.primitive_color = true;
+		cfg.draw=true;
+		_base_agent_layer->Initialize<NT>(cfg);
 	}
+
 	void Initialize(int i)
 	{
 		this->length<Basic_Units::Length_Variables::Feet>(10.0);
@@ -140,6 +182,8 @@ implementation struct Other_Agent_Implementation : public Base_Agent_Implementat
 
 		// set initial values for member variables
 		_z = GLOBALS::Uniform_RNG.Next_Rand<float>()*10;
+
+		_color.r(0); _color.g(0); _color.b(255);
 	}
 	void Do_Event()
 	{
@@ -148,12 +192,28 @@ implementation struct Other_Agent_Implementation : public Base_Agent_Implementat
 		float d_y = base_type::_y - this->_my_agent->y<float>();
 		float len = sqrt(pow(d_x,2) + pow(d_y,2));
 
-		base_type::_x += d_x/len*10;
-		base_type::_y += d_y/len*10;
+		float dd_x = -d_x/len*10;
+		float dd_y = -d_y/len*10;
+		base_type::_x += dd_x;
+		base_type::_y += dd_y;
 
 		cout << "Base Agent is at {"<<this->_my_agent->x<float>() << ", " <<this->_my_agent->y<float>() << "} ; Agent is at " <<base_type::_x << ", " <<base_type::_y<<endl;
+
+		Draw();
+	}
+	void Draw()
+	{
+		Point_Element_Colored p;
+		p._point.x(_x);
+		p._point.y(_y);
+		p._color._r=_color._r;
+		p._color._g=_color._g;
+		p._color._b=_color._b;
+		Scale_Coordinates<MT>(p._point);
+		_base_agent_layer->Push_Element<Regular_Element>(&p);
 	}
 };
+template<typename MasterType,typename InheritanceList> Antares_Layer<typename MasterType::antares_layer_type>* Other_Agent_Implementation<MasterType,InheritanceList>::_other_agent_layer;
 
 implementation struct Some_Other_Thing : public Polaris_Component<MasterType,INHERIT(Some_Other_Thing),Execution_Object>
 {
@@ -184,10 +244,11 @@ struct MasterType
 	//=================================================================================
 	#endif
 	typedef MasterType M;
+	// Add all of the types used in your code here
 	typedef Base_Agent_Implementation<M> agent_type;
 	typedef Other_Agent_Implementation<M> other_agent_type;
 	typedef Some_Other_Thing<M> some_other_type;
-	// Add all of the types used in your code here
+	
 };
 
 
@@ -216,6 +277,7 @@ int main(int argc, char *argv[])
 
 	// Initialize drawing layers - always need to call static initializer functions this way
 	MasterType::agent_type::Initialize_Type();
+	MasterType::other_agent_type::Initialize_Type();
 
 	// define an interface to use
 	typedef Agent<MasterType::agent_type> agent_itf;
@@ -226,10 +288,12 @@ int main(int argc, char *argv[])
 	{
 		agent_itf* base_agent = (agent_itf*)Allocate<MasterType::agent_type>();
 		base_agent->Initialize<int>(i);
+		
 
 		other_agent_itf* other_agent = (other_agent_itf*)Allocate<MasterType::other_agent_type>();
 		other_agent->Initialize<int>(i);
 		other_agent->my_agent(base_agent);
+		base_agent->my_agent(other_agent);
 
 		Agent<MasterType::some_other_type>* other_thing = (Agent<MasterType::some_other_type>*)Allocate<MasterType::some_other_type>();
 		other_thing->x<int>(1);

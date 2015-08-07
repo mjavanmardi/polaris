@@ -105,6 +105,7 @@ struct MasterType
 
 void write_scenario_file(char* database_name, char* scenario_name);
 
+
 int main(int argc,char** argv)
 {
 
@@ -342,72 +343,3 @@ void write_scenario_file(char* database_name, char* scenario_name)
 
 	cout <<"Reading information from '"<<db<<"' sqlite file."<<endl;
 }
-
-
-
-//==================================================
-// SKIMFILE READER APPLICATION
-//int main(int argc, char** argv)
-//{
-//	string input_filename, output_filename;
-//
-//	if (argc < 2)
-//	{
-//		cout << "Enter input skimfile name: ";
-//		cin >> input_filename;
-//	}
-//	else
-//	{
-//		input_filename = argv[1];
-//	}
-//	
-//	output_filename = input_filename + ".csv";
-//
-//	//Network_Skimming_Components::Prototypes::Network_Skimming_Prototype<NT>::Convert_Binary_Skimfile_To_CSV<NT>(input_filename, output_filename);
-//
-//
-//	//===========================================================================
-//	// FILE INPUT IF REQUESTED
-//	int num_modes;
-//	int num_zones;
-//	int update_increment;
-//
-//	File_IO::Binary_File_Reader infile;
-//	if (!infile.Open(input_filename)) 
-//	{
-//		int test;
-//		cin >> test;
-//		return 0;
-//	}
-//	
-//	infile.Read_Value<int>(num_modes);
-//	infile.Read_Value<int>(num_zones);
-//	infile.Read_Value<int>(update_increment);
-//
-//	ofstream outfile;
-//	outfile.open(output_filename);
-//
-//			
-//	Simulation_Timestep_Increment start;
-//	//===========================================================================
-//	// create the skim_table time periods, for basic create only a single time period skim_table
-//	for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
-//	{		
-//		float* data = new float[num_zones*num_zones];
-//		infile.Read_Array<float>(data, num_zones*num_zones);
-//
-//		outfile << endl << "Skim matrix for hour: " << GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,Time_Hours>(start)<<endl;
-//
-//		for (int i =0; i < num_zones; i++)
-//		{
-//			for (int j=0; j < num_zones; j++)
-//			{
-//				outfile << data[i*num_zones + j] << "," ;
-//			}
-//			outfile << endl;
-//		}
-//	}
-//
-//	int test;
-//	cin >> test;
-//}

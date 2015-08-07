@@ -173,6 +173,31 @@ namespace Person_Components
 				_vehicle->template initialize<NT>();
 				_vehicle->template is_integrated<bool>(true);
 
+				// Check if this vehicle is tracked for trajectory output
+				//if (((scenario_reference_interface*)_global_scenario)->use_vehicle_tracking_list<bool>())
+				//{
+				//	std::unordered_set<int>& tracking_list = ((scenario_reference_interface*)_global_scenario)->vehicle_tracking_list<std::unordered_set<int>&>();
+				//	std::unordered_set<int>::iterator itr = tracking_list.find(_vehicle->template uuid<int>());
+				//	if (itr != tracking_list.end())
+				//	{
+				//		_vehicle->write_trajectory(true);
+				//	}
+				//}
+				//else
+				//{
+				//	float x = ((scenario_reference_interface*)_global_scenario)->template vehicle_trajectory_sample_rate<float>();
+				//	if (x < 0.99999999)
+				//	{
+				//		float r = GLOBALS::Uniform_RNG. template Next_Rand<float>();
+				//		if (r < x) _vehicle->write_trajectory(true);
+				//	}
+				//	else
+				//	{
+				//		_vehicle->write_trajectory(true);
+				//	}
+				//}
+				
+
 				this->_current_location = nullptr;
 
 				// Add basic traveler properties							

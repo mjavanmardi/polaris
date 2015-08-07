@@ -1,0 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(Assignment_Analyzer ${cppfiles} ${hppfiles})
+target_link_libraries(Assignment_Analyzer ${libtcmalloc} ${iolibs} Scenario_Manager Core Routing)
+set_target_properties(Assignment_Analyzer PROPERTIES FOLDER apps)
