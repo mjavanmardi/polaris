@@ -29,7 +29,6 @@ int main() {
 	timestepsToPrint.push_back(modelisationTime-1);
 	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior);
 	clock_t end = clock();
-	cout << endl << endl << "PROCESSING TIME : " << (end-start)/1000 << " seconds";
 
 //### Outputs ###
 	ofstream file1, file2;

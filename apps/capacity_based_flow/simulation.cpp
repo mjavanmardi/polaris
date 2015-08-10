@@ -14,8 +14,7 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
 		vector<vector<int>> movingCars = preProcess(Roads, timestep);
-		//clock_t c = clock();
-		//cout << endl<< "TOTAL :" << c-b <<endl ;
+		//clock_t c = clock();;
 
 	//### Release cars from traveling areas into queues (Common or Individual)
 		travelingAreaToQueues(Roads, timestep);
@@ -23,8 +22,9 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 
 	//### Release cars from queues to traveling areas -> cars stored previously (Based on capacity) 
 		queuesToTravelingAreas(Roads, movingCars, timestep);
-		//clock_t e = clock();
-		//cout << endl << "Time : " << t << ". Total: " << e-a << ". 1:" << b-a << ". 2:" << c-b << ". 2:" << d-c << ". 3:" << e-d;
+		/*clock_t e = clock();
+		if(e-a > 20)
+			cout << endl << "Time : " << t << ". Total: " << e-a << ". 1:" << b-a << ". 2:" << c-b << ". 2:" << d-c << ". 3:" << e-d;*/
 
 	//### Display the network state if needed
 		printRoads(t, Roads, timestepsToPrint, superior);
