@@ -4,9 +4,9 @@ using namespace std;
 
 int selectEnteringRoad(map<int, Road>& Roads, int enterNodeA, int enterNodeB) {
 	// The function the nodeA / nodeB data (coming from the SQLite database) to the road ID (Data structure used for the C++ this model)
+			
 	int roadID = 0;
-	map<int, Road> roads = Roads;
-	for(map<int, Road>::iterator it = roads.begin() ; it != roads.end() ; it++) {
+	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
 		if(it->second.nodeA() == enterNodeA && it->second.nodeB() == enterNodeB) {
 			roadID = it->first;
 			break;
@@ -19,7 +19,7 @@ void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep) {
 	vector<int> toBeErased;
 	int iter = 0;
 	for(vector<Car>::iterator& it = Cars.begin() ; it != Cars.end() ; it++) {
-		if(it->enteringTime() > t && it->enteringTime() <= t + timestep) {
+		if(it->enteringTime() >= t && it->enteringTime() < t + timestep) {
 			int roadID = selectEnteringRoad(Roads, it->enteringNodeA(), it->enteringNodeB());  // The function the nodeA / nodeB data (coming from the SQLite database) to the road ID (Data structure used for the C++ this model)
 			if(roadID == 0)
 				cout << endl << "There is a problem with the entering Road ; the queue ID shoudln't be 0";
@@ -39,9 +39,9 @@ void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep) {
 			break;
 		}
 		iter += 1;
-	}
 
+	}
 	for(int i = toBeErased.size() ; i>0 ; i--) {
 		Cars.erase(Cars.begin() + toBeErased.at(i-1));
-	}
+	} 
 }

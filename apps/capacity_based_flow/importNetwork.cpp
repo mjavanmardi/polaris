@@ -19,6 +19,8 @@ double getCapacity(string type, double grade) {
 	double pedestrianLeftTurn = 1;					// Default Value
 	double pedestrianBicyclePedestrianRightTurn = 1;// Default Value
 
+	//!!! SQLite Supply Database provides "USE" and "TYPE" value that should be used somehow !!!!
+
 	double capacity = effectiveGreenTime * BSFR * laneWidth * heavyVehicles * approachGrade * parkingActivity * blockingEffect * areaType * laneUtilization * rightTurn * leftTurn * pedestrianLeftTurn * pedestrianBicyclePedestrianRightTurn;
 
 	return capacity;
@@ -28,14 +30,17 @@ bool verifyLane(int lane, string lanes) {
 	bool q = false;
 	char mini = lanes.at(0);
 	int min;
-	if(mini == 'R')
-		min = 1;
+	if(mini == 'R') 
+		min = lanes.at(1) - '0';
+	else if(mini == 'L')
+		min = 3;
 	else
 		min = lanes.at(0) - '0';
-	/*cout << endl << lanes;
-	cout << endl << lanes.at(0);
-	cout << endl << min;*/
-	int max = (int) lanes.at(lanes.size()-1);
+	/*if(mini == 'R' || mini == 'L')
+		min = lanes.at(1) - '0';
+	else
+		min = lanes.at(0) - '0';*/
+	int max = (int) lanes.at(lanes.size()-1)-'0';
 	if(lane >= min && lane <= max)
 		q = true;
 	return q;
@@ -54,13 +59,12 @@ void importLanes(Road& R, bool q, int lane, double grade, vector<int> link, vect
 				else
 					toNode = toNodeA[j];
 				capacities[toNode] = getCapacity(type[j], grade);
-
 			}
 		}
 		
 		double maxLength = 30;				// Default Value
 		double distanceBetweenCars = 1;		// Default Value
-		R.addQueue(lane, 30, 1, capacities);
+		R.addQueue(i, 30, 1, capacities);
 	}
 }
 
@@ -84,7 +88,7 @@ pair<Road,Road> importRoad(polaris::io::Link db_itr, int ID, vector<int> link, v
 //### Road Lanes Initialization ###
 	int lanes_AB = db_itr.getLanes_Ab();
 	int lanes_BA = db_itr.getLanes_Ba();
-	
+
 	importLanes(R1, 0, lanes_AB, db_itr.getGrade(), link, toNodeA, toNodeB, dir, lanes, type);		//The boolean is for the "direction" in the database. 0 = nodeA->B. 1 = nodeB->A
 	importLanes(R2, 1, lanes_BA, db_itr.getGrade(), link, toNodeA, toNodeB, dir, lanes, type);
 

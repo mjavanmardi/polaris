@@ -16,7 +16,7 @@ public:
 	//### Getters ###
 	int ID();
 	double length();
-	std::vector<Car> getQueue();
+	std::vector<Car>& getQueue();
 	std::map<int, double> getCapacities();
 
 	//### Dynamic methods ###

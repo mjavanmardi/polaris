@@ -5,10 +5,11 @@ using namespace std;
 //### Constructors & Destructors ###
 Car::Car() {		//Constructor used for fake cars in the queues
 	fake = true;
+	carNumber = -999;
 	carLength = 5;
 }
 
-Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration) {
+Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration, int entA, int entB, int exA, int exB) {
 	fake = _fake;
 	carNumber = _carNumber;
 	carLength = _carLength;
@@ -17,24 +18,28 @@ Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _
 	meanAcceleration = _meanAcceleration;
 	meanDecceleration = _meanDecceleration;
 
-	progression.clear();
 	reacIter = 0;
 	position = 0;
 	distInTA = 0;
 	carSpeed = 0;
 
-	path.clear();
-	path.push_back(83938);
-	path.push_back(83939);
-	path.push_back(83941);
-	path.push_back(83937);
-	path.push_back(83936);
-	path.push_back(83935);
-	path.push_back(83943);
+	enterNodeA = entB;
+	enterNodeB = entA;
+	exitNodeA = exA;
+	exitNodeB = exB;
 
-	enterNodeA = 83938;
-	enterNodeB = 83939;
-	exitNode = 83943;
+//### THIS PART SHOULD BE DELETED ONCE THE DJIKSTRA OR WHATEVER MODEL WILL BE ADDED IN THE carsPath.cpp && carsPath.h FILES ###
+	path.push_back(enterNodeA);
+	path.push_back(enterNodeB);
+
+	if(enterNodeA == 28 || enterNodeA == 26)
+		path.push_back(22);
+
+	path.push_back(19);
+
+	
+	path.push_back(exitNodeA);
+	path.push_back(exitNodeB);
 }
 
 Car::~Car() {
@@ -54,7 +59,7 @@ int Car::enteringNodeA() { return enterNodeA;}
 
 int Car::enteringNodeB() { return enterNodeB; }
 
-int Car::exitingNode() { return exitNode; }
+int Car::exitingNode() { return exitNodeB; }
 
 int Car::Node() { return path[position]; }
 

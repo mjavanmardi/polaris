@@ -7,8 +7,6 @@ std::vector<std::pair<int, int>> selectCars(int j, int k, std::vector<std::vecto
 
 void sampleCars(std::vector<std::pair<int,int>>& selectedCars, std::vector<std::vector<int>>& storedCars);
 
-int selectPreviousRoad(std::map<int, Road> Roads, int i, int j);
-
 void releaseCars(Road& R, std::map<int, Road>& Roads, std::vector<std::pair<int,int>> sampledCars, std::vector<std::pair<int,int>>& stuckCars, std::vector<std::pair<int,int>>& movingCars, int timestep);
 
 void deleteStuckCars(std::vector<int>& car, std::vector<std::pair<int,int>> stuckCars, bool& stuck);

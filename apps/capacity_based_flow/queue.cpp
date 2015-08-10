@@ -39,7 +39,7 @@ double Queue::length() {
 	return queueLength;
 }
 
-vector<Car> Queue::getQueue() {
+vector<Car>& Queue::getQueue() {
 	return cars;
 }
 
@@ -102,7 +102,7 @@ void Queue::moveFakeCars(int timestep) {
 					int trand = rand()%100;
 					int proba = 100*timestep/((it+1)->reactDuration() - (it+1)->reactIter());
 					(it+1)->iterReactIter(timestep);
-
+					
 					if(proba > trand) {
 						(it+1)->initReactIter();
 						iter_swap(it,it+1);

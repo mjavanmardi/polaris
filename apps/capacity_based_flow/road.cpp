@@ -112,9 +112,15 @@ void Road::commonToIndividualQueue() {
 
 		Car C = commonQueue[0+iter];
 		bool q = false;
-		int ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
+		int ID = selectIndividualQueue(C.nextNode(), q);
+		/*int ID =-99;
+		if(C.existence() == true)
+			ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
+		*/
 		if (q) {
+			//cout << endl << " Queue ID : " << ID << " & queue size : " << queues[ID].getQueue().size();
 			queues[ID].getQueue().push_back(C);
+			//cout << " compared to new size : " << queues[ID].getQueue().size();
 			commonQueue.erase(commonQueue.begin()+iter);
 		}
 		else
@@ -170,6 +176,8 @@ double Road::distanceToTravelInTA(Car C) {
 void Road::addCarToQueue(Car C){
 	if(C.Node() == C.exitingNode())	//Last Road of the car
 		lastQueue.push_back(C);
+	else if(commonQueue.size() !=0)
+		commonQueue.push_back(C);
 	else {							//Not last road of the car
 		bool q = false;
 		int queueID = selectIndividualQueue(C.nextNode(), q);

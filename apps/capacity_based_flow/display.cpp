@@ -12,7 +12,7 @@ void printQueue(vector<Car> cars) {
 void printIndivQueues(map<int, Queue>& indivQueues) {
 	for(map<int, Queue>::iterator it = indivQueues.begin() ; it != indivQueues.end() ; it++) {
 		if(it->second.getQueue().size() != 0) {
-			cout << endl << endl << "Queue (ID=" << it->first << ") : ";
+			cout << endl << "Queue (ID=" << it->first << ") : ";
 			printQueue(it->second.getQueue());
 		}
 	}
@@ -20,21 +20,21 @@ void printIndivQueues(map<int, Queue>& indivQueues) {
 
 void printLastQueue(vector<Car>& lastQueue){ 
 	if(lastQueue.size() != 0) {
-		cout << endl << endl << "Last Queue : ";
+		cout << endl << "Last Queue : ";
 		printQueue(lastQueue);
 	}
 }
 
 void printCommonQueue(vector<Car>& commonQueue){
 	if(commonQueue.size() != 0) {
-		cout << endl << endl << "Common Queue : ";
+		cout << endl << "Common Queue : ";
 		printQueue(commonQueue);
 	}
 }
 
 void printTravelingArea(vector<Car>& TA) {
 	if(TA.size() != 0) {
-		cout << endl << endl << "Traveling Area : ";
+		cout << endl << "Traveling Area : ";
 		printQueue(TA);
 	}
 }
@@ -43,19 +43,19 @@ void printRoad(Road R) {
 	map<int, Queue> queues = R.indivQueues();
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		if(it->second.getQueue().size() != 0) {
-			cout << endl << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
+			cout << endl << endl <<  "Road #" << R.ID() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 		if(R.getCommonQueue().size() != 0) {
-			cout << endl << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
+			cout << endl << endl <<  "Road #" << R.ID() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 		if(R.getTA().size() != 0) {
-			cout << endl << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
+			cout << endl << endl<< "Road #" << R.ID() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 		if(R.getLastQueue().size() != 0) {
-			cout << endl << endl << "Road #" << R.link() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
+			cout << endl << endl << "Road #" << R.ID() << " : <" << R.nodeA() << "," << R.nodeB() << ">";
 			break;
 		}
 	}
@@ -70,9 +70,10 @@ void printRoad(Road R) {
 void printRoads(int t, map<int, Road> Roads, vector<int> timestepsToPrint, int superior) {
 	for(vector<int>::iterator it = timestepsToPrint.begin() ; it != timestepsToPrint.end() ; it++) {
 		if((*it) == t || t >= superior) {
-			cout << endl << endl << " TIME " << t;
+			cout << endl << endl << endl << " TIME " << t;
 			for(map<int, Road>::iterator it2 = Roads.begin() ; it2 != Roads.end() ; it2++) {
-				printRoad(it2->second);
+				//if(it2->second.ID() == 43 || it2->second.ID() == 48)
+					printRoad(it2->second);
 			}
 			break;
 		}
