@@ -7,4 +7,4 @@
 
 void sortCars(std::vector<Car>& Cars);
 
-void preprocessCars(std::vector<Car>& Cars);
+std::vector<int> preprocessCars(std::vector<Car>& Cars);

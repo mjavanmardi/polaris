@@ -68,7 +68,7 @@ void moving_out_of_queue(ofstream& fichier, int nbImplementation, int duration, 
 
 void progressionOf(Car C, ofstream& fichier, bool q) {
 	vector<int> prog = C.prog();
-	fichier << C.number() << ", " << C.enteringTime() << ", " << prog.size() << ", ";
+	fichier << C.number() << ", " << C.enteringTime() << ", " << prog.size() << ", " << C.enteringTime() + prog.size() << ",";
 	if(q) {
 		vector<int>::iterator it = prog.begin();
 		int nbImplementation = 10;				//  TO BE INTEGRATED OUT OF THE FUNCTION
@@ -104,12 +104,16 @@ void progressionAt(Road R, ofstream& fichier, bool q) {
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		vector<Car> cars = it->second.getQueue();
 		for(vector<Car>::iterator it2 = cars.begin() ; it2 != cars.end() ; it2++) {
-			progressionOf((*it2), fichier, q);
+			progressionOf(*it2, fichier, q);
 		}
 	}
-	vector<Car> lastCars = R.getTA();
-	for(vector<Car>::iterator it = lastCars.begin() ; it != lastCars.end() ; it++) {
-		progressionOf((*it), fichier, q);
+	vector<Car> travelingCars = R.getTA();
+	for(vector<Car>::iterator it = travelingCars.begin() ; it != travelingCars.end() ; it++) {
+		progressionOf(*it, fichier, q);
+	}
+	vector<Car> lastQueueCars = R.getLastQueue();
+	for(vector<Car>::iterator it = lastQueueCars.begin() ; it != lastQueueCars.end() ; it++) {
+		progressionOf(*it, fichier,q);
 	}
 }
 

@@ -6,7 +6,7 @@ class Car {
 public:
 	//### Constructors & Destructors ###
 	Car();
-	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration);
+	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration, int entA, int entB, int exA, int exB);
 	~Car();
 
 	//### Getters ###
@@ -60,7 +60,8 @@ private:
 	int enterTime;
 	int enterNodeA;
 	int enterNodeB;
-	int exitNode;
+	int exitNodeA;
+	int exitNodeB;
 	double meanAcceleration;
 	double meanDecceleration;
 	double carSpeed;

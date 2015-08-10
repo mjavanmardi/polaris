@@ -14,6 +14,11 @@ void sortCars(vector<Car>& Cars) {
 	sort(Cars.begin(), Cars.end());
 }
 
-void preprocessCars(vector<Car>& Cars) { 
+vector<int> preprocessCars(vector<Car>& Cars) { 
+	vector<int> enteringTimes;
+	for(vector<Car>::iterator it = Cars.begin() ; it != Cars.end() ; it++) {
+		enteringTimes.push_back(it->enteringTime());
+	}
 	sortCars(Cars);
+	return enteringTimes;
 }

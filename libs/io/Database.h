@@ -246,15 +246,15 @@ inline unique_ptr<odb::database> open_sqlite_database(const std::string& name)
 	using namespace polaris::io;
 	unique_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
 	odb::transaction t (db->begin());
-	shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
+	//shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
 	t.commit();
-	if (mt.get() != nullptr)
-	{
-		if (mt->value != SCHEMA_REVISION)
-		{
-			std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << "\n";
-		}
-	}
+	//if (mt.get() != nullptr)
+	//{
+	//	if (mt->value != SCHEMA_REVISION)
+	//	{
+	//		std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << "\n";
+	//	}
+	//}
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
 	//c->execute("PRAGMA journal_mode = MEMORY");

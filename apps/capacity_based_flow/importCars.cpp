@@ -7,13 +7,14 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	bool fake = false;
 	int number = carNumber;
 	double carLength = 4;				// Default Value
-	int reacDuration = 1;				// Default Value
-	double meanAcceleration = 2;		// Default Value
-	double meanDecceleration = 3;		// Default Value
+	int reacDuration = 2;				// Default Value
+	double meanAcceleration = 3;		// Default Value
+	double meanDecceleration = 4;		// Default Value
 	int _enteringTime = enteringTime;
 	int enteringNodeA;
 	int enteringNodeB;
-	int exitingNode;
+	int exitingNodeA;
+	int exitingNodeB;
 	bool a = false;
 	bool b = false;
 	for(int i = 0 ; i < location.size() ; i++) {
@@ -23,14 +24,14 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 			a = true;
 		}
 		if(destination == location[i]) {
-			exitingNode = nodeB[i];
+			exitingNodeA = nodeB[i];
+			exitingNodeB = nodeA[i];
 			b = true;
 		}
 		if(a && b)
 			break;
 	}
-	//### NEED TO ADD enteringNodeA && enteringNodeB
-	Car C(fake, carNumber, carLength, reacDuration, enteringTime, meanAcceleration, meanDecceleration);
+	Car C(fake, carNumber, carLength, reacDuration, enteringTime, meanAcceleration, meanDecceleration, enteringNodeA, enteringNodeB, exitingNodeA, exitingNodeB);
 	return C;
 }
 
@@ -39,11 +40,11 @@ void preprocessLocations(result<polaris::io::Location> locations, vector<int>& l
 		location.push_back(it->getLocation());
 		Link L = *it->getLink();
 		if(it->getDir() == 0) {
-			nodeA.push_back(L.getNode_A()->getNode());
-			nodeB.push_back(L.getNode_B()->getNode());
+			nodeA.push_back(L.getNode_B()->getNode());
+			nodeB.push_back(L.getNode_A()->getNode());
 		}
 		else {
-			nodeA.push_back(L.getNode_B()->getNode());
+			nodeA.push_back(L.getNode_A()->getNode());
 			nodeB.push_back(L.getNode_B()->getNode());
 		}
 	}
