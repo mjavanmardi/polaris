@@ -62,7 +62,6 @@ namespace Link_Components
 		struct Pocket_Data
 		{
 			Pocket_Data():num_pockets(0),num_pockets_left(0),num_pockets_right(0),pocket_length(0.0f){}
-
 			int num_pockets;
 			int num_pockets_left;
 			int num_pockets_right;
@@ -323,6 +322,13 @@ namespace Link_Components
 			template<typename TargetType> void link_supply_update()
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
+
+				int a;
+				if (current_simulation_interval_index == 170)
+				{
+					a = 10;
+				}
+
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				//Newell's model
 				int link_upstream_cumulative_vehicles_by_t_minus_one = 0;	

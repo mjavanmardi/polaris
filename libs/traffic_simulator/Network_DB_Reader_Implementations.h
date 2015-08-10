@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Network_DB_Reader_Prototype.h"
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
@@ -134,6 +134,7 @@ namespace Network_Components
 				const float backward_wave_speed = 12.0;
 				const float distance_factor = 1.5;				
 				float num_lanes = 0.0f;
+				double scaling_factor = 0.5;
 
 				_network_reference->template max_free_flow_speed<float>(-1);
 				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
@@ -336,13 +337,16 @@ namespace Network_Components
 
 						//if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL" || facility_type=="RAMP" || facility_type=="RAMP")
 						
+						
 						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL)
 						{
 							// 1800 From HCM Equation 17-1
+							//maximum_flow_rate = scaling_factor*max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						}
 						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
+							//maximum_flow_rate = scaling_factor*max(1600.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							maximum_flow_rate = max(1600.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						}
 						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP || 
@@ -352,34 +356,44 @@ namespace Network_Components
 
 							if(link->template free_flow_speed<float>() > 50.0f)
 							{
+								//maximum_flow_rate =  scaling_factor*max(2200.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2200.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 40.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(2100.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2100.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 30.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max2(000.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2000.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 20.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(1900.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(1900.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
 							else
 							{
+								//maximum_flow_rate = scaling_factor*max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ab()) / link->template num_lanes<float>());
 							}
 						}
 						else if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
 						{
-							maximum_flow_rate = 2000.0f;
+							//VS modified on 7/15, addde multiplier to capacity to mimic impact of CACC
+							maximum_flow_rate = scaling_factor*2000.0f;
+							//maximum_flow_rate = 2000.0f;
+							//std::cout << maximum_flow_rate << "\n";
 						}
 						else
 						{
+							//maximum_flow_rate = scaling_factor*((float)db_itr->getCap_Ab()) / link->template num_lanes<float>();
 							maximum_flow_rate = ((float)db_itr->getCap_Ab()) / link->template num_lanes<float>();
 						}
 
+						//link->template maximum_flow_rate<float>(scaling_factor*maximum_flow_rate);
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						//the backward wave speed is considered constant
 						link->template backward_wave_speed<float>(backward_wave_speed);
@@ -561,10 +575,12 @@ namespace Network_Components
 						if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ARTERIAL)
 						{
 							// 1800 From HCM Equation 17-1
+							//maximum_flow_rate = scaling_factor*max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						}
 						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::LOCAL)
 						{
+							//maximum_flow_rate = scaling_factor*max(1600.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							maximum_flow_rate = max(1600.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						}
 						else if(link->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::ON_RAMP || 
@@ -574,35 +590,45 @@ namespace Network_Components
 
 							if(link->template free_flow_speed<float>() > 50.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(2200.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2200.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 40.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(2100.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2100.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 30.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(2000.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(2000.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
 							else if(link->template free_flow_speed<float>() > 20.0f)
 							{
+								//maximum_flow_rate = scaling_factor*max(1900.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(1900.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
 							else
 							{
+								//maximum_flow_rate = scaling_factor*max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 								maximum_flow_rate = max(1800.0f,((float)db_itr->getCap_Ba()) / link->template num_lanes<float>());
 							}
 						}
 						else if(facility_type=="FREEWAY" || facility_type=="EXPRESSWAY" || facility_type=="EXTERNAL")
 						{
-							maximum_flow_rate = 2000.0f;
+							//VS modified on 7/15, addde multiplier to capacity to mimic impact of CACC
+							//maximum_flow_rate = 2000.0f;
+							maximum_flow_rate = scaling_factor*2000.0f;
+							//std::cout << maximum_flow_rate << "\n";
 						}
 						else
 						{
+							//maximum_flow_rate = scaling_factor*((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
 							maximum_flow_rate = ((float)db_itr->getCap_Ba()) / link->template num_lanes<float>();
 						}
 
 
+						//link->template maximum_flow_rate<float>(scaling_factor*maximum_flow_rate);
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
