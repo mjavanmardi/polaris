@@ -211,7 +211,7 @@ namespace polaris
 
 
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
-	static float Time_Dependent_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, global_edge_id& end_id, unsigned int start_time, boost::container::deque< global_edge_id >& out_path, boost::container::deque< float >& out_cost)
+	static float Time_Dependent_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, std::vector<global_edge_id>& end_ids, unsigned int start_time, boost::container::deque< global_edge_id >& out_path, boost::container::deque< float >& out_cost)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
@@ -222,22 +222,29 @@ namespace polaris
 		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 		if(start == nullptr){ THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
 
-		A_Star_Edge<base_edge_type>* end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(end_id);
-		if(end == nullptr){ THROW_WARNING("Destination: " << end_id.edge_id << " not found in graph!"); return 0.0f; }
-
+		std::vector<base_edge_type*> ends;
+		A_Star_Edge<base_edge_type>* end;
+		
+		for (std::vector<global_edge_id>::iterator itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+		{
+			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			if(end == nullptr){ THROW_WARNING("Destination: " << end_id.edge_id << " not found in graph!"); return 0.0f; }
+			ends.push_back((base_edge_type*)end);
+		}
+		base_edge_type* end_base = (base_edge_type*)end;
 
 		Routing_Data<base_edge_type> routing_data;
 
 		routing_data.modified_edges = &modified_edges;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)start;
-		routing_data.end_edge = (base_edge_type*)end;
+		routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.start_time = start_time;
 
 		start->cost_from_origin(0.0f);
 		start->time_label((float)start_time);
 
-		float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start,(base_edge_type*)end);
+		float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start,(base_edge_type*)ends.front());
 
 		start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
 		
@@ -259,7 +266,7 @@ namespace polaris
 			
 			id.id = current->edge_id();
 
-			if( agent->at_destination((base_edge_type*)current, (base_edge_type*)end) )
+			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
 				success = true;
 				break;
@@ -288,7 +295,7 @@ namespace polaris
 
 		if(success)
 		{
-			base_edge_type* current = (base_edge_type*)end;
+			base_edge_type* current = end_base;//(base_edge_type*)end;
 			base_edge_type* cached_current = (base_edge_type*)current;
 
 			while(current != nullptr)

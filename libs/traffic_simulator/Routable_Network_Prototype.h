@@ -42,9 +42,9 @@ namespace Routing_Components
 				return this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
 			}
 
-			float compute_time_dependent_network_path(unsigned int start_time, unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_time_dependent_network_path(unsigned int origin, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
-				return this_component()->compute_time_dependent_network_path(start_time,origin,destination,path_container,cost_container);
+				return this_component()->compute_time_dependent_network_path(origin,destinations,start_time,path_container,cost_container);
 			}
 
 			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& edge_cost_container)

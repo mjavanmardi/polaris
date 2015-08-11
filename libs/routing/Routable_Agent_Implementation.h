@@ -17,6 +17,16 @@ namespace polaris
 			if(current->_edge_id == destination->_edge_id) return true;
 			else return false;
 		}
+		
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, Base_Edge_A_Star<MasterType>** final_destination)
+		{
+			for (std::vector<Base_Edge_A_Star<MasterType>*>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				*final_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				if(current->_edge_id == (*final_destination)->_edge_id) return true;	
+			}
+			return false;
+		}
 
 		template<typename CurrentEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)

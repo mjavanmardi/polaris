@@ -279,14 +279,6 @@ namespace Activity_Components
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 
-
-				//if (person->uuid<int>() == 0 && household->uuid<int>() == 247)
-				//{
-				//	DEBUG_MESSAGE("Debugging...");
-				//	person->Display_Activities(cout);
-				//}
-
-
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename get_component_type(_movement_plans_container_itf)>();
 				move->template initialize_trajectory<NULLTYPE>();
@@ -352,14 +344,6 @@ namespace Activity_Components
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
-
-
-				//if (person->uuid<int>() == 0 && household->uuid<int>() == 247)
-				//{
-				//	DEBUG_MESSAGE("Debugging...");
-				//	person->Display_Activities(cout);
-				//}
-
 
 				
 				if (!this->Route_Is_Planned<bool>())
@@ -469,8 +453,42 @@ namespace Activity_Components
 				// General interfaces, to parent and global classes
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
+				_household_itf* household = person->Household<_household_itf*>();
 
-				// continue if a valid movement is specified
+				if (move->Update_Locations<_activity_location_itf*>(orig,dest))
+				{
+					// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
+					Simulation_Timestep_Increment start = this->Start_Time<Simulation_Timestep_Increment>();
+					Simulation_Timestep_Increment ttime;
+					if (orig == dest) ttime = 0;
+					else ttime = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Simulation_Timestep_Increment,Simulation_Timestep_Increment>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+					this->Expected_Travel_Time<Simulation_Timestep_Increment>(ttime);
+
+					// recalculate the departure time based on new estimated travel time
+					Simulation_Timestep_Increment depart =  start - ttime;
+					// unless the activity is a return home activity, in which case, use the fixed departure time
+					if (activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+					{
+						_home_activity_itf* home_activity = (_home_activity_itf*)activity;
+						depart = home_activity->template Fixed_Departure<Simulation_Timestep_Increment>();
+					}
+						
+					// make sure not departure before minimum allowed
+					if (depart < min_departure)
+					{
+						depart = min_departure+1;
+
+						if (depart + ttime > (END)*2.0)
+						{
+							THROW_WARNING("Bad start time, depart="<<depart<<", ttime="<<ttime);
+						}
+						this->Start_Time<Simulation_Timestep_Increment>(depart + ttime);
+					}
+
+					// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
+					move->template departed_time<Simulation_Timestep_Increment>(depart);
+				}
+				/*// continue if a valid movement is specified
 				if (orig != nullptr && dest != nullptr) 
 				{
 					// If the trip is valid, assign to a movement plan and add to the schedule
@@ -532,8 +550,7 @@ namespace Activity_Components
 				else
 				{
 					THROW_WARNING("Null origin or destination values specified");
-				}
-
+				}*/
 			}
 			template<typename TargetType> void Arrive_At_Activity()
 			{

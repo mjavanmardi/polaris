@@ -71,6 +71,55 @@ namespace Movement_Plan_Components
 				Free<Component_Type>(this_component());
 			}
 
+			template<typename LocationType> bool Update_Locations(LocationType orig, LocationType dest, requires(LocationType,check(strip_modifiers(LocationType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				typedef Prototypes::Movement_Plan<ComponentType> this_itf;
+				
+				typedef Network_Components::Prototypes::Network< typename get_type_of(network)> _network_itf;
+				typedef Random_Access_Sequence< typename _network_itf::get_type_of(activity_locations_container)> _activity_locations_container_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_activity_locations_container_itf)>  _activity_location_itf;	
+				typedef Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links)> _links_container_itf;
+				typedef Link_Components::Prototypes::Link<typename get_component_type(_links_container_itf)>  _link_itf;
+				typedef Random_Access_Sequence< typename _link_itf::get_type_of(outbound_turn_movements)> _turns_container_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(_turns_container_itf)>  _turn_itf;
+
+				// continue if a valid movement is specified
+				if (orig != nullptr && dest != nullptr) 
+				{
+					// If the trip is valid, assign to a movement plan and add to the schedule
+					if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
+					{		
+						// add attributes to plan
+						this->template origin<_activity_location_itf*>(orig);
+						this->template destination<_activity_location_itf*>(dest);
+						this->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
+						this->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
+
+						if (this->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || this->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
+						{
+							_link_itf* o_link =this->template origin<_link_itf*>();
+							_link_itf* d_link =this->template destination<_link_itf*>();
+							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->dbid<int>() << ", dir="<<o_link->direction<int>()<<" : dest_link="<< d_link->dbid<int>()<<", dir="<<o_link->direction<int>());
+							return false;
+						}
+					}
+					else
+					{
+						this->template origin<_activity_location_itf*>(orig);
+						this->template destination<_activity_location_itf*>(dest);
+						THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
+						return false;
+					}
+				}
+				else
+				{
+					THROW_WARNING("Null origin or destination values specified");
+					return false;
+				}
+				return true;
+			}
+			
+
 			// overloaded origin and destination, depending on targetType
 			template<typename TargetType> void origin(TargetType activity_location, requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{

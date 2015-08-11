@@ -487,7 +487,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(unsigned int origin, unsigned int destination, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_time_dependent_network_path(unsigned int origin, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -497,13 +497,17 @@ namespace Routing_Components
 				start.edge_id = origin;
 				start.graph_id = _time_dependent_network_graph_id;
 				
-				global_edge_id end;
-
-				end.edge_id = destination;
-				end.graph_id = _time_dependent_network_graph_id;
+				std::vector<global_edge_id> ends;
+				for (std::vector<unsigned int>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+				{
+					global_edge_id end;
+					end.edge_id = *itr;
+					end.graph_id = _time_dependent_network_graph_id;
+					ends.push_back(end);
+				}
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
-				float routed_time = Time_Dependent_A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
+				float routed_time = Time_Dependent_A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,ends,start_time,path_container,cost_container);
 
 				return routed_time;
 			}

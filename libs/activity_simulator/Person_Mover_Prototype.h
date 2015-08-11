@@ -573,6 +573,7 @@ namespace Prototypes
 		{
 			// interfaces
 			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Household_Components::Prototypes::Household<typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 			typedef Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planning_Itf;
 			typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
@@ -586,12 +587,14 @@ namespace Prototypes
 					
 			
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			Household_Itf* household = person->Household<Household_Itf*>();
 			Planning_Itf* planner = person->template Planning_Faculty<Planning_Itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
 			// Skip routing if the mode is not SOV (remove when transit router is developed
 			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
+
 
 			// Do routing at the next timestep for the movement
 			planner->template Schedule_New_Routing<movement_itf*>(iteration()+1,movements);
@@ -639,7 +642,6 @@ namespace Prototypes
 			else if (dest_zone->areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
 			else max_walk_distance = 0.0;	
 			if (dist <max_walk_distance) act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
-
 
 			// If no movement involved - i.e. different activity at same location, do auto arrive
 			if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())

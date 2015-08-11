@@ -26,6 +26,8 @@ namespace Routing_Components
 
 			typedef Movement_Plan<typename type_of(movement_plan)> movement_plan_interface;
 			typedef Link_Components::Prototypes::Link<typename movement_plan_interface::get_type_of(origin)> Link_Interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<typename movement_plan_interface::get_type_of(origin_location)> Activity_Location_Interface;
+			typedef Random_Access_Sequence<typename Activity_Location_Interface::get_type_of(destination_links)> Link_Container_Interface;
 
 			template<typename Movement_Plan_Type>
 			void Attach_New_Movement_Plan(Movement_Plan<Movement_Plan_Type>* mp)
@@ -95,6 +97,17 @@ namespace Routing_Components
 				
 				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
 				unsigned int destination_id = _movement_plan->destination<Link_Interface*>()->uuid<unsigned int>();
+				Activity_Location_Interface* destination_loc = _movement_plan->destination<Activity_Location_Interface*>();
+				Link_Container_Interface* destination_links = destination_loc->destination_links<Link_Container_Interface*>();
+
+				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
+				std::vector<unsigned int> destination_ids;
+				for (Link_Container_Interface::iterator itr = destination_links->begin(); itr != destination_links->end(); ++itr)
+				{
+					Link_Interface* link = (Link_Interface*)(*itr);
+					destination_ids.push_back(link->uuid<unsigned int>());
+				}
+
 
 				//list of edgeid, graph_id tuples; internal edge ids
 				boost::container::deque<global_edge_id> path_container;
@@ -111,7 +124,7 @@ namespace Routing_Components
 				}
 				else
 				{
-					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_id,_departure_time/*iteration()*/,path_container,cost_container);
+					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_ids,_departure_time/*iteration()*/,path_container,cost_container);
 				}
 
 

@@ -16,6 +16,9 @@ namespace polaris
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
 		bool at_destination(CurrentEdgeType* current, DestinationEdgeType* destination){ return this_component()->at_destination(current, destination); }
 
+		template<typename CurrentEdgeType, typename DestinationEdgeType>
+		bool at_destination(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations, DestinationEdgeType** final_destination){ return this_component()->at_destination(current, destinations, final_destination); }
+
 		//heuristic cost for the A* algorithm
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, DestinationEdgeType* destination){ return this_component()->estimated_cost_between(current, destination); }

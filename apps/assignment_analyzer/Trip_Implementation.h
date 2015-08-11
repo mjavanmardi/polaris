@@ -73,7 +73,8 @@ namespace Trip_Components
 			typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
 			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 
-			m_container(boost::container::vector<typename get_component_type(_Trajectory_Container_Interface)*>, result_trajectory, NONE,NONE);
+			//m_container(boost::container::vector<typename get_component_type(_Trajectory_Container_Interface)*>, result_trajectory, NONE,NONE);
+			m_container(boost::container::vector<_Trajectory_Unit_Interface*>, result_trajectory, NONE, NONE);
 
 		};
 	}

@@ -445,7 +445,7 @@ namespace Person_Components
 						// update the following movement plan to account for new travel time
 						if (next_act != nullptr && next_move != nullptr) 
 						{
-							next_move->template origin<_Activity_Location_Interface*>(loc);
+							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->destination<_Activity_Location_Interface*>());
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
@@ -472,7 +472,9 @@ namespace Person_Components
 						// update the following movement plan to account for new travel time
 						if (next_act != nullptr && next_move != nullptr) 
 						{
-							next_move->template origin<_Activity_Location_Interface*>(loc);
+							//TODO: verify this code-> changed because origin links were not updating properly
+							//next_move->template origin<_Activity_Location_Interface*>(loc);
+							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->destination<_Activity_Location_Interface*>());
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
@@ -489,7 +491,8 @@ namespace Person_Components
 					
 						if (next_move != nullptr)
 						{
-							next_move->template origin<_Activity_Location_Interface*>(prev_loc);
+							next_move->template Update_Locations<_Activity_Location_Interface*>(prev_loc, next_move->destination<_Activity_Location_Interface*>());
+							//next_move->template origin<_Activity_Location_Interface*>(prev_loc);
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 
@@ -565,7 +568,6 @@ namespace Person_Components
 				// catch skipped movement plans
 				if (move->template departed_time<Simulation_Timestep_Increment>() < iteration()) return;
 
-				
 				// check for timing conflicts again and updated movement plans
 				bool added = this->Resolve_Timing_Conflict<Activity_Plan*>(act,true);
 

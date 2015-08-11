@@ -998,6 +998,7 @@ namespace Network_Components
 				using namespace polaris::io;
 
 				Types::Link_ID_Dir link_id_dir;
+				Types::Link_ID_Dir opp_link_id_dir;
 
 				boost::unordered::unordered_map<int,int> uuid_to_index;
 
@@ -1042,6 +1043,7 @@ namespace Network_Components
 					{
 						link_id_dir.id=db_itr->getLink()->getLink();
 						link_id_dir.dir=db_itr->getDir();
+
 				
 						if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 						{
@@ -1075,6 +1077,17 @@ namespace Network_Components
 						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+
+						// add the opposite direction link if exists
+						opp_link_id_dir.id = link_id_dir.id;
+						opp_link_id_dir.dir = abs(db_itr->getDir() - 1);
+						if(net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+						{
+							link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
+							activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
+							link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+						}
 				
 						activity_location->template zone<_Zone_Interface*>(zone);
 						activity_location->template uuid<int>(db_itr->getPrimaryKey());

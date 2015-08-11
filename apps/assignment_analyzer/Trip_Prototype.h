@@ -316,6 +316,7 @@ namespace Trip_Components
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Routing_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 				typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
 				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Random_Access_Sequence<typename get_type_of(result_trajectory)> _Result_Trajectory_Container_Interface;
 				
 				this->results_processed(true);
 
@@ -327,13 +328,18 @@ namespace Trip_Components
 					this->result_travel_time<Simulation_Timestep_Increment>(movement->routed_travel_time<float>());
 										
 					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+					_Result_Trajectory_Container_Interface& result_trajectory = this->result_trajectory<_Result_Trajectory_Container_Interface&>();
 
 					if (trajectory->size() == 0)
 					{
 						cout <<"Error: null trajectory.";
 					}
 
-					this->result_trajectory(trajectory);
+					for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+					{
+						_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
+						result_trajectory.push_back(tu);
+					}
 
 					//for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
 					//{
