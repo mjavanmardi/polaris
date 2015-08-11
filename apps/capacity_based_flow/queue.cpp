@@ -39,7 +39,7 @@ double Queue::length() {
 	return queueLength;
 }
 
-vector<Car> Queue::getQueue() {
+vector<Car>& Queue::getQueue() {
 	return cars;
 }
 
@@ -52,15 +52,15 @@ map<int, double> Queue::getCapacities() {
 int Queue::weight(int nextNode) {
 	int weight;
 	bool exist = false;
-	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {
+	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {	// To verify is the nextNode (Where the car is going) is part of the turning movement of this queue
 		if((*it) == nextNode) {
 			exist = true;
 			break;
 		}
 	}
 
-	if(exist && length() < maxLength)
-		weight = cars.size()*2 + nextNodes.size()*5;
+	if(exist && length() < maxLength)	//(exist == true) -> means that the nextNode is part of the turning movement of the present queue && length() is the length of all the vehicles in the queue
+		weight = cars.size()*2 + nextNodes.size()*5; // This is the model comparing the queues. 2 and 5 are the linear coefficient affected to the number of cars and number of turning movement of the road
 	else
 		weight = 900000;
 
@@ -102,7 +102,7 @@ void Queue::moveFakeCars(int timestep) {
 					int trand = rand()%100;
 					int proba = 100*timestep/((it+1)->reactDuration() - (it+1)->reactIter());
 					(it+1)->iterReactIter(timestep);
-
+					
 					if(proba > trand) {
 						(it+1)->initReactIter();
 						iter_swap(it,it+1);

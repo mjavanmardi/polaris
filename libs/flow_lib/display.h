@@ -15,4 +15,4 @@ void printTravelingArea(std::vector<Car>& TA);
 
 void printRoad(Road R);
 
-void printRoads(int t, std::map<int, Road> Roads, std::vector<int> timestepsToPrint, bool q, int superior);
+void printRoads(int t, std::map<int, Road> Roads, std::vector<int> timestepsToPrint, int superior);

@@ -5,33 +5,41 @@ using namespace std;
 //### Constructors & Destructors ###
 Car::Car() {		//Constructor used for fake cars in the queues
 	fake = true;
+	carNumber = -999;
 	carLength = 5;
 }
 
-Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _maximumAcceleration) {
+Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration, int entA, int entB, int exA, int exB) {
 	fake = _fake;
 	carNumber = _carNumber;
 	carLength = _carLength;
 	reacDuration = _reacDuration;
 	enterTime = _enterTime;
-	maximumAcceleration = _maximumAcceleration;
+	meanAcceleration = _meanAcceleration;
+	meanDecceleration = _meanDecceleration;
 
-	progression.clear();
 	reacIter = 0;
 	position = 0;
 	distInTA = 0;
+	carSpeed = 0;
 
-	path.clear();
-	path.push_back(83938);
-	path.push_back(83939);
-	path.push_back(83941);
-	path.push_back(83937);
-	path.push_back(83936);
-	path.push_back(83935);
-	path.push_back(83943);
+	enterNodeA = entB;
+	enterNodeB = entA;
+	exitNodeA = exA;
+	exitNodeB = exB;
 
-	enterNode = 83938;
-	exitNode = 83935;
+//### THIS PART SHOULD BE DELETED ONCE THE DJIKSTRA OR WHATEVER MODEL WILL BE ADDED IN THE carsPath.cpp && carsPath.h FILES ###
+	path.push_back(enterNodeA);
+	path.push_back(enterNodeB);
+
+	if(enterNodeA == 28 || enterNodeA == 26)
+		path.push_back(22);
+
+	path.push_back(19);
+
+	
+	path.push_back(exitNodeA);
+	path.push_back(exitNodeB);
 }
 
 Car::~Car() {
@@ -41,41 +49,23 @@ Car::~Car() {
 
 //### Getters ###
 
-double Car::length() {
-	return carLength;
-}
+double Car::length() {return carLength;}
 
-int Car::number() {
-	return carNumber;
-}
+int Car::number() {	return carNumber;}
 
-int Car::enteringTime() {
-	return enterTime;
-}
+int Car::enteringTime() {return enterTime;}
 
-int Car::enteringNode() {
-	return enterNode;
-}
+int Car::enteringNodeA() { return enterNodeA;}
 
-int Car::exitingNode() {
-	return exitNode;
-}
+int Car::enteringNodeB() { return enterNodeB; }
 
-int Car::lastNode() {
-	return exitNode;
-}
+int Car::exitingNode() { return exitNodeB; }
 
-int Car::Node() {
-	return path[position];
-}
+int Car::Node() { return path[position]; }
 
-int Car::nextNode() {
-	return path[position+1];
-}
+int Car::nextNode() { return path[position+1]; }
 
-int Car::prevNode() {
-	return path[position-1];
-}
+int Car::prevNode() { return path[position-1]; }
 
 bool Car::existence() {
 	if(fake)
@@ -84,29 +74,21 @@ bool Car::existence() {
 		return true;
 }
 
-int Car::reactIter() {
-	return reacIter;
-}
+double Car::speed() { return carSpeed; }
 
-int Car::reactDuration() {
-	return reacDuration;
-}
+int Car::reactIter() { return reacIter; }
 
-double Car::distanceInTA() {
-	return distInTA;
-}
+int Car::reactDuration() { return reacDuration; }
 
-double Car::accMax() {
-	return maximumAcceleration;
-}
+double Car::distanceInTA() { return distInTA; }
 
-vector<int> Car::prog() {
-	return progression;
-}
+double Car::accMean() { return meanAcceleration; }
 
-double Car::maxSpeed(int road) {
-	return maxSpeeds[road];
-}
+double Car::deccMean() { return meanDecceleration; }
+
+vector<int> Car::prog() { return progression; }
+
+double Car::maxSpeed(int road) { return maxSpeeds[road]; }
 
 
 //### Setters ###
@@ -135,6 +117,17 @@ void Car::iterReactIter(int k) {
 	reacIter += k;
 }
 
+void Car::initSpeed() {
+	carSpeed = 0;
+}
+void Car::iterSpeed(double newSpeed) {
+	carSpeed = newSpeed;
+}
+
 void Car::addSpeed(double speed) {
 	maxSpeeds.push_back(speed);
+}
+
+void Car::postponedEnteringTime(int timestep){
+	enterTime += timestep;
 }
