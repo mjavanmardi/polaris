@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>	//Only for the debugging : cout
+
 #include <vector>
 
 class Car {

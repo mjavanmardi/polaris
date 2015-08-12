@@ -7,9 +7,9 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	bool fake = false;
 	int number = carNumber;
 	double carLength = 4;				// Default Value
-	int reacDuration = 2;				// Default Value
+	int reacDuration = 3;				// Default Value
 	double meanAcceleration = 3;		// Default Value
-	double meanDecceleration = 4;		// Default Value
+	double meanDecceleration = 6;		// Default Value
 	int _enteringTime = enteringTime;
 	int enteringNodeA;
 	int enteringNodeB;
