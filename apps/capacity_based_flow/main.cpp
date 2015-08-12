@@ -10,7 +10,7 @@ using namespace std;
 #include "outputQueueLength.h"
 
 const int timestep = 1;
-const int modelisationTime = 3000 * timestep;
+const int modelisationTime = 15000 * timestep;
 char *db_path = "C:\\Users\\ikoval\\Documents\\Polaris_network\\network";
 
 int main() {
@@ -21,14 +21,10 @@ int main() {
 	vector<int> enteringTimes = preprocessCars(Cars);
 	
 //### Simulation ###
-	clock_t start = clock();
-	int superior = 9000;
+	int superior = 0;
 	vector<int> timestepsToPrint;
-	timestepsToPrint.push_back(15000);
-	timestepsToPrint.push_back(10000);
 	timestepsToPrint.push_back(modelisationTime-1);
 	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior);
-	clock_t end = clock();
 
 //### Outputs ###
 	ofstream file1, file2;

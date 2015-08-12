@@ -32,12 +32,35 @@ Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _
 	path.push_back(enterNodeA);
 	path.push_back(enterNodeB);
 
-	if(enterNodeA == 28 || enterNodeA == 26)
+	if(enterNodeA == 28 && _carNumber%3 == 0) {
+		path.push_back(15);
+		path.push_back(10);
+	}
+	else if(enterNodeA == 28 && _carNumber%3 == 1) {
+		path.push_back(15);
+		path.push_back(19);
+	}
+	else if(enterNodeA == 28 && _carNumber%3 == 2){
 		path.push_back(22);
+		path.push_back(19);
+	}
+	else if(enterNodeA == 26 && _carNumber%3 == 0) {
+		path.push_back(20);
+		path.push_back(14);
+	}
+	else if(enterNodeA == 26 && _carNumber%3 == 1) {
+		path.push_back(20);
+		path.push_back(19);
+	}
+	else if(enterNodeA == 26 && _carNumber%3 == 2) {
+		path.push_back(22);
+		path.push_back(19);
+	}
+	else if(enterNodeA == 27)
+		path.push_back(19);
+	else
+		cout << endl << "Something's wrong with the manual writing of the paths";
 
-	path.push_back(19);
-
-	
 	path.push_back(exitNodeA);
 	path.push_back(exitNodeB);
 }

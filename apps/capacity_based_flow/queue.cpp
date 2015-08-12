@@ -75,7 +75,7 @@ void Queue::iterCarsProg() {
 			it->iterProg(iter);
 			iter += 1;
 		}
-		queueLength = it->length() + distanceBetweenCars;
+		queueLength += it->length() + distanceBetweenCars;
 	}
 
 	if(queueLength < maxLength)
