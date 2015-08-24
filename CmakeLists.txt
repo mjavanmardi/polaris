@@ -1,26 +1,25 @@
 PROJECT(polaris CXX)
 cmake_minimum_required(VERSION 2.8)
+
 #Add capability to create visual studio solution folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(Popsyn OFF)
-set(Statewide OFF)
-
 #options to be used while running cmake
-#option(Antares "Build with Antares" ON)
-set(Antares OFF)
+option(Antares "Build with Antares" OFF)
+option(Popsyn "Build Popsyn App" OFF)
+option(Statewide "Build Statewide Model App" OFF)
+option(Coretests "Include Unit Tests for Core" OFF)
+option(Unittest "Include Unit Tests for Other Libraries" OFF)
+option(CapacityFlow "Include Traffic Flow Simulator Prototype" ON)
 
-option(CapacityFlow "Build Capacity based Flow Simulator" ON)
-
-set(BUILD_DIR build)
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
 
-
 #Variables designating where the output files go
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
+
 
 #Compiler flags for release mode applied to all projects
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
@@ -49,7 +48,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	if (UNIX)
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
 		find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
-		message(STATUS ""${libtcmalloc})
+		message(STATUS "" ${libtcmalloc})
 	endif()
 	
 	if (MSVC)
@@ -186,6 +185,7 @@ if (Coretests)
 endif()
 
 if (CapacityFlow)
+	message(${CapacityFlow})
 	add_subdirectory(libs/flow_lib)
 	add_subdirectory(apps/capacity_based_flow)
 endif()
