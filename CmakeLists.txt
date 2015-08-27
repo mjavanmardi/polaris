@@ -10,7 +10,7 @@ option(Popsyn "Build Popsyn App" OFF)
 option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
 option(Unittest "Include Unit Tests for Other Libraries" OFF)
-option(CapacityFlow "Include Traffic Flow Simulator Prototype" ON)
+option(CapacityFlow "Include Traffic Flow Simulator Prototype" OFF)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
