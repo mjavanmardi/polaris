@@ -53,6 +53,8 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 		}
 		if(it->second < capacMin) //To see : strange way to do a min
 			capacMin = it->second;
+		if(capacMin == 0)
+			return 0;
 	}
 	//cout << endl;
 	/*for(map<int, bool>::iterator it = green.begin();it != green.end();it++)

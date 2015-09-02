@@ -177,14 +177,10 @@ void Road::addCarToQueue(Car C){
 	if(C.Node() == C.exitingNode())	//Last Road of the car
 	{
 		lastQueue.push_back(C);
-		if(C.number()==73)
-			cout << "case 1" << endl;
 	}
 	else if(commonQueue.size() !=0)
 	{
 		commonQueue.push_back(C);
-		if(C.number()==73)
-			cout << "case 2" << endl;
 	}
 	else {							//Not last road of the car
 		bool q = false;
@@ -192,14 +188,10 @@ void Road::addCarToQueue(Car C){
 		if(q)							//The car can go into some queue
 		{
 			queues[queueID].addCar(C);
-			if(C.number()==73)
-				cout << "case 3" << endl;
 		}
 		else							//The car cannot fit any individual queue
 		{
 			commonQueue.push_back(C);
-			if(C.number()==73)
-				cout << "case 4 ; Road : " << roadID << endl;
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "road.h"
 #include "car.h"
+#include <cassert>
 
 int lastCarProba(double proba, double weight);
 
