@@ -7,7 +7,9 @@ Queue::Queue() {
 
 }
 
-Queue::Queue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> _capacities) {
+Queue::Queue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> _capacities, map<int,double> _greenTime, map<int,double> _cycle, map<int,double> _offset) : 
+greenTime(_greenTime), cycle(_cycle), offset(_offset)
+{
 	queueID = ID;
 	maxLength = _maxLength;
 	distanceBetweenCars = _distanceBetweenCars;
@@ -45,6 +47,21 @@ vector<Car>& Queue::getQueue() {
 
 map<int, double> Queue::getCapacities() {
 	return capacities;
+}
+
+map<int,double> Queue::getGreenTime()
+{
+	return greenTime;
+}
+
+map<int,double> Queue::getCycle()
+{
+	return cycle;
+}
+
+map<int,double> Queue::getOffset()
+{
+	return offset;
 }
 
 //### Dynamic methods ###
@@ -98,7 +115,8 @@ void Queue::moveFakeCars(int timestep) {
 		if(it->existence() == false && it != cars.end() - 1) {		// The car is fake but not the last one
 			if( (it+1)->existence() ) {									// The next car is not false 
 				if( (it+1)->reactIter() < (it+1)->reactDuration() )	{		// The car has not already waited for enough time
-					srand(rand()*rand()*time(NULL));
+					//srand(rand()*rand()*time(NULL));
+					srand(0);
 					int trand = rand()%100;
 					int proba = 100*timestep/((it+1)->reactDuration() - (it+1)->reactIter());
 					(it+1)->iterReactIter(timestep);

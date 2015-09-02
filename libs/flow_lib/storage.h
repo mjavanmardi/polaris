@@ -7,8 +7,10 @@
 
 int lastCarProba(double proba, double weight);
 
-int numberOfAllowedCars(std::map<int, double>& capac, std::vector<Car> queue, int timestep);
+std::map<int,bool> isGreen(int time, std::map<int,double> greenTime, std::map<int,double> cycle, std::map<int,double> offset);
 
-std::vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, std::map<int, double> capac, std::vector<Car> queue, int timestep);
+int numberOfAllowedCars(std::map<int, double>& capac, std::vector<Car> queue, int timestep, bool green, double factor);
 
-std::vector<std::vector<int>> preProcess(std::map<int, Road>& Roads, int timestep);
+std::vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, std::map<int, double> capac, std::vector<Car> queue, int timestep, bool green, double factor);
+
+std::vector<std::vector<int>> preProcess(std::map<int, Road>& Roads, int timestep, int time);

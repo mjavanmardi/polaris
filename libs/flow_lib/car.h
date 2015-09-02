@@ -13,7 +13,7 @@ public:
 
 	//### Getters ###
 	double length();		// Length of the car
-	int number();			// Number/ID of the car
+	int number() const;			// Number/ID of the car
 	int enteringTime();		// Time when the car enters the system
 	int enteringNodeA();	// A road is defined by two nodes (ahead and behind the car). enteringNodeA and enteringNodeB store this information when the SQLite database is read
 	int enteringNodeB();	//  "	"	"	"
@@ -23,7 +23,7 @@ public:
 	int prevNode();			// Returns A
 	bool existence();		// There are fake cars in the networks that model the car reaction time. (Existence = true) => Not a fake car.
 	double speed();
-	int reactIter();		// Iterator to know how long the car has waited while he car ahead of it has moved
+	int reactIter();		// Iterator to know how long the car has waited while the car ahead of it has moved
 	int reactDuration();	// Reaction time of the vehicle/driver
 	double distanceInTA();	// Distance already traveled by the car in the traveling area
 	double accMean();		// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d

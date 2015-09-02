@@ -17,7 +17,7 @@ void TAToQueues(Road& R, int timestep) {
 			it->initDistanceInTA();					//The traveled distance is initialized
 			it->initSpeed();
 			carsToErase.push_back(it->number());
-			R.addCarToQueue((*it));
+			R.addCarToQueue(*it);
 		}
 	}
 	R.removeCarsFromTA(carsToErase);

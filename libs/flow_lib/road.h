@@ -12,7 +12,7 @@ public:
 	Road();
 	Road(int ID, int link, int anode, int bnode, double _maximumSpeed, double _totalLength, double _distanceBetweenCars);
 	~Road();
-	void addQueue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> capacities);		// Add queue to the Road ; used only when importing the SQLite database
+	void addQueue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> capacities, std::map<int,double> greenTime, std::map<int,double> cycle, std::map<int,double> offset);		// Add queue to the Road ; used only when importing the SQLite database
 
 
 	//### Getters ###
@@ -21,7 +21,7 @@ public:
 	bool direction();								// Link of the Road ; used only to import/convert the data structure from the SQLite database
 	int nodeA();									// Get the entering node of the road
 	int nodeB();									// Get the exiting node of the road
-	double speedMax();								// Get the maximum speed of the road
+	double speedMax();								// Get the maixmum speed of the road
 	double getMaxIndivQueueLength();				// Get the maximum  queue length among all the individual queues
 	int getMaxIndivQueueSize();						// Get the maximum number of cars among all the individual queues
 	double getCommonQueueLength();					// Get the common queue length

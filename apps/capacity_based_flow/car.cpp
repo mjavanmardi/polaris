@@ -74,7 +74,7 @@ Car::~Car() {
 
 double Car::length() {return carLength;}
 
-int Car::number() {	return carNumber;}
+int Car::number() const {	return carNumber;}
 
 int Car::enteringTime() {return enterTime;}
 

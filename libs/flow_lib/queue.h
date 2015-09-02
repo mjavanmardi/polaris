@@ -10,7 +10,7 @@ class Queue {
 public:
 	//### Constructors & Destructors ###
 	Queue();
-	Queue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> _capacities);
+	Queue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> _capacities, std::map<int,double> _greenTime, std::map<int,double> _cycle, std::map<int,double> _offset);
 	~Queue();
 
 	//### Getters ###
@@ -18,6 +18,9 @@ public:
 	double length();
 	std::vector<Car>& getQueue();
 	std::map<int, double> getCapacities();
+	std::map<int,double> getGreenTime();
+	std::map<int,double> getCycle();
+	std::map<int,double> getOffset();
 
 	//### Dynamic methods ###
 	int weight(int nextNode);
@@ -34,6 +37,10 @@ private:
 	double distanceBetweenCars;
 	std::vector<int> nextNodes;
 	std::map<int, double> capacities;		//int of next node && capacity value to this next node
+
+	std::map<int,double> greenTime;
+	std::map<int,double> cycle;
+	std::map<int,double> offset;
 
 	//### Cars in queue ###
 	std::vector<Car> cars;
