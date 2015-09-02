@@ -7,9 +7,9 @@
 
 int lastCarProba(double proba, double weight);
 
-std::map<int,bool> isGreen(int time, std::map<int,double> greenTime, std::map<int,double> cycle, std::map<int,double> offset);
+std::map<int,bool> isGreen(double time, std::map<int,double> greenTime, std::map<int,double> cycle, std::map<int,double> offset);
 
-int numberOfAllowedCars(std::map<int, double>& capac, std::vector<Car> queue, int timestep, bool green, double factor);
+int numberOfAllowedCars(std::map<int, double>& capac, std::vector<Car> queue, int timestep, std::map<int,bool> green, std::map<int,double> factor);
 
 std::vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, std::map<int, double> capac, std::vector<Car> queue, int timestep, bool green, double factor);
 

@@ -15,7 +15,7 @@ int lastCarProba(double proba, double weight) { //weight = fractional capacity
 	return lastCar;
 }
 
-map<int,bool> isGreen(int time, map<int,double> greenTime, map<int,double> cycle, map<int,double> offset)
+map<int,bool> isGreen(double time, map<int,double> greenTime, map<int,double> cycle, map<int,double> offset)
 {
 	map<int,bool> green;
 	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)

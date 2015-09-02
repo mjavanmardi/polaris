@@ -8,14 +8,15 @@ using namespace std;
 #include "simulation.h"
 #include "outputProgression.h"
 #include "outputQueueLength.h"
-#include "gtest/gtest.h"
+#include "testCapacity.h"
 
 const int timestep = 1;
-//const int modelisationTime = 178 * timestep;
-const int modelisationTime = 6001 * timestep;
+const int modelisationTime = 178 * timestep;
+//const int modelisationTime = 6001 * timestep;
 char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 
-int main() {
+
+int main(int argc, char **argv) {
 	
 //### Import the SQLITE database and initialize the network ###
 	map<int, Road> Roads = openRoad(db_path);
@@ -36,7 +37,9 @@ int main() {
 	progressions(Roads, file1, false);		// Convert the cars progressions (Raw Data) into "Entering Time - Duration - Exiting Time" & "Speed Profil". If true, include the speed profile in the output file
 	queueLengths(Roads, file2);				// Convert the queues length (Raw Data) into "Average, Std Dev, Length over time, ..."
 	
-
+	
+	::testing::InitGoogleTest(&argc, argv);
+	RUN_ALL_TESTS();
 	system("pause");
 	return 0;
 }
