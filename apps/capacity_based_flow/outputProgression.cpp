@@ -99,7 +99,7 @@ void progressionOf(Car C, ofstream& fichier, bool q) {
 	fichier << endl;
 }
 
-void progressionAt(Road R, ofstream& fichier, bool q) {
+/*void progressionAt(Road R, ofstream& fichier, bool q) {
 	map<int, Queue> queues = R.indivQueues();
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
 		vector<Car> cars = it->second.getQueue();
@@ -115,9 +115,35 @@ void progressionAt(Road R, ofstream& fichier, bool q) {
 	for(vector<Car>::iterator it = lastQueueCars.begin() ; it != lastQueueCars.end() ; it++) {
 		progressionOf(*it, fichier,q);
 	}
+}*/
+
+//sorting version
+void progressionAt(Road R, ofstream& fichier, bool q, set<Car,car_order> &carSet) {
+	
+	map<int, Queue> queues = R.indivQueues();
+	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
+		vector<Car> cars = it->second.getQueue();
+		for(vector<Car>::iterator it2 = cars.begin() ; it2 != cars.end() ; it2++) {
+			carSet.insert(*it2);
+		}
+	}
+	vector<Car> travelingCars = R.getTA();
+	for(vector<Car>::iterator it = travelingCars.begin() ; it != travelingCars.end() ; it++) {
+		carSet.insert(*it);
+	}
+	vector<Car> lastQueueCars = R.getLastQueue();
+	for(vector<Car>::iterator it = lastQueueCars.begin() ; it != lastQueueCars.end() ; it++) {
+		carSet.insert(*it);
+	}
+	vector<Car> commonQueue = R.getCommonQueue();
+	for(vector<Car>::iterator it = commonQueue.begin();it != commonQueue.end();it++)
+	{
+		carSet.insert(*it);
+	}
 }
 
 void progressions(map<int, Road> Roads,  ofstream& fichier, bool q) {
+	set<Car,car_order> carSet;
 	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
 
 		//Adding the progression for the last queues where the cars are stored
@@ -128,6 +154,10 @@ void progressions(map<int, Road> Roads,  ofstream& fichier, bool q) {
 		}
 
 		//Turning the progression number into a speed profile
-		progressionAt(it->second, fichier, q);
+		progressionAt(it->second, fichier, q, carSet); //Collecting informations in the carSet
+	}
+	for(set<Car,car_order>::iterator it = carSet.begin();it!=carSet.end();it++) //Writing the output
+	{
+		progressionOf(*it, fichier, q);
 	}
 }

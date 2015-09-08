@@ -23,12 +23,35 @@ Road::Road(int ID, int link,  int anode, int bnode, double _maximumSpeed, double
 	lengthOverTime.clear();
 }
 
+Road::Road(Json::Value value)
+{
+	try
+	{
+		roadID = jsonToInt(value["roadID"],"roadID");
+		roadLink = jsonToInt(value["roadLink"],"roadLink");
+		Anode = jsonToInt(value["Anode"],"Anode");
+		Bnode = jsonToInt(value["Bnode"],"Bnode");
+		maximumSpeed = jsonToDouble(value["maximumSpeed"],"maximumSpeed");
+		totalLength = jsonToDouble(value["totalLength"],"totalLength");
+		distanceBetweenCars = jsonToDouble(value["distanceBetweenCars"],"distanceBetweenCars");
+		jsonToVector(value["travelingArea"],"travelingArea",travelingArea);
+		jsonToMapInt(value["queues"], "queues", queues);
+		jsonToVector(value["commonQueue"],"commonQueue",commonQueue);
+		jsonToVector(value["lastQueue"],"lastQueue",lastQueue);
+		lengthOverTime = jsonToVectorDouble(value["lengthOverTime"],"lengthOverTime");
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+}
+
 Road::~Road() {
 
 }
 
-void Road::addQueue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> capacities) {
-	Queue Q(ID, _maxLength, _distanceBetweenCars, capacities);
+void Road::addQueue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> capacities, map<int,double> greenTime, map<int,double> cycle, map<int,double> offset) {
+	Queue Q(ID, _maxLength, _distanceBetweenCars, capacities, greenTime, cycle, offset);
 	queues[ID] = Q;
 }
 
@@ -175,16 +198,24 @@ double Road::distanceToTravelInTA(Car C) {
 
 void Road::addCarToQueue(Car C){
 	if(C.Node() == C.exitingNode())	//Last Road of the car
+	{
 		lastQueue.push_back(C);
+	}
 	else if(commonQueue.size() !=0)
+	{
 		commonQueue.push_back(C);
+	}
 	else {							//Not last road of the car
 		bool q = false;
 		int queueID = selectIndividualQueue(C.nextNode(), q);
 		if(q)							//The car can go into some queue
+		{
 			queues[queueID].addCar(C);
+		}
 		else							//The car cannot fit any individual queue
+		{
 			commonQueue.push_back(C);
+		}
 	}
 }
 
@@ -215,3 +246,61 @@ void Road::moveFakeCars(int ID, int timestep) {
 	queues[ID].moveFakeCars(timestep);
 }
 
+Json::Value Road::toJson()
+{
+	Json::Value roadValue;
+	roadValue["roadID"] = Json::Value(roadID);
+	roadValue["roadLink"] = Json::Value(roadLink);
+	roadValue["Anode"] = Json::Value(Anode);
+	roadValue["Bnode"] = Json::Value(Bnode);
+	roadValue["maximumSpeed"] = Json::Value(maximumSpeed);
+	roadValue["totalLength"] = Json::Value(totalLength);
+	roadValue["distanceBetweenCars"] = Json::Value(distanceBetweenCars);
+	Json::Value JTravelingArea(Json::arrayValue);
+	for(int i=0;i<travelingArea.size();i++)
+	{
+		JTravelingArea.append(travelingArea[i].toJson());
+	}
+	roadValue["travelingArea"] = JTravelingArea;
+	Json::Value JQueues;
+	for(map<int,Queue>::iterator it = queues.begin();it!=queues.end();it++)
+	{
+		JQueues[std::to_string(long double(it->first))] = (it->second).toJson();
+	}
+	roadValue["queues"] = JQueues; 
+	Json::Value JCommonQueue(Json::arrayValue);
+	for(int i=0;i<commonQueue.size();i++)
+	{
+		JCommonQueue.append(commonQueue[i].toJson());
+	}
+	roadValue["commonQueue"] = JCommonQueue;
+	Json::Value JLastQueue(Json::arrayValue);
+	for(int i=0;i<lastQueue.size();i++)
+	{
+		JLastQueue.append(lastQueue[i].toJson());
+	}
+	roadValue["lastQueue"] = JLastQueue;
+	Json::Value jLengthOverTime(Json::arrayValue);
+	for(int i=0;i<lengthOverTime.size();i++)
+		jLengthOverTime.append(lengthOverTime[i]);
+	roadValue["lengthOverTime"] = Json::Value(jLengthOverTime);
+	return roadValue;
+}
+
+bool Road::operator==(const Road & R) const
+{
+	bool result = true;
+	result = result && (R.roadID == roadID);
+	result = result && (R.roadLink == roadLink);
+	result = result && (R.Anode == Anode);
+	result = result && (R.Bnode == Bnode);
+	result = result && (R.maximumSpeed == maximumSpeed);
+	result = result && (R.totalLength == totalLength);
+	result = result && (R.distanceBetweenCars == distanceBetweenCars);
+	result = result && (R.travelingArea == travelingArea);
+	result = result && (R.queues == queues);
+	result = result && (R.commonQueue == commonQueue);
+	result = result && (R.lastQueue == lastQueue);
+	result = result && (R.lengthOverTime == lengthOverTime);
+	return result;
+}

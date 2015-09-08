@@ -1,7 +1,9 @@
 #pragma once
 
 #include <iostream>	//Only for the debugging : cout
-
+#include "json.h"
+#include "reader.h"
+#include "JsonParser.h"
 #include <vector>
 
 class Car {
@@ -9,11 +11,12 @@ public:
 	//### Constructors & Destructors ###
 	Car();
 	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration, int entA, int entB, int exA, int exB);
+	Car(Json::Value value); //Creates a car from a json value
 	~Car();
 
 	//### Getters ###
 	double length();		// Length of the car
-	int number();			// Number/ID of the car
+	int number() const;			// Number/ID of the car
 	int enteringTime();		// Time when the car enters the system
 	int enteringNodeA();	// A road is defined by two nodes (ahead and behind the car). enteringNodeA and enteringNodeB store this information when the SQLite database is read
 	int enteringNodeB();	//  "	"	"	"
@@ -23,7 +26,7 @@ public:
 	int prevNode();			// Returns A
 	bool existence();		// There are fake cars in the networks that model the car reaction time. (Existence = true) => Not a fake car.
 	double speed();
-	int reactIter();		// Iterator to know how long the car has waited while he car ahead of it has moved
+	int reactIter();		// Iterator to know how long the car has waited while the car ahead of it has moved
 	int reactDuration();	// Reaction time of the vehicle/driver
 	double distanceInTA();	// Distance already traveled by the car in the traveling area
 	double accMean();		// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d
@@ -45,7 +48,11 @@ public:
 	void addSpeed(double speed);
 	void postponedEnteringTime(int timestep);
 
+	//### Serialization ###
 
+	Json::Value toJson(); //Turns current car into a json value
+	bool operator==(const Car & C1) const;
+	
 	friend bool operator< (Car & C1, Car & C2) { // Operator to compare the vehicles based on their entering time. Help sorting the vehicles that enter the system
 		if(C1.enterTime < C2.enterTime)
 			return true;

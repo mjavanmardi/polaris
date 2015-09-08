@@ -4,7 +4,7 @@
 
 #include "road.h"
 #include "io/database.h"
-#include "io/Io.h"
+#include "io/Io_db.h"
 
 using namespace odb;
 using namespace polaris::io;
@@ -21,3 +21,9 @@ std::pair<Road,Road> importRoad(polaris::io::Link db_itr, int ID, vector<int> li
 void preprocessConnections(result<polaris::io::Connect> connections, vector<int>& link, vector<int>& toNodeA, vector<int>& toNodeB, vector<bool>& dir, vector<string>& lanes, vector<string>& type);
 
 std::map<int, Road> openRoad(char *db_path);
+
+std::string fileToString(const std::string& filename);
+
+Json::Value roadToJson(char *db_path);
+
+std::map<int,Road> jsonToRoad(std::string fileName);
