@@ -171,6 +171,7 @@ else()
 	add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
+	add_subdirectory (apps/dee-test)
 	add_subdirectory (apps/network_validator)
 #	add_subdirectory (apps/Output_Visualizer)
 	add_subdirectory (libs/traffic_simulator)
@@ -188,4 +189,38 @@ if (CapacityFlow)
 	message(${CapacityFlow})
 	add_subdirectory(libs/flow_lib)
 	add_subdirectory(apps/capacity_based_flow)
+endif()
+
+if (Unittest)
+	# Enable ExternalProject CMake module
+	include(ExternalProject)
+	set(googletest_dir "${CMAKE_SOURCE_DIR}/external/googletest")
+	# Download and install GoogleTest
+	ExternalProject_Add(
+		gtest
+		# URL https://github.com/google/googletest/archive/master.zip
+		SOURCE_DIR ${googletest_dir}
+		# # PREFIX ${gtest_dir}
+		# SOURCE_DIR "${gtest_dir}/src"
+		# CONFIGURE_COMMAND
+			# "${CMAKE_COMMAND}"
+			# "-H${gtest_dir}/src/googletest"
+			# "-B${gtest_dir}/Builds"
+			# "-DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}"		
+	   # BUILD_COMMAND
+			# "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds"
+		# # INSTALL_COMMAND
+			# # "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds" --target install
+	)
+	add_library(libgtest IMPORTED STATIC GLOBAL)
+	add_dependencies(libgtest gtest)
+	# Set gtest properties
+	ExternalProject_Get_Property(gtest source_dir binary_dir)
+	set_target_properties(libgtest PROPERTIES
+		"IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
+		"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+	#    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
+	)
+	# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
+	include_directories("${source_dir}/include")	
 endif()
