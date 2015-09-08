@@ -118,3 +118,15 @@ double jsonToDouble(Json::Value root, std::string name)
 		throw string(name+" information missing");
 	return value;
 }
+
+std::string fileToString(const std::string& filename)
+{
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) return "";
+    std::string line, str;
+	while(getline(file,line))
+	{
+		str.append(line);
+	}
+    return str;
+}
