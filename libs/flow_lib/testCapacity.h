@@ -75,21 +75,6 @@ TEST (Car,CarJsonCarIdentity)
 	ASSERT_EQ(a,b);
 }
 
-//Tests that the Car constructor returns a valid exception when it reads a bad Json code
-/*TEST (DISABLED_Car,jsonContructorException)
-{
-	try
-	{
-		Json::Value v;
-		v["fake"] = Json::Value(true);
-		Car a(v);
-	}
-	catch(std::string &const st)
-	{
-		ASSERT_EQ(st,std::string("carNumber information missing"));
-	}
-}*/
-
 //Check that a queue to json to a queue is identity
 TEST (Queue,QueueJsonQueueIdentity)
 {
