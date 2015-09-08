@@ -136,12 +136,23 @@ TEST (Road,RoadJsonRoadIdentity)
 	ASSERT_EQ(rOne,rTwo);
 }
 
-TEST (RoadNetworkJson,CanBeImported) //Todo
+//Check if the test network can be imported
+TEST (RoadNetworkJson,CanBeImported) 
 {
-	std::string test = fileToString("network.json"); 
+	std::string test = fileToString("TEST_network.json"); 
 	Json::Value root;
 	Json::Reader reader;
 	reader.parse(test,root);
 	//std::cout << root << std::endl;
 	ASSERT_EQ (root.isNull(),false);
+}
+
+//Check if the test car demand can be imported
+TEST (CarsDemandJson,CanBeImported)
+{
+	std::string test = fileToString("TEST_cars.json"); 
+	Json::Value root;
+	Json::Reader reader;
+	reader.parse(test,root);
+	ASSERT_EQ (root.isArray(),true);
 }

@@ -41,12 +41,20 @@ int main(int argc, char **argv) {
 	queueLengths(Roads, file2);				// Convert the queues length (Raw Data) into "Average, Std Dev, Length over time, ..."
 	
 //### Writing road network to json file ###
-	/*ofstream str("network.json",ios::app);
-	str << roadToJson(db_path);
-	str.close();*/
+	/*ofstream strRoad("TEST_network.json",ios::app);
+	strRoad << roadToJson(db_path);
+	strRoad.close();*/
 
-	map<int,Road> roads = jsonToRoad("network.json");
-	cout << "Road size : " << roads.size() << endl;
+//### Writing cars demand to json file ###
+	/*ofstream strCar("TEST_cars.json",ios::app);
+	strCar << carsToJson(db_path);
+	strCar.close();*/
+
+	map<int,Road> jRoads = jsonToRoad("TEST_network.json");
+	cout << "Road size : " << jRoads.size() << endl;
+
+	vector<Car> jCars = jsonToCars("TEST_cars.json");
+	cout << "Cars number : " << jCars.size() << endl;
 	
 	::testing::InitGoogleTest(&argc, argv);
 	RUN_ALL_TESTS();

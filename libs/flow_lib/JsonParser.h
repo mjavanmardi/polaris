@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 //Tools to read from Json Values
 
 std::vector<int> jsonToVectInt(Json::Value root, std::string name);
@@ -48,3 +50,5 @@ void jsonToMapInt(Json::Value root, std::string name, std::map<int,T> &value)
 	else
 		throw string(name+" information missing");
 }
+
+std::string fileToString(const std::string& filename);
