@@ -69,68 +69,23 @@ Car::Car(Json::Value value)
 {
 	try
 	{
-		if(value["fake"].isBool())
-			fake = value["fake"].asBool();
-		else
-			throw string("fake information missing");
-		if(value["carNumber"].isInt())
-			carNumber = value["carNumber"].asInt();
-		else
-			throw string("carNumber information missing");
-		if(value["carLength"].isDouble())
-			carLength = value["carLength"].asDouble();
-		else
-			throw string("carLength information missing");
-		if(value["reacDuration"].isInt())
-			reacDuration = value["reacDuration"].asInt();
-		else
-			throw string("fake information missing");
-		if(value["enterTime"].isInt())
-			enterTime = value["enterTime"].asInt();
-		else
-			throw string("enterTime information missing");
-		if(value["enterNodeA"].isInt())
-			enterNodeA = value["enterNodeA"].asInt();
-		else
-			throw string("enterNodeA information missing");
-		if(value["enterNodeB"].isInt())
-			enterNodeB = value["enterNodeB"].asInt();
-		else
-			throw string("enterNodeB information missing");
-		if(value["exitNodeA"].isInt())
-			exitNodeA = value["exitNodeA"].asInt();
-		else
-			throw string("exitNodeA information missing");
-		if(value["exitNodeB"].isInt())
-			exitNodeB = value["exitNodeB"].asInt();
-		else
-			throw string("exitNodeB information missing");
-		if(value["meanAcceleration"].isDouble())
-			meanAcceleration = value["meanAcceleration"].asDouble();
-		else
-			throw string("meanAcceleration information missing");
-		if(value["meanDecceleration"].isDouble())
-			meanDecceleration = value["meanDecceleration"].asDouble();
-		else
-			throw string("meanDecceleration information missing");
-		if(value["carSpeed"].isDouble())
-			carSpeed = value["carSpeed"].asDouble();
-		else
-			throw string("carSpeed information missing");
+		fake = jsonToBool(value["fake"],"fake");
+		carNumber = jsonToInt(value["carNumber"],"carNumber");
+		carLength = jsonToDouble(value["carLength"],"carLength");
+		reacDuration = jsonToInt(value["reacDuration"],"reacDuration");
+		enterTime = jsonToInt(value["enterTime"],"enterTime");
+		enterNodeA = jsonToInt(value["enterNodeA"],"enterNodeA");
+		enterNodeB = jsonToInt(value["enterNodeB"],"enterNodeB");
+		exitNodeA = jsonToInt(value["exitNodeA"],"exitNodeA");
+		exitNodeB = jsonToInt(value["exitNodeB"],"exitNodeB");
+		meanAcceleration = jsonToDouble(value["meanAcceleration"],"meanAcceleration");
+		meanDecceleration = jsonToDouble(value["meanDecceleration"],"meanDecceleration");
+		carSpeed = jsonToDouble(value["carSpeed"],"carSpeed");
 		path = jsonToVectorInt(value["path"],"path");
-		if(value["reacIter"].isInt())
-			reacIter = value["reacIter"].asInt();
-		else
-			throw string("reacIter information missing");
-		if(value["position"].isInt())
-			position = value["position"].asInt();
-		else
-			throw string("position information missing");
-		if(value["distInTA"].isDouble())
-			distInTA = value["distInTA"].asDouble();
-		else
-			throw string("distInTA information missing");
-		progression=jsonToVectorInt(value["progression"],"progression");
+		reacIter = jsonToInt(value["reacIter"],"reacIter");
+		position = jsonToInt(value["position"],"position");
+		distInTA = jsonToDouble(value["distInTA"],"distInTA");
+		progression = jsonToVectorInt(value["progression"],"progression");
 		maxSpeeds = jsonToVectorDouble(value["maxSpeeds"],"maxSpeeds");
 	}
 	catch(string &const st)

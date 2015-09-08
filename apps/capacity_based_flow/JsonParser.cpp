@@ -88,3 +88,33 @@ std::vector<int> jsonToVectorInt(Json::Value root, std::string name)
 
 	return value;
 }
+
+bool jsonToBool(Json::Value root, std::string name)
+{
+	bool value;
+	if(root.isBool())
+		value = root.asBool();
+	else
+		throw string(name+" information missing");
+	return value;
+}
+
+int jsonToInt(Json::Value root, std::string name)
+{
+	int value;
+	if(root.isInt())
+		value = root.asInt();
+	else
+		throw string(name+" information missing");
+	return value;
+}
+
+double jsonToDouble(Json::Value root, std::string name)
+{
+	double value;
+	if(root.isDouble())
+		value = root.asDouble();
+	else
+		throw string(name+" information missing");
+	return value;
+}

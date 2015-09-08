@@ -27,18 +27,9 @@ Queue::Queue(Json::Value value)
 {
 	try
 	{
-		if(value["queueID"].isInt())
-			queueID = value["queueID"].asInt();
-		else
-			throw string("queueID information missing");
-		if(value["maxLength"].isDouble())
-			maxLength = value["maxLength"].asDouble();
-		else
-			throw string("maxLength information missing");
-		if(value["distanceBetweenCars"].isDouble())
-			distanceBetweenCars = value["distanceBetweenCars"].asDouble();
-		else
-			throw string("distanceBetweenCars information missing");
+		queueID = jsonToInt(value["queueID"],"queueID");
+		maxLength = jsonToDouble(value["maxLength"],"maxLength");
+		distanceBetweenCars = jsonToDouble(value["distanceBetweenCars"],"distanceBetweenCars");
 		nextNodes = jsonToVectInt(value["nextNodes"],"nextNodes");
 		capacities = jsonToMapIntDouble(value["capacities"],"capacities");
 		greenTime = jsonToMapIntDouble(value["greenTime"],"greenTime");
