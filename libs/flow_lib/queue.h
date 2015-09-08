@@ -4,6 +4,7 @@
 #include <iostream>		//Include rand()
 #include <vector>
 #include <map>
+#include<sstream>
 #include "car.h"
 
 class Queue {
@@ -11,6 +12,7 @@ public:
 	//### Constructors & Destructors ###
 	Queue();
 	Queue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> _capacities, std::map<int,double> _greenTime, std::map<int,double> _cycle, std::map<int,double> _offset);
+	Queue(Json::Value value);
 	~Queue();
 
 	//### Getters ###
@@ -28,6 +30,11 @@ public:
 	void addCar(Car C);
 	void removeCar();
 	void moveFakeCars(int timestep);
+
+	//### Serialization ###
+
+	Json::Value toJson();
+	bool operator==(const Queue & q) const;
 
 	
 private:

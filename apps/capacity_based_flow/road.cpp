@@ -23,6 +23,111 @@ Road::Road(int ID, int link,  int anode, int bnode, double _maximumSpeed, double
 	lengthOverTime.clear();
 }
 
+Road::Road(Json::Value value)
+{
+	try
+	{
+		if(value["roadID"].isInt())
+			roadID = value["roadID"].asInt();
+		else
+			throw string("roadID information missing");
+		if(value["roadLink"].isInt())
+			roadLink = value["roadLink"].asInt();
+		else
+			throw string("roadLink information missing");
+		if(value["Anode"].isInt())
+			Anode = value["Anode"].asInt();
+		else
+			throw string("Anode information missing");
+		if(value["Bnode"].isInt())
+			Bnode = value["Bnode"].asInt();
+		else
+			throw string("Bnode information missing");
+		if(value["maximumSpeed"].isDouble())
+			maximumSpeed = value["maximumSpeed"].asDouble();
+		else
+			throw string("maximumSpeed information missing");
+		if(value["totalLength"].isDouble())
+			totalLength = value["totalLength"].asDouble();
+		else
+			throw string("totalLength information missing");
+		if(value["distanceBetweenCars"].isDouble())
+			distanceBetweenCars = value["distanceBetweenCars"].asDouble();
+		else
+			throw string("distanceBetweenCars information missing");
+		travelingArea = vector<Car>(0);
+		Json::Value JTravelingArea = value["travelingArea"];
+		if(JTravelingArea.isArray())
+		{
+			for(int i=0;i<JTravelingArea.size();i++)
+			{
+				Car a(JTravelingArea[i]);
+				travelingArea.push_back(a);
+			}
+		}
+		else
+			throw string("travelingArea information missing");
+		queues = std::map<int, Queue>();
+		if(!value["queues"].isNull())
+		{
+			for(Json::Value::iterator it = value["queues"].begin();it != value["queues"].end();it++)
+			{
+				if(it.key().isString())
+					queues[stoi(it.key().asString())] = Queue(*it);
+				else
+					throw string("Problem with queues information");
+			}
+		}
+		else
+			throw string("queues information missing");
+		commonQueue = vector<Car>(0);
+		Json::Value JCommonQueue = value["commonQueue"];
+		if(JCommonQueue.isArray())
+		{
+			for(int i=0;i<JCommonQueue.size();i++)
+			{
+				Car a(JCommonQueue[i]);
+				commonQueue.push_back(a);
+			}
+		}
+		else
+			throw string("commonQueue information missing");
+
+		lastQueue = vector<Car>(0);
+		Json::Value JLastQueue = value["lastQueue"];
+		if(JLastQueue.isArray())
+		{
+			for(int i=0;i<JLastQueue.size();i++)
+			{
+				Car a(JLastQueue[i]);
+				lastQueue.push_back(a);
+			}
+		}
+		else
+			throw string("lastQueue information missing");
+
+		lengthOverTime = vector<double>(0);
+		if(value["lengthOverTime"].isArray())
+		{
+			Json::Value jLengthOverTime = value["lengthOverTime"];
+			for(int i=0;i<jLengthOverTime.size();i++)
+			{
+				if(jLengthOverTime[i].isDouble())
+					lengthOverTime.push_back(jLengthOverTime[i].asDouble());
+				else
+					throw string("Problem with lengthOverTime information");
+			}
+		}
+		else
+			throw string("lengthOverTime information missing");
+
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+}
+
 Road::~Road() {
 
 }
@@ -223,3 +328,61 @@ void Road::moveFakeCars(int ID, int timestep) {
 	queues[ID].moveFakeCars(timestep);
 }
 
+Json::Value Road::toJson()
+{
+	Json::Value roadValue;
+	roadValue["roadID"] = Json::Value(roadID);
+	roadValue["roadLink"] = Json::Value(roadLink);
+	roadValue["Anode"] = Json::Value(Anode);
+	roadValue["Bnode"] = Json::Value(Bnode);
+	roadValue["maximumSpeed"] = Json::Value(maximumSpeed);
+	roadValue["totalLength"] = Json::Value(totalLength);
+	roadValue["distanceBetweenCars"] = Json::Value(distanceBetweenCars);
+	Json::Value JTravelingArea(Json::arrayValue);
+	for(int i=0;i<travelingArea.size();i++)
+	{
+		JTravelingArea.append(travelingArea[i].toJson());
+	}
+	roadValue["travelingArea"] = JTravelingArea;
+	Json::Value JQueues;
+	for(map<int,Queue>::iterator it = queues.begin();it!=queues.end();it++)
+	{
+		JQueues[std::to_string(long double(it->first))] = (it->second).toJson();
+	}
+	roadValue["queues"] = JQueues; 
+	Json::Value JCommonQueue(Json::arrayValue);
+	for(int i=0;i<commonQueue.size();i++)
+	{
+		JCommonQueue.append(commonQueue[i].toJson());
+	}
+	roadValue["commonQueue"] = JCommonQueue;
+	Json::Value JLastQueue(Json::arrayValue);
+	for(int i=0;i<lastQueue.size();i++)
+	{
+		JLastQueue.append(lastQueue[i].toJson());
+	}
+	roadValue["lastQueue"] = JLastQueue;
+	Json::Value jLengthOverTime(Json::arrayValue);
+	for(int i=0;i<lengthOverTime.size();i++)
+		jLengthOverTime.append(lengthOverTime[i]);
+	roadValue["lengthOverTime"] = Json::Value(jLengthOverTime);
+	return roadValue;
+}
+
+bool Road::operator==(const Road & R) const
+{
+	bool result = true;
+	result = result && (R.roadID == roadID);
+	result = result && (R.roadLink == roadLink);
+	result = result && (R.Anode == Anode);
+	result = result && (R.Bnode == Bnode);
+	result = result && (R.maximumSpeed == maximumSpeed);
+	result = result && (R.totalLength == totalLength);
+	result = result && (R.distanceBetweenCars == distanceBetweenCars);
+	result = result && (R.travelingArea == travelingArea);
+	result = result && (R.queues == queues);
+	result = result && (R.commonQueue == commonQueue);
+	result = result && (R.lastQueue == lastQueue);
+	result = result && (R.lengthOverTime == lengthOverTime);
+	return result;
+}

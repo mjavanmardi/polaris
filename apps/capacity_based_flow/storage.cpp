@@ -38,23 +38,35 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 	double capacMin = DBL_MAX;
 	int size = queue.size();
 	//for(map<int, double>::iterator it = capac.begin() ; it != capac.end() ; it++) 
-	for(map<int, double>::iterator it = capac.begin();it != capac.end();it++)
+	try
 	{
-		//cout << "Loop two : " << green[it->first] << endl;
-		if(green[it->first]) //if green light then the initial capacity is amplified by the factor
+		for(map<int, double>::iterator it = capac.begin();it != capac.end();it++)
 		{
-			it->second *= factor[it->first];
-			//cout << "factor : " << factor[i] << endl;
+			//cout << "Loop two : " << green[it->first] << endl;
+			if(it->second ==0)
+			{
+				throw string("failure : one capacity is equal to 0");
+			}
+		
+			if(green[it->first]) //if green light then the initial capacity is amplified by the factor
+			{
+				it->second *= factor[it->first];
+				//cout << "factor : " << factor[i] << endl;
+			}
+			else
+			{
+				it->second = 0; // if red light, the capacity is null
+				//cout << "No factor : " << factor[i] << endl;
+			}
+			if(it->second < capacMin)
+				capacMin = it->second;
+			if(capacMin == 0)
+				return 0;
 		}
-		else
-		{
-			it->second = 0; // if red light, the capacity is null
-			//cout << "No factor : " << factor[i] << endl;
-		}
-		if(it->second < capacMin) //To see : strange way to do a min
-			capacMin = it->second;
-		if(capacMin == 0)
-			return 0;
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
 	}
 	//cout << endl;
 	/*for(map<int, bool>::iterator it = green.begin();it != green.end();it++)
@@ -66,23 +78,22 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 	double minNumberOfCars = capacMin * timestep / 3600;
 	int realNumberOfCars = 0;
 
-	bool q = true;
-	int iter = 0;
-	while(q && queue.size() >iter) {
+	for(int iter=0;iter < queue.size();iter++) {
 		Car C = queue.at(iter);
 
 		double absCapacity = capacMin;
 		if(C.existence() == true)
 			absCapacity = capac[C.nextNode()];	// Calculate the capacity of the turning movement the car is looking for out of all that are allowed on this lane
 		double carWeight = capacMin/absCapacity;	// Calculate the weight of the car ; included in ]0;1] ; equals to one for the turning movement with the smallest capacity
-		if(minNumberOfCars > carWeight) {				// If the carweight is superior to the number of car that can cross the intersection, than the car is 
-			iter += 1;						// To check in the next loop if the next car can cross the intersection
+		if(minNumberOfCars > carWeight) // If the carweight is superior to the number of car that can cross the intersection, than the car is 
+		{				
 			minNumberOfCars -= carWeight;	// Decrease the total number of car still allowed to cross the intersection
 			realNumberOfCars += 1;			// Increase the total number of car really crossing the network
 		}
-		else {		// For cars that have a weight superior to the minumum number of cars still allowed to crosse
+		else 
+		{		// For cars that have a weight superior to the minumum number of cars still allowed to crosse
 			realNumberOfCars += lastCarProba(minNumberOfCars, carWeight); // There is a probability of having this car crossing the intersection. It depends on its weight and on the remainder of number of cars allowed to crosse
-			q = false;
+			break;
 		}
 	}
 	realNumberOfCars =(realNumberOfCars < size) ? realNumberOfCars : size;

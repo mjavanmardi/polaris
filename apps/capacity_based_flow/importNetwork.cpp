@@ -78,9 +78,9 @@ void importLanes(Road& R, bool q, int lane, double grade, vector<int> link, vect
 			}
 		}
 		
-		double maxLength = 30;				// Default Value
+		double maxLength = 28;				// Default Value
 		double distanceBetweenCars = 0.5;		// Default Value
-		double greenTimeI = 15;	// Default value : green time of the red light
+		double greenTimeI = 28;	// Default value : green time of the red light
 		double cycleI = 30; // Default Value : cycle of the red light
 		double offsetI = 0; // Default Value : initial offset (before green)
 		map<int,double> greenTime;
@@ -168,3 +168,49 @@ map<int, Road> openRoad(char *db_path) {
 	return newRoads;
 }
 
+std::string fileToString(const std::string& filename)
+{
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) return "";
+    std::string line, str;
+	while(getline(file,line))
+	{
+		str.append(line);
+	}
+    return str;
+}
+
+Json::Value roadToJson(char *db_path)
+{
+	map<int,Road> roads = openRoad(db_path);
+	Json::Value roadsValue;
+	for(map<int,Road>::iterator it = roads.begin();it!=roads.end();it++)
+	{
+		roadsValue[std::to_string(long double(it->first))] = (it->second).toJson();
+	}
+	return roadsValue;
+}
+
+map<int,Road> jsonToRoad(string fileName)
+{
+	std::string test = fileToString("network.json"); 
+	Json::Value root;
+	Json::Reader reader;
+	reader.parse(test,root);
+	map<int,Road> roads;
+	try
+	{
+		for(Json::Value::iterator it = root.begin(); it != root.end();it++)
+		{
+			if(it.key().isString())
+				roads[stoi(it.key().asString())] = Road(*it);
+			else
+				throw string("Problem with roads information");
+		}
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+	return roads;
+}

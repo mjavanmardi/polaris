@@ -1,7 +1,9 @@
 #pragma once
 
 #include <iostream>	//Only for the debugging : cout
-
+#include "json.h"
+#include "reader.h"
+#include "JsonParser.h"
 #include <vector>
 
 class Car {
@@ -9,6 +11,7 @@ public:
 	//### Constructors & Destructors ###
 	Car();
 	Car::Car(bool _fake, int _carNumber, double _carLength, int _reacDuration, int _enterTime, double _meanAcceleration, double _meanDecceleration, int entA, int entB, int exA, int exB);
+	Car(Json::Value value); //Creates a car from a json value
 	~Car();
 
 	//### Getters ###
@@ -45,7 +48,11 @@ public:
 	void addSpeed(double speed);
 	void postponedEnteringTime(int timestep);
 
+	//### Serialization ###
 
+	Json::Value toJson(); //Turns current car into a json value
+	bool operator==(const Car & C1) const;
+	
 	friend bool operator< (Car & C1, Car & C2) { // Operator to compare the vehicles based on their entering time. Help sorting the vehicles that enter the system
 		if(C1.enterTime < C2.enterTime)
 			return true;

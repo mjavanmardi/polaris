@@ -11,6 +11,7 @@ public:
 	//### Constructors & Destructors ###
 	Road();
 	Road(int ID, int link, int anode, int bnode, double _maximumSpeed, double _totalLength, double _distanceBetweenCars);
+	Road(Json::Value value);
 	~Road();
 	void addQueue(int ID, double _maxLength, double _distanceBetweenCars, std::map<int,double> capacities, std::map<int,double> greenTime, std::map<int,double> cycle, std::map<int,double> offset);		// Add queue to the Road ; used only when importing the SQLite database
 
@@ -46,7 +47,9 @@ public:
 
 	void moveFakeCars(int ID, int timestep);			// This method deals with the fake cars added in the system to model/simulate the reaction duration of real car when the one ahead moved.
 
-
+	//### Serialization ###
+	Json::Value toJson();
+	bool operator==(const Road & R) const;
 
 private:
 	//### Constant parameters ###
