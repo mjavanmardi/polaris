@@ -168,7 +168,7 @@ map<int, Road> openRoad(char *db_path) {
 	return newRoads;
 }
 
-Json::Value roadToJson(char *db_path)
+Json::Value roadsToJson(char *db_path)
 {
 	map<int,Road> roads = openRoad(db_path);
 	Json::Value roadsValue;
@@ -179,7 +179,7 @@ Json::Value roadToJson(char *db_path)
 	return roadsValue;
 }
 
-map<int,Road> jsonToRoad(string fileName)
+map<int,Road> jsonToRoads(string fileName)
 {
 	std::string test = fileToString(fileName); 
 	Json::Value root;

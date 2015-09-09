@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	
 //### Writing road network to json file ###
 	/*ofstream strRoad("TEST_network.json",ios::app);
-	strRoad << roadToJson(db_path);
+	strRoad << roadsToJson(db_path);
 	strRoad.close();*/
 
 //### Writing cars demand to json file ###
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 	strCar << carsToJson(db_path);
 	strCar.close();*/
 
-	map<int,Road> jRoads = jsonToRoad("TEST_network.json");
+	map<int,Road> jRoads = jsonToRoads("TEST_network.json");
 	cout << "Road size : " << jRoads.size() << endl;
 
 	vector<Car> jCars = jsonToCars("TEST_cars.json");

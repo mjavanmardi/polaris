@@ -22,6 +22,6 @@ void preprocessConnections(result<polaris::io::Connect> connections, vector<int>
 
 std::map<int, Road> openRoad(char *db_path);
 
-Json::Value roadToJson(char *db_path);
+Json::Value roadsToJson(char *db_path);
 
-std::map<int,Road> jsonToRoad(std::string fileName);
+std::map<int,Road> jsonToRoads(std::string fileName);
