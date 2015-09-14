@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime> //only for the debugging
+#include <string>
 
 #include "newcars.h"
 #include "storage.h"

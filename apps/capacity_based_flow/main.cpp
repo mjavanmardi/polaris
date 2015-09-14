@@ -14,8 +14,8 @@ using namespace std;
 
 
 const int timestep = 1;
-const int modelisationTime = 178 * timestep;
-//const int modelisationTime = 6001 * timestep;
+//const int modelisationTime = 178 * timestep;
+const int modelisationTime = 6001 * timestep;
 char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 
 
@@ -50,14 +50,14 @@ int main(int argc, char **argv) {
 	strCar << carsToJson(db_path);
 	strCar.close();*/
 
-	map<int,Road> jRoads = jsonToRoads("TEST_network.json");
-	cout << "Road size : " << jRoads.size() << endl;
+	//map<int,Road> jRoads = jsonToRoads("TEST_network.json");
+	//cout << "Road size : " << jRoads.size() << endl;
 
-	vector<Car> jCars = jsonToCars("TEST_cars.json");
-	cout << "Cars number : " << jCars.size() << endl;
+	//vector<Car> jCars = jsonToCars("TEST_cars.json");
+	//cout << "Cars number : " << jCars.size() << endl;
 	
 	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	//RUN_ALL_TESTS();
 	system("pause");
 	return 0;
 }

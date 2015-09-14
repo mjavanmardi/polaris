@@ -10,7 +10,7 @@ vector<pair<int,int>> selectCars(int j, int k, vector<vector<int>> Cars) {
 		if((it->at(1) == j && it->at(3) == k) || it->at(3) == -999) {
 		//if(it->at(1) == j && it->at(3) == k) {		//If the car comes from R(.,j) && goes to k
 			pair<int, int> newLine;
-			newLine.first = it->at(0);	// Node where the car come from i [R(i,.)]
+			newLine.first = it->at(0);	// Node where the car comes from i [R(i,.)]
 			newLine.second = it->at(2);	// Queue ID of the Road(i,j)
 			selectedCars.push_back(newLine);
 		}
@@ -35,7 +35,7 @@ void sampleCars(vector<pair<int,int>>& selectedCars) {
 void releaseCars(Road& R, map<int, Road>& Roads, vector<pair<int,int>> sampledCars, vector<pair<int,int>>& stuckCars, vector<pair<int,int>>& movingCars, int timestep) {
 	//### REMINDER sampledCars < Node i , Queue ID >
 	for(vector<pair<int, int>>::iterator it = sampledCars.begin() ; it != sampledCars.end() ; it ++) {
-		int nodei = it ->first;
+		int nodei = it ->first; //Node where the car comes from
 		int queueID = it->second;
 		//### Select the previous road ID ###
 		int roadID;
@@ -86,8 +86,6 @@ void deleteMovingCars(vector<int>& car, vector<pair<int,int>> movingCars, bool& 
 			break;
 		}
 	}
-
-
 }
 
 void deleteCars(vector<vector<int>>& Cars,	vector<pair<int, int>> movingCars, vector< pair< int, int>> stuckCars, int nodej) {
