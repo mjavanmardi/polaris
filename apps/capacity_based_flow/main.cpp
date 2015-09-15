@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace std;
-
 #include "importNetwork.h"
 #include "importCars.h"
 #include "carsPath.h"
@@ -12,10 +10,11 @@ using namespace std;
 #include "JsonParser.h"
 #include <fstream>
 
+using namespace std;
 
 const int timestep = 1;
 //const int modelisationTime = 178 * timestep;
-const int modelisationTime = 6001 * timestep;
+const int modelisationTime = 15001 * timestep;
 char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 
 

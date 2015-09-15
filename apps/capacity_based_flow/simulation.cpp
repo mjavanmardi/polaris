@@ -54,12 +54,10 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 	timeSpent["Add cars"] = 0;
 	timeSpent["TA to queue"]  = 0;
 	timeSpent["Queue to TA"] = 0;
-	timeSpent["Common to individual queue"] = 0;
-	timeSpent["Iter Queue Progress"] = 0;
-	timeSpent["Store exiting cars"] = 0;
-	timeSpent["Green time loop"] = 0;
-	timeSpent["isGreen"] = 0;
-	timeSpent["start2"] = 0;
+	timeSpent["Preprocess"] = 0;
+	timeSpent["Total"] = 0;
+	std::clock_t startTot;
+	startTot= clock();
 	for(int t = 0 ; t < modelisationTime ; t++) {
 
 	
@@ -71,7 +69,9 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
-		vector<vector<int>> movingCars = preProcess(Roads, timestep, t, timeSpent);
+		start = clock();
+		vector<vector<int>> movingCars = preProcess(Roads, timestep, t);
+		timeSpent["Preprocess"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 	//### Release cars from traveling areas into queues (Common or Individual)
 		start = clock();
@@ -91,8 +91,9 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 		cout << "Car size : " << Cars.size() << endl;*/
 
 		if(t%50==0)
-			std::cout << "t : " << t << std::endl ; 
+			std::cout << "t : " << t << " " << Cars.size() << std::endl ; 
 	}
+	timeSpent["Total"] += (clock()-startTot) / (double)(CLOCKS_PER_SEC);
 	for(std::map<std::string,double>::iterator it = timeSpent.begin();it!=timeSpent.end();it++)
 	{
 		cout << "Time spent in " << it->first << " = " << it->second << " s" << endl;

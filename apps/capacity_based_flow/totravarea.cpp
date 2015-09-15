@@ -45,23 +45,28 @@ void releaseCars(Road& R, map<int, Road>& Roads, vector<pair<int,int>> sampledCa
 				break;
 			}
 		}
-
 		// RELEASE
 
-		if(Roads[roadID].getQueue(queueID).getQueue().size() != 0) {
-			if(Roads[roadID].getQueue(queueID).getQueue()[0].existence() == false)	{	// First Car is fake
+		if(Roads[roadID].getQueue(queueID).getQueue().size() != 0) 
+		{
+			if(Roads[roadID].getQueue(queueID).getQueue()[0].existence() == false)	// First Car is fake
+			{
 				Roads[roadID].moveFakeCars(queueID, timestep);			// Move Fake Car
 				movingCars.push_back((*it));
 			}
-			else {																		// First Car is not fake
-				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength() + (R.getTA().size()/R.indivQueues().size())) {				// Check if there is room left
+			else 
+			{																		// First Car is not fake
+				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength() + (R.getTA().size()/R.indivQueues().size())) // Check if there is room left
+				{
 					Car movingCar = Roads[roadID].getQueue(queueID).getQueue()[0];				// Get the first car of the previous road at the right queue
 					R.addCarToTA(movingCar);													// Add the car to the next Traveling Area
 					Roads[roadID].removeCarFromQueue(queueID, timestep); 						// Remove the car from the previous road ; Already includes fake car moving
 					movingCars.push_back(*it);
 				}
 				else
+				{
 					stuckCars.push_back(*it);
+				}
 			}
 		}
 		else
@@ -124,6 +129,7 @@ void deleteCars(vector<vector<int>>& Cars,	vector<pair<int, int>> movingCars, ve
 }
 
 void queuesToTravelingAreas(map<int, Road>& Roads, vector<vector<int>> Cars, int timestep) {
+	std::clock_t start;
 	while(Cars.size() != 0) {
  		for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
 			//### REMINDER ### vector<vector<int>>Cars : Only the cars that are allowed to cross an intersection based on the capacity.
@@ -138,7 +144,9 @@ void queuesToTravelingAreas(map<int, Road>& Roads, vector<vector<int>> Cars, int
 			//### Release cars && Store the moving & non-moving cars
 			vector<pair<int,int>> stuckCars;	//Cars that didn't moved because of the storage
 			vector<pair<int,int>> movingCars;	//Cars that dit moved thanks to the storage
+			//start = clock();
 			releaseCars(it->second, Roads, selectedCars, stuckCars, movingCars, timestep);
+			//timeSpent["Release cars"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 			//### From vector<vector<int>> Cars, delete lines where the first car cannot cross 
 			//###								&&

@@ -118,23 +118,17 @@ vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, doub
 	return newLine;
 }
 
-vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time, std::map<std::string,double> &timeSpent) {
+vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 	vector<vector<int>> capacityCars;
-	std::clock_t start, start2;
 	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
 		//### Release cars from Common Queue
-		start = clock();
 		it->second.commonToIndividualQueue();
-		timeSpent["Common to individual queue"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 		//### Write cars progression & Write queues length & Moving Fake Cars (In the individual queues && in the common queue)
-		start = clock();
 		it->second.iterQueuesProg(timestep);
-		timeSpent["Iter Queue Progress"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 		
 		//### Store cars that can exit the system based on the capacity
 		
-		start2 = clock();
 		//map<int, Queue> queues = it->second.indivQueues();
 		//for(map<int, Queue>::iterator it2 =  queues.begin() ; it2 !=  queues.end() ; it2++) {
 		for(map<int, Queue>::iterator it2 =  it->second.IndivQueuesBegin() ; it2 !=  it->second.IndivQueuesEnd() ; it2++) {
@@ -143,11 +137,8 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time, st
 				map<int,double> greenTime = it2->second.getGreenTime();
 				map<int,double> cycle = it2->second.getCycle();
 				map<int,double> offset = it2->second.getOffset();
-				start = clock();
 				map<int,bool> green = isGreen(time,greenTime,cycle,offset); //Gives the green phase for each lane
-				timeSpent["isGreen"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 				map<int,double> factor;
-				start = clock();
 				for(map<int,double>::iterator it3 = greenTime.begin();it3 != greenTime.end();it3++) //Red light management : factor by which we multiply the capacity in case of Green light
 				{
 					factor[it3->first] = 1;
@@ -156,17 +147,13 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time, st
 						factor[it3->first] = cycle[it3->first] / greenTime[it3->first];
 					}
 				}
-				timeSpent["Green time loop"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
-				start = clock();
 				vector<int>  newLine = movingCars(q, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
-				timeSpent["Store exiting cars"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 				if(q)
 					capacityCars.push_back(newLine);
 			}
 		}
-		timeSpent["start2"] += (clock()-start2) / (double)(CLOCKS_PER_SEC);
 	}
 	return capacityCars;
 }
