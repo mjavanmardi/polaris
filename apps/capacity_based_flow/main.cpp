@@ -8,27 +8,30 @@ using namespace std;
 #include "simulation.h"
 #include "outputProgression.h"
 #include "outputQueueLength.h"
+#include "testCapacity.h"
+#include "JsonParser.h"
+#include <fstream>
+
 
 const int timestep = 1;
-const int modelisationTime = 3000 * timestep;
-char *db_path = "C:\\Users\\ikoval\\Documents\\Polaris_network\\network";
+const int modelisationTime = 178 * timestep;
+//const int modelisationTime = 6001 * timestep;
+char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 
-int main() {
-	
+
+int main(int argc, char **argv) {
+
 //### Import the SQLITE database and initialize the network ###
 	map<int, Road> Roads = openRoad(db_path);
 	vector<Car>& Cars = openCars(db_path);
 	vector<int> enteringTimes = preprocessCars(Cars);
 	
+	
 //### Simulation ###
-	clock_t start = clock();
-	int superior = 9000;
+	int superior = 0;
 	vector<int> timestepsToPrint;
-	timestepsToPrint.push_back(15000);
-	timestepsToPrint.push_back(10000);
 	timestepsToPrint.push_back(modelisationTime-1);
 	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior);
-	clock_t end = clock();
 
 //### Outputs ###
 	ofstream file1, file2;
@@ -36,7 +39,25 @@ int main() {
 	file2.open("queue_lengths.txt", ios::out | ios::trunc);
 	progressions(Roads, file1, false);		// Convert the cars progressions (Raw Data) into "Entering Time - Duration - Exiting Time" & "Speed Profil". If true, include the speed profile in the output file
 	queueLengths(Roads, file2);				// Convert the queues length (Raw Data) into "Average, Std Dev, Length over time, ..."
+	
+//### Writing road network to json file ###
+	/*ofstream strRoad("TEST_network.json",ios::app);
+	strRoad << roadToJson(db_path);
+	strRoad.close();*/
 
+//### Writing cars demand to json file ###
+	/*ofstream strCar("TEST_cars.json",ios::app);
+	strCar << carsToJson(db_path);
+	strCar.close();*/
+
+	map<int,Road> jRoads = jsonToRoad("TEST_network.json");
+	cout << "Road size : " << jRoads.size() << endl;
+
+	vector<Car> jCars = jsonToCars("TEST_cars.json");
+	cout << "Cars number : " << jCars.size() << endl;
+	
+	::testing::InitGoogleTest(&argc, argv);
+	RUN_ALL_TESTS();
 	system("pause");
 	return 0;
 }

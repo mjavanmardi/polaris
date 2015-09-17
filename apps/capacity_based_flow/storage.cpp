@@ -2,10 +2,11 @@
 
 using namespace std;
 
-int lastCarProba(double proba, double weight) {
+int lastCarProba(double proba, double weight) { //weight = fractional capacity
 	int lastCar = 0;
 
-	srand(rand()*rand()*time(NULL));
+	//srand(rand()*rand()*time(NULL));
+	srand(0);
 	int possible = rand()%(int)(1000*weight);
 
 	if(1000*proba > possible)
@@ -14,106 +15,148 @@ int lastCarProba(double proba, double weight) {
 	return lastCar;
 }
 
-int numberOfAllowedCars(Queue Q, int timestep) {
-	//clock_t a = clock();
-	int realNumberOfCars = 0;
-	map<int, double> capac = Q.getCapacities();
-	//clock_t b = clock();
-
-	//### Get the biggest capactiy ; so that it'll be used as reference capacity to release cars ###
-	double capacMin = 0;
-	for(map<int, double>::iterator it = capac.begin() ; it != capac.end() ; it++) {
-		if((*it).second < capacMin || capacMin == 0)
-			capacMin = (*it).second;
+map<int,bool> isGreen(double time, map<int,double> greenTime, map<int,double> cycle, map<int,double> offset)
+{
+	map<int,bool> green;
+	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)
+	{
+		green[it->first] = false;
+		double t = fmod((time - offset[it->first]),cycle[it->first]);
+		if(t<greenTime[it->first])
+			green[it->first] = true;
+		//cout << "green: " << green[i] << " time: " << time << " greentime: " << greenTime[i] << " cycle: " << cycle[i] << " offset: " << offset[i] << endl;
 	}
-	double minNumberOfCars = capacMin * timestep /3600; // the capac min is in cars per hour
-	//clock_t c = clock();
+	return green;
+}
 
-	//### Calculate how many cars are released ###
-	bool q = true;		// Boolean to know if the model should keep on making car cross the intersection
-	int iter = 0;
-	while(q && Q.getQueue().size() > iter) {	// While the model should look for another car
-		Car C = Q.getQueue()[iter];					// Get the next car
+int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
+	//cout << " Size2 : " << capac.size() << endl;
+	//cout << "capacSize : " << capac.size() << " greenSize : " << green.size() << endl;
+	/*for(map<int, bool>::iterator it = green.begin();it != green.end();it++)
+		cout << "Loop one : " << it->second << " " << capac[it->first] << endl;
+	cout << endl;*/
+	double capacMin = DBL_MAX;
+	int size = queue.size();
+	//for(map<int, double>::iterator it = capac.begin() ; it != capac.end() ; it++) 
+	try
+	{
+		for(map<int, double>::iterator it = capac.begin();it != capac.end();it++)
+		{
+			//cout << "Loop two : " << green[it->first] << endl;
+			if(it->second ==0)
+			{
+				throw string("failure : one capacity is equal to 0");
+			}
+		
+			if(green[it->first]) //if green light then the initial capacity is amplified by the factor
+			{
+				it->second *= factor[it->first];
+				//cout << "factor : " << factor[i] << endl;
+			}
+			else
+			{
+				it->second = 0; // if red light, the capacity is null
+				//cout << "No factor : " << factor[i] << endl;
+			}
+			if(it->second < capacMin)
+				capacMin = it->second;
+			if(capacMin == 0)
+				return 0;
+		}
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+	//cout << endl;
+	/*for(map<int, bool>::iterator it = green.begin();it != green.end();it++)
+		cout << "Loop three : " << it->second << endl;
+	cout << endl;*/
+	//cout << "diff : " << capac.size() - green.size() << endl;
+	/*while(true)
+	{}*/
+	double minNumberOfCars = capacMin * timestep / 3600;
+	int realNumberOfCars = 0;
+
+	for(int iter=0;iter < queue.size();iter++) {
+		Car C = queue.at(iter);
 
 		double absCapacity = capacMin;
 		if(C.existence() == true)
 			absCapacity = capac[C.nextNode()];	// Calculate the capacity of the turning movement the car is looking for out of all that are allowed on this lane
 		double carWeight = capacMin/absCapacity;	// Calculate the weight of the car ; included in ]0;1] ; equals to one for the turning movement with the smallest capacity
-		if(minNumberOfCars > carWeight) {				// If the carweight is superior to the number of car that can cross the intersection, than the car is 
-			iter += 1;						// To check in the next loop if the next car can cross the intersection
+		if(minNumberOfCars > carWeight) // If the carweight is superior to the number of car that can cross the intersection, than the car is 
+		{				
 			minNumberOfCars -= carWeight;	// Decrease the total number of car still allowed to cross the intersection
 			realNumberOfCars += 1;			// Increase the total number of car really crossing the network
 		}
-		else {		// For cars that have a weight superior to the minumum number of cars still allowed to crosse
+		else 
+		{		// For cars that have a weight superior to the minumum number of cars still allowed to crosse
 			realNumberOfCars += lastCarProba(minNumberOfCars, carWeight); // There is a probability of having this car crossing the intersection. It depends on its weight and on the remainder of number of cars allowed to crosse
-			q = false;
+			break;
 		}
 	}
-	realNumberOfCars =(realNumberOfCars < Q.getQueue().size()) ? realNumberOfCars : Q.getQueue().size();
-	/*clock_t d = clock();
-	if(d-a>5)
-		cout << endl << "Total:" << d-a << " - 1:" << b-a << " - 2:" << c-b << " - 3:" << d-c ;*/
-
+	realNumberOfCars =(realNumberOfCars < size) ? realNumberOfCars : size;
 	return realNumberOfCars;
 }
 
-void movingCars(vector<vector<int>>& cars, Road R, int timestep) {
-	//clock_t a = clock();
-	map<int, Queue> queues = R.indivQueues();
-	//clock_t b = clock();
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
-		clock_t a1 = clock();
-		if(it->second.getQueue().size() != 0) {
-			//clock_t a11 = clock();
-			int numberOfCars = numberOfAllowedCars(it->second, timestep);
-			//clock_t a12 = clock();
-			if(numberOfCars > 0) {
-				vector<int> newLine;
-				newLine.push_back(R.nodeA());					// Node i
-				newLine.push_back(R.nodeB());					// Node j
-				newLine.push_back(it->first);					// Queue ID
-				for(int i = 0 ; i < numberOfCars ; i++) {
-					int nextNode = -999;
-					if(it->second.getQueue()[i].existence() == true)
-						nextNode = it->second.getQueue()[i].nextNode();
-					newLine.push_back(nextNode);		// nextNode(Car[0]) - nextNode(Car[1]) - nextNode(Car[2]) ... for the cars allowed to move
-				}
-				cars.push_back(newLine); 
-			}
-			/*clock_t a13 = clock();
-			if(a13 -a11>2)
-				cout << endl << "Sub1:" << a12 - a11 << " Subs2:" << a13 - a12; */
+vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
+	int numberOfCars = numberOfAllowedCars(capac, queue, timestep, green, factor);
+	vector<int> newLine;
+	if(numberOfCars >0) {
+		q = true;
+		newLine.push_back(nodeA);
+		newLine.push_back(nodeB);
+		newLine.push_back(queueID);
+		for(int i = 0 ; i < numberOfCars ; i++) {
+			int nextNode = -999;
+			if(queue.at(i).existence() == true)
+				nextNode = queue.at(i).nextNode();
+			newLine.push_back(nextNode);
 		}
-		/*clock_t a2 = clock();
-		if(a2-a1>2)
-			cout << endl << "TOTAL : " << a2-a1 << endl;*/
 	}
-	//clock_t e = clock();
-	//if(b-a>1)
-		//cout << endl << "Total:" << e-a <<  " - 1:" << b-a << " - 2:" << e-b << endl;
+	return newLine;
 }
 
-vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep) {
-	clock_t start = clock();
+vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 	vector<vector<int>> capacityCars;
 	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
-		//clock_t a = clock();
 		//### Release cars from Common Queue
 		it->second.commonToIndividualQueue();
 
 		//### Write cars progression & Write queues length & Moving Fake Cars (In the individual queues && in the common queue)
 		it->second.iterQueuesProg(timestep);
-		//clock_t c = clock();
-
+		
 		//### Store cars that can exit the system based on the capacity
-		movingCars(capacityCars, it->second, timestep);
-		/*clock_t d = clock();
-		iter += d-a;
-		if(d-a>-1)
-			cout << endl << "Total: " << d-a << ". 3:" << d-c << "  -  ITER : " << iter;*/
+		map<int, Queue> queues = it->second.indivQueues();
+		for(map<int, Queue>::iterator it2 =  queues.begin() ; it2 !=  queues.end() ; it2++) {
+			if(it2->second.getQueue().size() != 0) {
+				bool q = false;
+				map<int,double> greenTime = it2->second.getGreenTime();
+				map<int,double> cycle = it2->second.getCycle();
+				map<int,double> offset = it2->second.getOffset();
+				map<int,bool> green = isGreen(time,greenTime,cycle,offset);
+				map<int,double> factor;
+				/*for(int i=0;i<green.size();i++)
+				{
+					cout << "Green : " << green[i] << endl;
+				}*/
+				for(map<int,double>::iterator it3 = greenTime.begin();it3 != greenTime.end();it3++)
+				{
+					factor[it3->first] = 1;
+					if(greenTime[it3->first]!=0)
+					{
+						factor[it3->first] = cycle[it3->first] / greenTime[it3->first];
+					}
+				}
+				//cout << "diff : " << it2->second.getCapacities().size() - green.size() << endl; 
+				//cout << "Size1 : " << it2->second.getCapacities().size();
+				vector<int>  newLine = movingCars(q, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
+				if(q)
+					capacityCars.push_back(newLine);
+			}
+		}
+	
 	}
-	clock_t end = clock();
-	if(end-start > -1)
-		cout << endl << "TOTAL : " << end - start;
 	return capacityCars;
 }

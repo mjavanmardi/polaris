@@ -2,7 +2,7 @@
 
 #include "car.h"
 #include "io/database.h"
-#include "io/Io.h"
+#include "io/Io_db.h"
 
 using namespace odb;
 using namespace polaris::io;
@@ -13,3 +13,7 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, std:
 void preprocessLocations(result<polaris::io::Location> locations, std::vector<int>& location, std::vector<int>& nodeA, std::vector<int>&nodeB);
 
 std::vector<Car> openCars(char *db_path);
+
+Json::Value carsToJson(char *db_path);
+
+vector<Car> jsonToCars(string fileName);

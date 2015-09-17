@@ -72,7 +72,6 @@ void printRoads(int t, map<int, Road> Roads, vector<int> timestepsToPrint, int s
 		if((*it) == t || t >= superior) {
 			cout << endl << endl << endl << " TIME " << t;
 			for(map<int, Road>::iterator it2 = Roads.begin() ; it2 != Roads.end() ; it2++) {
-				//if(it2->second.ID() == 43 || it2->second.ID() == 48)
 					printRoad(it2->second);
 			}
 			break;

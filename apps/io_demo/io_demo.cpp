@@ -1,6 +1,6 @@
 #include "io/database.h"
 #include "spatial/spatial.h"
-#include "io/Io.h"
+#include "io/Io_db.h"
 int main( int argc, char** argv)
 {
 	if (argc != 2) 

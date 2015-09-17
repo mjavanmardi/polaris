@@ -7,9 +7,9 @@ Car importCar(int enteringTime, int origin, int destination, int carNumber, vect
 	bool fake = false;
 	int number = carNumber;
 	double carLength = 4;				// Default Value
-	int reacDuration = 2;				// Default Value
+	int reacDuration = 3;				// Default Value
 	double meanAcceleration = 3;		// Default Value
-	double meanDecceleration = 4;		// Default Value
+	double meanDecceleration = 6;		// Default Value
 	int _enteringTime = enteringTime;
 	int enteringNodeA;
 	int enteringNodeB;
@@ -75,4 +75,36 @@ std::vector<Car> openCars(char *db_path) {
 	}
 	
 	return Cars;
+}
+
+Json::Value carsToJson(char *db_path)
+{
+	vector<Car> cars = openCars(db_path);
+	Json::Value carsValue(Json::arrayValue);
+	for(int i = 0; i < cars.size();i++)
+	{
+		carsValue.append(cars[i].toJson());
+	}
+	return carsValue;
+}
+
+vector<Car> jsonToCars(string fileName)
+{
+	std::string test = fileToString(fileName); 
+	Json::Value root;
+	Json::Reader reader;
+	reader.parse(test,root);
+	vector<Car> cars;
+	try
+	{
+		for(int i=0;i<root.size();i++)
+		{
+			cars.push_back(Car(root[i]));
+		}
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+	return cars;
 }

@@ -5,19 +5,35 @@ using namespace std;
 double getCapacity(string type, double grade) {
 
 /// ### This capacity calculation is given by the Highway Capacity Manual 2010 - Chapter 18 (Signalized Intersection), page 35 ###
-	double effectiveGreenTime = 0.5;				// Default Value				
-	double BSFR = 1900;								// Default Value
+	double effectiveGreenTime = 0.45;				// Default Value				
+	double BSFR = 1900;								// Default Value - base saturation flow rate
 	double laneWidth = 1;							// Default Value
 	double heavyVehicles = 1;						// Default Value			
 	double approachGrade = 1-grade/200;				// !!!! WHAT IS THE VALUE/METRIC ??? ANGLE/PERCENT/... !!!
 	double parkingActivity = 1;						// Default Value						
 	double blockingEffect = 1;						// Default Value			
-	double areaType = 1;							// Default Value	
 	double laneUtilization = 1;						// Default Value		
 	double leftTurn = 1;							// Default Value
 	double rightTurn = 1;							// Default Value		
 	double pedestrianLeftTurn = 1;					// Default Value
 	double pedestrianBicyclePedestrianRightTurn = 1;// Default Value
+
+	//### Area Type calculation ### The values need to be validate
+	double areaType ;
+	if(type == "THRU") 
+		areaType = 1;		// Default Value
+	else if(type == "UTURN")
+		areaType = 0.90;	// Default Value
+	else if(type == "LEFT")
+		areaType = 1/1.05;	// HCM value ; to be validated
+	else if(type == "RIGHT")
+		areaType = 1/1.18;	// HCM value ; to be validated
+	else if(type == "MERGE")
+		areaType = 1;		// Default Value
+	else if(type == "DIVERGE")
+		areaType = 1;		// Default Value		
+	else
+		cout << endl << "The area type has not been defined in the model. Only 'UTURN', 'DIVERGE', 'MERGE', THRU', 'LEFT' and 'RIGHT' are allowed";
 
 	//!!! SQLite Supply Database provides "USE" and "TYPE" value that should be used somehow !!!!
 
@@ -62,9 +78,22 @@ void importLanes(Road& R, bool q, int lane, double grade, vector<int> link, vect
 			}
 		}
 		
-		double maxLength = 30;				// Default Value
-		double distanceBetweenCars = 1;		// Default Value
-		R.addQueue(i, 30, 1, capacities);
+		double maxLength = 28;				// Default Value
+		double distanceBetweenCars = 0.5;		// Default Value
+		double greenTimeI = 28;	// Default value : green time of the red light
+		double cycleI = 30; // Default Value : cycle of the red light
+		double offsetI = 0; // Default Value : initial offset (before green)
+		map<int,double> greenTime;
+		map<int,double> cycle;
+		map<int,double> offset;
+		for(map<int, double>::iterator it = capacities.begin();it!=capacities.end();it++)
+		{
+			greenTime[it->first] = greenTimeI;
+			cycle[it->first] = cycleI;
+			offset[it->first] = offsetI;
+		}
+		R.addQueue(i, 30, 1, capacities, greenTime, cycle, offset);
+		//cout << "Capacity size : " << capacities.size() << " Green time size : " << greenTime.size() << endl; 
 	}
 }
 
@@ -77,7 +106,7 @@ pair<Road,Road> importRoad(polaris::io::Link db_itr, int ID, vector<int> link, v
 	double maxSpeed_AB = db_itr.getSpeed_Ab();
 	double maxSpeed_BA = db_itr.getSpeed_Ba();
 	double totalLength = db_itr.getLength() + db_itr.getSetback_B();
-	double distanceBetweenCars = (double) 1;		//Default value for the distance between cars
+	double distanceBetweenCars = (double) 0.5;		//Default value for the distance between cars
 	
 // ### Road Initialization  ###
 // !!! Figure out how to return only one pair if lane = 0 !!!
@@ -139,3 +168,37 @@ map<int, Road> openRoad(char *db_path) {
 	return newRoads;
 }
 
+Json::Value roadToJson(char *db_path)
+{
+	map<int,Road> roads = openRoad(db_path);
+	Json::Value roadsValue;
+	for(map<int,Road>::iterator it = roads.begin();it!=roads.end();it++)
+	{
+		roadsValue[std::to_string(long double(it->first))] = (it->second).toJson();
+	}
+	return roadsValue;
+}
+
+map<int,Road> jsonToRoad(string fileName)
+{
+	std::string test = fileToString(fileName); 
+	Json::Value root;
+	Json::Reader reader;
+	reader.parse(test,root);
+	map<int,Road> roads;
+	try
+	{
+		for(Json::Value::iterator it = root.begin(); it != root.end();it++)
+		{
+			if(it.key().isString())
+				roads[stoi(it.key().asString())] = Road(*it);
+			else
+				throw string("Problem with roads information");
+		}
+	}
+	catch(string &const st)
+	{
+		cerr << st << endl;
+	}
+	return roads;
+}

@@ -1,26 +1,25 @@
 PROJECT(polaris CXX)
 cmake_minimum_required(VERSION 2.8)
+
 #Add capability to create visual studio solution folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(Popsyn OFF)
-set(Statewide OFF)
-
 #options to be used while running cmake
-#option(Antares "Build with Antares" ON)
-set(Antares OFF)
+option(Antares "Build with Antares" OFF)
+option(Popsyn "Build Popsyn App" OFF)
+option(Statewide "Build Statewide Model App" OFF)
+option(Coretests "Include Unit Tests for Core" OFF)
+option(Unittest "Include Unit Tests for Other Libraries" OFF)
+option(CapacityFlow "Include Traffic Flow Simulator Prototype" OFF)
 
-option(CapacityFlow "Build Capacity based Flow Simulator" ON)
-
-set(BUILD_DIR build)
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
 
-
 #Variables designating where the output files go
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
+
 
 #Compiler flags for release mode applied to all projects
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
@@ -49,7 +48,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	if (UNIX)
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
 		find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
-		message(STATUS ""${libtcmalloc})
+		message(STATUS "" ${libtcmalloc})
 	endif()
 	
 	if (MSVC)
@@ -62,13 +61,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	endif()
 	
 	#Google Testing Framework include and library dependencies
-	include_directories(${DEPS_DIR}/gtest-1.7.0/include)
-	find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
-	if (UNIX)
-		find_package(GTest REQUIRED)
-		include_directories(${GTEST_INCLUDE_DIR})
-		set(gtest ${GTEST_LIBRARIES})
-	endif()
+	#include_directories(${DEPS_DIR}/gtest-1.7.0/include)
+	#find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
+	#enable_testing()
+	#if (UNIX)
+	#	find_package(GTest REQUIRED)
+	#	include_directories(${GTEST_INCLUDE_DIR})
+	#	set(gtest ${GTEST_LIBRARIES})
+	#endif()
 
 	#ODB include dependencies
 	include_directories(${DEPS_DIR}/libodb-2.2.2)
@@ -172,6 +172,7 @@ else()
 	add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
+	#add_subdirectory (apps/dee-test)
 	add_subdirectory (apps/network_validator)
 #	add_subdirectory (apps/Output_Visualizer)
 	add_subdirectory (libs/traffic_simulator)
@@ -186,6 +187,41 @@ if (Coretests)
 endif()
 
 if (CapacityFlow)
+	message(${CapacityFlow})
 	add_subdirectory(libs/flow_lib)
 	add_subdirectory(apps/capacity_based_flow)
+endif()
+
+if (Unittest)
+	# Enable ExternalProject CMake module
+	include(ExternalProject)
+	set(googletest_dir "${CMAKE_SOURCE_DIR}/external/googletest")
+	# Download and install GoogleTest
+	ExternalProject_Add(
+		gtest
+		# URL https://github.com/google/googletest/archive/master.zip
+		SOURCE_DIR ${googletest_dir}
+		# # PREFIX ${gtest_dir}
+		# SOURCE_DIR "${gtest_dir}/src"
+		# CONFIGURE_COMMAND
+			# "${CMAKE_COMMAND}"
+			# "-H${gtest_dir}/src/googletest"
+			# "-B${gtest_dir}/Builds"
+			# "-DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}"		
+	   # BUILD_COMMAND
+			# "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds"
+		# # INSTALL_COMMAND
+			# # "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds" --target install
+	)
+	add_library(libgtest IMPORTED STATIC GLOBAL)
+	add_dependencies(libgtest gtest)
+	# Set gtest properties
+	ExternalProject_Get_Property(gtest source_dir binary_dir)
+	set_target_properties(libgtest PROPERTIES
+		"IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
+		"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+	#    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
+	)
+	# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
+	include_directories("${source_dir}/include")	
 endif()
