@@ -3,7 +3,7 @@
 
 namespace polaris
 {
-	prototype struct A_Star_Edge
+	prototype struct A_Star_Edge ADD_DEBUG_INFO
 	{
 		//tag_as_prototype;
 
@@ -52,6 +52,8 @@ namespace polaris
 
 		float time_label(){ return this_component()->time_label(); }
 		void time_label(float value){ this_component()->time_label(value); }
+
+		void Display(){this_component()->Display();}
 
 		//void reset(){ this_component()->reset(); }
 

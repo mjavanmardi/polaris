@@ -726,6 +726,13 @@ namespace Vehicle_Components
 				
 				_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Link_Interface*>();
 				_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
+				std::vector<unsigned int> origin_ids;
+				origin_ids.push_back(origin_link->uuid<unsigned int>());
+
+				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
+				std::vector<unsigned int> destination_ids;
+				destination_ids.push_back(destination_link->uuid<unsigned int>());
+				
 
 				boost::container::deque<global_edge_id> path_container;
 				boost::container::deque<float> cumulative_cost_container;
@@ -738,7 +745,7 @@ namespace Vehicle_Components
 
 				//if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				//{
-					best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->template uuid<int>(),destination_link->template uuid<int>(),path_container,cumulative_cost_container);
+					best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids,destination_ids,path_container,cumulative_cost_container);
 				//}
 				//else
 				//{

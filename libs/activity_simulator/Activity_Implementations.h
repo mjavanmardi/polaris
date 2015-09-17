@@ -56,6 +56,7 @@ namespace Activity_Components
 			typedef Person_Components::Prototypes::Activity_Generator< typename MasterType::activity_generator_type> _generator_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Properties)> _properties_itf;
 			typedef Person_Components::Prototypes::Person_Properties< typename _person_itf::get_type_of(Static_Properties)> _static_properties_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename _person_itf::get_type_of(vehicle)> _vehicle_Itf;
 			
 			typedef Person_Components::Prototypes::Destination_Chooser<typename _planning_itf::get_type_of(Destination_Choice_Faculty)> _dest_choice_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename _perception_itf::get_type_of(Scenario)> _scenario_itf;
@@ -284,6 +285,7 @@ namespace Activity_Components
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 				move->network<_network_itf*>(network);
+				move->traveler_id(person->vehicle<_vehicle_Itf*>()->uuid<int>());
 			
 				// Get the origin and destination locations
 				_activity_location_itf* orig;

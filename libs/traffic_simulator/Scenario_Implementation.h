@@ -112,6 +112,8 @@ namespace Scenario_Components
 			m_data(bool, use_skim_intervals, NONE, NONE);
 
 			m_data(bool, time_dependent_routing, NONE, NONE);
+			m_data(double, time_dependent_routing_weight_shape, NONE, NONE);
+			m_data(double, time_dependent_routing_weight_scale, NONE, NONE);
 
 			m_data(double, percent_to_synthesize, NONE, NONE);
 			m_data(double, ipf_tolerance, NONE, NONE);
@@ -207,6 +209,8 @@ namespace Scenario_Components
 			m_data(bool, enroute_switching_on_excessive_delay, NONE, NONE);
 			m_data(double, enroute_excessive_delay_factor, NONE, NONE);
 			m_data(double, minimum_seconds_from_arrival_for_enroute_switching, NONE, NONE);
+
+			m_data(bool, use_link_based_routing, NONE, NONE);
 
 			m_data(bool, multimodal_network_input, NONE, NONE);
 

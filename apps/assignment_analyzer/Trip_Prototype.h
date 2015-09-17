@@ -179,6 +179,16 @@ namespace Trip_Components
 
 				cout <<"Relative gap = "<<(ttime_sim - ttime_min)/ttime_min;
 
+				File_IO::File_Writer fhr;
+				string res_filename(((_Scenario_Interface*)_global_scenario)->template historical_results_database_name<string&>());
+				string res_extension("-assignment_results.csv");
+				res_filename = res_filename + res_extension;
+				fhr.Open(res_filename);
+				fhr.Write_Line("TTIME_MINIMUM,TTIME_SIMULATION,REL_GAP");
+				out<<ttime_min<<","<<ttime_sim<<","<<(ttime_sim - ttime_min)/ttime_min;
+				fhr.Write_Line(out);
+				fhr.Close();
+
 			}
 
 		};
@@ -273,7 +283,7 @@ namespace Trip_Components
 					int d = destination_link->template internal_id<int>();
 					int otm = origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size();
 					int dtm = destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size();
-					cout<<"Origin/Destination pair is not routable. Trip "<<Trip_Id<<" is skipped."<<endl;
+					//cout<<"Origin/Destination pair is not routable. Trip "<<Trip_Id<<" is skipped."<<endl;
 					return;
 				}
 
@@ -385,7 +395,8 @@ namespace Trip_Components
 
 				if (trajectory->size() == 0)
 				{
-					cout <<"Error: null trajectory.";
+					//cout <<"Error: null trajectory.";
+					return result.str();
 				}
 
 				_Trajectory_Container_Interface::iterator itr = trajectory->begin();

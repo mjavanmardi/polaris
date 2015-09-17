@@ -104,6 +104,7 @@ namespace Movement_Plan_Components
 			m_data(int, estimated_time_of_arrival, NONE, NONE);
 			m_data(float, route_length, NONE, NONE);
 			m_data(int, entry_time, NONE, NONE);
+			m_data(int, traveler_id, NONE, NONE);
 
 			template<typename TargetType>
 			TargetType absolute_departure_time()

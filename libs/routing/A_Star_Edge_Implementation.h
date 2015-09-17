@@ -67,5 +67,18 @@ namespace polaris
 		{  return lhs._estimated_cost_origin_destination > rhs._estimated_cost_origin_destination;  }
 		friend __forceinline bool operator== (const Base_Edge_A_Star &lhs,const Base_Edge_A_Star &rhs)
 		{  return lhs._estimated_cost_origin_destination == rhs._estimated_cost_origin_destination;  }
+
+		void Display()
+		{
+			cout << (int)(_edge_id/2.0) <<"."<<_edge_id - ((int)(_edge_id/2.0)*2)<<" ("<<_time_cost<<"); ";
+			Base_Edge_A_Star* prev = (Base_Edge_A_Star*)_came_from;
+			while (prev != nullptr)
+			{
+				cout << (int)(prev->_edge_id/2.0) <<"."<<prev->_edge_id - ((int)(prev->_edge_id/2.0)*2)<<" ("<<prev->_time_cost<<"); ";
+				prev = (Base_Edge_A_Star*)(prev->_came_from);
+			}
+			cout <<"\n";
+
+		}
 	};
 }

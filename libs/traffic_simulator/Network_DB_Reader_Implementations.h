@@ -312,6 +312,10 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::HEAVY_RAILWAY);
 						}
+						else if(facility_type=="EXTERNAL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::EXTERNAL);
+						}
 						else
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
@@ -753,18 +757,20 @@ namespace Network_Components
 						outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 					}
 
-
+					//TODO: what is the purpose of this? Already checking above...
 					if ((inbound_link->template link_type<int>() != FREEWAY && 
 						inbound_link->template link_type<int>() != ON_RAMP &&
 						inbound_link->template link_type<int>() != OFF_RAMP &&
 						inbound_link->template link_type<int>() != EXPRESSWAY &&
 						inbound_link->template link_type<int>() != ARTERIAL &&
+						inbound_link->template link_type<int>() != EXTERNAL && 
 						inbound_link->template link_type<int>() != LOCAL) || 
 						(outbound_link->template link_type<int>() != FREEWAY && 
 						outbound_link->template link_type<int>() != ON_RAMP &&
 						outbound_link->template link_type<int>() != OFF_RAMP &&
 						outbound_link->template link_type<int>() != EXPRESSWAY &&
 						outbound_link->template link_type<int>() != ARTERIAL &&
+						outbound_link->template link_type<int>() != EXTERNAL && 
 						outbound_link->template link_type<int>() != LOCAL))
 					{
 						continue;
@@ -1105,20 +1111,22 @@ namespace Network_Components
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 
 						// add the opposite direction link if exists
-						opp_link_id_dir.id = link_id_dir.id;
-						opp_link_id_dir.dir = abs(db_itr->getDir() - 1);
-						if(net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+						if (!this->_scenario_reference->use_link_based_routing<bool>())
 						{
-							link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
-							activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
-							link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-							activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+							opp_link_id_dir.id = link_id_dir.id;
+							opp_link_id_dir.dir = abs(link_id_dir.dir - 1);
+							if(net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+							{
+								link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
+								activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
+								link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+								activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+							}
 						}
 				
 						activity_location->template zone<_Zone_Interface*>(zone);
 						activity_location->template uuid<int>(db_itr->getPrimaryKey());
 						activity_location->template internal_id<int>(counter);
-
 
 						//shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
 						//if (data_ptr == nullptr) continue;

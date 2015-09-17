@@ -95,10 +95,26 @@ namespace Routing_Components
 				// get a routable network; routable_network know what thread you are
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
 				
+
+				// Get the current origin/destination information
 				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
 				unsigned int destination_id = _movement_plan->destination<Link_Interface*>()->uuid<unsigned int>();
+				Activity_Location_Interface* origin_loc = _movement_plan->origin<Activity_Location_Interface*>();
 				Activity_Location_Interface* destination_loc = _movement_plan->destination<Activity_Location_Interface*>();
+				Link_Container_Interface* origin_links = origin_loc->origin_links<Link_Container_Interface*>();
 				Link_Container_Interface* destination_links = destination_loc->destination_links<Link_Container_Interface*>();
+
+
+				// Debug_route is false, set to true under certain conditions to print the routing output
+				bool debug_route = false;
+
+				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
+				std::vector<unsigned int> origin_ids;
+				for (Link_Container_Interface::iterator itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+				{
+					Link_Interface* link = (Link_Interface*)(*itr);
+					origin_ids.push_back(link->uuid<unsigned int>());
+				}
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_ids;
@@ -108,23 +124,23 @@ namespace Routing_Components
 					destination_ids.push_back(link->uuid<unsigned int>());
 				}
 
-
 				//list of edgeid, graph_id tuples; internal edge ids
 				boost::container::deque<global_edge_id> path_container;
 				//cost of traversing each of the edges
 				boost::container::deque<float> cost_container;
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
-
 				float best_route_time_to_destination = 0.0f;
 
+
+				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
-					best_route_time_to_destination = routable_network->compute_static_network_path(origin_id,destination_id,path_container,cost_container);
+					best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids,destination_ids,path_container,cost_container);
 				}
 				else
 				{
-					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_id,destination_ids,_departure_time/*iteration()*/,path_container,cost_container);
+					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container,debug_route);
 				}
 
 
@@ -137,6 +153,26 @@ namespace Routing_Components
 					_movement_plan->template estimated_time_of_arrival<Simulation_Timestep_Increment>(_movement_plan->template absolute_departure_time<int>() + routed_travel_time);
 					_movement_plan->template estimated_travel_time_when_departed<float>(routed_travel_time);
 					_movement_plan->set_trajectory(path_container, cost_container);
+
+					// update movement plan O/D based on returned routing results
+					Link_Interface* olink = nullptr;
+					for (Link_Container_Interface::iterator itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+					{
+						Link_Interface* link = (Link_Interface*)(*itr);
+						if (link->uuid<unsigned int>()  == origin_ids.front()) olink=link;
+					}
+					Link_Interface* dlink = nullptr;
+					for (Link_Container_Interface::iterator itr = destination_links->begin(); itr != destination_links->end(); ++itr)
+					{
+						Link_Interface* link = (Link_Interface*)(*itr);
+						if (link->uuid<unsigned int>()  == destination_ids.front()) dlink=link;
+					}
+
+					if (olink != nullptr && dlink != nullptr)
+					{
+						_movement_plan->origin<Link_Interface*>(olink);
+						_movement_plan->destination<Link_Interface*>(dlink);
+					}
 				}
 				else
 				{
