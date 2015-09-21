@@ -70,7 +70,7 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
 		start = clock();
-		vector<MovingCars> movingCars = preProcess(Roads, timestep, t);
+		vector<vector<int>> movingCars = preProcess(Roads, timestep, t);
 		timeSpent["Preprocess"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 	//### Release cars from traveling areas into queues (Common or Individual)
