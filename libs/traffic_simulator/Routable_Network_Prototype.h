@@ -37,14 +37,14 @@ namespace Routing_Components
 				this_component()->construct_time_dependent_routable_network(source_network);
 			}
 
-			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
-				return this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
+				return this_component()->compute_static_network_path(origins,destinations,path_container,cost_container);
 			}
 
-			float compute_time_dependent_network_path(unsigned int origin, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container, bool debug_route=false)
 			{
-				return this_component()->compute_time_dependent_network_path(origin,destinations,start_time,path_container,cost_container);
+				return this_component()->compute_time_dependent_network_path(origins,destinations,start_time,path_container,cost_container, debug_route);
 			}
 
 			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& edge_cost_container)

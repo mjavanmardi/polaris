@@ -628,7 +628,6 @@ namespace Prototypes
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
 
 
-
 			/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
 			location_itf* orig = movements->origin<location_itf*>();
 			location_itf* dest = movements->destination<location_itf*>();

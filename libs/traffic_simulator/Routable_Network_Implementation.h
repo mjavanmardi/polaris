@@ -58,7 +58,8 @@ namespace Routing_Components
 			layer_id *= _layer_step;
 			layer_id += _first_layer_id;
 
-			if(layer_id < _first_layer_id || layer_id > ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id))
+			//TODO: changed this to >= since it seemed to be running past the end of the data - check with michael to verify
+			if(layer_id < _first_layer_id || layer_id >= ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id))
 			{
 				int max_id = (int)((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id);
 
@@ -281,11 +282,6 @@ namespace Routing_Components
 					
 					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
 
-					cout <<endl<<"Trying to find "<<current_link->template uuid<int>()<<" in list:"<<endl;
-					for (boost::unordered::unordered_map<int,int>::iterator itr = _link_id_to_moe_data.begin(); itr != _link_id_to_moe_data.end(); ++itr)
-					{
-						cout <<itr->first<<","<<itr->second<<endl;
-					}
 					
 					if(_link_id_to_moe_data.count(current_link->template uuid<int>()))
 					{
@@ -467,36 +463,58 @@ namespace Routing_Components
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
-				global_edge_id start;
+				// get start id list from link id list
+				std::vector<global_edge_id> starts;
+				for (std::vector<unsigned int>::iterator itr = origins.begin(); itr != origins.end(); ++itr)
+				{
+					global_edge_id start;
+					start.edge_id = *itr;
+					start.graph_id = _static_network_graph_id;
+					starts.push_back(start);
+				}
 
-				start.edge_id = origin;
-				start.graph_id = _static_network_graph_id;
-				
-				global_edge_id end;
+				// get edge id list from link id list
+				std::vector<global_edge_id> ends;
+				for (std::vector<unsigned int>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+				{
+					global_edge_id end;
+					end.edge_id = *itr;
+					end.graph_id = _static_network_graph_id;
+					ends.push_back(end);
+				}
 
-				end.edge_id = destination;
-				end.graph_id = _static_network_graph_id;
+				float routed_time = A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,starts,ends,0,path_container,cost_container);
 
-				float routed_time = A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,0,path_container,cost_container);
+				// update origins/destinations lists in from A_Star results
+				origins.clear();
+				origins.push_back(starts.front().edge_id);
+				destinations.clear();
+				destinations.push_back(ends.front().edge_id);
 
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(unsigned int origin, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container, bool debug_route=false)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
+			
+				// get start id list from link id list
+				std::vector<global_edge_id> starts;
+				for (std::vector<unsigned int>::iterator itr = origins.begin(); itr != origins.end(); ++itr)
+				{
+					global_edge_id start;
+					start.edge_id = *itr;
+					start.graph_id = _time_dependent_network_graph_id;
+					starts.push_back(start);
+				}
 
-				global_edge_id start;
-
-				start.edge_id = origin;
-				start.graph_id = _time_dependent_network_graph_id;
-				
+				// get edge id list from link id list
 				std::vector<global_edge_id> ends;
 				for (std::vector<unsigned int>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
 				{
@@ -507,7 +525,13 @@ namespace Routing_Components
 				}
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
-				float routed_time = Time_Dependent_A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,ends,start_time,path_container,cost_container);
+				float routed_time = Time_Dependent_A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,starts,ends,start_time,path_container,cost_container,debug_route);
+
+				// update origins/destinations lists in from A_Star results
+				origins.clear();
+				origins.push_back(starts.front().edge_id);
+				destinations.clear();
+				destinations.push_back(ends.front().edge_id);
 
 				return routed_time;
 			}
@@ -588,6 +612,11 @@ namespace Routing_Components
 					edge_lookup.graph_id = _time_dependent_network_graph_id;
 
 					A_Star_Edge<typename MasterType::time_dependent_edge_type>* edge = (A_Star_Edge<typename MasterType::time_dependent_edge_type>*)_routable_graph_pool->Get_Edge<typename MasterType::time_dependent_graph_type>(edge_lookup);
+
+					if (edge == nullptr)
+					{
+						THROW_EXCEPTION("ERROR in update_edge_turn_cost: edge not found, id="<<edge_lookup.edge_id<<", edge_cost="<<edge_cost<<", outbound_turn_index="<<outbound_turn_index<<", turn_cost'"<<turn_cost<<endl);
+					}
 
 					edge->time_cost(edge_cost);
 					edge->cost(edge_cost);

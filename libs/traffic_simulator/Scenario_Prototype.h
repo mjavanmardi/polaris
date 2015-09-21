@@ -182,6 +182,8 @@ namespace Scenario_Components
 			accessor(historic_link_moe_file_path_name, NONE, NONE);
 			accessor(read_normal_day_link_moe, NONE, NONE);
 			accessor(time_dependent_routing, NONE, NONE);
+			accessor(time_dependent_routing_weight_shape, NONE, NONE);
+			accessor(time_dependent_routing_weight_scale, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
 			accessor(historic_demand_moe_directory, NONE, NONE);
@@ -231,6 +233,7 @@ namespace Scenario_Components
 			accessor(multimodal_network_input, NONE, NONE);
 			accessor(enroute_switching_on_excessive_delay, NONE, NONE);
 			accessor(enroute_excessive_delay_factor, NONE, NONE);
+			accessor(use_link_based_routing,NONE,NONE);
 
 			/// antares visualization parameters
 			accessor(buildings_geometry_file, NONE, NONE);
@@ -310,6 +313,10 @@ namespace Scenario_Components
 					cout << "Assignment mode not supported" << endl;
 					assert(false);
 				}
+
+				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
+				// If left to false, then we can route to an activity location on a link using either DIR (i.e. left hand turns into activity location ) [RECOMMENDED]
+				if (cfgReader.getParameter("use_link_based_routing", use_link_based_routing<bool*>())!= PARAMETER_FOUND) use_link_based_routing<bool>(false);
 
 				//===============================================
 				// set rng type
@@ -564,6 +571,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
+				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
+				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1500.0);
 				
 				if (cfgReader.getParameter("accident_event_duration_reduction", accident_event_duration_reduction<double*>())!= PARAMETER_FOUND) accident_event_duration_reduction<double>(1.0);
 				
@@ -582,6 +591,17 @@ namespace Scenario_Components
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
 				open_input_files<NULLTYPE>();
+
+				//-----------------------
+				// copy scenario file
+				string scenario_out_name = output_dir_name<string>().append(filename);
+
+				std::ifstream src(filename,std::ios::binary);
+				std::ofstream dst(scenario_out_name,std::ios::binary);
+				dst<<src.rdbuf();
+
+				src.close();
+				dst.close();
 			}
 
 			// template<typename TargetType> void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)

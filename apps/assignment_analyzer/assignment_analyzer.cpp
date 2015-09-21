@@ -136,7 +136,7 @@ int main(int argc,char** argv)
 	File_IO::File_Info scenario_file(scenario_filename);
 
 	int threads = 1;
-	if (argc >= 5) threads = std::max(atoi(argv[4]),threads);
+	if (argc >= 4) threads = std::max(atoi(argv[3]),threads);
 
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(100, threads);

@@ -68,14 +68,28 @@ namespace polaris
 
 			if(moe_ptr != nullptr)
 			{
-				float time_cost = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				int sim_time = iteration();
+
+				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+
+				// updates to handle mixing of historical and real-time info in cost function
+				float time_cost_current = current->_cost + connection->_cost;
+
+				int t_diff = abs(current_time - iteration());
+
+				if (t_diff > 800)
+				{
+					int test = 1;
+				}
+
+				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+
+				float time_cost = w*time_cost_current + (1-w)*t;
+
 
 				if(neighbor->_is_highway)
 				{
-					//t_pointer(float,moe_ptr);
-					//static t_pointer(Layered_Data_Array<float>,moe_data);
-
-					return time_cost*.75f;
+					return time_cost*.95f;
 				}
 				else
 				{
@@ -89,7 +103,7 @@ namespace polaris
 				if(neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					return (current->_cost + connection->_cost)*.75f;
+					return (current->_cost + connection->_cost)*.95f;
 				}
 				else
 				{
@@ -115,18 +129,27 @@ namespace polaris
 
 			if(moe_ptr != nullptr)
 			{
-				//cout << "curent time: " << current_time << endl;
+				int sim_time = iteration();
 
-				float time_cost = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
 
-				//cout << "moe cost: " << time_cost << endl;
+				// updates to handle mixing of historical and real-time info in cost function
+				float time_cost_current = current->_time_cost + connection->_time_cost;
+				int t_diff = abs(current_time - iteration());
+
+				if (t_diff > 800)
+				{
+					int test = 1;
+				}
+
+				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+
+				float time_cost = w*time_cost_current + (1-w)*t;
+
 
 				if(neighbor->_is_highway)
 				{
-					//t_pointer(float,moe_ptr);
-					//static t_pointer(Layered_Data_Array<float>,moe_data);
-
-					return time_cost*.75f;
+					return time_cost*.95f;
 				}
 				else
 				{
@@ -140,12 +163,12 @@ namespace polaris
 				if(neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					return (current->_cost + connection->_cost)*.75f;
+					return (current->_time_cost + connection->_time_cost)*.95f;
 				}
 				else
 				{
 					//cout << "is not highway" << endl;
-					return current->_cost + connection->_cost;
+					return current->_time_cost + connection->_time_cost;
 				}
 				
 			}

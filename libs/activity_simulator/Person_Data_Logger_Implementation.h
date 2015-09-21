@@ -626,8 +626,6 @@ namespace Person_Components
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 				household_itf* hh = person->template Household<household_itf*>();
 
-			
-
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
@@ -648,7 +646,7 @@ namespace Person_Components
 				else trip_rec.setMode(3);
 				if (new_origin <0) trip_rec.setOrigin(orig->template uuid<int>());
 				else trip_rec.setOrigin(new_origin);
-				trip_rec.setPartition(0);
+				trip_rec.setPartition(move->routed_travel_time<int>());
 				trip_rec.setPassengers(0);
 				trip_rec.setPurpose(0);
 				//trip_rec.setStart(act->template Start_Time<Time_Seconds>());

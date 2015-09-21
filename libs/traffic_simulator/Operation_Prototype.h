@@ -555,8 +555,10 @@ namespace Operation_Components
 									}
 								}
 
-								assert(out_link!=nullptr);
-								
+								if(out_link==nullptr)
+								{
+									THROW_EXCEPTION("ERROR: outbound link '"<<link_id_dir.id<<" for phase movement was not found in network. Check link type, signal table, etc. for errors.");
+								}					
 
 
 								// with in_link and out_link in place, must now match movements, rummage through the inbound_outbound structure for this intersection

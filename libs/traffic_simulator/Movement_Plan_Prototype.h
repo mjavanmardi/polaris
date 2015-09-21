@@ -63,6 +63,7 @@ namespace Movement_Plan_Components
 			accessor(is_integrated, NONE, NONE);
 			accessor(route_length, NONE, NONE);
 			accessor(entry_time, NONE, NONE);
+			accessor(traveler_id, NONE,NONE);
 
 			void Free_Movement()
 			{
