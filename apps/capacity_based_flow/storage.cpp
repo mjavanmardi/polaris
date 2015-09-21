@@ -100,7 +100,7 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 	return realNumberOfCars;
 }
 
-vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
+vector<int> movingCars(bool& q,int roadID, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
 	int numberOfCars = numberOfAllowedCars(capac, queue, timestep, green, factor);
 	vector<int> newLine;
 	if(numberOfCars >0) {
@@ -108,6 +108,7 @@ vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, doub
 		newLine.push_back(nodeA);
 		newLine.push_back(nodeB);
 		newLine.push_back(queueID);
+		newLine.push_back(roadID);
 		for(int i = 0 ; i < numberOfCars ; i++) {
 			int nextNode = -999;
 			if(queue.at(i).existence() == true)
@@ -148,7 +149,7 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 					}
 				}
 
-				vector<int>  newLine = movingCars(q, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
+				vector<int>  newLine = movingCars(q, it->first, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
 
 				if(q)
 					capacityCars.push_back(newLine);

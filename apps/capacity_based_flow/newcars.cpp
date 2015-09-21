@@ -15,12 +15,13 @@ int selectEnteringRoad(map<int, Road>& Roads, int enterNodeA, int enterNodeB) {
 	return roadID;
 }
 
-void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep) {
+void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep, vector<vector<int>> &nodesToID) {
 	vector<int> toBeErased;
 	int iter = 0;
 	for(vector<Car>::iterator& it = Cars.begin() ; it != Cars.end() ; it++) {
 		if(it->enteringTime() >= t && it->enteringTime() < t + timestep) {
 			int roadID = selectEnteringRoad(Roads, it->enteringNodeA(), it->enteringNodeB());  // The function the nodeA / nodeB data (coming from the SQLite database) to the road ID (Data structure used for the C++ this model)
+			//int roadID = nodesToID[it->enteringNodeA()][it->enteringNodeB()];
 			if(roadID == 0)
 				cout << endl << "There is a problem with the entering Road ; the queue ID shoudln't be 0";
 
