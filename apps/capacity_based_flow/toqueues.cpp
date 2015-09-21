@@ -8,10 +8,9 @@ void TAToQueues(Road& R, int timestep) {
 	for(vector<Car>::iterator it = R.getTA().begin() ; it != R.getTA().end() ; it++) {
 		it->iterProg(0);
 		if(it->distanceInTA() < R.distanceToTravelInTA(*it)) {		// The car has to reach its queue (Individual or common)
-			double length;
-			double newSpeed = newCarSpeed(it->speed(), R.speedMax(), timestep, length, R.distanceToTravelInTA(*it) - it->distanceInTA(), it->accMean(), it->deccMean());
-			it->iterSpeed(newSpeed);
-			it->iterDistanceInTA(length);
+			pair<double,double> newDistanceAndSpeed = newCarDistanceAndSpeed(it->speed(), R.speedMax(), timestep, R.distanceToTravelInTA(*it) - it->distanceInTA(), it->accMean(), it->deccMean());
+			it->iterDistanceInTA(newDistanceAndSpeed.first);
+			it->iterSpeed(newDistanceAndSpeed.second);
 		}
 		else {								// The car has reached its queue (Individual or common)
 			it->initDistanceInTA();					//The traveled distance is initialized
@@ -29,7 +28,8 @@ void travelingAreaToQueues(map<int, Road>& Roads, int timestep) {
 	}
 }
 
-double newCarSpeed(double carSpeed, double speedLimit, int timestep, double& length, double distanceLeftToTravel, double accMean, double deccMean) {
+pair<double,double> newCarDistanceAndSpeed(double carSpeed, double speedLimit, int timestep, double distanceLeftToTravel, double accMean, double deccMean) {
+	pair<double,double> newDistanceAndSpeed;
 	double newSpeed;
 	// Be careful ! If the car speed is stored, it might decrease and increase a bit again before a traffic light
 	// This is due to the fact that comparison are made each Delta(t), not continuously
@@ -46,7 +46,7 @@ double newCarSpeed(double carSpeed, double speedLimit, int timestep, double& len
 	}
 	else
 		newSpeed = carSpeed;
-
-	length = timestep * (carSpeed + newSpeed) /2;		// The traveled distance is the duration * mean speed		(mean speed = (speed(t) + speed(t+1)) / 2)
-	return newSpeed;
+	newDistanceAndSpeed.first = timestep * (carSpeed + newSpeed) /2;		// The traveled distance is the duration * mean speed		(mean speed = (speed(t) + speed(t+1)) / 2)
+	newDistanceAndSpeed.second = carSpeed;
+	return newDistanceAndSpeed;
 }
