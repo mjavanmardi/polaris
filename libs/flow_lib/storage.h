@@ -5,7 +5,6 @@
 #include "road.h"
 #include "car.h"
 #include <string>
-#include "MovingCars.h"
 
 int lastCarProba(double proba, double weight);
 
