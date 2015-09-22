@@ -19,6 +19,9 @@ public:
 	int ID();
 	double length();
 	std::vector<Car>& getQueue();
+	std::vector<Car>::iterator getCarsBegin();
+	std::vector<Car>::iterator getCarsEnd();
+	int getNumberOfCars();
 	std::map<int, double> getCapacities();
 	std::map<int,double> getGreenTime();
 	std::map<int,double> getCycle();
@@ -30,7 +33,7 @@ public:
 	void addCar(Car C);
 	void removeCar();
 	void moveFakeCars(int timestep);
-	std::map<int,double> getRealCapacity(int time);
+	std::map<int,double> getRealCapacity(int time, bool &isRed);
 	double getMinCapacity();
 
 	//### Serialization ###

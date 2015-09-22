@@ -12,7 +12,7 @@ bool infEq(double a, double b)
 }
 
 //Tests known values for the isGreen function
-TEST (isGreen,knownValue)
+/*TEST (isGreen,knownValue)
 {
 	std::map<int, double> greenTime, cycle, offset;
 	double time = 3.5;
@@ -27,10 +27,10 @@ TEST (isGreen,knownValue)
 	offset[0] = 1;
 	result = isGreen(time,greenTime,cycle,offset);
 	ASSERT_EQ(true,result[0]);
-}
+}*/
 
 //At a red light, no car should pass
-TEST (numberOfAllowedCars,redLightCase)
+/*TEST (numberOfAllowedCars,redLightCase)
 {
 	std::map<int,double> capac, factor;
 	capac[0] = 7200;
@@ -41,10 +41,10 @@ TEST (numberOfAllowedCars,redLightCase)
 	green[0] = false;
 	int testedValue = numberOfAllowedCars(capac,queue,timestep,green,factor);
 	ASSERT_EQ(0,testedValue);
-}
+}*/
 
 //At a green light, number of car allowed should increase with factor
-TEST (numberOfAllowedCars,ShouldIncreaseWithFactor)
+/*TEST (numberOfAllowedCars,ShouldIncreaseWithFactor)
 {
 	std::map<int,double> capac, factor;
 	capac[0] = 7200;
@@ -65,7 +65,7 @@ TEST (numberOfAllowedCars,ShouldIncreaseWithFactor)
 	green[0] = true;
 	int secondNumberofAllowedCars = numberOfAllowedCars(capac,queue,timestep,green,factor);
 	ASSERT_PRED2(infEq,firstNumberofAllowedCars,secondNumberofAllowedCars);
-}
+}*/
 
 //Check that a car to json to a car is identity
 TEST (Car,CarJsonCarIdentity)

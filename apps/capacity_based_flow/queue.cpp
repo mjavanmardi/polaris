@@ -66,6 +66,21 @@ vector<Car>& Queue::getQueue() {
 	return cars;
 }
 
+vector<Car>::iterator Queue::getCarsBegin()
+{
+	return cars.begin();
+}
+
+vector<Car>::iterator Queue::getCarsEnd()
+{
+	return cars.end();
+}
+
+int Queue::getNumberOfCars()
+{
+	return cars.size();
+}
+
 map<int, double> Queue::getCapacities() {
 	return capacities;
 }
@@ -164,12 +179,14 @@ void Queue::moveFakeCars(int timestep) {
 //The dynamic capacity takes into account traffic lights
 //If at time "time" the traffic light is red, the capacity is null
 //otherwise, the static capacity is multiplied by cycleLength/greenTime
-map<int,double> Queue::getRealCapacity(int time)
+map<int,double> Queue::getRealCapacity(int time, bool &isRed)
 {
+	isRed = false;
 	map<int,double> realCapacity;
 	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)
 	{
 		realCapacity[it->first] = 0;
+		//if ( (time-offset) modulo cycle < greentime ) then light is green
 		double t = fmod((time - offset[it->first]),cycle[it->first]);
 		if(t<greenTime[it->first])
 		{
@@ -177,6 +194,11 @@ map<int,double> Queue::getRealCapacity(int time)
 			if(greenTime[it->first] != 0)
 				factor = cycle[it->first] / greenTime[it->first];
 			realCapacity[it->first] = factor;
+		}
+		else
+		{
+			isRed = true;
+			break;
 		}
 	}
 	return realCapacity;
