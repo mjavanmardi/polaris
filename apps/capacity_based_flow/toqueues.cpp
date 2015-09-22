@@ -47,6 +47,6 @@ pair<double,double> newCarDistanceAndSpeed(double carSpeed, double speedLimit, i
 	else
 		newSpeed = carSpeed;
 	newDistanceAndSpeed.first = timestep * (carSpeed + newSpeed) /2;		// The traveled distance is the duration * mean speed		(mean speed = (speed(t) + speed(t+1)) / 2)
-	newDistanceAndSpeed.second = carSpeed;
+	newDistanceAndSpeed.second = newSpeed;
 	return newDistanceAndSpeed;
 }
