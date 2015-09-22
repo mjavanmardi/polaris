@@ -30,6 +30,8 @@ public:
 	void addCar(Car C);
 	void removeCar();
 	void moveFakeCars(int timestep);
+	std::map<int,double> getRealCapacity(int time);
+	double getMinCapacity();
 
 	//### Serialization ###
 

@@ -160,6 +160,39 @@ void Queue::moveFakeCars(int timestep) {
 	}
 }
 
+//This function gives the real (dynamic) capacity of each lane of current queue
+//The dynamic capacity takes into account traffic lights
+//If at time "time" the traffic light is red, the capacity is null
+//otherwise, the static capacity is multiplied by cycleLength/greenTime
+map<int,double> Queue::getRealCapacity(int time)
+{
+	map<int,double> realCapacity;
+	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)
+	{
+		realCapacity[it->first] = 0;
+		double t = fmod((time - offset[it->first]),cycle[it->first]);
+		if(t<greenTime[it->first])
+		{
+			double factor = 1;
+			if(greenTime[it->first] != 0)
+				factor = cycle[it->first] / greenTime[it->first];
+			realCapacity[it->first] = factor;
+		}
+	}
+	return realCapacity;
+}
+
+double Queue::getMinCapacity()
+{
+	double min = DBL_MAX;
+	for(map<int, double>::iterator it = capacities.begin();it != capacities.end();it++)
+	{
+		if(it->second < min)
+			min = it->second;
+	}
+	return min;
+}
+
 Json::Value Queue::toJson()
 {
 	Json::Value queueValue;

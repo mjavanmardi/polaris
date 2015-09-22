@@ -2,26 +2,16 @@
 
 using namespace std;
 
-int selectEnteringRoad(map<int, Road>& Roads, int enterNodeA, int enterNodeB) {
-	// The function the nodeA / nodeB data (coming from the SQLite database) to the road ID (Data structure used for the C++ this model)
-			
-	int roadID = 0;
-	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
-		if(it->second.nodeA() == enterNodeA && it->second.nodeB() == enterNodeB) {
-			roadID = it->first;
-			break;
-		}
-	}
-	return roadID;
-}
-
+//Cars contains the cars that have not yet entered the system
+//if a car has reached its entering time, we check if it has room to enter its road
+//if yes, it enters the road
+//if not, its entering time is postponed
 void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep, vector<vector<int>> &nodesToID) {
 	vector<int> toBeErased;
 	int iter = 0;
 	for(vector<Car>::iterator& it = Cars.begin() ; it != Cars.end() ; it++) {
 		if(it->enteringTime() >= t && it->enteringTime() < t + timestep) {
-			int roadID = selectEnteringRoad(Roads, it->enteringNodeA(), it->enteringNodeB());  // The function the nodeA / nodeB data (coming from the SQLite database) to the road ID (Data structure used for the C++ this model)
-			//int roadID = nodesToID[it->enteringNodeA()][it->enteringNodeB()];
+			int roadID = nodesToID[it->enteringNodeA()][it->enteringNodeB()];
 			if(roadID == 0)
 				cout << endl << "There is a problem with the entering Road ; the queue ID shoudln't be 0";
 

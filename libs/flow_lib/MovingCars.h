@@ -3,6 +3,7 @@
 #include <vector>
 
 // Contains the informations needed to move cars in a given queue
+// Cars are only identified by the node they are heading at 
 class MovingCars
 {
 public:

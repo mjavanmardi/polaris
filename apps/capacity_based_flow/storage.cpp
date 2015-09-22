@@ -127,8 +127,6 @@ vector<MovingCars> preProcess(map<int, Road>& Roads, int timestep, int time) {
 		
 		//### Store cars that can exit the system based on the capacity
 		
-		//map<int, Queue> queues = it->second.indivQueues();
-		//for(map<int, Queue>::iterator it2 =  queues.begin() ; it2 !=  queues.end() ; it2++) {
 		for(map<int, Queue>::iterator it2 =  it->second.IndivQueuesBegin() ; it2 !=  it->second.IndivQueuesEnd() ; it2++) {
 			if(it2->second.getQueue().size() != 0) {
 				bool q = false;
