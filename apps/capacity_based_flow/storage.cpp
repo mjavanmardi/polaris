@@ -100,27 +100,24 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 	return realNumberOfCars;
 }
 
-vector<int> movingCars(bool& q,int roadID, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
+MovingCars movingCars(bool& q,int roadID, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
 	int numberOfCars = numberOfAllowedCars(capac, queue, timestep, green, factor);
-	vector<int> newLine;
+	vector<int> nextNodes;
 	if(numberOfCars >0) {
 		q = true;
-		newLine.push_back(nodeA);
-		newLine.push_back(nodeB);
-		newLine.push_back(queueID);
-		newLine.push_back(roadID);
 		for(int i = 0 ; i < numberOfCars ; i++) {
 			int nextNode = -999;
 			if(queue.at(i).existence() == true)
 				nextNode = queue.at(i).nextNode();
-			newLine.push_back(nextNode);
+			nextNodes.push_back(nextNode);
 		}
 	}
-	return newLine;
+	MovingCars carsMovingInCurrentQueue(nodeA,nodeB,queueID,roadID,nextNodes);
+	return carsMovingInCurrentQueue;
 }
 
-vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
-	vector<vector<int>> capacityCars;
+vector<MovingCars> preProcess(map<int, Road>& Roads, int timestep, int time) {
+	vector<MovingCars> capacityCars(0);
 	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
 		//### Release cars from Common Queue
 		it->second.commonToIndividualQueue();
@@ -149,7 +146,7 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 					}
 				}
 
-				vector<int>  newLine = movingCars(q, it->first, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
+				MovingCars  newLine = movingCars(q, it->first, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
 
 				if(q)
 					capacityCars.push_back(newLine);
