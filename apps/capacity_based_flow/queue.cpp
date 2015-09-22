@@ -7,6 +7,7 @@ Queue::Queue() {
 
 }
 
+//Standard constructor
 Queue::Queue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> _capacities, map<int,double> _greenTime, map<int,double> _cycle, map<int,double> _offset) : 
 greenTime(_greenTime), cycle(_cycle), offset(_offset)
 {
@@ -23,6 +24,7 @@ greenTime(_greenTime), cycle(_cycle), offset(_offset)
 	}
 }
 
+//consctructor from json value
 Queue::Queue(Json::Value value)
 {
 	try
@@ -54,6 +56,8 @@ int Queue::ID() {
 	return queueID;
 }
 
+//return the length of the current queue
+//TODO : compute it inside the queue, not when calling
 double Queue::length() {
 	double queueLength = 0;
 	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
@@ -81,39 +85,29 @@ int Queue::getNumberOfCars()
 	return cars.size();
 }
 
-map<int, double> Queue::getCapacities() {
-	return capacities;
-}
-
-map<int,double> Queue::getGreenTime()
-{
-	return greenTime;
-}
-
-map<int,double> Queue::getCycle()
-{
-	return cycle;
-}
-
-map<int,double> Queue::getOffset()
-{
-	return offset;
-}
-
 //### Dynamic methods ###
 
-int Queue::weight(int nextNode) {
-	int weight;
-	bool exist = false;
-	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {	// To verify is the nextNode (Where the car is going) is part of the turning movement of this queue
+//Gives the weight of a turning movement 
+int Queue::weight(int nextNode) 
+{
+	int weight=0;
+
+	//We check if the nextNode (Where the car is going) can be reached from the current queue
+	bool isReachable = false;
+	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {	
 		if((*it) == nextNode) {
-			exist = true;
+			isReachable = true;
 			break;
 		}
 	}
 
-	if(exist && length() < maxLength)	//(exist == true) -> means that the nextNode is part of the turning movement of the present queue && length() is the length of all the vehicles in the queue
-		weight = cars.size()*2 + nextNodes.size()*5; // This is the model comparing the queues. 2 and 5 are the linear coefficient affected to the number of cars and number of turning movement of the road
+	//if there is room left in the queue
+	//length() is the length of all the vehicles in the queue
+	if(isReachable && length() < maxLength)	
+		//We have a model to assign a car a queue 
+		//The bigger the weight, the less is the driver likely to take it
+		//2 and 5 are the linear coefficient affected to the number of cars and number of turning movement of the road
+		weight = cars.size()*2 + nextNodes.size()*5; 
 	else
 		weight = 900000;
 
@@ -179,8 +173,10 @@ void Queue::moveFakeCars(int timestep) {
 //The dynamic capacity takes into account traffic lights
 //If at time "time" the traffic light is red, the capacity is null
 //otherwise, the static capacity is multiplied by cycleLength/greenTime
-map<int,double> Queue::getRealCapacity(int time, bool &isRed)
+//isRed is true whenever there is a green light at current time "time"
+map<int,double> Queue::getRealCapacity(int time, bool &isRed, double &min)
 {
+	min = DBL_MAX;
 	isRed = false;
 	map<int,double> realCapacity;
 	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)
@@ -193,7 +189,9 @@ map<int,double> Queue::getRealCapacity(int time, bool &isRed)
 			double factor = 1;
 			if(greenTime[it->first] != 0)
 				factor = cycle[it->first] / greenTime[it->first];
-			realCapacity[it->first] = factor;
+			realCapacity[it->first] = factor*capacities[it->first];
+			if(realCapacity[it->first]<min)
+				min = realCapacity[it->first];
 		}
 		else
 		{
@@ -202,17 +200,6 @@ map<int,double> Queue::getRealCapacity(int time, bool &isRed)
 		}
 	}
 	return realCapacity;
-}
-
-double Queue::getMinCapacity()
-{
-	double min = DBL_MAX;
-	for(map<int, double>::iterator it = capacities.begin();it != capacities.end();it++)
-	{
-		if(it->second < min)
-			min = it->second;
-	}
-	return min;
 }
 
 Json::Value Queue::toJson()

@@ -23,18 +23,19 @@ int lastCarProba(double remainingAllowedWeight, double lastCarWeight)
 //For a given queue, returns the number of cars allowed to cross
 int numberOfAllowedCars(map<int, Queue>::iterator queueIterator, int timestep, int time) 
 {
+	//Here we get the dynamic capacity of each turning movement
+	//Which takes into account the traffic lights' state
+	double capacMin;
+	bool isRed = false;
+	map<int,double> realCapacity = queueIterator->second.getRealCapacity(time, isRed, capacMin);
+	if(isRed) //If there is a red light, no car can cross
+		return 0;
+
 	//Each cars which aims at crossing an intersection has a weight
 	//At each step, there is a total weight allowed to cross
 	//Here we compute this total weight
-    double capacMin = queueIterator->second.getMinCapacity();
+    
 	double totalAllowedWeight = capacMin * timestep / 3600; 
-
-	//Here we get the dynamic capacity of each turning movement
-	//Which takes into account the traffic lights' state
-	bool isRed = false;
-	map<int,double> realCapacity = queueIterator->second.getRealCapacity(time, isRed);
-	if(isRed) //If there is a red light, no car can cross
-		return 0;
 
 	int realNumberOfCars = 0;
 
@@ -68,17 +69,17 @@ int numberOfAllowedCars(map<int, Queue>::iterator queueIterator, int timestep, i
 //For a given queue contained in the queueIterator
 //This function returns a MovingCars, 
 //which is a structure that represents the cars which move at this step in the given queue
-MovingCars movingCars(bool& q, map<int, Road>::iterator roadIterator, map<int, Queue>::iterator queueIterator, int timestep, int time) {
+MovingCars movingCars(bool& areCarsMoving, map<int, Road>::iterator roadIterator, map<int, Queue>::iterator queueIterator, int timestep, int time) {
 	int numberOfCars = numberOfAllowedCars(queueIterator, timestep, time);
 	vector<int> nextNodes;
 	if(numberOfCars >0) {
-		q = true;
+		areCarsMoving = true;
 		for(vector<Car>::iterator carIter = queueIterator->second.getCarsBegin(); carIter != queueIterator->second.getCarsEnd();carIter++)  
 		{
 			int nextNode = -999;
 			if(carIter->existence() == true)
 				nextNode = carIter->nextNode();
-			nextNodes.push_back(nextNode);
+			nextNodes.push_back(nextNode); //We only need to store the node where the moving car is heading at
 		}
 	}
 	int roadID = roadIterator->first;
@@ -90,7 +91,7 @@ MovingCars movingCars(bool& q, map<int, Road>::iterator roadIterator, map<int, Q
 }
 
 //This function does 3 distinct actions on each road, which are specified inside
-//It returns a vector which stores all the cars authoriwed to move at the current step
+//It returns a vector which stores all the cars authorized to move at the current step
 vector<MovingCars> preProcess(map<int, Road>& Roads, int timestep, int time) {
 	vector<MovingCars> capacityCars(0);
 	for(map<int, Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
@@ -103,9 +104,9 @@ vector<MovingCars> preProcess(map<int, Road>& Roads, int timestep, int time) {
 		//### Store cars that can exit the system based on the capacity
 		for(map<int, Queue>::iterator it2 =  it->second.IndivQueuesBegin() ; it2 !=  it->second.IndivQueuesEnd() ; it2++) {
 			if(it2->second.getQueue().size() != 0) {
-				bool q = false;
-				MovingCars newLine = movingCars(q,it,it2,timestep,time);
-				if(q)
+				bool areCarsMoving = false;
+				MovingCars newLine = movingCars(areCarsMoving,it,it2,timestep,time);
+				if(areCarsMoving) //Avoid adding empty MovingCars structures
 					capacityCars.push_back(newLine);
 			}
 		}
