@@ -101,46 +101,41 @@ Car::~Car() {
 
 //### Getters ###
 
-double Car::length() {return carLength;}
+double Car::length() const {return carLength;}
 
 int Car::number() const {	return carNumber;}
 
-int Car::enteringTime() {return enterTime;}
+int Car::enteringTime() const {return enterTime;}
 
-int Car::enteringNodeA() { return enterNodeA;}
+int Car::enteringNodeA() const { return enterNodeA;}
 
-int Car::enteringNodeB() { return enterNodeB; }
+int Car::enteringNodeB() const { return enterNodeB; }
 
-int Car::exitingNode() { return exitNodeB; }
+int Car::exitingNode() const { return exitNodeB; }
 
-int Car::Node() { return path[position]; }
+int Car::Node() const { return path[position]; }
 
-int Car::nextNode() { return path[position+1]; }
+int Car::nextNode() const { return path[position+1]; }
 
-int Car::prevNode() { return path[position-1]; }
+int Car::prevNode() const { return path[position-1]; }
 
-bool Car::existence() {
-	if(fake)
-		return false;
-	else
-		return true;
-}
+bool Car::existence() const {return (!fake);}
 
-double Car::speed() { return carSpeed; }
+double Car::speed() const { return carSpeed; }
 
-int Car::reactIter() { return reacIter; }
+int Car::reactIter() const { return reacIter; }
 
-int Car::reactDuration() { return reacDuration; }
+int Car::reactDuration() const { return reacDuration; }
 
-double Car::distanceInTA() { return distInTA; }
+double Car::distanceInTA() const { return distInTA; }
 
-double Car::accMean() { return meanAcceleration; }
+double Car::accMean() const { return meanAcceleration; }
 
-double Car::deccMean() { return meanDecceleration; }
+double Car::deccMean() const { return meanDecceleration; }
 
-vector<int> Car::prog() { return progression; }
+vector<int> Car::prog() const { return progression; }
 
-double Car::maxSpeed(int road) { return maxSpeeds[road]; }
+double Car::maxSpeed(int road) const { return maxSpeeds[road]; }
 
 
 //### Setters ###

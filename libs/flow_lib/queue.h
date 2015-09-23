@@ -16,20 +16,22 @@ public:
 	~Queue();
 
 	//### Getters ###
-	int ID();
-	double length();
+	int ID() const;
+	double length() const;
 	std::vector<Car>& getQueue();
 	std::vector<Car>::iterator getCarsBegin();
 	std::vector<Car>::iterator getCarsEnd();
 	int getNumberOfCars();
+	int getNextNode(int i) const;
+	int getNextNodeSize() const;
 
 	//### Dynamic methods ###
-	int weight(int nextNode);
+	int weight(int nextNode) const;
 	void iterCarsProg();
 	void addCar(Car C);
 	void removeCar();
 	void moveFakeCars(int timestep);
-	std::map<int,double> getRealCapacity(int time, bool &isRed, double &min);
+	std::map<int,double> getRealCapacity(const int& time, bool &isRed, double &min);
 
 	//### Serialization ###
 

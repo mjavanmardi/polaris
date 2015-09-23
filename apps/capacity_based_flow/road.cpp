@@ -58,19 +58,19 @@ void Road::addQueue(int ID, double _maxLength, double _distanceBetweenCars, map<
 
 //### Getters ###
 
-int Road::ID() {return roadID;}
+int Road::ID() const {return roadID;}
 
-int Road::link() {return roadLink;}
+int Road::link() const {return roadLink;}
 
-int Road::nodeA(){return Anode;}
+int Road::nodeA() const {return Anode;}
 
-int Road::nodeB(){return Bnode;}
+int Road::nodeB() const {return Bnode;}
 
-double Road::speedMax() {return maximumSpeed;}
+double Road::speedMax() const {return maximumSpeed;}
 
-double Road::getMaxIndivQueueLength(){	// Length in meters
+double Road::getMaxIndivQueueLength() const{	// Length in meters
 	double max = 0;		
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the maximal length
+	for(map<int, Queue>::const_iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the maximal length
 		if(it->second.length() > max)
 			max = it->second.length();
 	}
@@ -86,9 +86,9 @@ int Road::getMaxIndivQueueSize() {		// Size in number of cars
 	return max;
 }
 
-double Road::getCommonQueueLength() {
+double Road::getCommonQueueLength() const {
 	double commonQueueLength = 0;
-	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it ++) {		// Loop over the common queue to count its length, adding "distanceBetweenCars" to have a space between them
+	for(vector<Car>::const_iterator it = commonQueue.begin() ; it != commonQueue.end() ; it ++) {		// Loop over the common queue to count its length, adding "distanceBetweenCars" to have a space between them
 		commonQueueLength = it->length() + distanceBetweenCars;
 	}
 	return commonQueueLength/(double)queues.size();			// The total length is divided by the number of queues = number of lanes on the road. The output is in meter;
@@ -120,16 +120,25 @@ vector<Car>& Road::getTA() {return travelingArea;}
 
 vector<double> Road::getLengthOverTime() {return lengthOverTime;}
 
+//Gets the size of the size of the nth  individual queue
+double Road::getNthQueueSize(int n) const
+{
+	map<int,Queue>::const_iterator it = queues.begin();
+	for(int j=0;j<n;j++)
+		it++;
+	return it->second.length();
+}
+
 
 //### Dynamic Methods ###
 
-int Road::selectIndividualQueue(int nextNode, bool& q){
+int Road::selectIndividualQueue(int nextNode, bool& q) const{
 	// nextNode is the node where the car is going. It the car is on Road(NodeA,NodeB) and goes to Road(B,C), it represents C
 	// The boolean returns true if a road has been found (Not being ealready full of cars)
 	int queueID = 0;
 	int minWeight = 10000;		// Initialization to get a queue
 	q = false;
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
+	for(map<int, Queue>::const_iterator it = queues.begin() ; it != queues.end() ; it++) {
 		if(it->second.weight(nextNode) < minWeight) {
 			minWeight = it->second.weight(nextNode);	// Iteration on the minimum weight to compare to the next one
 			queueID = it->first;						// Get the ID of the queue
@@ -148,6 +157,18 @@ void Road::commonToIndividualQueue() {
 		Car C = commonQueue[0+iter];
 		bool q = false;
 		int ID = selectIndividualQueue(C.nextNode(), q);
+		if(C.number()==8)
+		{
+			cout << roadID << " " << C.nextNode() << endl;
+			for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++)
+			{
+				for(int i=0;i<it->second.getNextNodeSize();i++)
+				{
+					cout << "RoadID : " << roadID << " QueueID : " << it->second.ID() << " Next possible node : " << it->second.getNextNode(i) << endl;
+				}
+			}
+			while(true){}
+		}
 		/*int ID =-99;
 		if(C.existence() == true)
 			ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
@@ -188,16 +209,20 @@ void Road::iterQueuesProg(int timestep) {
 	lengthOverTime.push_back( getMaxIndivQueueLength() + getCommonQueueLength() );
 }
 
-double Road::distanceToTravelInTA(Car C) {
+double Road::distanceToTravelInTA(Car C) const {
 	double distance;
 	if(C.Node() != C.exitingNode()) {	// It is not the last road where the car is traveling on		
 		if(commonQueue.size() != 0)			// There are cars in the common queue
 			distance = totalLength - getCommonQueueLength() - getMaxIndivQueueLength();
 		else {								// There is no cars in the common queue
 			bool q = false;
-			int queueID = selectIndividualQueue(C.nextNode(), q);
+			const int queueID = selectIndividualQueue(C.nextNode(), q);
 			if(q)	// If q = true, it means that there is at least one lane that can host the car (Meaning having the turning movement the car is looking for and not being full)
-				distance = totalLength - queues[queueID].length();
+			{
+				//map<int,Queue> copyQueue = queues;
+				distance = totalLength - getNthQueueSize(queueID);
+				//copyQueue[queueID].length();
+			}
 			else	// If q = false, it means that there all the queues having the dedicated turning movement 
 				distance = totalLength - getMaxIndivQueueLength();
 		}

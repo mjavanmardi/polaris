@@ -18,7 +18,7 @@ greenTime(_greenTime), cycle(_cycle), offset(_offset)
 	
 	cars.clear();
 	lengthOverTime.clear();
-	nextNodes.clear();
+	nextNodes = vector<int>(0);
 	for(map<int, double>::iterator it = _capacities.begin() ; it != _capacities.end() ; it++) {
 		nextNodes.push_back(it->first);
 	}
@@ -52,16 +52,20 @@ Queue::~Queue() {
 
 //### Getters ###
 
-int Queue::ID() {
+int Queue::ID() const
+{
 	return queueID;
 }
 
 //return the length of the current queue
 //TODO : compute it inside the queue, not when calling
-double Queue::length() {
+double Queue::length() const
+{
 	double queueLength = 0;
-	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
-		queueLength += it->length() + distanceBetweenCars;
+	for(int i = 0;i<cars.size();i++) 
+	{
+		Car curCar = cars[i];
+		queueLength += curCar.length() + distanceBetweenCars;
 	}
 	return queueLength;
 }
@@ -85,17 +89,27 @@ int Queue::getNumberOfCars()
 	return cars.size();
 }
 
+int Queue::getNextNode(int i) const
+{
+	return nextNodes[i];
+}
+
+int Queue::getNextNodeSize() const
+{
+	return nextNodes.size();
+}
+
 //### Dynamic methods ###
 
 //Gives the weight of a turning movement 
-int Queue::weight(int nextNode) 
+int Queue::weight(int nextNode) const
 {
 	int weight=0;
 
 	//We check if the nextNode (Where the car is going) can be reached from the current queue
 	bool isReachable = false;
-	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {	
-		if((*it) == nextNode) {
+	for(int i=0;i<nextNodes.size();i++) {	
+		if(nextNodes[i] == nextNode) {
 			isReachable = true;
 			break;
 		}
@@ -114,6 +128,8 @@ int Queue::weight(int nextNode)
 	return weight;
 }
 
+//Write cars' position in the queue at current step
+//Writes the current queue length at current step
 void Queue::iterCarsProg() {
 	int iter = 1;
 	double queueLength = 0;
@@ -174,12 +190,12 @@ void Queue::moveFakeCars(int timestep) {
 //If at time "time" the traffic light is red, the capacity is null
 //otherwise, the static capacity is multiplied by cycleLength/greenTime
 //isRed is true whenever there is a green light at current time "time"
-map<int,double> Queue::getRealCapacity(int time, bool &isRed, double &min)
+map<int,double> Queue::getRealCapacity(const int& time, bool &isRed, double &min) 
 {
 	min = DBL_MAX;
 	isRed = false;
 	map<int,double> realCapacity;
-	for(map<int,double>::iterator it = greenTime.begin();it!=greenTime.end();it++)
+	for(map<int,double>::const_iterator it = greenTime.cbegin();it!=greenTime.cend();it++)
 	{
 		realCapacity[it->first] = 0;
 		//if ( (time-offset) modulo cycle < greentime ) then light is green

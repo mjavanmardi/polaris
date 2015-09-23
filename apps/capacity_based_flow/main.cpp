@@ -26,7 +26,6 @@ int main(int argc, char **argv) {
 	vector<Car>& Cars = openCars(db_path);
 	vector<int> enteringTimes = preprocessCars(Cars);
 	
-	
 //### Simulation ###
 	int superior = 0;
 	vector<int> timestepsToPrint;

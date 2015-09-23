@@ -58,15 +58,13 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 	timeSpent["Total"] = 0;
 	std::clock_t startTot;
 	startTot= clock();
-	for(int t = 0 ; t < modelisationTime ; t++) {
-
-	
+	for(int t = 0 ; t < modelisationTime ; t++) 
+	{
 
 	//### Add new cars into the system
 		start = clock();
 		addNewCars(Cars, Roads, t, timestep, nodesToID);
 		timeSpent["Add cars"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
-
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
 		start = clock();
@@ -89,7 +87,6 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 		/*if(!checkFor(t,73,Roads))
 			t=t;
 		cout << "Car size : " << Cars.size() << endl;*/
-
 		
 		if(t%1000==0)
 			std::cout << "t : " << t << " " << Cars.size() << " " << Roads.size() << std::endl ; 
