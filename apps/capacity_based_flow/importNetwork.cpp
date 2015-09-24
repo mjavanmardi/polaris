@@ -78,9 +78,9 @@ void importLanes(Road& R, bool q, int lane, double grade, vector<int> link, vect
 			}
 		}
 		
-		double maxLength = 28;				// Default Value
+		double maxLength = 30;				// Default Value
 		double distanceBetweenCars = 0.5;		// Default Value
-		double greenTimeI = 28;	// Default value : green time of the red light
+		double greenTimeI = 30;	// Default value : green time of the red light
 		double cycleI = 30; // Default Value : cycle of the red light
 		double offsetI = 0; // Default Value : initial offset (before green)
 		map<int,double> greenTime;
@@ -140,7 +140,7 @@ void preprocessConnections(result<polaris::io::Connect> connections, vector<int>
 	}
 }
 
-map<int, Road> openRoad(char *db_path) {
+map<int, Road> openRoad(char *db_path, vector<vector<int>> &nodesToID) { //TODO : make a structure to encapsulate map<int,Road> and nodesToID
 //### Opening and transaction to the SQLite database ###
 	unique_ptr<odb::database> db;
 	db = open_sqlite_database(db_path);
@@ -164,13 +164,19 @@ map<int, Road> openRoad(char *db_path) {
 		newRoads[twoRoads.second.ID()] = twoRoads.second;
 		ID +=2;
 	}
+	nodesToID = vector<vector<int>>(ID,vector<int>(ID,0));
+	for(map<int, Road>::iterator it = newRoads.begin();it!= newRoads.end();it++)
+	{
+		nodesToID[it->second.nodeA()][it->second.nodeB()] = it->second.ID();
+	}
 		
 	return newRoads;
 }
 
-Json::Value roadToJson(char *db_path)
+Json::Value roadsToJson(char *db_path)
 {
-	map<int,Road> roads = openRoad(db_path);
+	vector<vector<int>> nodesToID;
+	map<int,Road> roads = openRoad(db_path, nodesToID);
 	Json::Value roadsValue;
 	for(map<int,Road>::iterator it = roads.begin();it!=roads.end();it++)
 	{
@@ -179,7 +185,7 @@ Json::Value roadToJson(char *db_path)
 	return roadsValue;
 }
 
-map<int,Road> jsonToRoad(string fileName)
+map<int,Road> jsonToRoads(string fileName)
 {
 	std::string test = fileToString(fileName); 
 	Json::Value root;

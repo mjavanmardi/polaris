@@ -100,7 +100,7 @@ int numberOfAllowedCars(map<int, double>& capac, vector<Car> queue, int timestep
 	return realNumberOfCars;
 }
 
-vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
+vector<int> movingCars(bool& q,int roadID, int nodeA, int nodeB, int queueID, map<int, double> capac, vector<Car> queue, int timestep, map<int,bool> green, map<int,double> factor) {
 	int numberOfCars = numberOfAllowedCars(capac, queue, timestep, green, factor);
 	vector<int> newLine;
 	if(numberOfCars >0) {
@@ -108,6 +108,7 @@ vector<int> movingCars(bool& q, int nodeA, int nodeB, int queueID, map<int, doub
 		newLine.push_back(nodeA);
 		newLine.push_back(nodeB);
 		newLine.push_back(queueID);
+		newLine.push_back(roadID);
 		for(int i = 0 ; i < numberOfCars ; i++) {
 			int nextNode = -999;
 			if(queue.at(i).existence() == true)
@@ -128,20 +129,18 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 		it->second.iterQueuesProg(timestep);
 		
 		//### Store cars that can exit the system based on the capacity
-		map<int, Queue> queues = it->second.indivQueues();
-		for(map<int, Queue>::iterator it2 =  queues.begin() ; it2 !=  queues.end() ; it2++) {
+		
+		//map<int, Queue> queues = it->second.indivQueues();
+		//for(map<int, Queue>::iterator it2 =  queues.begin() ; it2 !=  queues.end() ; it2++) {
+		for(map<int, Queue>::iterator it2 =  it->second.IndivQueuesBegin() ; it2 !=  it->second.IndivQueuesEnd() ; it2++) {
 			if(it2->second.getQueue().size() != 0) {
 				bool q = false;
 				map<int,double> greenTime = it2->second.getGreenTime();
 				map<int,double> cycle = it2->second.getCycle();
 				map<int,double> offset = it2->second.getOffset();
-				map<int,bool> green = isGreen(time,greenTime,cycle,offset);
+				map<int,bool> green = isGreen(time,greenTime,cycle,offset); //Gives the green phase for each lane
 				map<int,double> factor;
-				/*for(int i=0;i<green.size();i++)
-				{
-					cout << "Green : " << green[i] << endl;
-				}*/
-				for(map<int,double>::iterator it3 = greenTime.begin();it3 != greenTime.end();it3++)
+				for(map<int,double>::iterator it3 = greenTime.begin();it3 != greenTime.end();it3++) //Red light management : factor by which we multiply the capacity in case of Green light
 				{
 					factor[it3->first] = 1;
 					if(greenTime[it3->first]!=0)
@@ -149,14 +148,13 @@ vector<vector<int>> preProcess(map<int, Road>& Roads, int timestep, int time) {
 						factor[it3->first] = cycle[it3->first] / greenTime[it3->first];
 					}
 				}
-				//cout << "diff : " << it2->second.getCapacities().size() - green.size() << endl; 
-				//cout << "Size1 : " << it2->second.getCapacities().size();
-				vector<int>  newLine = movingCars(q, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
+
+				vector<int>  newLine = movingCars(q, it->first, it->second.nodeA(), it->second.nodeB(), it2->first, it2->second.getCapacities(), it2->second.getQueue(), timestep, green, factor);
+
 				if(q)
 					capacityCars.push_back(newLine);
 			}
 		}
-	
 	}
 	return capacityCars;
 }

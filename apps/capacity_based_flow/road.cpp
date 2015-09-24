@@ -98,6 +98,18 @@ double Road::getMaxCommonQueueLength() {return totalLength - getMaxIndivQueueLen
 
 map<int, Queue> Road::indivQueues() {return queues;}
 
+//test
+
+map<int, Queue>::iterator Road::IndivQueuesBegin()
+{
+	return queues.begin();
+}
+
+map<int, Queue>::iterator Road::IndivQueuesEnd()
+{
+	return queues.end();
+}
+
 Queue Road::getQueue(int ID) {return queues[ID];}
 
 vector<Car> Road::getLastQueue(){return lastQueue;}

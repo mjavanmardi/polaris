@@ -13,7 +13,7 @@ int jsonToInt(Json::Value root, std::string name);
 double jsonToDouble(Json::Value root, std::string name);
 
 template<typename T>
-void jsonToVector(Json::Value root, std::string name, std::vector<typename T> &value) //Converter for abstract type with constructor
+void jsonToVector(Json::Value root, std::string name, std::vector<typename T> &value) //Converter for vector of type with jSon constructor
 {
 	Json::Value JVect = root;
 	if(JVect.isArray())
@@ -29,7 +29,7 @@ void jsonToVector(Json::Value root, std::string name, std::vector<typename T> &v
 }
 
 template<typename T>
-void jsonToMapInt(Json::Value root, std::string name, std::map<int,T> &value)
+void jsonToMapInt(Json::Value root, std::string name, std::map<int,T> &value) //Converter for map of type with jSon constructor
 {
 	if(!root.isNull())
 	{

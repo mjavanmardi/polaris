@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace std;
-
 #include "importNetwork.h"
 #include "importCars.h"
 #include "carsPath.h"
@@ -12,17 +10,19 @@ using namespace std;
 #include "JsonParser.h"
 #include <fstream>
 
+using namespace std;
 
 const int timestep = 1;
-const int modelisationTime = 178 * timestep;
-//const int modelisationTime = 6001 * timestep;
+//const int modelisationTime = 178 * timestep;
+const int modelisationTime = 15000 * timestep;
 char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 
 
 int main(int argc, char **argv) {
 
 //### Import the SQLITE database and initialize the network ###
-	map<int, Road> Roads = openRoad(db_path);
+	vector<vector<int>> nodesToID;
+	map<int, Road> Roads = openRoad(db_path, nodesToID);
 	vector<Car>& Cars = openCars(db_path);
 	vector<int> enteringTimes = preprocessCars(Cars);
 	
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	int superior = 0;
 	vector<int> timestepsToPrint;
 	timestepsToPrint.push_back(modelisationTime-1);
-	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior);
+	simulation(modelisationTime, Roads, Cars, timestep, timestepsToPrint, superior, nodesToID);
 
 //### Outputs ###
 	ofstream file1, file2;
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	
 //### Writing road network to json file ###
 	/*ofstream strRoad("TEST_network.json",ios::app);
-	strRoad << roadToJson(db_path);
+	strRoad << roadsToJson(db_path);
 	strRoad.close();*/
 
 //### Writing cars demand to json file ###
@@ -50,14 +50,14 @@ int main(int argc, char **argv) {
 	strCar << carsToJson(db_path);
 	strCar.close();*/
 
-	map<int,Road> jRoads = jsonToRoad("TEST_network.json");
-	cout << "Road size : " << jRoads.size() << endl;
+	//map<int,Road> jRoads = jsonToRoads("TEST_network.json");
+	//cout << "Road size : " << jRoads.size() << endl;
 
-	vector<Car> jCars = jsonToCars("TEST_cars.json");
-	cout << "Cars number : " << jCars.size() << endl;
+	//vector<Car> jCars = jsonToCars("TEST_cars.json");
+	//cout << "Cars number : " << jCars.size() << endl;
 	
 	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	//RUN_ALL_TESTS();
 	system("pause");
 	return 0;
 }

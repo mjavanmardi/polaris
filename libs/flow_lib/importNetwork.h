@@ -20,8 +20,8 @@ std::pair<Road,Road> importRoad(polaris::io::Link db_itr, int ID, vector<int> li
 
 void preprocessConnections(result<polaris::io::Connect> connections, vector<int>& link, vector<int>& toNodeA, vector<int>& toNodeB, vector<bool>& dir, vector<string>& lanes, vector<string>& type);
 
-std::map<int, Road> openRoad(char *db_path);
+std::map<int, Road> openRoad(char *db_path, std::vector<std::vector<int>> &nodesToID);
 
-Json::Value roadToJson(char *db_path);
+Json::Value roadsToJson(char *db_path);
 
-std::map<int,Road> jsonToRoad(std::string fileName);
+std::map<int,Road> jsonToRoads(std::string fileName);

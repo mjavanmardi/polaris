@@ -28,6 +28,8 @@ public:
 	double getCommonQueueLength();					// Get the common queue length
 	double getMaxCommonQueueLength();				// Get the maximum common queue length
 	std::map<int, Queue> indivQueues();				// Get the individual queues
+	std::map<int, Queue>::iterator IndivQueuesBegin();
+	std::map<int, Queue>::iterator IndivQueuesEnd();
 	Queue getQueue(int ID);							// Get the cars being in the queue having the id=ID
 	std::vector<Car> getLastQueue();				// Get the cars being in the last queue
 	std::vector<Car> getCommonQueue();				// Get the cars being in the common queue

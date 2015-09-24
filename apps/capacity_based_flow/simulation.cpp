@@ -47,20 +47,41 @@ bool checkFor(int modelisationTime, int n, map<int, Road> Roads)
 	return false;
 }
 
-void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, int timestep, vector<int> timestepsToPrint, int superior) {
+void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, int timestep, vector<int> timestepsToPrint, int superior, vector<vector<int>> nodesToID) {
+	//### Time measuring ###
+	std::map<std::string,double> timeSpent;
+	std::clock_t start;
+	timeSpent["Add cars"] = 0;
+	timeSpent["TA to queue"]  = 0;
+	timeSpent["Queue to TA"] = 0;
+	timeSpent["Preprocess"] = 0;
+	timeSpent["Total"] = 0;
+	std::clock_t startTot;
+	startTot= clock();
 	for(int t = 0 ; t < modelisationTime ; t++) {
 
+	
+
 	//### Add new cars into the system
-		addNewCars(Cars, Roads, t, timestep);
+		start = clock();
+		addNewCars(Cars, Roads, t, timestep, nodesToID);
+		timeSpent["Add cars"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
+
 
 	//### Move from common queue & Increase cars progression & Write the queue length at time = t &  Store cars that can exit a road to enter a new one BASED ON THE CAPACITY 
+		start = clock();
 		vector<vector<int>> movingCars = preProcess(Roads, timestep, t);
+		timeSpent["Preprocess"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 	//### Release cars from traveling areas into queues (Common or Individual)
+		start = clock();
 		travelingAreaToQueues(Roads, timestep);
+		timeSpent["TA to queue"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 
 	//### Release cars from queues to traveling areas -> cars stored previously (Based on capacity) 
-		queuesToTravelingAreas(Roads, movingCars, timestep);
+		start = clock();
+		queuesToTravelingAreas(Roads, movingCars, timestep, nodesToID);
+		timeSpent["Queue to TA"] += (clock()-start) / (double)(CLOCKS_PER_SEC);
 		
 	//### Display the network state if needed => This part has not been optimized (Computational part) and it takes part even if it doesn't print anything
 		//printRoads(t, Roads, timestepsToPrint, superior);
@@ -69,7 +90,13 @@ void simulation(int modelisationTime, map<int, Road>& Roads, vector<Car>& Cars, 
 			t=t;
 		cout << "Car size : " << Cars.size() << endl;*/
 
-		if(t%10==0)
-			std::cout << "t : " << t << std::endl ; 
+		
+		if(t%1000==0)
+			std::cout << "t : " << t << " " << Cars.size() << " " << Roads.size() << std::endl ; 
+	}
+	timeSpent["Total"] += (clock()-startTot) / (double)(CLOCKS_PER_SEC);
+	for(std::map<std::string,double>::iterator it = timeSpent.begin();it!=timeSpent.end();it++)
+	{
+		cout << "Time spent in " << it->first << " = " << it->second << " s" << endl;
 	}
 }
