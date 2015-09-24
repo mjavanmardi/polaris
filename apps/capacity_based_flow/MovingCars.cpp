@@ -5,47 +5,47 @@ using namespace std;
 MovingCars::MovingCars():
 nodeA(0), nodeB(0), queueID(0), roadID(0)
 {
-	movingCarsIds = vector<int>(0);
+	nextNodes = vector<int>(0);
 }
-MovingCars::MovingCars(int _nodeA, int _nodeB, int _queueID, int _roadID, std::vector<int> &_movingCarsIds) :
+MovingCars::MovingCars(int _nodeA, int _nodeB, int _queueID, int _roadID, std::vector<int> &_nextNodes) :
 nodeA(_nodeA), nodeB(_nodeB), queueID(_queueID), roadID(_roadID)
 {
-	movingCarsIds = vector<int>(0);
-	for(int i=0;i < movingCarsIds.size();i++)
-		movingCarsIds.push_back(_movingCarsIds[i]);
+	nextNodes = vector<int>(0);
+	for(int i=0;i < _nextNodes.size();i++)
+		nextNodes.push_back(_nextNodes[i]);
 }
 
-int MovingCars::getNodeA() const
+int MovingCars::getNodeA()
 {
 	return nodeA;
 }
 
-int MovingCars::getNodeB() const
+int MovingCars::getNodeB()
 {
 	return nodeB;
 }
 
-int MovingCars::getQueueID() const
+int MovingCars::getQueueID()
 {
 	return queueID;
 }
 
-int MovingCars::getRoadID() const
+int MovingCars::getRoadID()
 {
 	return roadID;
 }
 
-int MovingCars::getMovingCarsIds(int i) const
+int MovingCars::getNextNode(int i)
 {
-	return movingCarsIds[i];
+	return nextNodes[i];
 }
 
-int MovingCars::getMovingCarsIdsSize() const
+int MovingCars::getNextNodesSize()
 {
-	return movingCarsIds.size();
+	return nextNodes.size();
 }
 
 void MovingCars::removeOneCar()
 {
-	movingCarsIds.pop_back();
+	nextNodes.pop_back();
 }

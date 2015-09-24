@@ -38,10 +38,10 @@ void releaseCars(Road& R, map<int, Road>& Roads, vector<MovingCars> sampledCars,
 		int queueID = it->getQueueID();
 		int roadID = it->getRoadID();
 
-		if (!Roads.count(roadID)) //checking if roadID is a valid road ID 
+		if (!Roads.count(roadID))
 			cout << "pb : " << "nodei " << nodei << "    R.nodeA " << R.nodeA() << endl;
 		// RELEASE
-		if(Roads[roadID].getQueue(queueID).getNumberOfCars() != 0) 
+		if(Roads[roadID].getQueue(queueID).getQueue().size() != 0) 
 		{
 			if(Roads[roadID].getQueue(queueID).getQueue()[0].existence() == false)	// First Car is fake
 			{
@@ -125,45 +125,6 @@ void deleteCars(vector<MovingCars>& Cars,	vector<MovingCars> movingCars, vector<
 			break;
 	}
 }
-
-/*void deleteCars(vector<MovingCars>& Cars,	vector<MovingCars> movingCars, vector<MovingCars> stuckCars, int nodej) {
-	for(vector< MovingCars >::iterator it = Cars.begin() ; it != Cars.end() ;) {
-		if(Cars.size() != 0) {
-			if(it->getNodeB() == nodej) {
-				bool moving = false;
-				bool stuck = false;
-				deleteMovingCars((*it), movingCars, moving);
-				if(moving == false) 
-					deleteStuckCars((*it), stuckCars, stuck);
-				if(it->getNextNodesSize() == 0) 
-				{
-						Cars.erase(it);
-						break;
-				}
-				//### Increase iterator
-				if(moving == true) {
-					if(it->getNextNodesSize() == 0) {
-						Cars.erase(it);
-						break;
-					}
-					else
-						it++;
-				}
-				else if(stuck == true) {
-					Cars.erase(it);
-					break;
-				}
-				else 
-					it++;
-				//###
-			}
-			else 
-				it++;
-		}
-		if(Cars.size() == 0)
-			break;
-	}
-}*/
 
 void queuesToTravelingAreas(map<int, Road>& Roads, vector<MovingCars> Cars, int timestep, vector<vector<int>> &nodesToID) {
 	std::clock_t start;

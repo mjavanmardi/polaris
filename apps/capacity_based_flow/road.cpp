@@ -251,14 +251,9 @@ void Road::addCarToQueue(Car C){
 	{
 		commonQueue.push_back(C);
 	}
-	else 
-	{							//Not last road of the car
+	else {							//Not last road of the car
 		bool q = false;
 		int queueID = selectIndividualQueue(C.nextNode(), q);
-		/*if(C.number()==8)
-		{
-			cout << "Car 8 is on road " << roadID << " and tries to reach indiv queue number " << queueID << endl; 
-		}*/
 		if(q)							//The car can go into some queue
 		{
 			queues[queueID].addCar(C);
