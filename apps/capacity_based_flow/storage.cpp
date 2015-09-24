@@ -71,22 +71,21 @@ int numberOfAllowedCars(map<int, Queue>::iterator queueIterator, int timestep, i
 //which is a structure that represents the cars which move at this step in the given queue
 MovingCars movingCars(bool& areCarsMoving, map<int, Road>::iterator roadIterator, map<int, Queue>::iterator queueIterator, int timestep, int time) {
 	int numberOfCars = numberOfAllowedCars(queueIterator, timestep, time);
-	vector<int> nextNodes;
+	vector<int> movingCarsIds(0);
 	if(numberOfCars >0) {
 		areCarsMoving = true;
 		for(vector<Car>::iterator carIter = queueIterator->second.getCarsBegin(); carIter != queueIterator->second.getCarsEnd();carIter++)  
 		{
 			int nextNode = -999;
 			if(carIter->existence() == true)
-				nextNode = carIter->nextNode();
-			nextNodes.push_back(nextNode); //We only need to store the node where the moving car is heading at
+				movingCarsIds.push_back(carIter->number()); //We only need to store the node where the moving car is heading at
 		}
 	}
 	int roadID = roadIterator->first;
 	int nodeA = roadIterator->second.nodeA();
 	int nodeB = roadIterator->second.nodeB();
 	int queueID = queueIterator->first;
-	MovingCars carsMovingInCurrentQueue(nodeA,nodeB,queueID,roadID,nextNodes);
+	MovingCars carsMovingInCurrentQueue(nodeA,nodeB,queueID,roadID,movingCarsIds);
 	return carsMovingInCurrentQueue;
 }
 
