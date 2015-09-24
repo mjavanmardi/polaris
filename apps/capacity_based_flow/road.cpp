@@ -77,11 +77,11 @@ double Road::getMaxIndivQueueLength() const{	// Length in meters
 	return max;
 }
 
-int Road::getMaxIndivQueueSize() {		// Size in number of cars
+int Road::getMaxIndivQueueSize() const {		// Size in number of cars
 	int max = 0;
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the one with the larger number of cars
-		if(it->second.getQueue().size() > max)
-			max = it->second.getQueue().size();
+	for(map<int, Queue>::const_iterator it = queues.begin() ; it != queues.end() ; it++) {	// Loop over the queues to find the one with the larger number of cars
+		if(it->second.getNumberOfCars() > max)
+			max = it->second.getNumberOfCars();
 	}
 	return max;
 }
@@ -94,7 +94,7 @@ double Road::getCommonQueueLength() const {
 	return commonQueueLength/(double)queues.size();			// The total length is divided by the number of queues = number of lanes on the road. The output is in meter;
 }
 
-double Road::getMaxCommonQueueLength() {return totalLength - getMaxIndivQueueLength();}
+double Road::getMaxCommonQueueLength() const {return totalLength - getMaxIndivQueueLength();}
 
 map<int, Queue> Road::indivQueues() {return queues;}
 
@@ -121,12 +121,19 @@ vector<Car>& Road::getTA() {return travelingArea;}
 vector<double> Road::getLengthOverTime() {return lengthOverTime;}
 
 //Gets the size of the size of the nth  individual queue
-double Road::getNthQueueSize(int n) const
+double Road::getNthQueueLength(int n) const
 {
 	map<int,Queue>::const_iterator it = queues.begin();
-	for(int j=0;j<n;j++)
+	while(it->first != n)
 		it++;
+	if(it == queues.end())
+		cout << "getNthQueueLength error : " << endl;
 	return it->second.length();
+}
+
+int Road::getNumberOfIndivQueues() const
+{
+	return queues.size();
 }
 
 
@@ -175,7 +182,8 @@ void Road::commonToIndividualQueue() {
 		*/
 		if (q) {
 			//cout << endl << " Queue ID : " << ID << " & queue size : " << queues[ID].getQueue().size();
-			queues[ID].getQueue().push_back(C);
+			//queues[ID].getQueue().push_back(C);
+			queues[ID].addCar(C);
 			//cout << " compared to new size : " << queues[ID].getQueue().size();
 			commonQueue.erase(commonQueue.begin()+iter);
 		}
@@ -209,7 +217,8 @@ void Road::iterQueuesProg(int timestep) {
 	lengthOverTime.push_back( getMaxIndivQueueLength() + getCommonQueueLength() );
 }
 
-double Road::distanceToTravelInTA(Car C) const {
+double Road::distanceToTravelInTA(Car C) const 
+{
 	double distance;
 	if(C.Node() != C.exitingNode()) {	// It is not the last road where the car is traveling on		
 		if(commonQueue.size() != 0)			// There are cars in the common queue
@@ -220,7 +229,7 @@ double Road::distanceToTravelInTA(Car C) const {
 			if(q)	// If q = true, it means that there is at least one lane that can host the car (Meaning having the turning movement the car is looking for and not being full)
 			{
 				//map<int,Queue> copyQueue = queues;
-				distance = totalLength - getNthQueueSize(queueID);
+				distance = totalLength - getNthQueueLength(queueID);
 				//copyQueue[queueID].length();
 			}
 			else	// If q = false, it means that there all the queues having the dedicated turning movement 
@@ -261,7 +270,8 @@ void Road::removeCarFromQueue(int queueID, int timestep) {
 	moveFakeCars(queueID, timestep);
 }
 
-void Road::addCarToTA(Car& C) {
+void Road::addCarToTA(Car& C) 
+{
 	C.iterPosition();
 	C.addSpeed(maximumSpeed);
 	travelingArea.push_back(C);

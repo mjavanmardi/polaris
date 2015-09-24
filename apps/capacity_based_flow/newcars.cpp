@@ -20,9 +20,8 @@ void addNewCars(vector<Car>& Cars, map<int, Road>& Roads, int t, int timestep, v
 				cout << endl << "There is a problem with the entering Road ; the queue ID shoudln't be 0";
 
 			// "if" to check it there is room left on the road : Max Length > Common Queue + (Cars in the Traveling Area/# of lanes)
-			if(Roads[roadID].getMaxCommonQueueLength() > Roads[roadID].getCommonQueueLength() + (Roads[roadID].getTA().size()/Roads[roadID].indivQueues().size())) 
+			if(Roads[roadID].getMaxCommonQueueLength() > Roads[roadID].getCommonQueueLength() + (Roads[roadID].getTA().size()/Roads[roadID].getNumberOfIndivQueues())) 
 			{
-
 				Roads[roadID].addCarToTA((*it));
 				toBeErased.push_back(carIndex);
 

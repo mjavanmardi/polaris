@@ -62,10 +62,10 @@ int Queue::ID() const
 double Queue::length() const
 {
 	double queueLength = 0;
-	for(int i = 0;i<cars.size();i++) 
+	for(vector<Car>::const_iterator carIterator = cars.begin();carIterator!=cars.end();carIterator++) 
 	{
-		Car curCar = cars[i];
-		queueLength += curCar.length() + distanceBetweenCars;
+		//Car curCar = cars[i];
+		queueLength += (*carIterator).length() + distanceBetweenCars;
 	}
 	return queueLength;
 }
@@ -84,7 +84,7 @@ vector<Car>::iterator Queue::getCarsEnd()
 	return cars.end();
 }
 
-int Queue::getNumberOfCars()
+int Queue::getNumberOfCars() const
 {
 	return cars.size();
 }
@@ -195,7 +195,7 @@ map<int,double> Queue::getRealCapacity(const int& time, bool &isRed, double &min
 	min = DBL_MAX;
 	isRed = false;
 	map<int,double> realCapacity;
-	for(map<int,double>::const_iterator it = greenTime.cbegin();it!=greenTime.cend();it++)
+	for(map<int,double>::const_iterator it = greenTime.begin();it!=greenTime.end();it++)
 	{
 		realCapacity[it->first] = 0;
 		//if ( (time-offset) modulo cycle < greentime ) then light is green

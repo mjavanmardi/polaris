@@ -50,7 +50,7 @@ void releaseCars(Road& R, map<int, Road>& Roads, vector<MovingCars> sampledCars,
 			}
 			else 
 			{																		// First Car is not fake
-				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength() + (R.getTA().size()/R.indivQueues().size())) // Check if there is room left
+				if(R.getMaxCommonQueueLength() > R.getCommonQueueLength() + (R.getTA().size()/R.getNumberOfIndivQueues())) // Check if there is room left
 				{
 					Car movingCar = Roads[roadID].getQueue(queueID).getQueue()[0];				// Get the first car of the previous road at the right queue
 					R.addCarToTA(movingCar);													// Add the car to the next Traveling Area

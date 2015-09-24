@@ -24,9 +24,9 @@ public:
 	int nodeB() const;								// Get the exiting node of the road
 	double speedMax() const;								// Get the maixmum speed of the road
 	double getMaxIndivQueueLength() const;				// Get the maximum  queue length among all the individual queues
-	int getMaxIndivQueueSize();						// Get the maximum number of cars among all the individual queues
+	int getMaxIndivQueueSize() const;						// Get the maximum number of cars among all the individual queues
 	double getCommonQueueLength() const;					// Get the common queue length
-	double getMaxCommonQueueLength();				// Get the maximum common queue length
+	double getMaxCommonQueueLength() const;				// Get the maximum common queue length
 	std::map<int, Queue> indivQueues();				// Get the individual queues
 	std::map<int, Queue>::iterator IndivQueuesBegin();
 	std::map<int, Queue>::iterator IndivQueuesEnd();
@@ -35,7 +35,8 @@ public:
 	std::vector<Car> getCommonQueue();				// Get the cars being in the common queue
 	std::vector<Car>& getTA();						// Get the cars being in the traveling area
 	std::vector<double> getLengthOverTime();		// Get the length of the maximum queue in the road
-	double getNthQueueSize(int n) const;
+	double getNthQueueLength(int n) const;			// Get the length of the nth individual queue
+	int getNumberOfIndivQueues() const;				// Get the number of individual queues
 
 	//### Dynamic Methods ###
 	int selectIndividualQueue(int nextNode, bool& q) const;	// Select the queue where the car is going to go if its heading to nextNode ; q explicit if such a queue exist

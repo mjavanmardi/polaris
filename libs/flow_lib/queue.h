@@ -21,7 +21,7 @@ public:
 	std::vector<Car>& getQueue();
 	std::vector<Car>::iterator getCarsBegin();
 	std::vector<Car>::iterator getCarsEnd();
-	int getNumberOfCars();
+	int getNumberOfCars() const;
 	int getNextNode(int i) const;
 	int getNextNodeSize() const;
 
