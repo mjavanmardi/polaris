@@ -13,7 +13,7 @@
 using namespace std;
 
 const int timestep = 1;
-//const int modelisationTime = 178 * timestep;
+//const int modelisationTime = 1500 * timestep;
 const int modelisationTime = 15000 * timestep;
 char *db_path = "C:\\Users\\planglois\\Documents\\Polaris_network\\network";
 

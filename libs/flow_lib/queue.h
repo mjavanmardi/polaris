@@ -30,6 +30,7 @@ public:
 	void iterCarsProg();
 	void addCar(Car C);
 	void removeCar();
+	Car getCar(int carID, int timeStep);
 	void moveFakeCars(int timestep);
 	std::map<int,double> getRealCapacity(const int& time, bool &isRed, double &min);
 

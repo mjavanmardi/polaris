@@ -46,6 +46,7 @@ public:
 	
 	void addCarToQueue(Car C);							// Release the car C from the traveling area into the queue (Either one individual queue or either the common queue when the indivudual ones are full)
 	void removeCarFromQueue(int queueID, int timestep); // Remove the first car of the queue having the id=ID. The parameters "timestep" deals with the fake cars
+	Car removeCarFromQueue(int queueID,int carID, int timestep);
 	void addCarToTA(Car& C);							// Release the car C into the traveling area ; it means it just enters the road
 	void removeCarsFromTA(std::vector<int> carNumbers); // Remove the cars from the Traveling Area ; it means it just entered a queue
 

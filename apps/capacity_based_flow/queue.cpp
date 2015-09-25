@@ -156,6 +156,25 @@ void Queue::removeCar() {
 	cars[0] = fakeCar;
 }
 
+Car Queue::getCar(int carID, int timeStep)
+{
+	Car a;
+	for(vector<Car>::iterator it =cars.begin();it!=cars.end();it++)
+	{
+		if(it->number()==carID)
+		{
+			//if(it - cars.begin())
+				//cout << "Not first car deleted. Reel first car : " << cars.begin()->number() << endl;
+			a = (*it);
+			cars.erase(it);
+			moveFakeCars(timeStep);
+			return a;
+		}
+	}
+	cout << "Error : car " << carID << " not found in queue " << queueID << endl;
+	return a;
+}
+
 void Queue::moveFakeCars(int timestep) {
 	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
 		if(it->existence() == false && it != cars.end() - 1) {		// The car is fake but not the last one

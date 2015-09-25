@@ -164,7 +164,7 @@ void Road::commonToIndividualQueue() {
 		Car C = commonQueue[0+iter];
 		bool q = false;
 		int ID = selectIndividualQueue(C.nextNode(), q);
-		if(C.number()==8)
+		/*if(C.number()==8)
 		{
 			cout << roadID << " " << C.nextNode() << endl;
 			for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++)
@@ -175,7 +175,7 @@ void Road::commonToIndividualQueue() {
 				}
 			}
 			while(true){}
-		}
+		}*/
 		/*int ID =-99;
 		if(C.existence() == true)
 			ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
@@ -268,6 +268,11 @@ void Road::addCarToQueue(Car C){
 void Road::removeCarFromQueue(int queueID, int timestep) {
 	queues[queueID].removeCar();
 	moveFakeCars(queueID, timestep);
+}
+
+Car Road::removeCarFromQueue(int queueID,int carID, int timestep)
+{
+	 return queues[queueID].getCar(carID, timestep);
 }
 
 void Road::addCarToTA(Car& C) 

@@ -5,16 +5,15 @@
 #include <tuple>
 #include <algorithm>
 
-std::vector<MovingCars> selectCars(int j, int k, std::vector<MovingCars> Cars);
+struct ComingCar
+{
+	int carID;
+	int formerRoadID;
+	int formerQueueID;
+};
 
-void sampleCars(std::vector<std::tuple<int,int,int>>& selectedCars, std::vector<std::vector<int>>& storedCars);
+std::map<int,std::vector<ComingCar>> sortCars(std::vector<MovingCars> cars, const std::vector<std::vector<int>> &nodesToID);
 
-void releaseCars(Road& R, std::map<int, Road>& Roads, std::vector<MovingCars> sampledCars, std::vector<MovingCars>& stuckCars, std::vector<MovingCars>& movingCars, int timestep, std::vector<std::vector<int>> &nodesToID);
+bool tryToMoveFirstCar(std::map<int,ComingCar>::iterator roadIterator, std::map<int, Road>& Roads, int timeStep);
 
-void deleteStuckCars(MovingCars& car, std::vector<std::pair<int,int>> stuckCars, bool& stuck);
-
-void deleteMovingCars(MovingCars& car, std::vector<std::pair<int,int>> movingCars, bool& moving);
-
-void deleteCars(std::vector<MovingCars>& Cars, std::vector<MovingCars> movingCars, std::vector<MovingCars> stuckCars, int nodej); 
-
-void queuesToTravelingAreas(std::map<int, Road>& Roads, std::vector<MovingCars> Cars, int timestep, std::vector<std::vector<int>> &nodesToID);
+void queuesToTravelingAreas(std::map<int, Road>& Roads, std::vector<MovingCars> cars, int timestep, std::vector<std::vector<int>> &nodesToID);
