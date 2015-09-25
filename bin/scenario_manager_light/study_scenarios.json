@@ -1,0 +1,13 @@
+{
+    "initial_scenairo_id": 10,
+    "scnarios": [
+        {
+            "capacity_adjustment_highway": 1.2,
+            "capacity_adjustment_arterial": 1
+        },
+        {
+            "capacity_adjustment_highway": 1.3,
+            "capacity_adjustment_arterial": 1
+        }
+    ]
+}
