@@ -1,45 +1,54 @@
 import json
 import sys
 import os
-
-if len(sys.argv) < 4:
-	print "Usage: %s master_scenario_file study_parameters_file output_path"%sys.argv[0]
+import shutil
+if len(sys.argv) < 3:
+	print "Usage: %s master_scenario_file study_parameters_file  [out_folder]"%sys.argv[0]
 	sys.exit()
 	
 master_scenario_file  = sys.argv[1]
 study_parameters_file = sys.argv[2]
-output_path           = sys.argv[3]
-m_doc = json.load(open(master_scenario_file))
+
+
+if len(sys.argv) > 3:
+	out_folder           = sys.argv[3]
+else:	
+	out_folder = '.'
+
+if not os.path.exists(out_folder):
+	os.makedirs(out_folder)
+
+if not os.path.exists(out_folder):
+	os.makedirs(out_folder)	
+print study_parameters_file
 s_doc = json.load(open(study_parameters_file))
 
-scenario_id = s_doc['initial_scenairo_id']
+bath_id= study_parameters_file.split('.')[0]
+
+study_folder  = out_folder + '/' + bath_id
+if not os.path.exists(study_folder):
+	os.makedirs(study_folder)	
+
+polaris_exe = s_doc['polaris_exe']
+polaris_exe_basename = os.path.basename(polaris_exe)
+bin_folder = study_folder + '/bin'
+if not os.path.exists(bin_folder):
+	os.makedirs(bin_folder)	
+shutil.copy(polaris_exe, bin_folder)
+batch_fh = open(study_folder + '/run.bat','w')
+scenario_id = 1
 for scenario in s_doc['scnarios']:
+	print scenario_id
+	m_doc = json.load(open(master_scenario_file))
 	for parmeter_key in scenario:
-		# print m_doc
 		m_doc[parmeter_key] = scenario[parmeter_key]
-	out_folder = output_path + '/' + str(scenario_id)
-	if not os.path.exists(out_folder):
-		os.makedirs(out_folder)		
-	# print json.dumps(m_doc, sort_keys=True, indent=4, separators=(',',': '))
-	m_doc['output_dir_name'] = out_folder
+	m_doc['output_dir_name'] = bath_id+'_'+str(scenario_id)
 	m_doc['master_scenario_file'] = master_scenario_file
-	scenario_id += 1 
-	# print json.dumps(m_doc, sort_keys=True, indent=4, separators=(',',': '))
-	with open(out_folder + '/scenario.json','w') as fh:
-		# print m_doc['output_dir_name'] + '/scenario.json'
-		# print m_doc
+	scenario_file_name = 'scenario_'+str(scenario_id)+'.json'
+	with open(study_folder + '/' +  scenario_file_name,'w') as fh:
 		fh.write(json.dumps(m_doc, sort_keys=True, indent=4, separators=(',',': ')))
-		
-		
-		
-# d = {}
-# d['initial_scenairo_id'] = 10
-# d['scnarios'] = []
-
-# d['scnarios'].append({'a':10, 'b':20})
-# d['scnarios'].append({'a':15, 'b':25})
-
-# json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
+	batch_fh.write(".\\bin\\%s %s 16\n"%(polaris_exe_basename, scenario_file_name))
+	scenario_id+=1	
 	
 	
 		

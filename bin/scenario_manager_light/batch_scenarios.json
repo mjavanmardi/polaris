@@ -1,5 +1,5 @@
 {
-    "initial_scenairo_id": 10,
+	"polaris_exe": "C:/Users/vsokolov/Documents/GitHub/polaris/build/bin/Debug/Integrated_Model.exe",
     "scnarios": [
         {
             "capacity_adjustment_highway": 1.2,
