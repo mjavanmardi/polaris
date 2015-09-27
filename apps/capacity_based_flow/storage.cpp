@@ -75,15 +75,20 @@ MovingCars movingCars(bool& areCarsMoving, map<int, Road>::iterator roadIterator
 	vector<int> carIds;
 	if(numberOfCars >0) {
 		areCarsMoving = true;
-		for(vector<Car>::iterator carIter = queueIterator->second.getCarsBegin(); carIter != queueIterator->second.getCarsEnd();carIter++)  
+		for(vector<Car>::iterator carIter = queueIterator->second.getCarsBegin(); carIter != queueIterator->second.getCarsEnd() && numberOfCars > 0;carIter++)  
 		{
 			int nextNode = -999;
 			if(carIter->existence() == true)
+			{
 				nextNode = carIter->nextNode();
+				numberOfCars--;
+			}
 			nextNodes.push_back(nextNode); //We only need to store the node where the moving car is heading at
 			carIds.push_back(carIter->number());
 		}
 	}
+	//Now that we have the identity of the moving cars in current queue
+	//We make a corresponding MovingCars object which will be used by the totravarea.cpp file
 	int roadID = roadIterator->first;
 	int nodeA = roadIterator->second.nodeA();
 	int nodeB = roadIterator->second.nodeB();
@@ -103,7 +108,7 @@ vector<MovingCars> preProcess(map<int, Road>& Roads, int timestep, int time) {
 		//### Write cars progression & Write queues length & Moving Fake Cars (In the individual queues && in the common queue)
 		it->second.iterQueuesProg(timestep);
 		
-		//### Store cars that can exit the system based on the capacity
+		//### Store cars that can exit theirs queues based on the capacity
 		for(map<int, Queue>::iterator it2 =  it->second.IndivQueuesBegin() ; it2 !=  it->second.IndivQueuesEnd() ; it2++) {
 			if(it2->second.getQueue().size() != 0) {
 				bool areCarsMoving = false;

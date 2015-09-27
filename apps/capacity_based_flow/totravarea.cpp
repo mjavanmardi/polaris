@@ -44,7 +44,7 @@ bool tryToMoveFirstCar(map<int,vector<ComingCar>>::iterator roadIterator, map<in
 	else if(maxLengthLeft > queueLengthAfterCarHasEntered) //If there is room left the car enters the road
 	{
 		isMoving = true; //There is at least one car which is moving at this step
-		Car currentCar = Roads[formerRoadID].removeCarFromQueue(formerQueueID,carID,timeStep); //We remove the car from its former queue
+		Car& currentCar = Roads[formerRoadID].removeCarFromQueue(formerQueueID,carID,timeStep); //We remove the car from its former queue
 		Roads[currentRoadID].addCarToTA(currentCar); //We add it to its new queue
 		roadIterator->second.erase(roadIterator->second.begin()); //We remove the ComingCar information corresponding to the current car
 	}

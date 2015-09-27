@@ -282,8 +282,12 @@ void Road::addCarToTA(Car& C)
 	travelingArea.push_back(C);
 }
 
-void Road::removeCarsFromTA(std::vector<int> carNumbers) {
-	while(carNumbers.size() != 0) {
+//This function removes the car carNumbers in the trafic area
+//It can be optimized with hash tables (TODO)
+void Road::removeCarsFromTA(std::vector<int> carNumbers) 
+{
+	while(carNumbers.size() != 0) 
+	{
 		vector<Car> newTA;
 		for(vector<Car>::iterator it = travelingArea.begin() ; it != travelingArea.end() ; it++) {
 			if(it->number() != carNumbers[0])
