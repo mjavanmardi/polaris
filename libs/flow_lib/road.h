@@ -48,7 +48,7 @@ public:
 	void removeCarFromQueue(int queueID, int timestep); // Remove the first car of the queue having the id=ID. The parameters "timestep" deals with the fake cars
 	Car removeCarFromQueue(int queueID,int carID, int timestep);
 	void addCarToTA(Car& C);							// Release the car C into the traveling area ; it means it just enters the road
-	void removeCarsFromTA(std::vector<int> carNumbers); // Remove the cars from the Traveling Area ; it means it just entered a queue
+	void removeCarsFromTA(std::vector<int> &carNumbers) ; // Remove the cars from the Traveling Area ; it means it just entered a queue
 
 	void moveFakeCars(int ID, int timestep);			// This method deals with the fake cars added in the system to model/simulate the reaction duration of real car when the one ahead moved.
 

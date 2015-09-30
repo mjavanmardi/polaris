@@ -157,34 +157,17 @@ int Road::selectIndividualQueue(int nextNode, bool& q) const{
 
 void Road::commonToIndividualQueue() {
 	int iter = 0;		// Iterator which stops when it gets to the second layer of cars in the common queue
+	//### !! *Pierre-Alain* I am not sure that it is relevant to release only the first layer !! ###
 	while(commonQueue.size() != 0) {
 		if(iter == queues.size() || iter == commonQueue.size() )	// If the first layer has already been screened (iter == queues.size() ) or it got to the end (commonQueue.size()), the loop is broken/stopped
 			break;
 
 		Car C = commonQueue[0+iter];
-		bool q = false;
-		int ID = selectIndividualQueue(C.nextNode(), q);
-		/*if(C.number()==8)
+		bool validQueueSelected = false;
+		int ID = selectIndividualQueue(C.nextNode(), validQueueSelected); //selecting the queue where the car is going to
+		if (validQueueSelected) 
 		{
-			cout << roadID << " " << C.nextNode() << endl;
-			for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++)
-			{
-				for(int i=0;i<it->second.getNextNodeSize();i++)
-				{
-					cout << "RoadID : " << roadID << " QueueID : " << it->second.ID() << " Next possible node : " << it->second.getNextNode(i) << endl;
-				}
-			}
-			while(true){}
-		}*/
-		/*int ID =-99;
-		if(C.existence() == true)
-			ID = selectIndividualQueue(C.nextNode(), q);		// Returns  q = false if at least one queue having a turn on C.nextNode() is empty
-		*/
-		if (q) {
-			//cout << endl << " Queue ID : " << ID << " & queue size : " << queues[ID].getQueue().size();
-			//queues[ID].getQueue().push_back(C);
 			queues[ID].addCar(C);
-			//cout << " compared to new size : " << queues[ID].getQueue().size();
 			commonQueue.erase(commonQueue.begin()+iter);
 		}
 		else
@@ -192,21 +175,24 @@ void Road::commonToIndividualQueue() {
 	}
 }
 
+//### updates the progression of cars in the queues for the current iteration ###
 void Road::iterQueuesProg(int timestep) {
 	
 	//### Move Fake Cars in the individual Queues  &&  Iterate Queues length & Cars progression ###
-	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
+	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) 
+	{
 		moveFakeCars(it->first, timestep);
 		it->second.iterCarsProg();		// Iterate Queues length & Cars progression
-
 	}
 
 
 	//### Iterate cars progression in the Common Queue ###
 	int numberOfCars = getMaxIndivQueueSize();
 	int iter = 0;
-	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it++) {
-		if(it->existence()) {
+	for(vector<Car>::iterator it = commonQueue.begin() ; it != commonQueue.end() ; it++) 
+	{
+		if(it->existence()) 
+		{
 			double div = (double) iter / (double) queues.size();
 			it->iterProg(numberOfCars + (int)floor(div) );
 			iter += 1;
@@ -217,6 +203,8 @@ void Road::iterQueuesProg(int timestep) {
 	lengthOverTime.push_back( getMaxIndivQueueLength() + getCommonQueueLength() );
 }
 
+//Returns the distance the car C still have to go through in the traveling area
+//(Assumes the car is in the traveling area)
 double Road::distanceToTravelInTA(Car C) const 
 {
 	double distance;
@@ -242,7 +230,8 @@ double Road::distanceToTravelInTA(Car C) const
 	return distance;
 }
 
-void Road::addCarToQueue(Car C){
+void Road::addCarToQueue(Car C)
+{
 	if(C.Node() == C.exitingNode())	//Last Road of the car
 	{
 		lastQueue.push_back(C);
@@ -251,7 +240,8 @@ void Road::addCarToQueue(Car C){
 	{
 		commonQueue.push_back(C);
 	}
-	else {							//Not last road of the car
+	else 
+	{							//Not last road of the car
 		bool q = false;
 		int queueID = selectIndividualQueue(C.nextNode(), q);
 		if(q)							//The car can go into some queue
@@ -283,8 +273,9 @@ void Road::addCarToTA(Car& C)
 }
 
 //This function removes the car carNumbers in the trafic area
+//It is the following set difference : travelingArea \ carNumbers
 //It can be optimized with hash tables (TODO)
-void Road::removeCarsFromTA(std::vector<int> carNumbers) 
+void Road::removeCarsFromTA(std::vector<int> &carNumbers) 
 {
 	while(carNumbers.size() != 0) 
 	{
