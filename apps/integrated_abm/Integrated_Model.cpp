@@ -518,12 +518,12 @@ int main(int argc,char** argv)
 	}
 
 	//==================================================================================================================================
-	// Destination choice model - set parameters
+	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize start time model
-	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data_new.txt");	
+	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
 	// Initialize person properties with average activity frequency and duration
 	MasterType::person_properties_type::Static_Initializer();
 

@@ -45,6 +45,10 @@ namespace Scenario_Components
 
 			accessor(path_calculation_interval_length, NONE, NONE);
 
+			// capacity adjustments by facility type
+			accessor(capacity_adjustment_highway, NONE, NONE);
+			accessor(capacity_adjustment_arterial, NONE, NONE);
+
 
 			accessor(current_day_index, NONE, NONE);
 			
@@ -129,6 +133,7 @@ namespace Scenario_Components
 			accessor(do_planner_routing, NONE, NONE);
 			accessor(write_demand_to_database, NONE, NONE);
 			accessor(read_demand_from_database, NONE, NONE);
+			accessor(activity_start_time_model_file_name,NONE,NONE);
 
 			//===============================================
 			// Popsyn parameters
@@ -404,6 +409,8 @@ namespace Scenario_Components
 				string popsyn_control_string;
 				if (cfgReader.getParameter("popsyn_control_file", this->template popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->template popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
 
+				// Start time model parameters
+				if (cfgReader.getParameter("activity_start_time_model_file_name", this->template activity_start_time_model_file_name<string*>()) != PARAMETER_FOUND) this->template activity_start_time_model_file_name<string>((string)"start_time_duration_data_new.txt");
 
 
 				if (cfgReader.getParameter("write_visualizer_snapshot", this->template write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->template write_visualizer_snapshot<bool>(false);
@@ -475,6 +482,10 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
+				// read capacity adjustments 
+				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
+				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
+
 				//===============================================
 				// Vehicle trajectory tracking parameters
 				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);

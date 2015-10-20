@@ -557,7 +557,7 @@ namespace Operation_Components
 
 								if(out_link==nullptr)
 								{
-									THROW_EXCEPTION("ERROR: outbound link '"<<link_id_dir.id<<" for phase movement was not found in network. Check link type, signal table, etc. for errors.");
+									THROW_EXCEPTION("ERROR: outbound link '"<<link_id_dir.id<<" for movement from phasing table was not found in network. Check link type, signal table, etc. for errors.");
 								}					
 
 

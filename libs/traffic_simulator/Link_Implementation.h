@@ -357,7 +357,18 @@ namespace Link_Components
 				_link_supply = max(0.0,(double)link_available_spaces);
 
 				float current_link_capacity = 0.0;
-				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0);
+				float capacity_adjustment = 1.0;
+
+				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
+				{
+					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
+				}
+				else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)
+				{
+					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_arterial<double>();
+				}
+
+				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment;
 
 				_link_capacity = current_link_capacity;
 			}

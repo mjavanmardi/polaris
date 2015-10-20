@@ -46,6 +46,8 @@ namespace Scenario_Components
 
 			m_data(int, current_day_index, NONE, NONE);
 
+			m_data(double, capacity_adjustment_highway,NONE,NONE);
+			m_data(double, capacity_adjustment_arterial,NONE,NONE);
 
 			m_data(string, input_dir_name, NONE, NONE);
 			m_data(string, output_dir_name, NONE, NONE);
@@ -114,6 +116,8 @@ namespace Scenario_Components
 			m_data(bool, time_dependent_routing, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_shape, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_scale, NONE, NONE);
+
+			m_data(string, activity_start_time_model_file_name, NONE, NONE);
 
 			m_data(double, percent_to_synthesize, NONE, NONE);
 			m_data(double, ipf_tolerance, NONE, NONE);
