@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
 	typedef Agent<MasterType::other_agent_type> other_agent_itf;
 	
 	// Create agents and initialize them
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		agent_itf* base_agent = (agent_itf*)Allocate<MasterType::agent_type>();
 		base_agent->Initialize<int>(i);
