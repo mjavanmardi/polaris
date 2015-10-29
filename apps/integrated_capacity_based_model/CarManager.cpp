@@ -50,3 +50,16 @@ void CarManager::addCarsToRoadNetWork(RoadNetwork* rn)
 		rn->insertCarInNetwork(*it);
 	}
 }
+
+vector<Car*>* CarManager::getCars()
+{
+	return (&cars);
+}
+
+void CarManager::speak()
+{
+	for(vector<Car*>::iterator it = cars.begin();it != cars.end();it++)
+	{
+		(*it)->speak();
+	}
+}

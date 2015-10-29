@@ -20,7 +20,7 @@ public:
 	void addCar(Car* car); //add a car to the TA with logarithmic complexity
 	void removeCar(multiset<Car*,distInTAComp>::iterator car); //remove a car from the TA with a logarithmic complexity
 	double getMinLength() const; // returns the minimum length of the traveling car so that the cars do not touch each other
-	bool moveCars(); // returns true if any car has moved
+	bool moveCars(double dt); // returns true if any car has moved
 	void speak() const;
 private:
 	const int numberOfLanes;

@@ -30,7 +30,7 @@ double TravelingArea::getMinLength() const
 	return (totalLength/double(numberOfLanes));
 }
 
-bool TravelingArea::moveCars()
+bool TravelingArea::moveCars(double dt)
 {
 	bool hasMoved = false;
 	//The set structure allows to move first the cars which are located at the end
@@ -38,7 +38,7 @@ bool TravelingArea::moveCars()
 	multiset<Car*,distInTAComp>::iterator carIt = begin();
 	while(carIt != end())
 	{
-		MoveResult result = (*carIt)->move();
+		MoveResult result = (*carIt)->travelingAreaMove(dt);
 		hasMoved = hasMoved || result.getHasMoved();
 		if(result.getHasChangedState()) //If a car has moved to a queue, we erase it
 		{

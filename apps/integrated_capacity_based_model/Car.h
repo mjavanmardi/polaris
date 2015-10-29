@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cmath>
 #include "CarType.h"
 #include "Road.h"
 
@@ -24,18 +25,24 @@ class Car
 {
 public:
 	Car(int _id, CarType _type, std::vector<int> _path, double _enteringTime);
-	MoveResult move(); //Moves the car during current time step.
+	//MoveResult move(double dt); //Moves the car during current time step.
 	void writeOutput(); //Todo : choose a format for the output
 
 	//### Moving procedures ###
 	//Here we declare all the procedure to move the car depending on the car state
-	MoveResult tryToEnterRoad();
-	MoveResult travelingAreaMove();
+	MoveResult tryToEnterRoad(Road* road);
+	MoveResult travelingAreaMove(double dt);
 	MoveResult travelingCommonQueue();
 
 	void addDistanceTraveled(double distance);
 	void postponeEnteringTime(double time);
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step
+
+	//### Dynamic model ###
+
+	void updateSpeedAndDistance(double dt, double alpha);
+	double computeAlpha(double dt, double distToStop);
+	double dBraking(double dt, double acceleration);
 
 	//### getters ###
 
@@ -45,6 +52,8 @@ public:
 	int getEntryNode() const;
 	int getNextNode() const;
 	double getEnteringTime() const;
+
+	void speak();
 
 private:
 	CarState state; //Main state variable

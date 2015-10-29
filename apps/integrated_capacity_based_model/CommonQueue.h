@@ -14,6 +14,7 @@ public:
 	bool moveCars();
 	void speak();
 	double getLength() const;
+	int getSize() const;
 private:
 	double length;
 	const double distanceBetweenCars;

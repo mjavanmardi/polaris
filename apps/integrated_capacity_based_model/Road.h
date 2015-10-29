@@ -7,6 +7,8 @@
 #include "JunctionArea.h"
 #include "Intersection.h"
 
+typedef const std::vector< std::vector <Road*> >* MatPointer;
+
 class TravelingArea;
 class CommonQueue;
 class JunctionArea;
@@ -16,16 +18,28 @@ class Road
 {
 public:
 	Road(int _id, TravelingArea* _travArea, CommonQueue* _comQueue, JunctionArea* _juncArea, 
-		Intersection* _intersectionA, Intersection* _intersectionB, double _length);
+		Intersection* _intersectionA, Intersection* _intersectionB, double _length, double _maxSpeed, 
+		MatPointer _nodesToRoad);
 	~Road();
+
+	//### Static methods ###
 	TravelingArea* getTA() const;
 	CommonQueue* getCQ() const;
 	JunctionArea* getJA() const;
 	int getId() const;
+	int getNodeA() const;
+	int getNodeB() const;
 	void speak() const;
+	double getLength() const;
+	double getMaxSpeed() const;
+	MatPointer getNodesToRoad() const;
+	Intersection* getIntersectionA() const;
 
 	//### Dynamic methods ###
 	double getRoomLeftInTravelingArea();
+
+	bool moveCarsInCQandTA(double dt); //Move cars in commonQueue and TravelingArea
+	bool moveCarsInJA(); //Move cars in JunctionArea
 
 private:
 	const int id;
@@ -35,4 +49,8 @@ private:
 	JunctionArea* juncArea;
 	Intersection* intersectionA;
 	Intersection* intersectionB;
+	const int nodeA;
+	const int nodeB;
+	const double maxSpeed;
+	MatPointer nodesToRoad;
 };

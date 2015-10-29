@@ -20,37 +20,52 @@ void Intersection::addOutgoingRoad(Road* newRoad)
 	outgoingRoads.push_back(newRoad);
 }
 
-Event Intersection::runEvent(Event ev, double time, double dt)
+vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 {
-	Event eventToReschedule(nullEvent,NULL,NULL); //sample
+	vector<Event> eventsToReschedule(0); 
 	EventType type = ev.getType();
 	switch(type)
 	{
 		case enteringRoad:
 		 {
 			 Road* road = ev.getRoad();
-			 //TODO : add function to execute in road
+			 bool hasMoved = road->moveCarsInJA();
+			 if(hasMoved)
+			 {
+				 Intersection* previousIntersection = road->getIntersectionA();
+				 eventsToReschedule.push_back(Event(outgoingRoad,road,previousIntersection));
+			 }
 			 break;
 		 }
 		case outgoingRoad:
 		 {
 			 Road* road = ev.getRoad();
-			 //TODO : add function to execute in road
+			 bool hasMoved = road->moveCarsInCQandTA(dt);
+			 if(hasMoved) //if at least one car has moved
+			 {
+				 //Rescheduling the entrance of the car that enter the network
+				 eventsToReschedule.push_back(Event(enteringNetwork,NULL,this));
+				 //Rescheduling entry of cars from the road entering the intersection
+				 for(vector<Road*>::iterator it = enteringRoads.begin();it != enteringRoads.end();it++)
+				 {
+					 eventsToReschedule.push_back(Event(enteringRoad,*it,this));
+				 }
+			 }
 			 break;
 		 }
 		case enteringNetwork:
 		 {
 			 EnterCarIt it = enteringCars.begin();
-			 while(it != enteringCars.end())
+			 while(it != enteringCars.end()) //We go through every entering car
 			 {
 				 EnterCarIt it2 = next(it);
 				 Car* currentCar = it->first;
 				 Road* targetRoad = it->second;
-				 if(currentCar->getEnteringTime() <= time)
+				 if(currentCar->getEnteringTime() <= time) //If it is time for the current car to enter the network
 				 {
-					 if(targetRoad->getRoomLeftInTravelingArea() >= currentCar->getLength())
+					 if(targetRoad->getRoomLeftInTravelingArea() >= currentCar->getLength()) //If there is room for the car
 					 {
-						 MoveResult result = currentCar->move(); //Run the moving function in the car
+						 MoveResult result = currentCar->tryToEnterRoad(targetRoad); //Run the moving function in the car
 						 targetRoad->getTA()->addCar(currentCar); //Add the car to the new traveling area
 						 enteringCars.erase(it); //erasing the car
 						 it = it2; //updating the iterator
@@ -67,10 +82,10 @@ Event Intersection::runEvent(Event ev, double time, double dt)
 			 break;
 		 }
 	}
-	return eventToReschedule;
+	return eventsToReschedule;
 }
 
-std::vector<Event>& Intersection::getPossibleEvents()
+std::vector<Event> Intersection::getPossibleEvents()
 {
 	vector<Event> possibleEvents;
 	//Vehicle entering the network insertion

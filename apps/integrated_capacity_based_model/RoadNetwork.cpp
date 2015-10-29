@@ -2,6 +2,9 @@
 
 using namespace std;
 
+typedef vector<Intersection*>::iterator interIt;
+typedef vector<Road*>::iterator roadIt;
+
 RoadNetwork::RoadNetwork()
 {
 	// ### TEST NETWORK ### //
@@ -9,7 +12,7 @@ RoadNetwork::RoadNetwork()
 	// ### Building TravelingAreas ###
 	TravelingArea* ta0 = new TravelingArea(2);
 	TravelingArea* ta1 = new TravelingArea(1);
-	TravelingArea* ta2 = new TravelingArea(3);
+	TravelingArea* ta2 = new TravelingArea(2);
 	TravelingArea* ta3 = new TravelingArea(1);
 	TravelingArea* ta4 = new TravelingArea(2);
 	TravelingArea* ta5 = new TravelingArea(1);
@@ -18,7 +21,7 @@ RoadNetwork::RoadNetwork()
 	// ### Building CommonQueue ###
 	CommonQueue* cq0 = new CommonQueue(0.1,2);
 	CommonQueue* cq1 = new CommonQueue(0.1,1);
-	CommonQueue* cq2 = new CommonQueue(0.1,3);
+	CommonQueue* cq2 = new CommonQueue(0.1,2);
 	CommonQueue* cq3 = new CommonQueue(0.1,1);
 	CommonQueue* cq4 = new CommonQueue(0.1,2);
 	CommonQueue* cq5 = new CommonQueue(0.1,1);
@@ -115,24 +118,18 @@ RoadNetwork::RoadNetwork()
 	intersections.push_back(i3);
 
 	//### Building the roads ###
-	Road* r0 = new Road(0,ta0,cq0,ja0,i1,i0,100.);
-	Road* r1 = new Road(1,ta1,cq1,ja1,i0,i1,100.);
-	Road* r2 = new Road(2,ta2,cq2,ja2,i2,i0,100.);
-	Road* r3 = new Road(3,ta3,cq3,ja3,i0,i2,100.);
-	Road* r4 = new Road(4,ta4,cq4,ja4,i3,i0,100.);
-	Road* r5 = new Road(5,ta5,cq5,ja5,i0,i3,100.);
+	Road* r0 = new Road(0,ta0,cq0,ja0,i1,i0,100.,13.9,&nodesToRoad);
+	Road* r1 = new Road(1,ta1,cq1,ja1,i0,i1,100.,13.9,&nodesToRoad);
+	Road* r2 = new Road(2,ta2,cq2,ja2,i2,i0,100.,13.9,&nodesToRoad);
+	Road* r3 = new Road(3,ta3,cq3,ja3,i0,i2,100.,13.9,&nodesToRoad);
+	Road* r4 = new Road(4,ta4,cq4,ja4,i3,i0,100.,13.9,&nodesToRoad);
+	Road* r5 = new Road(5,ta5,cq5,ja5,i0,i3,100.,13.9,&nodesToRoad);
 	network.push_back(r0);
 	network.push_back(r1);
 	network.push_back(r2);
 	network.push_back(r3);
 	network.push_back(r4);
 	network.push_back(r5);
-	idToRoad[0] = r0;
-	idToRoad[1] = r1;
-	idToRoad[2] = r2;
-	idToRoad[3] = r3;
-	idToRoad[4] = r4;
-	idToRoad[5] = r5;
 
 	//### Building the links ###
 
@@ -148,6 +145,11 @@ RoadNetwork::RoadNetwork()
 	i3->addOutgoingRoad(r4);
 	i0->addOutgoingRoad(r5);
 	i3->addEnteringRoad(r5);
+
+	//### END OF TEST NETWORK ###
+
+	//### Building the nodesToRoad matrix ###
+	setupNodesToRoad();
 }
 
 RoadNetwork::~RoadNetwork()
@@ -158,12 +160,29 @@ RoadNetwork::~RoadNetwork()
 		delete intersections[j];
 }
 
+void RoadNetwork::setupNodesToRoad()
+{
+	int maxRoadIndex = -1;
+	for(interIt it = intersections.begin(); it != intersections.end();it++)
+	{
+		if ((*it)->getId() > maxRoadIndex)
+			maxRoadIndex = (*it)->getId();
+	}
+	nodesToRoad = vector < vector <Road*> >(maxRoadIndex+1,vector<Road*>(maxRoadIndex+1,NULL));
+	for(roadIt it = network.begin(); it != network.end();it++)
+	{
+		nodesToRoad[(*it)->getNodeA()][(*it)->getNodeB()] = (*it);
+	}
+
+}
+
 void RoadNetwork::roadSpeak()
 {
 	for(int i=0;i<network.size();i++)
 	{
 		network[i]->speak();
 	}
+	cout << endl << endl;
 }
 
 void RoadNetwork::intersectionSpeak()
@@ -172,6 +191,7 @@ void RoadNetwork::intersectionSpeak()
 	{
 		intersections[i]->speak();
 	}
+	cout << endl << endl;
 }
 
 void RoadNetwork::insertCarInNetwork(Car* car)
@@ -180,19 +200,10 @@ void RoadNetwork::insertCarInNetwork(Car* car)
 	{
 		if((*it)->getId()==car->getEntryNode())
 		{
-			Road* enteringRoad =getRoad(car->getNextNode());
+			Road* enteringRoad =nodesToRoad[car->getEntryNode()][car->getNextNode()];
 			(*it)->addEnteringCar(car,enteringRoad);
 		}
 	}
-}
-
-Road* RoadNetwork::getRoad(int id)
-{
-	map<int,Road*>::iterator itRoad = idToRoad.find(id);
-	if(itRoad==idToRoad.end())
-		return NULL;
-	else
-		return (itRoad->second); 
 }
 
 vector<Road*>* RoadNetwork::getNetwork()

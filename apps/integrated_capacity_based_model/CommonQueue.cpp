@@ -26,13 +26,15 @@ bool CommonQueue::moveCars()
 	//The set structure allows to move first the cars which are located at the end
 	//of the traveling area
 	list<Car*>::iterator carIt = begin();
-	for(int i=0;i<numberOfLanes && carIt != end();i++) //Only the cars
+	int numberOfMoves = numberOfLanes;
+	for(int i=0;i<numberOfMoves && carIt != end();i++) //Only the cars in the first layer can move
 	{
-		MoveResult result = (*carIt)->move();
+		MoveResult result = (*carIt)->travelingCommonQueue();
 		hasMoved = hasMoved || result.getHasMoved();
 		if(result.getHasChangedState()) //If a car has moved to a queue, we erase it and we move the iterator to the next car
 		{
 			list<Car*>::iterator carIt2 = next(carIt);
+			numberOfMoves++; //If we delete a car, it means that a new one appears in the first layer
 			for(list<Car*>::iterator carItMove = next(carIt);carItMove != end();carItMove++)
 			{ //Each vehicle after the vehicle that has left moves
 				(*carItMove)->addDistanceTraveled((*carIt)->getLength() / double(numberOfLanes));
@@ -60,4 +62,9 @@ void CommonQueue::speak()
 double CommonQueue::getLength() const
 {
 	return length;
+}
+
+int CommonQueue::getSize() const
+{
+	return size();
 }

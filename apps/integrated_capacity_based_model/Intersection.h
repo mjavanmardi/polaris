@@ -12,9 +12,9 @@ public:
 	void addEnteringRoad(Road* newRoad);
 	void addOutgoingRoad(Road* newRoad);
 	void addEnteringCar(Car* car, Road* enteringRoad);
-	Event runEvent(Event ev, double time, double dt);
+	std::vector<Event> runEvent(Event ev, double time, double dt);
 
-	std::vector<Event>& getPossibleEvents(); //Get every event that can happen on the intersection
+	std::vector<Event> getPossibleEvents(); //Get every event that can happen on the intersection
 
 	void speak();
 	int getId() const;
