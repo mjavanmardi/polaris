@@ -33,6 +33,7 @@ public:
 	MoveResult tryToEnterRoad(Road* road);
 	MoveResult travelingAreaMove(double dt);
 	MoveResult travelingCommonQueue();
+	MoveResult leaveRoad(); //When reaching the end of a junction area
 
 	void addDistanceTraveled(double distance);
 	void postponeEnteringTime(double time);

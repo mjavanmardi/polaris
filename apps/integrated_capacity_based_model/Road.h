@@ -8,6 +8,7 @@
 #include "Intersection.h"
 
 typedef const std::vector< std::vector <Road*> >* MatPointer;
+typedef const std::vector< std::vector < std::map <int,double> > >* CapaPointer;
 
 class TravelingArea;
 class CommonQueue;
@@ -19,7 +20,7 @@ class Road
 public:
 	Road(int _id, TravelingArea* _travArea, CommonQueue* _comQueue, JunctionArea* _juncArea, 
 		Intersection* _intersectionA, Intersection* _intersectionB, double _length, double _maxSpeed, 
-		MatPointer _nodesToRoad);
+		MatPointer _nodesToRoad, CapaPointer _capacity);
 	~Road();
 
 	//### Static methods ###
@@ -33,6 +34,7 @@ public:
 	double getLength() const;
 	double getMaxSpeed() const;
 	MatPointer getNodesToRoad() const;
+	CapaPointer getCapacity() const;
 	Intersection* getIntersectionA() const;
 
 	//### Dynamic methods ###
@@ -53,4 +55,5 @@ private:
 	const int nodeB;
 	const double maxSpeed;
 	MatPointer nodesToRoad;
+	CapaPointer capacity;
 };

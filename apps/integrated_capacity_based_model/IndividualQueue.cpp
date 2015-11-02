@@ -2,10 +2,46 @@
 
 using namespace std;
 
-IndividualQueue::IndividualQueue(double _length, std::vector<int> _turningMovements):
+typedef vector<pair<int,TurningMovementType> >::const_iterator TurnMovIt ;
+
+IndividualQueue::IndividualQueue(double _length, std::vector<std::pair<int,TurningMovementType> > _turningMovements, 
+		double width, double baseSaturationFlowRate, double approachGrade, 
+		double parkingFactor, double busFactor):
 length(_length), turningMovements(_turningMovements), stuckSectionLength(0), 
 freeFlowSectionLength(0)
 {
+	//Width factor model : 
+	double widthFactor = 1.;
+	if(width <3.048)
+		widthFactor = 0.96;
+	else
+		if(width>3.93192)
+			widthFactor = 1.04;
+
+	//Approach grade model : 
+	double gradeFactor = 1. - approachGrade / 200.;
+
+	//Base factor model in vehicle/s :
+	double baseCapacityFactor = baseSaturationFlowRate * widthFactor * 
+		gradeFactor * parkingFactor * busFactor;
+
+	for(TurnMovIt it = turningMovements.begin();it != turningMovements.end();it++)
+	{
+		double areaFactor = 1.;
+		switch(it->second)
+		{
+			case Uturn :
+				areaFactor = 0.9;
+				break;
+			case Left :
+				areaFactor = 1./1.05;
+				break;
+			case Right :
+				areaFactor = 1./1.18;
+				break;
+		}
+		capacities[it->first] = baseCapacityFactor * areaFactor;
+	}
 
 }
 
@@ -20,7 +56,7 @@ double IndividualQueue::getLength() const
 	return length;
 }
 
-vector<int> IndividualQueue::getTurningMovements() const
+vector<std::pair<int,TurningMovementType> > IndividualQueue::getTurningMovements() const
 {
 	return turningMovements;
 }
@@ -84,13 +120,30 @@ void IndividualQueue::insertCar(Car* car)
 bool IndividualQueue::isInTurningMovements(int i) const
 {
 	bool isHere = false;
-	for(vector<int>::const_iterator it = turningMovements.begin();it != turningMovements.end();it++)
+	for(TurnMovIt it = turningMovements.begin();it != turningMovements.end();it++)
 	{
-		if(*it==i)
+		if(it->first==i)
 		{
 			isHere = true;
 			break;
 		}
 	}
 	return isHere;
+}
+
+map<int,double> IndividualQueue::computeCapacities() const
+{
+	//Here we can add a traffic light model
+	return capacities;
+}
+
+bool IndividualQueue::moveStuckCar()
+{
+	bool hasMoved = false;
+	if(stuckSection.size() != 0)
+	{
+		Car* carMoving = *stuckSection.begin();
+		carMoving->leaveRoad();
+	}
+	return hasMoved;
 }

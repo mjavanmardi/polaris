@@ -16,8 +16,8 @@ int main()
 	double dt = 0.5;
 	int numberOfSteps = 18;
 
-	EventManager simulation(dt,numberOfSteps);
-	simulation.runSimulation(testNetwork,testCars);
+	EventManager simulation(dt,numberOfSteps,testNetwork,testCars);
+	simulation.run();
 
 	system("pause");
 	return 0;

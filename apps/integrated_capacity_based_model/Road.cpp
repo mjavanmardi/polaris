@@ -4,11 +4,11 @@ using namespace std;
 
 Road::Road(int _id, TravelingArea* _travArea, CommonQueue* _comQueue, JunctionArea* _juncArea,
 	Intersection* _intersectionA, Intersection* _intersectionB, double _length, double _maxSpeed, 
-	MatPointer _nodesToRoad) : 
+	MatPointer _nodesToRoad, CapaPointer _capacity) : 
 	id(_id), travArea(_travArea), comQueue(_comQueue), juncArea(_juncArea), 
 	intersectionA(_intersectionA), intersectionB(_intersectionB), length(_length),
 	nodeA(_intersectionA->getId()),nodeB(_intersectionB->getId()), maxSpeed(_maxSpeed), 
-	nodesToRoad(_nodesToRoad)
+	nodesToRoad(_nodesToRoad), capacity(_capacity)
 {
 
 }
@@ -58,6 +58,11 @@ double Road::getMaxSpeed() const
 MatPointer Road::getNodesToRoad() const
 {
 	return nodesToRoad;
+}
+
+CapaPointer Road::getCapacity() const
+{
+	return capacity;
 }
 
 Intersection* Road::getIntersectionA() const

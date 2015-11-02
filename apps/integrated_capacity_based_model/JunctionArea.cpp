@@ -49,12 +49,12 @@ pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
 	pair<int,int> position(initI,initJ); 
 	for(int j=0;j<nbColumns;j++)
 	{
-		position = selectNextQueue(position,nextRoad);
+		position = selectNextQueue(position,nextRoad); //We select the next queue to go to
 		if(isQueueEmpty(position.first,position.second))
 		{
 			freeFlowDistance += getQueueLength(position.first,position.second);
 		}
-		else
+		else //If there are vehicles in the current individualQueue
 		{
 			freeFlowDistance += getTotalLengthLeft(position.first,position.second);
 			isFree = false;
@@ -67,7 +67,10 @@ pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
 bool JunctionArea::moveCars()
 {
 	bool hasMoved = false;
-	//TODO
+	for(int lane = 0 ; lane < nbLanes;lane++)
+	{
+		at(lane).at(nbColumns-1).moveStuckCar();
+	}
 	return hasMoved;
 }
 
@@ -81,6 +84,11 @@ void JunctionArea::speak()
 			at(i).at(j).speak();
 		}
 	}
+}
+
+double JunctionArea::getNbLanes() const
+{
+	return nbLanes;
 }
 
 double JunctionArea::getLength() const
@@ -137,4 +145,19 @@ void JunctionArea::updateWeightAndLane(double& currentWeight,int& currentLane,in
 			currentLane = newLane;
 		}
 	}
+}
+
+vector<pair<int,TurningMovementType> > JunctionArea::getTurningMovements(int idLane)
+{
+	return (*this)[idLane][nbColumns-1].getTurningMovements();
+}
+
+vector<map<int,double> > JunctionArea::getCapacities()
+{
+	vector<map<int,double> > roadCapacities;
+	for(int i=0;i<nbLanes;i++)
+	{
+		roadCapacities.push_back(at(i).at(nbColumns-1).computeCapacities());
+	}
+	return roadCapacities;
 }

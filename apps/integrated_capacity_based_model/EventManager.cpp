@@ -5,8 +5,8 @@ using namespace std;
 typedef vector<Intersection*>::iterator interIt;
 typedef vector<Car*>::iterator carIt;
 
-EventManager::EventManager(double _dt, int _numberOfSteps) :
-dt(_dt), time(0), numberOfSteps(_numberOfSteps)
+EventManager::EventManager(double _dt, int _numberOfSteps, RoadNetwork* _rn, CarManager* _cs) :
+dt(_dt), time(0), numberOfSteps(_numberOfSteps), rn(_rn), cs(_cs)
 {
 
 }
@@ -16,7 +16,7 @@ EventManager::~EventManager()
 
 }
 
-void EventManager::setupTimeStep(RoadNetwork* rn, CarManager* cs)
+void EventManager::setupTimeStep()
 {
 	vector<Intersection*>* network = rn->getIntersections();
 	for(interIt it = network->begin(); it != network->end();it++)
@@ -27,7 +27,7 @@ void EventManager::setupTimeStep(RoadNetwork* rn, CarManager* cs)
 			if(eventsToAdd[i].getType() != nullEvent) //We don't add null events
 				eventStack.push(eventsToAdd[i]);
 		//### Setup capacities ###
-		//TODO
+		(*it)->setCapacities(rn->getNetworkCapacities());
 	}
 	//### Setup cars ###
 	vector<Car*>* cars = cs->getCars();
@@ -35,10 +35,11 @@ void EventManager::setupTimeStep(RoadNetwork* rn, CarManager* cs)
 	{
 		(*it)->initTimeStep(dt);
 	}
+	rn->printCapacities();
 }
 
 
-void EventManager::runTimeStep(RoadNetwork* rn)
+void EventManager::runTimeStep()
 {
 	while(!eventStack.empty())
 	{
@@ -57,18 +58,18 @@ void EventManager::runTimeStep(RoadNetwork* rn)
 					eventStack.push(*it); //Rescheduling it
 		}
 	}
-	time += dt; //When timestep is over, we go to the next time step
 }
 
-void EventManager::runSimulation(RoadNetwork* rn, CarManager* cs)
+void EventManager::run()
 {
 	rn->intersectionSpeak();
 	cs->speak();
 	for(int i=0;i<numberOfSteps;i++)
 	{
 		cout << "Timestep : " << i << endl;
-		setupTimeStep(rn,cs);
-		runTimeStep(rn);
+		setupTimeStep();
+		runTimeStep();
+		time += dt; //When timestep is over, we go to the next time step
 		//rn->intersectionSpeak();
 		//rn->roadSpeak();
 		//cs->speak();

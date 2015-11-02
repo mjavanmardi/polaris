@@ -13,6 +13,7 @@ public:
 	void addOutgoingRoad(Road* newRoad);
 	void addEnteringCar(Car* car, Road* enteringRoad);
 	std::vector<Event> runEvent(Event ev, double time, double dt);
+	void setCapacities(std::vector< std::vector < std::map <int,double> > >* networkCapacities);
 
 	std::vector<Event> getPossibleEvents(); //Get every event that can happen on the intersection
 

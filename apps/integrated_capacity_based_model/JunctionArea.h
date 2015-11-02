@@ -1,8 +1,11 @@
 #pragma once
 
+#include <map>
+
 #include "IndividualQueue.h"
 
 class IndividualQueue;
+enum TurningMovementType;
 
 class JunctionArea : private std::vector<std::vector<IndividualQueue>>
 {
@@ -20,12 +23,15 @@ public:
 	std::pair<bool,double> isPathFree(int nextRoad, int initI, int initJ); 
 	std::pair<int,int> JunctionArea::selectNextQueue(std::pair<int,int> currentPosition,int nextRoad);
 	bool moveCars();
+	std::vector<std::map<int,double> > getCapacities();
 
 	//### Static methods ###
 	double getQueueLength(int i, int j); //Get the length of a given individual queue
 	void speak();
 	double getLength() const;
 	void updateWeightAndLane(double& currentWeight,int& currentLane,int newLane,int column, int nextRoad);
+	double getNbLanes() const;
+	std::vector<std::pair<int,TurningMovementType> > getTurningMovements(int idLane);
 private:
 	double length;
 	const int nbLanes;

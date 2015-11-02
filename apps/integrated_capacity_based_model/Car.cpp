@@ -236,6 +236,31 @@ MoveResult Car::travelingCommonQueue()
 	return MoveResult(hasMoved,hasChangedState);
 }
 
+MoveResult Car::leaveRoad()
+{
+	if(distanceInTimeStep >= maxDistanceLeftInCurrentTimeStep) //If the car can't move anymore
+		return MoveResult(false,false);
+	bool hasMoved = false;
+	bool hasChangedState = false;
+	vector<int>::iterator nextNodeB = next(nextNodeIterator);
+	if (nextNodeB == path.end()) //If this is the car's last road
+	{
+		hasChangedState = true;
+		hasMoved = true;
+		state = in_OutOfNetwork;
+	}
+	else //This is not the car's last road
+	{
+		//Get the next road ID
+		int targetRoadId = currentRoad->getNodesToRoad()->at(*nextNodeIterator).at(*nextNodeB)->getId();
+		//Get the capacity left for the targeted turning movement
+		double capacity = currentRoad->getCapacity()->at(currentRoad->getId()).at(currentIndivQueue.first).at(targetRoadId);
+		//Computing the car's capacity
+		//TODO
+	}
+	return MoveResult(hasMoved,hasChangedState);
+}
+
 void Car::addDistanceTraveled(double distance)
 {
 	distanceTraveled += distance;
