@@ -252,7 +252,7 @@ namespace PopSyn
 					if(!zone_fr.Get_Data<typename regions_itf::key_type>(RID,linker->region_in_zone_id_column())){THROW_EXCEPTION("ERROR: could not retrieve region id from zone file");}		
 					
 					// get region iterator from hash map
-					if ((region_itr = regions->find(RID))==regions->end()) {THROW_EXCEPTION("ERROR: Region ID not found in map.  Press a key to end.");}
+					if ((region_itr = regions->find(RID))==regions->end()) {THROW_EXCEPTION("ERROR: Region ID '"<<RID <<"' not found in map.  Press a key to end.");}
 					region_itf* region = (region_itf*)region_itr->second;
 
 					// Initialize the new zone

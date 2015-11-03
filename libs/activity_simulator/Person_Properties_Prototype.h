@@ -520,6 +520,11 @@ namespace Person_Components
 
 				return this_component()->Is_Student<TargetType>();
 			}
+
+			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
+			{
+				return this_component()->Value_of_Travel_Time_Adjustment<TargetType>();
+			}
 			
 			local_check_template_method_name(Characteristics_exists,Characteristics);
 			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check_2(TargetType, boost::container::vector<double>*, is_same)))

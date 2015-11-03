@@ -40,7 +40,7 @@ namespace Prototypes
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->template Initialize< TargetType>(id);	
-			this->template Set_Home_Location<NT>();
+			//this->template Set_Home_Location<NT>();
 		}
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -58,11 +58,11 @@ namespace Prototypes
 		}
 
 		// Sub-component accessors	
-		template<typename TargetType> void Set_Home_Location()
-		{
-			// set the home locations on event
-			this_component()->template Set_Home_Location< TargetType>();
-		}
+		//template<typename TargetType> void Set_Home_Location()
+		//{
+		//	// set the home locations on event
+		//	this_component()->template Set_Home_Location< TargetType>();
+		//}
 		accessor(Properties, NONE, NONE);
 		accessor(Static_Properties, NONE, NONE);
 		

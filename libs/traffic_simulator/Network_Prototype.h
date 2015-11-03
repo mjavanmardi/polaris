@@ -57,6 +57,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(turn_movements_container, NONE, NONE);
 			accessor(activity_locations_container, NONE, NONE);
+			accessor(activity_location_id_to_idx_container, NONE, NONE);
 			accessor(zones_container, NONE, NONE);
 			accessor(zone_ids_container, NONE, NONE);
 			accessor(ramp_metering_container, NONE, NONE);
