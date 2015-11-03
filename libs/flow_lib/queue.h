@@ -16,20 +16,23 @@ public:
 	~Queue();
 
 	//### Getters ###
-	int ID();
-	double length();
+	int ID() const;
+	double length() const;
 	std::vector<Car>& getQueue();
-	std::map<int, double> getCapacities();
-	std::map<int,double> getGreenTime();
-	std::map<int,double> getCycle();
-	std::map<int,double> getOffset();
+	std::vector<Car>::iterator getCarsBegin();
+	std::vector<Car>::iterator getCarsEnd();
+	int getNumberOfCars() const;
+	int getNextNode(int i) const;
+	int getNextNodeSize() const;
 
 	//### Dynamic methods ###
-	int weight(int nextNode);
+	int weight(int nextNode) const;
 	void iterCarsProg();
 	void addCar(Car C);
 	void removeCar();
+	Car getCar(int carID, int timeStep);
 	void moveFakeCars(int timestep);
+	std::map<int,double> getRealCapacity(const int& time, bool &isRed, double &min);
 
 	//### Serialization ###
 
@@ -43,11 +46,14 @@ private:
 	double maxLength;
 	double distanceBetweenCars;
 	std::vector<int> nextNodes;
-	std::map<int, double> capacities;		//int of next node && capacity value to this next node
 
-	std::map<int,double> greenTime;
-	std::map<int,double> cycle;
-	std::map<int,double> offset;
+	//For one queue, there can be several turning movement
+	//key = next node 
+	//value = capacity for turning movement to this next node
+	std::map<int, double> capacities; //static capactity 
+	std::map<int,double> greenTime; //green time for each turining movement
+	std::map<int,double> cycle; //traffic light cycle for each turining movement
+	std::map<int,double> offset; //traffic light offset for each turining movement
 
 	//### Cars in queue ###
 	std::vector<Car> cars;
