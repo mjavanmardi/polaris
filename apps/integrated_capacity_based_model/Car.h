@@ -34,10 +34,13 @@ public:
 	MoveResult travelingAreaMove(double dt);
 	MoveResult travelingCommonQueue();
 	MoveResult leaveRoad(); //When reaching the end of a junction area
+	MoveResult moveFromLastFreeFlowArea(double dt);
 
 	void addDistanceTraveled(double distance);
 	void postponeEnteringTime(double time);
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step
+
+	bool lastCarProba(double remainingAllowedWeight, double lastCarWeight);
 
 	//### Dynamic model ###
 
@@ -48,6 +51,7 @@ public:
 	//### getters ###
 
 	double getDistanceInTA() const;
+	double getDistanceTraveled() const;
 	double getLength() const;
 	int getId() const;
 	int getEntryNode() const;

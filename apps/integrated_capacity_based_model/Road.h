@@ -8,7 +8,7 @@
 #include "Intersection.h"
 
 typedef const std::vector< std::vector <Road*> >* MatPointer;
-typedef const std::vector< std::vector < std::map <int,double> > >* CapaPointer;
+typedef const std::vector< std::vector < std::map <int,std::pair<double,double> > > >* CapaPointer;
 
 class TravelingArea;
 class CommonQueue;
@@ -41,7 +41,7 @@ public:
 	double getRoomLeftInTravelingArea();
 
 	bool moveCarsInCQandTA(double dt); //Move cars in commonQueue and TravelingArea
-	bool moveCarsInJA(); //Move cars in JunctionArea
+	bool moveCarsInJA(double dt); //Move cars in JunctionArea
 
 private:
 	const int id;

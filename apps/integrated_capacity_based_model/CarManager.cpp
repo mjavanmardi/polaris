@@ -33,6 +33,12 @@ CarManager::CarManager()
 	cars.push_back(b);
 	cars.push_back(c);
 
+	for(int i=0;i<10;i++)
+	{
+		Car* d = new Car(0,typeDodge,path0,0);
+		cars.push_back(d);
+	}
+
 }
 
 CarManager::~CarManager()
@@ -61,5 +67,13 @@ void CarManager::speak()
 	for(vector<Car*>::iterator it = cars.begin();it != cars.end();it++)
 	{
 		(*it)->speak();
+	}
+}
+
+void CarManager::writeOutput(double time, ofstream& outputFlow)
+{
+	for(vector<Car*>::iterator it = cars.begin() ; it != cars.end(); it++)
+	{
+		outputFlow << (*it)->getId() << " ; " << time  << " ; " << (*it)->getDistanceTraveled() << endl;
 	}
 }

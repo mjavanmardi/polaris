@@ -189,20 +189,21 @@ void RoadNetwork::setupCapacities()
 			maxRoadId = currentRoadId;
 	}
 	//We create the corresponding capacity structure :
-	//capacity[road][lane][turningMovement] = currentCapacity
-	capacity = vector < vector < map <int,double> > >(maxRoadId+1, vector < map<int,double> >(0));
+	//capacity[road][lane][turningMovement].first = capacity at the beginning timestep
+	//capacity[road][lane][turningMovement].second = capacity left
+	capacity = Capacity(maxRoadId+1, vector < map<int,pair<double,double> > >(0));
 	
 	for(roadIt it = network.begin();it != network.end();it++)
 	{
-		vector < map<int,double> > currentRoad = vector < map<int,double> >(0);
+		vector < map<int,pair<double,double> > > currentRoad = vector < map<int,pair<double,double> > >(0);
 		JunctionArea* currentJA = (*it)->getJA();
 		for(int i=0;i<currentJA->getNbLanes();i++)
 		{
 			vector <pair<int,TurningMovementType> > currentTurningMovements = currentJA->getTurningMovements(i);
-			map<int,double> currentLane = map<int,double>();
+			map<int,pair<double,double> > currentLane = map<int,pair<double,double> >();
 			for(int j=0;j<currentTurningMovements.size();j++)
 			{
-				currentLane[currentTurningMovements[j].first] = 0; //capacity initiated at 0
+				currentLane[currentTurningMovements[j].first] = pair<double,double>(0,0); //capacity initiated at 0
 			}
 			currentRoad.push_back(currentLane);
 		}
@@ -237,9 +238,9 @@ void RoadNetwork::printCapacities()
 		for(int j=0;j<capacity[i].size();j++)
 		{
 			cout << "    Lane : " << j << endl;
-			for(map<int,double>::iterator it = capacity[i][j].begin() ; it != capacity[i][j].end();it++)
+			for(map<int,pair<double,double> >::iterator it = capacity[i][j].begin() ; it != capacity[i][j].end();it++)
 			{
-				cout << "      Turning movement to road : " << it->first << " has capacity " << it->second << endl;
+				cout << "      Turning movement to road : " << it->first << " has capacity left " << it->second.second << endl;
 			}
 			cout << endl;
 		}
@@ -269,7 +270,7 @@ vector<Intersection*>* RoadNetwork::getIntersections()
 	return (&intersections);
 }
 
-vector< vector < map <int,double> > >* RoadNetwork::getNetworkCapacities()
+vector< vector < map <int,pair<double,double> > > >* RoadNetwork::getNetworkCapacities()
 {
 	return &capacity;
 }

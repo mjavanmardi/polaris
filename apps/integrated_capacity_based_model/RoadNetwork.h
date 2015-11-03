@@ -4,6 +4,8 @@
 
 #include "Road.h"
 
+typedef std::vector< std::vector < std::map <int,std::pair<double,double> > > > Capacity;
+
 class RoadNetwork
 {
 public:
@@ -17,11 +19,11 @@ public:
 
 	std::vector<Road*>* getNetwork();
 	std::vector<Intersection*>* getIntersections();
-	std::vector< std::vector < std::map <int,double> > >* getNetworkCapacities();
+	Capacity* getNetworkCapacities();
 	void printCapacities();
 private:
 	std::vector<Road*> network;
 	std::vector<Intersection*> intersections;
 	std::vector< std::vector <Road*> > nodesToRoad;
-	std::vector< std::vector < std::map <int,double> > > capacity;
+	Capacity capacity;
 };

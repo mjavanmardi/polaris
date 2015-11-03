@@ -93,10 +93,10 @@ bool Road::moveCarsInCQandTA(double dt)
 	return hasMoved;
 }
 
-bool Road::moveCarsInJA()
+bool Road::moveCarsInJA(double dt)
 {
 	bool hasMoved = false;
-	hasMoved = juncArea->moveCars();
+	hasMoved = juncArea->moveCars(dt);
 	return hasMoved;
 }
 

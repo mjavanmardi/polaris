@@ -54,7 +54,7 @@ void CommonQueue::speak()
 	cout << "Cars in  the common queue : " ;
 	for(list<Car*>::iterator it = begin();it!=end();it++)
 	{
-		cout << (*it)->getLength() << " ; " ;
+		cout << (*it)->getId() << " ; " ;
 	}
 	cout << endl;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <cstdlib>
 
 #include "RoadNetwork.h"
 #include "CarManager.h"

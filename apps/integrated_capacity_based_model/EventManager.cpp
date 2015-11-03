@@ -35,7 +35,7 @@ void EventManager::setupTimeStep()
 	{
 		(*it)->initTimeStep(dt);
 	}
-	rn->printCapacities();
+	//rn->printCapacities();
 }
 
 
@@ -64,14 +64,16 @@ void EventManager::run()
 {
 	rn->intersectionSpeak();
 	cs->speak();
+	ofstream outputFlow("output.txt");
 	for(int i=0;i<numberOfSteps;i++)
 	{
 		cout << "Timestep : " << i << endl;
 		setupTimeStep();
 		runTimeStep();
+		cs->writeOutput(dt*double(i),outputFlow);
 		time += dt; //When timestep is over, we go to the next time step
 		//rn->intersectionSpeak();
-		//rn->roadSpeak();
+		rn->roadSpeak();
 		//cs->speak();
 	}
 }

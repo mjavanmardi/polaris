@@ -20,11 +20,11 @@ void Intersection::addOutgoingRoad(Road* newRoad)
 	outgoingRoads.push_back(newRoad);
 }
 
-void Intersection::setCapacities(vector< vector < map <int,double> > >* networkCapacities)
+void Intersection::setCapacities(vector< vector < map <int,pair<double,double> > > >* networkCapacities)
 {
 	for(vector<Road*>::iterator it = enteringRoads.begin();it!= enteringRoads.end();it++)
 	{
-		vector<map<int,double> >  currentRoadCapacities = (*it)->getJA()->getCapacities();\
+		vector<map<int,pair<double,double> > >  currentRoadCapacities = (*it)->getJA()->getCapacities();
 		//Here the intersection can have an effect on the capacities
 		networkCapacities->at((*it)->getId()) = currentRoadCapacities;
 	}
@@ -39,7 +39,7 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 		case enteringRoad:
 		 {
 			 Road* road = ev.getRoad();
-			 bool hasMoved = road->moveCarsInJA();
+			 bool hasMoved = road->moveCarsInJA(dt);
 			 if(hasMoved) //if at least one car has moved
 			 {
 				 Intersection* previousIntersection = road->getIntersectionA();

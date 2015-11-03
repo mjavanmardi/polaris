@@ -32,14 +32,29 @@ double JunctionArea::getQueueLength(int i, int j)
 	return((*this)[i][j].getLength());
 }
 
+double JunctionArea::getFreeFlowSectionLeft(std::pair<int,int> queueCoord)
+{
+	return(at(queueCoord.first).at(queueCoord.second).getFreeFlowSectionLength());
+}
+
 bool JunctionArea::isQueueEmpty(int i, int j)
 {
 	return((*this)[i][j].isEmpty());
 }
 
-void JunctionArea::insertCar(Car* car, std::pair<int,int> queue)
+bool JunctionArea::isStuckSectionEmpty(pair<int,int> queueCoord)
+{
+	return(at(queueCoord.first).at(queueCoord.second).isStuckSectionEmpty());
+}
+
+void JunctionArea::insertCar(Car* car, pair<int,int> queue)
 {
 	(*this)[queue.first][queue.second].insertCar(car);
+}
+
+void JunctionArea::insertCarInStuckSection(Car* car, pair<int,int> queueCoord)
+{
+	at(queueCoord.first).at(queueCoord.second).insertCarInStuckSection(car);
 }
 
 pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
@@ -64,13 +79,36 @@ pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
 	return(pair<bool,double>(isFree,freeFlowDistance));
 }
 
-bool JunctionArea::moveCars()
+bool JunctionArea::moveCars(double dt)
 {
 	bool hasMoved = false;
-	for(int lane = 0 ; lane < nbLanes;lane++)
+	bool stillMoving = true;
+	while(stillMoving)
 	{
-		at(lane).at(nbColumns-1).moveStuckCar();
+		stillMoving = false;
+		bool stuckCarsMove = true;
+		while(stuckCarsMove)
+		{
+			stuckCarsMove = false;
+			for(int lane = 0 ; lane < nbLanes;lane++)
+			{
+				stuckCarsMove = stuckCarsMove || at(lane).at(nbColumns-1).moveLastStuckCar();
+				stillMoving = stillMoving || stuckCarsMove;
+			}
+			hasMoved = hasMoved || stuckCarsMove;
+		}
+		bool freeFlowCarsMove = true;
+		while(freeFlowCarsMove)
+		{
+			freeFlowCarsMove = false;
+			for(int lane = 0 ; lane < nbLanes;lane++)
+			{
+				freeFlowCarsMove = freeFlowCarsMove || at(lane).at(nbColumns-1).moveLastFreeFlowCars(dt);
+				stillMoving = stillMoving || freeFlowCarsMove;
+			}
+		}
 	}
+	//cout << "Has Moved " << hasMoved << endl;
 	return hasMoved;
 }
 
@@ -152,9 +190,9 @@ vector<pair<int,TurningMovementType> > JunctionArea::getTurningMovements(int idL
 	return (*this)[idLane][nbColumns-1].getTurningMovements();
 }
 
-vector<map<int,double> > JunctionArea::getCapacities()
+vector<map<int,pair<double,double> > > JunctionArea::getCapacities()
 {
-	vector<map<int,double> > roadCapacities;
+	vector<map<int,pair<double,double> > > roadCapacities;
 	for(int i=0;i<nbLanes;i++)
 	{
 		roadCapacities.push_back(at(i).at(nbColumns-1).computeCapacities());

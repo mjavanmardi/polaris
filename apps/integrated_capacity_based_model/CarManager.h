@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 #include "Car.h"
 #include "RoadNetwork.h"
 
@@ -14,6 +16,7 @@ public:
 	std::vector<Car*>* getCars();
 
 	void speak();
+	void writeOutput(double time, std::ofstream& outputFlow);
 private:
 	std::vector<Car*> cars;
 };

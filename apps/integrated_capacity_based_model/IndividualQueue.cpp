@@ -40,7 +40,8 @@ freeFlowSectionLength(0)
 				areaFactor = 1./1.18;
 				break;
 		}
-		capacities[it->first] = baseCapacityFactor * areaFactor;
+		double realCapa = baseCapacityFactor * areaFactor;
+		capacities[it->first] = pair<double,double>(realCapa,realCapa);
 	}
 
 }
@@ -102,6 +103,11 @@ bool IndividualQueue::isEmpty() const
 	return(freeFlowSection.size() == 0 && stuckSection.size() == 0);
 }
 
+bool IndividualQueue::isStuckSectionEmpty() const
+{
+	return(stuckSection.size() == 0);
+}
+
 void IndividualQueue::insertCar(Car* car)
 {
 	double carLength = car->getLength();
@@ -112,9 +118,14 @@ void IndividualQueue::insertCar(Car* car)
 	}
 	else // add in the stuck section
 	{
-		stuckSection.push_back(car);
-		stuckSectionLength += carLength;
+		insertCarInStuckSection(car);
 	}
+}
+
+void IndividualQueue::insertCarInStuckSection(Car* car)
+{
+	stuckSection.push_back(car);
+	stuckSectionLength += car->getLength();
 }
 
 bool IndividualQueue::isInTurningMovements(int i) const
@@ -131,19 +142,51 @@ bool IndividualQueue::isInTurningMovements(int i) const
 	return isHere;
 }
 
-map<int,double> IndividualQueue::computeCapacities() const
+map<int,pair<double,double> > IndividualQueue::computeCapacities() const
 {
 	//Here we can add a traffic light model
 	return capacities;
 }
 
-bool IndividualQueue::moveStuckCar()
+bool IndividualQueue::moveLastStuckCar()
 {
 	bool hasMoved = false;
 	if(stuckSection.size() != 0)
 	{
 		Car* carMoving = *stuckSection.begin();
-		carMoving->leaveRoad();
+		MoveResult result = carMoving->leaveRoad();
+		if(result.getHasChangedState())
+		{
+			//We remove the Car
+			stuckSectionLength -= carMoving->getLength();
+			stuckSection.erase(stuckSection.begin());
+			//Every car after the removed car are moving
+			for(list<Car*>::iterator it = stuckSection.begin() ; it != stuckSection.end() ; it++ )
+			{
+				(*it)->addDistanceTraveled(carMoving->getLength());
+			}
+			hasMoved = true; //We confirm that the car has actually moved
+		}
+	}
+	return hasMoved;
+}
+
+bool IndividualQueue::moveLastFreeFlowCars(double dt)
+{
+	bool hasMoved = false;
+	list<Car*>::iterator carIt = freeFlowSection.begin();
+	while(carIt != freeFlowSection.end())
+	{
+		MoveResult result = (*carIt)->moveFromLastFreeFlowArea(dt);
+		hasMoved = hasMoved || result.getHasMoved();
+		if(result.getHasChangedState()) //If a car has left the free flow section, we erase it
+		{
+			list<Car*>::iterator carIt2 = next(carIt);
+			freeFlowSection.erase(carIt);
+			carIt = carIt2;
+		}
+		else //Otherwise, we move the next car
+			carIt++;
 	}
 	return hasMoved;
 }
