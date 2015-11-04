@@ -4,7 +4,7 @@
 ///----------------------------------------------------------------------------------------------------
 #include "m_array.h"
 #include "Generic.h"
-#include "windows\gperftools\tcmalloc.h"
+//#include "windows\gperftools\tcmalloc.h"
 
 
 //#define ENABLE_MEMORY_LOGGING
@@ -79,8 +79,8 @@ namespace polaris
 	}
 }
 
-__forceinline extern void* operator new ( size_t size );
-__forceinline extern void* operator new[] ( size_t size );
+extern void* operator new ( size_t size );
+extern void* operator new[] ( size_t size );
 
-__forceinline extern void operator delete ( void* ptr );
-__forceinline extern void operator delete[] ( void* ptr );
+extern void operator delete ( void* ptr );
+extern void operator delete[] ( void* ptr );

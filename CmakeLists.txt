@@ -22,10 +22,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
 
 
 #Compiler flags for release mode applied to all projects
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 
-
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 
 #Set up dependencies
 
@@ -34,8 +35,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	set(DEPS_DIR C:/opt/polarisdeps)
 
 	#Variable to indicate where boost lives
-	set(BOOST_ROOT ${DEPS_DIR}/boost_1_54_0)
-	find_package(Boost 1.54)
+	set(BOOST_ROOT ${DEPS_DIR}/boost_1_59_0)
+	find_package(Boost 1.59)
 
 	if(Boost_FOUND)
 		#Boost include dependencies
@@ -45,20 +46,20 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	endif()
 
 	#TC_Malloc include and library dependencies
-	if (UNIX)
-		include_directories(${DEPS_DIR}/gperftools-2.1/src)
-		find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
-		message(STATUS "" ${libtcmalloc})
-	endif()
+	#if (UNIX)
+	#	include_directories(${DEPS_DIR}/gperftools-2.1/src)
+	#	find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
+	#	message(STATUS "" ${libtcmalloc})
+	#endif()
 	
-	if (MSVC)
-		add_definitions(/Zi)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
-		include_directories(${DEPS_DIR}/gperftools-2.1/src)
-		find_library(libtcmalloc-r NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
-		find_library(libtcmalloc-d NAMES libtcmalloc_minimal-debug  HINTS ${DEPS_DIR}/gperftools-2.1/Debug)
-		set(libtcmalloc optimized ${libtcmalloc-r} debug ${libtcmalloc-d})
-	endif()
+	#if (MSVC)
+	#	add_definitions(/Zi)
+	#	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
+	#	include_directories(${DEPS_DIR}/gperftools-2.1/src)
+	#	find_library(libtcmalloc-r NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+	#	find_library(libtcmalloc-d NAMES libtcmalloc_minimal-debug  HINTS ${DEPS_DIR}/gperftools-2.1/Debug)
+	#	set(libtcmalloc optimized ${libtcmalloc-r} debug ${libtcmalloc-d})
+	#endif()
 	
 	#Google Testing Framework include and library dependencies
 	#include_directories(${DEPS_DIR}/gtest-1.7.0/include)

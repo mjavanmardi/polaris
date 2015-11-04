@@ -37,7 +37,7 @@ using google::sparse_hash_set;
 #else
 #include <pthread.h>
 #include <unistd.h>
-#define __forceinline inline
+//#define __forceinline inline
 #endif
 
 //---------------------------------------------------------
@@ -51,8 +51,3 @@ using google::sparse_hash_set;
 
 
 using namespace std;
-
-
-using namespace boost::container;
-using namespace boost::unordered;
-

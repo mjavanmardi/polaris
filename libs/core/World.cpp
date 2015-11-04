@@ -62,7 +62,7 @@ void World::Initialize(Simulation_Configuration& cfg) // called in the INITIALIZ
 		// lock this before threads get going, to ensure they don't finish improperly
 		pthread_mutex_lock(&_threads_finished_mutex);
 	
-		_threads = new pthread_t[__num_sim_threads];
+		_threads = new pthread_t[_num_sim_threads];
 	#endif
 
 	Thread_Information* thread_information = new Thread_Information[_num_sim_threads];
@@ -118,7 +118,7 @@ void World::Send_Signal_To_World() // set event
 		pthread_mutex_lock(&_threads_start_mutex);
 
 		// let the world know that this thread is waiting
-		if(Mark_Thread_As_Idle() == __num_sim_threads)
+		if(Mark_Thread_As_Idle() == _num_sim_threads)
 		{
 			// must toggle mutex in order to get conditional functionality
 			pthread_mutex_lock(&_threads_finished_mutex);
@@ -144,7 +144,7 @@ void World::Send_Finished_Signal_To_World()
 		}
 	#else
 		// let the world know that this thread is waiting
-		if(Mark_Thread_As_Idle() == __num_sim_threads)
+		if(Mark_Thread_As_Idle() == _num_sim_threads)
 		{
 			// must toggle mutex in order to get conditional functionality
 			pthread_mutex_lock(&_threads_finished_mutex);

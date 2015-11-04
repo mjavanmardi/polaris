@@ -12,16 +12,16 @@ namespace polaris
 	/// Global Accessors
 	///----------------------------------------------------------------------------------------------------
 
-	inline unsigned int num_iterations();
-	inline unsigned int num_sim_threads();
-	inline unsigned int num_threads();
-	inline unsigned int num_antares_threads();
-	inline unsigned int execution_segments_per_thread();
-	inline unsigned int execution_objects_per_block();
-	inline unsigned int max_execution_objects_per_block();
-	inline unsigned int max_free_blocks();
-	inline unsigned int num_free_blocks_buffer();
-	inline long long preallocation_bytes();
+	static unsigned int num_iterations();
+	static unsigned int num_sim_threads();
+	static unsigned int num_threads();
+	static unsigned int num_antares_threads();
+	static unsigned int execution_segments_per_thread();
+	static unsigned int execution_objects_per_block();
+	static unsigned int max_execution_objects_per_block();
+	static unsigned int max_free_blocks();
+	static unsigned int num_free_blocks_buffer();
+	static long long preallocation_bytes();
 
 	typedef Basic_Units::Time_Variables::Time_Seconds Simulation_Timestep_Increment;
 
@@ -136,9 +136,9 @@ namespace polaris
 	/// Global Simulation State Accessors
 	///----------------------------------------------------------------------------------------------------
 
-	inline int iteration();
-	inline int sub_iteration();
-	inline const Revision& revision();
+	static int iteration();
+	static int sub_iteration();
+	static const Revision& revision();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Global event step tracking variables
