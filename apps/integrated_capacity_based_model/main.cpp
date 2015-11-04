@@ -14,7 +14,7 @@ int main()
 	//testNetwork->intersectionSpeak();
 
 	double dt = 0.5;
-	int numberOfSteps = 35;
+	int numberOfSteps = 200;
 
 	EventManager simulation(dt,numberOfSteps,testNetwork,testCars);
 	simulation.run();

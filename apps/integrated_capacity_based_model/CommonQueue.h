@@ -15,6 +15,7 @@ public:
 	void speak();
 	double getLength() const;
 	int getSize() const;
+	int getNumberOfLanes() const;
 private:
 	double length;
 	const double distanceBetweenCars;

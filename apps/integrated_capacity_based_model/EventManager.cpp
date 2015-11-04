@@ -62,11 +62,11 @@ void EventManager::runTimeStep()
 
 void EventManager::run()
 {
-	rn->intersectionSpeak();
-	cs->speak();
 	ofstream outputFlow("output.txt");
 	for(int i=0;i<numberOfSteps;i++)
 	{
+		if(i==87)
+			cout << endl;
 		cout << "Timestep : " << i << endl;
 		setupTimeStep();
 		runTimeStep();

@@ -20,13 +20,18 @@ MoveResult Car::tryToEnterRoad(Road* road)
 {
 	if(state != in_WaitingForEntry)
 		cout << "Problem with car : " << id << endl;
-	MoveResult result(true,true);
-	//For the moment, this method is executed only if their is room for the car to enter the road
-	//As a consequence, the move result is always (true,true)
-	currentRoad = road; //update current road
-	state = in_TravelingArea; //updating state
-	distanceInTA = 0.;
-	distanceInTimeStep = maxDistanceLeftInCurrentTimeStep; //We make sure that the that the car will not move anymore in the current time step
+	double hasMoved = false;
+	double hasChangedState = false;
+	if(road->getRoomLeftInTravelingArea() > getLength()) //If there is room left in the targeted road
+	{
+		currentRoad = road; //update current road
+		state = in_TravelingArea; //updating state
+		distanceInTA = 0.;
+		distanceInTimeStep = maxDistanceLeftInCurrentTimeStep; //We make sure that the that the car will not move anymore in the current time step
+		hasMoved = true;
+		hasChangedState = true;
+	}
+	MoveResult result(hasMoved,hasChangedState);
 	return result;
 }
 
@@ -39,7 +44,7 @@ MoveResult Car::travelingAreaMove(double dt)
 	bool hasChangedState = false;
 	JunctionArea* juncArea = currentRoad->getJA();
 	CommonQueue* comQueue = currentRoad->getCQ();
-	
+
 	if(comQueue->getSize() == 0) //If the common queue is empty
 	{
 		int& nextRoadNodeA = (*nextNodeIterator);
@@ -70,7 +75,7 @@ MoveResult Car::travelingAreaMove(double dt)
 				double distToStop = 0;
 				if(freePath.first) //If there is a way to go to the next road without queueing
 				{
-					distToStop = 2. * currentRoad->getLength(); // We consider that the stop is far away
+					distToStop = currentRoad->getLength() - distanceInTA; // We consider that the stop is far away
 				}
 				else
 				{
@@ -97,6 +102,7 @@ MoveResult Car::travelingAreaMove(double dt)
 				else //No room : we insert in the CQ
 				{
 					distanceTraveled += 0; //Their can be overshoot, so we don't update the distanceTravled
+					speed = 0;
 					comQueue->addCar(this);
 					state = in_CommonQueue;
 					distanceInTA = 0;
@@ -116,6 +122,7 @@ MoveResult Car::travelingAreaMove(double dt)
 		else //If we don't need to move we enter the common queue
 		{
 			distanceTraveled += 0; //Their can be overshoot, so we don't update the distanceTravled
+			speed = 0;
 			comQueue->addCar(this);
 			state = in_CommonQueue;
 			hasChangedState = true;
@@ -200,7 +207,10 @@ MoveResult Car::travelingCommonQueue()
 			hasMoved = true;
 			juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
 			state = in_JunctionArea;
-			distanceTraveled += getLength();
+			currentIndivQueue = nextQueue;
+			double dx = min(maxDistanceLeftInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
+			distanceTraveled += dx;
+			distanceInTimeStep += dx;
 		}
 	}
 
@@ -326,9 +336,15 @@ MoveResult Car::moveFromLastFreeFlowArea(double dt)
 	return MoveResult(hasMoved,hasChangedState);
 }
 
+void Car::setSpeedZero()
+{
+	speed = 0.;
+}
+
 void Car::addDistanceTraveled(double distance)
 {
 	distanceTraveled += distance;
+	distanceInTimeStep += min(distance,maxDistanceLeftInCurrentTimeStep-distanceInTimeStep);
 }
 
 void Car::postponeEnteringTime(double time)
@@ -378,6 +394,11 @@ int Car::getNextNode() const
 double Car::getEnteringTime() const
 {
 	return enteringTime;
+}
+
+CarState Car::getState() const
+{
+	return state;
 }
 
 void Car::speak()

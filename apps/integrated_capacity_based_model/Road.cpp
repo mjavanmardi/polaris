@@ -82,14 +82,18 @@ void Road::speak() const
 
 double Road::getRoomLeftInTravelingArea()
 {
-	return max(0.,(length - juncArea->getLength() - comQueue->getLength()));
+	return max(0.,(length - juncArea->getLength() - comQueue->getLength() - travArea->getMinLength()));
 }
 
 bool Road::moveCarsInCQandTA(double dt)
 {
 	bool hasMoved = false;
-	hasMoved = hasMoved || comQueue->moveCars();
-	hasMoved = hasMoved || travArea->moveCars(dt);
+	if(id==0)
+		cout << endl;
+	bool hasCQMoved = comQueue->moveCars();
+	bool hasTAMoved = travArea->moveCars(dt);
+	hasMoved = hasMoved || hasCQMoved;
+	hasMoved = hasMoved || hasTAMoved;
 	return hasMoved;
 }
 

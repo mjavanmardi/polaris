@@ -125,6 +125,7 @@ void IndividualQueue::insertCar(Car* car)
 void IndividualQueue::insertCarInStuckSection(Car* car)
 {
 	stuckSection.push_back(car);
+	car->setSpeedZero();
 	stuckSectionLength += car->getLength();
 }
 
@@ -181,6 +182,7 @@ bool IndividualQueue::moveLastFreeFlowCars(double dt)
 		hasMoved = hasMoved || result.getHasMoved();
 		if(result.getHasChangedState()) //If a car has left the free flow section, we erase it
 		{
+			freeFlowSectionLength-= (*carIt)->getLength();
 			list<Car*>::iterator carIt2 = next(carIt);
 			freeFlowSection.erase(carIt);
 			carIt = carIt2;

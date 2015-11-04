@@ -41,6 +41,7 @@ public:
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step
 
 	bool lastCarProba(double remainingAllowedWeight, double lastCarWeight);
+	void setSpeedZero(); //Used when a car enters a queue
 
 	//### Dynamic model ###
 
@@ -57,6 +58,7 @@ public:
 	int getEntryNode() const;
 	int getNextNode() const;
 	double getEnteringTime() const;
+	CarState getState() const;
 
 	void speak();
 

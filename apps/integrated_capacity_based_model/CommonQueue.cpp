@@ -16,7 +16,7 @@ void CommonQueue::addCar(Car* car)
 
 void CommonQueue::removeCar(std::list<Car*>::iterator car)
 {
-	length -= (*car)->getLength();
+	length -= (*car)->getLength()/double(numberOfLanes);
 	erase(car);
 }
 
@@ -67,4 +67,9 @@ double CommonQueue::getLength() const
 int CommonQueue::getSize() const
 {
 	return size();
+}
+
+int CommonQueue::getNumberOfLanes() const
+{
+	return numberOfLanes;
 }
