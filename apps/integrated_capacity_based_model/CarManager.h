@@ -16,7 +16,7 @@ public:
 	std::vector<Car*>* getCars();
 
 	void speak();
-	void writeOutput(double time, std::ofstream& outputFlow);
+	void writeOutput(double time, std::vector< std::vector <double > >& outputVect);
 private:
 	std::vector<Car*> cars;
 };

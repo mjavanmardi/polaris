@@ -41,7 +41,7 @@ freeFlowSectionLength(0)
 				break;
 		}
 		double realCapa = baseCapacityFactor * areaFactor;
-		capacities[it->first] = pair<double,double>(realCapa,realCapa);
+		staticCapacities[it->first] = pair<double,double>(realCapa,realCapa);
 	}
 
 }
@@ -143,10 +143,9 @@ bool IndividualQueue::isInTurningMovements(int i) const
 	return isHere;
 }
 
-map<int,pair<double,double> > IndividualQueue::computeCapacities() const
+map<int,pair<double,double> > IndividualQueue::getStaticCapacities() const
 {
-	//Here we can add a traffic light model
-	return capacities;
+	return staticCapacities;
 }
 
 bool IndividualQueue::moveLastStuckCar()
@@ -176,7 +175,7 @@ bool IndividualQueue::moveLastFreeFlowCars(double dt)
 {
 	bool hasMoved = false;
 	list<Car*>::iterator carIt = freeFlowSection.begin();
-	while(carIt != freeFlowSection.end())
+	while(carIt != freeFlowSection.end()) //We go through the free flow cars
 	{
 		MoveResult result = (*carIt)->moveFromLastFreeFlowArea(dt);
 		hasMoved = hasMoved || result.getHasMoved();

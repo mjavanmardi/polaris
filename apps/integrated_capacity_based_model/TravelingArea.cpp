@@ -38,8 +38,6 @@ bool TravelingArea::moveCars(double dt)
 	multiset<Car*,distInTAComp>::iterator carIt = begin();
 	while(carIt != end())
 	{
-		if((*carIt)->getId()==90)
-			cout << endl;
 		MoveResult result = (*carIt)->travelingAreaMove(dt);
 		hasMoved = hasMoved || result.getHasMoved();
 		if(result.getHasChangedState()) //If a car has moved to a queue, we erase it

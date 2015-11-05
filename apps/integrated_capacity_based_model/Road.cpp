@@ -88,8 +88,6 @@ double Road::getRoomLeftInTravelingArea()
 bool Road::moveCarsInCQandTA(double dt)
 {
 	bool hasMoved = false;
-	if(id==0)
-		cout << endl;
 	bool hasCQMoved = comQueue->moveCars();
 	bool hasTAMoved = travArea->moveCars(dt);
 	hasMoved = hasMoved || hasCQMoved;

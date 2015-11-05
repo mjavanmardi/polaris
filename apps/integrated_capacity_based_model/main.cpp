@@ -14,10 +14,13 @@ int main()
 	//testNetwork->intersectionSpeak();
 
 	double dt = 0.5;
-	int numberOfSteps = 200;
+	int numberOfSteps = 2000;
 
 	EventManager simulation(dt,numberOfSteps,testNetwork,testCars);
 	simulation.run();
+
+	delete testNetwork;
+	delete testCars;
 
 	system("pause");
 	return 0;

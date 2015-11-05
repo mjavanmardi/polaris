@@ -25,18 +25,37 @@ CarManager::CarManager()
 	path2.push_back(0);
 	path2.push_back(1);
 
-	Car* a = new Car(0,typeDodge,path0,0);
-	Car* b = new Car(1,typeDodge,path1,0);
-	Car* c = new Car(2,typeDodge,path2,0);
+	int id = 0;
+	Car* a = new Car(id,typeDodge,path0,0);
+	id++;
+	Car* b = new Car(id,typeDodge,path1,0);
+	id++;
+	Car* c = new Car(id,typeDodge,path2,0);
+	id++;
 	
 	cars.push_back(a);
 	cars.push_back(b);
 	cars.push_back(c);
 
-	for(int i=0;i<1000;i++)
+	for(int i=0;i<3000;i++)
 	{
-		Car* d = new Car(3+i,typeDodge,path0,0);
+		Car* d = new Car(id,typeDodge,path0,rand()%1000);
 		cars.push_back(d);
+		id++;
+	}
+
+	for(int i=0;i<3000;i++)
+	{
+		Car* e = new Car(id,typeDodge,path1,rand()%1000);
+		cars.push_back(e);
+		id++;
+	}
+
+	for(int i=0;i<3000;i++)
+	{
+		Car* f = new Car(id,typeDodge,path2,rand()%1000);
+		cars.push_back(f);
+		id++;
 	}
 
 }
@@ -70,10 +89,19 @@ void CarManager::speak()
 	}
 }
 
-void CarManager::writeOutput(double time, ofstream& outputFlow)
+void CarManager::writeOutput(double time, vector< vector <double > >& outputVect)
 {
 	for(vector<Car*>::iterator it = cars.begin() ; it != cars.end(); it++)
 	{
-		outputFlow << (*it)->getId() << " ; " << time  << " ; " << (*it)->getDistanceTraveled() << " ; " << (*it)->getState() << endl;
+		if((*it)->getId()==91)
+		{
+			vector<double> currentCar(0);
+			currentCar.push_back((*it)->getId());
+			currentCar.push_back(time);
+			currentCar.push_back((*it)->getDistanceTraveled());
+			currentCar.push_back((*it)->getState());
+			outputVect.push_back(currentCar);
+			return;
+		}
 	}
 }

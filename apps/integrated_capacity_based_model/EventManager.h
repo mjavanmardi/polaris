@@ -22,4 +22,5 @@ private:
 	double time; // Current simulation time
 	RoadNetwork* rn;
 	CarManager* cs;
+	std::vector< std::vector <double > > outputResults;
 };

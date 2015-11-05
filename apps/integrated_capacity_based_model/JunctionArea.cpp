@@ -82,33 +82,35 @@ pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
 bool JunctionArea::moveCars(double dt)
 {
 	bool hasMoved = false;
-	bool stillMoving = true;
-	while(stillMoving)
+	bool currentStepMoving = true;
+	while(currentStepMoving) //While its possible to move cars during this timestep
 	{
-		stillMoving = false;
+		currentStepMoving = false;
+		//First we take car of the stuck cars in the last column (about to leave the road)
 		bool stuckCarsMove = true;
 		while(stuckCarsMove)
 		{
 			stuckCarsMove = false;
 			for(int lane = 0 ; lane < nbLanes;lane++)
 			{
-				stuckCarsMove = stuckCarsMove || at(lane).at(nbColumns-1).moveLastStuckCar();
-				stillMoving = stillMoving || stuckCarsMove;
+				bool currentIterStuckCarsMove = at(lane).at(nbColumns-1).moveLastStuckCar();
+				stuckCarsMove = stuckCarsMove || currentIterStuckCarsMove;
 			}
-			hasMoved = hasMoved || stuckCarsMove;
 		}
+		//Then we take care of the free flow cars in the last column
 		bool freeFlowCarsMove = true;
 		while(freeFlowCarsMove)
 		{
 			freeFlowCarsMove = false;
 			for(int lane = 0 ; lane < nbLanes;lane++)
 			{
-				freeFlowCarsMove = freeFlowCarsMove || at(lane).at(nbColumns-1).moveLastFreeFlowCars(dt);
-				stillMoving = stillMoving || freeFlowCarsMove;
+				bool currentIterFreeFlowMove = at(lane).at(nbColumns-1).moveLastFreeFlowCars(dt);
+				freeFlowCarsMove = freeFlowCarsMove || currentIterFreeFlowMove;\
 			}
 		}
+		currentStepMoving = stuckCarsMove || freeFlowCarsMove; //We check if cars have moved during the current iteration
+		hasMoved = hasMoved || currentStepMoving; //We check if cars are moving during the whole time steps
 	}
-	//cout << "Has Moved " << hasMoved << endl;
 	return hasMoved;
 }
 
@@ -187,15 +189,17 @@ void JunctionArea::updateWeightAndLane(double& currentWeight,int& currentLane,in
 
 vector<pair<int,TurningMovementType> > JunctionArea::getTurningMovements(int idLane)
 {
+	//Reminder for the pair ; first value = nextRoadId ; second value = turningMovementType
 	return (*this)[idLane][nbColumns-1].getTurningMovements();
 }
 
 vector<map<int,pair<double,double> > > JunctionArea::getCapacities()
 {
-	vector<map<int,pair<double,double> > > roadCapacities;
+	vector<map<int,pair<double,double> > > roadCapacities; //roadCapacities[i] = capacities of lane i 
+	//Reminder : lanes are indexed top to bottom when direction of the road is left to right
 	for(int i=0;i<nbLanes;i++)
 	{
-		roadCapacities.push_back(at(i).at(nbColumns-1).computeCapacities());
+		roadCapacities.push_back(at(i).at(nbColumns-1).getStaticCapacities());
 	}
 	return roadCapacities;
 }

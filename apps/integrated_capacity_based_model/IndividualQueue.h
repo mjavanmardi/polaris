@@ -25,7 +25,7 @@ public:
 	bool isStuckSectionEmpty() const;
 	void insertCar(Car* car);
 	void insertCarInStuckSection(Car* car);
-	std::map<int,std::pair<double,double> > IndividualQueue::computeCapacities() const;
+	std::map<int,std::pair<double,double> > IndividualQueue::getStaticCapacities() const;
 	bool moveLastStuckCar(); //Try to move a single stuck car to the next road
 	bool moveLastFreeFlowCars(double dt); //Try to move the cars in free flow area to the next road
 
@@ -38,7 +38,7 @@ public:
 private:
 	//Lane characteristics
 	const double length;
-	std::map<int,std::pair<double,double> > capacities; //first : nextRoad Id ; second : corresponding base capacity
+	std::map<int,std::pair<double,double> > staticCapacities; //first : nextRoad Id ; second : (capacity at the beginning timestep, capacity left)
 	const std::vector<std::pair<int,TurningMovementType> > turningMovements;
 	std::list<Car*> freeFlowSection;
 	std::list<Car*> stuckSection;

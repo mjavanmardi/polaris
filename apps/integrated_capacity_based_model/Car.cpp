@@ -20,8 +20,8 @@ MoveResult Car::tryToEnterRoad(Road* road)
 {
 	if(state != in_WaitingForEntry)
 		cout << "Problem with car : " << id << endl;
-	double hasMoved = false;
-	double hasChangedState = false;
+	bool hasMoved = false;
+	bool hasChangedState = false;
 	if(road->getRoomLeftInTravelingArea() > getLength()) //If there is room left in the targeted road
 	{
 		currentRoad = road; //update current road
@@ -278,7 +278,6 @@ MoveResult Car::leaveRoad()
 bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight) 
 {
 	bool canCross = false;
-	srand(0);
 	int possible = rand()%(int)(1000*lastCarWeight);
 
 	if(1000*remainingAllowedWeight > possible)

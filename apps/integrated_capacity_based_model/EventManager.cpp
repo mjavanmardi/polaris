@@ -8,7 +8,7 @@ typedef vector<Car*>::iterator carIt;
 EventManager::EventManager(double _dt, int _numberOfSteps, RoadNetwork* _rn, CarManager* _cs) :
 dt(_dt), time(0), numberOfSteps(_numberOfSteps), rn(_rn), cs(_cs)
 {
-
+	outputResults = vector< vector <double> >(0., vector<double>(0.));
 }
 
 EventManager::~EventManager()
@@ -62,18 +62,25 @@ void EventManager::runTimeStep()
 
 void EventManager::run()
 {
-	ofstream outputFlow("output.txt");
 	for(int i=0;i<numberOfSteps;i++)
 	{
-		if(i==87)
-			cout << endl;
-		cout << "Timestep : " << i << endl;
+		if(!(i%100))
+			cout << "Timestep : " << i << endl;
 		setupTimeStep();
 		runTimeStep();
-		cs->writeOutput(dt*double(i),outputFlow);
+		cs->writeOutput(dt*double(i),outputResults);
 		time += dt; //When timestep is over, we go to the next time step
 		//rn->intersectionSpeak();
-		rn->roadSpeak();
+		//rn->roadSpeak();
 		//cs->speak();
+	}
+	//Writing output
+	cout << "Writing output" << endl;
+	ofstream outputFlow("output.txt");
+	for(int i=0;i<outputResults.size();i++)
+	{
+		for(int j=0;j<outputResults[i].size();j++)
+			outputFlow << outputResults[i][j] << " ; " ;
+		outputFlow << endl;
 	}
 }
