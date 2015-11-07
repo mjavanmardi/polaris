@@ -6,6 +6,9 @@
 #include <sstream>
 #include <vector>
 #include <exception>
+#include <iostream>
+#include <limits>
+#include <cfloat>
 
 typedef unsigned int uint;
 

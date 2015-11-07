@@ -663,7 +663,7 @@ namespace polaris
 
 	};
 
-	template<typename ComponentType,typename K = typename ComponentType::key_type, template<typename T> class value_prototype> 
+	template<typename ComponentType,typename K = typename ComponentType::key_type, template<typename T=NULLTYPE> class value_prototype=NULLTEMPLATE>
 	struct Prototype_Pair_Associative_Container
 	{
 		static_assert(is_pointer<typename ComponentType::mapped_type>::value,"Container must hold pointer types");
@@ -1087,7 +1087,7 @@ namespace polaris
 
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_container – member creator, type-definition and basic accessors
+	/// m_container ï¿½ member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_container(CONTAINER_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -1127,7 +1127,7 @@ namespace polaris
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_prototype_container – member creator, type-definition and basic accessors
+	/// m_prototype_container ï¿½ member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_prototype_container(CONTAINER_TYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\

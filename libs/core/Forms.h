@@ -186,7 +186,7 @@ namespace polaris
 				template<typename U>\
 				struct function_check<U,true>\
 				{\
-					template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<NT>);\
+					template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::#NAME<NT>);\
 					template<typename V> static large_type has_matching_named_member(...);\
 					\
 					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
@@ -194,7 +194,7 @@ namespace polaris
 					template<typename V>\
 					struct form_check<V,true>\
 					{\
-						template<typename Z> static small_type has_matching_formed_member( decltype( ((Z*)judge)->NAME<NT>(NT()) ) value = nullptr );\
+						template<typename Z> static small_type has_matching_formed_member( decltype( ((Z*)judge)->#NAME<NT>(NT()) ) value = nullptr );\
 						template<typename Z> static large_type has_matching_formed_member(...);\
 						static const int value = (sizeof(has_matching_formed_member<V>())==success);\
 					};\
@@ -534,7 +534,7 @@ namespace polaris
 			}\
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_data – member creator, type-definition and basic accessors
+	/// m_data ï¿½ member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -725,7 +725,7 @@ namespace polaris
 			}\
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_prototype – member prototype creator, type-definition and basic accessors
+	/// m_prototype ï¿½ member prototype creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_prototype(PROTOTYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\

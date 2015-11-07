@@ -261,11 +261,11 @@ namespace polaris
 	/// Allocate_Array
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	DataType* Execution_Component_Manager<DataType>::Allocate_Array( unsigned int num )
-	{
-		static_assert("Array allocation not supported for execution components");
-	}
+//	template<typename DataType>
+//	DataType* Execution_Component_Manager<DataType>::Allocate_Array( unsigned int num )
+//	{
+//		static_assert("Array allocation not supported for execution components");
+//	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Lazy_Free - Deschedule the execution object, execution engine will deallocate when convenient
@@ -291,11 +291,11 @@ namespace polaris
 	/// Free_Array
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Free_Array( DataType* ptr )
-	{
-		static_assert("Array deallocation not supported for execution components");
-	}
+//	template<typename DataType>
+//	void Execution_Component_Manager<DataType>::Free_Array( DataType* ptr )
+//	{
+//		static_assert("Array deallocation not supported for execution components");
+//	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Clean_Up_Thread_Memory - return thread memory to the global allocator

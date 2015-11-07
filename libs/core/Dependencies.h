@@ -31,7 +31,7 @@ using google::sparse_hash_set;
 //#include <vector>
 #include <type_traits>
 #include <direct.h>
-
+#include <memory>
 #ifdef _MSC_VER
 #include <Windows.h>
 #else

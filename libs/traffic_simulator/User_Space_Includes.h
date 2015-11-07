@@ -16,8 +16,8 @@
 //#include <unordered_map>
 //#include <unordered_set>
 #ifndef _MSC_VER
-#include <tr1/boost::unordered::unordered_map>
-#include <tr1/boost::unordered::unordered_set>
+#include <unordered_map>
+#include <unordered_set>
 using namespace __gnu_cxx;
 #endif
 
@@ -129,7 +129,8 @@ public:
 
 
 #ifndef _MSC_VER
-#define FLT_MAX	3.402823466e+38F	/* max value */
+//#define FLT_MAX	3.402823466e+38F	/* max value */
+#include <cfloat>
 #endif
 
 #define INFINITY_FLOAT 9999999

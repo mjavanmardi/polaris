@@ -1,7 +1,7 @@
 #ifdef ANTARES
 #include "Antares/Antares.h"
 #endif
-#include "repository/Repository.h"
+#include "core/Core.h"
 using namespace polaris;
 
 

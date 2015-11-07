@@ -7,10 +7,12 @@
 #include <sstream>
 #include <vector>
 #include <exception>
+#include <iostream>
 
 #define THROW_MATRIX_EXCEPTION(...) \
 			{stringstream s;\
 			s << "\nRUNTIME_ERROR: " << __FILE__ << " at " << __LINE__<< "\n\t" << __VA_ARGS__ << endl;\
+            cerr << s.str();\
 			throw new runtime_error(s.str().c_str());}
 
 typedef unsigned int uint;

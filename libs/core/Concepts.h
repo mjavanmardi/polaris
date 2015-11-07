@@ -11,7 +11,7 @@ namespace polaris
 	/// General Definitions
 	///----------------------------------------------------------------------------------------------------
 
-	#define concept template<typename T=NULLTYPE,typename V=NULLTYPE>
+	#define concept template<typename T=NULLTYPE,typename _V=NULLTYPE>
 
 	typedef char small_type;
 
@@ -122,7 +122,7 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check{ static const bool value = __VA_ARGS__; };\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -139,19 +139,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename V::##NAME*);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename _V::#NAME*);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(0))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(0))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = true; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = true; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -166,19 +166,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename V::##NAME*);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename _V::#NAME*);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(0))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(0))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = is_same<typename V::##NAME,TYPE>::value; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = is_same<typename _V::#NAME,TYPE>::value; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -193,19 +193,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(true_val))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = true; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = true; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -220,19 +220,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(true_val))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = is_same<decltype(&V::NAME),TYPE V::*>::value; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = is_same<decltype(&_V::NAME),TYPE _V::*>::value; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -247,19 +247,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct data_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(true_val))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = __VA_ARGS__; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = __VA_ARGS__; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -274,19 +274,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct function_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&V::NAME)>::type);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(true_val))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = true; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = true; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = function_check<TypeChecked>::value;\
@@ -301,19 +301,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct function_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&V::NAME)>::type);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(true_val))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const bool value = is_same<decltype(&V::NAME),FUNCTION_SIGNATURE::function_type>::value; };\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = is_same<decltype(&_V::NAME),FUNCTION_SIGNATURE::function_type>::value; };\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = function_check<TypeChecked>::value;\
@@ -328,19 +328,19 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct function_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<NULLTYPE>);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(void (_V::* arg)() = &_V::NAME<NULLTYPE>);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(nullptr))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const int value = true;};\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const int value = true;};\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = function_check<TypeChecked>::value;\
@@ -355,22 +355,22 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U>\
+		template<typename _U>\
 		struct function_check\
 		{\
-			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<__VA_ARGS__>);\
-			template<typename V> static large_type has_matching_named_member(...);\
+			template<typename _V> static small_type has_matching_named_member(void (_V::* arg)() = &_V::NAME<__VA_ARGS__>);\
+			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(nullptr))==success)>\
 			struct form_check{ static const bool value = false; };\
 			\
-			template<typename V> static small_type has_matching_formed_member(typename FUNCTION_SIGNATURE::function_type);\
-			template<typename V> static large_type has_matching_formed_member(...);\
+			template<typename _V> static small_type has_matching_formed_member(typename FUNCTION_SIGNATURE::function_type);\
+			template<typename _V> static large_type has_matching_formed_member(...);\
 			\
-			template<typename V>\
-			struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<__VA_ARGS__>))==success);};\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const int value = (sizeof(has_matching_formed_member<_V>(&_V::NAME<__VA_ARGS__>))==success);};\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool value = form_check<_U>::value;\
 		};\
 		\
 		static const bool value = function_check<TypeChecked>::value;\

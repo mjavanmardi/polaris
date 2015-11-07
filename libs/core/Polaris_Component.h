@@ -63,6 +63,9 @@ namespace polaris
 	class Polaris_Component : public ObjectType
 	{
 	public:
+		using ObjectType::_uuid;
+		using ObjectType::_component_id;
+
 		Polaris_Component(int uuid = -1):ObjectType(component_id,uuid){}
 
 		const int uuid(){ return _uuid; }
