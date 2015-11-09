@@ -36,7 +36,8 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 	EventType type = ev.getType();
 	switch(type)
 	{
-		case enteringRoad:
+		//### Moving the cars in the intersection's entering roads ###
+		case enteringRoad: 
 		 {
 			 Road* road = ev.getRoad();
 			 bool hasMoved = road->moveCarsInJA(dt);
@@ -48,6 +49,7 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 			 }
 			 break;
 		 }
+		 //### Moving the cars in the intersection's outgoing roads ###
 		case outgoingRoad:
 		 {
 			 Road* road = ev.getRoad();
@@ -64,6 +66,7 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 			 }
 			 break;
 		 }
+		 //### Moving the cars which are waiting to enter their first road ###
 		case enteringNetwork:
 		 {
 			 EnterCarIt it = enteringCars.begin();
@@ -74,10 +77,9 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 				 Road* targetRoad = it->second;
 				 if(currentCar->getEnteringTime() <= time) //If it is time for the current car to enter the network
 				 {
-					 if(targetRoad->getRoomLeftInTravelingArea() >= currentCar->getLength()) //If there is room for the car
+					 MoveResult result = currentCar->tryToEnterRoad(targetRoad); //Run the moving function in the car
+					 if(result.getHasChangedState()) //If the car has been able to move
 					 {
-						 MoveResult result = currentCar->tryToEnterRoad(targetRoad); //Run the moving function in the car
-						 targetRoad->getTA()->addCar(currentCar); //Add the car to the new traveling area
 						 enteringCars.erase(it); //erasing the car
 						 it = it2; //updating the iterator
 					 }

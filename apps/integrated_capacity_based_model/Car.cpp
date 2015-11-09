@@ -25,6 +25,7 @@ MoveResult Car::tryToEnterRoad(Road* road)
 	bool hasChangedState = false;
 	if(road->getRoomLeftInTravelingArea() > getLength()) //If there is room left in the targeted road
 	{
+		road->getTA()->addCar(this); //Add the car to the new traveling area
 		currentRoad = road; //update current road
 		state = in_TravelingArea; //updating state
 		distanceInTA = 0.;

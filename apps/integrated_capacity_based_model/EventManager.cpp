@@ -9,6 +9,9 @@ EventManager::EventManager(double _dt, int _numberOfSteps, RoadNetwork* _rn, Car
 dt(_dt), time(0), numberOfSteps(_numberOfSteps), rn(_rn), cs(_cs)
 {
 	outputResults = vector< vector <double> >(0., vector<double>(0.));
+
+	//Adding the cars to their initial intersection in the road network
+	cs->addCarsToRoadNetWork(rn);
 }
 
 EventManager::~EventManager()

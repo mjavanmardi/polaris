@@ -6,19 +6,20 @@ using namespace std;
 int main()
 {
 	srand(0);
+	
+	//Build the test network and the test cars
 	RoadNetwork* testNetwork = new RoadNetwork();
 	CarManager* testCars = new CarManager();
-	testCars->addCarsToRoadNetWork(testNetwork);
 
-	//testNetwork->roadSpeak();
-	//testNetwork->intersectionSpeak();
-
+	//Set the simulation parameters
 	double dt = 0.25;
 	int numberOfSteps = 500;
 
+	//Create and run the simulation
 	EventManager simulation(dt,numberOfSteps,testNetwork,testCars);
 	simulation.run();
 
+	//delete the network and the cars
 	delete testNetwork;
 	delete testCars;
 
