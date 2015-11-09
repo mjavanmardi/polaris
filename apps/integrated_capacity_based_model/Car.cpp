@@ -13,7 +13,8 @@ Car::Car(int _id, CarType _type, std::vector<int> _path, double _enteringTime) :
 	currentRoad = NULL;
 	currentIndivQueue = pair<int,int>(-1,-1);
 	distanceTraveled = 0;
-	maxDistanceLeftInCurrentTimeStep = 0;
+	distanceInCurrentRoad = 0;
+	maxDistanceInCurrentTimeStep = 0;
 }
 
 MoveResult Car::tryToEnterRoad(Road* road)
@@ -27,7 +28,8 @@ MoveResult Car::tryToEnterRoad(Road* road)
 		currentRoad = road; //update current road
 		state = in_TravelingArea; //updating state
 		distanceInTA = 0.;
-		distanceInTimeStep = maxDistanceLeftInCurrentTimeStep; //We make sure that the that the car will not move anymore in the current time step
+		distanceInTimeStep = maxDistanceInCurrentTimeStep; //We make sure that the that the car will not move anymore in the current time step
+		distanceInCurrentRoad=0;
 		hasMoved = true;
 		hasChangedState = true;
 	}
@@ -37,7 +39,7 @@ MoveResult Car::tryToEnterRoad(Road* road)
 
 MoveResult Car::travelingAreaMove(double dt)
 {
-	if(distanceInTimeStep >= maxDistanceLeftInCurrentTimeStep) //If the car can't move anymore
+	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 
 	bool hasMoved = true;
@@ -59,7 +61,6 @@ MoveResult Car::travelingAreaMove(double dt)
 			}
 			else //The car gets out of the network
 			{
-				distanceTraveled += getLength();
 				state = in_OutOfNetwork;
 				hasChangedState = true;
 				currentRoad = NULL;
@@ -138,9 +139,11 @@ void Car::updateSpeedAndDistance(double dt, double alpha)
 	distanceInTA += dx;
 	distanceTraveled += dx;
 	distanceInTimeStep += dx;
+	distanceInCurrentRoad +=dx;
 	speed = newSpeed;
 }
 
+//See documentation : free flow algorithm feature
 double Car::computeAlpha(double dt, double distToStop)
 {
 	double alpha = 1.;
@@ -165,7 +168,6 @@ double Car::computeAlpha(double dt, double distToStop)
 		else
 		{
 			alpha = type.getMaxAcc() * (1 - speed/maxSpeed * (1 - type.getDelta()));
-
 		}
 	}
 	return alpha;
@@ -179,7 +181,7 @@ double Car::dBraking(double dt, double acceleration)
 
 MoveResult Car::travelingCommonQueue()
 {
-	if(distanceInTimeStep >= maxDistanceLeftInCurrentTimeStep) //If the car can't move anymore
+	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 	bool hasMoved = false;
 	bool hasChangedState = false;
@@ -208,7 +210,8 @@ MoveResult Car::travelingCommonQueue()
 			juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
 			state = in_JunctionArea;
 			currentIndivQueue = nextQueue;
-			double dx = min(maxDistanceLeftInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
+			double dx = min(maxDistanceInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
+			distanceInCurrentRoad += dx;
 			distanceTraveled += dx;
 			distanceInTimeStep += dx;
 		}
@@ -217,9 +220,9 @@ MoveResult Car::travelingCommonQueue()
 	return MoveResult(hasMoved,hasChangedState);
 }
 
-MoveResult Car::leaveRoad()
+MoveResult Car::leaveRoad(double dt)
 {
-	if(distanceInTimeStep >= maxDistanceLeftInCurrentTimeStep) //If the car can't move anymore
+	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 	bool hasMoved = false;
 	bool hasChangedState = false;
@@ -262,8 +265,17 @@ MoveResult Car::leaveRoad()
 				distanceInTA = 0;
 				nextNodeIterator++;
 				currentIndivQueue = pair<int,int>(-1,-1);
-				distanceInTimeStep += getLength();
-				distanceTraveled += getLength();
+				speed = type.getMaxAcc() * dt;
+
+				//When a car leaves a road, we should advance of distance adjustDistance (See below)
+				//However, the distance a car can advance is bounded between 0 and 
+				//maxDistanceInCurrentTimeStep-distanceInTimeStep.
+				double adjustDistance = currentRoad->getLength() - distanceInCurrentRoad;
+				double dx = max(0.,min(maxDistanceInCurrentTimeStep-distanceInTimeStep,adjustDistance));
+				distanceInTimeStep += dx;
+				distanceTraveled += dx;
+
+				distanceInCurrentRoad = 0;
 			}
 		}
 	}
@@ -275,7 +287,7 @@ MoveResult Car::leaveRoad()
 //When a car has a weight superior to the remaining allowed weight
 //There is a probability that it crosses the intersection
 //This function returns 1 if the car crosses, 0 otherwise
-bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight) 
+bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight) const
 {
 	bool canCross = false;
 	int possible = rand()%(int)(1000*lastCarWeight);
@@ -288,7 +300,7 @@ bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight)
 
 MoveResult Car::moveFromLastFreeFlowArea(double dt)
 {
-	if(distanceInTimeStep >= maxDistanceLeftInCurrentTimeStep) //If the car can't move anymore
+	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 	bool hasMoved = false;
 	bool hasChangedState = false;
@@ -302,7 +314,7 @@ MoveResult Car::moveFromLastFreeFlowArea(double dt)
 	{
 		if(currentRoad->getJA()->isStuckSectionEmpty(currentIndivQueue)) //If the stuck section is empty
 		{
-			MoveResult tryToLeaveRoad = leaveRoad(); //Updates the state attributes if the car has managed to change road
+			MoveResult tryToLeaveRoad = leaveRoad(dt); //Updates the state attributes if the car has managed to change road
 			if(!tryToLeaveRoad.getHasChangedState()) //If the car couldn't leave the road
 			{//We add it to the stuck section and we indicate it has changed state
 				currentRoad->getJA()->insertCarInStuckSection(this,currentIndivQueue);
@@ -343,7 +355,8 @@ void Car::setSpeedZero()
 void Car::addDistanceTraveled(double distance)
 {
 	distanceTraveled += distance;
-	distanceInTimeStep += min(distance,maxDistanceLeftInCurrentTimeStep-distanceInTimeStep);
+	distanceInCurrentRoad += distance;
+	distanceInTimeStep += min(distance,maxDistanceInCurrentTimeStep-distanceInTimeStep);
 }
 
 void Car::postponeEnteringTime(double time)
@@ -356,7 +369,7 @@ void Car::postponeEnteringTime(double time)
 void Car::initTimeStep(double dt)
 {
 	//To be improved
-	maxDistanceLeftInCurrentTimeStep = 0.5 * type.getMaxAcc() * dt * dt; 
+	maxDistanceInCurrentTimeStep = 0.5 * type.getMaxAcc() * dt * dt; 
 	distanceInTimeStep = 0;
 }
 
@@ -398,6 +411,24 @@ double Car::getEnteringTime() const
 CarState Car::getState() const
 {
 	return state;
+}
+
+int Car::getCurrentLane() const
+{
+	return currentIndivQueue.first;
+}
+
+int Car::currentRoadId() const
+{
+	if(currentRoad != NULL)
+		return currentRoad->getId();
+	else
+		return -1;
+}
+
+double Car::getDistanceInCurrentRoad() const
+{
+	return distanceInCurrentRoad;
 }
 
 void Car::speak()
