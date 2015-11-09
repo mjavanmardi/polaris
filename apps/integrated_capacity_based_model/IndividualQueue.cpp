@@ -10,6 +10,8 @@ IndividualQueue::IndividualQueue(double _length, std::vector<std::pair<int,Turni
 length(_length), turningMovements(_turningMovements), stuckSectionLength(0), 
 freeFlowSectionLength(0)
 {
+	//### Computing the capacities ###
+
 	//Width factor model : 
 	double widthFactor = 1.;
 	if(width <3.048)
@@ -129,6 +131,9 @@ void IndividualQueue::insertCarInStuckSection(Car* car)
 	stuckSectionLength += car->getLength();
 }
 
+//Check if road i is in the turning movements of the current individual queue
+//Performance note : this can seem not to be performant. However, there is usually
+//a maximum of 3 turning movements per individual queue
 bool IndividualQueue::isInTurningMovements(int i) const
 {
 	bool isHere = false;
@@ -148,13 +153,14 @@ map<int,pair<double,double> > IndividualQueue::getStaticCapacities() const
 	return staticCapacities;
 }
 
-bool IndividualQueue::moveLastStuckCar()
+//Move the cars in a stuck section located in the last column of the junction area
+bool IndividualQueue::moveLastStuckCar(double dt)
 {
 	bool hasMoved = false;
 	if(stuckSection.size() != 0)
 	{
 		Car* carMoving = *stuckSection.begin();
-		MoveResult result = carMoving->leaveRoad();
+		MoveResult result = carMoving->leaveRoad(dt);
 		if(result.getHasChangedState())
 		{
 			//We remove the Car
@@ -171,6 +177,7 @@ bool IndividualQueue::moveLastStuckCar()
 	return hasMoved;
 }
 
+//Move the cars in a free flow section located in the last column of the junction area
 bool IndividualQueue::moveLastFreeFlowCars(double dt)
 {
 	bool hasMoved = false;

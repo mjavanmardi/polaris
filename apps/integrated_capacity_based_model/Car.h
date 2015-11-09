@@ -6,7 +6,9 @@
 
 class Road;
 
-class MoveResult
+//This class just allows the cars to inform their parent road structure 
+//if they have been able to move or not
+class MoveResult 
 {
 public:
 	MoveResult(bool _hasMoved, bool _hasChangedState) :
@@ -29,21 +31,23 @@ public:
 	void writeOutput(); //Todo : choose a format for the output
 
 	//### Moving procedures ###
-	//Here we declare all the procedure to move the car depending on the car state
+	//Here we declare all the procedure to move the car 
+	//depending on the car's situation in the network
 	MoveResult tryToEnterRoad(Road* road);
 	MoveResult travelingAreaMove(double dt);
 	MoveResult travelingCommonQueue();
-	MoveResult leaveRoad(); //When reaching the end of a junction area
+	MoveResult leaveRoad(double dt); 
 	MoveResult moveFromLastFreeFlowArea(double dt);
 
-	void addDistanceTraveled(double distance);
+	void addDistanceTraveled(double distance); //Should be use as less as possible. A car should always update its distance traveled itself
 	void postponeEnteringTime(double time);
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step
 
-	bool lastCarProba(double remainingAllowedWeight, double lastCarWeight);
+	bool lastCarProba(double remainingAllowedWeight, double lastCarWeight) const;
 	void setSpeedZero(); //Used when a car enters a queue
 
-	//### Dynamic model ###
+	//### Dynamic travel model ###
+	//Free flow model. See documentation
 
 	void updateSpeedAndDistance(double dt, double alpha);
 	double computeAlpha(double dt, double distToStop);
@@ -59,6 +63,9 @@ public:
 	int getNextNode() const;
 	double getEnteringTime() const;
 	CarState getState() const;
+	int getCurrentLane() const;
+	int currentRoadId() const;
+	double getDistanceInCurrentRoad() const;
 
 	void speak();
 
@@ -67,21 +74,22 @@ private:
 
 	//### Secondary state variables ###
 	double enteringTime;
-	double distanceInTA; //Distance traveled in the current traveling area
 	double speed; // current speed
 	std::vector<int>::iterator nextNodeIterator; //iterator on the next node the car is heading at
 	Road* currentRoad; // Pointer to the current Road
 	std::pair<int,int> currentIndivQueue; // Coordinate of the current individual queue ((-1,-1) if out of the junction area)
-	double maxDistanceLeftInCurrentTimeStep; // Maximum distance the car can move during the current time step
+	double maxDistanceInCurrentTimeStep; // Maximum distance the car can move during the current time step
 	double distanceInTimeStep; //Distance moved during the current time step
+	double distanceInTA; //Distance traveled in the current traveling area
+	double distanceInCurrentRoad; //Distance traveled by the car in the current road
 
 	double distanceTraveled; //Distance travelled by the car since its entry in the network
 
 	//### Car caracteristics ###
-	const int id;
-	const CarType type;
+	const int id; //Id of the car
+	const CarType type; //Physical characteristics of the car
 	std::vector<int> path; //Successive nodes the car has scheduled to follow
 	const int entryNode; //Node where the car enters the network
-	const int exitingNode;
+	const int exitingNode; //Node where the car exits the network
 
 };

@@ -57,10 +57,10 @@ RoadNetwork::RoadNetwork()
 	//ja2
 	vector<pair<int,TurningMovementType>> tm_2_0_0;
 	tm_2_0_0.push_back(pair<int,TurningMovementType>(5,Left));
-	IndividualQueue iq20(10., tm_2_0_0);
+	IndividualQueue iq20(20., tm_2_0_0);
 	vector<pair<int,TurningMovementType>> tm_2_1_0;
-	tm_2_1_0.push_back(pair<int,TurningMovementType>(-1,Right));
-	IndividualQueue iq21(10., tm_2_1_0);
+	tm_2_1_0.push_back(pair<int,TurningMovementType>(1,Right));
+	IndividualQueue iq21(20., tm_2_1_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq20);
@@ -163,6 +163,8 @@ RoadNetwork::~RoadNetwork()
 		delete intersections[j];
 }
 
+//Setup the matrix nodesToRoad
+//Reminder : nodeToRoad[IntersectionA][IntersectionB] = roadId
 void RoadNetwork::setupNodesToRoad()
 {
 	int maxRoadIndex = -1;
@@ -178,6 +180,7 @@ void RoadNetwork::setupNodesToRoad()
 	}
 }
 
+//Setup the capacity structure
 void RoadNetwork::setupCapacities()
 {
 	//We get the maximum road id
@@ -248,6 +251,9 @@ void RoadNetwork::printCapacities()
 	}
 }
 
+
+//Inserting a car in its entering intersection
+//Only for algorithm setup
 void RoadNetwork::insertCarInNetwork(Car* car)
 {
 	for(vector<Intersection*>::iterator it = intersections.begin(); it != intersections.end();it++)

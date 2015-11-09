@@ -6,6 +6,7 @@ JunctionArea::JunctionArea(vector<vector<IndividualQueue>> indivQueues) :
 nbLanes(indivQueues.size()), nbColumns(indivQueues[0].size())
 {
 	double maxLength = 0;
+	//Copying the individual queue matrix
 	for(int i = 0 ; i < indivQueues.size();i++)
 	{
 		vector<IndividualQueue> lane;
@@ -24,12 +25,12 @@ nbLanes(indivQueues.size()), nbColumns(indivQueues[0].size())
 
 double JunctionArea::getTotalLengthLeft(int i, int j)
 {
-	return((*this)[i][j].getTotalLengthLeft());
+	return(at(i).at(j).getTotalLengthLeft());
 }
 
 double JunctionArea::getQueueLength(int i, int j)
 {
-	return((*this)[i][j].getLength());
+	return(at(i).at(j).getLength());
 }
 
 double JunctionArea::getFreeFlowSectionLeft(std::pair<int,int> queueCoord)
@@ -39,7 +40,7 @@ double JunctionArea::getFreeFlowSectionLeft(std::pair<int,int> queueCoord)
 
 bool JunctionArea::isQueueEmpty(int i, int j)
 {
-	return((*this)[i][j].isEmpty());
+	return(at(i).at(j).isEmpty());
 }
 
 bool JunctionArea::isStuckSectionEmpty(pair<int,int> queueCoord)
@@ -49,7 +50,7 @@ bool JunctionArea::isStuckSectionEmpty(pair<int,int> queueCoord)
 
 void JunctionArea::insertCar(Car* car, pair<int,int> queue)
 {
-	(*this)[queue.first][queue.second].insertCar(car);
+	at(queue.first).at(queue.second).insertCar(car);
 }
 
 void JunctionArea::insertCarInStuckSection(Car* car, pair<int,int> queueCoord)
@@ -93,7 +94,7 @@ bool JunctionArea::moveCars(double dt)
 			stuckCarsMove = false;
 			for(int lane = 0 ; lane < nbLanes;lane++)
 			{
-				bool currentIterStuckCarsMove = at(lane).at(nbColumns-1).moveLastStuckCar();
+				bool currentIterStuckCarsMove = at(lane).at(nbColumns-1).moveLastStuckCar(dt);
 				stuckCarsMove = stuckCarsMove || currentIterStuckCarsMove;
 			}
 		}
@@ -178,7 +179,7 @@ void JunctionArea::updateWeightAndLane(double& currentWeight,int& currentLane,in
 {
 	if((*this)[newLane][column].isInTurningMovements(nextRoad)) //If road is accessible in the new queue
 	{
-		double newWeight = (double) (*this)[newLane][column].getNumberOfCars();
+		double newWeight = (double) at(newLane).at(column).getNumberOfCars();
 		if(newWeight < currentWeight) //if the new queue is a better choice
 		{
 			currentWeight = newWeight; //we update currentWeight and currentLane
@@ -190,7 +191,7 @@ void JunctionArea::updateWeightAndLane(double& currentWeight,int& currentLane,in
 vector<pair<int,TurningMovementType> > JunctionArea::getTurningMovements(int idLane)
 {
 	//Reminder for the pair ; first value = nextRoadId ; second value = turningMovementType
-	return (*this)[idLane][nbColumns-1].getTurningMovements();
+	return at(idLane).at(nbColumns-1).getTurningMovements();
 }
 
 vector<map<int,pair<double,double> > > JunctionArea::getCapacities()

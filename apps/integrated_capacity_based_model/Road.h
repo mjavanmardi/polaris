@@ -8,6 +8,7 @@
 #include "Intersection.h"
 
 typedef const std::vector< std::vector <Road*> >* MatPointer;
+//Reminder : capacity[roadId][laneNumber][nextRoadId] = (capacityAtTheBeginingOfTimeStep,capacityLeft)
 typedef const std::vector< std::vector < std::map <int,std::pair<double,double> > > >* CapaPointer;
 
 class TravelingArea;
@@ -54,6 +55,6 @@ private:
 	const int nodeA;
 	const int nodeB;
 	const double maxSpeed;
-	MatPointer nodesToRoad;
-	CapaPointer capacity;
+	MatPointer nodesToRoad; //nodeToRoad[IntersectionA][IntersectionB] = roadId
+	CapaPointer capacity; //Stores the capacities in the network
 };

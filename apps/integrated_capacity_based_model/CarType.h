@@ -17,9 +17,9 @@ public:
 	double getMaxDec() const;
 private:
 	const double carLength;
-	const double beta;
-	const double delta;
-	const double gamma;
+	const double beta; //free flow model parameter
+	const double delta;//free flow model parameter
+	const double gamma;//free flow model parameter
 	const double maxAcc;
 	const double maxDec;
 };

@@ -90,8 +90,8 @@ bool Road::moveCarsInCQandTA(double dt)
 	bool hasMoved = false;
 	bool hasCQMoved = comQueue->moveCars();
 	bool hasTAMoved = travArea->moveCars(dt);
-	hasMoved = hasMoved || hasCQMoved;
-	hasMoved = hasMoved || hasTAMoved;
+	hasMoved = hasMoved || hasCQMoved; //We firstly move the common queue
+	hasMoved = hasMoved || hasTAMoved; //Then we move the traveling area
 	return hasMoved;
 }
 

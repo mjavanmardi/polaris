@@ -4,6 +4,7 @@
 
 #include "Road.h"
 
+//Reminder : capacity[roadId][laneNumber][nextRoadId] = (capacityAtTheBeginingOfTimeStep,capacityLeft)
 typedef std::vector< std::vector < std::map <int,std::pair<double,double> > > > Capacity;
 
 class RoadNetwork

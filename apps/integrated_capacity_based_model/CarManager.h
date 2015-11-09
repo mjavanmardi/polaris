@@ -5,6 +5,8 @@
 #include "Car.h"
 #include "RoadNetwork.h"
 
+//This class holds all the cars in the network.
+//No car should be created outside of this class
 class CarManager
 {
 public:

@@ -26,7 +26,7 @@ public:
 	void insertCar(Car* car);
 	void insertCarInStuckSection(Car* car);
 	std::map<int,std::pair<double,double> > IndividualQueue::getStaticCapacities() const;
-	bool moveLastStuckCar(); //Try to move a single stuck car to the next road
+	bool moveLastStuckCar(double dt); //Try to move a single stuck car to the next road
 	bool moveLastFreeFlowCars(double dt); //Try to move the cars in free flow area to the next road
 
 	//### Static methods ###
@@ -39,7 +39,7 @@ private:
 	//Lane characteristics
 	const double length;
 	std::map<int,std::pair<double,double> > staticCapacities; //first : nextRoad Id ; second : (capacity at the beginning timestep, capacity left)
-	const std::vector<std::pair<int,TurningMovementType> > turningMovements;
+	const std::vector<std::pair<int,TurningMovementType> > turningMovements; //First value of the pair : id of the next road
 	std::list<Car*> freeFlowSection;
 	std::list<Car*> stuckSection;
 	double stuckSectionLength;

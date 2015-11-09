@@ -12,7 +12,7 @@ public:
 	EventManager(double _dt, int _numberOfSteps, RoadNetwork* _rn, CarManager* _cs);
 	~EventManager();
 
-	void setupTimeStep();
+	void setupTimeStep(); //Function that initiate the data structure before running a time step
 	void runTimeStep();
 	void run();
 private:
