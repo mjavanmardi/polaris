@@ -178,70 +178,16 @@ namespace polaris
 
 	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
-			template<typename TypeChecked>\
-			struct NAME##_set_check\
-			{\
-				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-				struct function_check{ static const bool value = true; };\
-				template<typename U>\
-				struct function_check<U,true>\
-				{\
-					template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::#NAME<NT>);\
-					template<typename V> static large_type has_matching_named_member(...);\
-					\
-					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
-					struct form_check{ static const bool value = false; };\
-					template<typename V>\
-					struct form_check<V,true>\
-					{\
-						template<typename Z> static small_type has_matching_formed_member( decltype( ((Z*)judge)->#NAME<NT>(NT()) ) value = nullptr );\
-						template<typename Z> static large_type has_matching_formed_member(...);\
-						static const int value = (sizeof(has_matching_formed_member<V>())==success);\
-					};\
-					\
-					static const bool value = form_check<U>::value;\
-				};\
-				\
-				static const bool value = function_check<TypeChecked>::value;\
-			};\
 			template<typename TargetType>\
 			void NAME(TargetType set_value)\
 			{\
-				static_assert(check(ComponentType,NAME##_set_check),"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
 				this_component()->template NAME<TargetType>(set_value);\
 			}\
-			template<typename TypeChecked>\
-			struct NAME##_get_check\
-			{\
-				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-				struct function_check{ static const bool value = true; };\
-				template<typename U>\
-				struct function_check<U,true>\
-				{\
-					template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<NT>);\
-					template<typename V> static large_type has_matching_named_member(...);\
-					\
-					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
-					struct form_check{ static const bool value = false; };\
-					template<typename V>\
-					struct form_check<V,true>\
-					{\
-						template<typename Z> static small_type has_matching_formed_member( decltype( ((Z*)judge)->NAME<NT>() ) value );\
-						template<typename Z> static large_type has_matching_formed_member(...);\
-						static const int value = (sizeof(has_matching_formed_member<V>(NT()))==success);\
-					};\
-					\
-					static const bool value = form_check<U>::value;\
-				};\
-				\
-				static const bool value = function_check<TypeChecked>::value;\
-			};\
 			template<typename TargetType>\
 			TargetType NAME()\
 			{\
-				static_assert(check(ComponentType,NAME##_get_check),"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
-				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME "\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
 				return this_component()->template NAME<TargetType>();\
 			}\
 
@@ -537,10 +483,16 @@ namespace polaris
 	/// m_data � member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
+
+
 	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 			DATA_TYPE _##NAME;\
 		public:\
-			typedef typename DATA_TYPE NAME##_type;\
+			template<typename T>\
+			T& NAME##_deref(T* val){return *val;}\
+			template<typename T>\
+			T& NAME##_deref(T& val){return val;}\
+			typedef DATA_TYPE NAME##_type;\
 			typedef NAME##_type NAME##_accessible_type;\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
@@ -550,7 +502,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(*_##NAME);}\
+			{return (TargetType)(NAME##_deref(_##NAME));}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\

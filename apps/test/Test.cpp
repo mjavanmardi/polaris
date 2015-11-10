@@ -5,6 +5,28 @@
 using namespace polaris;
 
 
+//template<typename T>
+//struct AgentPrototype
+//{
+//	void DoStuff()
+//	{
+//		((T*)this)->DoStuff();
+//	}
+//
+//	void DoOtherStuff()
+//	{
+//		std::cout << "yay";
+//	}
+//};
+//
+//struct Bob{};
+//
+//int main(int argc, char *argv[])
+//{
+//	AgentPrototype<Bob> hellion;
+//	hellion.DoOtherStuff();
+//	//hellion.DoStuff<int>();
+//}
 
 // Test agent
 prototype struct Agent ADD_DEBUG_INFO
@@ -18,6 +40,7 @@ prototype struct Agent ADD_DEBUG_INFO
 	accessor(extra_data,NONE,NONE);
 	accessor(thing_i_care_about,NONE,NONE);
 };
+
 prototype struct Simple_Agent ADD_DEBUG_INFO
 {
 	tag_as_prototype;
@@ -34,8 +57,8 @@ prototype struct My_Code ADD_DEBUG_INFO
 
 	template<typename TargetType> void Do_stuff_with_agent()
 	{
-		typedef Agent<MasterType::agent_type> agent_itf;
-		typedef Agent<MasterType::other_agent_type> other_agent_itf;
+		//typedef Agent<MasterType::agent_type> agent_itf;
+		//typedef Agent<MasterType::other_agent_type> other_agent_itf;
 		this->my_agent<>();
 	}
 };
@@ -57,6 +80,7 @@ implementation struct Base_Agent_Implementation : public Polaris_Component<Maste
 implementation struct Other_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation)>
 {
 	// Member data
+	m_data(int,data,NONE,NONE);
 	m_data(int,extra_data,NONE,NONE);
 	m_data(int, thing_i_care_about,NONE,NONE);
 	m_data(int,other_stuff,NONE,NONE);
@@ -69,22 +93,22 @@ struct MasterType
 	typedef MasterType M;
 	// Add all of the types used in your code here
 	typedef Base_Agent_Implementation<M> agent_type;
-	typedef Other_Agent_Implementation<M> other_agent_type;	
+	typedef Other_Agent_Implementation<M> other_agent_type;
 };
 
 
 int main(int argc, char *argv[])
 {
 	//----------------------------------------------------------
-	// Initialize basic simulation 
+	// Initialize basic simulation
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(10000, 1);
 	INITIALIZE_SIMULATION(cfg);
 
 
 	// Standard initialization of random number generator
-	GLOBALS::Uniform_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Set_Seed<int>();
+//	GLOBALS::Uniform_RNG.Initialize();
+//	GLOBALS::Uniform_RNG.Set_Seed<int>();
 
 
 
@@ -94,22 +118,22 @@ int main(int argc, char *argv[])
 	// define an interface to use
 	typedef Agent<MasterType::agent_type> agent_itf;
 	typedef Agent<MasterType::other_agent_type> other_agent_itf;
-	
+
 	// Create agents and initialize them
 	agent_itf* base_agent = (agent_itf*)Allocate<MasterType::agent_type>();
 	base_agent->thing_i_care_about(1);
 	base_agent->x(5.0);
-		
+
 
 	other_agent_itf* other_agent = (other_agent_itf*)Allocate<MasterType::other_agent_type>();
 	other_agent->data(6);
-	other_agent->other_stuff(7);
+	//other_agent->other_stuff(7);
 
 	other_agent->thing_i_care_about(2);
-	
+
 	agent_itf* new_agent = (agent_itf*)other_agent;
-	cout << new_agent->thing_i_care_about<int>();
-	cout << new_agent->x<float>();
+	cout << new_agent->template thing_i_care_about<int>();
+	cout << new_agent->template x<float>();
 
 	START();
 	char test;
