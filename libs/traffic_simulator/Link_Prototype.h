@@ -25,7 +25,7 @@ namespace Link_Components
 
 	namespace Prototypes
 	{
-		prototype struct Link
+		prototype struct Link ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 	

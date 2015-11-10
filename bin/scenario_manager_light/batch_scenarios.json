@@ -1,6 +1,6 @@
 {
-	"polaris_exe": "C:/Users/jauld/Desktop/polaris_v5/build_noantares/build/bin/Release/Integrated_Model.exe",
-    "scnarios": [
+	"polaris_exe": "C:/Research/Projects/POLARIS/polaris_v5/build_noantares/build/bin/Release/Integrated_Model.exe",
+    "scenarios": [
         {
             "capacity_adjustment_highway": 1.2,
             "capacity_adjustment_arterial": 1

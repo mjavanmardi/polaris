@@ -132,7 +132,12 @@ namespace Routing_Components
 		{
 			t_data(float,cost);
 			t_data(float,time_cost);
+			t_data(float*,moe_ptr);
+
+			static t_data(Layered_Data_Array<float>*,turn_moe_data);
+
 		};
+		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
 	}
 
 
@@ -152,6 +157,10 @@ namespace Routing_Components
 			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
 
 			static m_data(concat(boost::unordered::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+
+			// addition of new layered data array to hold to historical connection (turn-movement) information
+			static m_data(Layered_Data_Array<float>,turn_moe_data,NONE,NONE);
+			static m_data(concat(boost::unordered::unordered_map<int,int>),turn_id_to_moe_data,NONE,NONE);
 
 			static void initialize_moe_data()
 			{
@@ -206,6 +215,46 @@ namespace Routing_Components
 					}
 				}
 
+				// Do the same as above for the turn movement database
+				try
+				{
+					result<TurnMOE> turn_moe_result=db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				
+					int turn_id;
+					float turn_delay;
+					start_time = -1;
+					counter = -1;
+					time_advance = false;
+
+					for(typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin (); db_itr != turn_moe_result.end (); ++db_itr)
+					{
+						if(++counter%100000 == 0) cout << counter << endl;
+
+						if(start_time == -1) start_time= db_itr->getStart_Time();
+
+						if(start_time != db_itr->getStart_Time())
+						{
+							time_advance = true;
+						}
+
+						start_time = db_itr->getStart_Time();
+						turn_id = db_itr->getTurn_Uid();
+						turn_delay = db_itr->getTurn_Penalty()*60.0f;
+
+						unsigned int ptr = _turn_moe_data.add_layer_element(turn_delay,start_time);
+
+						if(!time_advance)
+						{
+							_turn_id_to_moe_data[turn_id] = ptr;
+							time_advance = false;
+						}
+					}
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << "ODB database exception when reading TurnMOE table: "<<ex.message()<<endl;
+				}
+
 			}
 
 			Routable_Network<ComponentType>* create_copy()
@@ -229,6 +278,7 @@ namespace Routing_Components
 			{
 
 				Types::time_dependent_attributes<MT>::_moe_data = &_moe_data;
+				Types::time_dependent_to_time_dependent::_turn_moe_data = &_turn_moe_data;
 
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
@@ -316,6 +366,15 @@ namespace Routing_Components
 
 						connection_attributes._cost = 0.0f;
 						connection_attributes._time_cost = 0.0f;
+
+						if(_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
+						{
+							connection_attributes._moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
+						}
+						else
+						{
+							connection_attributes._moe_ptr = nullptr;
+						}
 
 						time_dependent_to_time_dependent_connection_group->_neighbor_attributes.push_back(connection_attributes);
 					}
@@ -659,5 +718,11 @@ namespace Routing_Components
 
 		template<typename MasterType, typename InheritanceList>
 		boost::unordered::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_turn_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		boost::unordered::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_turn_id_to_moe_data;
 	}
 }

@@ -698,6 +698,36 @@ namespace Network_Components
 			if (((_Scenario_Interface*)_global_scenario)->template output_turn_movement_moe_for_assignment_interval<bool>())
 			{
 				// output turn movement moe
+				shared_ptr<TurnMOE> moe_rec(nullptr);
+				// output link moe to database
+				using namespace odb;
+				using namespace polaris::io;
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+
+				shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
+				transaction t(db_ptr->begin());
+
+
+				typedef typename MasterType::turn_movement_type _movement_component_type;
+				typename _Turn_Movements_Container_Interface::iterator movement_itr;
+				for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+				{
+					_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+					moe_rec.reset(new TurnMOE());
+					moe_rec->setTurn_Uid(movement->_uuid);
+					moe_rec->setLink_Inbound_Uid(((_link_component_type*)movement->_inbound_link)->_uuid);
+					moe_rec->setLink_Outbound_Uid(((_link_component_type*)movement->_outbound_link)->_uuid);
+					moe_rec->setNode_Uid(((_intersection_component_type*)((_link_component_type*)movement->_inbound_link)->_downstream_intersection)->_uuid);
+					moe_rec->setStart_Time(time);
+					moe_rec->setTurn_Penalty(movement->movement_moe_data.turn_penalty);
+					moe_rec->setTurn_Penalty_SD(movement->movement_moe_data.turn_penalty_standard_deviation);
+					moe_rec->setInbound_Link_Turn_Time(movement->movement_moe_data.inbound_link_turn_time);
+					moe_rec->setOutbound_Link_Turn_Time(movement->movement_moe_data.outbound_link_turn_time);
+					moe_rec->setMovement_Flow_Rate(movement->movement_moe_data.movement_flow_rate);
+					db_ptr->persist(moe_rec);
+				}
+				t.commit();
+				/*
 				typedef typename MasterType::turn_movement_type _movement_component_type;
 				typename _Turn_Movements_Container_Interface::iterator movement_itr;
 				for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
@@ -718,6 +748,7 @@ namespace Network_Components
 						<<endl;
 
 				}
+				*/
 			}
 			if (((_Scenario_Interface*)_global_scenario)->template output_network_moe_for_assignment_interval<bool>())
 			{

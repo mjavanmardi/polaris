@@ -18,6 +18,7 @@ class link_travel;
 class Path;
 class Link_Probability;
 class LinkMOE;
+class TurnMOE;
 
 
 #pragma db value
@@ -495,6 +496,74 @@ private:
 	float link_density_ratio;
 	float link_travel_time_ratio;
 	float num_vehicles_in_link;
+};
+
+#pragma db object
+class TurnMOE
+{
+public:
+	// Default Constructor
+	TurnMOE () {}        
+	TurnMOE (int id_, int start_time_, int turn_uid_,
+			int node_uid_,
+			int link_inbound_uid_,
+			int link_outbound_uid_,
+			float turn_penalty_,
+			float turn_penalty_sd_,
+			float inbound_link_turn_time_,
+			float outbound_link_turn_time_,
+			float movement_flow_rate_)
+		: id(id_), start_time(start_time_), turn_uid(turn_uid_),
+			node_uid(node_uid_),
+			link_inbound_uid(link_inbound_uid_),
+			link_outbound_uid(link_outbound_uid_),
+			turn_penalty(turn_penalty_),
+			turn_penalty_sd(turn_penalty_sd_),
+			inbound_link_turn_time(inbound_link_turn_time_),
+			outbound_link_turn_time(outbound_link_turn_time_),
+			movement_flow_rate(movement_flow_rate_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const int& getTurn_Uid () const {return turn_uid;}
+	void setTurn_Uid (const int& turn_uid_) {turn_uid = turn_uid_;}
+	const int& getNode_Uid () const {return node_uid;}
+	void setNode_Uid (const int& node_uid_) {node_uid = node_uid_;}
+	const int& getLink_Inbound_Uid () const {return link_inbound_uid;}
+	void setLink_Inbound_Uid (const int& link_inbound_uid_) {link_inbound_uid = link_inbound_uid_;}
+	const int& getLink_Outbound_Uid () const {return link_outbound_uid;}
+	void setLink_Outbound_Uid (const int& link_outbound_uid_) {link_outbound_uid = link_outbound_uid_;}
+	const int& getStart_Time () const {return start_time;}
+	void setStart_Time (const int& start_time_) {start_time = start_time_;}
+	const float& getTurn_Penalty () const {return turn_penalty;}
+	void setTurn_Penalty (const float& turn_penalty_) {turn_penalty = turn_penalty_;}
+	const float& getTurn_Penalty_SD () const {return turn_penalty_sd;}
+	void setTurn_Penalty_SD (const float& turn_penalty_sd_) {turn_penalty_sd = turn_penalty_sd_;}
+	const float& getInbound_Link_Turn_Time () const {return inbound_link_turn_time;}
+	void setInbound_Link_Turn_Time (const float& inbound_link_turn_time_) {inbound_link_turn_time = inbound_link_turn_time_;}
+	const float& getOutbound_Link_Turn_Time () const {return outbound_link_turn_time;}
+	void setOutbound_Link_Turn_Time (const float& outbound_link_turn_time_) {outbound_link_turn_time = outbound_link_turn_time_;}
+	const float& getMovement_Flow_Rate () const {return movement_flow_rate;}
+	void setMovement_Flow_Rate (const float& movement_flow_rate_) {movement_flow_rate = movement_flow_rate_;}
+	
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db auto id
+	int id;
+#pragma db not_null
+	int start_time;
+	int turn_uid;
+	int node_uid;
+	int link_inbound_uid;
+	int link_outbound_uid;
+	float turn_penalty;
+	float turn_penalty_sd;
+	float inbound_link_turn_time;
+	float outbound_link_turn_time;
+	float movement_flow_rate;
 };
 }//end of io namespace
 }//end of polaris namespace

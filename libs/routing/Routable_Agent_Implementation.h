@@ -65,12 +65,16 @@ namespace polaris
 			// moe lookup
 			int current_time = current->time_label();
 			float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->moe_ptr();
 
 			if(moe_ptr != nullptr)
 			{
 				int sim_time = iteration();
 
-				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+
+				float t_turn = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time);
+				float t = current->moe_data()->get_closest_element(moe_ptr,current_time) + t_turn;
+				
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_cost + connection->_cost;
