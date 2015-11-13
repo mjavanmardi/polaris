@@ -123,10 +123,19 @@ namespace Routing_Components
 			t_data(float*,moe_ptr);
 
 			static t_data(Layered_Data_Array<float>*,moe_data);
+			static t_data(float, ttime_weight_shape);
+			static t_data(float, ttime_weight_scale);
+			static t_data(float, ttime_weight_factor);
 		};
 		
 		template<typename MasterType>
 		Layered_Data_Array<float>* time_dependent_attributes<MasterType>::_moe_data;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_shape;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_scale;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_factor;
 
 		struct time_dependent_to_time_dependent
 		{
@@ -189,6 +198,10 @@ namespace Routing_Components
 
 				bool time_advance = false;
 
+
+				// This has been restructured significantly - evently we should get rid of linkMOE as the average over all turn movements is not meaningful for routing
+				// Currently restructured so that this stores the free-flow travel time on the link for every time period, which is redundent
+				// Eventually need to just store this information once, or read from the link travel times in the TurnMOE database
 				for(typename result<LinkMOE>::iterator db_itr = moe_result.begin (); db_itr != moe_result.end (); ++db_itr)
 				{
 					if(++counter%100000 == 0) cout << counter << endl;
@@ -202,7 +215,9 @@ namespace Routing_Components
 
 					start_time = db_itr->getStart_Time();
 					link_id = db_itr->getLink_Uid();
-					travel_delay = db_itr->getLink_Travel_Time()*60.0f;
+					
+					//TODO: division by travel time ratio gives the free flow travel time only
+					travel_delay = db_itr->getLink_Travel_Time()*60.0f/db_itr->getLink_Travel_Time_Ratio();
 
 					//if(travel_delay < 0.01f) cout << travel_delay << endl;
 
@@ -276,8 +291,12 @@ namespace Routing_Components
 
 			void construct_time_dependent_routable_network(Network<typename MasterType::network_type>* source_network)
 			{
+				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
 				Types::time_dependent_attributes<MT>::_moe_data = &_moe_data;
+				Types::time_dependent_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_shape<float>();
+				Types::time_dependent_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_scale<float>();
+				Types::time_dependent_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_factor<float>();
 				Types::time_dependent_to_time_dependent::_turn_moe_data = &_turn_moe_data;
 
 				typedef Network<typename MasterType::network_type> Network_Interface;

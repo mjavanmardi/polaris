@@ -67,29 +67,42 @@ namespace polaris
 			float* moe_ptr = current->moe_ptr();
 			float* turn_moe_ptr = connection->moe_ptr();
 
-			if(moe_ptr != nullptr)
+			if(moe_ptr != nullptr && turn_moe_ptr != nullptr)
 			{
 				int sim_time = iteration();
 
-
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = current->moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t_turn = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time);
-				float t = current->moe_data()->get_closest_element(moe_ptr,current_time) + t_turn;
+				float t_link = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				float t = t_link + t_turn;
+				if (t > ttime_step)
+				{
+					ttime_accumulation += ttime_step;
+					t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+					ttime_step = current->moe_data()->layer_step<float>();	
+					while (t-ttime_accumulation > ttime_step)
+					{
+						ttime_accumulation += ttime_step;
+						t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+								
+					}
+				}
+				t = ttime_accumulation + std::max(t-ttime_accumulation,0.0f);
 				
-
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_cost + connection->_cost;
 
 				int t_diff = abs(current_time - iteration());
 
-				if (t_diff > 800)
-				{
-					int test = 1;
-				}
-
-				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff/current->ttime_weight_scale()),current->ttime_weight_shape())))*current->ttime_weight_factor();
+				//float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
 
 				float time_cost = w*time_cost_current + (1-w)*t;
-
 
 				if(neighbor->_is_highway)
 				{
@@ -97,7 +110,6 @@ namespace polaris
 				}
 				else
 				{
-
 					return time_cost;
 				}
 			}
@@ -130,26 +142,40 @@ namespace polaris
 			// moe lookup
 			int current_time = current->time_label();
 			float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->moe_ptr();
 
-			if(moe_ptr != nullptr)
+			if(moe_ptr != nullptr && turn_moe_ptr != nullptr)
 			{
 				int sim_time = iteration();
 
-				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = current->moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
+				float t_turn = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time);
+				float t_link = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				float t = t_link + t_turn;
+				if (t > ttime_step)
+				{
+					ttime_accumulation += ttime_step;
+					t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+					ttime_step = current->moe_data()->layer_step<float>();	
+					while (t-ttime_accumulation > ttime_step)
+					{
+						ttime_accumulation += ttime_step;
+						t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+								
+					}
+				}
+				t = ttime_accumulation + std::max(t-ttime_accumulation,0.0f);
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_time_cost + connection->_time_cost;
 				int t_diff = abs(current_time - iteration());
 
-				if (t_diff > 800)
-				{
-					int test = 1;
-				}
-
-				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+				float w = (exp(-1.0*pow(((float)t_diff/current->ttime_weight_scale()),current->ttime_weight_shape())))*current->ttime_weight_factor();
 
 				float time_cost = w*time_cost_current + (1-w)*t;
-
 
 				if(neighbor->_is_highway)
 				{
@@ -157,7 +183,6 @@ namespace polaris
 				}
 				else
 				{
-
 					return time_cost;
 				}
 			}

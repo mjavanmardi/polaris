@@ -191,6 +191,7 @@ namespace Scenario_Components
 			accessor(time_dependent_routing, NONE, NONE);
 			accessor(time_dependent_routing_weight_shape, NONE, NONE);
 			accessor(time_dependent_routing_weight_scale, NONE, NONE);
+			accessor(time_dependent_routing_weight_factor, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
 			accessor(historic_demand_moe_directory, NONE, NONE);
@@ -589,8 +590,9 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
 				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
-				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1500.0);
-				
+				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1000.0);
+				if (cfgReader.getParameter("time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_factor<double>(1.0);
+
 				if (cfgReader.getParameter("accident_event_duration_reduction", accident_event_duration_reduction<double*>())!= PARAMETER_FOUND) accident_event_duration_reduction<double>(1.0);
 				
 
