@@ -26,7 +26,7 @@ namespace polaris
 
 		std::vector<base_edge_type*> starts;
 		A_Star_Edge<base_edge_type>* start;
-		for (std::vector<global_edge_id>::iterator itr = start_ids.begin(); itr != start_ids.end(); ++itr)
+		for (auto itr = start_ids.begin(); itr != start_ids.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 			if(start == nullptr){ THROW_WARNING("Origin: " << (*itr).edge_id << " not found in graph pool!"); return 0.0f; }
@@ -36,7 +36,7 @@ namespace polaris
 
 		std::vector<base_edge_type*> ends;
 		A_Star_Edge<base_edge_type>* end;
-		for (std::vector<global_edge_id>::iterator itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
 		{
 			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 			if(end == nullptr){ THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
@@ -52,7 +52,7 @@ namespace polaris
 		routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.start_time = start_time;
 
-		for (std::vector<base_edge_type*>::iterator itr = starts.begin(); itr != starts.end(); ++itr)
+		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 			start->cost_from_origin(0.0f);
@@ -140,7 +140,7 @@ namespace polaris
 		}
 		
 		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
-		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
+		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
 			(*itr)->reset();
 		}
@@ -213,7 +213,7 @@ namespace polaris
 
 		boost::container::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
 
-		for(boost::container::vector< base_edge_type* >::iterator itr = edges->begin();itr!=edges->end();itr++)
+		for(auto itr = edges->begin();itr!=edges->end();itr++)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
 
@@ -224,7 +224,7 @@ namespace polaris
 		
 		float total_cost = 0.0f;
 
-		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
+		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
 			(*itr)->reset();
 		}
@@ -244,7 +244,7 @@ namespace polaris
 
 		std::vector<base_edge_type*> starts;
 		A_Star_Edge<base_edge_type>* start;
-		for (std::vector<global_edge_id>::iterator itr = start_ids.begin(); itr != start_ids.end(); ++itr)
+		for (auto itr = start_ids.begin(); itr != start_ids.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 			if(start == nullptr){ THROW_WARNING("Origin: " << (*itr).edge_id << " not found in graph pool!"); return 0.0f; }
@@ -254,7 +254,7 @@ namespace polaris
 
 		std::vector<base_edge_type*> ends;
 		A_Star_Edge<base_edge_type>* end;
-		for (std::vector<global_edge_id>::iterator itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
 		{
 			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 			if(end == nullptr){ THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
@@ -270,7 +270,7 @@ namespace polaris
 		routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.start_time = start_time;
 
-		for (std::vector<base_edge_type*>::iterator itr = starts.begin(); itr != starts.end(); ++itr)
+		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 			start->cost_from_origin(0.0f);
@@ -370,7 +370,7 @@ namespace polaris
 			end_ids.push_back(out_path.back());
 		}
 			
-		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
+		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
 			(*itr)->reset();
 		}

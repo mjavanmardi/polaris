@@ -226,7 +226,8 @@ namespace GLOBALS
 		
 			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 			rng_itf* rng = (rng_itf*)&this->thread_rng[0];
-			rng->Initialize<int>(abs(std::sin((float)i+1)*(float)INT_MAX));
+			// TODO i was used here before, is 1 correct?
+			rng->Initialize<int>(abs(std::sin((float)1+1)*(float)INT_MAX));
 		}
 
 		template <typename TargetType>
@@ -289,7 +290,8 @@ namespace GLOBALS
 		template <typename TargetType>
 		void Correlated_Rands(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
 		{
-			GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
+			// TODO Normal_RNG not a member of GLOBALS
+			//GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
 			
 			for (uint i=0; i<Sigma.num_rows();++i)
 			{
@@ -329,7 +331,8 @@ namespace GLOBALS
 		
 			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 			rng_itf* rng = (rng_itf*)&this->thread_rng[0];
-			rng->Initialize<int>(abs(std::sin((float)i+1)*(float)INT_MAX));
+			// TODO i was used here before, is 1 correct?
+			rng->Initialize<int>(abs(std::sin((float)1+1)*(float)INT_MAX));
 		}
 
 
@@ -351,7 +354,8 @@ namespace GLOBALS
 				TargetType random_seed = time(NULL);
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<TargetType>((TargetType)(abs(std::sin((float)(i+1)*random_seed)*(float)INT_MAX)) + random_seed);
+				// TODO i was used here before, is 1 correct?
+				rng->Initialize<TargetType>((TargetType)(abs(std::sin((float)(1+1)*random_seed)*(float)INT_MAX)) + random_seed);
 			}
 		}
 

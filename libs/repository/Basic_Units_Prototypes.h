@@ -261,14 +261,14 @@ namespace Basic_Units
 
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,Concepts::Is_Length_Value) && check(ReturnType,Concepts::Is_Length_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<typename InputType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<typename ReturnType>();
-				return typename ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,!Concepts::Is_Length_Value) || check(ReturnType,!Concepts::Is_Length_Value)))
 			{
-				assert_check(typename ReturnType,Concepts::Is_Length_Value, "ReturnType is not a valid length value structure.");
-				assert_check(typename InputType,Concepts::Is_Length_Value, "InputTypee is not a valid length value structure.");
+				assert_check(ReturnType,Concepts::Is_Length_Value, "ReturnType is not a valid length value structure.");
+				assert_check(InputType,Concepts::Is_Length_Value, "InputTypee is not a valid length value structure.");
 			}
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
@@ -519,7 +519,7 @@ namespace Basic_Units
 				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<InputType>();
 				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
-				return typename ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
+				return ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
 			}
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Volume_Value) || check(ReturnType,!Concepts::Is_Volume_Value)))
 			{

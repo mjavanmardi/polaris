@@ -182,6 +182,38 @@ namespace polaris
 	template<class Head,class Tail,unsigned int i>
 	struct IsTrue<TypeList<Head,Tail>,i>{ static const bool value=Head::value && IsTrue<Tail,i-1>::value; };
 
+//	template<typename T>
+//	struct ToStringTester
+//	{
+//		template<typename U>
+//		constexpr static bool ExistsInForm(
+//				typename std::enable_if<
+//						std::is_member_function_pointer<
+//								decltype(static_cast<std::string(U::*)()const>(&U::toString))>::value>::type* = nullptr)
+//		{}
+//
+//		template<typename U>
+//		constexpr static bool ExistsInForm(...){ return Exists<U>(0); }
+//
+//		template<typename U>
+//		constexpr static bool Exists(typename std::enable_if<std::is_member_function_pointer<decltype(&U::toString) >::value>::type* = nullptr)
+//		{}
+//
+//		template<typename U>
+//		constexpr static bool Exists(...)
+//		{}
+//
+//		static const bool value = (ExistsInForm<T>(0) == 1);
+//	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// dereference Implementation
+	///----------------------------------------------------------------------------------------------------
+	template<typename T>
+	T& dereference(T* val){return *val;}
+	template<typename T>
+	T& dereference(T& val){return val;}
+
 	////-----------------------------------------------------------------
 	//// Feature Dispatcher
 	////

@@ -13,6 +13,8 @@ namespace Hazard_Model_Components
 	{
 		implementation struct Hazard_Model_Implementation : public Polaris_Component<MT,INHERIT(Hazard_Model_Implementation),Data_Object>
 		{
+			typedef typename Polaris_Component<MT,INHERIT(Hazard_Model_Implementation),Data_Object>::ComponentType ComponentType;
+
 			typedef Prototypes::Hazard_Model<ComponentType> this_itf;
 
 			template<typename TargetType, typename TimeType> TargetType Evaluate_Failure_Probability(TimeType t1, TimeType t2, TargetType BX)
@@ -101,6 +103,10 @@ namespace Hazard_Model_Components
 
 		implementation struct Additive_Weibull_Baseline_Hazard_Implementation : public Weibull_Baseline_Hazard_Implementation<MT,INHERIT(Additive_Weibull_Baseline_Hazard_Implementation)>
 		{
+			typedef Weibull_Baseline_Hazard_Implementation<MT,INHERIT(Additive_Weibull_Baseline_Hazard_Implementation)> Base_t;
+			using Base_t::_constant;
+			using Base_t::_gamma;
+
 			typedef true_type Additive_Weibull_Hazard_tag;
 
 			m_data(double, l_gamma, NONE, NONE);
@@ -126,7 +132,7 @@ namespace Hazard_Model_Components
 
 			template<typename TargetType, typename TimeType> TargetType Evaluate_Baseline_Hazard(TimeType t)
 			{	
-				TargetType val = Base_Type::Evaluate_Baseline_Hazard<TargetType,TimeType>(t);
+				TargetType val = Base_Type::template Evaluate_Baseline_Hazard<TargetType,TimeType>(t);
 				return val + std::exp(-1.0*_l_constant) * _l_gamma * std::pow(t,_l_gamma-1);
 			}
 

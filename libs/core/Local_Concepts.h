@@ -245,16 +245,17 @@ namespace polaris
 		template<typename U>\
 		struct function_check<U,true>\
 		{\
-			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<NULLTYPE>);\
+			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::template NAME<NULLTYPE>);\
 			template<typename V> static large_type has_matching_named_member(...);\
 			\
-			template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+			template<typename V,bool _P>\
 			struct form_check{ static const bool value = false; };\
 			\
 			template<typename V>\
 			struct form_check<V,true>{ static const int value = true;};\
 			\
-			static const bool value = form_check<U>::value;\
+			static const bool performcheck = (sizeof(has_matching_named_member<U>(nullptr))==success);\
+			static const bool value = form_check<U,performcheck>::value;\
 		};\
 		\
 		static const bool value = function_check<T>::value;\

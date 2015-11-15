@@ -54,7 +54,7 @@ namespace File_IO
 				}
 			}
 		}
-		bool Is_File_Type(char* extension)
+		bool Is_File_Type(const char* extension)
 		{
 			return (strcmp(_extension.c_str(),extension) == 0);
 		}

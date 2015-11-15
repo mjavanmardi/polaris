@@ -6,6 +6,9 @@ namespace polaris
 	template<typename MasterType, typename InheritanceList = NULLTYPELIST, typename Base_Graph_Type = NT>
 	struct Graph_Pool_Implementation : public Polaris_Component<MasterType, typename Append<InheritanceList,Graph_Pool_Implementation<MasterType,NTL,Base_Graph_Type>>::Result>
 	{
+		typedef Polaris_Component<MasterType, typename Append<InheritanceList,Graph_Pool_Implementation<MasterType,NTL,Base_Graph_Type>>::Result> Base_t;
+		typedef typename Base_t::ComponentType ComponentType;
+
 		Graph_Pool_Implementation():_num_graphs(0){}
 
 		typedef Base_Graph_Type base_graph_type;
@@ -64,7 +67,7 @@ namespace polaris
 		//liks all of the graphs in the pool
 		void Link_Graphs()
 		{
-			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			for(auto itr = _graphs.begin(); itr != _graphs.end(); itr++)
 			{
 				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
 
@@ -96,7 +99,7 @@ namespace polaris
 
 			copy->_num_graphs = _num_graphs;
 
-			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			for(auto itr = _graphs.begin(); itr != _graphs.end(); itr++)
 			{
 				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
 

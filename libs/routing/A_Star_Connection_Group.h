@@ -8,13 +8,22 @@ namespace polaris
 	struct Custom_Connection_Group<MasterType,typename MasterType::static_graph_type,typename MasterType::static_graph_type,typename MasterType::static_to_static_type>
 		: public Connection_Group_Base< MasterType, typename MasterType::static_graph_type, typename MasterType::static_graph_type, typename MasterType::static_to_static_type >
 	{
+		typedef Connection_Group_Base< MasterType, typename MasterType::static_graph_type, typename MasterType::static_graph_type, typename MasterType::static_to_static_type > Base_t;
+		typedef typename Base_t::Anonymous_Connection_Group Anonymous_Connection_Group;
+		typedef typename Base_t::current_edge_type current_edge_type;
+		typedef typename Base_t::base_edge_type base_edge_type;
+		typedef typename Base_t::connection_type connection_type;
+		typedef typename Base_t::Connection_Implementation Connection_Implementation;
+		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
+		typedef typename Base_t::connection_attributes_type connection_attributes_type;
+
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
-			const Connection_Implementation* const end_connection_itr = end_forward_edges();
+			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
 
-			for(Connection_Implementation* connection_itr = forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
+			for(Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
 			{
 				Evaluate_Neighbor<AgentType>(agent,current,connection_itr,routing_data);
 			}
@@ -72,12 +81,21 @@ namespace polaris
 	struct Custom_Connection_Group<MasterType,typename MasterType::time_dependent_graph_type,typename MasterType::time_dependent_graph_type,typename MasterType::time_dependent_to_time_dependent_type>
 		: public Connection_Group_Base< MasterType, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_to_time_dependent_type >
 	{
+		typedef Connection_Group_Base< MasterType, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_to_time_dependent_type > Base_t;
+		typedef typename Base_t::Anonymous_Connection_Group Anonymous_Connection_Group;
+		typedef typename Base_t::current_edge_type current_edge_type;
+		typedef typename Base_t::base_edge_type base_edge_type;
+		typedef typename Base_t::connection_type connection_type;
+		typedef typename Base_t::Connection_Implementation Connection_Implementation;
+		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
+		typedef typename Base_t::connection_attributes_type connection_attributes_type;
+
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
 		{
-			const Connection_Implementation* const end_connection_itr = end_forward_edges();
+			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
 
-			for(Connection_Implementation* connection_itr = forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
+			for(Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
 			{
 				Evaluate_Neighbor<AgentType>(agent,current,connection_itr,routing_data);
 			}

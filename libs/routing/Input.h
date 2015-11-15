@@ -24,6 +24,9 @@ namespace polaris
 		virtual boost::container::deque<edge_id_type>& neighbors() = 0;
 	};
 
+	prototype struct Connection;
+	prototype struct Connection_Group;
+
 	template<typename Connection_Group_Type = NT>
 	struct Input_Connection_Group_Implementation : public Input_Connection_Group
 	{
@@ -40,11 +43,11 @@ namespace polaris
 			connection_group->num_forward_edges((uint) _neighbors.size() );
 
 			Connection<connection_type>* fwd_edge_itr = connection_group->forward_edges();
-			boost::container::deque<connection_attributes_type>::iterator connection_attributes_itr = _neighbor_attributes.begin();
+			auto connection_attributes_itr = _neighbor_attributes.begin();
 
 			connection_group->linked_graph( _neighbor_graph_id );
 
-			for(boost::container::deque<edge_id_type>::iterator itr = _neighbors.begin();itr!=_neighbors.end();itr++)
+			for(auto itr = _neighbors.begin();itr!=_neighbors.end();itr++)
 			{
 				fwd_edge_itr->edge_id( *itr );
 
@@ -66,12 +69,12 @@ namespace polaris
 			Input_Connection_Group_Implementation* copy = new Input_Connection_Group_Implementation();
 			copy->_neighbor_graph_id = _neighbor_graph_id;
 
-			for(boost::container::deque<edge_id_type>::iterator neighbor_itr = _neighbors.begin();neighbor_itr!=_neighbors.end();neighbor_itr++)
+			for(auto neighbor_itr = _neighbors.begin();neighbor_itr!=_neighbors.end();neighbor_itr++)
 			{
 				copy->_neighbors.push_back( *neighbor_itr );
 			}
 		
-			for(boost::container::deque<connection_attributes_type>::iterator neighbor_itr = _neighbor_attributes.begin();neighbor_itr!=_neighbor_attributes.end();neighbor_itr++)
+			for(auto neighbor_itr = _neighbor_attributes.begin();neighbor_itr!=_neighbor_attributes.end();neighbor_itr++)
 			{
 				copy->_neighbor_attributes.push_back( *neighbor_itr );
 			}

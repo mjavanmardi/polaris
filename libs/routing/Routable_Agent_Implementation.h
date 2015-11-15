@@ -20,7 +20,7 @@ namespace polaris
 		
 		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, Base_Edge_A_Star<MasterType>** final_destination)
 		{
-			for (std::vector<Base_Edge_A_Star<MasterType>*>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 			{
 				*final_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
 				if(current->_edge_id == (*final_destination)->_edge_id) return true;	
@@ -58,8 +58,7 @@ namespace polaris
 				return current->_cost + connection->_cost;
 			}
 		}
-		
-		template<>
+
 		float cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
 		{
 			// moe lookup
@@ -119,8 +118,7 @@ namespace polaris
 		{
 			return current->_time_cost + connection->_time_cost;
 		}
-		
-		template<>
+
 		float time_cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
 		{
 			// moe lookup

@@ -9,12 +9,14 @@ namespace polaris
 	template<typename MasterType, typename Current_Graph_Type, typename Neighbor_Graph_Type, typename Connection_Attributes_Type>
 	struct Connection_Group_Base : public Anonymous_Connection_Group< MasterType, typename Current_Graph_Type::base_edge_type >
 	{
+		typedef Anonymous_Connection_Group< MasterType, typename Current_Graph_Type::base_edge_type > Anonymous_Connection_Group;
+
 		Connection_Group_Base():_num_forward_edges(0),_num_backward_edges(0){}
 		
 		typedef Custom_Connection_Group<MasterType,Current_Graph_Type,Neighbor_Graph_Type,Connection_Attributes_Type> ComponentType;
 
-		typedef typename Current_Graph_Type current_graph_type;
-		typedef typename Neighbor_Graph_Type neighbor_graph_type;
+		typedef Current_Graph_Type current_graph_type;
+		typedef Neighbor_Graph_Type neighbor_graph_type;
 
 		typedef typename current_graph_type::graph_pool_type graph_pool_type;
 		typedef typename current_graph_type::stored_edge_type current_edge_type;
@@ -56,7 +58,7 @@ namespace polaris
 			while(forward_edge_itr != end)
 			{
 				linked_edge_id.edge_id = forward_edge_itr->edge_id();
-				forward_edge_itr->_neighbor = (neighbor_edge_type*)( current_graph_pool->Get_Edge<Neighbor_Graph_Type>(linked_edge_id) );
+				forward_edge_itr->_neighbor = (neighbor_edge_type*)( current_graph_pool->template Get_Edge<Neighbor_Graph_Type>(linked_edge_id) );
 
 				if(forward_edge_itr->_neighbor == nullptr)
 				{

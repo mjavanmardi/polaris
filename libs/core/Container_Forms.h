@@ -1103,7 +1103,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(*_##NAME);}\
+			{return (TargetType)dereference(_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
@@ -1144,7 +1144,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(*_##NAME);}\
+			{return (TargetType)dereference(_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\

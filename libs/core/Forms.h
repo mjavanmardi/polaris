@@ -55,6 +55,8 @@ namespace polaris
 	/// implementation - standard declarator for all implementations
 	///----------------------------------------------------------------------------------------------------
 
+	#define declare_implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST>
+	#define define_implementation template<typename MasterType,typename InheritanceList>
 	#define implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST>
 
 	///----------------------------------------------------------------------------------------------------
@@ -483,15 +485,9 @@ namespace polaris
 	/// m_data � member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
-
-
 	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 			DATA_TYPE _##NAME;\
 		public:\
-			template<typename T>\
-			T& NAME##_deref(T* val){return *val;}\
-			template<typename T>\
-			T& NAME##_deref(T& val){return val;}\
 			typedef DATA_TYPE NAME##_type;\
 			typedef NAME##_type NAME##_accessible_type;\
 			template<typename TargetType>\
@@ -502,7 +498,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(NAME##_deref(_##NAME));}\
+			{return (TargetType)(dereference(_##NAME));}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\

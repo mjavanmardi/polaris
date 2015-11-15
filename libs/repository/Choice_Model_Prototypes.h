@@ -23,6 +23,11 @@ namespace Choice_Model_Components
 		typedef true_type Ordered_Logit_Model_tag;
 	}
 
+    namespace Implementations
+	{
+		implementation struct Choice_Option_Base;
+		implementation struct Nested_Choice_Option_Base;
+	}
 
 	//==================================================================================================================
 	/// Namespace which holds all the concepts which enforce requirements and restrictions on template members, including components 
@@ -104,13 +109,16 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Prototypes
 	{
+		prototype struct Choice_Option;
+
 		prototype struct Choice_Model ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
 			template<typename TargetType> void Initialize()
 			{
-				typedef Random_Access_Sequence<typename get_type_of(choice_options),> choice_options_itf;
+				// TODO comma here before, is this the correct form?
+				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),float> utilities_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),float> probabilities_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
@@ -125,7 +133,7 @@ namespace Choice_Model_Components
 			{
 				// Push item into boost::container::vector as anonymous
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
-				typedef Prototypes::Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
+				typedef Prototypes::Choice_Option<get_component_type(choice_options_itf)> choice_option_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
 				options->push_back((choice_option_itf*)choice_option);				
 			}
@@ -203,7 +211,7 @@ namespace Choice_Model_Components
 			template<typename TargetType> void Evaluate_Utilities(requires(TargetType,check(Component_Type, Concepts::Is_Utility_Based_Model)))
 			{	
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
-				typedef Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
+				typedef Choice_Option<get_component_type(choice_options_itf)> choice_option_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),double> utilities_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
@@ -222,7 +230,7 @@ namespace Choice_Model_Components
 				for (itr; itr!= choices->end(); itr++)
 				{
 					choice = (choice_option_itf*)(*itr);
-					u = choice->Calculate_Utility<ComponentType>();
+					u = choice->template Calculate_Utility<ComponentType>();
 					utils->push_back(u);
 					utility_sum = utility_sum + exp(u);
 				}
@@ -262,7 +270,7 @@ namespace Choice_Model_Components
 			template<typename TargetType> void Evaluate_Probabilities(requires(TargetType,check(Component_Type, Concepts::Is_Logit_Model)))
 			{	
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
-				typedef Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
+				typedef Choice_Option<get_component_type(choice_options_itf)> choice_option_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),double> utilities_itf;
 				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
@@ -281,7 +289,7 @@ namespace Choice_Model_Components
 				for (itr; itr!= choices->end(); itr++)
 				{
 					choice = (choice_option_itf*)(*itr);
-					utility_sum += exp(choice->choice_utility<double>());
+					utility_sum += exp(choice->template choice_utility<double>());
 				}
 
 				// if sum(exp(u)) = 0 then no valid choices can be made as all options have -ininity utility
@@ -293,13 +301,13 @@ namespace Choice_Model_Components
 				for (itr= choices->begin(); itr!= choices->end(); itr++)
 				{
 					choice = (choice_option_itf*)(*itr);
-					u = choice->choice_utility<double>();
+					u = choice->template choice_utility<double>();
 					p = exp(u) / utility_sum;
-					if (ISNAN(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); choice->choice_probability<double>(0.0);}
-					else choice->choice_probability<double>(p);
+					if (ISNAN(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); choice->template choice_probability<double>(0.0);}
+					else choice->template choice_probability<double>(p);
 
 					// Evaluate choice options in nest, if the current option is a nest-level
-					if (choice->is_nest<Component_Type>()) choice->Evaluate_Probabilities<Component_Type>();
+					if (choice->template is_nest<Component_Type>()) choice->template Evaluate_Probabilities<Component_Type>();
 				}
 			}	
 			template<typename TargetType> void Evaluate_Probabilities(requires(TargetType,!check(Component_Type, Concepts::Is_Logit_Model)))
@@ -392,7 +400,7 @@ namespace Choice_Model_Components
 			template<typename ModelType> double Calculate_Utility(requires(ModelType,check(ModelType, Concepts::Is_Nested_Logit_Model)))
 			{
 				typedef Choice_Option<Implementations::Nested_Choice_Option_Base<NT>> choice_option_itf;
-				typedef Random_Access_Sequence<get_type_of(sub_choice_options)> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
 				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
 				
 				// If the option does not represent a nest, simply return its utiltiy value
@@ -404,7 +412,7 @@ namespace Choice_Model_Components
 
 				// Calculate log-sum
 				double IV = 0;
-				for (choice_options_itf::iterator itr = options->begin(); itr != options->end(); ++itr)
+				for (auto itr = options->begin(); itr != options->end(); ++itr)
 				{
 					choice_option_itf* choice = (choice_option_itf*)(*itr);
 					IV += exp(choice->Calculate_Utility<ModelType>());
@@ -423,7 +431,7 @@ namespace Choice_Model_Components
 			template<typename ModelType> void Evaluate_Probabilities(requires(ModelType,check(ModelType, Concepts::Is_Nested_Logit_Model)))
 			{	
 				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
-				typedef Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
+				typedef Choice_Option<get_component_type(choice_options_itf)> choice_option_itf;
 
 				// Local type definition option
 				choice_options_itf* choices =	this->sub_choice_options<choice_options_itf*>();
@@ -466,7 +474,7 @@ namespace Choice_Model_Components
 			template<typename ModelType> bool is_nest(requires(ModelType,check(ModelType, Concepts::Is_Nested_Logit_Model)))
 			{
 				typedef Choice_Option<Implementations::Nested_Choice_Option_Base<NT>> choice_option_itf;
-				typedef Random_Access_Sequence<get_type_of(sub_choice_options)> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
 				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
 				if (options->size() == 0) return false;
 				return true;

@@ -113,11 +113,13 @@ public:
 	void Start()
 	{
 		_l=0;
-		start_timer(_start);
+		//TODO: I don't see where this is defined
+		//start_timer(_start);
 	}
 	double Stop()
 	{
-		end_timer(_start,_l);
+		//TODO: I don't see where this is defined
+		//end_timer(_start,_l);
 		cout << endl << "approx clock time (ns) = "<< _l<<endl;
 		return (double)(_l);
 	}
