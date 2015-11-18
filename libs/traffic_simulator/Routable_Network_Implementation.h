@@ -280,6 +280,7 @@ namespace Routing_Components
 
 				copy->_routable_graph_pool = graph_copy;
 				copy->_static_network_graph_id = _static_network_graph_id;
+				copy->_time_dependent_network_graph_id = _time_dependent_network_graph_id;
 
 				return (Routable_Network<ComponentType>*)copy;
 			}
