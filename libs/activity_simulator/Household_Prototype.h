@@ -58,11 +58,11 @@ namespace Prototypes
 		}
 
 		// Sub-component accessors	
-		//template<typename TargetType> void Set_Home_Location()
-		//{
-		//	// set the home locations on event
-		//	this_component()->template Set_Home_Location< TargetType>();
-		//}
+		template<typename TargetType> void Set_Home_Location()
+		{
+			// set the home locations on event
+			this_component()->template Set_Home_Location< TargetType>();
+		}
 		accessor(Properties, NONE, NONE);
 		accessor(Static_Properties, NONE, NONE);
 		

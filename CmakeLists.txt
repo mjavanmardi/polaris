@@ -6,7 +6,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
 option(Antares "Build with Antares" OFF)
-option(Popsyn "Build Popsyn App" ON)
+option(Popsyn "Build Popsyn App" OFF)
 option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
 option(Unittest "Include Unit Tests for Other Libraries" OFF)
