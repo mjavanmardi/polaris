@@ -35,7 +35,7 @@ double JunctionArea::getQueueLength(int i, int j)
 
 double JunctionArea::getFreeFlowSectionLeft(std::pair<int,int> queueCoord)
 {
-	return(at(queueCoord.first).at(queueCoord.second).getFreeFlowSectionLength());
+	return(at(queueCoord.first).at(queueCoord.second).getTotalLengthLeft());
 }
 
 bool JunctionArea::isQueueEmpty(int i, int j)
@@ -45,7 +45,7 @@ bool JunctionArea::isQueueEmpty(int i, int j)
 
 bool JunctionArea::isStuckSectionEmpty(pair<int,int> queueCoord)
 {
-	return(at(queueCoord.first).at(queueCoord.second).isStuckSectionEmpty());
+	return(at(queueCoord.first).at(queueCoord.second).isEmpty());
 }
 
 void JunctionArea::insertCar(Car* car, pair<int,int> queue)
@@ -80,7 +80,7 @@ pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
 	return(pair<bool,double>(isFree,freeFlowDistance));
 }
 
-bool JunctionArea::moveCars(double dt)
+/*bool JunctionArea::moveCars(double dt)
 {
 	bool hasMoved = false;
 	bool currentStepMoving = true;
@@ -110,6 +110,30 @@ bool JunctionArea::moveCars(double dt)
 			}
 		}
 		currentStepMoving = stuckCarsMove || freeFlowCarsMove; //We check if cars have moved during the current iteration
+		hasMoved = hasMoved || currentStepMoving; //We check if cars are moving during the whole time steps
+	}
+	return hasMoved;
+}*/
+
+bool JunctionArea::moveCars(double dt)
+{
+	bool hasMoved = false;
+	bool currentStepMoving = true;
+	while(currentStepMoving) //While its possible to move cars during this timestep
+	{
+		currentStepMoving = false;
+		//First we take car of the stuck cars in the last column (about to leave the road)
+		bool stuckCarsMove = true;
+		while(stuckCarsMove)
+		{
+			stuckCarsMove = false;
+			for(int lane = 0 ; lane < nbLanes;lane++)
+			{
+				bool currentIterStuckCarsMove = at(lane).at(nbColumns-1).moveLastStuckCar(dt);
+				stuckCarsMove = stuckCarsMove || currentIterStuckCarsMove;
+			}
+		}
+		currentStepMoving = stuckCarsMove ; //We check if cars have moved during the current iteration
 		hasMoved = hasMoved || currentStepMoving; //We check if cars are moving during the whole time steps
 	}
 	return hasMoved;
@@ -162,7 +186,7 @@ pair<int,int> JunctionArea::selectNextQueue(pair<int,int> currentPosition,int ne
 			//Left lane
 			if(i-1>=0) 
 				updateWeightAndLane(weight,newLine,i-1,newColumn,nextRoad);
-			//StraightForard lane
+			//StraightForward lane
 			updateWeightAndLane(weight,newLine,i,newColumn,nextRoad);
 			//Right lane
 			if(i+1 < nbLanes)
@@ -172,7 +196,7 @@ pair<int,int> JunctionArea::selectNextQueue(pair<int,int> currentPosition,int ne
 	return(pair<int,int>(newLine,newColumn));
 }
 
-/*Checks if the queue (newLane,column) is a better choice than (currenetLane,column) which has weight currentWeight
+/*Checks if the queue (newLane,column) is a better choice than (currentLane,column) which has weight currentWeight
 for turning to nextRoad.*/
 //It updates currentWeight and currentLane with the relevant values
 void JunctionArea::updateWeightAndLane(double& currentWeight,int& currentLane,int newLane,int column, int nextRoad)

@@ -2,8 +2,8 @@
 
 using namespace std;
 
-CommonQueue::CommonQueue(double _distanceBetweenCars, int _numberOfLanes) :
-list<Car*>(), distanceBetweenCars(_distanceBetweenCars), numberOfLanes(_numberOfLanes), length(0)
+CommonQueue::CommonQueue(int _numberOfLanes) :
+numberOfLanes(_numberOfLanes), length(0)
 {
 
 }
@@ -14,45 +14,73 @@ void CommonQueue::addCar(Car* car)
 	length += car->getLength() /double(numberOfLanes);
 }
 
-void CommonQueue::removeCar(std::list<Car*>::iterator car)
-{
-	length -= (*car)->getLength()/double(numberOfLanes);
-	erase(car);
-}
-
-bool CommonQueue::moveCars()
+bool CommonQueue::moveCars(double dt)
 {
 	bool hasMoved = false;
-	//The set structure allows to move first the cars which are located at the end
-	//of the traveling area
+	double minDistanceInFrontLayer = DBL_MAX;
+	double frontDistanceAvailable = 0;
+	double averageSpeedFirstLayer = 0;
 	list<Car*>::iterator carIt = begin();
-	int numberOfMoves = numberOfLanes;
-	for(int i=0;i<numberOfMoves && carIt != end();i++) //Only the cars in the first layer can move
+	int it = 0;
+	int maxIt = numberOfLanes;
+	//We move the cars in the first layer
+	while(it < maxIt && carIt != end())
 	{
-		MoveResult result = (*carIt)->travelingCommonQueue();
-		hasMoved = hasMoved || result.getHasMoved();
-		if(result.getHasChangedState()) //If a car has moved to a queue, we erase it and we move the iterator to the next car
+		MoveResult result = (*carIt)->travelingCommonQueue(dt);
+		if(result.getHasChangedState())
 		{
-			list<Car*>::iterator carIt2 = next(carIt);
-			numberOfMoves++; //If we delete a car, it means that a new one appears in the first layer
-			for(list<Car*>::iterator carItMove = next(carIt);carItMove != end();carItMove++)
-			{ //Each vehicle after the vehicle that has left moves
-				(*carItMove)->addDistanceTraveled((*carIt)->getLength() / double(numberOfLanes));
-			}
-			removeCar(carIt);
-			carIt = carIt2;
+			list<Car*>::iterator nextIt = next(carIt);
+			length -= (*carIt)->getLength() /double(numberOfLanes);
+			erase(carIt);
+			carIt = nextIt;
+			maxIt++; //One car is out means that one appears in the front layer
 		}
-		else //Otherwise, we just move the iterator to next car
+		else
+		{
+			if((*carIt)->getDistanceInCurrentRoad() < minDistanceInFrontLayer)
+				minDistanceInFrontLayer = (*carIt)->getDistanceInCurrentRoad();
+			averageSpeedFirstLayer += (*carIt)->getSpeed();
 			carIt++;
+		}
+		it++;
+	}
+	list<Car*>::iterator firstLayerCarIt = begin();
+	for(int i=0;i<numberOfLanes && firstLayerCarIt != end();i++)
+	{
+		frontDistanceAvailable += (*firstLayerCarIt)->getDistanceInCurrentRoad() - minDistanceInFrontLayer;
+		firstLayerCarIt++;
+	}
+	double frontCarPosition = 0;
+	double frontCarSpeed = 0;
+	//We move the car right after the first layer
+	if(carIt != end())
+	{
+		frontDistanceAvailable = frontDistanceAvailable / (double) numberOfLanes;
+		averageSpeedFirstLayer = averageSpeedFirstLayer / (double) numberOfLanes;
+		(*carIt)->moveQueuing(frontDistanceAvailable,averageSpeedFirstLayer,dt);
+		cout << frontDistanceAvailable << endl;
+		if (frontCarSpeed != 0)
+			cout << "Front car speed : " << frontCarSpeed << endl;
+		frontCarPosition = (*carIt)->getDistanceInCurrentRoad();
+		frontCarSpeed = (*carIt)->getSpeed();
+		carIt++;
+	}
+	//We move the cars remaining
+	for(carIt;carIt != end();carIt++)
+	{
+		//cout << frontCarPosition - (*carIt)->getDistanceInCurrentRoad() << endl;
+		(*carIt)->moveQueuing(max(0.,frontCarPosition - (*carIt)->getDistanceInCurrentRoad()),frontCarSpeed,dt);
+		frontCarPosition = (*carIt)->getDistanceInCurrentRoad();
+		frontCarSpeed = (*carIt)->getSpeed();
 	}
 	return hasMoved;
 }
 
-void CommonQueue::speak()
+void CommonQueue::speak() const
 {
 	cout << "Common Queue length : " << length << endl;
 	cout << "Cars in  the common queue : " ;
-	for(list<Car*>::iterator it = begin();it!=end();it++)
+	for(list<Car*>::const_iterator it = begin();it!=end();it++)
 	{
 		cout << (*it)->getId() << " ; " ;
 	}

@@ -72,9 +72,9 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 			 EnterCarIt it = enteringCars.begin();
 			 while(it != enteringCars.end()) //We go through every entering car
 			 {
-				 EnterCarIt it2 = next(it);
-				 Car* currentCar = it->first;
-				 Road* targetRoad = it->second;
+				EnterCarIt it2 = next(it);
+				Car* currentCar = it->first;
+				Road* targetRoad = it->second;
 				 if(currentCar->getEnteringTime() <= time) //If it is time for the current car to enter the network
 				 {
 					 MoveResult result = currentCar->tryToEnterRoad(targetRoad); //Run the moving function in the car

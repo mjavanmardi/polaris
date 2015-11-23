@@ -5,7 +5,7 @@ using namespace std;
 CarManager::CarManager()
 {
 	// ### Building test cars ###
-	CarType typeDodge(4.42,0.58034612,0.38614873,0.68841545,6.2254787,3.30777879);
+	CarType typeDodge(4.42,0.58034612,0.38614873,0.68841545,6.2254787,3.30777879,1.7,4.42+0.5);
 
 	//path0
 	vector<int> path0;

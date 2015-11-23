@@ -8,7 +8,7 @@ typedef vector<Car*>::iterator carIt;
 EventManager::EventManager(double _dt, int _numberOfSteps, RoadNetwork* _rn, CarManager* _cs) :
 dt(_dt), time(0), numberOfSteps(_numberOfSteps), rn(_rn), cs(_cs)
 {
-	outputResults = vector< vector <double> >(0., vector<double>(0.));
+	outputResults = vector< vector <double> >(0, vector<double>(0));
 
 	//Adding the cars to their initial intersection in the road network
 	cs->addCarsToRoadNetWork(rn);
@@ -67,7 +67,9 @@ void EventManager::run()
 {
 	for(int i=0;i<numberOfSteps;i++)
 	{
-		if(!(i%100))
+		if(time == 6)
+			cout << "debug : " << endl;
+		if(!(i%10))
 			cout << "Timestep : " << i << endl;
 		setupTimeStep();
 		runTimeStep();

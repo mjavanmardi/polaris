@@ -43,94 +43,112 @@ MoveResult Car::travelingAreaMove(double dt)
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 
-	bool hasMoved = true;
+	const bool hasMoved = true; //The car necessarily moves at this point
 	bool hasChangedState = false;
 	JunctionArea* juncArea = currentRoad->getJA();
 	CommonQueue* comQueue = currentRoad->getCQ();
 
-	if(comQueue->getSize() == 0) //If the common queue is empty
-	{
-		int& nextRoadNodeA = (*nextNodeIterator);
-		vector<int>::iterator itNodeB = next(nextNodeIterator);
-		if(itNodeB ==path.end()) //If this is the car's last road
-		{
-			if(currentRoad->getLength() - juncArea->getLength() > distanceInTA) //If the car still needs to move
-			{
-				double distToStop = currentRoad->getLength()- juncArea->getLength() - comQueue->getLength() - distanceInTA;
-				double alpha = computeAlpha(dt,distToStop);
-				updateSpeedAndDistance(dt,alpha);
-			}
-			else //The car gets out of the network
-			{
-				state = in_OutOfNetwork;
-				hasChangedState = true;
-				currentRoad = NULL;
-			}
-		}
-		else //If this is not the car's last road
-		{
-			int& nextRoadNodeB = (*itNodeB);
-			int nextRoadId = currentRoad->getNodesToRoad()->at(nextRoadNodeA).at(nextRoadNodeB)->getId(); //We get the Id of the next road
-			if(currentRoad->getLength() - juncArea->getLength() > distanceInTA) //If the car still needs to move
-			{
-				pair<bool,double> freePath = juncArea->isPathFree(nextRoadId,-1,-1); //freePath.second is the distance of free flow available in the junction area
-				double distToStop = 0;
-				if(freePath.first) //If there is a way to go to the next road without queueing
-				{
-					distToStop = currentRoad->getLength() - distanceInTA; // We consider that the stop is far away
-				}
-				else
-				{
-					double distLeftInTA = currentRoad->getLength() - distanceInTA - juncArea->getLength();
-					double& freeDistanceInJA = freePath.second;
-					distToStop = distLeftInTA + freeDistanceInJA;
-				}
-				double alpha = computeAlpha(dt,distToStop);
-				updateSpeedAndDistance(dt,alpha);
-			}
-			else
-			{
-				//Insert in JA if room, in CQ if no room
-				pair<int,int> nextQueue = juncArea->selectNextQueue(pair<int,int>(-1,-1),nextRoadId);
-				double freeRoom = juncArea->getTotalLengthLeft(nextQueue.first,nextQueue.second);
-				if(freeRoom >= type.getCarLength()) //If there is room for the car to enter the individual queue
-				{
-					distanceTraveled += 0; //Their can be overshoot, so we don't update the distanceTraveled
-					juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
-					state = in_JunctionArea;
-					currentIndivQueue = nextQueue;
-					distanceInTA = 0;
-				}
-				else //No room : we insert in the CQ
-				{
-					distanceTraveled += 0; //Their can be overshoot, so we don't update the distanceTravled
-					speed = 0;
-					comQueue->addCar(this);
-					state = in_CommonQueue;
-					distanceInTA = 0;
-				}
-				hasChangedState = true;
-			}
-		}
-	}
-	else //If common queue is not empty
+	bool isCommonQueueEmpty = (comQueue->getSize()==0);
+	if(!isCommonQueueEmpty) //if the common queue is not empty
 	{
 		double distToComQueue = currentRoad->getLength() - currentRoad->getJA()->getLength()  - currentRoad->getCQ()->getLength() - distanceInTA;
-		if(distToComQueue > 0) //If we still need to move
+		bool hasReachedCommonQueue = distToComQueue <= 0.;
+		if(hasReachedCommonQueue) //if this is the car has reached its common queue
 		{
-			double alpha = computeAlpha(dt,distToComQueue);
-			updateSpeedAndDistance(dt,alpha); //Updates distanceInTA, distanceTraveled, distanceInTimeStep and speed
-		}
-		else //If we don't need to move we enter the common queue
-		{
-			distanceTraveled += 0; //Their can be overshoot, so we don't update the distanceTravled
-			speed = 0;
+			//The car enters the common queue
 			comQueue->addCar(this);
 			state = in_CommonQueue;
 			hasChangedState = true;
+			return MoveResult(hasMoved,hasChangedState);
+		}
+		else
+		{
+			//The car moves in free-flow
+			//Parameter : distance to the common queue
+			double alpha = computeAlpha(dt,distToComQueue);
+			updateSpeedAndDistance(dt,alpha); //Updates distanceInTA, distanceTraveled, distanceInTimeStep and speed
+			hasChangedState = false;
+			return MoveResult(hasMoved,hasChangedState);
 		}
 	}
-	return MoveResult(hasMoved,hasChangedState);
+	vector<int>::iterator itNodeB = next(nextNodeIterator);
+	bool isLastRoad = itNodeB == path.end();
+	bool hasReachedJunctionArea = currentRoad->getLength() - juncArea->getLength() <= distanceInTA;
+	if(isLastRoad) //if this is the car's last road
+	{
+		if(hasReachedJunctionArea) //if the car has reached its junction area
+		{
+			//The car gets out of the network
+			state = in_OutOfNetwork;
+			hasChangedState = true;
+			currentRoad = NULL;
+			return MoveResult(hasMoved,hasChangedState);
+		}
+		else
+		{
+			//The car moves in free-flow
+			//Parameter : distance to the junction area
+			double distToJunctionArea = currentRoad->getLength()- juncArea->getLength() - distanceInTA;
+			double alpha = computeAlpha(dt,distToJunctionArea);
+			updateSpeedAndDistance(dt,alpha);
+			hasChangedState = false;
+			return MoveResult(hasMoved,hasChangedState);
+		}
+	}
+	int& nextRoadNodeA = (*nextNodeIterator);
+	int& nextRoadNodeB = (*itNodeB);
+	int nextRoadId = currentRoad->getNodesToRoad()->at(nextRoadNodeA).at(nextRoadNodeB)->getId(); //We get the Id of the next road
+	if(!hasReachedJunctionArea) //if the car has not reached its junction area
+	{
+		
+		pair<bool,double> freePath = juncArea->isPathFree(nextRoadId,-1,-1); //freePath.second is the distance of free flow available in the junction area
+		bool& isFreeFlowPathInJunctionArea = freePath.first;
+		if(isFreeFlowPathInJunctionArea) //If there is a way to go to the next road without queueing
+		{
+			//The car moves in free-flow
+			//Parameter : we consider that the stop is at the end of the road
+			double distToStop = currentRoad->getLength() - distanceInTA; 
+			double alpha = computeAlpha(dt,distToStop);
+			updateSpeedAndDistance(dt,alpha);
+			hasChangedState = false;
+			return MoveResult(hasMoved,hasChangedState);
+		}
+		else
+		{
+			//The car moves in free-flow
+			//Parameter : maximum free-flow distance avaiable
+			double distLeftInTA = currentRoad->getLength() - distanceInTA - juncArea->getLength();
+			double& freeDistanceInJA = freePath.second;
+			double maxFreeFlowDistance = distLeftInTA + freeDistanceInJA;
+			double alpha = computeAlpha(dt,maxFreeFlowDistance);
+			updateSpeedAndDistance(dt,alpha);
+			hasChangedState = false;
+			return MoveResult(hasMoved,hasChangedState);
+		}
+
+	}
+	pair<int,int> nextQueue = juncArea->selectNextQueue(pair<int,int>(-1,-1),nextRoadId);
+	double freeRoom = juncArea->getTotalLengthLeft(nextQueue.first,nextQueue.second);
+	bool isRoomInJunctionArea = (freeRoom >= type.getCarLength());
+	if(isRoomInJunctionArea) //If there is room for the car to enter the individual queue 
+	{
+		//The car enters the junction area
+		juncArea->insertCar(this,nextQueue); 
+		state = in_JunctionArea;
+		currentIndivQueue = nextQueue;
+		distanceInTA = 0;
+		hasChangedState = true;
+		return MoveResult(hasMoved,hasChangedState);
+	}
+	else
+	{
+		//The car enters the common queue
+		comQueue->addCar(this);
+		state = in_CommonQueue;
+		distanceInTA = 0;
+		hasChangedState = true;
+		return MoveResult(hasMoved,hasChangedState);
+	}
 }
 
 void Car::updateSpeedAndDistance(double dt, double alpha)
@@ -180,7 +198,7 @@ double Car::dBraking(double dt, double acceleration)
 	return (nb * dt * (speed - 0.5 * acceleration * nb * dt));
 }
 
-MoveResult Car::travelingCommonQueue()
+MoveResult Car::travelingCommonQueue(double dt)
 {
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
@@ -204,7 +222,11 @@ MoveResult Car::travelingCommonQueue()
 		int nextRoadId = currentRoad->getNodesToRoad()->at(nextRoadNodeA).at(nextRoadNodeB)->getId(); //We get the Id of the next road
 		pair<int,int> nextQueue = juncArea->selectNextQueue(pair<int,int>(-1,-1),nextRoadId);
 		double freeRoom = juncArea->getTotalLengthLeft(nextQueue.first,nextQueue.second);
-		if(freeRoom >= type.getCarLength()) //If there is room for the car to enter the individual queue
+
+		double alpha = computeAlpha(dt,freeRoom+getDistanceToJunctionArea());
+		updateSpeedAndDistance(dt,alpha);
+
+		if(getDistanceToJunctionArea() <= 0) //If there is room for the car to enter the individual queue
 		{
 			hasChangedState = true;
 			hasMoved = true;
@@ -217,12 +239,12 @@ MoveResult Car::travelingCommonQueue()
 			distanceInTimeStep += dx;
 		}
 	}
-
 	return MoveResult(hasMoved,hasChangedState);
 }
 
 MoveResult Car::leaveRoad(double dt)
 {
+	double distanceToNextRoad = currentRoad->getLength() - distanceInCurrentRoad;
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 	bool hasMoved = false;
@@ -233,8 +255,18 @@ MoveResult Car::leaveRoad(double dt)
 		hasChangedState = true;
 		hasMoved = true;
 		state = in_OutOfNetwork;
+		return MoveResult(hasMoved,hasChangedState);
 	}
-	else //This is not the car's last road
+	//This is not the car's last road
+
+	distanceToNextRoad = currentRoad->getLength() - distanceInCurrentRoad;
+	if(distanceToNextRoad >0)
+	{
+		double alpha = computeAlpha(dt,distanceToNextRoad);
+		updateSpeedAndDistance(dt,alpha); //Updates distanceInTA, distanceTraveled, distanceInTimeStep and speed
+	}
+	distanceToNextRoad = currentRoad->getLength() - distanceInCurrentRoad;
+	if(distanceToNextRoad <= 0)
 	{
 		//Get the next road ID
 		Road* targetRoad = currentRoad->getNodesToRoad()->at(*nextNodeIterator).at(*nextNodeB);
@@ -263,22 +295,22 @@ MoveResult Car::leaveRoad(double dt)
 				hasMoved = true;
 				state = in_TravelingArea;
 				currentRoad = targetRoad;
-				distanceInTA = 0;
 				nextNodeIterator++;
 				currentIndivQueue = pair<int,int>(-1,-1);
-				speed = type.getMaxAcc() * dt;
+				
+				double dx = min(-distanceToNextRoad,distanceInTimeStep - maxDistanceInCurrentTimeStep);
 
-				//When a car leaves a road, we should advance of distance adjustDistance (See below)
-				//However, the distance a car can advance is bounded between 0 and 
-				//maxDistanceInCurrentTimeStep-distanceInTimeStep.
-				double adjustDistance = currentRoad->getLength() - distanceInCurrentRoad;
-				double dx = max(0.,min(maxDistanceInCurrentTimeStep-distanceInTimeStep,adjustDistance));
-				distanceInTimeStep += dx;
-				distanceTraveled += dx;
+				distanceInTA = 0;
+				distanceInTimeStep += 0;
+				distanceTraveled += 0;
 
 				distanceInCurrentRoad = 0;
 			}
+			else
+				speed = 0;
 		}
+		else
+			speed = 0;
 	}
 	return MoveResult(hasMoved,hasChangedState);
 }
@@ -299,65 +331,33 @@ bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight) cons
 	return canCross;
 }
 
-MoveResult Car::moveFromLastFreeFlowArea(double dt)
+bool Car::moveQueuing(double frontDistanceAvailable,double frontSpeed, double dt)
 {
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
-		return MoveResult(false,false);
-	bool hasMoved = false;
-	bool hasChangedState = false;
-	double distanceLeft = currentRoad->getJA()->getFreeFlowSectionLeft(currentIndivQueue)-distanceInTA;
-	if(distanceLeft > 0) //If the car still has to move
-	{
-		double alpha = computeAlpha(dt,distanceLeft);
-		updateSpeedAndDistance(dt,alpha);
-	}
-	else
-	{
-		if(currentRoad->getJA()->isStuckSectionEmpty(currentIndivQueue)) //If the stuck section is empty
-		{
-			MoveResult tryToLeaveRoad = leaveRoad(dt); //Updates the state attributes if the car has managed to change road
-			if(!tryToLeaveRoad.getHasChangedState()) //If the car couldn't leave the road
-			{//We add it to the stuck section and we indicate it has changed state
-				currentRoad->getJA()->insertCarInStuckSection(this,currentIndivQueue);
-				hasMoved = true;
-				hasChangedState = true;
-				//Update the state variables
-				distanceInTA = 0;
-				speed = 0;
-				distanceInTimeStep += 0; //There can be overshooting
-				distanceTraveled += 0; //There can be overshooting
-			}
-			else
-			{
-				hasMoved = true;
-				hasChangedState = true;
-			}
-		}
-		else //If we arrived in the stuck section, we get into it
-		{
-			currentRoad->getJA()->insertCarInStuckSection(this,currentIndivQueue);
-			hasMoved = true;
-			hasChangedState = true;
-			//Update the state variables
-			distanceInTA = 0;
-			speed = 0;
-			distanceInTimeStep += 0; //There can be overshooting
-			distanceTraveled += 0; //There can be overshooting
-		}
-	}
-	return MoveResult(hasMoved,hasChangedState);
+		return false;
+	if(frontDistanceAvailable<0)
+		return false;
+	double safetyDistance = getSafetyDistance(frontSpeed,currentRoad->getMaxSpeed());
+	
+	double error = (frontDistanceAvailable) - safetyDistance;
+	double lowBound = speed - type.getMaxDec() * dt;
+	double highBound = speed + type.getMaxAcc() * dt;
+	speed = min(min(currentRoad->getMaxSpeed(),highBound),max(max(0.,lowBound),error/dt));
+	double dx = speed*dt;
+	distanceInTimeStep += dx;
+	distanceTraveled += dx;
+	distanceInCurrentRoad += dx;
+	return (dx >= 1E-14); //To avoid numerical error
+}
+
+double Car::getSafetyDistance(double frontCarSpeed, double maxSpeed) const
+{
+	return type.getTau() * frontCarSpeed + maxSpeed/(2*type.getMaxDec()) * (speed - frontCarSpeed) + type.getDz(); 
 }
 
 void Car::setSpeedZero()
 {
 	speed = 0.;
-}
-
-void Car::addDistanceTraveled(double distance)
-{
-	distanceTraveled += distance;
-	distanceInCurrentRoad += distance;
-	distanceInTimeStep += min(distance,maxDistanceInCurrentTimeStep-distanceInTimeStep);
 }
 
 void Car::postponeEnteringTime(double time)
@@ -430,6 +430,21 @@ int Car::currentRoadId() const
 double Car::getDistanceInCurrentRoad() const
 {
 	return distanceInCurrentRoad;
+}
+
+double Car::getDistanceToJunctionArea() const
+{
+	return currentRoad->getLength()-currentRoad->getJA()->getLength() - distanceInCurrentRoad;
+}
+
+double Car::getSpeed() const
+{
+	return speed;
+}
+
+double Car::getDistanceToNextRoad() const
+{
+	return currentRoad->getLength()-distanceInCurrentRoad;
 }
 
 void Car::speak()

@@ -35,13 +35,13 @@ public:
 	//depending on the car's situation in the network
 	MoveResult tryToEnterRoad(Road* road);
 	MoveResult travelingAreaMove(double dt);
-	MoveResult travelingCommonQueue();
+	MoveResult travelingCommonQueue(double dt);
 	MoveResult leaveRoad(double dt); 
 	MoveResult moveFromLastFreeFlowArea(double dt);
 
-	void addDistanceTraveled(double distance); //Should be use as less as possible. A car should always update its distance traveled itself
 	void postponeEnteringTime(double time);
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step
+	bool moveQueuing(double frontDistanceAvailable,double frontSpeed, double dt);
 
 	bool lastCarProba(double remainingAllowedWeight, double lastCarWeight) const;
 	void setSpeedZero(); //Used when a car enters a queue
@@ -53,7 +53,7 @@ public:
 	double computeAlpha(double dt, double distToStop);
 	double dBraking(double dt, double acceleration);
 
-	//### getters ###
+	//### Getters ###
 
 	double getDistanceInTA() const;
 	double getDistanceTraveled() const;
@@ -66,6 +66,10 @@ public:
 	int getCurrentLane() const;
 	int currentRoadId() const;
 	double getDistanceInCurrentRoad() const;
+	double getDistanceToJunctionArea() const;
+	double getSpeed() const;
+	double getSafetyDistance(double frontCarSpeed, double maxSpeed) const;
+	double getDistanceToNextRoad() const;
 
 	void speak();
 

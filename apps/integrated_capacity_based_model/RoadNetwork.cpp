@@ -19,12 +19,12 @@ RoadNetwork::RoadNetwork()
 
 
 	// ### Building CommonQueue ###
-	CommonQueue* cq0 = new CommonQueue(0.1,2);
-	CommonQueue* cq1 = new CommonQueue(0.1,1);
-	CommonQueue* cq2 = new CommonQueue(0.1,2);
-	CommonQueue* cq3 = new CommonQueue(0.1,1);
-	CommonQueue* cq4 = new CommonQueue(0.1,2);
-	CommonQueue* cq5 = new CommonQueue(0.1,1);
+	CommonQueue* cq0 = new CommonQueue(2);
+	CommonQueue* cq1 = new CommonQueue(1);
+	CommonQueue* cq2 = new CommonQueue(2);
+	CommonQueue* cq3 = new CommonQueue(1);
+	CommonQueue* cq4 = new CommonQueue(2);
+	CommonQueue* cq5 = new CommonQueue(1);
 
 	// ### Building JunctionArea ###
 
@@ -57,10 +57,10 @@ RoadNetwork::RoadNetwork()
 	//ja2
 	vector<pair<int,TurningMovementType>> tm_2_0_0;
 	tm_2_0_0.push_back(pair<int,TurningMovementType>(5,Left));
-	IndividualQueue iq20(20., tm_2_0_0);
+	IndividualQueue iq20(30, tm_2_0_0);
 	vector<pair<int,TurningMovementType>> tm_2_1_0;
 	tm_2_1_0.push_back(pair<int,TurningMovementType>(1,Right));
-	IndividualQueue iq21(20., tm_2_1_0);
+	IndividualQueue iq21(30, tm_2_1_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq20);

@@ -88,7 +88,7 @@ double Road::getRoomLeftInTravelingArea()
 bool Road::moveCarsInCQandTA(double dt)
 {
 	bool hasMoved = false;
-	bool hasCQMoved = comQueue->moveCars();
+	bool hasCQMoved = comQueue->moveCars(dt);
 	bool hasTAMoved = travArea->moveCars(dt);
 	hasMoved = hasMoved || hasCQMoved; //We firstly move the common queue
 	hasMoved = hasMoved || hasTAMoved; //Then we move the traveling area

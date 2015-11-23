@@ -29,3 +29,13 @@ double CarType::getMaxDec() const
 {
 	return maxDec;
 }
+
+double CarType::getTau() const
+{
+	return tau;
+}
+
+double CarType::getDz() const
+{
+	return dz;
+}

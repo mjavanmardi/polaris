@@ -19,7 +19,7 @@ int main()
 	EventManager simulation(dt,numberOfSteps,testNetwork,testCars);
 	simulation.run();
 
-	//delete the network and the cars
+	//Delete the network and the cars
 	delete testNetwork;
 	delete testCars;
 

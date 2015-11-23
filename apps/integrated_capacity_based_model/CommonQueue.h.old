@@ -1,22 +1,23 @@
 #pragma once
-
-#include <list>
 #include "Car.h"
+#include <list>
 
 class Car;
 
 class CommonQueue : private std::list<Car*>
 {
 public:
-	CommonQueue(int _numberOfLanes);
+	CommonQueue(double _distanceBetweenCars, int _numberOfLanes);
 
 	void addCar(Car* car);
-	bool moveCars(double dt);
-	void speak() const;
+	void removeCar(std::list<Car*>::iterator car);
+	bool moveCars();
+	void speak();
 	double getLength() const;
 	int getSize() const;
 	int getNumberOfLanes() const;
 private:
-	const int numberOfLanes;
 	double length;
+	const double distanceBetweenCars;
+	const int numberOfLanes;
 };
