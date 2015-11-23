@@ -67,8 +67,8 @@ void EventManager::run()
 {
 	for(int i=0;i<numberOfSteps;i++)
 	{
-		if(time == 6)
-			cout << "debug : " << endl;
+		//if(time == 6)
+			//cout << "debug : " << endl;
 		if(!(i%10))
 			cout << "Timestep : " << i << endl;
 		setupTimeStep();

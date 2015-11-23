@@ -198,6 +198,7 @@ double Car::dBraking(double dt, double acceleration)
 	return (nb * dt * (speed - 0.5 * acceleration * nb * dt));
 }
 
+//Used only for the first layer of cars in the Common Queue
 MoveResult Car::travelingCommonQueue(double dt)
 {
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
@@ -223,20 +224,27 @@ MoveResult Car::travelingCommonQueue(double dt)
 		pair<int,int> nextQueue = juncArea->selectNextQueue(pair<int,int>(-1,-1),nextRoadId);
 		double freeRoom = juncArea->getTotalLengthLeft(nextQueue.first,nextQueue.second);
 
-		double alpha = computeAlpha(dt,freeRoom+getDistanceToJunctionArea());
-		updateSpeedAndDistance(dt,alpha);
-
-		if(getDistanceToJunctionArea() <= 0) //If there is room for the car to enter the individual queue
+		bool isJunctionAreaReached = getDistanceToJunctionArea() <= 0;
+		if(isJunctionAreaReached) //If junction area is reached
 		{
-			hasChangedState = true;
-			hasMoved = true;
-			juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
-			state = in_JunctionArea;
-			currentIndivQueue = nextQueue;
-			double dx = min(maxDistanceInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
-			distanceInCurrentRoad += dx;
-			distanceTraveled += dx;
-			distanceInTimeStep += dx;
+			bool isRoomLeftInJunctionArea = freeRoom >= getLength();
+			if(isRoomLeftInJunctionArea) //If there is room for the car to enter the individual queue
+			{
+				hasChangedState = true;
+				hasMoved = true;
+				juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
+				state = in_JunctionArea;
+				currentIndivQueue = nextQueue;
+				double dx = min(maxDistanceInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
+				distanceInCurrentRoad += dx;
+				distanceTraveled += dx;
+				distanceInTimeStep += dx;
+			}
+		}
+		else
+		{
+			double alpha = computeAlpha(dt,freeRoom+getDistanceToJunctionArea());
+			updateSpeedAndDistance(dt,alpha);
 		}
 	}
 	return MoveResult(hasMoved,hasChangedState);
@@ -336,7 +344,10 @@ bool Car::moveQueuing(double frontDistanceAvailable,double frontSpeed, double dt
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return false;
 	if(frontDistanceAvailable<0)
+	{
+		speed = max(0.,speed - type.getMaxDec() * dt);
 		return false;
+	}
 	double safetyDistance = getSafetyDistance(frontSpeed,currentRoad->getMaxSpeed());
 	
 	double error = (frontDistanceAvailable) - safetyDistance;

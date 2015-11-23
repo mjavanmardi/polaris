@@ -161,6 +161,8 @@ bool IndividualQueue::moveLastStuckCar(double dt)
 			if(it != stuckSection.end())
 			    nextIt++;
 		}
+		if(stuckSection.size() !=0)
+			firstCarDistanceToNextRoad = stuckSection.back()->getDistanceToNextRoad();
 	}
 	return hasMoved;
 }

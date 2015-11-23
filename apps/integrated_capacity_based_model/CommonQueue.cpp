@@ -58,9 +58,6 @@ bool CommonQueue::moveCars(double dt)
 		frontDistanceAvailable = frontDistanceAvailable / (double) numberOfLanes;
 		averageSpeedFirstLayer = averageSpeedFirstLayer / (double) numberOfLanes;
 		(*carIt)->moveQueuing(frontDistanceAvailable,averageSpeedFirstLayer,dt);
-		cout << frontDistanceAvailable << endl;
-		if (frontCarSpeed != 0)
-			cout << "Front car speed : " << frontCarSpeed << endl;
 		frontCarPosition = (*carIt)->getDistanceInCurrentRoad();
 		frontCarSpeed = (*carIt)->getSpeed();
 		carIt++;
@@ -68,7 +65,6 @@ bool CommonQueue::moveCars(double dt)
 	//We move the cars remaining
 	for(carIt;carIt != end();carIt++)
 	{
-		//cout << frontCarPosition - (*carIt)->getDistanceInCurrentRoad() << endl;
 		(*carIt)->moveQueuing(max(0.,frontCarPosition - (*carIt)->getDistanceInCurrentRoad()),frontCarSpeed,dt);
 		frontCarPosition = (*carIt)->getDistanceInCurrentRoad();
 		frontCarSpeed = (*carIt)->getSpeed();
