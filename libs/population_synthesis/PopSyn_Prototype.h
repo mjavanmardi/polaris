@@ -977,10 +977,10 @@ namespace PopSyn
 								household_type* hh = (household_type*)*p_itr;
 
 								// create household record using the ACS properties
-								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
+								shared_ptr<MasterType::hh_db_rec_type> hh_rec(new MasterType::hh_db_rec_type());
 								hh_rec->setHhold(uuid);
-								Set_HH_Record_Location<household_type*,zone_itf*>(hh_rec,hh,zone);
-								Fill_HH_Record<typename get_type_of(network_reference),household_type*,zone_itf*>(hh_rec,hh,zone);
+								Set_HH_Record_Location<shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
+								Fill_HH_Record<typename get_type_of(network_reference),shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
 
 								//push to database
 								db->persist(hh_rec);
@@ -994,11 +994,11 @@ namespace PopSyn
 
 									person_type* person = (person_type*)(*p_itr);
 
-									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
+									shared_ptr<MasterType::person_db_rec_type> per_rec(new MasterType::person_db_rec_type());
 									per_rec->setId(perid);
 									per_rec->setHousehold(hh_rec);
-									Set_Person_Record_Locations<person_type*,zone_itf*>(per_rec,person,zone);
-									Fill_Person_Record<typename get_type_of(network_reference),person_type*,zone_itf*>(per_rec,person,zone);
+									Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*,zone_itf*>(per_rec,person,zone);
+									Fill_Person_Record<typename get_type_of(network_reference),shared_ptr<MasterType::person_db_rec_type>,person_type*,zone_itf*>(per_rec,person,zone);
 									
 									//push to database
 									db->persist(per_rec);
@@ -1032,7 +1032,7 @@ namespace PopSyn
 				return name;
 			}
 
-			template<typename NetworkType, typename HHType, typename ZoneType> void Fill_HH_Record(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
@@ -1041,7 +1041,7 @@ namespace PopSyn
 
 				Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->Static_Properties<household_itf*>(),zone);
 			}
-			template<typename NetworkType, typename HHType, typename ZoneType> void Fill_HH_Record(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				hh_rec->setPersons(hh->template Household_size<int>());
 				hh_rec->setWorkers(hh->template Number_of_workers<int>());
@@ -1049,7 +1049,7 @@ namespace PopSyn
 				hh_rec->setIncome(hh->Income<Basic_Units::Currency_Variables::Dollars>());
 				hh_rec->setType(hh->Household_type<int>());
 			}
-			template<typename HHType, typename ZoneType> void Set_HH_Record_Location(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename HHRecType, typename HHType, typename ZoneType> void Set_HH_Record_Location(HHRecType hh_rec, HHType hh, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
@@ -1059,11 +1059,11 @@ namespace PopSyn
 				household_itf* hh_itf = (household_itf*)hh;
 				hh_rec->setLocation(hh_itf->Home_Location<activity_location_itf*>()->template uuid<int>());
 			}
-			template<typename HHType, typename ZoneType> void Set_HH_Record_Location(shared_ptr<polaris::io::Household> hh_rec, HHType hh, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename HHRecType, typename HHType, typename ZoneType> void Set_HH_Record_Location(HHRecType hh_rec, HHType hh, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				hh_rec->setLocation(zone->ID<long long>());
 			}
-			template<typename NetworkType, typename PerType, typename ZoneType> void Fill_Person_Record(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename PerRecType, typename PerType, typename ZoneType> void Fill_Person_Record(PerRecType per_rec, PerType person, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
@@ -1071,9 +1071,9 @@ namespace PopSyn
 				typedef Person_Components::Prototypes::Person_Properties<typename strip_modifiers(PerType)::get_type_of(Static_Properties)> person_itf;
 
 				Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->Static_Properties<person_itf*>(),zone);
-				person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
+				person->template person_record<shared_ptr<MasterType::person_db_rec_type>>(per_rec);
 			}
-			template<typename NetworkType, typename PerType, typename ZoneType> void Fill_Person_Record(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename PerRecType, typename PerType, typename ZoneType> void Fill_Person_Record(PerRecType per_rec, PerType person, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				per_rec->setAge(person->Age<int>());
 				per_rec->setEducation(person->Educational_Attainment<int>());
@@ -1092,7 +1092,7 @@ namespace PopSyn
 				per_rec->setWorker_class(person->Class_of_worker<int>());
 				per_rec->setWork_hours(person->Work_Hours<Time_Hours>());
 			}
-			template<typename PerType, typename ZoneType> void Set_Person_Record_Locations(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename PerRecType, typename PerType, typename ZoneType> void Set_Person_Record_Locations(PerRecType per_rec, PerType person, ZoneType zone, requires(ZoneType,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
@@ -1109,7 +1109,7 @@ namespace PopSyn
 				else
 					per_rec->setWork_Location_Id(0);
 			}
-			template<typename PerType, typename ZoneType> void Set_Person_Record_Locations(shared_ptr<polaris::io::Person> per_rec, PerType person, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename PerRecType, typename PerType, typename ZoneType> void Set_Person_Record_Locations(PerRecType per_rec, PerType person, ZoneType zone, requires(ZoneType,!check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				per_rec->setSchool_Location_Id(0);
 				per_rec->setWork_Location_Id(0);
