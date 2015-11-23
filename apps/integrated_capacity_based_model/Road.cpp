@@ -1,0 +1,108 @@
+#include "Road.h"
+
+using namespace std;
+
+Road::Road(int _id, TravelingArea* _travArea, CommonQueue* _comQueue, JunctionArea* _juncArea,
+	Intersection* _intersectionA, Intersection* _intersectionB, double _length, double _maxSpeed, 
+	MatPointer _nodesToRoad, CapaPointer _capacity) : 
+	id(_id), travArea(_travArea), comQueue(_comQueue), juncArea(_juncArea), 
+	intersectionA(_intersectionA), intersectionB(_intersectionB), length(_length),
+	nodeA(_intersectionA->getId()),nodeB(_intersectionB->getId()), maxSpeed(_maxSpeed), 
+	nodesToRoad(_nodesToRoad), capacity(_capacity)
+{
+
+}
+
+Road::~Road()
+{
+	delete travArea;
+	delete comQueue;
+	delete juncArea;
+}
+
+TravelingArea* Road::getTA() const
+{
+	return travArea;
+}
+
+CommonQueue* Road::getCQ() const
+{
+	return comQueue;
+}
+
+JunctionArea* Road::getJA() const
+{ 
+	return juncArea;
+}
+
+int Road::getId() const
+{
+	return id;
+}
+
+int Road::getNodeA() const
+{
+	return nodeA;
+}
+
+int Road::getNodeB() const
+{
+	return nodeB;
+}
+
+double Road::getMaxSpeed() const
+{
+	return maxSpeed;
+}
+
+MatPointer Road::getNodesToRoad() const
+{
+	return nodesToRoad;
+}
+
+CapaPointer Road::getCapacity() const
+{
+	return capacity;
+}
+
+Intersection* Road::getIntersectionA() const
+{
+	return intersectionA;
+}
+
+void Road::speak() const
+{
+	cout << "Road Id : " << id << " is going from intersection " <<
+		intersectionA->getId() << " to intersection " << intersectionB->getId() << endl;
+	travArea->speak();
+	comQueue->speak();
+	juncArea->speak();
+	cout << endl << endl;
+}
+
+double Road::getRoomLeftInTravelingArea()
+{
+	return max(0.,(length - juncArea->getLength() - comQueue->getLength() - travArea->getMinLength()));
+}
+
+bool Road::moveCarsInCQandTA(double dt)
+{
+	bool hasMoved = false;
+	bool hasCQMoved = comQueue->moveCars();
+	bool hasTAMoved = travArea->moveCars(dt);
+	hasMoved = hasMoved || hasCQMoved; //We firstly move the common queue
+	hasMoved = hasMoved || hasTAMoved; //Then we move the traveling area
+	return hasMoved;
+}
+
+bool Road::moveCarsInJA(double dt)
+{
+	bool hasMoved = false;
+	hasMoved = juncArea->moveCars(dt);
+	return hasMoved;
+}
+
+double Road::getLength() const
+{
+	return length;
+}
