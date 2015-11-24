@@ -188,10 +188,10 @@ namespace Network_Skimming_Components
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(zone_origins_count),int> zone_location_count_itf;
 				
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_itf)> location_itf;
 				
 				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 				
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
@@ -203,10 +203,10 @@ namespace Network_Skimming_Components
 				
 				// origin to zone / destination to zone mappings
 				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> origin_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> origin_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(origin_locations_itf)> origin_location_itf;
 				
 				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> destination_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> destination_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(origin_locations_itf)> destination_location_itf;
 				
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();
 				destination_locations_itf* destination_locations = skim->template destination_locations<destination_locations_itf*>();		
@@ -217,7 +217,7 @@ namespace Network_Skimming_Components
 
 				// get reference to the routers used to create path-trees from each origin
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(path_trees_container)> path_trees_itf;
-				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(path_trees_itf)> path_tree_itf;
+				typedef Routing_Components::Prototypes::Routing<get_component_type(path_trees_itf)> path_tree_itf;
 				
 				path_trees_itf* trees_container = skim->template path_trees_container<path_trees_itf*>();
 				typename path_trees_itf::iterator tree_itr = trees_container->begin();	
@@ -638,7 +638,7 @@ namespace Network_Skimming_Components
 			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
 			
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
@@ -745,7 +745,7 @@ namespace Network_Skimming_Components
 
 				// tree builder interface
 				typedef Pair_Associative_Container< type_of(path_trees_container)> tree_builder_list_itf;
-				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(tree_builder_list_itf)> tree_builder_itf;
+				typedef Routing_Components::Prototypes::Routing<get_component_type(tree_builder_list_itf)> tree_builder_itf;
 				tree_builder_list_itf* tree_list = this->path_trees_container<tree_builder_list_itf*>();
 
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();	

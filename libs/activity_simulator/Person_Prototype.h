@@ -2,6 +2,9 @@
 
 #include "Activity_Simulator_Includes.h"
 #include "Activity_Prototype.h"
+
+
+
 //#include "Network_Event_Prototype.h"
 //#include "Activity_Location_Prototype.h"
 //#include "Network_Prototype.h"
@@ -22,9 +25,9 @@ namespace Concepts
 {
 	concept struct Is_Person
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
-		check_template_method_name(Has_Properties_Defined,Properties);
-		check_template_method_name(Has_Planner_Defined,Planning_Faculty);
+		check_template_method_name(Has_Initialize_Defined,template Initialize);
+		check_template_method_name(Has_Properties_Defined,template Properties);
+		check_template_method_name(Has_Planner_Defined,template Planning_Faculty);
 		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
 	};
 
@@ -43,7 +46,7 @@ namespace Concepts
 
 	concept struct Has_Initialize
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
+		check_template_method_name(Has_Initialize_Defined,template Initialize);
 		define_default_check(Has_Initialize_Defined);
 	};
 
@@ -97,56 +100,8 @@ namespace Prototypes
 			// start the agent off at home
 			this->current_location<location_itf*>(this->Home_Location<location_itf*>());
 		}
-		template<typename T> void Print_Preplanned_Activities_Event()
-		{
-			typedef Person<ComponentType> _Person_Interface;
-			_Person_Interface* pthis =(_Person_Interface*)this;
-			typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
-			typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+		template<typename T> void Print_Preplanned_Activities_Event(){this_component()->template Print_Preplanned_Activities_Event();}
 
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activities;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activities)>  Activity;
-			
-			typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container)> Activity_Records;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)>  Activity_Record;
-			
-			
-			typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::person_data_logger_type> _Logger_Interface;
-			
-
-			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
-			Activities* activities = scheduler->template Activity_Container<Activities*>();
-			Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
-
-#ifdef ANTARES
-			for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
-			{
-				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(*itr,false);
-
-				// store activity records in the person activity record container.
-				Activity_Record* new_record = (Activity_Record*)Allocate<typename get_component_type(Activity_Records)>();
-				new_record->Initialize<Activity*>(*itr);
-				activity_records->push_back(new_record);
-			}
-			
-			pthis->Sort_Activity_Records<void>();
-#endif
-			
-
-			//// exit if no activity output is specified
-			//scenario_itf* scenario = (scenario_itf*)_global_scenario;
-			//if (!scenario->template write_activity_output<bool>()) return;
-
-
-			// push the start-of-day at home activity to the output database
-			typename Activities::iterator itr = activities->begin();
-			Activity* act = (Activity*)(*itr);
-			if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
-			{
-				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(act,true);
-			}
-		}
 
 		// Initializers
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
@@ -158,7 +113,7 @@ namespace Prototypes
 			this_component()->template Initialize< TargetType>(id);	
 
 			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
-			((ComponentType*)this)->Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
+			((ComponentType*)this)->template Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
 		}
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
@@ -177,7 +132,7 @@ namespace Prototypes
 
 			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 
-			((ComponentType*)this)->Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
+			((ComponentType*)this)->template Load_Event<ComponentType>(&Agent_Event_Controller,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration);
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
@@ -242,7 +197,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -262,7 +217,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
@@ -300,7 +255,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -314,7 +269,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -336,7 +291,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -355,7 +310,7 @@ namespace Prototypes
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
@@ -386,7 +341,7 @@ namespace Prototypes
 			typedef Person_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -423,10 +378,10 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zone_container_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zone_container_itf)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zone_container_itf)>  zone_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> locations_container_interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  location_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 			
 
 			properties_itf* props = this->Properties<properties_itf*>();
@@ -466,29 +421,29 @@ namespace Prototypes
 		{
 			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 			Activity_Plan* prev_act = this->previous_activity_plan<TimeType,Activity_Plan*>(start);
 			Activity_Plan* next_act = this->next_activity_plan<TimeType,Activity_Plan*>(start);
 
 			TimeType prev_end = 0;
 			TimeType next_start = END;
-			if (prev_act != nullptr) prev_end = prev_act->End_Time<TimeType>();
-			if (next_act != nullptr) next_start = next_act->Start_Time<TimeType>();
+			if (prev_act != nullptr) prev_end = prev_act->template End_Time<TimeType>();
+			if (next_act != nullptr) next_start = next_act->template Start_Time<TimeType>();
 
 			if ( prev_end < start && next_start > end) return true;
 			else if (prev_end > start && next_start > end)
 			{
 				if (prev_act != nullptr)
 				{
-					if (prev_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
+					if (prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
 				}
 			}
 			else if (prev_end < start && next_start < end)
 			{
 				if (next_act != nullptr)
 				{
-					if (next_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
+					if (next_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY) return true;
 				}
 			}
 			return false;
@@ -499,25 +454,25 @@ namespace Prototypes
 		{
 			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
 			typedef Household_Components::Prototypes::Household<typename get_type_of(Household)> _household_itf;
 
 			cout <<endl<<"**************************************************************************************************"<<endl;
 			cout <<"Printing activities for (Household,person): "<<this->Household<_household_itf*>()->uuid<int>()<<","<<this->uuid<int>()<<endl;
 
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
-			scheduler->Current_Activity<Activity_Plan*>()->Display_Activity();
+			scheduler->template Current_Activity<Activity_Plan*>()->Display_Activity();
 				
-			Activity_Plans& activities = this->Scheduling_Faculty<scheduler_itf*>()->Activity_Container<Activity_Plans&>();
+			Activity_Plans& activities = this->Scheduling_Faculty<scheduler_itf*>()->template Activity_Container<Activity_Plans&>();
 			for (Activity_Plans::iterator itr = activities.begin(); itr != activities.end(); ++itr)
 			{
 				Activity_Plan* act = (Activity_Plan*)(*itr);
 				act->Display_Activity();
 			}
 
-			Movement_Plans& moves = this->Scheduling_Faculty<scheduler_itf*>()->Movement_Plans_Container<Movement_Plans&>();
+			Movement_Plans& moves = this->Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans&>();
 			for (Movement_Plans::iterator itr = moves.begin(); itr != moves.end(); ++itr)
 			{
 				Movement_Plan* move = (Movement_Plan*)(*itr);
@@ -545,7 +500,7 @@ namespace Prototypes
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
 			return scheduler->template next_activity_plan<ParamType, ReturnType>(current_time_or_activity);
 		}
-		template<typename ParamType, typename ReturnType> typename ReturnType previous_activity_plan(ParamType current_time)
+		template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType current_time)
 		{
 			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();

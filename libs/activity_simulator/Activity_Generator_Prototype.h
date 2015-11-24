@@ -47,14 +47,14 @@ namespace Person_Components
 				if (sub_iteration() == Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION)
 				{
 					this_ptr->Activity_Generation_Event<NT>();
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Generation_Time_Increment<Simulation_Timestep_Increment>()));
 					response.next._sub_iteration = Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION;
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// No valid events scheduled - skip to next iteration
 				else
 				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Generation_Time_Increment<Simulation_Timestep_Increment>()));
 					response.next._sub_iteration = Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION;
 				}
 
@@ -71,7 +71,7 @@ namespace Person_Components
 				this_component()->Activity_Generation<TargetType>();
 
 				// set next activity generation occurence
-				this->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
+				this->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
 			}
 
 			local_check_template_method_name(Has_Initialize,Initialize);
@@ -81,14 +81,14 @@ namespace Person_Components
 
 				typedef Prototypes::Person_Planner<typename get_type_of(Parent_Planner)> planner_itf;
 				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
-				person_itf* parent = this->Parent_Planner<planner_itf*>()->Parent_Person<person_itf*>();
+				person_itf* parent = this->template Parent_Planner<planner_itf*>()->template Parent_Person<person_itf*>();
 				
 				float random_number = 1.0f; //GLOBALS::Uniform_RNG<float>();
 				long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>() + (Simulation_Timestep_Increment)(random_number*60.0f);
 				this_component()->Initialize< TargetType>();
 
 				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
-				((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION);
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION);
 			}
 
 			template<typename TargetType, typename LocationType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location)

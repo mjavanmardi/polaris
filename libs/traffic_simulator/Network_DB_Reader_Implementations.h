@@ -3,6 +3,7 @@
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
 #include "Activity_Location_Prototype.h"
+#include "Link_Implementation.h"
 
 namespace Network_Components
 {
@@ -1111,7 +1112,7 @@ namespace Network_Components
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 
 						// add the opposite direction link if exists
-						if (!this->_scenario_reference->use_link_based_routing<bool>())
+						if (!this->_scenario_reference->template use_link_based_routing<bool>())
 						{
 							opp_link_id_dir.id = link_id_dir.id;
 							opp_link_id_dir.dir = abs(link_id_dir.dir - 1);

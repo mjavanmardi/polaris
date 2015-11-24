@@ -1570,7 +1570,7 @@ namespace Vehicle_Components
 						typedef Person_Planner<typename traveler_itf::get_type_of(Planning_Faculty)> planner_itf;
 						typedef Person_Scheduler<typename traveler_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 						typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-						typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+						typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 						typedef Back_Insertion_Sequence<typename traveler_itf::get_type_of(Activity_Record_Container)> Discarded_Activity_Plans;
 
 						traveler_itf* person=(traveler_itf*)_traveler;
@@ -1746,7 +1746,7 @@ namespace Vehicle_Components
 					typedef Person_Planner<typename traveler_itf::get_type_of(Planning_Faculty)> planner_itf;
 					typedef Person_Scheduler<typename traveler_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 					typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-					typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Plans)> Activity_Plan;
+					typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 					traveler_itf* person=(traveler_itf*)_traveler;
 					household_itf* household = person->Household<household_itf*>();

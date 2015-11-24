@@ -321,7 +321,7 @@ int main(int argc,char** argv)
 	
 	// activity location map - link the location id to the actual object pointer
 	//typedef Random_Access_Sequence< _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-	//typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
+	//typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
 	//typedef Batch_Router_Components::Prototypes::Routed_Trip<typename MasterType::trip_type> _Trip_Interface;
 
 	//_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();

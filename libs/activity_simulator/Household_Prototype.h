@@ -11,15 +11,15 @@ namespace Concepts
 {
 	concept struct Is_Household
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
-		check_template_method_name(Has_Properties_Defined,Properties);
-		check_template_method_name(Has_Planner_Defined,Planning_Faculty);
+		check_template_method_name(Has_Initialize_Defined,template Initialize);
+		check_template_method_name(Has_Properties_Defined,template Properties);
+		check_template_method_name(Has_Planner_Defined,template Planning_Faculty);
 		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
 	};
 
 	concept struct Has_Initialize
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
+		check_template_method_name(Has_Initialize_Defined,template Initialize);
 		define_default_check(Has_Initialize_Defined);
 	};
 
@@ -82,7 +82,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
-			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
 
 			typename person_container_itf::iterator p_itr;
 			person_container_itf* persons = this->Persons_Container<person_container_itf*>();
@@ -101,7 +101,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
-			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
 
 			typedef Person_Components::Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)>  person_properties_itf;
 
@@ -111,7 +111,7 @@ namespace Prototypes
 			for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 			{
 				person_itf* p = (person_itf*)(*p_itr);
-				if (p->Is_Free(start_time,end_time) && p->Static_Properties<person_properties_itf*>()->Age<int>()>=16) return (PersonItfType)p;
+				if (p->Is_Free(start_time,end_time) && p->template Static_Properties<person_properties_itf*>()->template Age<int>()>=16) return (PersonItfType)p;
 			}
 			return nullptr;
 		}
@@ -124,7 +124,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -138,7 +138,7 @@ namespace Prototypes
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
@@ -164,7 +164,7 @@ namespace Prototypes
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -185,10 +185,10 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zone_container_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zone_container_itf)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zone_container_itf)>  zone_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> locations_container_interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 
 
 			properties_itf* props = this->Properties<properties_itf*>();

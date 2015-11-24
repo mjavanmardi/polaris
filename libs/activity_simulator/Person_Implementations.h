@@ -106,13 +106,13 @@ namespace Person_Components
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;
 			
 			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container)> zones_container_interface;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_container_interface)>  zone_interface;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_container_interface)>  zone_interface;
 			
 			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 			
 			typedef Back_Insertion_Sequence< typename type_of(Activity_Record_Container)> Activity_Records;
-			typedef Activity_Components::Prototypes::Activity_Planner<typename get_component_type(Activity_Records)> Activity_Record;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)> Activity_Record;
 			
 			
 			//=======================================================================================================================================================================
@@ -205,6 +205,56 @@ namespace Person_Components
 				this->template internal_id<int>(id);
 				_has_done_replanning=false;
 				
+			}
+			template<typename T> void Print_Preplanned_Activities_Event()
+			{
+				typedef Person<ComponentType> _Person_Interface;
+				_Person_Interface* pthis =(_Person_Interface*)this;
+				typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
+				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+
+				typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activities;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activities)>  Activity;
+
+				typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container)> Activity_Records;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)>  Activity_Record;
+
+
+				typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::person_data_logger_type> _Logger_Interface;
+
+
+				scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
+				Activities* activities = scheduler->template Activity_Container<Activities*>();
+				Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
+
+#ifdef ANTARES
+				for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
+			{
+				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(*itr,false);
+
+				// store activity records in the person activity record container.
+				Activity_Record* new_record = (Activity_Record*)Allocate<get_component_type(Activity_Records)>();
+				new_record->Initialize<Activity*>(*itr);
+				activity_records->push_back(new_record);
+			}
+
+			pthis->Sort_Activity_Records<void>();
+#endif
+
+
+				//// exit if no activity output is specified
+				//scenario_itf* scenario = (scenario_itf*)_global_scenario;
+				//if (!scenario->template write_activity_output<bool>()) return;
+
+
+				// push the start-of-day at home activity to the output database
+				typename Activities::iterator itr = activities->begin();
+				Activity* act = (Activity*)(*itr);
+				if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+				{
+					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(act,true);
+				}
 			}
 			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{

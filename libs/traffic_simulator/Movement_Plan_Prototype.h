@@ -78,11 +78,11 @@ namespace Movement_Plan_Components
 				
 				typedef Network_Components::Prototypes::Network< typename get_type_of(network)> _network_itf;
 				typedef Random_Access_Sequence< typename _network_itf::get_type_of(activity_locations_container)> _activity_locations_container_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_activity_locations_container_itf)>  _activity_location_itf;	
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_activity_locations_container_itf)>  _activity_location_itf;
 				typedef Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links)> _links_container_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(_links_container_itf)>  _link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(_links_container_itf)>  _link_itf;
 				typedef Random_Access_Sequence< typename _link_itf::get_type_of(outbound_turn_movements)> _turns_container_itf;
-				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(_turns_container_itf)>  _turn_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(_turns_container_itf)>  _turn_itf;
 
 				// continue if a valid movement is specified
 				if (orig != nullptr && dest != nullptr) 
@@ -317,14 +317,14 @@ namespace Movement_Plan_Components
 			void clear_trajectory()
 			{
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
-				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+				typedef  Trajectory_Unit<get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
 
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
 
 				// Free the allocated memory in the trajectory, if exists
 				for (Trajectory_Container_Interface::iterator itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
-					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 				trajectory.clear();
 
@@ -335,7 +335,7 @@ namespace Movement_Plan_Components
 			{
 				// get interface to trajectory
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
-				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+				typedef  Trajectory_Unit<get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
 
 				// validate offset
@@ -344,7 +344,7 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (Trajectory_Container_Interface::iterator itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
-					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 
 				//erase 

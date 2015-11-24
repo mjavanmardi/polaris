@@ -191,7 +191,7 @@ namespace Network_Components
 				Origin_ID = orig->template zone<_zone_interface*>()->template uuid<int>();
 				Destination_ID = dest->template zone<_zone_interface*>()->template uuid<int>();*/
 
-				ReturnType ret_value = skim->Get_LOS<LocationType, TimeType, ReturnType>(Origin, Destination, Start_Time);
+				ReturnType ret_value = skim->template Get_LOS<LocationType, TimeType, ReturnType>(Origin, Destination, Start_Time);
 				
 				return ret_value;
 			}
@@ -309,11 +309,11 @@ namespace Network_Components
 			{
 				
 				typedef  Pair_Associative_Container< typename get_type_of(zones_container)> _Zones_Container_Interface;
-				typedef  Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+				typedef  Zone_Components::Prototypes::Zone< get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 				typedef  Random_Access_Sequence< typename get_type_of(zone_ids_container)> _Zone_Ids_Interface;
 				_Zone_Interface* zone;
-				_Zones_Container_Interface::iterator zone_itr;
+				typename _Zones_Container_Interface::iterator zone_itr;
 				int zone_index, zone_id, zone_count;
 
 				if (available_zones == nullptr)
@@ -343,7 +343,7 @@ namespace Network_Components
 			template<typename TargetType> TargetType get_random_location(TargetType excluded_location=nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				typedef Random_Access_Sequence< typename get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)> activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)> activity_location_itf;
 				
 				activity_locations_itf* locations = this->template activity_locations_container<activity_locations_itf*>();
 				

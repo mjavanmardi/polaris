@@ -2,7 +2,9 @@
 
 #include "Activity_Simulator_Includes.h"
 //#include "Person_Prototype.h"
-
+#include "Activity_Generator_Prototype.h"
+#include "Household_Prototype.h"
+#include "Person_Prototype.h"
 
 //---------------------------------------------------------
 //	Person Scheduler - Handles Activity Scheduling for the Planner Class
@@ -24,16 +26,16 @@ namespace Person_Components
 	{
 		concept struct Is_Person_Planner_Prototype
 		{
-			check_template_method_name(Has_Parent_Person,ComponentType::Parent_Person);
-			check_template_method_name(Has_Movement_Plans_Container, ComponentType::Movement_Plans_Container);
-			check_template_method_name(Has_Activity_Plans_Container, ComponentType::Activity_Container);
+			check_template_method_name(Has_Parent_Person,ComponentType::template Parent_Person);
+			check_template_method_name(Has_Movement_Plans_Container, ComponentType::template Movement_Plans_Container);
+			check_template_method_name(Has_Activity_Plans_Container, ComponentType::template Activity_Container);
 			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
 		};
 		concept struct Is_Person_Planner_Component
 		{
-			check_template_method_name(Has_Parent_Person,Parent_Person);
-			check_template_method_name(Has_Movement_Plans_Container, Movement_Plans_Container);
-			check_template_method_name(Has_Activity_Plans_Container, Activity_Container);
+			check_template_method_name(Has_Parent_Person,template Parent_Person);
+			check_template_method_name(Has_Movement_Plans_Container, template Movement_Plans_Container);
+			check_template_method_name(Has_Activity_Plans_Container, template Activity_Container);
 			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
 		};
 		concept struct Is_Person_Planner
@@ -54,82 +56,7 @@ namespace Person_Components
 			// Event handling and helper functions
 			static void Planning_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
-				//----------------------------------------------
-				// CONDITIONALS FOR BASIC AGENT SCHEDULING
-				// 1.) Activity Generation (Occurs 
-				// Create alias for this to use in conditional
-				typedef Person_Planner<ComponentType> _Planning_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Planning_Interface* this_ptr =(_Planning_Interface*)_pthis;
-
-				// Define interfaces to the container members of the class
-				typedef Prototypes::Person<typename get_type_of(Parent_Person)> person_itf;
-				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
-				typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
-
-				typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans_List;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans_List)> Movement_Plan;
-				
-				
-				person_itf* person = this_ptr->template Parent_Person<person_itf*>();
-				household_itf* household = person->template Household<household_itf*>();
-				scheduler_itf* scheduler = person->template Scheduling_Faculty<scheduler_itf*>();
-				Movement_Plans_List* movement_plans = scheduler->template Movement_Plans_Container<Movement_Plans_List*>();
-
-				typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
-				Movement_Plan* movement;			
-				if (move_itr != movement_plans->end()) movement = *move_itr;
-
-
-				//------------------------------------------------------------------------------------------------------------------------------
-				// SETUP SUBITERATION, set up future subiteration() schedule
-				if (sub_iteration() == 0)
-				{
-					// If activity generation is to be performed, do that next
-					if(this_ptr->template Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.template Current_Time<Time_Seconds>()) 
-					{	
-						this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION,response);
-					}
-					else if (move_itr != movement_plans->end())
-					{
-						if (movement->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
-							this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION,response);
-						else
-							this_ptr->template Go_To_Next_Iteration<NT>(response);
-					}
-					// otherwise move on to next main iteration
-					else
-					{
-						this_ptr->template Go_To_Next_Iteration<NT>(response);
-					}
-				}
-
-				//------------------------------------------------------------------------------------------------------------------------------
-				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
-				else if (sub_iteration() == Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION)
-				{
-					this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION,response);
-
-					this_ptr->Activity_Generation_Event<NT>();
-				}
-
-				//------------------------------------------------------------------------------------------------------------------------------
-				// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future subiteration() schedule
-				else if (sub_iteration() == Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION)
-				{
-					this_ptr->template Go_To_Next_Iteration<NT>(response);
-
-					this_ptr->Movement_Planning_Event<NT>();
-				}
-				//------------------------------------------------------------------------------------------------------------------------------
-				// No valid events scheduled - skip to next iteration
-				else
-				{
-					this_ptr->template Go_To_Next_Iteration<NT>(response);
-				}
-
-				// set next planning time for other functions to use
-				this_ptr->template Next_Planning_Time<Simulation_Timestep_Increment>(iteration() + this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>());
+				ComponentType::Planning_Event_Controller(_this,response);
 			}
 			template<typename TargetType> void Go_To_Subiteration(Scenario_Components::Types::Demand_Sub_Iteration_keys subiteration, Event_Response& response)
 			{
@@ -154,7 +81,7 @@ namespace Person_Components
 				typedef Prototypes::Activity_Generator<typename get_type_of(Activity_Generation_Faculty)> activity_generator_itf;
 				activity_generator_itf* generator = this_ptr->template Activity_Generation_Faculty<activity_generator_itf*>();
 	
-				generator->Activity_Generation<T>();
+				generator->template Activity_Generation<T>();
 
 				// set next activity generation occurence
 				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
@@ -173,13 +100,13 @@ namespace Person_Components
 				typedef Network_Components::Prototypes::Network< typename parent_itf::get_type_of(network_reference)> _Network_Interface;
 				
 				typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
 				
 				typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
+				typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 				
 				typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 				
 				
 				parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
@@ -195,7 +122,7 @@ namespace Person_Components
 
 				// Get reference to movement plans
 				typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename get_component_type(Movement_Plans)> Movement_Plan;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
 				
 				typedef Activity_Components::Prototypes::Activity_Planner< typename Movement_Plan::get_type_of(destination_activity_reference)> Activity_Plan;
 				Movement_Plans* movements = parent->template Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans*>();

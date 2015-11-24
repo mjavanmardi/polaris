@@ -202,13 +202,14 @@ namespace polaris
 			template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::NAME)>::type);\
 			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
+			template<typename _V,bool _P>\
 			struct form_check{ static const bool value = false; };\
 			\
 			template<typename _V>\
 			struct form_check<_V,true>{ static const bool value = true; };\
 			\
-			static const bool value = form_check<_U>::value;\
+			static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+			static const bool value = form_check<_U,performcheck>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
@@ -229,13 +230,14 @@ namespace polaris
 			template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::NAME)>::type);\
 			template<typename _V> static large_type has_matching_named_member(...);\
 			\
-			template<typename _V,bool Perform_Check = (sizeof(has_matching_named_member<_U>(true_val))==success)>\
+			template<typename _V,bool _P>\
 			struct form_check{ static const bool value = false; };\
 			\
 			template<typename _V>\
 			struct form_check<_V,true>{ static const bool value = is_same<decltype(&_V::NAME),TYPE _V::*>::value; };\
 			\
-			static const bool value = form_check<_U>::value;\
+			static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+			static const bool value = form_check<_U,performcheck>::value;\
 		};\
 		\
 		static const bool value = data_check<TypeChecked>::value;\

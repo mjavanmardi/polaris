@@ -297,7 +297,7 @@ int main(int argc,char** argv)
 	cout << "Initializing network validation..." <<endl;
 	typedef Network_Components::Prototypes::Network_Validator<MasterType::network_validation_type> _network_validation_itf;
 	typedef Random_Access_Sequence<typename _Network_Interface::get_type_of(activity_locations_container)> locations_itf;
-	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
+	typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_itf)> location_itf;
 	locations_itf* locations = network->activity_locations_container<locations_itf*>();
 			
 	_network_validation_itf* validator = (_network_validation_itf*)Allocate<MasterType::network_validation_type>();

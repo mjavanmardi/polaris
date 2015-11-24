@@ -302,7 +302,7 @@ namespace PopSyn
 				typedef get_mapped_component_type(zone_collection_type)							zone_type;
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_container_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_itf)>  location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_itf)>  location_itf;
 				typedef Pair_Associative_Container<region_collection_type> regions_itf;
 				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;		
 				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type> zones_itf;
@@ -401,9 +401,9 @@ namespace PopSyn
 				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
-				typedef Household_Components::Prototypes::Household<typename get_component_type(household_collection_itf)>  household_itf;		
+				typedef Household_Components::Prototypes::Household<get_component_type(household_collection_itf)>  household_itf;
 				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
-				typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+				typedef Person_Components::Prototypes::Person<get_component_type(person_collection_itf)>  person_itf;
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 				#pragma endregion
@@ -549,9 +549,9 @@ namespace PopSyn
 				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
 				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> households_container_itf;
-				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Household_Components::Prototypes::Household_Properties<get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				typedef Person_Components::Prototypes::Person_Properties<get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type>	marginal_itf;
 				typedef typename marginal_itf::index_type index;
@@ -730,9 +730,9 @@ namespace PopSyn
 				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
 				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> households_container_itf;
-				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Household_Components::Prototypes::Household_Properties<get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Persons_Container)> persons_container_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
+				typedef Person_Components::Prototypes::Person_Properties<get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 				typedef Multidimensional_Random_Access_Array<joint_dist_type>	joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type>	marginal_itf;
 				typedef typename marginal_itf::index_type index;
@@ -756,13 +756,13 @@ namespace PopSyn
 			//	#pragma region Define interfaces
 			//	//---------------------------------------------------------------------------------------------
 			//	typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-			//	typedef typename get_mapped_component_type(region_collection_type)		region_type;
+			//	typedef get_component_type(region_collection_type)		region_type;
 			//	typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
-			//	typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
+			//	typedef get_component_type(sample_collection_type)		sample_type;
 			//	typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
-			//	typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
+			//	typedef get_component_type(zone_collection_type)		zone_type;
 			//	typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-			//	typedef typename get_component_type(household_collection_type)			household_type;
+			//	typedef get_component_type(household_collection_type)			household_type;
 			//	typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 			//	typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
@@ -778,7 +778,7 @@ namespace PopSyn
 			//	typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 			//	
 			//	typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-			//	typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+			//	typedef Person_Components::Prototypes::Person_Properties<get_component_type(person_sample_data_itf)> person_unit_itf;
 			//	
 			//	typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
 			//	typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
@@ -787,17 +787,17 @@ namespace PopSyn
 			//	typedef Household_Components::Prototypes::Household<household_type>  household_itf;
 			//	
 			//	typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
-			//	typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+			//	typedef Person_Components::Prototypes::Person<get_component_type(person_collection_itf)>  person_itf;
 			//	
 			//	typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container)> activity_location_ids_itf;
 			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 			//	typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 			//	
 			//	typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-			//	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+			//	typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 			//	
 			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-			//	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+			//	typedef Zone_Components::Prototypes::Zone<get_component_type(_Zone_Container_Interface)>  _Zone_Interface;
 
 			//	#pragma endregion			
 			//	//---------------------------------------------------------------------------------------------
@@ -903,15 +903,15 @@ namespace PopSyn
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename get_mapped_component_type(region_collection_type)		region_type;
+				typedef get_component_type(region_collection_type)		region_type;
 				typedef typename region_type::type_of(Sample_Data)						sample_collection_type;
-				typedef typename get_mapped_component_type(sample_collection_type)		sample_type;
+				typedef get_component_type(sample_collection_type)		sample_type;
 				typedef typename region_type::type_of(Synthesis_Zone_Collection)		zone_collection_type;
-				typedef typename get_mapped_component_type(zone_collection_type)		zone_type;
+				typedef get_component_type(zone_collection_type)		zone_type;
 				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-				typedef typename get_component_type(household_collection_type)			household_type;
+				typedef get_component_type(household_collection_type)			household_type;
 				typedef typename household_type::get_type_of(Persons_Container)			person_collection_type;
-				typedef typename get_component_type(person_collection_type)				person_type;
+				typedef get_component_type(person_collection_type)				person_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
@@ -924,13 +924,13 @@ namespace PopSyn
 				typedef Pair_Associative_Container<sample_collection_type> sample_data_itf;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties<get_component_type(person_sample_data_itf)> person_unit_itf;
 				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
-				typedef Household_Components::Prototypes::Household_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+				typedef Household_Components::Prototypes::Household_Properties<get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
 				/*typedef Random_Access_Sequence<typename household_itf::type_of(Persons_Container)> person_collection_itf;
-				typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;*/
+				typedef Person_Components::Prototypes::Person_Properties<get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;*/
 				typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
-				//typedef Person_Components::Prototypes::Person<typename get_component_type(person_collection_itf)>  person_itf;
+				//typedef Person_Components::Prototypes::Person<get_component_type(person_collection_itf)>  person_itf;
 				typedef Multidimensional_Random_Access_Array<joint_dist_type> joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type> marginal_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
@@ -1036,7 +1036,7 @@ namespace PopSyn
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Household_Components::Prototypes::Household_Properties<typename strip_modifiers(HHType)::get_type_of(Static_Properties)> household_itf;
 
 				Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->Static_Properties<household_itf*>(),zone);
@@ -1053,7 +1053,7 @@ namespace PopSyn
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Household_Components::Prototypes::Household<typename strip_modifiers(HHType)> household_itf;
 				
 				household_itf* hh_itf = (household_itf*)hh;
@@ -1067,7 +1067,7 @@ namespace PopSyn
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Person_Components::Prototypes::Person_Properties<typename strip_modifiers(PerType)::get_type_of(Static_Properties)> person_itf;
 
 				Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->Static_Properties<person_itf*>(),zone);
@@ -1096,7 +1096,7 @@ namespace PopSyn
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Person_Components::Prototypes::Person<typename strip_modifiers(PerType)> person_itf;
 				person_itf* per_itf = (person_itf*)person;
 

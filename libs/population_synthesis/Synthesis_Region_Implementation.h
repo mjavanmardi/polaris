@@ -115,7 +115,7 @@ namespace PopSyn
 				typedef get_mapped_component_type(Sample_Data_type) sample_type;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef typename get_component_type(person_sample_data_itf) person_sample_type;
+				typedef get_component_type(person_sample_data_itf) person_sample_type;
 				typedef Person_Components::Prototypes::Person_Properties<person_sample_type> person_unit_itf;
 
 				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
@@ -294,7 +294,7 @@ namespace PopSyn
 				typedef get_mapped_component_type(Sample_Data_type) sample_type;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef typename get_component_type(person_sample_data_itf) person_sample_type;
+				typedef get_component_type(person_sample_data_itf) person_sample_type;
 				typedef Person_Components::Prototypes::Person_Properties<person_sample_type> person_unit_itf;
 
 				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;

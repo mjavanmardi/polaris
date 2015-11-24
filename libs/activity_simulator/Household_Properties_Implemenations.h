@@ -44,10 +44,10 @@ namespace Household_Components
 				typedef Network_Components::Prototypes::Network<typename type_of(Parent_Household)::get_type_of(network_reference)> network_itf;
 				
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_component_type(_Zone_Container_Interface)>  _Zone_Interface;
 				
 			
 				zone_itf* zone = (zone_itf*)home_synthesis_zone;

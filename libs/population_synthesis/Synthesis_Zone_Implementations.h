@@ -356,7 +356,7 @@ namespace PopSyn
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
 				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
@@ -465,7 +465,7 @@ namespace PopSyn
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
 				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
@@ -587,9 +587,9 @@ namespace PopSyn
 			{
 				typedef Prototypes::Synthesis_Zone<ComponentType> this_itf;
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <typename get_mapped_component_type(sample_itf)>  pop_unit_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_component_type(sample_itf)>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution)> mway_itf;
 				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution)> marg_itf;
 				this_itf* pthis = (this_itf*)this;
@@ -626,7 +626,7 @@ namespace PopSyn
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
 				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
@@ -955,7 +955,7 @@ namespace PopSyn
 				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
 				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
