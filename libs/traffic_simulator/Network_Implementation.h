@@ -85,6 +85,7 @@ namespace Network_Components
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::activity_location_type*>, activity_locations_container, NONE, NONE);
+			m_container(concat(dense_hash_map<int,int>), activity_location_id_to_idx_container, NONE, NONE);
 
 			m_container(concat(dense_hash_map<int,typename MasterType::zone_type*>), zones_container, NONE, NONE);
 

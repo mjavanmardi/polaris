@@ -22,6 +22,9 @@ namespace Vehicle_Components
 		{
 
 			m_data(bool, is_integrated, NONE, NONE);
+
+			m_data(bool, is_autonomous, NONE, NONE);
+
 			m_data(bool, its_switch, NONE, NONE);
 			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
 
@@ -965,6 +968,17 @@ namespace Vehicle_Components
 				else
 				{
 					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION;
+				}
+
+				// autonomous vehicle capability
+				r1 = Uniform_RNG.template Next_Rand<double>();//_rng_stream.RandU01();
+				if (r1 <= ((_Scenario_Interface*)_global_scenario)->template cav_market_penetration<double>())
+				{
+					this->is_autonomous(true);
+				}
+				else
+				{
+					this->is_autonomous(false);
 				}
 
 				/// information compliance rate

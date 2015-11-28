@@ -1,18 +1,19 @@
 #pragma once
 
 #include "road.h"
+#include "MovingCars.h"
 #include <tuple>
+#include <algorithm>
 
-std::vector<std::tuple<int,int,int>> selectCars(int j, int k, std::vector<std::vector<int>> Cars);
+struct ComingCar
+{
+	int carID;
+	int formerRoadID;
+	int formerQueueID;
+};
 
-void sampleCars(std::vector<std::tuple<int,int,int>>& selectedCars, std::vector<std::vector<int>>& storedCars);
+std::map<int,std::vector<ComingCar>> sortCars(std::vector<MovingCars> cars, const std::vector<std::vector<int>> &nodesToID);
 
-void releaseCars(Road& R, std::map<int, Road>& Roads, std::vector<std::tuple<int,int,int>> sampledCars, std::vector<std::pair<int,int>>& stuckCars, std::vector<std::pair<int,int>>& movingCars, int timestep, std::vector<std::vector<int>> &nodesToID);
+bool tryToMoveFirstCar(std::map<int,ComingCar>::iterator roadIterator, std::map<int, Road>& Roads, int timeStep);
 
-void deleteStuckCars(std::vector<int>& car, std::vector<std::pair<int,int>> stuckCars, bool& stuck);
-
-void deleteMovingCars(std::vector<int>& car, std::vector<std::pair<int,int>> movingCars, bool& moving);
-
-void deleteCars(std::vector<std::vector<int>>& Cars, std::vector<std::pair<int, int>> movingCars, std::vector< std::pair< int, int>> stuckCars, int nodej); 
-
-void queuesToTravelingAreas(std::map<int, Road>& Roads, std::vector<std::vector<int>> Cars, int timestep, std::vector<std::vector<int>> &nodesToID);
+void queuesToTravelingAreas(std::map<int, Road>& Roads, std::vector<MovingCars> cars, int timestep, std::vector<std::vector<int>> &nodesToID);

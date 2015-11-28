@@ -49,6 +49,9 @@ namespace Scenario_Components
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
 
+			m_data(double, cav_market_penetration, NONE, NONE);
+			m_data(double, cav_vott_adjustment, NONE, NONE);
+
 			m_data(string, input_dir_name, NONE, NONE);
 			m_data(string, output_dir_name, NONE, NONE);
 				

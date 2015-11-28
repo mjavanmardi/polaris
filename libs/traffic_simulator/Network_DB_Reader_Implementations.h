@@ -1048,10 +1048,15 @@ namespace Network_Components
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename type_of(network_reference)::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;
 
+				typedef dense_hash_map<int,int> _loc_id_to_idx_container_interface;
 
 				_Activity_Locations_Container_Interface& activity_locations_container = _network_reference->template activity_locations_container<_Activity_Locations_Container_Interface&>();
+				_loc_id_to_idx_container_interface& loc_id_to_idx_container = _network_reference->template activity_location_id_to_idx_container<_loc_id_to_idx_container_interface&>();
 
 				activity_locations_container.clear();
+
+				loc_id_to_idx_container.set_empty_key(-1);
+				loc_id_to_idx_container.set_deleted_key(-2);
 
 				result<Location> location_result;
 				try
@@ -1257,6 +1262,9 @@ namespace Network_Components
 			
 						// Push to main network container
 						activity_locations_container.push_back(activity_location);
+
+						// store the id to index lookup info
+						loc_id_to_idx_container.insert(pair<int,int>(activity_location->uuid<int>(),activity_location->internal_id<int>()));
 						++counter;
 					}
 					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}

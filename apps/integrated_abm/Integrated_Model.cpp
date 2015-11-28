@@ -165,6 +165,8 @@ struct MasterType
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
+	typedef polaris::io::Household hh_db_rec_type; // these represent the type of database record to write - use Household/Person for writing to Demand or Synthetic_Household/Person for writing to Popsyn only
+	typedef polaris::io::Person person_db_rec_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 

@@ -17,16 +17,16 @@ public:
 
 
 	//### Getters ###
-	int ID();										// ID of the Road						
-	int link();										// Link of the Road ; used only to import/convert the data structure from the SQLite database
-	bool direction();								// Link of the Road ; used only to import/convert the data structure from the SQLite database
-	int nodeA();									// Get the entering node of the road
-	int nodeB();									// Get the exiting node of the road
-	double speedMax();								// Get the maixmum speed of the road
-	double getMaxIndivQueueLength();				// Get the maximum  queue length among all the individual queues
-	int getMaxIndivQueueSize();						// Get the maximum number of cars among all the individual queues
-	double getCommonQueueLength();					// Get the common queue length
-	double getMaxCommonQueueLength();				// Get the maximum common queue length
+	int ID() const;									// ID of the Road						
+	int link() const;								// Link of the Road ; used only to import/convert the data structure from the SQLite database
+	bool direction() const;							// Link of the Road ; used only to import/convert the data structure from the SQLite database
+	int nodeA() const;								// Get the entering node of the road
+	int nodeB() const;								// Get the exiting node of the road
+	double speedMax() const;								// Get the maixmum speed of the road
+	double getMaxIndivQueueLength() const;				// Get the maximum  queue length among all the individual queues
+	int getMaxIndivQueueSize() const;						// Get the maximum number of cars among all the individual queues
+	double getCommonQueueLength() const;					// Get the common queue length
+	double getMaxCommonQueueLength() const;				// Get the maximum common queue length
 	std::map<int, Queue> indivQueues();				// Get the individual queues
 	std::map<int, Queue>::iterator IndivQueuesBegin();
 	std::map<int, Queue>::iterator IndivQueuesEnd();
@@ -35,17 +35,20 @@ public:
 	std::vector<Car> getCommonQueue();				// Get the cars being in the common queue
 	std::vector<Car>& getTA();						// Get the cars being in the traveling area
 	std::vector<double> getLengthOverTime();		// Get the length of the maximum queue in the road
+	double getNthQueueLength(int n) const;			// Get the length of the nth individual queue
+	int getNumberOfIndivQueues() const;				// Get the number of individual queues
 
 	//### Dynamic Methods ###
-	int selectIndividualQueue(int nextNode, bool& q);	// Select the queue where the car is going to go if its heading to nextNode ; q explicit if such a queue exist
+	int selectIndividualQueue(int nextNode, bool& q) const;	// Select the queue where the car is going to go if its heading to nextNode ; q explicit if such a queue exist
 	void commonToIndividualQueue();						// Release cars from common to individual queue
 	void iterQueuesProg(int timestep);					// Iterate the queue lengh over time AND the cars progression
-	double distanceToTravelInTA(Car C);					// Distance to travel for a car in a traveling Area to get to a queue
+	double distanceToTravelInTA(Car C) const;					// Distance to travel for a car in a traveling Area to get to a queue
 	
 	void addCarToQueue(Car C);							// Release the car C from the traveling area into the queue (Either one individual queue or either the common queue when the indivudual ones are full)
 	void removeCarFromQueue(int queueID, int timestep); // Remove the first car of the queue having the id=ID. The parameters "timestep" deals with the fake cars
+	Car removeCarFromQueue(int queueID,int carID, int timestep);
 	void addCarToTA(Car& C);							// Release the car C into the traveling area ; it means it just enters the road
-	void removeCarsFromTA(std::vector<int> carNumbers); // Remove the cars from the Traveling Area ; it means it just entered a queue
+	void removeCarsFromTA(std::vector<int> &carNumbers) ; // Remove the cars from the Traveling Area ; it means it just entered a queue
 
 	void moveFakeCars(int ID, int timestep);			// This method deals with the fake cars added in the system to model/simulate the reaction duration of real car when the one ahead moved.
 

@@ -1,3 +1,5 @@
-add_executable(population_synthesizer population_synthesizer.cpp)	
-target_link_libraries(population_synthesizer ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core)
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(population_synthesizer ${cppfiles} ${hppfiles})
+target_link_libraries(population_synthesizer ${libtcmalloc} ${iolibs} Scenario_Manager Core Traffic_Simulator)
 set_target_properties(population_synthesizer PROPERTIES FOLDER apps)

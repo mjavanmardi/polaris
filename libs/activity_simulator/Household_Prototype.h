@@ -40,7 +40,7 @@ namespace Prototypes
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->template Initialize< TargetType>(id);	
-			this->template Set_Home_Location<NT>();
+			//this->template Set_Home_Location<NT>();
 		}
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,!check(ComponentType,Concepts::Has_Initialize)))
 		{

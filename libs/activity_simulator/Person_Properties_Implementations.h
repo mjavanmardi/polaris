@@ -63,6 +63,9 @@ namespace Person_Components
 			m_data(int, work_location_id, NONE, NONE);
 			m_data(int, school_location_id, NONE, NONE);
 			
+			typedef Prototypes::Person<typename type_of(Parent_Person)> person_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_interface;
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
 			// Methods
 			template<typename TargetType> void Initialize()
@@ -217,6 +220,18 @@ namespace Person_Components
 				{
 					this->_average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<ValueType,ValueType> >(act_type, pair<ValueType,ValueType>(value,0)));
 				}
+			}
+
+			// VOTT adjustment
+			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
+			{
+				vehicle_interface* veh = _Parent_Person->vehicle<vehicle_interface*>();
+				if (veh->is_autonomous<bool>())
+				{
+					TargetType adj = ((_Scenario_Interface*)_global_scenario)->cav_vott_adjustment<TargetType>();
+					return adj;
+				}
+				else return 1.0;
 			}
 		};
 		template<typename MasterType, typename InheritanceList> int* ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count_Array;

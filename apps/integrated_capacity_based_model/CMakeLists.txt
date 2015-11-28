@@ -1,0 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+add_executable(integrated_capacity_based_model main.cpp)
+target_link_libraries(integrated_capacity_based_model ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core Routing )
+set_target_properties(integrated_capacity_based_model PROPERTIES FOLDER apps)

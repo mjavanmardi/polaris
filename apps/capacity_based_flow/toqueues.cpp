@@ -3,31 +3,33 @@
 using namespace std;
 
 
-void TAToQueues(Road& R, int timestep) {
-	vector<int> carsToErase;
-	for(vector<Car>::iterator it = R.getTA().begin() ; it != R.getTA().end() ; it++) {
-		it->iterProg(0);
-		if(it->distanceInTA() < R.distanceToTravelInTA(*it)) {		// The car has to reach its queue (Individual or common)
-			pair<double,double> newDistanceAndSpeed = newCarDistanceAndSpeed(it->speed(), R.speedMax(), timestep, R.distanceToTravelInTA(*it) - it->distanceInTA(), it->accMean(), it->deccMean());
-			it->iterDistanceInTA(newDistanceAndSpeed.first);
-			it->iterSpeed(newDistanceAndSpeed.second);
-		}
-		else {								// The car has reached its queue (Individual or common)
-			it->initDistanceInTA();					//The traveled distance is initialized
-			it->initSpeed();
-			carsToErase.push_back(it->number());
-			R.addCarToQueue(*it);
-		}
-	}
-	R.removeCarsFromTA(carsToErase);
-}
-
+//We manage here the cars who are currently in a travelling area
+//We either update their speeds are move them to queue
 void travelingAreaToQueues(map<int, Road>& Roads, int timestep) {
 	for(map<int,Road>::iterator it = Roads.begin() ; it != Roads.end() ; it++) {
-		TAToQueues(it->second,timestep);
+		Road& R = it->second;
+		vector<int> carsToErase;
+		for(vector<Car>::iterator it = R.getTA().begin() ; it != R.getTA().end() ; it++) {
+			it->iterProg(0);
+			if(it->distanceInTA() < R.distanceToTravelInTA(*it)) {		// The car has to reach its queue (Individual or common)
+				pair<double,double> newDistanceAndSpeed = newCarDistanceAndSpeed(it->speed(), R.speedMax(), timestep, R.distanceToTravelInTA(*it) - it->distanceInTA(), it->accMean(), it->deccMean());
+				it->iterDistanceInTA(newDistanceAndSpeed.first);
+				it->iterSpeed(newDistanceAndSpeed.second);
+			}
+			else {								// The car has reached its queue (Individual or common)
+				it->initDistanceInTA();					//The traveled distance is initialized
+				it->initSpeed();
+				carsToErase.push_back(it->number());
+				R.addCarToQueue(*it);
+			}
+		}
+		R.removeCarsFromTA(carsToErase);
 	}
 }
 
+//This function computes the new speed of a given car
+//If it is far enough from the queues, it accelerates to speedLimit
+//Otherwise it slows down
 pair<double,double> newCarDistanceAndSpeed(double carSpeed, double speedLimit, int timestep, double distanceLeftToTravel, double accMean, double deccMean) {
 	pair<double,double> newDistanceAndSpeed;
 	double newSpeed;
@@ -47,6 +49,6 @@ pair<double,double> newCarDistanceAndSpeed(double carSpeed, double speedLimit, i
 	else
 		newSpeed = carSpeed;
 	newDistanceAndSpeed.first = timestep * (carSpeed + newSpeed) /2;		// The traveled distance is the duration * mean speed		(mean speed = (speed(t) + speed(t+1)) / 2)
-	newDistanceAndSpeed.second = carSpeed;
+	newDistanceAndSpeed.second = newSpeed;
 	return newDistanceAndSpeed;
 }

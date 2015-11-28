@@ -106,6 +106,8 @@ include_directories(libs/traffic_simulator)
 include_directories(apps)
 include_directories(tests)
 
+include_directories(apps/integrated_capacity_based_model)
+
 #Apply CMake over POLARIS library project structure
 add_subdirectory (libs/core) 
 add_subdirectory (libs/repository) 
@@ -114,6 +116,8 @@ add_subdirectory (libs/io)
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
+
+add_subdirectory (apps/integrated_capacity_based_model)
 
 
 
@@ -160,6 +164,7 @@ endif()
 if (Popsyn)
 	set(Antares OFF)
 	add_subdirectory (apps/population_synthesizer)
+	add_subdirectory (libs/traffic_simulator)
 elseif(Statewide)
 	add_subdirectory (apps/ILSTDM) 
 	add_subdirectory (libs/statewide_model)
