@@ -466,14 +466,14 @@ namespace Prototypes
 			scheduler->template Current_Activity<Activity_Plan*>()->Display_Activity();
 				
 			Activity_Plans& activities = this->Scheduling_Faculty<scheduler_itf*>()->template Activity_Container<Activity_Plans&>();
-			for (Activity_Plans::iterator itr = activities.begin(); itr != activities.end(); ++itr)
+			for (auto itr = activities.begin(); itr != activities.end(); ++itr)
 			{
 				Activity_Plan* act = (Activity_Plan*)(*itr);
 				act->Display_Activity();
 			}
 
 			Movement_Plans& moves = this->Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans&>();
-			for (Movement_Plans::iterator itr = moves.begin(); itr != moves.end(); ++itr)
+			for (auto itr = moves.begin(); itr != moves.end(); ++itr)
 			{
 				Movement_Plan* move = (Movement_Plan*)(*itr);
 				move->Display_Movement();

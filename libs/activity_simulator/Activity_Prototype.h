@@ -16,12 +16,12 @@ namespace Activity_Components
 		
 		concept struct Is_Activity_Plan_Prototype
 		{
-			check_template_method_name(has_id,Component_Type::Activity_Plan_ID);
+			check_template_method_name(has_id,Component_Type::template Activity_Plan_ID);
 			define_default_check(has_id);
 		};
 		concept struct Is_Activity_Plan
 		{
-			check_template_method_name(has_id,Activity_Plan_ID);
+			check_template_method_name(has_id,template Activity_Plan_ID);
 			check_concept(is_prototype, Is_Activity_Plan_Prototype, T, V);
 			define_default_check(has_id || is_prototype);
 		};
@@ -504,32 +504,32 @@ namespace Activity_Components
 				if (Is_Minimum_Plan_Time(persons)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,persons._iteration, persons._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,persons._iteration, persons._sub_iteration);
 				}
 				else if (Is_Minimum_Plan_Time(mode)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,mode._iteration, mode._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,mode._iteration, mode._sub_iteration);
 				}
 				else if (Is_Minimum_Plan_Time(duration)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,duration._iteration, duration._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,duration._iteration, duration._sub_iteration);
 				}
 				else if (Is_Minimum_Plan_Time(location)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,location._iteration, location._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,location._iteration, location._sub_iteration);
 				}
 				else if (Is_Minimum_Plan_Time(start_time)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,start_time._iteration, start_time._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,start_time._iteration, start_time._sub_iteration);
 				}
 				else if (Is_Minimum_Plan_Time(route)) 
 				{
 					int test = 1;
-					((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Planning_Event_Controller,route._iteration, route._sub_iteration);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Planning_Event_Controller,route._iteration, route._sub_iteration);
 				}
 				else 
 				{
@@ -539,7 +539,7 @@ namespace Activity_Components
 					err << endl << "Start: "<<start_time._iteration <<","<<start_time._sub_iteration;
 					err << endl << "Location: "<<location._iteration <<","<<location._sub_iteration; 
 					err << endl << "Route: "<<route._iteration <<","<<route._sub_iteration; 
-					THROW_EXCEPTION(err);
+					THROW_EXCEPTION(err.str());
 				}
 
 			}
@@ -575,17 +575,17 @@ namespace Activity_Components
 				deletion._iteration = iteration()+2;
 				deletion._sub_iteration = 0;
 				//((ComponentType*)this)->Load_Event<ComponentType>(&Activity_Deletion_Event_Controller,deletion._iteration, deletion._sub_iteration);
-				this_component()->Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
+				this_component()->template Reschedule<ComponentType>(deletion._iteration, deletion._sub_iteration);
 			}
 			
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
-				this_component()->Set_Meta_Attributes<TargetType>();
+				this_component()->template Set_Meta_Attributes<TargetType>();
 			}
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
-				this_component()->Update_Movement_Plan<TargetType>(origin,destination,min_departure);
+				this_component()->template Update_Movement_Plan<TargetType>(origin,destination,min_departure);
 			}
 
 			template<typename TargetType> void Arrive_At_Activity()
@@ -596,27 +596,27 @@ namespace Activity_Components
 			// features to check if activity attributes have been planned - calculated based on reviion times for attribute planes (true if set to END)
 			template<typename TargetType> bool Location_Is_Planned()
 			{
-				return this_component()->Location_Is_Planned<TargetType>();
+				return this_component()->template Location_Is_Planned<TargetType>();
 			}
 			template<typename TargetType> bool Mode_Is_Planned()
 			{
-				return this_component()->Mode_Is_Planned<TargetType>();
+				return this_component()->template Mode_Is_Planned<TargetType>();
 			}
 			template<typename TargetType> bool Start_Is_Planned()
 			{
-				return this_component()->Start_Is_Planned<TargetType>();
+				return this_component()->template Start_Is_Planned<TargetType>();
 			}
 			template<typename TargetType> bool Duration_Is_Planned()
 			{
-				return this_component()->Duration_Is_Planned<TargetType>();
+				return this_component()->template Duration_Is_Planned<TargetType>();
 			}
 			template<typename TargetType> bool Involved_Persons_Is_Planned()
 			{
-				return this_component()->Involved_Persons_Is_Planned<TargetType>();
+				return this_component()->template Involved_Persons_Is_Planned<TargetType>();
 			}
 			template<typename TargetType> bool Route_Is_Planned()
 			{
-				return this_component()->Route_Is_Planned<TargetType>();
+				return this_component()->template Route_Is_Planned<TargetType>();
 			}
 
 			void Display_Activity()

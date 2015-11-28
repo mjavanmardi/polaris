@@ -1298,7 +1298,7 @@ namespace Network_Components
 					{
 						link = (Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
-						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+						pocket_data = link->template pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
 						lanes = db_itr->getLanes();
 

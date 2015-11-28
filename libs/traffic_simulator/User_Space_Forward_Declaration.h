@@ -133,6 +133,16 @@ namespace Scenario_Components {
 	}
 };
 namespace Vehicle_Components {
+	namespace Types
+	{
+		enum Type_Vehicle_Action_keys
+		{
+			MOVE_TO_NEXT_LINK = 0,
+			MOVE_TO_ORIGIN_LINK,
+			DO_NOTHING,
+		};
+	}
+
 	namespace Prototypes
 	{
 		template<typename ComponentType> struct Vehicle;

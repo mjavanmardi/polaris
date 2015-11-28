@@ -297,7 +297,7 @@ namespace Link_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
-			typedef Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
+			typedef Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
@@ -307,10 +307,10 @@ namespace Link_Components
 			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<type_of(upstream_intersection)> _Intersection_Interface;
 			typedef Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
 			Link_Implementation()
@@ -361,11 +361,11 @@ namespace Link_Components
 
 				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
+					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_highway<double>();
 				}
 				else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_arterial<double>();
+					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_arterial<double>();
 				}
 
 				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment;
@@ -449,7 +449,7 @@ namespace Link_Components
 
 				typedef typename remove_pointer<network_reference_type>::type::Component_Type::routable_networks_type routable_networks_type;
 
-				Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>* routable_networks = _network_reference->routable_networks<routable_networks_type>();
+				Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>* routable_networks = _network_reference->template routable_networks<routable_networks_type>();
 
 
 				//Note, this variable is the delay for link + turn delay
@@ -457,7 +457,7 @@ namespace Link_Components
 
 				unsigned int outbound_turn_index = 0;
 
-				for(boost::container::vector<typename MasterType::turn_movement_type*>::iterator itr = _outbound_turn_movements.begin();itr!=_outbound_turn_movements.end();itr++,outbound_turn_index++)
+				for(auto itr = _outbound_turn_movements.begin();itr!=_outbound_turn_movements.end();itr++,outbound_turn_index++)
 				{
 					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
 
@@ -475,7 +475,7 @@ namespace Link_Components
 						//	cout << cost_update << endl;
 						//}
 
-						for(Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>::iterator routable_itr = routable_networks->begin();routable_itr != routable_networks->end();routable_itr++)
+						for(auto routable_itr = routable_networks->begin();routable_itr != routable_networks->end();routable_itr++)
 						{
 							Routable_Network<typename MasterType::routable_network_type>* current_network = *routable_itr;
 
@@ -902,7 +902,7 @@ namespace Link_Components
 
 			template<typename TargetType> void Initialize()
 			{
-				Load_Event<ComponentType>(&ComponentType::Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+				this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
 			
 				//TODO
 //load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
@@ -1106,8 +1106,8 @@ namespace Link_Components
 			{
 				// event subscription
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification,(int)component_id);
-				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,(int)component_id);
+				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification,(int)ComponentType::component_id);
+				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,(int)ComponentType::component_id);
 			}
 
 			//void subscribe_events_local()

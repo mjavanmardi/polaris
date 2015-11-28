@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Activity_Simulator_Includes.h"
-//#include "Person_Prototype.h"
 #include "Activity_Generator_Prototype.h"
-#include "Household_Prototype.h"
 #include "Person_Prototype.h"
+#include "Household_Prototype.h"
 
 //---------------------------------------------------------
 //	Person Scheduler - Handles Activity Scheduling for the Planner Class
@@ -93,7 +92,7 @@ namespace Person_Components
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// create aliases for network components from parent
-				typedef Prototypes::Person<typename get_type_of(Parent_Person)> parent_itf;
+				typedef Person<typename get_type_of(Parent_Person)> parent_itf;
 				typedef Household_Components::Prototypes::Household<typename parent_itf::get_type_of(Household)> household_itf;
 				typedef Prototypes::Person_Scheduler<typename parent_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 				typedef Person_Components::Prototypes::Person_Mover< typename parent_itf::get_type_of(Moving_Faculty)> _Movement_Faculty_Interface;
@@ -110,7 +109,8 @@ namespace Person_Components
 				
 				
 				parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
-				household_itf* household = parent->template Household<household_itf*>();
+				parent->parent_itf::template Household<int>();
+				household_itf* household = nullptr;
 
 				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
 				_Movement_Faculty_Interface* movement_faculty = parent->template Moving_Faculty<_Movement_Faculty_Interface*>();
@@ -224,7 +224,7 @@ namespace Person_Components
 				this_component()->template Initialize< TargetType>();
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
 
-				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
 				//load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 			}
 
@@ -235,7 +235,7 @@ namespace Person_Components
 				this_component()->template Initialize< TargetType>(initializer);
 				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
 
-				((ComponentType*)this)->Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Planning_Event_Controller,first_iter,0);
 			}
 
 
@@ -256,7 +256,7 @@ namespace Person_Components
 				Activity_Itf* act = move->template destination_activity_reference<Activity_Itf*>();
 
 				// set movement plan as current movement in router faculty
-				itf->movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
+				itf->template movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);
 
 				move->template planning_time<Simulation_Timestep_Increment>(planning_time);
 

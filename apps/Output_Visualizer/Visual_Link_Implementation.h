@@ -263,7 +263,7 @@ namespace Link_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
-			typedef Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
+			typedef Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
@@ -273,10 +273,10 @@ namespace Link_Components
 			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<type_of(upstream_intersection)> _Intersection_Interface;
 			typedef Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
 			Visual_Link_Implementation()

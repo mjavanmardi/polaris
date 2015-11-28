@@ -100,7 +100,7 @@ namespace Movement_Plan_Components
 						{
 							_link_itf* o_link =this->template origin<_link_itf*>();
 							_link_itf* d_link =this->template destination<_link_itf*>();
-							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->dbid<int>() << ", dir="<<o_link->direction<int>()<<" : dest_link="<< d_link->dbid<int>()<<", dir="<<o_link->direction<int>());
+							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->template dbid<int>() << ", dir="<<o_link->template direction<int>()<<" : dest_link="<< d_link->template dbid<int>()<<", dir="<<o_link->template direction<int>());
 							return false;
 						}
 					}
@@ -223,7 +223,7 @@ namespace Movement_Plan_Components
 				{
 					Trajectory_Unit_Interface* vehicle_trajectory_data=(Trajectory_Unit_Interface*)Allocate<typename Trajectory_Unit_Interface::Component_Type>();
 
-					Link_Interface* link = net->get_link_ptr< typename Trajectory_Unit_Interface::get_type_of(link) >( itr->edge_id );
+					Link_Interface* link = net->template get_link_ptr< typename Trajectory_Unit_Interface::get_type_of(link) >( itr->edge_id );
 					
 
 					vehicle_trajectory_data->template Initialize<Link_Interface*>( link );
@@ -292,7 +292,7 @@ namespace Movement_Plan_Components
 
 				for(path_itr = path_container.begin() + 1, arrival_time_itr = arrival_time_container.begin() + 1; path_itr != path_container.end(); path_itr++,arrival_time_itr++)
 				{
-					_Link_Interface* link = net->get_link_ptr< typename _Trajectory_Unit_Interface::get_type_of(link) >( path_itr->edge_id );
+					_Link_Interface* link = net->template get_link_ptr< typename _Trajectory_Unit_Interface::get_type_of(link) >( path_itr->edge_id );
 
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
 					vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr/* - 1*/) + stored_ttime);
@@ -322,7 +322,7 @@ namespace Movement_Plan_Components
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
 
 				// Free the allocated memory in the trajectory, if exists
-				for (Trajectory_Container_Interface::iterator itr = trajectory.begin(); itr != trajectory.end(); ++itr)
+				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
@@ -342,7 +342,7 @@ namespace Movement_Plan_Components
 				if (offset >= trajectory.size()) THROW_EXCEPTION("Error, invalid begining offset for clearing the trajectory, must be less than the container size.");
 
 				// Free the allocated memory in the trajectory, if exists
-				for (Trajectory_Container_Interface::iterator itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
+				for (auto itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}

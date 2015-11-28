@@ -33,7 +33,7 @@ namespace Batch_Router_Components
 		//	m_container(std::vector<Network_Validation_Unit<typename MasterType::network_validation_unit_type>*>,validation_units, NONE, NONE);
 
 		//	typedef Network_Validation_Unit<get_component_type(validation_units_type)> validation_unit_itf;
-		//	typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;		
+		//	typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
 		//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
 		//	typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
 		//	typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;

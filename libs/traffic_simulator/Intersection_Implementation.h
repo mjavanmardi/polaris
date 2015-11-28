@@ -26,9 +26,9 @@ namespace Intersection_Components
 			// container of inbound movements
 			m_container(boost::container::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
 
-			typedef  Link_Components::Prototypes::Link<typename type_of(outbound_link_reference)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(outbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(inbound_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence<typename type_of(inbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<type_of(inbound_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -327,9 +327,9 @@ namespace Intersection_Components
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
 
-			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link_reference)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(inbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence<typename type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
