@@ -15,24 +15,24 @@ public:
 	~Car();
 
 	//### Getters ###
-	double length();		// Length of the car
-	int number() const;			// Number/ID of the car
-	int enteringTime();		// Time when the car enters the system
-	int enteringNodeA();	// A road is defined by two nodes (ahead and behind the car). enteringNodeA and enteringNodeB store this information when the SQLite database is read
-	int enteringNodeB();	//  "	"	"	"
-	int exitingNode();		// Node where is car is heading.
-	int Node();				// The car is on the road (A,B) heading to (B,C). Returns B
-	int nextNode();			// Returns C
-	int prevNode();			// Returns A
-	bool existence();		// There are fake cars in the networks that model the car reaction time. (Existence = true) => Not a fake car.
-	double speed();
-	int reactIter();		// Iterator to know how long the car has waited while the car ahead of it has moved
-	int reactDuration();	// Reaction time of the vehicle/driver
-	double distanceInTA();	// Distance already traveled by the car in the traveling area
-	double accMean();		// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d
-	double deccMean();
-	std::vector<int> prog();// Store the progression state of the car (0: out of the queue /\ 1:first car in the queue /\ 2 ; second car in the queue /\ ...)
-	double maxSpeed(int road);	//
+	double length() const;			// Length of the car
+	int number() const;				// Number/ID of the car
+	int enteringTime() const;		// Time when the car enters the system
+	int enteringNodeA() const;		// A road is defined by two nodes (ahead and behind the car). enteringNodeA and enteringNodeB store this information when the SQLite database is read
+	int enteringNodeB() const;		//  "	"	"	"
+	int exitingNode() const;		// Node where is car is heading.
+	int Node() const;				// The car is on the road (A,B) heading to (B,C). Returns B
+	int nextNode() const;			// Returns C
+	int prevNode() const;			// Returns A
+	bool existence() const;			// There are fake cars in the networks that model the car reaction time. (Existence = true) => Not a fake car.
+	double speed() const;
+	int reactIter() const;			// Iterator to know how long the car has waited while the car ahead of it has moved
+	int reactDuration() const;		// Reaction time of the vehicle/driver
+	double distanceInTA() const;	// Distance already traveled by the car in the traveling area
+	double accMean() const;			// Maximum acceleration of the car (!!! if the has a linear acceleration only !!! If it's polynomial, such as d
+	double deccMean() const;
+	std::vector<int> prog() const;	// Store the progression state of the car (0: out of the queue /\ 1:first car in the queue /\ 2 ; second car in the queue /\ ...)
+	double maxSpeed(int road) const;// Returns car max speed
 
 	//### Setters ###
 	void iterDistanceInTA(double length);	// Iterated traveled distance in Traveling Area by length (= Speed * Timestep)

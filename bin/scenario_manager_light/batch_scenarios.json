@@ -1,13 +1,19 @@
 {
-	"polaris_exe": "C:/Users/vsokolov/Documents/GitHub/polaris/build/bin/Debug/Integrated_Model.exe",
-    "scnarios": [
+	"polaris_exe": "C:/users/jauld/desktop/Research/Projects/POLARIS/polaris_v5/build_noantares/bin/Release/Integrated_Model.exe",
+    "scenarios": [
         {
             "capacity_adjustment_highway": 1.2,
-            "capacity_adjustment_arterial": 1
+            "capacity_adjustment_arterial": 1		
         },
         {
             "capacity_adjustment_highway": 1.3,
-            "capacity_adjustment_arterial": 1
+            "capacity_adjustment_arterial": 1,
+			"input_highway_skim_file_path_name" : "previous output_highway_skim_file_path_name"
+        },
+		{
+            "capacity_adjustment_highway": 1.5,
+            "capacity_adjustment_arterial": 1,
+			"input_highway_skim_file_path_name" : "previous output_highway_skim_file_path_name 1"
         }
     ]
 }

@@ -7,6 +7,7 @@ Queue::Queue() {
 
 }
 
+//Standard constructor
 Queue::Queue(int ID, double _maxLength, double _distanceBetweenCars, map<int,double> _capacities, map<int,double> _greenTime, map<int,double> _cycle, map<int,double> _offset) : 
 greenTime(_greenTime), cycle(_cycle), offset(_offset)
 {
@@ -17,12 +18,13 @@ greenTime(_greenTime), cycle(_cycle), offset(_offset)
 	
 	cars.clear();
 	lengthOverTime.clear();
-	nextNodes.clear();
+	nextNodes = vector<int>(0);
 	for(map<int, double>::iterator it = _capacities.begin() ; it != _capacities.end() ; it++) {
 		nextNodes.push_back(it->first);
 	}
 }
 
+//consctructor from json value
 Queue::Queue(Json::Value value)
 {
 	try
@@ -50,14 +52,20 @@ Queue::~Queue() {
 
 //### Getters ###
 
-int Queue::ID() {
+int Queue::ID() const
+{
 	return queueID;
 }
 
-double Queue::length() {
+//return the length of the current queue
+//TODO : compute it inside the queue, not when calling
+double Queue::length() const
+{
 	double queueLength = 0;
-	for(vector<Car>::iterator it = cars.begin() ; it != cars.end() ; it++) {
-		queueLength += it->length() + distanceBetweenCars;
+	for(vector<Car>::const_iterator carIterator = cars.begin();carIterator!=cars.end();carIterator++) 
+	{
+		//Car curCar = cars[i];
+		queueLength += (*carIterator).length() + distanceBetweenCars;
 	}
 	return queueLength;
 }
@@ -66,45 +74,62 @@ vector<Car>& Queue::getQueue() {
 	return cars;
 }
 
-map<int, double> Queue::getCapacities() {
-	return capacities;
+vector<Car>::iterator Queue::getCarsBegin()
+{
+	return cars.begin();
 }
 
-map<int,double> Queue::getGreenTime()
+vector<Car>::iterator Queue::getCarsEnd()
 {
-	return greenTime;
+	return cars.end();
 }
 
-map<int,double> Queue::getCycle()
+int Queue::getNumberOfCars() const
 {
-	return cycle;
+	return cars.size();
 }
 
-map<int,double> Queue::getOffset()
+int Queue::getNextNode(int i) const
 {
-	return offset;
+	return nextNodes[i];
+}
+
+int Queue::getNextNodeSize() const
+{
+	return nextNodes.size();
 }
 
 //### Dynamic methods ###
 
-int Queue::weight(int nextNode) {
-	int weight;
-	bool exist = false;
-	for(vector<int>::iterator it = nextNodes.begin() ; it != nextNodes.end() ; it++) {	// To verify is the nextNode (Where the car is going) is part of the turning movement of this queue
-		if((*it) == nextNode) {
-			exist = true;
+//Gives the weight of a turning movement 
+int Queue::weight(int nextNode) const
+{
+	int weight=0;
+
+	//We check if the nextNode (Where the car is going) can be reached from the current queue
+	bool isReachable = false;
+	for(int i=0;i<nextNodes.size();i++) {	
+		if(nextNodes[i] == nextNode) {
+			isReachable = true;
 			break;
 		}
 	}
 
-	if(exist && length() < maxLength)	//(exist == true) -> means that the nextNode is part of the turning movement of the present queue && length() is the length of all the vehicles in the queue
-		weight = cars.size()*2 + nextNodes.size()*5; // This is the model comparing the queues. 2 and 5 are the linear coefficient affected to the number of cars and number of turning movement of the road
+	//if there is room left in the queue
+	//length() is the length of all the vehicles in the queue
+	if(isReachable && length() < maxLength)	
+		//We have a model to assign a car a queue 
+		//The bigger the weight, the less is the driver likely to take it
+		//2 and 5 are the linear coefficient affected to the number of cars and number of turning movement of the road
+		weight = cars.size()*2 + nextNodes.size()*5; 
 	else
 		weight = 900000;
 
 	return weight;
 }
 
+//Write cars' position in the queue at current step
+//Writes the current queue length at current step
 void Queue::iterCarsProg() {
 	int iter = 1;
 	double queueLength = 0;
@@ -129,6 +154,25 @@ void Queue::addCar(Car C) {
 void Queue::removeCar() {
 	Car fakeCar;
 	cars[0] = fakeCar;
+}
+
+Car Queue::getCar(int carID, int timeStep)
+{
+	Car a;
+	for(vector<Car>::iterator it =cars.begin();it!=cars.end();it++)
+	{
+		if(it->number()==carID)
+		{
+			//if(it - cars.begin())
+				//cout << "Not first car deleted. Reel first car : " << cars.begin()->number() << endl;
+			a = (*it);
+			cars.erase(it);
+			moveFakeCars(timeStep);
+			return a;
+		}
+	}
+	cout << "Error : car " << carID << " not found in queue " << queueID << endl;
+	return a;
 }
 
 void Queue::moveFakeCars(int timestep) {
@@ -158,6 +202,39 @@ void Queue::moveFakeCars(int timestep) {
 	while(cars.size() != 0 && cars.back().existence() == false) {
 		cars.pop_back();
 	}
+}
+
+//This function gives the real (dynamic) capacity of each lane of current queue
+//The dynamic capacity takes into account traffic lights
+//If at time "time" the traffic light is red, the capacity is null
+//otherwise, the static capacity is multiplied by cycleLength/greenTime
+//isRed is true whenever there is a green light at current time "time"
+map<int,double> Queue::getRealCapacity(const int& time, bool &isRed, double &min) 
+{
+	min = DBL_MAX;
+	isRed = false;
+	map<int,double> realCapacity;
+	for(map<int,double>::const_iterator it = greenTime.begin();it!=greenTime.end();it++)
+	{
+		realCapacity[it->first] = 0;
+		//if ( (time-offset) modulo cycle < greentime ) then light is green
+		double t = fmod((time - offset[it->first]),cycle[it->first]);
+		if(t<greenTime[it->first])
+		{
+			double factor = 1;
+			if(greenTime[it->first] != 0)
+				factor = cycle[it->first] / greenTime[it->first];
+			realCapacity[it->first] = factor*capacities[it->first];
+			if(realCapacity[it->first]<min)
+				min = realCapacity[it->first];
+		}
+		else
+		{
+			isRed = true;
+			break;
+		}
+	}
+	return realCapacity;
 }
 
 Json::Value Queue::toJson()

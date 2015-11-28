@@ -122,8 +122,7 @@ void progressionAt(Road R, ofstream& fichier, bool q, set<Car,car_order> &carSet
 	
 	map<int, Queue> queues = R.indivQueues();
 	for(map<int, Queue>::iterator it = queues.begin() ; it != queues.end() ; it++) {
-		vector<Car> cars = it->second.getQueue();
-		for(vector<Car>::iterator it2 = cars.begin() ; it2 != cars.end() ; it2++) {
+		for(vector<Car>::iterator it2 = it->second.getCarsBegin() ; it2 != it->second.getCarsEnd() ; it2++) {
 			carSet.insert(*it2);
 		}
 	}

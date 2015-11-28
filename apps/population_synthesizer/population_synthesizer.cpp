@@ -19,6 +19,8 @@ struct MasterType
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
+	typedef polaris::io::Synthetic_Household hh_db_rec_type;
+	typedef polaris::io::Synthetic_Person person_db_rec_type;
 	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
 	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;

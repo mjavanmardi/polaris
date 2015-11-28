@@ -65,7 +65,7 @@ namespace PopSyn
 						}
 						else 
 						{
-							cout<<"Error: dimension outside of bounds when setting pums column."<<endl; return;
+							cout<<"Error: dimension number '"<<dimension_number<<"' outside of bounds '"<<_pums_file_link.size() <<"' when setting pums column."<<endl; return;
 						}
 					}
 					else
@@ -83,7 +83,7 @@ namespace PopSyn
 						}
 						else 
 						{
-							cout<<"Error: dimension outside of bounds when setting person pums column."<<endl; return;
+							cout<<"Error: dimension'"<<dimension_number<<"' outside of bounds '"<<_person_pums_file_link.size() <<"' when setting person pums column."<<endl; return;
 						}
 					}
 					else
@@ -98,8 +98,8 @@ namespace PopSyn
 				{
 					if (!test_variable)
 					{
-						if (dimension_number >= _ranges.size()){THROW_EXCEPTION("Error: dimension outside of bounds when setting sf3 column.");}
-						if (index_in_dimension >= _ranges[dimension_number].size()){THROW_EXCEPTION("Error: index outside of dimension bounds when setting sf3 column.");}
+						if (dimension_number >= _ranges.size()){THROW_EXCEPTION("Error: dimension '"<<dimension_number<<"' outside of bounds '"<<_ranges.size() <<"' when setting sf3 column.");}
+						if (index_in_dimension >= _ranges[dimension_number].size()){THROW_EXCEPTION("Error: index '"<<index_in_dimension<<"' outside of dimension bounds '"<<_ranges[dimension_number].size() <<"' when setting sf3 column for dimension '"<<dimension_number<<"'.");}
 						_ranges[dimension_number][index_in_dimension].first=low_value; 
 						_ranges[dimension_number][index_in_dimension].second=high_value;
 						_sf3_file_link[dimension_number][index_in_dimension]=column_number;
@@ -116,8 +116,8 @@ namespace PopSyn
 				{
 					if (!test_variable)
 					{
-						if (dimension_number >= _person_ranges.size()){THROW_EXCEPTION("Error: dimension outside of bounds when setting person sf3 column.");}
-						if (index_in_dimension >= _person_ranges[dimension_number].size()){THROW_EXCEPTION("Error: index outside of dimension bounds when setting person sf3 column.");}
+						if (dimension_number >= _person_ranges.size()){THROW_EXCEPTION("Error: dimension '"<<dimension_number<<"' outside of bounds '"<<_person_ranges.size() <<"' when setting person sf3 column.");}
+						if (index_in_dimension >= _person_ranges[dimension_number].size()){THROW_EXCEPTION("Error: index '"<<index_in_dimension<<"' outside of dimension bounds '"<<_person_ranges[dimension_number].size() <<"' when setting person sf3 column for dimension '"<<dimension_number<<"'.");}
 						_person_ranges[dimension_number][index_in_dimension].first=low_value; 
 						_person_ranges[dimension_number][index_in_dimension].second=high_value;
 						_person_sf3_file_link[dimension_number][index_in_dimension]=column_number;
