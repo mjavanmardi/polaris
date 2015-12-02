@@ -5,6 +5,7 @@
 #ifndef EXCLUDE_DEMAND
 //#include "Person_Implementations.h"
 #endif
+#include "Network_Skimming_Prototype.h"
 #include <iostream>
 namespace Routing_Components
 {
@@ -20,11 +21,15 @@ namespace Routing_Components
 	{
 		implementation struct Routing_Implementation:public Polaris_Component<MasterType,INHERIT(Routing_Implementation),Execution_Object>
 		{
+			typedef Polaris_Component<MasterType,INHERIT(Routing_Implementation),Execution_Object> Base_t;
+			typedef typename Base_t::ComponentType ComponentType;
+			typedef typename Base_t::Component_Type Component_Type;
+
 			m_prototype(Movement_Plan,typename MasterType::movement_plan_type,movement_plan,NONE,NONE);
 			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 			m_data(Simulation_Timestep_Increment, departure_time, NONE, NONE);
 
-			typedef Movement_Plan<typename type_of(movement_plan)> movement_plan_interface;
+			typedef Movement_Plan<type_of(movement_plan)> movement_plan_interface;
 			typedef Link_Components::Prototypes::Link<typename movement_plan_interface::get_type_of(origin)> Link_Interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename movement_plan_interface::get_type_of(origin_location)> Activity_Location_Interface;
 			typedef Random_Access_Sequence<typename Activity_Location_Interface::get_type_of(destination_links)> Link_Container_Interface;
@@ -87,22 +92,22 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Movement plan is undefined.");
 				}
-				else if (_movement_plan->origin<Link_Interface*>() == nullptr)
+				else if (_movement_plan->template origin<Link_Interface*>() == nullptr)
 				{
 					THROW_EXCEPTION("Origin is undefined.");
 				}
 
 				// get a routable network; routable_network know what thread you are
-				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
 				
 
 				// Get the current origin/destination information
-				unsigned int origin_id = _movement_plan->origin<Link_Interface*>()->uuid<unsigned int>();
-				unsigned int destination_id = _movement_plan->destination<Link_Interface*>()->uuid<unsigned int>();
-				Activity_Location_Interface* origin_loc = _movement_plan->origin<Activity_Location_Interface*>();
-				Activity_Location_Interface* destination_loc = _movement_plan->destination<Activity_Location_Interface*>();
-				Link_Container_Interface* origin_links = origin_loc->origin_links<Link_Container_Interface*>();
-				Link_Container_Interface* destination_links = destination_loc->destination_links<Link_Container_Interface*>();
+				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
+				unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
+				Activity_Location_Interface* origin_loc = _movement_plan->template origin<Activity_Location_Interface*>();
+				Activity_Location_Interface* destination_loc = _movement_plan->template destination<Activity_Location_Interface*>();
+				Link_Container_Interface* origin_links = origin_loc->template origin_links<Link_Container_Interface*>();
+				Link_Container_Interface* destination_links = destination_loc->template destination_links<Link_Container_Interface*>();
 
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
@@ -110,18 +115,18 @@ namespace Routing_Components
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
 				std::vector<unsigned int> origin_ids;
-				for (Link_Container_Interface::iterator itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
-					origin_ids.push_back(link->uuid<unsigned int>());
+					origin_ids.push_back(link->template uuid<unsigned int>());
 				}
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_ids;
-				for (Link_Container_Interface::iterator itr = destination_links->begin(); itr != destination_links->end(); ++itr)
+				for (auto itr = destination_links->begin(); itr != destination_links->end(); ++itr)
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
-					destination_ids.push_back(link->uuid<unsigned int>());
+					destination_ids.push_back(link->template uuid<unsigned int>());
 				}
 
 				//list of edgeid, graph_id tuples; internal edge ids
@@ -156,22 +161,22 @@ namespace Routing_Components
 
 					// update movement plan O/D based on returned routing results
 					Link_Interface* olink = nullptr;
-					for (Link_Container_Interface::iterator itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 					{
 						Link_Interface* link = (Link_Interface*)(*itr);
-						if (link->uuid<unsigned int>()  == origin_ids.front()) olink=link;
+						if (link->template uuid<unsigned int>()  == origin_ids.front()) olink=link;
 					}
 					Link_Interface* dlink = nullptr;
-					for (Link_Container_Interface::iterator itr = destination_links->begin(); itr != destination_links->end(); ++itr)
+					for (auto itr = destination_links->begin(); itr != destination_links->end(); ++itr)
 					{
 						Link_Interface* link = (Link_Interface*)(*itr);
-						if (link->uuid<unsigned int>()  == destination_ids.front()) dlink=link;
+						if (link->template uuid<unsigned int>()  == destination_ids.front()) dlink=link;
 					}
 
 					if (olink != nullptr && dlink != nullptr)
 					{
-						_movement_plan->origin<Link_Interface*>(olink);
-						_movement_plan->destination<Link_Interface*>(dlink);
+						_movement_plan->template origin<Link_Interface*>(olink);
+						_movement_plan->template destination<Link_Interface*>(dlink);
 					}
 				}
 				else
@@ -187,6 +192,7 @@ namespace Routing_Components
 
 		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>
 		{
+			using Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>::_network;
 			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>::Component_Type ComponentType;
 			
 			m_prototype(Network_Skimming_Components::Prototypes::Network_Skimming, typename MasterType::network_skim_type, parent_skimmer,NONE,NONE);
@@ -218,19 +224,19 @@ namespace Routing_Components
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				if(sub_iteration() == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
-					if (iteration() >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
+					if (iteration() >= (int)_this_ptr->template start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->template end_time<Simulation_Timestep_Increment>())
 					{
 						_this->Compute_Tree();
 						//response.result=true;
 						//response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-						response.next._iteration=_this_ptr->update_increment<Simulation_Timestep_Increment>();
+						response.next._iteration=_this_ptr->template update_increment<Simulation_Timestep_Increment>();
 						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
 					else
 					{
 						//response.result=false;
 						//response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-						response.next._iteration=_this_ptr->update_increment<Simulation_Timestep_Increment>();
+						response.next._iteration=_this_ptr->template update_increment<Simulation_Timestep_Increment>();
 						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
 				}
@@ -241,12 +247,13 @@ namespace Routing_Components
 				}
 			}
 
+
 			void Compute_Tree()
 			{
 				// get a routable network
-				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->routable_network<typename MasterType::routable_network_type>();
-				
-				unsigned int origin_id = _origin_link->uuid<unsigned int>();
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
+
+				unsigned int origin_id = _origin_link->template uuid<unsigned int>();
 
 				_travel_times_to_link_container.clear();
 

@@ -127,7 +127,7 @@ namespace Network_Components
 
 								path_delayed_time+=route_link_delayed_time;
 					
-								if (route_link_travel_time > 0 && route_link->link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
+								if (route_link_travel_time > 0 && route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
 								{
 									vehicle_trajectory_file
 										<< vehicle_id << ","
@@ -808,7 +808,7 @@ namespace Network_Components
 							}
 						}
 					}
-					_analyze_link_groups_container.push_back((MasterType::analyze_link_group_type*)analyze_link_group);
+					_analyze_link_groups_container.push_back((typename MasterType::analyze_link_group_type*)analyze_link_group);
 				}
 			}
 

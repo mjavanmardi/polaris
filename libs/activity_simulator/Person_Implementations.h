@@ -91,14 +91,14 @@ namespace Person_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
-			typedef Prototypes::Person_Properties<typename type_of(Properties)> Properties_interface;
-			typedef Prototypes::Person_Properties<typename type_of(Static_Properties)> Static_Properties_interface;
-			typedef Prototypes::Person_Mover<typename type_of(Moving_Faculty)> Moving_Faculty_interface;
-			typedef Prototypes::Person_Planner<typename type_of(Planning_Faculty)> Planning_Faculty_interface;
-			typedef Prototypes::Person_Scheduler<typename type_of(Scheduling_Faculty)> Scheduling_Faculty_interface;
-			typedef Prototypes::Person_Perception<typename type_of(Perception_Faculty)> Perception_Faculty_interface;
-			typedef Routing_Components::Prototypes::Routing<typename type_of(router)> router_interface;
-			typedef Vehicle_Components::Prototypes::Vehicle<typename type_of(vehicle)> vehicle_interface;
+			typedef Prototypes::Person_Properties<type_of(Properties)> Properties_interface;
+			typedef Prototypes::Person_Properties<type_of(Static_Properties)> Static_Properties_interface;
+			typedef Prototypes::Person_Mover<type_of(Moving_Faculty)> Moving_Faculty_interface;
+			typedef Prototypes::Person_Planner<type_of(Planning_Faculty)> Planning_Faculty_interface;
+			typedef Prototypes::Person_Scheduler<type_of(Scheduling_Faculty)> Scheduling_Faculty_interface;
+			typedef Prototypes::Person_Perception<type_of(Perception_Faculty)> Perception_Faculty_interface;
+			typedef Routing_Components::Prototypes::Routing<type_of(router)> router_interface;
+			typedef Vehicle_Components::Prototypes::Vehicle<type_of(vehicle)> vehicle_interface;
 
 			typedef Prototypes::Activity_Generator<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)> generator_itf;
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
@@ -111,7 +111,7 @@ namespace Person_Components
 			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 			
-			typedef Back_Insertion_Sequence< typename type_of(Activity_Record_Container)> Activity_Records;
+			typedef Back_Insertion_Sequence< type_of(Activity_Record_Container)> Activity_Records;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)> Activity_Record;
 			
 			

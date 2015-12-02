@@ -177,14 +177,14 @@ namespace PopSyn
 				//==========================================================
 				// Get the solution settings
 				typedef typename get_type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
-				typedef Pair_Associative_Container<typename type_of(Synthesis_Zone_Collection)> zones_itf;
-				typedef Prototypes::Synthesis_Zone<get_mapped_component_type(typename type_of(Synthesis_Zone_Collection))> zone_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
+				typedef Pair_Associative_Container<type_of(Synthesis_Zone_Collection)> zones_itf;
+				typedef Prototypes::Synthesis_Zone<get_mapped_component_type(type_of(Synthesis_Zone_Collection))> zone_itf;
 
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> mway_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(typename type_of(Sample_Data))>  hh_unit_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(type_of(Sample_Data))>  hh_unit_itf;
 				typedef Random_Access_Sequence< typename hh_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 
@@ -355,19 +355,19 @@ namespace PopSyn
 				//==========================================================
 				// Get the solution settings
 				typedef typename get_type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
-				typedef Pair_Associative_Container<typename type_of(Synthesis_Zone_Collection)> zones_itf;
-				typedef Prototypes::Synthesis_Zone<get_mapped_component_type(typename type_of(Synthesis_Zone_Collection))> zone_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
+				typedef Pair_Associative_Container<type_of(Synthesis_Zone_Collection)> zones_itf;
+				typedef Prototypes::Synthesis_Zone<get_mapped_component_type(type_of(Synthesis_Zone_Collection))> zone_itf;
 
 				//?????????????????????????????????????????????????????????????????????????????????
 				// REPLACE WITH TYPEDEFS FOR APPROPRIATE IPU CONTAINERS 
 				//------------------------------------------
-				//typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> mway_itf;
-				//typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				//typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
+				//typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				//?????????????????????????????????????????????????????????????????????????????????
 
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(typename type_of(Sample_Data))>  hh_unit_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(type_of(Sample_Data))>  hh_unit_itf;
 				typedef Random_Access_Sequence< typename hh_unit_itf::type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 

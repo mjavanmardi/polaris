@@ -283,10 +283,11 @@ namespace Network_Components
 				return (TargetType)(start_of_current_simulation_interval_relative<TargetType>() + scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>());
 			}
 
-			template<typename TargetType> TargetType get_routable_network_from_snapshots(int current_time)
-			{
-				return (TargetType)(this_component()->template get_routable_network_from_snapshots<TargetType>(current_time));
-			}
+// TODO: this doesn't compile and is not called
+//			template<typename TargetType> TargetType get_routable_network_from_snapshots(int current_time)
+//			{
+//				return (TargetType)(this_component()->template get_routable_network_from_snapshots<TargetType>(current_time));
+//			}
 
 			template<typename TargetType> void increase_in_network_vht_vehicle_based(float increase)
 			{

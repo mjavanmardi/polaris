@@ -1,6 +1,46 @@
 #ifdef ANTARES
 #include "Antares/Antares.h"
 #endif
+
+// can we get away with only storing 1 function pointer for an entire graph?
+// what if we store the pointer type with the pointer in the priority queue, instead of in the graph?
+// if we store like an index into to a function pointer table, it is at least cheaper
+
+// "real edge" passed into the function pointer resolution
+
+struct Edge_A;
+
+struct Edge_B;
+
+template<typename From,typename To>
+struct Connection
+{
+
+};
+
+template<typename This_Edge,typename Adjacent_1,typename Adjacent_2>
+struct ConnectionTypes
+{
+	static void Visit_Neighbors(void* edge)
+	{
+		(This_Edge*)edge;
+	}
+
+	Connection<This_Edge,Adjacent_1> neighbors_1;
+	Connection<This_Edge,Adjacent_2> neighbors_2;
+};
+
+template<typename Adjacent_1,typename Adjacent_2>
+struct EdgeConn : public Connection<EdgeConn,Adjacent_1,Adjacent_2>
+{
+
+};
+
+int main(int argc, char *argv[])
+{
+}
+
+#ifdef STUFF
 #include "core/Core.h"
 using namespace polaris;
 
@@ -139,7 +179,7 @@ int main(int argc, char *argv[])
 	char test;
 	cin >> test;
 }
-
+#endif
 
 
 //// Test agent

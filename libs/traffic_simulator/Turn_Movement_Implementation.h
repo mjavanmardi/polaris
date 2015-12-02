@@ -119,10 +119,10 @@ namespace Turn_Movement_Components
 			struct Movement_MOE_Data realtime_movement_moe_data;
 
 			
-			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(inbound_link)> _Link_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename  type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
-			typedef  Back_Insertion_Sequence<typename type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+			typedef  Back_Insertion_Sequence<type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Turn_Movement_Components::Prototypes::Movement<typename MasterType::movement_type> _Turn_Movement_Interface;
@@ -210,11 +210,11 @@ namespace Turn_Movement_Components
 					_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
 					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
 
-					_Intersection_Interface* itx = lnk->downstream_intersection<_Intersection_Interface*>();
+					_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
 
 
 
-					if(itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
+					if(itx->template intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
 					{
 						_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
 					}
@@ -308,7 +308,7 @@ namespace Turn_Movement_Components
 					//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
 
 					// reset vehicle intersection delays for the link to zero, once it starts moving again
-					for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+					for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 					{
 						_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
 						vehicle->template movement_plan<_Movement_Plan_Interface*>()->template set_current_link_intersection_delay<int>(0);
@@ -337,7 +337,7 @@ namespace Turn_Movement_Components
 
 								// update vehicles currently being delayed by the signal
 								
-								for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+								for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 								{
 									_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
 									vehicle->template movement_plan<_Movement_Plan_Interface*>()->template update_current_link_intersection_delay<int>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());

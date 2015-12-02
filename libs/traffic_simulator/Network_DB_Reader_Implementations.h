@@ -1264,7 +1264,7 @@ namespace Network_Components
 						activity_locations_container.push_back(activity_location);
 
 						// store the id to index lookup info
-						loc_id_to_idx_container.insert(pair<int,int>(activity_location->uuid<int>(),activity_location->internal_id<int>()));
+						loc_id_to_idx_container.insert(pair<int,int>(activity_location->template uuid<int>(),activity_location->template internal_id<int>()));
 						++counter;
 					}
 					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}

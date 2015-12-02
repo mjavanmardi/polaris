@@ -41,6 +41,7 @@ namespace polaris
 	//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
 	
 	#define requires(TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
+	#define template_requires(...) typename enable_if<__VA_ARGS__>
 
 	#define method_requires(...) char(*)[__VA_ARGS__]=NULL
 

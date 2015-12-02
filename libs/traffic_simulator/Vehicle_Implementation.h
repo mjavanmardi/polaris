@@ -65,7 +65,7 @@ namespace Vehicle_Components
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
-			typedef  Random_Access_Sequence<typename type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
+			typedef  Random_Access_Sequence<type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
 
 			typedef  Link<typename remove_pointer< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), _Link_Interface*> _Links_Container_Interface;
@@ -82,7 +82,7 @@ namespace Vehicle_Components
 			typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
-			typedef  Traveler_Components::Prototypes::Traveler<typename type_of(traveler)> _Traveler_Interface;
+			typedef  Traveler_Components::Prototypes::Traveler<type_of(traveler)> _Traveler_Interface;
 			
 			//TODO:ROUTING
 			//typedef Network_Components::Prototypes::Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
@@ -286,7 +286,7 @@ namespace Vehicle_Components
 					if (position_index+2<traj_container.size())
 					{
 						_Trajectory_Unit_Interface* next_traj_unit = traj_container[position_index+2];
-						_Link_Interface* next_link = next_traj_unit->link<_Link_Interface*>();
+						_Link_Interface* next_link = next_traj_unit->template link<_Link_Interface*>();
 						int next_routed_travel_time = next_traj_unit->template estimated_link_accepting_time<int>();
 						
 						int diff = next_routed_travel_time - routed_travel_time;
@@ -560,41 +560,42 @@ namespace Vehicle_Components
 //load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template Vehicle_Action,first_triggeriteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,NULLTYPE);
 			}
 
-			static void Vehicle_Action_Condition(ComponentType* _this,Event_Response& response)
-			{
-				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
-				{
-					response.result=false;
-					response.next._iteration=END;
-				}
-				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION)
-				{
-					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					response.result=true;
-					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
-					{
-						response.next._iteration=_iteration;
-						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
-					}
-					else
-					{
-						response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
-					}
-				}
-				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION)
-				{
-					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
-				}
-				else
-				{
-					cout << "Should never reach here in vehicle action conditional!" << endl;
-					assert(false);				
-				}
-			}
+// TODO: this doesn't compile
+//			static void Vehicle_Action_Condition(ComponentType* _this,Event_Response& response)
+//			{
+//				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
+//				{
+//					response.result=false;
+//					response.next._iteration=END;
+//				}
+//				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION)
+//				{
+//					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
+//					//response.result=true;
+//					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
+//					{
+//						response.next._iteration=_iteration;
+//						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
+//					}
+//					else
+//					{
+//						response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+//						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
+//					}
+//				}
+//				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION)
+//				{
+//					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
+//					response.result=true;
+//					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+//					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
+//				}
+//				else
+//				{
+//					cout << "Should never reach here in vehicle action conditional!" << endl;
+//					assert(false);
+//				}
+//			}
 
 			//declare_event(Vehicle_Action)
 			void Vehicle_Action()
@@ -715,16 +716,16 @@ namespace Vehicle_Components
 				update_eta<NULLTYPE>(current_route_time_to_destination);
 				_Network_Interface* net = (_Network_Interface*)_global_network;
 
-				Routable_Network<typename MasterType::routable_network_type>* routable_net = net->routable_network<typename MasterType::routable_network_type>();
+				Routable_Network<typename MasterType::routable_network_type>* routable_net = net->template routable_network<typename MasterType::routable_network_type>();
 				
 				_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Link_Interface*>();
 				_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
 				std::vector<unsigned int> origin_ids;
-				origin_ids.push_back(origin_link->uuid<unsigned int>());
+				origin_ids.push_back(origin_link->template uuid<unsigned int>());
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_ids;
-				destination_ids.push_back(destination_link->uuid<unsigned int>());
+				destination_ids.push_back(destination_link->template uuid<unsigned int>());
 				
 
 				boost::container::deque<global_edge_id> path_container;
@@ -1006,9 +1007,9 @@ namespace Vehicle_Components
 
 				// determine if we track this vehicle for trajectory writing
 				_write_trajectory = false;
-				if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_list<bool>())
+				if (((_Scenario_Interface*)_global_scenario)->template use_vehicle_tracking_list<bool>())
 				{
-					std::unordered_set<int>& tracking_list = ((_Scenario_Interface*)_global_scenario)->vehicle_tracking_list<std::unordered_set<int>&>();
+					std::unordered_set<int>& tracking_list = ((_Scenario_Interface*)_global_scenario)->template vehicle_tracking_list<std::unordered_set<int>&>();
 					std::unordered_set<int>::iterator itr = tracking_list.find(_uuid);
 					if (itr != tracking_list.end())
 					{

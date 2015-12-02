@@ -25,6 +25,23 @@ namespace Network_Skimming_Components
 		template<typename ComponentType> struct Skim_Table;
 		template<typename ComponentType> struct Location_To_Zone_Map_Item;
 
+
+		prototype struct LOS ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+
+			accessor(auto_ttime, NONE, NONE);
+			accessor(auto_tolls, NONE, NONE);
+			accessor(auto_parking_cost, NONE, NONE);
+			accessor(auto_distance /*transit_sov_access_time*/, NONE, NONE);
+
+			accessor(transit_ttime, NONE, NONE);
+			accessor(transit_walk_access_time, NONE, NONE);
+			accessor(transit_wait_time, NONE, NONE);
+			accessor(transit_fare, NONE, NONE);
+			accessor(LOS_time_invariant, NONE, NONE);
+		};
+
 		prototype struct Network_Skimming ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
@@ -419,7 +436,7 @@ namespace Network_Skimming_Components
 				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
 
 				//Check for bad travel time
-				if (los_value->auto_ttime<Time_Seconds>() > END || los_value->auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->auto_ttime<Time_Seconds>()))
+				if (los_value->template auto_ttime<Time_Seconds>() > END || los_value->template auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->template auto_ttime<Time_Seconds>()))
 				{
 					int O = this->template Get_Zone_ID<LocationType>(Origin);
 					int D = this->template Get_Zone_ID<LocationType>(Destination);
@@ -482,8 +499,8 @@ namespace Network_Skimming_Components
 
 				// get only the HH:MM:SS portion of requested time if Time > 1 day
 				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(Start_Time))/24);
-				typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
-				typename TimeType remain = Start_Time - rounded;
+				TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+				TimeType remain = Start_Time - rounded;
 				
 				// go to skim table for requested time period
 				for (; itr != skims->end(); ++itr)
@@ -541,8 +558,8 @@ namespace Network_Skimming_Components
 
 				// get only the HH:MM:SS portion of requested time if Time > 1 day
 				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(start_time))/24);
-				typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
-				typename TimeType remain = start_time - rounded;
+				TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+				TimeType remain = start_time - rounded;
 				
 				// go to skim table for requested time period
 				for (; itr != skims->end(); ++itr)
@@ -650,52 +667,54 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
-			template<typename TargetType> static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
-			{
-//				File_IO::Binary_File_Reader infile;
-				infile.Open(infilename);
-				
-				ofstream outfile;
-				outfile.open(outfilename);
 
-				//===========================================================================
-				// Read Header
-				int num_modes, num_zones, update_increment;
-				infile.template Read_Value<int>(num_modes);
-				infile.template Read_Value<int>(num_zones);
-				infile.template Read_Value<int>(update_increment);
-				
-				//===========================================================================
-				// create the skim_table time periods, for basic create only a single time period skim_table
-				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
-				{		
-					float* data = new float[num_zones*num_zones];
-
-
-
-					infile.template Read_Array<float>(data, num_zones*num_zones);
-
-
-					boost::container::vector<float> temp(data,data+num_zones*num_zones);
-
-					
-					outfile << "Skim table for time period starting at: " << start<<endl;
-
-					for (int i=0; i< num_zones; i++)
-					{
-						for (int j=0; j< num_zones; j++)
-						{
-							outfile << data[i*(num_zones)+j] << ",";
-						}
-						outfile << endl;
-					}
-					cout <<endl<< "finished period "<<start<<endl;
-					outfile << endl;
-				}
-
-				infile.Close();
-				outfile.close();
-			}
+// TODO: this does not compile
+//			template<typename TargetType> static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
+//			{
+////				File_IO::Binary_File_Reader infile;
+//				infile.Open(infilename);
+//
+//				ofstream outfile;
+//				outfile.open(outfilename);
+//
+//				//===========================================================================
+//				// Read Header
+//				int num_modes, num_zones, update_increment;
+//				infile.template Read_Value<int>(num_modes);
+//				infile.template Read_Value<int>(num_zones);
+//				infile.template Read_Value<int>(update_increment);
+//
+//				//===========================================================================
+//				// create the skim_table time periods, for basic create only a single time period skim_table
+//				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
+//				{
+//					float* data = new float[num_zones*num_zones];
+//
+//
+//
+//					infile.template Read_Array<float>(data, num_zones*num_zones);
+//
+//
+//					boost::container::vector<float> temp(data,data+num_zones*num_zones);
+//
+//
+//					outfile << "Skim table for time period starting at: " << start<<endl;
+//
+//					for (int i=0; i< num_zones; i++)
+//					{
+//						for (int j=0; j< num_zones; j++)
+//						{
+//							outfile << data[i*(num_zones)+j] << ",";
+//						}
+//						outfile << endl;
+//					}
+//					cout <<endl<< "finished period "<<start<<endl;
+//					outfile << endl;
+//				}
+//
+//				infile.Close();
+//				outfile.close();
+//			}
 
 			template<typename TargetType> void Read_Binary_Headers(int& num_modes, int& num_zones, TargetType intervals, bool perform_checks)
 			{
@@ -705,6 +724,8 @@ namespace Network_Skimming_Components
 			{
 				this_component()->template Read_Binary_Data<TargetType>(data_ptr, file, num_zones);
 			}
+
+			typedef typename ComponentType::Master_Type MasterType;
 
 			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
@@ -860,21 +881,6 @@ namespace Network_Skimming_Components
 
 		};
 
-		prototype struct LOS ADD_DEBUG_INFO
-		{
-			tag_as_prototype;
-
-			accessor(auto_ttime, NONE, NONE);
-			accessor(auto_tolls, NONE, NONE);
-			accessor(auto_parking_cost, NONE, NONE);
-			accessor(auto_distance /*transit_sov_access_time*/, NONE, NONE);
-
-			accessor(transit_ttime, NONE, NONE);
-			accessor(transit_walk_access_time, NONE, NONE);		
-			accessor(transit_wait_time, NONE, NONE);
-			accessor(transit_fare, NONE, NONE);
-			accessor(LOS_time_invariant, NONE, NONE);
-		};
 
 	}
 }

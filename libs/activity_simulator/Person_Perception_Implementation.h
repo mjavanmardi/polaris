@@ -23,7 +23,7 @@ namespace Person_Components
 			m_prototype(Scenario_Components::Prototypes::Scenario, typename MasterType::scenario_type, Scenario, NONE, NONE);
 
 			// Interface definitions
-			typedef Network_Components::Prototypes::Network< typename type_of(Network)> _Network_Interface;
+			typedef Network_Components::Prototypes::Network< type_of(Network)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;

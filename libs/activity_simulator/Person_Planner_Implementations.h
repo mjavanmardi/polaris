@@ -130,7 +130,7 @@ namespace Person_Components
 
 
 			// Interface definitions
-			typedef Prototypes::Person<typename type_of(Parent_Person)> _Person_Interface;
+			typedef Prototypes::Person<type_of(Parent_Person)> _Person_Interface;
 			typedef Prototypes::Person_Scheduler< typename _Person_Interface::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename _Person_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename _Person_Interface::get_type_of(network_reference)> _Network_Interface;

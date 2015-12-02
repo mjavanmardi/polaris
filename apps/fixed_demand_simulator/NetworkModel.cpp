@@ -225,12 +225,12 @@ struct MasterType
 
 
 ostream* stream_ptr;
-void run_with_input_from_db(char* scenario_filename);
+void run_with_input_from_db(const char* scenario_filename);
 //void run_with_input_from_files();
 
 int main(int argc, char* argv[])
 {
-	char* scenario_filename = "scenario.json";
+	std::string scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 
 	int num_threads = 1;
@@ -252,11 +252,11 @@ int main(int argc, char* argv[])
 	Average_Execution_Objects_Hint<MasterType::antares_layer_type>(10);
 #endif
 
-	run_with_input_from_db(scenario_filename);
+	run_with_input_from_db(scenario_filename.c_str());
 }
 
 
-void run_with_input_from_db(char* scenario_filename)
+void run_with_input_from_db(const char* scenario_filename)
 {
 
 	Network_Components::Types::Network_IO_Maps network_io_maps;
@@ -321,14 +321,14 @@ void run_with_input_from_db(char* scenario_filename)
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	typedef Demand<MasterType::demand_type> _Demand_Interface;
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	demand->scenario_reference<_Scenario_Interface*>(scenario);
-	demand->network_reference<_Network_Interface*>(network);
+	demand->template scenario_reference<_Scenario_Interface*>(scenario);
+	demand->template network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
-	demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	demand->template read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 
-	if (scenario->ramp_metering_flag<bool>() == true) {
+	if (scenario->template ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}

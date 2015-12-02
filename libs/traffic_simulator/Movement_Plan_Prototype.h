@@ -119,10 +119,10 @@ namespace Movement_Plan_Components
 				}
 				return true;
 			}
-			
 
 			// overloaded origin and destination, depending on targetType
-			template<typename TargetType> void origin(TargetType activity_location, requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType>
+			void origin(TargetType activity_location,requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				this_component()->template origin_location<TargetType>(activity_location);
 			}
@@ -138,7 +138,8 @@ namespace Movement_Plan_Components
 			{
 				return this_component()->template destination_location<TargetType>();
 			}
-			template<typename TargetType> void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
+			template<typename TargetType>
+			void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
 			{
 				this_component()->template origin<TargetType>(link);
 			}

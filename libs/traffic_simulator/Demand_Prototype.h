@@ -45,6 +45,8 @@ namespace Demand_Components
 		{
 			tag_as_prototype;
 
+			typedef typename ComponentType::Master_Type MasterType;
+
 			accessor(scenario_reference, NONE, NONE);
 			accessor(network_reference, NONE, NONE);
 			accessor(vehicles_container, NONE, NONE);
@@ -215,7 +217,7 @@ namespace Demand_Components
 
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
 
-					movement_plan->network<_Network_Interface*>(network);
+					movement_plan->template network<_Network_Interface*>(network);
 
 					vehicle->template uuid<int>(++traveler_id_counter);
 					vehicle->template internal_id<int>(traveler_id_counter);
@@ -252,7 +254,7 @@ namespace Demand_Components
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
 
-					router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+					router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
 					traveler->Schedule_New_Departure(departed_time);
 

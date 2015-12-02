@@ -219,13 +219,13 @@ namespace PopSyn
 				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
 
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution)> mway_itf;
-				typedef Multidimensional_Random_Access_Array<typename type_of(Target_Marginal_Distribution)> marg_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array<type_of(Target_Marginal_Distribution)> marg_itf;
 
 				typename mway_itf::iterator itr;
 				typename marg_itf::iterator marg_itr;
@@ -289,13 +289,13 @@ namespace PopSyn
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution)> mway_itf;
-				typedef Multidimensional_Random_Access_Array<typename type_of(Target_Marginal_Distribution)> marg_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array<type_of(Target_Marginal_Distribution)> marg_itf;
 
 				typename mway_itf::iterator itr;
 				typename marg_itf::iterator marg_itr;
@@ -353,15 +353,15 @@ namespace PopSyn
 				// Interface typedefs
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> mway_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef typename marg_itf::index_type marg_index;
 
 				mway_itf& mway_per = this->Target_Person_Joint_Distribution<mway_itf&>();
@@ -462,15 +462,15 @@ namespace PopSyn
 				// Interface typedefs
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
-				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> mway_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
+				typedef type_of(Target_Joint_Distribution)::value_type value_type;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef typename marg_itf::index_type marg_index;
 
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
@@ -586,12 +586,12 @@ namespace PopSyn
 			template<typename TargetType> void Add_Household_and_Persons(TargetType stored_pop_unit, double& persons_remaining)
 			{
 				typedef Prototypes::Synthesis_Zone<ComponentType> this_itf;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
 				typedef Household_Components::Prototypes::Household_Properties <get_component_type(sample_itf)>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution)> mway_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution)> marg_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution)> marg_itf;
 				this_itf* pthis = (this_itf*)this;
 
 				// create the actual household agent
@@ -623,15 +623,15 @@ namespace PopSyn
 				// Interface typedefs
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> joint_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marginal_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> joint_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marginal_itf;
 
 				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
 
@@ -844,13 +844,13 @@ namespace PopSyn
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution)> mway_itf;
-				typedef Multidimensional_Random_Access_Array<typename type_of(Target_Marginal_Distribution)> marg_itf;
+				typedef Multidimensional_Random_Access_Array<type_of(Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array<type_of(Target_Marginal_Distribution)> marg_itf;
 
 				typename mway_itf::iterator itr;
 				typename marg_itf::iterator marg_itr;
@@ -952,15 +952,15 @@ namespace PopSyn
 				// Interface typedefs
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Pair_Associative_Container< typename type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( typename type_of(Sample_Data))>  pop_unit_itf;
+				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Prototypes::Solver_Settings<typename type_of(Solver_Settings)> solution_settings_itf;
+				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Joint_Distribution),value_type> mway_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef typename marg_itf::index_type marg_index;
 
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();

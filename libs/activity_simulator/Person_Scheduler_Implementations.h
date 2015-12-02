@@ -70,11 +70,11 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence<typename type_of(Activity_Container)> Activity_Plans;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 
-			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container)> Movement_Plans;
+			typedef Back_Insertion_Sequence<type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
 			
 			typedef Back_Insertion_Sequence<typename type_of(Parent_Person)::type_of(Activity_Record_Container)> Activity_Records;

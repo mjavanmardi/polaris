@@ -15,6 +15,9 @@ namespace Traveler_Components
 	{
 		implementation struct Traveler_Implementation:public Polaris_Component<MasterType,INHERIT(Traveler_Implementation),Execution_Object>
 		{
+			typedef Polaris_Component<MasterType,INHERIT(Traveler_Implementation),Execution_Object> Base_t;
+			typedef typename Base_t::ComponentType ComponentType;
+
 			static void Initiate_Departure_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
@@ -50,7 +53,7 @@ namespace Traveler_Components
 				_router->Schedule_Route_Computation(departed_time);
 
 				// other stuff than routing
-				Load_Event<ComponentType>(&Initiate_Departure_Conditional,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION);
+				this->template Load_Event<ComponentType>(&Initiate_Departure_Conditional,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION);
 			}
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));

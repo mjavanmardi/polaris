@@ -63,7 +63,7 @@ namespace Person_Components
 			m_data(int, work_location_id, NONE, NONE);
 			m_data(int, school_location_id, NONE, NONE);
 			
-			typedef Prototypes::Person<typename type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person<type_of(Parent_Person)> person_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 

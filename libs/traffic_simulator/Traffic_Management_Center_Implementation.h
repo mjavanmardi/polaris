@@ -400,7 +400,7 @@ namespace Traffic_Management_Center_Components
 			{
 				this_component()->template Read_Database<TargetType>();
 
-				Load_Event<ComponentType>(&ComponentType::TMC_Conditional, 0, 1);
+				this->template Load_Event<ComponentType>(&ComponentType::TMC_Conditional, 0, 1);
 			}
 
 			/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector

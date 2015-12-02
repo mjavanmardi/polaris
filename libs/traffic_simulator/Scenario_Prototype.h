@@ -253,10 +253,10 @@ namespace Scenario_Components
 			accessor(use_tile_imagery,NONE,NONE);
 			accessor(tile_imagery_alpha_level,NONE,NONE);
 
-			template<typename TargetType> void read_scenario_data(char* filename)
+			template<typename TargetType> void read_scenario_data(const char* filename)
 			{
 				CfgReader cfgReader;
-				char* path = filename;
+				const char* path = filename;
 				bool result = cfgReader.initialize(path);
 
 				if (!result) THROW_EXCEPTION("Scenario file '"<<filename<<"' was not able to be opened.");

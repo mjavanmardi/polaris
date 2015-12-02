@@ -20,6 +20,9 @@ namespace Zone_Components
 	{
 		implementation struct Zone_Implementation:public Polaris_Component<MasterType,INHERIT(Zone_Implementation),Execution_Object>
 		{
+			typedef Polaris_Component<MasterType,INHERIT(Zone_Implementation),Execution_Object> Base_t;
+			typedef typename Base_t::ComponentType ComponentType;
+
 			typedef Zone<typename MasterType::zone_type> _this_interface;
 
 			int* production_counter;

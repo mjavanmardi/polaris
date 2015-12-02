@@ -343,7 +343,7 @@ namespace Intersection_Components
 				
 				// skip non-arterial/local links
 
-				Link_Components::Types::Link_Type_Keys link_type = link->link_type<Link_Components::Types::Link_Type_Keys>();
+				Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 				// skip non-arterial/local links
 				if(link_type == Link_Components::Types::Link_Type_Keys::FREEWAY || 
@@ -354,7 +354,7 @@ namespace Intersection_Components
 					return;
 				}
 				
-				Link_Components::Implementations::Pocket_Data* pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+				Link_Components::Implementations::Pocket_Data* pocket_data = link->template pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
 				if(!pocket_data->num_pockets_left || !pocket_data->num_pockets_right)
 				{
@@ -382,7 +382,7 @@ namespace Intersection_Components
 						
 						total_demand += outbound_movement->template movement_demand<float>();
 
-						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
 						if(type == U_TURN || type == LEFT_TURN)
 						{
@@ -424,7 +424,7 @@ namespace Intersection_Components
 
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
 							if(type == THROUGH_TURN)
 							{
@@ -455,7 +455,7 @@ namespace Intersection_Components
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
 							if(type == U_TURN || type == LEFT_TURN)
 							{
@@ -495,7 +495,7 @@ namespace Intersection_Components
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
 							if(type == RIGHT_TURN)
 							{
@@ -556,14 +556,14 @@ namespace Intersection_Components
 			
 			
 			typedef Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
 
 
 			typedef Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer<typename  type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Outbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Outbound_Movement_Interface*> _Outbound_Movements_Container_Interface;
@@ -575,7 +575,7 @@ namespace Intersection_Components
 
 			typedef Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
-			typedef Intersection_Control_Components::Prototypes::Intersection_Control<typename type_of(intersection_control)> _Intersection_Control_Interface;
+			typedef Intersection_Control_Components::Prototypes::Intersection_Control<type_of(intersection_control)> _Intersection_Control_Interface;
 			typedef Intersection_Control_Components::Prototypes::Control_Plan< typename _Intersection_Control_Interface::get_type_of(current_control_plan)> _Control_Plan_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -802,7 +802,7 @@ namespace Intersection_Components
 				{
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
 					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
-					Load_Event<ComponentType>(&ComponentType::Newells_Conditional,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION);
+					this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION);
 					////TODO
 //load_event(ComponentType,,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
 				}

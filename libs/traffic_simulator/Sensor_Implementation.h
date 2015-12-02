@@ -29,13 +29,14 @@ namespace Sensor_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Link_Sensor),Data_Object>::Component_Type ComponentType;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
-			template<typename TargetType> void Sensor_Conditional()
-			{
-				response.next._iteration = _iteration + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
-
-				response.result = true;
-			}
+// TODO: does not compile
+//			template<typename TargetType> void Sensor_Conditional()
+//			{
+//				response.next._iteration = _iteration + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+//				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+//
+//				response.result = true;
+//			}
 			
 			declare_event(Sensor_Event)
 			{
@@ -92,44 +93,45 @@ namespace Sensor_Components
 			template<typename TargetType> static void Initialize_Type()
 			{
 			}
-			
-			template<typename TargetType> void Initialize(polaris::io::Fixed_Sensor& instance)
-			{
-				using namespace polaris::io;
 
-				_detector = nullptr;
-				_outlier_detected = false;
-
-				_covered_link = nullptr;
-
-				union Link_ID_Dir
-				{
-					struct
-					{
-						int id;
-						int dir;
-					};
-					long long id_dir;
-				} link_id_dir;
-
-				link_id_dir.id = instance.getLink();
-				link_id_dir.dir = instance.getDir();
-
-				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
-
-				if(db_map.count(link_id_dir.id_dir))
-				{
-					covered_link_interface* polaris_link = (covered_link_interface*)db_map[link_id_dir.id_dir];
-
-					_covered_link = polaris_link;
-
-					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
-
-					typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
-					//TODO
-//load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::template Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
-				}
-			}
+// TODO: does not compile
+//			template<typename TargetType> void Initialize(polaris::io::Fixed_Sensor& instance)
+//			{
+//				using namespace polaris::io;
+//
+//				_detector = nullptr;
+//				_outlier_detected = false;
+//
+//				_covered_link = nullptr;
+//
+//				union Link_ID_Dir
+//				{
+//					struct
+//					{
+//						int id;
+//						int dir;
+//					};
+//					long long id_dir;
+//				} link_id_dir;
+//
+//				link_id_dir.id = instance.getLink();
+//				link_id_dir.dir = instance.getDir();
+//
+//				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
+//
+//				if(db_map.count(link_id_dir.id_dir))
+//				{
+//					covered_link_interface* polaris_link = (covered_link_interface*)db_map[link_id_dir.id_dir];
+//
+//					_covered_link = polaris_link;
+//
+//					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
+//
+//					typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
+//					//TODO
+////load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::template Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
+//				}
+//			}
 			
 			template<typename TargetType> void Attach_Detector(boost::unordered::unordered_map<int, Detector1DU<double> >& detector_configuration)
 			{
