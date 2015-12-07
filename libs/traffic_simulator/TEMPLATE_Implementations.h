@@ -78,7 +78,7 @@ namespace EXAMPLE_COMPONENTS
 		/// The polaris component can be ed through the "type" member of the struct;
 		implementation struct COMPONENT_NAME
 		{
-			typedef NULLTYPE GROUPLIST_TYPE; // no groupboost::container::list type defined
+			typedef NULLTYPE GROUPLIST_TYPE; // no groupstd::list type defined
 			typedef Data_Object OBJECT_TYPE; // The polaris component type is a "Data_Object", i.e. contains no schedulable functions
 			typedef Polaris_Component< MasterType,Implementations::IMPLEMENTATION_NAME<MasterType>, PARENT_TYPE,GROUPLIST_TYPE, OBJECT_TYPE> type;
 		};

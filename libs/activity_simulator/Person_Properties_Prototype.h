@@ -527,15 +527,15 @@ namespace Person_Components
 			}
 			
 			local_check_template_method_name(Characteristics_exists,Characteristics);
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check_2(TargetType, boost::container::vector<double>*, is_same)))
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check_2(TargetType, std::vector<double>*, is_same)))
 			{
 				assert_check(ComponentType,Characteristics_exists,"ComponentType does not have 'Characteristics' method defined.");
 
 				this_component()->Characteristics<TargetType>(data);
 			}
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, !check_2(TargetType, boost::container::vector<double>*, is_same)))
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, !check_2(TargetType, std::vector<double>*, is_same)))
 			{
-				assert_check_2(TargetType, boost::container::vector<double>*, is_same, "TargetType must be specified as a pointer to a boost::vector of doubles.");
+				assert_check_2(TargetType, std::vector<double>*, is_same, "TargetType must be specified as a pointer to a vector of doubles.");
 			}
 
 			template<typename TargetType> Types::EMPLOYMENT_INDUSTRY_SIMPLE Employment_Industry_Simple()

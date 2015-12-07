@@ -71,12 +71,12 @@ namespace polaris
 		virtual void Terminate() = 0;
 		virtual Component_Manager_Types Component_Manager_Type(){ return NULL_MANAGER; }
 
-		boost::unordered::unordered_map<int,pair<int,void(NULLTYPE::*)(void)>> function_map;
-		boost::unordered_map<int,void*>* _object_repository;
+		std::unordered_map<int,pair<int,void(NULLTYPE::*)(void)>> function_map;
+		std::unordered_map<int,void*>* _object_repository;
 	};
 
 	extern int __component_counter;
-	extern boost::unordered::unordered_map<size_t,Component_Manager_Base*>* __all_components;
+	extern std::unordered_map<size_t,Component_Manager_Base*>* __all_components;
 
 	///----------------------------------------------------------------------------------------------------
 	/// INITIALIZE_SIMULATION macro which must be called to initialize the simulation
@@ -85,7 +85,7 @@ namespace polaris
 	#define INITIALIZE_SIMULATION(CONFIGURATION_OBJECT)\
 		_world = new World();\
 		_world->Initialize(CONFIGURATION_OBJECT);\
-		for(boost::unordered::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++){ (itr->second)->Initialize(); }
+		for(std::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++){ (itr->second)->Initialize(); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// TERMINATE_SIMULATION macro which must be called to clean up the simulation
@@ -94,7 +94,7 @@ namespace polaris
 	#define TERMINATE_SIMULATION()\
 		_world->Terminate();\
 		delete _world;\
-		for(boost::unordered::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++) (itr->second)->Terminate();
+		for(std::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++) (itr->second)->Terminate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// START macro which must be called to begin the simulation

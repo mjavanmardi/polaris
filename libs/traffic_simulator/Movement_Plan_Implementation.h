@@ -40,7 +40,7 @@ namespace Movement_Plan_Components
 			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
-			m_container(boost::container::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
+			m_container(std::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
 			
 			//==================================================================================================================
 			/// current_trajectory_position
@@ -213,7 +213,7 @@ namespace Movement_Plan_Components
 			}	 
 
 			m_prototype(Null_Prototype, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);
 			m_data(bool, valid_trajectory, NONE, NONE);
 		};
 

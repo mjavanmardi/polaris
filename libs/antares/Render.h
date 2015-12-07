@@ -65,7 +65,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Render(wxPaintEvent& eve
 
 	//---- loop over and draw all layers ----
 
-	boost::container::list<Antares_Layer_Interface*>::iterator itr;
+	std::list<Antares_Layer_Interface*>::iterator itr;
 
 	for(itr=_layers.begin();itr!=_layers.end();itr++)
 	{

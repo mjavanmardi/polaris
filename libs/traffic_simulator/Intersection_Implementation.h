@@ -24,7 +24,7 @@ namespace Intersection_Components
 			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link_reference, NONE, NONE);
 			
 			// container of inbound movements
-			m_container(boost::container::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
 
 			typedef  Link_Components::Prototypes::Link<typename type_of(outbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(inbound_movements)::value_type>::type>  _Movement_Interface;
@@ -325,7 +325,7 @@ namespace Intersection_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Inbound_Outbound_Movements_Implementation),Data_Object>::ComponentType ComponentType;
 
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link_reference, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
 
 			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
@@ -362,9 +362,9 @@ namespace Intersection_Components
 
 					const float interval_capacity = (1800.0f/(60.0f*60.0f))*interval;
 
-					//boost::container::deque<_Movement_Interface*> through_movements;
-					//boost::container::deque<_Movement_Interface*> right_movements;
-					//boost::container::deque<_Movement_Interface*> left_movements;
+					//std::deque<_Movement_Interface*> through_movements;
+					//std::deque<_Movement_Interface*> right_movements;
+					//std::deque<_Movement_Interface*> left_movements;
 					
 					_Movement_Interface* outbound_movement;
 					typename _Movements_Container_Interface::iterator outbound_itr;
@@ -543,10 +543,10 @@ namespace Intersection_Components
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);

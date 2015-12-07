@@ -158,13 +158,13 @@ static inline int X_Sort_Function (const void *rec1, const void *rec2)
 	return (0);
 }
 
-static inline bool In_Polygon(boost::container::vector<Point_3D<NULLTYPE>>& points, float x, float y)
+static inline bool In_Polygon(std::vector<Point_3D<NULLTYPE>>& points, float x, float y)
 {
 	int num;
 	double x1, y1, x2, y2, xarray [100];
 	bool first, close_flag;
 
-	boost::container::vector<Point_3D<NULLTYPE>>::iterator point_itr, end_itr;
+	std::vector<Point_3D<NULLTYPE>>::iterator point_itr, end_itr;
 	
 	if (points.size () < 3) return (false);
 

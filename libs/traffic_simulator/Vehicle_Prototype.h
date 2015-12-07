@@ -119,7 +119,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> bool exploit_events_set(TargetType events_set)
 			{
-				return this_component()->template exploit_events_boost::container::set< TargetType>(events_set);
+				return this_component()->template exploit_events_set< TargetType>(events_set);
 			}
 
 			template<typename TargetType> void update_vehicle_position()

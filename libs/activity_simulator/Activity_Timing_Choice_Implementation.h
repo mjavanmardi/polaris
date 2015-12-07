@@ -25,7 +25,7 @@ namespace Person_Components
 
 
 			// static start time and duration lookup container for each activity type
-			static m_container(concat(boost::unordered::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
+			static m_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
 			
 
 			//=======================================================================================================
@@ -179,6 +179,6 @@ namespace Person_Components
 
 		template<typename MasterType, typename InheritanceList> typename Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::type_of(is_initialized) Activity_Timing_Chooser_Implementation<MasterType,InheritanceList>::_is_initialized = false;
 		//static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
-		template<typename MasterType, typename InheritanceList> boost::unordered::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
+		template<typename MasterType, typename InheritanceList> std::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
 	}
 }

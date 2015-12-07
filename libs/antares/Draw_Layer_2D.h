@@ -40,7 +40,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 
 	const int data_stride=_layer->data_stride<int>();
 	
-	const Dynamic_Multi_Buffer< boost::container::vector<int>* >& storage=_layer->storage<Dynamic_Multi_Buffer< boost::container::vector<int>* >&>();
+	const Dynamic_Multi_Buffer< std::vector<int>* >& storage=_layer->storage<Dynamic_Multi_Buffer< std::vector<int>* >&>();
 
 	//---- determine bounds for main layer ----
 
@@ -50,7 +50,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = storage[current_iteration];
 
 		for(int i=0;i<num_antares_threads();i++)
 		{
@@ -101,7 +101,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 		current_iteration++;
 	}
 
-	const Dynamic_Multi_Buffer< boost::container::vector<int>* >& accent_storage=_layer->accent_storage<Dynamic_Multi_Buffer< boost::container::vector<int>* >&>();
+	const Dynamic_Multi_Buffer< std::vector<int>* >& accent_storage=_layer->accent_storage<Dynamic_Multi_Buffer< std::vector<int>* >&>();
 
 	//---- determine bounds for accents ----
 
@@ -109,7 +109,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 	
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = accent_storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
 		for(int i=0;i<num_antares_threads();i++)
 		{
@@ -201,7 +201,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = storage[current_iteration];
 
 		for(int i=0;i<num_antares_threads();i++)
 		{
@@ -248,7 +248,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = accent_storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
 		for(int i=0;i<num_antares_threads();i++)
 		{

@@ -20,7 +20,7 @@ namespace Intersection_Components
 	{
 		implementation struct Antares_Intersection_Implementation:public Intersection_Implementation<MasterType,INHERIT(Antares_Intersection_Implementation)>
 		{
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -28,7 +28,7 @@ namespace Intersection_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -36,7 +36,7 @@ namespace Intersection_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -108,7 +108,7 @@ namespace Intersection_Components
 				((MasterType::network_type*) _global_network)->_intersection_polygons->Push_Element<Accented_Element>(&polygon);
 			}
 
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				stringstream s;
 				//char str_buf[128];
@@ -155,7 +155,7 @@ namespace Intersection_Components
 
 			}
 
-			//static bool fetch_attributes(Antares_Intersection_Implementation* _this,boost::container::vector<string>& bucket)
+			//static bool fetch_attributes(Antares_Intersection_Implementation* _this,std::vector<string>& bucket)
 			//{
 			//	stringstream s;
 			//	s << _this->_internal_id;

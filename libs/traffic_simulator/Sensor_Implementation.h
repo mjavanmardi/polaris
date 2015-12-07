@@ -53,7 +53,7 @@ namespace Sensor_Components
 			{
 				double sum=0.0;
 				unsigned int count=0;
-				for(boost::container::vector<Types::Sensor_MOE_Data>::iterator itr = _sensor_data.begin();itr!=_sensor_data.end();itr++)
+				for(std::vector<Types::Sensor_MOE_Data>::iterator itr = _sensor_data.begin();itr!=_sensor_data.end();itr++)
 				{
 					sum += itr->density;
 					count++;
@@ -115,7 +115,7 @@ namespace Sensor_Components
 				link_id_dir.id = instance.getLink();
 				link_id_dir.dir = instance.getDir();
 
-				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
+				std::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
 
 				if(db_map.count(link_id_dir.id_dir))
 				{
@@ -131,7 +131,7 @@ namespace Sensor_Components
 				}
 			}
 			
-			template<typename TargetType> void Attach_Detector(boost::unordered::unordered_map<int, Detector1DU<double> >& detector_configuration)
+			template<typename TargetType> void Attach_Detector(std::unordered_map<int, Detector1DU<double> >& detector_configuration)
 			{
 				if(!_covered_link) return;
 
@@ -150,7 +150,7 @@ namespace Sensor_Components
 			
 			m_data(bool,outlier_detected, NONE, NONE);
 
-			m_data(boost::container::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
+			m_data(std::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::link_type,covered_link, NONE, NONE);
 		};

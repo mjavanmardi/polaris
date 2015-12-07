@@ -67,39 +67,39 @@ namespace Network_Components
 //#endif
 		{
 			static float _intersection_radius;
-			boost::container::vector<Point_2D<MasterType>> _network_vmt_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_vht_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_cumulative_loaded_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_cumulative_departed_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_in_network_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_cumulative_arrived_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _network_vmt_cache;
+			std::vector<Point_2D<MasterType>> _network_vht_cache;
+			std::vector<Point_2D<MasterType>> _network_cumulative_loaded_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _network_cumulative_departed_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _network_in_network_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _network_cumulative_arrived_vehicles_cache;
 
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_travel_time_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_speed_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_density_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_in_volume_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_out_volume_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_travel_time_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_speed_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_density_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _network_avg_link_queue_length_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_travel_time_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_speed_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_density_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_in_volume_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_out_volume_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_travel_time_ratio_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_speed_ratio_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_density_ratio_cache;
+			std::vector<Point_2D<MasterType>> _network_avg_link_queue_length_cache;
 
-			boost::container::vector<Point_2D<MasterType>> _reference_network_vmt_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_vht_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_cumulative_loaded_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_cumulative_departed_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_in_network_vehicles_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_cumulative_arrived_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_vmt_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_vht_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_cumulative_loaded_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_cumulative_departed_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_in_network_vehicles_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_cumulative_arrived_vehicles_cache;
 
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_travel_time_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_speed_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_density_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_in_volume_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_out_volume_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_travel_time_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_speed_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_density_ratio_cache;
-			boost::container::vector<Point_2D<MasterType>> _reference_network_avg_link_queue_length_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_travel_time_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_speed_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_density_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_in_volume_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_out_volume_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_travel_time_ratio_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_speed_ratio_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_density_ratio_cache;
+			std::vector<Point_2D<MasterType>> _reference_network_avg_link_queue_length_cache;
 
 			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_vmt_layer, NONE, NONE);
 			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,network_vht_layer, NONE, NONE);
@@ -129,7 +129,7 @@ namespace Network_Components
 			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_density_ratio_layer, NONE, NONE);
 			m_prototype(Antares_Layer,typename MasterType::antares_layer_type,historic_link_queue_length_layer, NONE, NONE);
 
-			boost::container::vector<struct Extended_MOE_Data> reference_td_network_moe_data_array;
+			std::vector<struct Extended_MOE_Data> reference_td_network_moe_data_array;
 
 			template<typename TargetType> void set_network_bounds()
 			{
@@ -175,7 +175,7 @@ namespace Network_Components
 				if (network_moe_reference_file.is_open())
 				{
 					struct Extended_MOE_Data moe_data;
-					boost::container::vector<string> tokens;
+					std::vector<string> tokens;
 					string line;
 					int token_size = 20;
 					getline(network_moe_reference_file,line); // skip the first line
@@ -428,7 +428,7 @@ namespace Network_Components
 					//cout << tilename<<endl;
 					int tex_id = cfg.Add_Texture(tilename);			
 
-					//cout << "Tile layer texture map size="<<_tile_imagery->texture_map<boost::container::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
+					//cout << "Tile layer texture map size="<<_tile_imagery->texture_map<std::vector<unsigned int>&>().size()<<endl<<"Texture id = "<<tex_id<<endl;
 
 					// read positioning information from tile file
 					float xmin, xmax,ymin,ymax,z;
@@ -872,7 +872,7 @@ namespace Network_Components
 					THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
 				}
 				struct Link_MOE_Data link_moe_data;
-				boost::container::vector<string> tokens;
+				std::vector<string> tokens;
 				string line;
 				int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
 				int record_time;

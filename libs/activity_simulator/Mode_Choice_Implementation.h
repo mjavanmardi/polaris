@@ -447,7 +447,7 @@ namespace Person_Components
 
 				// create local choice model
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
-				boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
+				std::vector<_Mode_Choice_Option_Interface*> mode_options;
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();

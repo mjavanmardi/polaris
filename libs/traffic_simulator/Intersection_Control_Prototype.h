@@ -651,9 +651,9 @@ namespace Intersection_Control_Components
 				}
 
 				float lost_time = 0.0f;
-				boost::container::vector<_Link_Interface*> critical_link_array; 
-				boost::container::vector<int> critical_link_queue_length_array;
-				boost::container::vector<int> critical_link_discharge_time_array;
+				std::vector<_Link_Interface*> critical_link_array; 
+				std::vector<int> critical_link_queue_length_array;
+				std::vector<int> critical_link_discharge_time_array;
 
 				critical_link_array.resize(num_phases);
 				critical_link_queue_length_array.resize(num_phases);

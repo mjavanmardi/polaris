@@ -147,7 +147,7 @@ namespace Network_Components
 				_Links_Container_Interface* links_container_ptr=_network_reference->template links_container<_Links_Container_Interface*>();
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>> id_to_links_type;
+				typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_type;
 
 				Types::Link_ID_Dir link_id_dir;
 				
@@ -424,7 +424,7 @@ namespace Network_Components
 						}
 						else
 						{
-							boost::container::vector<typename MasterType::link_type*> links_arr;
+							std::vector<typename MasterType::link_type*> links_arr;
 							links_arr.push_back((typename MasterType::link_type*)link);
 							id_to_links_map[link_id_dir.id] = links_arr;
 						}
@@ -657,7 +657,7 @@ namespace Network_Components
 						}
 						else
 						{
-							boost::container::vector<typename MasterType::link_type*> links_arr;
+							std::vector<typename MasterType::link_type*> links_arr;
 							links_arr.push_back((typename MasterType::link_type*)link);
 							id_to_links_map[link_id_dir.id] = links_arr;
 						}
@@ -1032,7 +1032,7 @@ namespace Network_Components
 				Types::Link_ID_Dir link_id_dir;
 				Types::Link_ID_Dir opp_link_id_dir;
 
-				boost::unordered::unordered_map<int,int> uuid_to_index;
+				std::unordered_map<int,int> uuid_to_index;
 
 				cout << "Reading Activity Locations..." << endl;
 
@@ -1214,11 +1214,11 @@ namespace Network_Components
 						}
 						activity_location->land_use_type(code);
 
-						// add to the zone boost::container::list
+						// add to the zone std::list
 						zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 
-						// add to zone land use type subboost::container::lists
+						// add to zone land use type substd::lists
 						if (code == Activity_Location_Components::Types::LU_ALL)
 						{
 							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);

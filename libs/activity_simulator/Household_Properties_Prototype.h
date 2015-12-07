@@ -127,16 +127,16 @@ namespace Household_Components
 			//}
 
 			local_check_template_method_name(Characteristics_exists,Characteristics);
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*check(ComponentType, Characteristics_exists) && */check_2(TargetType, boost::container::vector<double>*, is_same)))
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*check(ComponentType, Characteristics_exists) && */check_2(TargetType, std::vector<double>*, is_same)))
 			{
 				assert_check(ComponentType, Characteristics_exists, "No 'Characteristics' data member defined in component.");
 
 				this_component()->Characteristics<TargetType>(data);
 			}
-			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*!check(ComponentType, Characteristics_exists) || */!check_2(TargetType, boost::container::vector<double>*, is_same)))
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, /*!check(ComponentType, Characteristics_exists) || */!check_2(TargetType, std::vector<double>*, is_same)))
 			{
 				/*assert_check(ComponentType, Characteristics_exists, "No 'Characteristics' data member defined in component.");*/
-				assert_check(TargetType, Characteristics_exists, "'data' parameter must be passed as a pointer to a boost::vector of doubles.");
+				assert_check(TargetType, Characteristics_exists, "'data' parameter must be passed as a pointer to a vector of doubles.");
 			}
 
 			template<typename TargetType> void Normalize_Weight(TargetType normalization_factor, requires(TargetType,check(strip_modifiers(TargetType),is_arithmetic)))

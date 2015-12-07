@@ -611,8 +611,8 @@ namespace Network_Skimming_Components
 			m_container(concat(dense_hash_map<long,Routing_Components::Prototypes::Routing<typename MasterType::skim_routing_type>*>), path_trees_container, NONE, NONE);
 			
 			// link-to-zone mapping for use in skimming
-			m_container(boost::container::vector<Activity_Location<typename MasterType::activity_location_type>*>,origin_locations, NONE, NONE);
-			m_container(boost::container::vector<Activity_Location<typename MasterType::activity_location_type>*>,destination_locations, NONE, NONE);
+			m_container(std::vector<Activity_Location<typename MasterType::activity_location_type>*>,origin_locations, NONE, NONE);
+			m_container(std::vector<Activity_Location<typename MasterType::activity_location_type>*>,destination_locations, NONE, NONE);
 			m_container(concat(dense_hash_map<long,int>),zone_origins_count, NONE, NONE);
 			m_container(concat(dense_hash_map<long,int>),zone_destinations_count, NONE, NONE);
 
@@ -630,8 +630,8 @@ namespace Network_Skimming_Components
 			m_data(File_IO::Binary_File_Reader, transit_input_file, NONE, NONE);
 			m_data(File_IO::File_Writer, skim_fit_results_file, NONE, NONE);
 
-			m_container(boost::container::vector<Prototypes::Skim_Table<Skim_Table_Implementation<MasterType>>*>, skims_by_time_container, NONE, NONE);
-			m_container(boost::container::list<int>, available_modes_container, NONE, NONE);
+			m_container(std::vector<Prototypes::Skim_Table<Skim_Table_Implementation<MasterType>>*>, skims_by_time_container, NONE, NONE);
+			m_container(std::list<int>, available_modes_container, NONE, NONE);
 
 
 			// set the network and skimmer references
@@ -773,7 +773,7 @@ namespace Network_Skimming_Components
 					tree_builder->template start_time<Simulation_Timestep_Increment>(0);//this->start_time<Simulation_Timestep_Increment>());
 					tree_builder->template end_time<Simulation_Timestep_Increment>(END);//this->end_time<Simulation_Timestep_Increment>());
 			
-					// Add the tree_builder to the boost::container::list for future processing
+					// Add the tree_builder to the std::list for future processing
 					tree_builder->Schedule_Route_Computation(iteration());
 
 					pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig_index,tree_builder);

@@ -90,12 +90,12 @@ namespace PopSyn
 				typename sample_type::Weight_type weight;
 				fr.Get_Data<typename sample_type::ID_type>(sample_id,linker->sample_id_column()); // get id from the id column in linker
 				fr.Get_Data<typename sample_type::Weight_type>(weight, linker->sample_weight_column()); // get weight from the weight column
-				boost::container::vector<double> data;
+				std::vector<double> data;
 				fr.Get_Data<double>(data,linker->get_pums_data_columns()); // dump the rest of the columns to the data vector
 				pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();			
 				p->ID(sample_id);				
 				p->Weight(weight);
-				p->template Characteristics<boost::container::vector<double>*>(&data);
+				p->template Characteristics<std::vector<double>*>(&data);
 				p->Index(_Target_Joint_Distribution.get_index(index));	// save the index (converted to 1-dimensional value) into the joint distribution for this household
 				p->Test_Index(test_index);
 
@@ -141,13 +141,13 @@ namespace PopSyn
 				// Get person header info
 				fr.Get_Data<typename person_sample_type::ID_type>(sample_id,link->person_sample_id_column());
 				fr.Get_Data<typename person_sample_type::ID_type>(weight,link->person_weight_column());
-				boost::container::vector<double> data;
+				std::vector<double> data;
 				fr.Get_Data<double>(data,link->get_person_data_columns());
 
 				// Create the person object
 				person_unit_itf* p = (person_unit_itf*)Allocate<person_sample_type>();		
 				p->ID(sample_id);				
-				p->template Characteristics<boost::container::vector<double>*>(&data);	
+				p->template Characteristics<std::vector<double>*>(&data);	
 				p->Index(_Target_Person_Joint_Distribution.get_index(index));
 				p->Test_Index(test_index);
 
@@ -265,12 +265,12 @@ namespace PopSyn
 				typename sample_type::Weight_type weight;
 				fr.Get_Data<typename sample_type::ID_type>(sample_id,linker->sample_id_column());
 				fr.Get_Data<typename sample_type::Weight_type>(weight, linker->sample_weight_column());
-				boost::container::vector<double> data;
+				std::vector<double> data;
 				fr.Get_Data<double>(data,linker->get_pums_data_columns());
 				pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();			
 				p->ID(sample_id);				
 				p->Weight(weight);
-				p->template Characteristics<boost::container::vector<double>*>(&data);
+				p->template Characteristics<std::vector<double>*>(&data);
 				//p->Index(_Target_Joint_Distribution.get_index(index));
 
 				//????????????????????????????????????????????????????????????????????????????????????
@@ -316,13 +316,13 @@ namespace PopSyn
 				// Get person header info
 				fr.Get_Data<typename person_sample_type::ID_type>(sample_id,link->person_sample_id_column());
 				fr.Get_Data<typename person_sample_type::ID_type>(weight,link->person_weight_column());
-				boost::container::vector<double> data;
+				std::vector<double> data;
 				fr.Get_Data<double>(data,link->get_person_data_columns());
 
 				// Create the person object
 				person_unit_itf* p = (person_unit_itf*)Allocate<person_sample_type>();		
 				p->ID(sample_id);				
-				p->template Characteristics<boost::container::vector<double>*>(&data);	
+				p->template Characteristics<std::vector<double>*>(&data);	
 
 				//??????????????????????????????????????????????????????????????????????????
 				// Re-write how to index the sample into the joint distribution and update the distribution

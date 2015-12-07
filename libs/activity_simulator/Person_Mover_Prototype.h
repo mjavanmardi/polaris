@@ -241,21 +241,21 @@ namespace Prototypes
 
 			if (har != nullptr)
 			{	
-				boost::container::vector<event_itf*> base_events;
+				std::vector<event_itf*> base_events;
 				har->template Get_Displayed_Messages<typename Component_Type::base_network_event_type>(base_events);
 
 				// process weather events from HAR
-				boost::container::vector<weather_itf*> weather_events;
+				std::vector<weather_itf*> weather_events;
 				har->template Get_Displayed_Messages<typename Component_Type::weather_network_event_type>(weather_events);
-				for (typename boost::container::vector<weather_itf*>::iterator w_itr = weather_events.begin(); w_itr != weather_events.end(); ++w_itr)
+				for (typename std::vector<weather_itf*>::iterator w_itr = weather_events.begin(); w_itr != weather_events.end(); ++w_itr)
 				{
 					this->Evaluate_Network_Event<weather_itf*>(*w_itr);
 				}
 			
 				// process accident events from HAR
-				boost::container::vector<accident_itf*> accident_events;
+				std::vector<accident_itf*> accident_events;
 				har->template Get_Displayed_Messages<typename Component_Type::accident_network_event_type>(accident_events);
-				for (typename boost::container::vector<accident_itf*>::iterator a_itr = accident_events.begin(); a_itr != accident_events.end(); ++a_itr)
+				for (typename std::vector<accident_itf*>::iterator a_itr = accident_events.begin(); a_itr != accident_events.end(); ++a_itr)
 				{
 					this->Evaluate_Network_Event<accident_itf*>(*a_itr);
 				}
@@ -316,7 +316,7 @@ namespace Prototypes
 				person->template has_done_replanning<bool>(true);
 
 				// get all zones affected by weather
-				boost::container::vector<location_itf*> *unaffected_locations = weather_event->template unaffected_locations<boost::container::vector<location_itf*>*>();
+				std::vector<location_itf*> *unaffected_locations = weather_event->template unaffected_locations<std::vector<location_itf*>*>();
 
 				// replan, select new zone ouside of affected area
 				location_itf* orig, * dest, *next;
@@ -419,7 +419,7 @@ namespace Prototypes
 			weather_itf* my_event = (weather_itf*)event;
 
 			// does event affect destination zone?
-			boost::container::vector<zone_itf*> *affected_zones = my_event->template affected_zones<boost::container::vector<zone_itf*> *>();
+			std::vector<zone_itf*> *affected_zones = my_event->template affected_zones<std::vector<zone_itf*> *>();
 			
 			// event is not relevent if going to home/work/school as these locations are fixed.
 
@@ -433,7 +433,7 @@ namespace Prototypes
 			}
 
 			zone_itf* affected_zone;
-			for (typename boost::container::vector<zone_itf*>::iterator itr = affected_zones->begin(); itr != affected_zones->end(); ++itr)
+			for (typename std::vector<zone_itf*>::iterator itr = affected_zones->begin(); itr != affected_zones->end(); ++itr)
 			{
 				affected_zone = *itr;
 				
@@ -495,7 +495,7 @@ namespace Prototypes
 			return false;
 		}
 
-		template<typename TargetType> void Get_Event_Extents(TargetType event, boost::unordered::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		template<typename TargetType> void Get_Event_Extents(TargetType event, std::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;

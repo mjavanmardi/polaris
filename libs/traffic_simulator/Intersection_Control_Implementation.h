@@ -51,7 +51,7 @@ namespace Intersection_Control_Components
 			m_data(int, adjusted_minimum_green_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 			//movements
-			m_container(boost::container::vector<typename MasterType::phase_movement_type*>, turn_movements_in_the_phase_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::phase_movement_type*>, turn_movements_in_the_phase_array, NONE, NONE);
 		};
 
 		implementation struct Approach_Implementation:public Polaris_Component<MasterType,INHERIT(Approach_Implementation),Data_Object>
@@ -82,22 +82,22 @@ namespace Intersection_Control_Components
 			m_data(int, cycle_ending_time, NONE, NONE);
 			m_data(int, cycle_leftover_time, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::phase_type*>, phase_data_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::phase_type*>, phase_data_array, NONE, NONE);
 
 			//approach data
-			m_container(boost::container::vector<typename MasterType::approach_type*>, approach_data_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::approach_type*>, approach_data_array, NONE, NONE);
 
 			//two-way stop and yield sign
-			m_container(boost::container::vector<typename MasterType::approach_type*>, major_approach_data_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::approach_type*>, major_approach_data_array, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::approach_type*>, minor_approach_data_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::approach_type*>, minor_approach_data_array, NONE, NONE);
 		};
 
 		implementation struct Intersection_Control_Implementation:public Polaris_Component<MasterType,INHERIT(Intersection_Control_Implementation),Execution_Object>
 		{
 			m_prototype(Null_Prototype,typename MasterType::intersection_type, intersection, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::control_plan_type, current_control_plan, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::control_plan_type*>, control_plan_data_array, NONE, NONE);
+			m_container(std::vector<typename MasterType::control_plan_type*>, control_plan_data_array, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 		};
 	}

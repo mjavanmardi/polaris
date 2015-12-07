@@ -31,7 +31,7 @@ namespace Detector_Components
 			}
 
 			/// Train detector with the sampled data set
-			void Train(const boost::container::vector<T>& training_set)
+			void Train(const std::vector<T>& training_set)
 			{
 				int n = (int)training_set.size();
 				mu = 0.0;

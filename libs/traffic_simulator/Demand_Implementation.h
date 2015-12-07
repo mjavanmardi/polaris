@@ -22,7 +22,7 @@ namespace Demand_Components
 
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			
-			m_container(boost::container::vector<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
 			m_data(int, first_vehicle_departure_time, NONE, NONE);
 

@@ -23,7 +23,7 @@ namespace Person_Components
 			// static counters
 			static int* Count_Array;
 			static int Count;
-			static m_container(concat(boost::unordered::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
+			static m_container(concat(std::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
 			static bool _is_initialized;
 			static void Static_Initializer()
 			{
@@ -237,7 +237,7 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> int* ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count_Array;
 		template<typename MasterType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count;
 		template<typename MasterType, typename InheritanceList> bool ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::_is_initialized = false;
-		template<typename MasterType, typename InheritanceList> boost::unordered::unordered_map<int, pair<float,float>> ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::_average_activity_frequency_and_duration_container;
+		template<typename MasterType, typename InheritanceList> std::unordered_map<int, pair<float,float>> ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::_average_activity_frequency_and_duration_container;
 	}
 }
 

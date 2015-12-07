@@ -15,9 +15,9 @@
 #include "Core/Core.h"
 #include "Geometry_Implementation.h"
 
-typedef void (*selection_callback_type)(const boost::container::list<void*>&,const boost::container::list<void*>&,const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&);
-typedef void (*double_click_callback_type)(const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&,boost::container::vector<boost::container::vector<string>>&);
-typedef bool (*submission_callback_type)(const boost::container::list<void*>&,const boost::container::vector<string>&,const boost::container::vector<string>&);
+typedef void (*selection_callback_type)(const std::list<void*>&,const std::list<void*>&,const std::list<void*>&,std::vector<pair<string,string>>&);
+typedef void (*double_click_callback_type)(const std::list<void*>&,std::vector<pair<string,string>>&,std::vector<std::vector<string>>&);
+typedef bool (*submission_callback_type)(const std::list<void*>&,const std::vector<string>&,const std::vector<string>&);
 typedef float (*pixel_size_callback_type)(float);
 typedef void (*reschedule_callback_type)(void*, int);
 

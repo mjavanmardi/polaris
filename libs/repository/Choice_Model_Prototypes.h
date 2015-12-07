@@ -123,7 +123,7 @@ namespace Choice_Model_Components
 
 			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
 			{
-				// Push item into boost::container::vector as anonymous
+				// Push item into std::vector as anonymous
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
 				typedef Prototypes::Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
@@ -375,7 +375,7 @@ namespace Choice_Model_Components
 
 			template<typename TargetType> void Add_Sub_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
 			{
-				// Push item into boost::container::vector as anonymous
+				// Push item into std::vector as anonymous
 				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
 				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
 				options->push_back((Choice_Option<Implementations::Nested_Choice_Option_Base<NT>>*)choice_option);			

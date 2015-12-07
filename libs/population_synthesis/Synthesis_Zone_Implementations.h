@@ -18,7 +18,7 @@ namespace PopSyn
 
 			m_prototype(PopSyn::Prototypes::Synthesis_Region,typename MasterType::synthesis_region_type, parent_reference, NONE, NONE);
 	
-			typedef boost::unordered_multimap<uint, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __sample_map_type;		
+			typedef std::unordered_multimap<uint, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __sample_map_type;		
 			m_container(__sample_map_type, Sample_Data, NONE, NONE); 
 
 			template<typename TargetType> void Initialize()
@@ -547,7 +547,7 @@ namespace PopSyn
 							// add probabilistically, if rand is less than probability of seeing this household out of all similar households (w/sum(w))
 							if (GLOBALS::Uniform_RNG.Next_Rand<double>() < p)
 							{					
-								// create the actual person agent from the census static properties and add to the zones created person agent boost::container::list
+								// create the actual person agent from the census static properties and add to the zones created person agent std::list
 								this->Add_Household_and_Persons<pop_unit_itf*>(stored_pop_unit,num_persons_remaining);
 								num_required--;
 							}
@@ -1037,7 +1037,7 @@ namespace PopSyn
 				//			// add probabilistically, if rand is less than probability of seeing this household out of all similar households (w/sum(w))
 				//			if (GLOBALS::Uniform_RNG.Next_Rand<double>() < p)
 				//			{					
-				//				// create the actual person agent from the census static properties and add to the zones created person agent boost::container::list
+				//				// create the actual person agent from the census static properties and add to the zones created person agent std::list
 				//				this->Add_Household_and_Persons<pop_unit_itf*>(stored_pop_unit,num_persons_remaining);
 				//				num_required--;
 				//			}

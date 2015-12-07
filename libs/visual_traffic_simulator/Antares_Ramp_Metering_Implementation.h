@@ -39,7 +39,7 @@ namespace Ramp_Metering_Components
 			};
 #pragma pack(pop)
 
-			static bool on_submit(const boost::container::list<void*>& selected,const boost::container::vector<string>& attribute_choices,const boost::container::vector<string>& dropdown_choices)
+			static bool on_submit(const std::list<void*>& selected,const std::vector<string>& attribute_choices,const std::vector<string>& dropdown_choices)
 			{
 				string user_event_choice = dropdown_choices[0];
 
@@ -56,7 +56,7 @@ namespace Ramp_Metering_Components
 
 				bool update_successful = false;
 
-				for(boost::container::list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
+				for(std::list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
 				{
 					ComponentType* its_component=(ComponentType*) (*sitr);
 
@@ -69,7 +69,7 @@ namespace Ramp_Metering_Components
 				else return false;
 			}
 
-			static void on_double_click(const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& attributes,boost::container::vector<boost::container::vector<string>>& dropdowns)
+			static void on_double_click(const std::list<void*>& selected,std::vector<pair<string,string>>& attributes,std::vector<std::vector<string>>& dropdowns)
 			{
 				ComponentType* its_component=(ComponentType*)selected.back();
 
@@ -97,7 +97,7 @@ namespace Ramp_Metering_Components
 				dropdowns[0].push_back( string("Disable") );
 			}
 
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -106,7 +106,7 @@ namespace Ramp_Metering_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -114,7 +114,7 @@ namespace Ramp_Metering_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -126,7 +126,7 @@ namespace Ramp_Metering_Components
 				}
 			}
 			
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				pair<string,string> key_value_pair;
 

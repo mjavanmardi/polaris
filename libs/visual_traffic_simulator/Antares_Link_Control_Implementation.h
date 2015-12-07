@@ -64,7 +64,7 @@ namespace Link_Control_Components
 				Link_Line_Segment* segments;
 			};
 #pragma pack(pop)
-			static bool on_submit(const boost::container::list<void*>& selected,const boost::container::vector<string>& attribute_choices,const boost::container::vector<string>& dropdown_choices)
+			static bool on_submit(const std::list<void*>& selected,const std::vector<string>& attribute_choices,const std::vector<string>& dropdown_choices)
 			{
 				//ComponentType* its_component=(ComponentType*)selected.back();
 
@@ -82,7 +82,7 @@ namespace Link_Control_Components
 				}
 				else return false;
 
-				for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+				for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 				{
 					ComponentType* its_component=(ComponentType*) (*itr);
 
@@ -95,7 +95,7 @@ namespace Link_Control_Components
 						its_component->_shoulder_opened=false;
 					}
 
-					for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
+					for(std::vector<Link<typename MasterType::link_type>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
 					{
 						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
@@ -113,20 +113,20 @@ namespace Link_Control_Components
 				return true;
 			}
 
-			static void on_double_click(const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& attributes,boost::container::vector<boost::container::vector<string>>& dropdowns)
+			static void on_double_click(const std::list<void*>& selected,std::vector<pair<string,string>>& attributes,std::vector<std::vector<string>>& dropdowns)
 			{
 				ComponentType* its_component=(ComponentType*)selected.back();
 
 				dropdowns.resize(1);
 
-				//for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+				//for(std::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
 				//{
 					dropdowns[0].push_back( "Open Shoulder" );
 					dropdowns[0].push_back( "Close Shoulder" );
 				//}
 			}
 
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -134,7 +134,7 @@ namespace Link_Control_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -142,7 +142,7 @@ namespace Link_Control_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -154,7 +154,7 @@ namespace Link_Control_Components
 				}
 			}
 
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				pair<string,string> key_value_pair;
 				
@@ -182,7 +182,7 @@ namespace Link_Control_Components
 
 				Link_Line_Segment* current_segment = group.segments;
 
-				for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				for(std::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
 					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
@@ -227,7 +227,7 @@ namespace Link_Control_Components
 
 					Link_Line_Segment* current_segment = group.segments;
 
-					for(boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					for(std::vector<Link<typename MasterType::link_type>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 					{
 						Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 						

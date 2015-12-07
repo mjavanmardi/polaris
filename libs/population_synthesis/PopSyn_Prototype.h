@@ -203,7 +203,7 @@ namespace PopSyn
 						new_region->template ID<int>(ID);
 						new_region->template Solver_Settings<solver_itf*>(solver);
 
-						// add new region to the boost::container::list
+						// add new region to the std::list
 						pair<typename regions_itf::key_type, region_itf*> item = pair<typename regions_itf::key_type, region_itf*>(ID, new_region);
 						regions->insert(item);
 					}
@@ -286,7 +286,7 @@ namespace PopSyn
 			template<typename NetworkType> bool Link_Zones_To_Network_Locations(requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
 				//===============================================================================================================
-				// Fill zonal activity_locations boost::container::list from network reference
+				// Fill zonal activity_locations std::list from network reference
 				//---------------------------------------------------------------------------------------------------------------
 
 				//===============================================================================================================
@@ -1039,7 +1039,7 @@ namespace PopSyn
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Household_Components::Prototypes::Household_Properties<typename strip_modifiers(HHType)::get_type_of(Static_Properties)> household_itf;
 
-				Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->Static_Properties<household_itf*>(),zone);
+				Fill_HH_Record<NT,HHRecType,household_itf*,ZoneType>(hh_rec,hh->Static_Properties<household_itf*>(),zone);
 			}
 			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
@@ -1070,7 +1070,7 @@ namespace PopSyn
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Person_Components::Prototypes::Person_Properties<typename strip_modifiers(PerType)::get_type_of(Static_Properties)> person_itf;
 
-				Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->Static_Properties<person_itf*>(),zone);
+				Fill_Person_Record<NT,PerRecType,person_itf*,ZoneType>(per_rec,person->Static_Properties<person_itf*>(),zone);
 				person->template person_record<shared_ptr<MasterType::person_db_rec_type>>(per_rec);
 			}
 			template<typename NetworkType, typename PerRecType, typename PerType, typename ZoneType> void Fill_Person_Record(PerRecType per_rec, PerType person, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
