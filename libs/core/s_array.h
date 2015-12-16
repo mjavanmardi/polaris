@@ -275,7 +275,7 @@ public:
 	}
 
 	// MArray constructors/destructor
-	s_array (void){_size = 0;_data=nullptr;}
+	s_array (void){_size = 0;_data=nullptr;_row_sizes.push_back(0);}
 	s_array (const_dimensional_type row_sizes);
 	s_array (const_dimensional_type row_sizes, T init_val);
 	s_array (const s_array& obj);
@@ -414,6 +414,8 @@ void s_array<T>::_copy(const s_array<T>& obj)
 	_cursor.first = 0;
 	_cursor.second = 0;
 	_size = obj._size;
+
+	if (obj._size == 0) return;
 
 	for (size_type i=0; i<obj._row_sizes.size(); i++)
 	{

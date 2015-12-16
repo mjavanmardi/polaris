@@ -60,11 +60,11 @@ namespace Network_Components
 		//---------------------------------------------------------
 		//	Antares_Network_Implementation - network class definition
 		//---------------------------------------------------------
-//#ifdef IntegratedModelApplication
+#ifdef EXCLUDE_DEMAND
+		implementation struct Antares_Network_Implementation:public Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
+#else
 		implementation struct Antares_Network_Implementation:public Integrated_Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-//#else
-//		implementation struct Antares_Network_Implementation:public Network_Implementation<MasterType,INHERIT(Antares_Network_Implementation)>
-//#endif
+#endif
 		{
 			static float _intersection_radius;
 			std::vector<Point_2D<MasterType>> _network_vmt_cache;

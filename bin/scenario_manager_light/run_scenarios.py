@@ -34,10 +34,28 @@ while os.path.exists(study_folder):
 	study_folder = tmp_study_folder + '_' + str(batch_count)
 os.makedirs(study_folder)	
 
+
+# copy the executable to the runs directory
 polaris_exe = s_doc['polaris_exe']
 polaris_exe_basename = os.path.basename(polaris_exe)
 bin_folder = study_folder + '/bin'
+if not os.path.exists(bin_folder):
+	os.makedirs(bin_folder)	
+shutil.copy(polaris_exe, bin_folder)
 
+
+# copy model input files
+if 'input_file_directory' in s_doc:
+	input_files = s_doc['input_file_directory']
+	if not os.path.exists(input_files):
+		print "Error: input file directory '",input_files, " not found."
+		sys.exit()
+	files = os.listdir(input_files)
+	for file in files:
+		file_path = os.path.join(input_files, file)
+		if os.path.isfile(file_path):
+			shutil.copy(file_path, study_folder)
+	
 # not sure how valuable this is, may be superseded by the addition of the 'previous' keyword logic below
 prev_study_folder = ""
 if 'previous_run' in s_doc:
@@ -51,10 +69,6 @@ threads = 1
 if 'threads' in s_doc:
 	threads = s_doc['threads']
 	
-if not os.path.exists(bin_folder):
-	os.makedirs(bin_folder)	
-shutil.copy(polaris_exe, bin_folder)
-
 # copy the study parameters file to the study folder so scenarios can be identified easily
 shutil.copy(study_parameters_file,study_folder)
 batch_fh = open(study_folder + '/run.bat','w')
