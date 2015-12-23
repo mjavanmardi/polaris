@@ -433,6 +433,8 @@ namespace Basic_Units
 
 		prototype struct Width : public Length<ComponentType>
 		{
+			tag_as_prototype;
+
 			template<typename TargetType> TargetType Value()
 			{
 				return ((Length<ComponentType>*)this)->template Value<TargetType>();
@@ -446,6 +448,8 @@ namespace Basic_Units
 
 		prototype struct Height : public Length<ComponentType>
 		{
+			tag_as_prototype;
+
 			template<typename TargetType> TargetType Value()
 			{
 				return ((Length<ComponentType>*)this)->template Value<TargetType>();
@@ -459,6 +463,8 @@ namespace Basic_Units
 
 		prototype struct Area : public Length<ComponentType>
 		{
+			tag_as_prototype;
+
 			typedef Length<ComponentType> base_type;
 			template<typename TargetType> TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Area_Value)))
 			{		

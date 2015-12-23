@@ -2,6 +2,7 @@
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
 #include "Scenario_Prototype.h"
+#include "Link_Implementation.h"
 
 namespace Intersection_Components
 {
@@ -384,15 +385,15 @@ namespace Intersection_Components
 
 						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-						if(type == U_TURN || type == LEFT_TURN)
+						if(type == Turn_Movement_Components::Types::U_TURN || type == Turn_Movement_Components::Types::LEFT_TURN)
 						{
 							left_demand += outbound_movement->template movement_demand<float>();
 						}
-						else if(type == RIGHT_TURN)
+						else if(type == Turn_Movement_Components::Types::RIGHT_TURN)
 						{
 							right_demand += outbound_movement->template movement_demand<float>();
 						}
-						else if(type == THROUGH_TURN)
+						else if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 						{
 							through_demand += outbound_movement->template movement_demand<float>();
 						}
@@ -426,7 +427,7 @@ namespace Intersection_Components
 
 							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == THROUGH_TURN)
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
 								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) ));
 							}
@@ -457,7 +458,7 @@ namespace Intersection_Components
 
 							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == U_TURN || type == LEFT_TURN)
+							if(type == Turn_Movement_Components::Types::U_TURN || type == Turn_Movement_Components::Types::LEFT_TURN)
 							{
 								// skip these, they get full supply
 								continue;
@@ -468,7 +469,7 @@ namespace Intersection_Components
 								
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
-							if(type == THROUGH_TURN)
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
 								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
 							}
@@ -497,7 +498,7 @@ namespace Intersection_Components
 
 							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == RIGHT_TURN)
+							if(type == Turn_Movement_Components::Types::RIGHT_TURN)
 							{
 								// skip these, they get full supply
 								continue;
@@ -507,7 +508,7 @@ namespace Intersection_Components
 							movement_supply = outbound_movement->template movement_supply<float>();
 							
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
-							if(type == THROUGH_TURN)
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
 								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
 							}

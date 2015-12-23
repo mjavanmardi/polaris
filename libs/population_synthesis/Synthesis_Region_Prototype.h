@@ -21,7 +21,7 @@ namespace PopSyn
 			{
 				this_component()->template Init<NT>();
 				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per,0,0);
-				((ComponentType*)this)->Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);		
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);
 			}
 
 			accessor(Temporary_Sample_Data, NONE, NONE);

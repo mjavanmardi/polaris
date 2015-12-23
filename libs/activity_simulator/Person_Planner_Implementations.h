@@ -18,6 +18,10 @@ namespace Person_Components
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Planner_Implementation),Execution_Object>::Component_Type ComponentType;
+			typedef ComponentType Component_Type;
+
+			// Pointer to the Parent class
+			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 
 			static void Planning_Event_Controller(ComponentType* _this,Event_Response& response)
 			{
@@ -39,7 +43,7 @@ namespace Person_Components
 
 
 				person_itf* person = this_ptr->template Parent_Person<person_itf*>();
-				household_itf* household = person->template Household<household_itf*>();
+				household_itf* household = person->person_itf::template Household<household_itf*>();
 				scheduler_itf* scheduler = person->template Scheduling_Faculty<scheduler_itf*>();
 				Movement_Plans_List* movement_plans = scheduler->template Movement_Plans_Container<Movement_Plans_List*>();
 
@@ -77,7 +81,7 @@ namespace Person_Components
 				{
 					this_ptr->template Go_To_Subiteration<NT>(Scenario_Components::Types::MOVEMENT_PLANNING_SUB_ITERATION,response);
 
-					this_ptr->Activity_Generation_Event<NT>();
+					this_ptr->template Activity_Generation_Event<NT>();
 				}
 
 					//------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +90,7 @@ namespace Person_Components
 				{
 					this_ptr->template Go_To_Next_Iteration<NT>(response);
 
-					this_ptr->Movement_Planning_Event<NT>();
+					this_ptr->template Movement_Planning_Event<NT>();
 				}
 					//------------------------------------------------------------------------------------------------------------------------------
 					// No valid events scheduled - skip to next iteration
@@ -109,9 +113,6 @@ namespace Person_Components
 			{
 				//if (_write_activity_files) this->logs[__thread_id] << s;
 			}
-
-			// Pointer to the Parent class
-			m_prototype(Prototypes::Person, typename MasterType::person_type, Parent_Person, NONE, NONE);
 
 			// Pointer to the child classses
 			//m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Person_Scheduler, NONE, NONE);
@@ -143,7 +144,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 
 			///*typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;

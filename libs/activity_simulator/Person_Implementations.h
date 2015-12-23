@@ -20,6 +20,7 @@ namespace Person_Components
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Person_Implementation),Execution_Object>::Component_Type ComponentType;
+			typedef ComponentType Component_Type;
 
 			typedef typename MasterType::person_data_logger_type person_data_logger_type;
 
@@ -47,23 +48,25 @@ namespace Person_Components
 			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_accessible_type;
 			typedef typename type_of(Perception_Faculty)::type_of(Scenario) scenario_reference_accessible_type;
 
+			typedef typename remove_pointer<Perception_Faculty_type>::type person_perception_type;
+
 			template<typename TargetType> TargetType network_reference()
 			{
-				return this->_Perception_Faculty->template Network<TargetType>();
+				return this->_Perception_Faculty->person_perception_type::template Network<TargetType>();
 			}
 			template<typename TargetType> void network_reference(TargetType set_value)
 			{
-				this->_Perception_Faculty->template Network<TargetType>(set_value);
+				this->_Perception_Faculty->person_perception_type::template Network<TargetType>(set_value);
 			}	
 			tag_getter_as_available(network_reference);		
 			tag_setter_as_available(network_reference);	
 			template<typename TargetType> TargetType scenario_reference()
 			{
-				return this->_Perception_Faculty->template Scenario<TargetType>();
+				return this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>();
 			}
 			template<typename TargetType> void scenario_reference(TargetType set_value)
 			{
-				this->_Perception_Faculty->template Scenario<TargetType>(set_value);
+				this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>(set_value);
 			}	
 			tag_getter_as_available(scenario_reference);
 			tag_setter_as_available(scenario_reference);
@@ -106,7 +109,7 @@ namespace Person_Components
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;
 			
 			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container)> zones_container_interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_container_interface)>  zone_interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;
 			
 			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
@@ -210,6 +213,7 @@ namespace Person_Components
 			{
 				typedef Person<ComponentType> _Person_Interface;
 				_Person_Interface* pthis =(_Person_Interface*)this;
+
 				typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
 
@@ -256,12 +260,15 @@ namespace Person_Components
 					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(act,true);
 				}
 			}
+
 			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
+				typedef typename remove_pointer<Perception_Faculty_type>::type perception_faculty_type;
+
 				this->Initialize<IdType>(id);
 				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
-				this->_Perception_Faculty->template Network<NetworkRefType>(network_ref);
-				this->_Perception_Faculty->template Scenario<ScenarioRefType>(scenario_ref);
+				this->_Perception_Faculty->perception_faculty_type::template Network<NetworkRefType>(network_ref);
+				this->_Perception_Faculty->perception_faculty_type::template Scenario<ScenarioRefType>(scenario_ref);
 				this->_router->template network<NetworkRefType>(network_ref);
 
 				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
@@ -298,14 +305,14 @@ namespace Person_Components
 					dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
 				}
 
-				if (dest == nullptr) pthis->Work_Location<location_interface*>(pthis->Home_Location<location_interface*>());
-				else pthis->Work_Location<location_interface*>(dest);
+				if (dest == nullptr) pthis->template Work_Location<location_interface*>(pthis->template Home_Location<location_interface*>());
+				else pthis->template Work_Location<location_interface*>(dest);
 
-				scenario_reference_interface* scenario = pthis->scenario_reference<scenario_reference_interface*>();
-				zone_interface* zone = pthis->Work_Location<zone_interface*>();
+				scenario_reference_interface* scenario = pthis->template scenario_reference<scenario_reference_interface*>();
+				zone_interface* zone = pthis->template Work_Location<zone_interface*>();
 				
 				// update the simulated employment in the work zone
-				zone->employment_simulated<int&>() += 1.0f / scenario->percent_to_synthesize<float>();
+				zone->template employment_simulated<int&>() += 1.0f / scenario->template percent_to_synthesize<float>();
 			}
 
 			template<typename TargetType> void Choose_Work_Location_Based_On_Census()

@@ -12,8 +12,8 @@ namespace RNG_Components
 	{
 		concept struct Is_RNG
 		{
-			check_template_method_name(Has_Rand_Defined,template Next_Rand);
-			check_template_method_name(Has_Rand_Defined_Prototype, Component_Type::template Next_Rand);
+			check_accessor_name(Has_Rand_Defined, Next_Rand);
+			check_component_accessor_name(Has_Rand_Defined_Prototype, Next_Rand);
 			define_default_check(Has_Rand_Defined/* || Has_Rand_Defined_Prototype*/);
 		};
 	}

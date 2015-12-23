@@ -489,7 +489,8 @@ void run_with_input_from_db(const char* scenario_filename)
 				if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
 				if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
 			}
-			skimmer->Initialize<_Network_Interface*>(network);
+			//NOTE: break out m_container into test and run check in isolation
+			skimmer->template Initialize<_Network_Interface*>(network);
 			network->skimming_faculty<_network_skim_itf*>(skimmer);
 		}
 

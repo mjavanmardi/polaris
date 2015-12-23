@@ -25,16 +25,16 @@ namespace Person_Components
 	{
 		concept struct Is_Person_Planner_Prototype
 		{
-			check_template_method_name(Has_Parent_Person,ComponentType::template Parent_Person);
-			check_template_method_name(Has_Movement_Plans_Container, ComponentType::template Movement_Plans_Container);
-			check_template_method_name(Has_Activity_Plans_Container, ComponentType::template Activity_Container);
+			check_component_accessor_name(Has_Parent_Person, Parent_Person);
+			check_component_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
+			check_component_accessor_name(Has_Activity_Plans_Container, Activity_Container);
 			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
 		};
 		concept struct Is_Person_Planner_Component
 		{
-			check_template_method_name(Has_Parent_Person,template Parent_Person);
-			check_template_method_name(Has_Movement_Plans_Container, template Movement_Plans_Container);
-			check_template_method_name(Has_Activity_Plans_Container, template Activity_Container);
+			check_accessor_name(Has_Parent_Person,Parent_Person);
+			check_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
+			check_accessor_name(Has_Activity_Plans_Container, Activity_Container);
 			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
 		};
 		concept struct Is_Person_Planner

@@ -176,22 +176,23 @@ namespace Person_Components
 				duration = GLOBALS::Time_Converter.Convert_Value<Time_Minutes,ReturnTimeType>(value);
 				return duration;
 			}
-			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Duration(ActivitytypeType act_type, TimeType value)
-			{
-				// duration stored in minutes
-				Time_Minutes duration = GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Minutes>(value);
-			
-				typename average_activity_frequency_and_duration_container_type::iterator itr;
-				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
-				if (itr != this->_average_activity_frequency_and_duration_container.end())
-				{
-					itr->second.second= duration;
-				}
-				else
-				{
-					this->_average_activity_frequency_and_duration_container.insert(pair<ActType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
-				}
-			}
+// TODO: does not compile ActType not visible
+//			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Duration(ActivitytypeType act_type, TimeType value)
+//			{
+//				// duration stored in minutes
+//				Time_Minutes duration = GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Minutes>(value);
+//
+//				typename average_activity_frequency_and_duration_container_type::iterator itr;
+//				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+//				if (itr != this->_average_activity_frequency_and_duration_container.end())
+//				{
+//					itr->second.second= duration;
+//				}
+//				else
+//				{
+//					this->template _average_activity_frequency_and_duration_container.insert(pair<ActType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
+//				}
+//			}
 
 			// Getter / Setter for the activity frequency
 			template<typename ActivitytypeType, typename ReturnType> ReturnType Average_Activity_Frequency(ActivitytypeType act_type)
@@ -208,27 +209,28 @@ namespace Person_Components
 					return (ReturnType)0.0;
 				}
 			}
-			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Frequency(ActivitytypeType act_type, TimeType value)
-			{
-				typename average_activity_frequency_and_duration_container_type::iterator itr;
-				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
-				if (itr != this->_average_activity_frequency_and_duration_container.end())
-				{
-					itr->second.first = value;
-				}
-				else
-				{
-					this->_average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<ValueType,ValueType> >(act_type, pair<ValueType,ValueType>(value,0)));
-				}
-			}
+// TODO: does not compile, ValueType is not visible
+//			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Frequency(ActivitytypeType act_type, TimeType value)
+//			{
+//				typename average_activity_frequency_and_duration_container_type::iterator itr;
+//				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+//				if (itr != this->_average_activity_frequency_and_duration_container.end())
+//				{
+//					itr->second.first = value;
+//				}
+//				else
+//				{
+//					this->template _average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<ValueType,ValueType> >(act_type, pair<ValueType,ValueType>(value,0)));
+//				}
+//			}
 
 			// VOTT adjustment
 			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
 			{
-				vehicle_interface* veh = _Parent_Person->vehicle<vehicle_interface*>();
-				if (veh->is_autonomous<bool>())
+				vehicle_interface* veh = _Parent_Person->template vehicle<vehicle_interface*>();
+				if (veh->template is_autonomous<bool>())
 				{
-					TargetType adj = ((_Scenario_Interface*)_global_scenario)->cav_vott_adjustment<TargetType>();
+					TargetType adj = ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
 					return adj;
 				}
 				else return 1.0;

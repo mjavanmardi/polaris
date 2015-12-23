@@ -2,43 +2,463 @@
 #include "Antares/Antares.h"
 #endif
 
+
+
+#define CONCEPTS
+
+#ifdef CONCEPTS
+#include "core.h"
+#include <type_traits>
+using namespace std;
+
+// ((NT (_V::*)())&_V::NAME<NT>)
+
+//concept struct Is_Basic_Link_Prototype
+//{
+//	check_accessor_name(has_upstream_intersection, Component_Type::template upstream_intersection);
+//	check_accessor_name(has_downstream_intersection, Component_Type::template downstream_intersection);
+//	check_accessor_name(has_network_reference, Component_Type::template network_reference);
+//	check_accessor_name(has_link_type, Component_Type::template link_type);
+//	check_accessor_name(has_uuid, Component_Type::template uuid);
+//	check_accessor_name(has_internal_id, Component_Type::template internal_id);
+//	define_default_check(has_upstream_intersection && has_downstream_intersection && has_network_reference && has_link_type  && has_uuid && has_internal_id);
+//};
+
+//concept struct Is_Basic_Link
+//{
+//	check_accessor_name(has_upstream_intersection, template upstream_intersection);
+////	check_accessor_name(has_downstream_intersection, template downstream_intersection);
+////	check_accessor_name(has_network_reference, template network_reference);
+////	check_accessor_name(has_link_type, template link_type);
+////	check_accessor_name(has_uuid, template uuid);
+////	check_accessor_name(has_internal_id, template internal_id);
+////
+////	check_concept(is_basic_link_prototype, Is_Basic_Link_Prototype, T, V);
+////	define_sub_check(is_basic_link, has_upstream_intersection && has_downstream_intersection && has_network_reference && has_link_type  && has_uuid && has_internal_id);
+////	define_default_check(is_basic_link || is_basic_link_prototype);
+//	define_default_check(has_upstream_intersection);
+//};
+
+prototype struct Link
+{
+	tag_as_prototype;
+
+	//==================================================================================================================
+	/// basic link
+	//------------------------------------------------------------------------------------------------------------------
+//	accessor(uuid, NONE, NONE);
+//	accessor(internal_id, NONE, NONE);
+//	accessor(network_reference, NONE, NONE);
+//	accessor(link_type, NONE, NONE);
+//	accessor(turn_movements_container, NONE, NONE);
+	accessor(upstream_intersection, NONE, NONE);
+//	accessor(downstream_intersection, NONE, NONE);
+};
+
+struct MasterType
+{
+	typedef float turn_movement_type;
+};
+
+implementation struct Link_Implementation:public Polaris_Component<MasterType,INHERIT(Link_Implementation),Execution_Object>
+{
+	typedef typename Polaris_Component<MasterType, INHERIT(Link_Implementation), Execution_Object>::Component_Type ComponentType;
+
+//	m_data(int, uuid, NONE, NONE);
+//	m_data(int, internal_id, NONE, NONE);
+//	m_data(int, network_reference, NONE, NONE);
+//	m_data(int, link_type, NONE, NONE);
+//	m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
+	m_data(int, upstream_intersection, NONE, NONE);
+//	m_data(int, downstream_intersection, NONE, NONE);
+};
+
+template<typename TypeChecked>
+struct has_upstream_intersection_procedure
+{
+//	template<typename _V>
+//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::*)())&_V::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//	{return 1;}
+//
+//	template<typename _V>
+//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//	{return 1;}
+
+//	template<typename _V>
+//	constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((_V*)nullptr)->template upstream_intersection<NT*>()),NT*>::value>::type* = nullptr)
+//	{return 1;}
+
+	template<typename _V>
+	constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((typename _V::Component_Type*)nullptr)->template upstream_intersection<NT*>()),NT*>::value>::type* = nullptr)
+	{return 1;}
+
+//	template<typename _V>
+//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//	{return 1;}
+
+	template<typename _V>
+	constexpr static bool has_matching_named_member(...)
+	{return 0;}
+
+	static const bool value = has_matching_named_member<TypeChecked>(0);
+};
+
+//decltype((NT* (_V::Component_Type::*)())&_V::Component_Type::NAME<NT*>)
+
+#define check_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
+		template<typename TypeChecked>\
+		struct CHECK_ALIAS##_procedure\
+		{\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(typename enable_if<is_same<((_V*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
+			{return 1;}\
+			\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(...)\
+			{return 0;}\
+			\
+			static const bool value = has_matching_named_member<TypeChecked>(0);\
+		};\
+		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+#define check_component_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
+		template<typename TypeChecked>\
+		struct CHECK_ALIAS##_procedure\
+		{\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(typename enable_if<is_same<((typename _V::Component_Type*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
+			{return 1;}\
+			\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(...)\
+			{return 0;}\
+			\
+			static const bool value = has_matching_named_member<TypeChecked>(0);\
+		};\
+		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+int main(int argc, char *argv[])
+{
+	typedef Link<Link_Implementation<MasterType>>* link_itf_ptr;
+	typedef Link<Link_Implementation<MasterType>> link_itf;
+//	typedef typename link_itf::Component_Type CType;
+//	typedef NT* (CType::* bob_t)(void*);
+
+	//NT (CType::* bob)();
+	//bob_t bob = &CType::template turn_movements_container<NT*>;
+
+	//decltype((NT (link_itf::*)())&strip_modifiers(link_itf_ptr)::Component_Type::template turn_movements_container<NT>) bob;
+
+	//static_assert(is_same<decltype(judge->template upstream_intersection<NT>()),NT>::value,"Fail!");
+	static_assert(check(strip_modifiers(link_itf_ptr),has_upstream_intersection_procedure),"Fail!");
+
+	//bob_t bob = &link_itf::Component_Type::template upstream_intersection<NT*>;
+	//decltype((NT* (link_itf::Component_Type*)(void*))&link_itf::Component_Type::template upstream_intersection<NT*>) bob;
+	//static_assert(check(strip_modifiers(link_itf_ptr),Is_Basic_Link),"Fail!");
+}
+#endif
+
+#ifdef ROUTER
+#include <iostream>
+#include <chrono>
+#include <vector>
 // can we get away with only storing 1 function pointer for an entire graph?
 // what if we store the pointer type with the pointer in the priority queue, instead of in the graph?
 // if we store like an index into to a function pointer table, it is at least cheaper
 
 // "real edge" passed into the function pointer resolution
 
-struct Edge_A;
+//template<typename This_Edge,typename Adjacent,typename Attributes>
+//struct ConnectionGroup
+//{
+//
+//};
+//
+//template<typename Edge_t,typename ConnectionGroup1,typename ConnectionGroup2>
+//struct Graph
+//{
+//
+//};
+//
+//struct Edge_A;
+//
+//struct Edge_B;
+//
+//template<typename From,typename To>
+//struct Connection
+//{
+//
+//};
+//
+//
+//template<int x>
+//struct Executor
+//{
+//	static void DoStuff(int pmap)
+//	{
+//		if(pmap & x)
+//		{
+//			std::cout << "Doing Stuff" << std::endl;
+//
+//
+//			if(pmap == 0) return;
+//		}
+//
+//		next::DoStuff(pmap-2);
+//	}
+//
+//	typedef Executor<x-2> next;
+//};
+//
+//
+//template<typename This_Edge,typename ConnectionGroup1,typename ConnectionGroup2>
+//struct ConnectionTypes
+//{
+//	void Visit_Neighbors(void* edge)
+//	{
+//		void* pthis = this;
+//
+//		// switch to combination of neighbors present
+//		switch(_pmap)
+//		{
+//			case 0x01:
+//				pthis = ((ConnectionGroup1*)pthis)->Visit_Neighbors(edge);
+//				break;
+//			case 0x10:
+//				pthis = ((ConnectionGroup2*)pthis)->Visit_Neighbors(edge);
+//				break;
+//			case 0x11:
+//			{
+//				pthis = ((ConnectionGroup1*)pthis)->Visit_Neighbors(edge);
+//				pthis = ((ConnectionGroup2*)pthis)->Visit_Neighbors(edge);
+//				break;
+//			}
+//		};
+//	}
+//
+//	static void Visit_Connections(void* pthis,void* edge)
+//	{
+//		((ConnectionTypes*)pthis)->Visit_Neighbors(edge);
+//	}
+//
+//	int _pmap;
+//};
+//
+//template<typename Adjacent_1,typename Adjacent_2>
+//struct EdgeConn : public Connection<EdgeConn,Adjacent_1,Adjacent_2>
+//{
+//
+//};
 
-struct Edge_B;
 
-template<typename From,typename To>
-struct Connection
+struct ConnectionC
 {
-
-};
-
-template<typename This_Edge,typename Adjacent_1,typename Adjacent_2>
-struct ConnectionTypes
-{
-	static void Visit_Neighbors(void* edge)
+	static void DoStuff(uint64_t& sum)
 	{
-		(This_Edge*)edge;
+		sum += 3;
 	}
 
-	Connection<This_Edge,Adjacent_1> neighbors_1;
-	Connection<This_Edge,Adjacent_2> neighbors_2;
+	static void DoStuff(int pmap,uint64_t& sum)
+	{
+		if(pmap & 0b100) sum += 3;
+		//if(pmap <= 0b100) return;
+	}
+
+
+	template<int pmap>
+	inline static void DoStuff(uint64_t& sum)
+	{
+		if (pmap & 0b100) sum += 3;
+	}
 };
 
-template<typename Adjacent_1,typename Adjacent_2>
-struct EdgeConn : public Connection<EdgeConn,Adjacent_1,Adjacent_2>
+struct ConnectionB
 {
+	static void DoStuff(uint64_t& sum)
+	{
+		sum += 2;
+	}
 
+	static void DoStuff(int pmap,uint64_t& sum)
+	{
+		if (pmap & 0b010)
+		{
+			sum += 2;
+
+			if(pmap <= 0b011) return;
+		}
+
+		ConnectionC::DoStuff(pmap, sum);
+	}
+
+	template<int pmap>
+	inline static void DoStuff(uint64_t& sum)
+	{
+		if (pmap & 0b010) sum += 2;
+
+		ConnectionC::template DoStuff<pmap>(sum);
+	}
 };
 
+
+
+struct ConnectionA
+{
+	static void DoStuff(uint64_t& sum)
+	{
+		sum += 1;
+	}
+
+	static void DoStuff(int pmap,uint64_t& sum)
+	{
+		if(pmap & 0b001)
+		{
+			sum += 1;
+
+			if(pmap <= 0b001) return;
+		}
+
+		 ConnectionB::DoStuff(pmap, sum);
+	}
+
+	template<int pmap>
+	inline static void DoStuff(uint64_t& sum)
+	{
+		if(pmap & 0b001) sum += 1;
+
+		ConnectionB::template DoStuff<pmap>(sum);
+	}
+};
+
+// Note, things get a lot cheaper if you can minimize parameter passing
+
+int pmap;
+int sum = 0;
+
+template<int x = 0>
+struct Executor
+{
+	inline static void DoStuff(uint64_t& sum)
+	{
+		if(pmap==x) ConnectionA::template DoStuff<x>(sum);
+		else Executor<x-1>::DoStuff(sum);
+	}
+};
+
+template<>
+struct Executor<0>
+{
+	inline static void DoStuff(uint64_t&){}
+
+//	{
+//		ConnectionA::template DoStuff<1>(sum);
+//	}
+};
+
+//template<>
+//struct Executor<0>
+//{
+//
+//}
 int main(int argc, char *argv[])
 {
+	using namespace std::chrono;
+
+	std::vector<int> edges;
+
+	for(int i=0;i<100000000;i++)
+	{
+		edges.push_back((rand()%7+1));
+	}
+
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+	uint64_t sum = 0;
+	uint64_t sum2 = 0;
+
+	for(auto& edge : edges)
+	{
+//		switch(edge)
+//		{
+//			case 0b001:
+//				ConnectionA::DoStuff(sum);
+//				break;
+//			case 0b010:
+//				ConnectionB::DoStuff(sum);
+//				break;
+//			case 0b011:
+//				ConnectionA::DoStuff(sum);
+//				ConnectionB::DoStuff(sum);
+//				break;
+//			case 0b100:
+//				ConnectionC::DoStuff(sum);
+//				break;
+//			case 0b101:
+//				ConnectionA::DoStuff(sum);
+//				ConnectionC::DoStuff(sum);
+//				break;
+//			case 0b110:
+//				ConnectionB::DoStuff(sum);
+//				ConnectionC::DoStuff(sum);
+//				break;
+//			case 0b111:
+//				ConnectionA::DoStuff(sum);
+//				ConnectionB::DoStuff(sum);
+//				ConnectionC::DoStuff(sum);
+//				break;
+//		}
+
+//		if(edge == 0b001)
+//		{
+//			ConnectionA::DoStuff(sum);
+//		}
+//		else if(edge == 0b010)
+//		{
+//			ConnectionB::DoStuff(sum);
+//		}
+//		else if(edge == 0b011)
+//		{
+//			ConnectionA::DoStuff(sum);
+//			ConnectionB::DoStuff(sum);
+//		}
+//		else if(edge == 0b100)
+//		{
+//			ConnectionC::DoStuff(sum);
+//		}
+//		else if(edge == 0b101)
+//		{
+//			ConnectionA::DoStuff(sum);
+//			ConnectionC::DoStuff(sum);
+//		}
+//		else if(edge == 0b110)
+//		{
+//			ConnectionB::DoStuff(sum);
+//			ConnectionC::DoStuff(sum);
+//		}
+//		else// if(edge == 0b111)
+//		{
+//			ConnectionA::DoStuff(sum);
+//			ConnectionB::DoStuff(sum);
+//			ConnectionC::DoStuff(sum);
+//		}
+
+//		ConnectionA::DoStuff(edge,sum);
+
+		pmap = edge;
+		Executor<7>::DoStuff(sum);
+	}
+
+	high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+	auto time_span = t2 - t1;
+
+	std::cout << "It took me " << time_span.count() << " nanos." << std::endl;
+
+	std::cout << sum << std::endl;
 }
+
+
+#endif
 
 #ifdef STUFF
 #include "core/Core.h"

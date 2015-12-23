@@ -233,7 +233,7 @@ namespace polaris
 	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// check_template_method_name - given name must be a method template member
+	/// check_accessor_name - given name must be a method template member
 	///----------------------------------------------------------------------------------------------------
 
 	#define local_check_template_method_name(CHECK_ALIAS,NAME)\

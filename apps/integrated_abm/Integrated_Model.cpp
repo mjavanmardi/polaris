@@ -245,7 +245,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
-	char* scenario_filename = "scenario.json";
+	string scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 	int threads = 1;
 	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
@@ -300,7 +300,7 @@ int main(int argc,char** argv)
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 
 	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 

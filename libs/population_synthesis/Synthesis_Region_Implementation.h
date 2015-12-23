@@ -29,15 +29,15 @@ namespace PopSyn
 			// pass through functions to access the Top-level class scenario/network
 			template<typename TargetType> TargetType scenario_reference()
 			{
-				return this->parent_reference<type_of(parent_reference)&>().scenario_reference<TargetType>();
+				return this->template parent_reference<type_of(parent_reference)&>().template scenario_reference<TargetType>();
 			}
 			template<typename TargetType> TargetType network_reference()
 			{
-				return this->parent_reference<type_of(parent_reference)&>().network_reference<TargetType>();
+				return this->template parent_reference<type_of(parent_reference)&>().template network_reference<TargetType>();
 			}
 			template<typename TargetType> TargetType file_linker_reference()
 			{
-				return this->parent_reference<type_of(parent_reference)&>().file_linker<TargetType>();
+				return this->template parent_reference<type_of(parent_reference)&>().template file_linker<TargetType>();
 			}
 
 			// Function to initialize the google hash maps
@@ -62,7 +62,17 @@ namespace PopSyn
 		implementation struct Polaris_Synthesis_Region_Implementation_Simple : public Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Simple),Execution_Object>, _Polaris_Synthesis_Region_Implementation<MasterType>
 		{
 			typedef _Polaris_Synthesis_Region_Implementation<MasterType> BaseType;
-			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Simple),Execution_Object>::Component_Type ComponentType;		
+
+			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Region_Implementation_Simple),Execution_Object>::Component_Type ComponentType;
+			typedef ComponentType Component_Type;
+
+			using_member(BaseType,Sample_Data);
+			using_member(BaseType,Temporary_Sample_Data);
+			using_member(BaseType,Target_Joint_Distribution);
+			using_member(BaseType,Target_Marginal_Distribution);
+			using_member(BaseType,Target_Person_Joint_Distribution);
+			using_member(BaseType,Synthesis_Zone_Collection);
+			using_member(BaseType,Solver_Settings);
 
 			// Use the current line in File_Reader and the info in linker to construct a new household object
 			template<typename TargetType> void Add_Household_Sample(File_IO::File_Reader& fr, TargetType linker, requires(TargetType,check(TargetType, is_pointer)))
@@ -70,7 +80,7 @@ namespace PopSyn
 				typedef get_mapped_component_type(Sample_Data_type) sample_type;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 
-				Target_Joint_Distribution_type::index_type index;
+				typename Target_Joint_Distribution_type::index_type index;
 
 				// find which marginal category each control variable belongs to and place in index
 				double x;
@@ -105,7 +115,7 @@ namespace PopSyn
 				_Target_Joint_Distribution[index] += weight;
 					
 				// also add to temporary sample data, so that the person file records can attach to household records
-				pair<typename Temporary_Sample_Data_type::key_type,pop_unit_itf*> tmp_item = pair<typename Temporary_Sample_Data_type::key_type,pop_unit_itf*>(sample_id,p);
+				pair<typename BaseType::Temporary_Sample_Data_type::key_type,pop_unit_itf*> tmp_item = pair<typename BaseType::Temporary_Sample_Data_type::key_type,pop_unit_itf*>(sample_id,p);
 				_Temporary_Sample_Data.insert(tmp_item);
 			}
 			
@@ -121,7 +131,7 @@ namespace PopSyn
 				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
 				linker_itf* link = (linker_itf*)linker;
 
-				Target_Person_Joint_Distribution_type::index_type index;
+				typename Target_Person_Joint_Distribution_type::index_type index;
 
 				// find which marginal category each control variable belongs to and place in index
 				double x;
@@ -241,6 +251,17 @@ namespace PopSyn
 		// This class must have the methods shown below defined for your specific algorithm
 		implementation struct Popgen_Synthesis_Region_Implementation_Simple : public Polaris_Component<MasterType,INHERIT(Popgen_Synthesis_Region_Implementation_Simple),Execution_Object>, _Popgen_Synthesis_Region_Implementation<MasterType>
 		{
+			typedef _Popgen_Synthesis_Region_Implementation<MasterType> BaseType;
+			typedef typename Polaris_Component<MasterType,INHERIT(Popgen_Synthesis_Region_Implementation_Simple),Execution_Object>::Component_Type ComponentType;
+			typedef ComponentType Component_Type;
+
+			using_member(BaseType,Sample_Data);
+			using_member(BaseType,Target_Joint_Distribution);
+			using_member(BaseType,Target_Person_Joint_Distribution);
+			using_member(BaseType,Temporary_Sample_Data);
+			using_member(BaseType,Solver_Settings);
+			using_member(BaseType,Synthesis_Zone_Collection);
+
 			// Use the current line in File_Reader and the info in linker to construct a new household object and add to the distribution for the region
 			template<typename TargetType> void Add_Household_Sample(File_IO::File_Reader& fr, TargetType linker, requires(TargetType,check(TargetType, is_pointer)))
 			{
@@ -248,7 +269,7 @@ namespace PopSyn
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 
 				// This is an index into the joint distribution
-				Target_Joint_Distribution_type::index_type index;
+				typename Target_Joint_Distribution_type::index_type index;
 
 				// find which marginal category each control variable belongs to and place in index
 				// This creates an index where each position corresponds to a control variable an the value in each position
@@ -300,7 +321,7 @@ namespace PopSyn
 				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
 				linker_itf* link = (linker_itf*)linker;
 
-				Target_Person_Joint_Distribution_type::index_type index;
+				typename Target_Person_Joint_Distribution_type::index_type index;
 
 				// find which marginal category each control variable belongs to and place in index
 				double x;

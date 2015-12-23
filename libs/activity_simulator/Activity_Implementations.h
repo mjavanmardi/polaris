@@ -8,7 +8,7 @@
 #include "Person_Properties_Prototype.h"
 #include "activity_simulator\Person_Scheduler_Implementations.h"
 #include "Activity_Prototype.h"
-
+#include "Activity_Simulator_Forward_Declaration.h"
 
 namespace Activity_Components
 {
@@ -74,7 +74,7 @@ namespace Activity_Components
 			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(_turns_container_itf)>  _turn_itf;
 	
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_zones_container_itf)>  _zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 		
 			//typedef typename _scheduler_itf::Component_Type ctype;
 			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Activity_Container)> _activity_plans_container_itf;
@@ -148,19 +148,20 @@ namespace Activity_Components
 					else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
 				}
 			}
-			// departure time feature - set by route_handler, =0 before the route is planned
-			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
-			{
-				if (this->Route_Is_Planned<NT>())
-				{
-					_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
-					return move->template departed_time<TargetType>(depart);
-				}
-				else
-				{
-					return this->template Start_Time<TargetType>();
-				}
-			}
+// TODO: does not compile
+//			// departure time feature - set by route_handler, =0 before the route is planned
+//			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
+//			{
+//				if (this->Route_Is_Planned<NT>())
+//				{
+//					_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
+//					return move->template departed_time<TargetType>(depart);
+//				}
+//				else
+//				{
+//					return this->template Start_Time<TargetType>();
+//				}
+//			}
 			
 			// Planning event time members
 			m_data(Revision,Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
@@ -222,48 +223,48 @@ namespace Activity_Components
 				pthis->Duration_Flexibility(obj->Duration_Flexibility<Types::FLEXIBILITY_VALUES>());
 				pthis->Involved_Persons_Flexibility(obj->Involved_Persons_Flexibility<Types::FLEXIBILITY_VALUES>());
 
-				pthis->Location<_activity_location_itf*>(obj->Location<_activity_location_itf*>());
-				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(obj->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
-				pthis->Start_Time(obj->Start_Time<Time_Seconds>());
-				pthis->Duration(obj->Duration<Time_Seconds>());
+				pthis->Location<_activity_location_itf*>(obj->template Location<_activity_location_itf*>());
+				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(obj->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+				pthis->Start_Time(obj->template Start_Time<Time_Seconds>());
+				pthis->Duration(obj->template Duration<Time_Seconds>());
 
-				for (Involved_Persons_Container_type::iterator itr = obj->Involved_Persons_Container<Involved_Persons_Container_type&>().begin(); itr != obj->Involved_Persons_Container<Involved_Persons_Container_type&>().end(); ++itr)
+				for (auto itr = obj->template Involved_Persons_Container<Involved_Persons_Container_type&>().begin(); itr != obj->template Involved_Persons_Container<Involved_Persons_Container_type&>().end(); ++itr)
 				{
 					_Involved_Persons_Container.push_back(*itr);
 				}
 				
-				pthis->Location_Planning_Time(obj->Location_Planning_Time<Revision>());
-				pthis->Mode_Planning_Time(obj->Mode_Planning_Time<Revision>());		
-				pthis->Start_Time_Planning_Time(obj->Start_Time_Planning_Time<Revision>());		
-				pthis->Duration_Planning_Time(obj->Duration_Planning_Time<Revision>());		
-				pthis->Involved_Persons_Planning_Time(obj->Involved_Persons_Planning_Time<Revision>());		
-				pthis->Route_Planning_Time(obj->Route_Planning_Time<Revision>());		
-				pthis->Deletion_Time(obj->Deletion_Time<Revision>());
+				pthis->Location_Planning_Time(obj->template Location_Planning_Time<Revision>());
+				pthis->Mode_Planning_Time(obj->template Mode_Planning_Time<Revision>());
+				pthis->Start_Time_Planning_Time(obj->template Start_Time_Planning_Time<Revision>());
+				pthis->Duration_Planning_Time(obj->template Duration_Planning_Time<Revision>());
+				pthis->Involved_Persons_Planning_Time(obj->template Involved_Persons_Planning_Time<Revision>());
+				pthis->Route_Planning_Time(obj->template Route_Planning_Time<Revision>());
+				pthis->Deletion_Time(obj->template Deletion_Time<Revision>());
 			}
-
-			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
-			{
-				Revision &start = this->Start_Time_Planning_Time<  Revision&>();
-				Revision &dur = this->Duration_Planning_Time<  Revision&>();
-				Revision &loc = this->Location_Planning_Time<  Revision&>();
-				Revision & mode = this->Mode_Planning_Time<  Revision&>();
-				Revision & persons = this->Involved_Persons_Planning_Time<  Revision&>();
-				Revision &route = this->Route_Planning_Time<  Revision&>();
-				
-				start._iteration = END;				
-				dur._iteration = END;				
-				loc._iteration = END;				
-				mode._iteration = END;				
-				persons._iteration = END;			
-				route._iteration = min(_iteration+1, (int)planning_time);
-
-				start._sub_iteration = 0;	
-				dur._sub_iteration = 0;
-				loc._sub_iteration = 0;
-				mode._sub_iteration = 0;
-				persons._sub_iteration = 0;
-				route._sub_iteration = 5;	
-			}
+// TODO: does not compile
+//			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+//			{
+//				Revision &start = this->Start_Time_Planning_Time<  Revision&>();
+//				Revision &dur = this->Duration_Planning_Time<  Revision&>();
+//				Revision &loc = this->Location_Planning_Time<  Revision&>();
+//				Revision & mode = this->Mode_Planning_Time<  Revision&>();
+//				Revision & persons = this->Involved_Persons_Planning_Time<  Revision&>();
+//				Revision &route = this->Route_Planning_Time<  Revision&>();
+//
+//				start._iteration = END;
+//				dur._iteration = END;
+//				loc._iteration = END;
+//				mode._iteration = END;
+//				persons._iteration = END;
+//				route._iteration = min(_iteration+1, (int)planning_time);
+//
+//				start._sub_iteration = 0;
+//				dur._sub_iteration = 0;
+//				loc._sub_iteration = 0;
+//				mode._sub_iteration = 0;
+//				persons._sub_iteration = 0;
+//				route._sub_iteration = 5;
+//			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
 				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
@@ -274,7 +275,7 @@ namespace Activity_Components
 				// General interfaces, to parent and global classes
 				_planning_itf* planner = this->Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
-				_household_itf* household = person->template Household<_household_itf*>();
+				_household_itf* household = person->_person_itf::template Household<_household_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
@@ -284,8 +285,8 @@ namespace Activity_Components
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<get_component_type(_movement_plans_container_itf)>();
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
-				move->network<_network_itf*>(network);
-				move->traveler_id(person->vehicle<_vehicle_Itf*>()->uuid<int>());
+				move->template network<_network_itf*>(network);
+				move->traveler_id(person->template vehicle<_vehicle_Itf*>()->template uuid<int>());
 			
 				// Get the origin and destination locations
 				_activity_location_itf* orig;
@@ -341,8 +342,8 @@ namespace Activity_Components
 			{
 				// General interfaces
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
-				_static_properties_itf* properties = person->Static_Properties<_static_properties_itf*>();
-				_household_itf* household = person->template Household<_household_itf*>();
+				_static_properties_itf* properties = person->template Static_Properties<_static_properties_itf*>();
+				_household_itf* household = person->_person_itf::template Household<_household_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
@@ -359,13 +360,13 @@ namespace Activity_Components
 
 
 				// If this is a child needing an escort
-				if (properties->Age<int>()<6 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
+				if (properties->template Age<int>()<6 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 				{
 					// Require parent escort when using HOV
 					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
 					{
 						// get a free adult available for escort
-						_person_itf* adult = household->Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+						_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 						// If no adults free and not school trip - cancel act
 						if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
@@ -374,18 +375,18 @@ namespace Activity_Components
 						// otherwise, assign escort duty to adult
 						else
 						{
-							_generator_itf* gen = adult->Planning_Faculty<_planning_itf*>()->Activity_Generation_Faculty<_generator_itf*>();
-							gen->Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+							_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
+							gen->template Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
 						}
 					}
 				}
-				else if (properties->Age<int>()<16 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
+				else if (properties->template Age<int>()<16 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 				{
 					// Attempt parent escort when using HOV - if fails force to transit
 					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
 					{
 						// get a free adult available for escort
-						_person_itf* adult = household->Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+						_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 						// If no adults free, force trip to transit
 						if (adult == nullptr) 
@@ -395,8 +396,8 @@ namespace Activity_Components
 						else
 						{
 							// if adult free, add new escort activity to the adult schedule
-							_generator_itf* gen = adult->Planning_Faculty<_planning_itf*>()->Activity_Generation_Faculty<_generator_itf*>();
-							gen->Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+							_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
+							gen->template Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
 						}
 					}
 				}
@@ -455,9 +456,9 @@ namespace Activity_Components
 				// General interfaces, to parent and global classes
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
-				_household_itf* household = person->Household<_household_itf*>();
+				_household_itf* household = person->_person_itf::template Household<_household_itf*>();
 
-				if (move->Update_Locations<_activity_location_itf*>(orig,dest))
+				if (move->template Update_Locations<_activity_location_itf*>(orig,dest))
 				{
 					// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
 					Simulation_Timestep_Increment start = this->Start_Time<Simulation_Timestep_Increment>();
@@ -672,7 +673,7 @@ namespace Activity_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_links_container_itf)>  _link_itf;
 	
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_zones_container_itf)>  _zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
 			//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
 			//typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
@@ -699,6 +700,7 @@ namespace Activity_Components
 
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
+				using namespace Activity_Components::Types;
 				//===========================================================================================================================
 				// Initialize local variables for use
 				//---------------------------------------------------------------------------------------------------------------------------
@@ -716,9 +718,9 @@ namespace Activity_Components
 				ACT1 = 0; ACT2 = 0; ACT3 = 0; ACT4 = 0; ACT5 = 0; Employed = 0; Student = 0; Male = 0; Senior = 0; TELEWORK = 0; ICT_USE = 0;
 				float AvgDur, AvgFreq;
 
-				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
-				else if (base_this->_Activity_Type == HEALTHCARE_ACTIVITY || base_this->_Activity_Type == RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
-				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
+				if (base_this->_Activity_Type == Types::WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == Types::PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == Types::PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == Types::SCHOOL_ACTIVITY || base_this->_Activity_Type == Types::OTHER_WORK_ACTIVITY) ACT1 = 1;
+				else if (base_this->_Activity_Type == Types::HEALTHCARE_ACTIVITY || base_this->_Activity_Type == Types::RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == Types::PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
+				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == Types::PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == Types::SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
 				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
 				else if (base_this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY ||base_this-> _Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
 				if (static_props->template Is_Employed<bool>()) Employed = 1;
@@ -727,8 +729,8 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
-				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Days>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<Types::ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<Types::ACTIVITY_TYPES,Time_Days>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -1064,7 +1066,7 @@ namespace Activity_Components
 
 				// set the duration, making sure it fits into current schedule slot
 				pthis->template Duration<Time_Seconds>(0.0f);
-				float duration = max<float>(start_and_duration.second, (float)pthis->Minimum_Duration<Time_Seconds>());
+				float duration = max<float>(start_and_duration.second, (float)pthis->template Minimum_Duration<Time_Seconds>());
 				pthis->template Duration<Time_Seconds>(duration);
 
 				////========================================================================
@@ -1159,7 +1161,7 @@ namespace Activity_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_links_container_itf)>  _link_itf;
 	
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_zones_container_itf)>  _zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -1295,6 +1297,8 @@ namespace Activity_Components
 
 			template<typename TargetType> void Duration_Planning_Event_Handler()
 			{
+				using namespace Activity_Components::Types;
+
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
@@ -1321,6 +1325,8 @@ namespace Activity_Components
 
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()
 			{
+				using namespace Activity_Components::Types;
+
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
@@ -1414,6 +1420,7 @@ namespace Activity_Components
 
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
+				using namespace Activity_Components::Types;
 				//===========================================================================================================================
 				// Initialize local variables for use
 				//---------------------------------------------------------------------------------------------------------------------------
@@ -1540,7 +1547,7 @@ namespace Activity_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_links_container_itf)>  _link_itf;
 	
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_zones_container_itf)>  _zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================

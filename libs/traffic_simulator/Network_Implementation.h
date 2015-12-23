@@ -4,6 +4,7 @@
 #include "Network_Event_Prototype.h"
 #include "Link_Implementation.h"
 #include "Analyze_Link_Group_Implementation.h" 
+#include "Network_DB_Reader_Implementations.h"
 
 namespace Network_Components
 {
@@ -1102,7 +1103,7 @@ namespace Network_Components
 					MasterType::routable_network_type::initialize_moe_data();
 				}
 
-				Routable_Network<typename MasterType::routable_network_type>* routable_network = (Routable_Network<typename MasterType::routable_network_type>*)Allocate<MasterType::routable_network_type>();
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = (Routable_Network<typename MasterType::routable_network_type>*)Allocate<typename MasterType::routable_network_type>();
 				_routable_networks.push_back(routable_network);
 				
 				routable_network->initialize();
@@ -1233,7 +1234,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------		
 			template<typename TargetType> void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
-				_db_reader = Allocate<remove_pointer<type_of(db_reader)>::type>();
+				_db_reader = Allocate<typename remove_pointer<type_of(db_reader)>::type>();
 				typedef Prototypes::Network_DB_Reader<typename remove_pointer<type_of(db_reader)>::type> _DB_Interface;
 				_DB_Interface* db = (_DB_Interface*)_db_reader;
 				db->template network_reference<ComponentType*>((ComponentType*)this);

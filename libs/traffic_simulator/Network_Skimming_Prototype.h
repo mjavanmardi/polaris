@@ -375,7 +375,7 @@ namespace Network_Skimming_Components
 				this->template network_reference<NetworkType>(network_pointer);
 				
 				this->template Initialize<NT>();
-			}			
+			}
 			template<typename NetworkType> void Initialize(NetworkType network_reference, requires(NetworkType,!check(NetworkType, is_pointer) || !check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
 				assert_check(NetworkType, is_pointer,"TargetType is not a pointer" );
@@ -466,7 +466,7 @@ namespace Network_Skimming_Components
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-				typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -517,7 +517,7 @@ namespace Network_Skimming_Components
 				// if the code gets here, then the requested time does not fall within any skim_table time period
 				cout << endl << "Get LOS failure: " <<"origin: " << Origin_Zone_ID <<", destination: " << Destination_Zone_ID<<", time: "  << Start_Time<<", remain time="<<remain<<", rounded="<<rounded<<endl;
 				assert(false);
-				return false;
+				return nullptr;
 			}
 			
 			//---------------------------------------------

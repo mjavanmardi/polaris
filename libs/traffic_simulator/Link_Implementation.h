@@ -14,6 +14,7 @@
 #include "Advisory_ITS_Prototype.h"
 #include "Sensor_Prototype.h"
 #include "Movement_Plan_Prototype.h"
+#include "Routable_Network_Prototype.h"
 
 namespace Link_Components
 {

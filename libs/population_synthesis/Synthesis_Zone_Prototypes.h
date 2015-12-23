@@ -56,9 +56,9 @@ namespace PopSyn
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable");
 				assert_check(ComponentType,Concepts::Is_IPU_Compatible," And not Combinatorial-optimization compatible.");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
 			template<typename AnalysisUnitType> void Integerize_Joint_Distribution(requires(AnalysisUnitType,check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible)))
@@ -69,24 +69,24 @@ namespace PopSyn
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable");
 				assert_check(ComponentType,Concepts::Is_IPU_Compatible," And not Combinatorial-optimization compatible.");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
 
 
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, IPU, etc. methods
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible)) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)))
+			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible))/* && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)*/))
 			{
 				this_component()->Select_Synthetic_Population_Units<TargetType>(Region_Sample_Ptr);
 			}
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType,Concepts::Is_IPF_Compatible) && !check(ComponentType,Concepts::Is_IPU_Compatible)) || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))))
+			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType,Concepts::Is_IPF_Compatible) && !check(ComponentType,Concepts::Is_IPU_Compatible))/* || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))*/)))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				/*assert_check(TargetType, is_pointer,"Is not a pointer");*/
-				assert_check(strip_modifiers(TargetType), polaris::Container_Concepts::Is_Associative, "Container is not associative.");
+				//assert_check(strip_modifiers(TargetType), polaris::Container_Concepts::Is_Associative, "Container is not associative.");
 			}
 			
 			//===================================================================================================================================
@@ -128,7 +128,7 @@ namespace PopSyn
 					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
 					person->template Static_Properties<person_unit_itf*>((person_unit_itf*)(*person_unit_itr));
 					hh->template Persons_Container<persons_itf&>().push_back(person);
-					person->template Household<household_itf*>(hh);
+					person->person_itf::template Household<household_itf*>(hh);
 				}
 				household_container->push_back(hh);
 			}
@@ -137,18 +137,18 @@ namespace PopSyn
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
-				typedef  Household_Components::Prototypes::Household_Properties<get_component_type( typename get_type_of(Synthetic_Households_Container))>  household_itf;
+				typedef  Household_Components::Prototypes::Household_Properties<get_component_type(get_type_of(Synthetic_Households_Container))>  household_itf;
 				
-				typedef  Random_Access_Sequence<get_type_of(Synthetic_Persons_Container)> persons_itf;
-				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(typename get_type_of(Synthetic_Persons_Container))>  person_itf;
+				typedef  Random_Access_Sequence<typename get_type_of(Synthetic_Persons_Container)> persons_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(get_type_of(Synthetic_Persons_Container))>  person_itf;
 
 				// interface to the ACS sample data classes
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Household_Components::Prototypes::Household_Properties <get_component_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <get_component_type(get_type_of(Sample_Data))>  pop_unit_itf;
 				
 				
 				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(typename pop_unit_itf::get_type_of(Persons_Container))>  person_unit_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(pop_unit_itf::get_type_of(Persons_Container))>  person_unit_itf;
 				
 
 				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<households_itf*>();

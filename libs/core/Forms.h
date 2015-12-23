@@ -49,7 +49,7 @@ namespace polaris
 	//	template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_id;}\
 	//	const int uuid(){return this_component()->uuid();}
 
-	prototype struct Null_Prototype{typedef ComponentType Component_Type;};
+	prototype struct Null_Prototype{tag_as_prototype;};
 
 	///----------------------------------------------------------------------------------------------------
 	/// implementation - standard declarator for all implementations
@@ -482,6 +482,15 @@ namespace polaris
 			}\
 
 	///----------------------------------------------------------------------------------------------------
+	/// using_member � convenience macro to assist in inheritance
+	///----------------------------------------------------------------------------------------------------
+	
+	#define using_member(BASE,NAME)\
+		using BASE::_##NAME;\
+		using typename BASE::NAME##_type;\
+		using typename BASE::NAME##_accessible_type;
+		
+	///----------------------------------------------------------------------------------------------------
 	/// m_data � member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
@@ -712,12 +721,12 @@ namespace polaris
               return itf->template MEMBER_COMPONENT_FEATURE<TargetType>();\
        }\
        template<typename TargetType>\
-       void FEATURE_NAME(TargetType value)\
+       void FEATURE_NAME(TargetType value,TargetType* = nullptr)\
        {\
               typedef MEMBER_COMPONENT_PROTOTYPE<type_of(typename ComponentType::MEMBER_COMPONENT_NAME)> MEMBER_COMPONENT_NAME##_itf;\
               MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<MEMBER_COMPONENT_NAME##_itf*>();\
               itf->template MEMBER_COMPONENT_FEATURE<TargetType>(value);\
-       }
+       }\
        tag_getter_as_available(FEATURE_NAME);\
        tag_setter_as_available(FEATURE_NAME);
 

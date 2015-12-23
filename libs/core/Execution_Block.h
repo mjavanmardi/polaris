@@ -20,13 +20,13 @@ namespace polaris
 		//----------------------------------------------------------------------------------------------------
 
 		template<typename DataType>
-		inline DataType* Allocate();
+		DataType* Allocate();
 		
 		template<typename DataType>
-		inline void Free(DataType* ptr);
+		void Free(DataType* ptr);
 		
 		template<typename DataType>
-		inline void Lazy_Free(DataType* ptr);
+		void Lazy_Free(DataType* ptr);
 
 		bool Empty(){ return _num_allocated == 0; }
 

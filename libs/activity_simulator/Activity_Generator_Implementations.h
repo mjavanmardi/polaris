@@ -17,6 +17,7 @@ namespace Person_Components
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Activity_Generator_Implementation),Data_Object>::Component_Type ComponentType;
+			typedef typename ComponentType::Master_Type Master_Type;
 
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner,typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
@@ -25,7 +26,7 @@ namespace Person_Components
 			typedef Prototypes::Person< typename type_of(Parent_Planner)::type_of(Parent_Person)> _Person_Interface;
 			typedef Household_Components::Prototypes::Household< typename _Person_Interface::get_type_of(Household)> _Household_Interface;
 			typedef Prototypes::Person_Scheduler< typename _Person_Interface::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
-			
+
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
@@ -39,7 +40,8 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Activity_Container)> Activity_Plans;
+			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
+			typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Movement_Plans_Container)> Movement_Plans;
@@ -51,17 +53,17 @@ namespace Person_Components
 
 			template<typename TargetType> TargetType Parent_Person()
 			{
-				return _Parent_Planner->Parent_Person<TargetType>();
+				return _Parent_Planner->template Parent_Person<TargetType>();
 			}
 			template<typename TargetType> TargetType Scheduling_Faculty()
 			{
-				_Person_Interface* person = _Parent_Planner->Parent_Person<_Person_Interface*>();
-				return person->Scheduling_Faculty<_Scheduler_Interface*>();
+				_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
+				return person->template Scheduling_Faculty<_Scheduler_Interface*>();
 			}
 			int Scheduled_Activity_Count()
 			{
-				_Person_Interface* person = _Parent_Planner->Parent_Person<_Person_Interface*>();
-				return person->Scheduling_Faculty<_Scheduler_Interface*>()->Activity_Count<int>();
+				_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
+				return person->template Scheduling_Faculty<_Scheduler_Interface*>()->template Activity_Count<int>();
 			}
 
 			// ACTIVITY CREATION METHODS
@@ -75,7 +77,7 @@ namespace Person_Components
 				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
 
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
 				activity_count++;
@@ -91,7 +93,7 @@ namespace Person_Components
 				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
 
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
@@ -106,11 +108,11 @@ namespace Person_Components
 				activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
 
 				// set location and remove from planning stream
-				activity->Location<LocationType>(location);
-				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Location<LocationType>(location);
+				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
 
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
 				return activity;
@@ -128,16 +130,16 @@ namespace Person_Components
 				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
 
 				// set location and remove from planning stream
-				activity->Location<LocationType>(location);
-				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Location<LocationType>(location);
+				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
 
 				// set location and remove from planning stream
-				activity->Mode<ModeType>(mode);
-				activity->Mode_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Mode<ModeType>(mode);
+				activity->template Mode_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
 
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
 				return activity;
@@ -155,25 +157,25 @@ namespace Person_Components
 				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
 
 				// set location and remove from planning stream
-				activity->Location<LocationType>(location);
-				activity->Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Location<LocationType>(location);
+				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
 
 				// set location and remove from planning stream
-				activity->Mode<ModeType>(mode);
-				activity->Mode_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Mode<ModeType>(mode);
+				activity->template Mode_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
 
 				// set location and remove from planning stream
-				activity->Start_Time<TimeType>(start);
-				activity->Start_Time_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
+				activity->template Start_Time<TimeType>(start);
+				activity->template Start_Time_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
 
-				activity->Duration<TimeType>(duration);
-				activity->Duration_Planning_Time<Revision&>()._iteration = END+1;
-				activity->Duration_Planning_Time<Revision&>()._sub_iteration = END+1;		
+				activity->template Duration<TimeType>(duration);
+				activity->template Duration_Planning_Time<Revision&>()._iteration = END+1;
+				activity->template Duration_Planning_Time<Revision&>()._sub_iteration = END+1;
 
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 				
 				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
 				return activity;
@@ -185,7 +187,7 @@ namespace Person_Components
 				activity->template Activity_Plan_ID<int>(activity_count);
 
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
 				activity_count++;
@@ -198,7 +200,7 @@ namespace Person_Components
 				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+100);
 
 				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,departure_time,start,duration,mode);
-				activity->Schedule_Activity_Events<NT>();
+				activity->template Schedule_Activity_Events<NT>();
 
 				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
 
@@ -286,7 +288,10 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Activity_Container)> Activity_Plans;
+			typedef typename base_type::_Scheduler_Interface _Scheduler_Interface;
+
+			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
+			typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Movement_Plans_Container)> Movement_Plans;
@@ -337,8 +342,8 @@ namespace Person_Components
 
 				//=========================================================================================================================
 				// Initialize person with at-home activity
-				At_Home_Activity_Plan* home_act = Create_Home_Activity<NT>(act_count);
-				scheduler->Update_Current_Activity(home_act);
+				At_Home_Activity_Plan* home_act = this->template Create_Home_Activity<NT>(act_count);
+				scheduler->template Update_Current_Activity(home_act);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -348,10 +353,10 @@ namespace Person_Components
 				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
 				{
 					float num_work = work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) Create_Routine_Activity<ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
 
 					float num_pwork = part_time_work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) Create_Routine_Activity<ACTIVITY_TYPES>(PART_TIME_WORK_ACTIVITY,act_count, start_plan_time);
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(PART_TIME_WORK_ACTIVITY,act_count, start_plan_time);
 				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
@@ -362,7 +367,7 @@ namespace Person_Components
 				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 				{
 					float num_school = school_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school ) Create_Routine_Activity<ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
 				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
@@ -383,17 +388,17 @@ namespace Person_Components
 				float num_service = service_vehicle_activity_freq[person_index];
 				float num_social = social_activity_freq[person_index];
 
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out ) Create_Activity<ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand ) Create_Activity<ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare ) Create_Activity<ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure ) Create_Activity<ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop ) Create_Activity<ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out ) this->template Create_Activity<ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand ) this->template Create_Activity<ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare ) this->template Create_Activity<ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure ) this->template Create_Activity<ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop ) this->template Create_Activity<ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
 				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop ) Create_Activity<ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb ) Create_Activity<ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic ) Create_Activity<ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service ) Create_Activity<ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social ) Create_Activity<ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop ) this->template Create_Activity<ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb ) this->template Create_Activity<ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic ) this->template Create_Activity<ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service ) this->template Create_Activity<ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social ) this->template Create_Activity<ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
 
 			}
 

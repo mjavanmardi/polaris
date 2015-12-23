@@ -13,6 +13,8 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>
 		{
+			typedef typename Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>::Component_Type ComponentType;
+
 			boost::container::vector<int> num_acts;
 			boost::container::vector<int>* planned_acts;
 			boost::container::vector<int>* executed_acts;
@@ -95,13 +97,13 @@ namespace Person_Components
 					}
 				}
 
-				this->Logging_Interval<Time_Minutes>(5);
-				this->Next_Logging_Time<Time_Minutes>(5);
-				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<Simulation_Timestep_Increment>();
+				this->template Logging_Interval<Time_Minutes>(5);
+				this->template Next_Logging_Time<Time_Minutes>(5);
+				Simulation_Timestep_Increment first_time = this->template Next_Logging_Time<Simulation_Timestep_Increment>();
 				
 
 				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
-				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,Scenario_Components::Types::OUTPUT_WRITING_SUB_ITERATION);
+				this->template Load_Event<ComponentType>(&Logging_Event_Controller,first_time,Scenario_Components::Types::OUTPUT_WRITING_SUB_ITERATION);
 
 				// Initialize pointers to data buffers
 				buff = output_data_buffer;
@@ -180,7 +182,7 @@ namespace Person_Components
 				act_record_itf* act = (act_record_itf*)act_record;
 				person_planner_itf* planner = act->template Parent_Planner<person_planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();
-				household_itf* hh = person->template Household<household_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
 
 				location_itf* loc = act->template Location<location_itf*>();
 
@@ -251,7 +253,7 @@ namespace Person_Components
 
 				s << "\t";
 				s <<move->template origin<location_itf*>()->template uuid<int>()<< "\t"<<move->template destination<location_itf*>()->template uuid<int>()<< "\t";
-				s <<move->template departed_time<Time_Days>()<< "\t"<<move->arrived_time<Time_Days>()<< "\t"<<act->template Start_Time<Time_Days>() << "\t"<<act->template End_Time<Time_Days>() << "\t"<< act->template Mode<int>();
+				s <<move->template departed_time<Time_Days>()<< "\t"<<move->template arrived_time<Time_Days>()<< "\t"<<act->template Start_Time<Time_Days>() << "\t"<<act->template End_Time<Time_Days>() << "\t"<< act->template Mode<int>();
 				buff[__thread_id].push_back(s.str());
 			}
 			template<typename TargetType> void Add_Summary_Record(TargetType act_record, bool is_executed)
@@ -624,7 +626,7 @@ namespace Person_Components
 				location_itf* dest = move->template destination<location_itf*>();
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
-				household_itf* hh = person->template Household<household_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
 
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
@@ -646,7 +648,7 @@ namespace Person_Components
 				else trip_rec.setMode(3);
 				if (new_origin <0) trip_rec.setOrigin(orig->template uuid<int>());
 				else trip_rec.setOrigin(new_origin);
-				trip_rec.setPartition(move->routed_travel_time<int>());
+				trip_rec.setPartition(move->template routed_travel_time<int>());
 				trip_rec.setPassengers(0);
 				trip_rec.setPurpose(0);
 				//trip_rec.setStart(act->template Start_Time<Time_Seconds>());

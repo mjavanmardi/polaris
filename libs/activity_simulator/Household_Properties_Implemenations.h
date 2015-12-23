@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Household_Properties_Prototype.h"
+#include "Population_Synthesis_Concepts.h"
 //#include "Person_Properties_Prototype.h"
 //#include "Person_Prototype.h"
 //#include "Movement_Plan_Prototype.h"
@@ -30,7 +31,7 @@ namespace Household_Components
 			{
 				
 			}
-			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(typename TargetType, is_pointer)))
+			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(TargetType, is_pointer)))
 			{	
 				//===============================================================================================================
 				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS

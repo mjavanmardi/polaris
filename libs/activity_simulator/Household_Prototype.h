@@ -11,15 +11,15 @@ namespace Concepts
 {
 	concept struct Is_Household
 	{
-		check_template_method_name(Has_Initialize_Defined,template Initialize);
-		check_template_method_name(Has_Properties_Defined,template Properties);
-		check_template_method_name(Has_Planner_Defined,template Planning_Faculty);
+		check_accessor_name(Has_Initialize_Defined,Initialize);
+		check_accessor_name(Has_Properties_Defined,Properties);
+		check_accessor_name(Has_Planner_Defined,Planning_Faculty);
 		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
 	};
 
 	concept struct Has_Initialize
 	{
-		check_template_method_name(Has_Initialize_Defined,template Initialize);
+		check_accessor_name(Has_Initialize_Defined,Initialize);
 		define_default_check(Has_Initialize_Defined);
 	};
 

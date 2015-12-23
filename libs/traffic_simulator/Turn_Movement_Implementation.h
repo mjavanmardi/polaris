@@ -62,7 +62,7 @@ namespace Turn_Movement_Components
 			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
 			
 			template<typename TargetType>
-			void forward_link_turn_travel_time(TargetType set_value)
+			void forward_link_turn_travel_time(TargetType set_value,void* = nullptr)
 			{
 				_forward_link_turn_travel_time = (float)set_value;
 				//TODO:ROUTING_OPERATION

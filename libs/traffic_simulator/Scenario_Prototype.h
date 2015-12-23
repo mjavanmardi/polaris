@@ -744,7 +744,7 @@ namespace Scenario_Components
 				odb::transaction t(db->begin());
 				t.commit();
 				shared_ptr<odb::database> db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (output_results_database_name<string>());				
-				result_db_ptr<shared_ptr<odb::database>>(db_ptr);
+				this->template result_db_ptr<shared_ptr<odb::database>>(db_ptr);
 
 				//----------------------
 				// demand database

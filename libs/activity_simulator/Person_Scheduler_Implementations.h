@@ -68,7 +68,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 			
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
@@ -90,7 +90,7 @@ namespace Person_Components
 			}
 			template<typename ActivityType> void Update_Current_Activity(ActivityType current_act)
 			{
-				this->_Current_Activity->Copy<ActivityType>(current_act);
+				this->_Current_Activity->template Copy<ActivityType>(current_act);
 			}
 
 			// scheduling features - move to Person_Scheduler eventually
@@ -138,7 +138,7 @@ namespace Person_Components
 				{
 					return (ReturnType)_Current_Activity;
 				}
-				else if (this->_Current_Activity->Start_Time<Time_Seconds>() > previous->Start_Time<Time_Seconds>())
+				else if (this->_Current_Activity->template Start_Time<Time_Seconds>() > previous->template Start_Time<Time_Seconds>())
 				{
 					return (ReturnType)_Current_Activity;
 				}
@@ -339,7 +339,7 @@ namespace Person_Components
 				Movement_Plan* next_move = nullptr;
 				if (next_act != nullptr)
 				{
-					if (next_act->Route_Is_Planned<bool>())	next_move = next_act->template movement_plan<Movement_Plan*>();
+					if (next_act->template Route_Is_Planned<bool>())	next_move = next_act->template movement_plan<Movement_Plan*>();
 				}
 
 				Time_Seconds ttime_prev;
@@ -402,21 +402,21 @@ namespace Person_Components
 				// and ends ttime+min_duration before the end of the original act
 				if (prev_act != nullptr)
 				{
-					if (prev_act->Duration<Time_Hours>() > 2.0 && prev_act->Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->Start_Time<Time_Seconds>() && prev_act->End_Time<Time_Seconds>() >= act->End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
+					if (prev_act->template Duration<Time_Hours>() > 2.0 && prev_act->template Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->template Start_Time<Time_Seconds>() && prev_act->template End_Time<Time_Seconds>() >= act->template End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
 						//Allocate new activity for the split half and copy from the other half
-						Activity_Components::Prototypes::Activity_Planner<MasterType::activity_plan_type>* new_act = (Activity_Components::Prototypes::Activity_Planner<MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
-						new_act->Copy<Activity_Plan*>(prev_act);
-						new_act->Activity_Plan_ID<int>(prev_act->Activity_Plan_ID<int>() + 1000);
-						new_act->Start_Time<Time_Seconds>(act->End_Time<Time_Seconds>()+ttime_prev);
-						new_act->End_Time<Time_Seconds>(prev_act->End_Time<Time_Seconds>(), false);
-						Revision &route = new_act->Route_Planning_Time<Revision&>();
+						auto new_act = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
+						new_act->template Copy<Activity_Plan*>(prev_act);
+						new_act->template Activity_Plan_ID<int>(prev_act->template Activity_Plan_ID<int>() + 1000);
+						new_act->template Start_Time<Time_Seconds>(act->template End_Time<Time_Seconds>()+ttime_prev);
+						new_act->template End_Time<Time_Seconds>(prev_act->template End_Time<Time_Seconds>(), false);
+						Revision &route = new_act->template Route_Planning_Time<Revision&>();
 						route._iteration = iteration() + 1;
 						route._sub_iteration = 0;
-						new_act->Schedule_Activity_Events<NT>();
+						new_act->template Schedule_Activity_Events<NT>();
 					
 						//modify the preceding portion of the split activity
-						prev_act->End_Time<Time_Seconds>(act->Start_Time<Time_Seconds>() - ttime_prev,false);
+						prev_act->template End_Time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev,false);
 
 						//update movement plans
 						if (update_movement_plans) move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev);
@@ -433,7 +433,7 @@ namespace Person_Components
 					if (update_movement_plans) 
 					{
 						// No need to resolve conflicts for return home activities, these are scheduled on-the-fly and should always fit
-						if (act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+						if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 						{
 							At_Home_Activity_Plan* at_home_act = (At_Home_Activity_Plan*)act;
 							act->template Start_Time<Time_Seconds>(at_home_act->template Fixed_Departure<Time_Seconds>()+ttime_prev);
@@ -445,7 +445,7 @@ namespace Person_Components
 						// update the following movement plan to account for new travel time
 						if (next_act != nullptr && next_move != nullptr) 
 						{
-							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->destination<_Activity_Location_Interface*>());
+							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->template destination<_Activity_Location_Interface*>());
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
@@ -460,7 +460,7 @@ namespace Person_Components
 					if (update_movement_plans)
 					{
 						// No need to resolve conflicts for return home activities, these are scheduled on-the-fly and should always fit
-						if (act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+						if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 						{
 							At_Home_Activity_Plan* at_home_act = (At_Home_Activity_Plan*)act;
 							act->template Start_Time<Time_Seconds>(at_home_act->template Fixed_Departure<Time_Seconds>()+ttime_prev);
@@ -474,7 +474,7 @@ namespace Person_Components
 						{
 							//TODO: verify this code-> changed because origin links were not updating properly
 							//next_move->template origin<_Activity_Location_Interface*>(loc);
-							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->destination<_Activity_Location_Interface*>());
+							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->template destination<_Activity_Location_Interface*>());
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
@@ -491,7 +491,7 @@ namespace Person_Components
 					
 						if (next_move != nullptr)
 						{
-							next_move->template Update_Locations<_Activity_Location_Interface*>(prev_loc, next_move->destination<_Activity_Location_Interface*>());
+							next_move->template Update_Locations<_Activity_Location_Interface*>(prev_loc, next_move->template destination<_Activity_Location_Interface*>());
 							//next_move->template origin<_Activity_Location_Interface*>(prev_loc);
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
@@ -578,15 +578,15 @@ namespace Person_Components
 					this->template Remove_Activity_Plan<Activity_Plan*>(act);
 
 					// if the failed movement addition represents a return home activity, advance the departure time of the following activity so no gaps left in schedule
-					if (act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+					if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
-						Activity_Plan* next_act = this->next_activity_plan<Activity_Plan*,Activity_Plan*>(act);
+						Activity_Plan* next_act = this->template next_activity_plan<Activity_Plan*,Activity_Plan*>(act);
 						if (next_act == nullptr) return;
 
-						Movement_Plan* next_move = next_act->movement_plan<Movement_Plan*>();
-						if (next_move == nullptr || !next_act->Route_Is_Planned<bool>()) return;
+						Movement_Plan* next_move = next_act->template movement_plan<Movement_Plan*>();
+						if (next_move == nullptr || !next_act->template Route_Is_Planned<bool>()) return;
 
-						next_move->departed_time<Simulation_Timestep_Increment>(move->departed_time<Simulation_Timestep_Increment>());
+						next_move->template departed_time<Simulation_Timestep_Increment>(move->template departed_time<Simulation_Timestep_Increment>());
 					}
 					return;
 				}
@@ -684,19 +684,19 @@ namespace Person_Components
 			{
 
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
-				Movement_Plan* move = act->movement_plan<Movement_Plan*>();
+				Movement_Plan* move = act->template movement_plan<Movement_Plan*>();
 				
 				// if movement plan is not null check for refreence mismatch, then remove from schedule
 				if (move != nullptr)
 				{
-					if (act != move->destination_activity_reference<Activity_Plan*>() ) THROW_EXCEPTION("ERROR: mismatch between movement and activity references when deleting activity plan.");
+					if (act != move->template destination_activity_reference<Activity_Plan*>() ) THROW_EXCEPTION("ERROR: mismatch between movement and activity references when deleting activity plan.");
 					Remove_Movement_Plan(move);
 				}
 
 				// Then remove activity - calls activity free function, which deletes the memory for movement plan
 				Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
 				
-				for (Activity_Plans::iterator itr = activities->begin(); itr != activities->end(); ++itr)
+				for (auto itr = activities->begin(); itr != activities->end(); ++itr)
 				{
 					if (*itr == act)
 					{
@@ -705,7 +705,7 @@ namespace Person_Components
 					}
 				}
 				// Free the activity using interface
-				act->Free_Activity<NT>();
+				act->template Free_Activity<NT>();
 			}
 			//template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			//{
@@ -764,12 +764,12 @@ namespace Person_Components
 				Activity_Plan* next_next = nullptr;
 
 				// if the following activity is still within the current activity, get the next following activity
-				if (next->End_Time<Time_Seconds>() < current->End_Time<Time_Seconds>())
+				if (next->template End_Time<Time_Seconds>() < current->template End_Time<Time_Seconds>())
 				{
 					next_next = next_activity_plan<Activity_Plan*,Activity_Plan*>(next);
 
 					// if two activities are wholly overlapped by current activity, return false - can not resolve this conflict
-					if (next_next->End_Time<Time_Seconds>() < current->End_Time<Time_Seconds>()) return false;
+					if (next_next->template End_Time<Time_Seconds>() < current->template End_Time<Time_Seconds>()) return false;
 				}
 
 				// Determine if a conflict exists with any of the three surrounding activities
@@ -786,29 +786,29 @@ namespace Person_Components
 
 				// start defining the conflict
 				Implementations::Activity_Conflict<MT> conflict;				
-				conflict.conflicting_activity<Activity_Plan*>(conflicting);
-				conflict.original_activity<Activity_Plan*>(original);
+				conflict.template conflicting_activity<Activity_Plan*>(conflicting);
+				conflict.template original_activity<Activity_Plan*>(original);
 				
 				// determine the conflict type and overlap percentage
-				if (original->Start_Time<Time_Seconds>() <= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() >= conflicting->End_Time<Time_Seconds>())
+				if (original->template Start_Time<Time_Seconds>() <= conflicting->template Start_Time<Time_Seconds>() && original->template End_Time<Time_Seconds>() >= conflicting->template End_Time<Time_Seconds>())
 				{
 					conflict.conflict_type = Types::CONFLICT_TYPES::INSERT;
-					conflict.percent_overlap = conflicting->Duration<Time_Seconds>() / original->Duration<Time_Seconds>();
+					conflict.percent_overlap = conflicting->template Duration<Time_Seconds>() / original->template Duration<Time_Seconds>();
 				}
-				else if (original->Start_Time<Time_Seconds>() >= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() <= conflicting->End_Time<Time_Seconds>())
+				else if (original->template Start_Time<Time_Seconds>() >= conflicting->template Start_Time<Time_Seconds>() && original->template End_Time<Time_Seconds>() <= conflicting->template End_Time<Time_Seconds>())
 				{
 					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_ALL;
 					conflict.percent_overlap = 1.0;
 				}
-				else if (original->Start_Time<Time_Seconds>() >= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() >= conflicting->End_Time<Time_Seconds>())
+				else if (original->template Start_Time<Time_Seconds>() >= conflicting->template Start_Time<Time_Seconds>() && original->template End_Time<Time_Seconds>() >= conflicting->template End_Time<Time_Seconds>())
 				{
 					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_START;
-					conflict.percent_overlap = (conflicting->End_Time<Time_Seconds>() - original->Start_Time<Time_Seconds>) / original->Duration<Time_Seconds>();
+					conflict.percent_overlap = (conflicting->template End_Time<Time_Seconds>() - original->template Start_Time<Time_Seconds>()) / original->template Duration<Time_Seconds>();
 				}
-				else if (original->Start_Time<Time_Seconds>() <= conflicting->Start_Time<Time_Seconds>() && original->End_Time<Time_Seconds>() <= conflicting->End_Time<Time_Seconds>())
+				else if (original->template Start_Time<Time_Seconds>() <= conflicting->template Start_Time<Time_Seconds>() && original->template End_Time<Time_Seconds>() <= conflicting->template End_Time<Time_Seconds>())
 				{
 					conflict.conflict_type = Types::CONFLICT_TYPES::OVERLAP_END;
-					conflict.percent_overlap = (original->End_Time<Time_Seconds>() - conflicting->Start_Time<Time_Seconds>) / original->Duration<Time_Seconds>();
+					conflict.percent_overlap = (original->template End_Time<Time_Seconds>() - conflicting->template Start_Time<Time_Seconds>()) / original->template Duration<Time_Seconds>();
 				}
 				else
 				{

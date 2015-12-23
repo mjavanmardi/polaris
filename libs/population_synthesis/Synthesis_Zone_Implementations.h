@@ -78,6 +78,8 @@ namespace PopSyn
 		// this class holds data members and methods which are common to both the zone and the region - and is inherited by the region class
 		implementation struct _Polaris_Synthesis_Zone_Implementation : public _Synthesis_Zone_Base_Implementation<MasterType>
 		{
+			typedef _Synthesis_Zone_Base_Implementation<MasterType> base_type;
+
 			//------------------------------------------------------------------------------------------
 			// Type definitions which are checked by various concepts
 			typedef true_type Has_Marginal_Distribution;
@@ -106,7 +108,7 @@ namespace PopSyn
 			template<typename ContainerType> void Initialize(ContainerType dims_hh, ContainerType dims_per, int dims_hh_test, int dims_per_test)
 			{
 				// Call base initializer
-				_Synthesis_Zone_Base_Implementation<MasterType>::Initialize<NT>();
+				_Synthesis_Zone_Base_Implementation<MasterType>::template Initialize<NT>();
 
 				// Create the dimension vectors for the hh and person distributions from linker
 				typename Target_Joint_Distribution_type::index_type dimensions_hh;
@@ -114,11 +116,11 @@ namespace PopSyn
 				typename Target_Joint_Distribution_type::index_type dimensions_hh_test;
 				typename Target_Person_Joint_Distribution_type::index_type dimensions_per_test;
 
-				for (typename strip_modifiers(ContainerType)::iterator i = dims_hh.begin(); i != dims_hh.end(); ++i) 
+				for (strip_modifiers(ContainerType)::iterator i = dims_hh.begin(); i != dims_hh.end(); ++i)
 				{
 					dimensions_hh.push_back(*i);
 				}
-				for (typename strip_modifiers(ContainerType)::iterator i = dims_per.begin(); i != dims_per.end(); ++i) 
+				for (strip_modifiers(ContainerType)::iterator i = dims_per.begin(); i != dims_per.end(); ++i)
 				{
 					dimensions_per.push_back(*i);
 				}
@@ -144,12 +146,12 @@ namespace PopSyn
 			// Create the marginal distribution for the zone and update the marginal distribution for the region from the current input file line from 'fr'
 			template<typename TargetType> void Add_Marginal_Data(File_IO::File_Reader& fr, TargetType linker)
 			{
-				typedef get_mapped_component_type(Sample_Data_type) sample_type;
+				typedef get_mapped_component_type(base_type::Sample_Data_type) sample_type;
 				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Multidimensional_Random_Access_Array<Target_Marginal_Distribution_type> marginal_itf;
 				marginal_itf* regional_marg, *regional_person_marg;
-				if (_parent_reference != nullptr) regional_marg = _parent_reference->Target_Marginal_Distribution<marginal_itf*>();
-				if (_parent_reference != nullptr) regional_person_marg = _parent_reference->Target_Person_Marginal_Distribution<marginal_itf*>();
+				if (base_type::_parent_reference != nullptr) regional_marg = base_type::_parent_reference->template Target_Marginal_Distribution<marginal_itf*>();
+				if (base_type::_parent_reference != nullptr) regional_person_marg = base_type::_parent_reference->template Target_Person_Marginal_Distribution<marginal_itf*>();
 
 				double x;
 
@@ -166,7 +168,7 @@ namespace PopSyn
 						// set the marginal distribution value for i,j
 						_Target_Marginal_Distribution[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
 						// Add to the region marginal distribution
-						if (_parent_reference != nullptr) (*regional_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
+						if (base_type::_parent_reference != nullptr) (*regional_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
 					}
 
 				}
@@ -179,7 +181,7 @@ namespace PopSyn
 					{
 						if (!fr.Get_Data<double>(x,linker->get_sf3_column(i,j,false))) break;
 						_Target_Person_Marginal_Distribution[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
-						if (_parent_reference != nullptr) (*regional_person_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
+						if (base_type::_parent_reference != nullptr) (*regional_person_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
 					}
 
 				}
@@ -216,11 +218,11 @@ namespace PopSyn
 			template<typename AnalysisUnitType> void Fit_Joint_Distribution_To_Marginal_Data()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
+				_Scenario_Interface* scenario = this->template scenario_reference<_Scenario_Interface*>();
 
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
-				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(typename base_type::Solver_Settings)> solution_settings_itf;
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
@@ -287,10 +289,10 @@ namespace PopSyn
 			template<typename AnalysisUnitType> void Integerize_Joint_Distribution()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
+				_Scenario_Interface* scenario = this->template scenario_reference<_Scenario_Interface*>();
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
-				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(typename base_type::Solver_Settings)> solution_settings_itf;
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
@@ -353,12 +355,12 @@ namespace PopSyn
 				// Interface typedefs
 				typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(Sample_Data))>  pop_unit_itf;
+				typedef Pair_Associative_Container< type_of(typename base_type::Sample_Data)> sample_itf;
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type( type_of(base_type::Sample_Data))>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
-				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
+				typedef Prototypes::Solver_Settings<type_of(typename base_type::Solver_Settings)> solution_settings_itf;
 				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
@@ -371,7 +373,7 @@ namespace PopSyn
 				//----------------------------------------------------------------------------------
 				//get the cumulative weight of all items matching the current index by iterating over them
 				double cumulative_weight = 0;
-				for (std::vector<SampleType>::iterator itr = sample.begin(); itr != sample.end(); ++itr)
+				for (auto itr = sample.begin(); itr != sample.end(); ++itr)
 				{
 					pop_unit_itf* hh = (pop_unit_itf*)(*itr);
 					// Household weight
@@ -382,8 +384,8 @@ namespace PopSyn
 					int w_count = 0;
 					if (mway_per.size()>0)
 					{
-						person_sample_itf* persons = hh->Persons_Container<person_sample_itf*>();
-						for (person_sample_itf::iterator per_itr = persons->begin(); per_itr != persons->end(); per_itr++) w_sum += mway_per[(*per_itr)->Index<int>()]/num_persons_remaining;
+						person_sample_itf* persons = hh->template Persons_Container<person_sample_itf*>();
+						for (auto per_itr = persons->begin(); per_itr != persons->end(); per_itr++) w_sum += mway_per[(*per_itr)->template Index<int>()]/num_persons_remaining;
 						w_count++;
 					}
 					// factor the weight by the average person suitability in the household
@@ -418,44 +420,50 @@ namespace PopSyn
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Zone_Implementation_Simple),Data_Object>::Component_Type ComponentType;		
+			typedef _Polaris_Synthesis_Zone_Implementation<MasterType> BaseType;
 
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same)))
 			{
 				typedef Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
 
-				linker_itf* linker = this->file_linker_reference<linker_itf*>();
+				linker_itf* linker = this->template file_linker_reference<linker_itf*>();
 
 				// Track the updates to the household distributions
-				_Synthesized_Joint_Distribution[unit->Index<int>()]+=count;
-				Synthesized_Joint_Distribution_type::index_type index = _Synthesized_Joint_Distribution.get_index(unit->Index<int>());
+				this->_Synthesized_Joint_Distribution[unit->template Index<int>()]+=count;
+				auto index = this->_Synthesized_Joint_Distribution.get_index(unit->template Index<int>());
 				for (int i=0; i< index.size(); i++)
 				{
-					_Synthesized_Marginal_Distribution(i,index[i])+=count;	
+					this->_Synthesized_Marginal_Distribution(i,index[i])+=count;
 				}
 
 				// update the test distribution if applicable
-				if (unit->Test_Index<int>() > 0) _Synthesized_Test_Marginal_Distribution(0,unit->Test_Index<int>())+=count;			
+				if (unit->template Test_Index<int>() > 0) this->_Synthesized_Test_Marginal_Distribution(0,unit->template Test_Index<int>())+=count;
 			}
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same)))
 			{
 				// Track the updates to the person distributions
-				if (_Synthesized_Person_Joint_Distribution.size()>0)
+				if (this->_Synthesized_Person_Joint_Distribution.size()>0)
 				{
-					_Synthesized_Person_Joint_Distribution[unit->Index<int>()]+=count;
-					Synthesized_Person_Joint_Distribution_type::index_type index = _Synthesized_Person_Joint_Distribution.get_index(unit->Index<int>());
+					this->_Synthesized_Person_Joint_Distribution[unit->template Index<int>()]+=count;
+					auto index = this->_Synthesized_Person_Joint_Distribution.get_index(unit->template Index<int>());
 					for (int i=0; i< index.size(); i++)
 					{
-						_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;	
+						this->_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;
 					}
 				}
-				if (unit->Test_Index<int>() >= 0) _Synthesized_Test_Person_Marginal_Distribution(0,unit->Test_Index<int>())+=count;	
+				if (unit->template Test_Index<int>() >= 0) this->_Synthesized_Test_Person_Marginal_Distribution(0,unit->template Test_Index<int>())+=count;
 			}
-			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(type_of(strip_modifiers(InterfaceType)),typename MasterType::household_static_properties_type,is_same)))
+			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(strip_modifiers(InterfaceType),typename MasterType::household_static_properties_type,is_same)))
 			{
 				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same,"The object type is not the same as defined in MasterType::person_static_properties_type.");
 				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same,"The object type is not the same as defined in MasterType::household_static_properties_type.");
-				
+
 			}
+
+			using_member(BaseType,Sample_Data);
+			using_member(BaseType,Target_Joint_Distribution);
+			using_member(BaseType,Target_Marginal_Distribution);
+			using_member(BaseType,Solver_Settings);
 
 			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr)
 			{
@@ -468,28 +476,28 @@ namespace PopSyn
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_data_itf;
 				typedef Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
-				typedef type_of(Target_Joint_Distribution)::value_type value_type;
+				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> mway_itf;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef typename marg_itf::index_type marg_index;
 
-				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();
 
 				// Get references to the distributions and scale them down by the synthesis percentage
-				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
-				mway.scale(settings.template Percentage_to_synthesize<double>());		
-				mway_itf& mway_per = this->Target_Person_Joint_Distribution<mway_itf&>();
+				mway_itf& mway = this->template Target_Joint_Distribution<mway_itf&>();
+				mway.scale(settings.template Percentage_to_synthesize<double>());
+				mway_itf& mway_per = this->template Target_Person_Joint_Distribution<mway_itf&>();
 				mway_per.scale(settings.template Percentage_to_synthesize<double>());
 
 				// Get references to the distributions used to store the generated results
-				mway_itf& hh_mway_temp = this->Synthesized_Joint_Distribution<mway_itf&>();
-				mway_itf& per_mway_temp = this->Synthesized_Person_Joint_Distribution<mway_itf&>();
-				marg_itf& hh_marg_temp = this->Synthesized_Marginal_Distribution<marg_itf&>();
-				marg_itf& per_marg_temp = this->Synthesized_Person_Marginal_Distribution<marg_itf&>();
+				mway_itf& hh_mway_temp = this->template Synthesized_Joint_Distribution<mway_itf&>();
+				mway_itf& per_mway_temp = this->template Synthesized_Person_Joint_Distribution<mway_itf&>();
+				marg_itf& hh_marg_temp = this->template Synthesized_Marginal_Distribution<marg_itf&>();
+				marg_itf& per_marg_temp = this->template Synthesized_Person_Marginal_Distribution<marg_itf&>();
 
-				// Get pointers to the regional and zonal household samples		
+				// Get pointers to the regional and zonal household samples
 				sample_itf* sample = (sample_itf*)Region_Sample_Ptr;
-				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
+				sample_itf* zone_sample = this->template Sample_Data<sample_itf*>();
 
 				std::vector<double> sample_weights;
 				std::vector<pop_unit_itf*> sample_units;
@@ -513,12 +521,12 @@ namespace PopSyn
 					typename sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
 					double num_persons_remaining = mway_per.sum();
-					
+
 
 					//----------------------------------------------------------------------------------
 					//get the cumulative weight of all items matching the current index by iterating over them
 					double cumulative_weight = 0;
-					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);			
+					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);
 					while (range.first != range.second)
 					{
 						sample_units.push_back(range.first->second);
@@ -528,11 +536,11 @@ namespace PopSyn
 
 					//-------------------------------------------------------------------------------------------------------------------------------
 					// loop over all sample units which link to the current cell(index) and make num_required attempts to add each one
-					std::vector<pop_unit_itf*>::reverse_iterator s_itr = sample_units.rbegin();
+					auto s_itr = sample_units.rbegin();
 					for (; s_itr != sample_units.rend(); ++s_itr)
 					{
 						// Update the remaining weights and cumulative weight after removal of previous household
-						cumulative_weight = Get_Weights_For_Sample<pop_unit_itf*>(remaining_sample_units,sample_weights,num_persons_remaining);
+						cumulative_weight = this->template Get_Weights_For_Sample<pop_unit_itf*>(remaining_sample_units,sample_weights,num_persons_remaining);
 
 						stored_pop_unit = (pop_unit_itf*)(*s_itr);
 						double w = sample_weights.back();
@@ -546,7 +554,7 @@ namespace PopSyn
 						{
 							// add probabilistically, if rand is less than probability of seeing this household out of all similar households (w/sum(w))
 							if (GLOBALS::Uniform_RNG.Next_Rand<double>() < p)
-							{					
+							{
 								// create the actual person agent from the census static properties and add to the zones created person agent boost::container::list
 								this->Add_Household_and_Persons<pop_unit_itf*>(stored_pop_unit,num_persons_remaining);
 								num_required--;
@@ -580,7 +588,7 @@ namespace PopSyn
 					// if at the end of the map, break so that increment does not go past end of data_structure, otherwise step over all items in sample that had the same index and go to next index
 					itr = range.second;
 					if (itr == sample->end()) break;
-				}	
+				}
 			}
 
 			template<typename TargetType> void Add_Household_and_Persons(TargetType stored_pop_unit, double& persons_remaining)
@@ -595,27 +603,27 @@ namespace PopSyn
 				this_itf* pthis = (this_itf*)this;
 
 				// create the actual household agent
-				pthis->Create_Household<TargetType>(stored_pop_unit);
+				pthis->template Create_Household<TargetType>(stored_pop_unit);
 
 				// Track the updates to the household distributions
-				pthis->Add_To_Synthetic_Distributions<TargetType>(stored_pop_unit);	
+				pthis->template Add_To_Synthetic_Distributions<TargetType>(stored_pop_unit);
 
-				mway_itf& mway_per = this->Target_Person_Joint_Distribution<mway_itf&>();
+				mway_itf& mway_per = this->template Target_Person_Joint_Distribution<mway_itf&>();
 
-				person_sample_itf* persons = stored_pop_unit->Persons_Container<person_sample_itf*>();
-				for (person_sample_itf::iterator per_itr = persons->begin(); per_itr != persons->end(); per_itr++)
+				person_sample_itf* persons = stored_pop_unit->template Persons_Container<person_sample_itf*>();
+				for (auto per_itr = persons->begin(); per_itr != persons->end(); per_itr++)
 				{
 					// update joint distribution
 					person_unit_itf* per = (person_unit_itf*)(*per_itr);
-					if (mway_per.size()>0) mway_per[per->Index<int>()]-=1;
+					if (mway_per.size()>0) mway_per[per->template Index<int>()]-=1;
 
 					// Track the updates to the person distributions
-					pthis->Add_To_Synthetic_Distributions<person_unit_itf*>(per);
+					pthis->template Add_To_Synthetic_Distributions<person_unit_itf*>(per);
 
 					persons_remaining--;
 				}
 
-			}		
+			}
 
 			// Method for writing the distribution results to the marginal and joint results files
 			template<typename TargetType> void Write_Distribution_Results(ofstream& marg_out, ofstream& sample_out)
@@ -633,10 +641,10 @@ namespace PopSyn
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution),value_type> joint_itf;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marginal_itf;
 
-				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
+				_Scenario_Interface* scenario = this->template scenario_reference<_Scenario_Interface*>();
 
 				// write the full population results
-				if (scenario->write_full_output<bool>())
+				if (scenario->template write_full_output<bool>())
 				{
 					sample_out <<endl<<endl<<"ZONE_ID: "<<this->template ID<long long int>();
 					this->template Target_Joint_Distribution<joint_itf*>()->write(sample_out);
@@ -652,7 +660,7 @@ namespace PopSyn
 				}
 
 				// write the marginal results
-				if (scenario->write_marginal_output<bool>())
+				if (scenario->template write_marginal_output<bool>())
 				{
 					marginal_itf& marg_hh =		this->template Target_Marginal_Distribution<marginal_itf&>();
 					marginal_itf& marg_per =	this->template Target_Person_Marginal_Distribution<marginal_itf&>();
@@ -721,7 +729,7 @@ namespace PopSyn
 					marg_out <<"\t\t"<<sum_err/sum_tot<<endl;
 				}
 			}
-			
+
 			template<typename TargetType> double Calculate_Fit_Statistics()
 			{
 
@@ -753,6 +761,7 @@ namespace PopSyn
 		// this class holds data members and methods which are common to both the zone and the region - and is inherited by the region class
 		implementation struct _Popgen_Synthesis_Zone_Implementation : public _Synthesis_Zone_Base_Implementation<MasterType>
 		{
+			typedef _Synthesis_Zone_Base_Implementation<MasterType> base_type;
 			typedef MasterType Master_Type;
 			//------------------------------------------------------------------------------------------
 			// Type definitions which are checked by various concepts
@@ -842,15 +851,15 @@ namespace PopSyn
 			template<typename AnalysisUnitType> void Fit_Joint_Distribution_To_Marginal_Data()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = this->scenario_reference<_Scenario_Interface*>();
+				_Scenario_Interface* scenario = this->template scenario_reference<_Scenario_Interface*>();
 				// Get the solution settings
-				typedef PopSyn::Prototypes::Solver_Settings<type_of(Solver_Settings)> solution_settings_itf;
-				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+				typedef PopSyn::Prototypes::Solver_Settings<type_of(typename base_type::Solver_Settings)> solution_settings_itf;
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
-				typedef typename type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array<type_of(Target_Joint_Distribution)> mway_itf;
-				typedef Multidimensional_Random_Access_Array<type_of(Target_Marginal_Distribution)> marg_itf;
+				typedef typename type_of(base_type::Target_Joint_Distribution)::value_type value_type;
+				typedef Multidimensional_Random_Access_Array<typename type_of(base_type::Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array<typename type_of(base_type::Target_Marginal_Distribution)> marg_itf;
 
 				typename mway_itf::iterator itr;
 				typename marg_itf::iterator marg_itr;
@@ -858,13 +867,13 @@ namespace PopSyn
 
 
 				// get the proper distribution based on Analysis Unit type (i.e. household or person)
-				mway_itf* mway = this->Get_Joint_Distribution<AnalysisUnitType,mway_itf*>();
+				mway_itf* mway = this->template Get_Joint_Distribution<AnalysisUnitType,mway_itf*>();
 		
 				typename mway_itf::const_index_type dimensions = mway->dimensions();
 				typename mway_itf::size_type num_dim = (typename mway_itf::size_type)(dimensions.size());
 
 				// get the marginals
-				marg_itf* marg = this->Get_Marginal_Distribution<AnalysisUnitType,marg_itf*>();	
+				marg_itf* marg = this->template Get_Marginal_Distribution<AnalysisUnitType,marg_itf*>();
 
 				// Main Execution loop - loop over each dimension, and each index within each dimensions and fit to the marginal
 				value_type max_error = (value_type)INT_MAX;
@@ -913,7 +922,8 @@ namespace PopSyn
 		implementation struct Popgen_Synthesis_Zone_Implementation_Simple : public Polaris_Component< MasterType,INHERIT(Popgen_Synthesis_Zone_Implementation_Simple), Data_Object>, _Popgen_Synthesis_Zone_Implementation<MasterType>
 		{
 			// Tag as implementation
-			typedef typename Polaris_Component<MasterType,INHERIT(Popgen_Synthesis_Zone_Implementation_Simple),Data_Object>::Component_Type ComponentType;		
+			typedef typename Polaris_Component<MasterType,INHERIT(Popgen_Synthesis_Zone_Implementation_Simple),Data_Object>::Component_Type ComponentType;
+			typedef _Popgen_Synthesis_Zone_Implementation<MasterType> BaseType;
 
 			// Add a new household to the synthesized distribution
 			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same)))
@@ -923,7 +933,7 @@ namespace PopSyn
 				//Synthesized_Joint_Distribution_type::index_type index = _Synthesized_Joint_Distribution.get_index(unit->Index<int>());
 				//for (int i=0; i< index.size(); i++)
 				//{
-				//	_Synthesized_Marginal_Distribution(i,index[i])+=count;	
+				//	_Synthesized_Marginal_Distribution(i,index[i])+=count;
 				//}
 			}
 			// Add a new person to the synthesized distribution
@@ -934,16 +944,20 @@ namespace PopSyn
 				//Synthesized_Person_Joint_Distribution_type::index_type index = _Synthesized_Person_Joint_Distribution.get_index(unit->Index<int>());
 				//for (int i=0; i< index.size(); i++)
 				//{
-				//	_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;	
+				//	_Synthesized_Person_Marginal_Distribution(i,index[i])+=count;
 				//}
 			}
 			// error handler for incorrect type
-			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(type_of(strip_modifiers(InterfaceType)),typename MasterType::household_static_properties_type,is_same)))
+			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(strip_modifiers(InterfaceType),typename MasterType::household_static_properties_type,is_same)))
 			{
 				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same,"The object type is not the same as defined in MasterType::person_static_properties_type.");
-				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same,"The object type is not the same as defined in MasterType::household_static_properties_type.");		
+				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same,"The object type is not the same as defined in MasterType::household_static_properties_type.");
 			}
 
+			using_member(BaseType,Sample_Data);
+			using_member(BaseType,Target_Joint_Distribution);
+			using_member(BaseType,Target_Marginal_Distribution);
+			using_member(BaseType,Solver_Settings);
 
 			// Do the household selection from the fitted distribution here if necessary
 			// This function creates the household and person records which are pushed to output
@@ -963,11 +977,11 @@ namespace PopSyn
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Marginal_Distribution),value_type> marg_itf;
 				typedef typename marg_itf::index_type marg_index;
 
-				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();
 
 				//// Get references to the distributions and scale them down by the synthesis percentage
 				//mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
-				//mway.scale(settings.template Percentage_to_synthesize<double>());		
+				//mway.scale(settings.template Percentage_to_synthesize<double>());
 				//mway_itf& mway_per = this->Target_Person_Joint_Distribution<mway_itf&>();
 				//mway_per.scale(settings.template Percentage_to_synthesize<double>());
 
@@ -977,7 +991,7 @@ namespace PopSyn
 				//marg_itf& hh_marg_temp = this->Synthesized_Marginal_Distribution<marg_itf&>();
 				//marg_itf& per_marg_temp = this->Synthesized_Person_Marginal_Distribution<marg_itf&>();
 
-				//// Get pointers to the regional and zonal household samples		
+				//// Get pointers to the regional and zonal household samples
 				//sample_itf* sample = (sample_itf*)Region_Sample_Ptr;
 				//sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
 
@@ -1003,12 +1017,12 @@ namespace PopSyn
 				//	typename sample_itf::key_type index = itr->first;
 				//	double num_required = mway[index];
 				//	double num_persons_remaining = mway_per.sum();
-				//	
+				//
 
 				//	//----------------------------------------------------------------------------------
 				//	//get the cumulative weight of all items matching the current index by iterating over them
 				//	double cumulative_weight = 0;
-				//	pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);			
+				//	pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);
 				//	while (range.first != range.second)
 				//	{
 				//		sample_units.push_back(range.first->second);
@@ -1036,7 +1050,7 @@ namespace PopSyn
 				//		{
 				//			// add probabilistically, if rand is less than probability of seeing this household out of all similar households (w/sum(w))
 				//			if (GLOBALS::Uniform_RNG.Next_Rand<double>() < p)
-				//			{					
+				//			{
 				//				// create the actual person agent from the census static properties and add to the zones created person agent boost::container::list
 				//				this->Add_Household_and_Persons<pop_unit_itf*>(stored_pop_unit,num_persons_remaining);
 				//				num_required--;
@@ -1070,14 +1084,13 @@ namespace PopSyn
 				//	// if at the end of the map, break so that increment does not go past end of data_structure, otherwise step over all items in sample that had the same index and go to next index
 				//	itr = range.second;
 				//	if (itr == sample->end()) break;
-				//}	
+				//}
 			}
 
-			
+
 			// Static versions of the agent containers - these hold the objects created in the Select_Synthetic_Population_Units function
 			m_container(std::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*>, Synthetic_Households_Container, NONE, NONE);
 			m_container(std::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Synthetic_Persons_Container, NONE, NONE);
-
 		};
 	}
 }

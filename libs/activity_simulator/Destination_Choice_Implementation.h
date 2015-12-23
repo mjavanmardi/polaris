@@ -90,8 +90,8 @@ namespace Person_Components
 			virtual double Calculate_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				person_properties_itf* properties = _Parent_Person->Properties<person_properties_itf*>();
-				person_static_properties_itf* static_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
+				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
+				person_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<person_static_properties_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -104,7 +104,7 @@ namespace Person_Components
 				double utility_sum = 0;
 				double prob_sum = 0;
 				_Zone_Interface* zone;
-				Time_Minutes start_time = this->start_time<Time_Minutes>();
+				Time_Minutes start_time = this->template start_time<Time_Minutes>();
 
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
@@ -117,49 +117,49 @@ namespace Person_Components
 				
 				//=====================================
 				// ACCOUNT FOR VOTT changes
-				float VOTT_change = properties->Value_of_Travel_Time_Adjustment<float>();
+				float VOTT_change = properties->template Value_of_Travel_Time_Adjustment<float>();
 
 				//=====================================
 				// Discounted deflected travel time 
 				ttime_deflected = (ttime_before + ttime_after - ttime_without)*VOTT_change;
 				
 				// Get Income/race dif with zone
-				float inc_diff = log(abs(zone->average_household_income<Dollars>() - static_properties->Income<Dollars>()) + 1.0);
+				float inc_diff = log(abs(zone->template average_household_income<Dollars>() - static_properties->template Income<Dollars>()) + 1.0);
 				float race_diff;
-				if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
-				else if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
-				else race_diff = zone->race_percent_white<float>() + zone->race_percent_black<float>();
+				if (static_properties->template Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->template race_percent_white<float>();
+				else if (static_properties->template Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->template race_percent_black<float>();
+				else race_diff = zone->template race_percent_white<float>() + zone->template race_percent_black<float>();
 					
-				float area_res = zone->residential_area<Square_Feet>()/1000000.0;
-				float area_rec = zone->other_area<Square_Feet>()/1000000.0;
-				float area_ret = zone->retail_area<Square_Feet>()/1000000.0;
-				float area_ent = zone->entertainment_area<Square_Feet>()/1000000.0;
-				float area_ins = zone->institutional_area<Square_Feet>()/1000000.0;
-				float area_off = zone->office_area<Square_Feet>()/1000000.0;
-				float area_mix = zone->mixed_use_area<Square_Feet>()/1000000.0;
-				float area_sch = zone->school_area<Square_Feet>()/1000000.0;
-				float emp_oth = zone->employment_other<double>()/1000.0;
-				float emp_ind = zone->employment_industrial<double>()/1000.0;
-				float emp_man = zone->employment_manufacturing<double>()/1000.0;
-				float emp_gov = zone->employment_government<double>()/1000.0;
-				float emp_srv = zone->employment_services<double>()/1000.0;
-				float emp_ret = zone->employment_retail<double>()/1000.0;
+				float area_res = zone->template residential_area<Square_Feet>()/1000000.0;
+				float area_rec = zone->template other_area<Square_Feet>()/1000000.0;
+				float area_ret = zone->template retail_area<Square_Feet>()/1000000.0;
+				float area_ent = zone->template entertainment_area<Square_Feet>()/1000000.0;
+				float area_ins = zone->template institutional_area<Square_Feet>()/1000000.0;
+				float area_off = zone->template office_area<Square_Feet>()/1000000.0;
+				float area_mix = zone->template mixed_use_area<Square_Feet>()/1000000.0;
+				float area_sch = zone->template school_area<Square_Feet>()/1000000.0;
+				float emp_oth = zone->template employment_other<double>()/1000.0;
+				float emp_ind = zone->template employment_industrial<double>()/1000.0;
+				float emp_man = zone->template employment_manufacturing<double>()/1000.0;
+				float emp_gov = zone->template employment_government<double>()/1000.0;
+				float emp_srv = zone->template employment_services<double>()/1000.0;
+				float emp_ret = zone->template employment_retail<double>()/1000.0;
 
-				float thetag = zone->accessibility_employment_government<double>()/1000.0;
-				float thetam = zone->accessibility_employment_manufacturing<double>()/1000.0;
-				float thetar = zone->accessibility_employment_retail<double>()/1000.0;
-				float thetas = zone->accessibility_employment_services<double>()/1000.0;
-				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
-				float thetao = zone->accessibility_employment_other<double>()/1000.0;
+				float thetag = zone->template accessibility_employment_government<double>()/1000.0;
+				float thetam = zone->template accessibility_employment_manufacturing<double>()/1000.0;
+				float thetar = zone->template accessibility_employment_retail<double>()/1000.0;
+				float thetas = zone->template accessibility_employment_services<double>()/1000.0;
+				float thetai = zone->template accessibility_employment_industrial<double>()/1000.0;
+				float thetao = zone->template accessibility_employment_other<double>()/1000.0;
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
-					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
+					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->template Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
 					// Mode specific effects
 					int ModAuto = 0, ModTran = 0,ModOth = 0;
-					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
+					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
 					if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_AUTOMOBILE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_MOTORCYCLE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_TAXI)
 						ModAuto = 1;
 					else if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_BUS || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_RAILROAD || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_STREETCAR || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_SUBWAY)
@@ -169,7 +169,7 @@ namespace Person_Components
 
 					// positive impact of working near home
 					float HOME = 0.0; 
-					if (zone == _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
+					if (zone == _Parent_Person->template Home_Location<_Zone_Interface*>()) HOME = 1.0;
 
 					// industry type interaction variables
 					float IndR = 0, IndS = 0, IndG = 0, IndI = 0, IndM = 0, IndO = 0;
@@ -180,22 +180,22 @@ namespace Person_Components
 					if (industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE::MANUFACTURING) IndM = 1.0;
 					if (industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE::OTHER) IndO = 1.0;
 
-					float area_res = log(zone->residential_area<Square_Feet>()+1.0);
-					float area_rec = log(zone->other_area<Square_Feet>()+1.0);
-					float area_ret = log(zone->retail_area<Square_Feet>()+1.0);
-					float area_ent = log(zone->entertainment_area<Square_Feet>()+1.0);
-					float area_ins = log(zone->institutional_area<Square_Feet>()+1.0);
-					float area_off = log(zone->office_area<Square_Feet>()+1.0);
-					float area_mix = log(zone->mixed_use_area<Square_Feet>()+1.0);
-					float area_sch = log(zone->school_area<Square_Feet>()+1.0);
+					float area_res = log(zone->template residential_area<Square_Feet>()+1.0);
+					float area_rec = log(zone->template other_area<Square_Feet>()+1.0);
+					float area_ret = log(zone->template retail_area<Square_Feet>()+1.0);
+					float area_ent = log(zone->template entertainment_area<Square_Feet>()+1.0);
+					float area_ins = log(zone->template institutional_area<Square_Feet>()+1.0);
+					float area_off = log(zone->template office_area<Square_Feet>()+1.0);
+					float area_mix = log(zone->template mixed_use_area<Square_Feet>()+1.0);
+					float area_sch = log(zone->template school_area<Square_Feet>()+1.0);
 
 					// Unrelated employment
-					EMPUR += (max<float>(zone->employment_retail<float>(), 0.0) / 1000.0) * (-1.0 * (IndR - 1.0));
-					EMPUR += (max<float>(zone->employment_government<float>(), 0.0) / 1000.0) * (-1.0 * (IndG - 1.0));
-					EMPUR += (max<float>(zone->employment_services<float>(), 0.0) / 1000.0) * (-1.0 * (IndS - 1.0));
-					EMPUR += (max<float>(zone->employment_industrial<float>(), 0.0) / 1000.0) * (-1.0 * (IndI - 1.0));
-					EMPUR += (max<float>(zone->employment_manufacturing<float>(), 0.0) / 1000.0) * (-1.0 * (IndM - 1.0));
-					EMPUR += (max<float>(zone->employment_other<float>(), 0.0) / 1000.0) * (-1.0 * (IndO - 1.0));
+					EMPUR += (max<float>(zone->template employment_retail<float>(), 0.0) / 1000.0) * (-1.0 * (IndR - 1.0));
+					EMPUR += (max<float>(zone->template employment_government<float>(), 0.0) / 1000.0) * (-1.0 * (IndG - 1.0));
+					EMPUR += (max<float>(zone->template employment_services<float>(), 0.0) / 1000.0) * (-1.0 * (IndS - 1.0));
+					EMPUR += (max<float>(zone->template employment_industrial<float>(), 0.0) / 1000.0) * (-1.0 * (IndI - 1.0));
+					EMPUR += (max<float>(zone->template employment_manufacturing<float>(), 0.0) / 1000.0) * (-1.0 * (IndM - 1.0));
+					EMPUR += (max<float>(zone->template employment_other<float>(), 0.0) / 1000.0) * (-1.0 * (IndO - 1.0));
 
 					float theta_ur = thetar * (1.0 - IndR) + thetag * (1.0 - IndG) + thetas * (1.0 - IndS) + thetai * (1.0 - IndI) + thetam * (1.0 - IndM) + thetao * (1.0 - IndO);
 
@@ -203,8 +203,8 @@ namespace Person_Components
 					//ttime_deflected = ttime_deflected *0.5;
 
 					// Old values - with time strata at (45A/60T/20W)
-					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
-					if (zone->employment_total<int>() < 1.0) u = -9999999;
+					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
+					if (zone->template employment_total<int>() < 1.0) u = -9999999;
 					if (ISNAN(u))
 					{
 						THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
@@ -269,7 +269,7 @@ namespace Person_Components
 			virtual void Print_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				person_static_properties_itf* static_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
+				person_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<person_static_properties_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -294,42 +294,42 @@ namespace Person_Components
 				ttime_deflected = ttime_before + ttime_after - ttime_without;
 				
 				// Get Income/race dif with zone
-				float inc_diff = log(abs(zone->average_household_income<Dollars>() - static_properties->Income<Dollars>()) + 1.0);
+				float inc_diff = log(abs(zone->template average_household_income<Dollars>() - static_properties->template Income<Dollars>()) + 1.0);
 				float race_diff;
-				if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
-				else if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
-				else race_diff = zone->race_percent_white<float>() + zone->race_percent_black<float>();
+				if (static_properties->template Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->template race_percent_white<float>();
+				else if (static_properties->template Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->template race_percent_black<float>();
+				else race_diff = zone->template race_percent_white<float>() + zone->template race_percent_black<float>();
 					
-				float area_res = zone->residential_area<Square_Feet>()/1000000.0;
-				float area_rec = zone->other_area<Square_Feet>()/1000000.0;
-				float area_ret = zone->retail_area<Square_Feet>()/1000000.0;
-				float area_ent = zone->entertainment_area<Square_Feet>()/1000000.0;
-				float area_ins = zone->institutional_area<Square_Feet>()/1000000.0;
-				float area_off = zone->office_area<Square_Feet>()/1000000.0;
-				float area_mix = zone->mixed_use_area<Square_Feet>()/1000000.0;
-				float area_sch = zone->school_area<Square_Feet>()/1000000.0;
-				float emp_oth = zone->employment_other<double>()/1000.0;
-				float emp_ind = zone->employment_industrial<double>()/1000.0;
-				float emp_man = zone->employment_manufacturing<double>()/1000.0;
-				float emp_gov = zone->employment_government<double>()/1000.0;
-				float emp_srv = zone->employment_services<double>()/1000.0;
-				float emp_ret = zone->employment_retail<double>()/1000.0;
+				float area_res = zone->template residential_area<Square_Feet>()/1000000.0;
+				float area_rec = zone->template other_area<Square_Feet>()/1000000.0;
+				float area_ret = zone->template retail_area<Square_Feet>()/1000000.0;
+				float area_ent = zone->template entertainment_area<Square_Feet>()/1000000.0;
+				float area_ins = zone->template institutional_area<Square_Feet>()/1000000.0;
+				float area_off = zone->template office_area<Square_Feet>()/1000000.0;
+				float area_mix = zone->template mixed_use_area<Square_Feet>()/1000000.0;
+				float area_sch = zone->template school_area<Square_Feet>()/1000000.0;
+				float emp_oth = zone->template employment_other<double>()/1000.0;
+				float emp_ind = zone->template employment_industrial<double>()/1000.0;
+				float emp_man = zone->template employment_manufacturing<double>()/1000.0;
+				float emp_gov = zone->template employment_government<double>()/1000.0;
+				float emp_srv = zone->template employment_services<double>()/1000.0;
+				float emp_ret = zone->template employment_retail<double>()/1000.0;
 
-				float thetag = zone->accessibility_employment_government<double>()/1000.0;
-				float thetam = zone->accessibility_employment_manufacturing<double>()/1000.0;
-				float thetar = zone->accessibility_employment_retail<double>()/1000.0;
-				float thetas = zone->accessibility_employment_services<double>()/1000.0;
-				float thetai = zone->accessibility_employment_industrial<double>()/1000.0;
-				float thetao = zone->accessibility_employment_other<double>()/1000.0;
+				float thetag = zone->template accessibility_employment_government<double>()/1000.0;
+				float thetam = zone->template accessibility_employment_manufacturing<double>()/1000.0;
+				float thetar = zone->template accessibility_employment_retail<double>()/1000.0;
+				float thetas = zone->template accessibility_employment_services<double>()/1000.0;
+				float thetai = zone->template accessibility_employment_industrial<double>()/1000.0;
+				float thetao = zone->template accessibility_employment_other<double>()/1000.0;
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
-					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
+					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->template Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
 					// Mode specific effects
 					int ModAuto = 0, ModTran = 0,ModOth = 0;
-					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
+					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
 					if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_AUTOMOBILE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_MOTORCYCLE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_TAXI)
 						ModAuto = 1;
 					else if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_BUS || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_RAILROAD || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_STREETCAR || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_SUBWAY)
@@ -339,7 +339,7 @@ namespace Person_Components
 
 					// positive impact of working near home
 					float HOME = 0.0; 
-					if (zone == _Parent_Person->Home_Location<_Zone_Interface*>()) HOME = 1.0;
+					if (zone == _Parent_Person->template Home_Location<_Zone_Interface*>()) HOME = 1.0;
 
 					// industry type interaction variables
 					float IndR = 0, IndS = 0, IndG = 0, IndI = 0, IndM = 0, IndO = 0;
@@ -350,22 +350,22 @@ namespace Person_Components
 					if (industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE::MANUFACTURING) IndM = 1.0;
 					if (industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE::OTHER) IndO = 1.0;
 
-					float area_res = log(zone->residential_area<Square_Feet>()+1.0);
-					float area_rec = log(zone->other_area<Square_Feet>()+1.0);
-					float area_ret = log(zone->retail_area<Square_Feet>()+1.0);
-					float area_ent = log(zone->entertainment_area<Square_Feet>()+1.0);
-					float area_ins = log(zone->institutional_area<Square_Feet>()+1.0);
-					float area_off = log(zone->office_area<Square_Feet>()+1.0);
-					float area_mix = log(zone->mixed_use_area<Square_Feet>()+1.0);
-					float area_sch = log(zone->school_area<Square_Feet>()+1.0);
+					float area_res = log(zone->template residential_area<Square_Feet>()+1.0);
+					float area_rec = log(zone->template other_area<Square_Feet>()+1.0);
+					float area_ret = log(zone->template retail_area<Square_Feet>()+1.0);
+					float area_ent = log(zone->template entertainment_area<Square_Feet>()+1.0);
+					float area_ins = log(zone->template institutional_area<Square_Feet>()+1.0);
+					float area_off = log(zone->template office_area<Square_Feet>()+1.0);
+					float area_mix = log(zone->template mixed_use_area<Square_Feet>()+1.0);
+					float area_sch = log(zone->template school_area<Square_Feet>()+1.0);
 
 					// Unrelated employment
-					EMPUR += (max<float>(zone->employment_retail<float>(), 0.0) / 1000.0) * (-1.0 * (IndR - 1.0));
-					EMPUR += (max<float>(zone->employment_government<float>(), 0.0) / 1000.0) * (-1.0 * (IndG - 1.0));
-					EMPUR += (max<float>(zone->employment_services<float>(), 0.0) / 1000.0) * (-1.0 * (IndS - 1.0));
-					EMPUR += (max<float>(zone->employment_industrial<float>(), 0.0) / 1000.0) * (-1.0 * (IndI - 1.0));
-					EMPUR += (max<float>(zone->employment_manufacturing<float>(), 0.0) / 1000.0) * (-1.0 * (IndM - 1.0));
-					EMPUR += (max<float>(zone->employment_other<float>(), 0.0) / 1000.0) * (-1.0 * (IndO - 1.0));
+					EMPUR += (max<float>(zone->template employment_retail<float>(), 0.0) / 1000.0) * (-1.0 * (IndR - 1.0));
+					EMPUR += (max<float>(zone->template employment_government<float>(), 0.0) / 1000.0) * (-1.0 * (IndG - 1.0));
+					EMPUR += (max<float>(zone->template employment_services<float>(), 0.0) / 1000.0) * (-1.0 * (IndS - 1.0));
+					EMPUR += (max<float>(zone->template employment_industrial<float>(), 0.0) / 1000.0) * (-1.0 * (IndI - 1.0));
+					EMPUR += (max<float>(zone->template employment_manufacturing<float>(), 0.0) / 1000.0) * (-1.0 * (IndM - 1.0));
+					EMPUR += (max<float>(zone->template employment_other<float>(), 0.0) / 1000.0) * (-1.0 * (IndO - 1.0));
 
 					float theta_ur = thetar * (1.0 - IndR) + thetag * (1.0 - IndG) + thetas * (1.0 - IndS) + thetai * (1.0 - IndI) + thetam * (1.0 - IndM) + thetao * (1.0 - IndO);
 
@@ -373,8 +373,8 @@ namespace Person_Components
 					ttime_deflected = ttime_deflected *0.5;
 
 					// Old values - with time strata at (45A/60T/20W)
-					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
-					if (zone->employment_total<int>() < 1.0) u = -9999999;
+					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
+					if (zone->template employment_total<int>() < 1.0) u = -9999999;
 					if (ISNAN(u))
 					{
 						THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
@@ -430,7 +430,7 @@ namespace Person_Components
 					u = -999999.0;
 				}
 				
-				cout << "Utility for zone " << zone->uuid<int>() << " = " << u <<" from origin zone " <<_previous->zone<_Zone_Interface*>()->uuid<int>()<< ": ";
+				cout << "Utility for zone " << zone->template uuid<int>() << " = " << u <<" from origin zone " <<_previous->template zone<_Zone_Interface*>()->template uuid<int>()<< ": ";
 				cout << ", ttime_deflected="<<ttime_deflected;
 				cout << ", inc_diff ="<<inc_diff ;
 				cout << ", race_diff ="<<race_diff ;
@@ -765,7 +765,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 	
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container),int> _Zone_Ids_Interface;
 
@@ -1024,7 +1024,7 @@ namespace Person_Components
 				//----------------------------------------------------------------------------------------
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
 				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
@@ -1037,50 +1037,50 @@ namespace Person_Components
 
 				_Activity_Location_Interface* prev_loc, *next_loc;
 				bool restrict_choice_set = true;
-				if (this->_Current_Activity->Start_Is_Planned<bool>())
+				if (this->_Current_Activity->template Start_Is_Planned<bool>())
 				{
-					start_time = _Current_Activity->Start_Time<Time_Minutes>();
+					start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 
-					prev_act = (Current_Activity_type)(scheduler->previous_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
-					next_act = (Current_Activity_type)(scheduler->next_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
+					prev_act = (Current_Activity_type)(scheduler->template previous_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
+					next_act = (Current_Activity_type)(scheduler->template next_activity_plan<Time_Seconds,Current_Activity_type>(GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,Simulation_Timestep_Increment>(start_time)));
 
 					// check previous act, if it is not known or if its location is not know, do not restrict current choice set
 					if (prev_act == nullptr)
 					{
-						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if (prev_act->Location_Is_Planned<bool>())
+					else if (prev_act->template Location_Is_Planned<bool>())
 					{
-						prev_loc = prev_act->Location<_Activity_Location_Interface*>();
-						min_start = prev_act->End_Time<Time_Minutes>();
+						prev_loc = prev_act->template Location<_Activity_Location_Interface*>();
+						min_start = prev_act->template End_Time<Time_Minutes>();
 					}
 					else
 					{
-						prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						min_start = prev_act->End_Time<Time_Minutes>();				
+						prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+						min_start = prev_act->template End_Time<Time_Minutes>();
 					}
 					// check next act, if it is not known or if its location is not know, do not restrict current choice set
 					if (next_act == nullptr)
 					{
-						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+						next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if(next_act->Location_Is_Planned<bool>())
+					else if(next_act->template Location_Is_Planned<bool>())
 					{
-						next_loc = next_act->Location<_Activity_Location_Interface*>();
-						max_end = next_act->Start_Time<Time_Minutes>();
+						next_loc = next_act->template Location<_Activity_Location_Interface*>();
+						max_end = next_act->template Start_Time<Time_Minutes>();
 					}
 					else
 					{
-						next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-						max_end = next_act->Start_Time<Time_Minutes>();
+						next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+						max_end = next_act->template Start_Time<Time_Minutes>();
 					}
 
 					// Use half the available time to stratify the zone choices
 					if (restrict_choice_set)
 					{
-						avail_time = max_end - min_start - _Current_Activity->Duration<Time_Minutes>();
+						avail_time = max_end - min_start - _Current_Activity->template Duration<Time_Minutes>();
 						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;
 					}
 				}
@@ -1089,43 +1089,43 @@ namespace Person_Components
 					start_time = 540.0; // default start time to 9AM if not planned, for ttime purposes
 					prev_act = nullptr;
 					next_act = nullptr;
-					prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-					next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+					prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+					next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 					restrict_choice_set = false;
 				}
 				// double check that prev/next locations are set properly, if not assume start/end of tour at home
-				if (prev_loc == nullptr) prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-				if (next_loc == nullptr) next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				if (prev_loc == nullptr) prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				if (next_loc == nullptr) next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				//----------------------------------------------------------------------
 				// Get the mode of the activity, if not yet planned, assume 9AM
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
-				if (_Current_Activity->Mode_Is_Planned<NT>()) mode = _Current_Activity->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
-				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
 
 				//----------------------------------------------------------------------
 				// Get the stratified availability sets
 				std::vector<_Zone_Interface*> zones_near;
-				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);			
+				LOS->template Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);
 				std::vector<_Zone_Interface*> zones_far;
-				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, avail_time, mode, false);
+				LOS->template Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, avail_time, mode, false);
 				std::vector<std::vector<_Zone_Interface*>> available_zones; //0=near-high, 1=near-low, 2=far-high, 3=far-low
 
 				for (int i=0; i<_num_strata; ++i) available_zones.push_back(std::vector<_Zone_Interface*>());
 
-				std::vector<_Zone_Interface*>::iterator z_itr;
+				typename std::vector<_Zone_Interface*>::iterator z_itr;
 				for (z_itr = zones_near.begin(); z_itr != zones_near.end(); ++z_itr)
 				{
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
-					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
+					if (zone->template employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
 					else available_zones[1].push_back(zone);
 				}
 				for (z_itr = zones_far.begin(); z_itr != zones_far.end(); ++z_itr)
 				{
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
-					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
+					if (zone->template employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
 					else available_zones[3].push_back(zone);
 				}				
 
@@ -1225,12 +1225,12 @@ namespace Person_Components
 				//----------------------------------------------------------------------
 				// Get person context and system knowledge
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
 				_Zone_Ids_Interface& zone_ids = network->template zone_ids_container<_Zone_Ids_Interface&>();
 				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
-				_Zones_Container_Interface::iterator zone_itr;
+				typename _Zones_Container_Interface::iterator zone_itr;
 
 				//----------------------------------------------------------------------
 				// Get preceding and following activities based on start time, otherwise assume plan a new tour startinga and ending at home
@@ -1240,15 +1240,15 @@ namespace Person_Components
 
 				prev_act = nullptr;
 				next_act = nullptr;
-				prev_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-				next_loc = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
+				prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				//----------------------------------------------------------------------
 				// Get the start time of the activity, if not yet planned, assume 9AM
 				Time_Minutes start_time = 9.0 * 60.0;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->Start_Is_Planned<NT>()) start_time = _Current_Activity->Start_Time<Time_Minutes>();
+					if (_Current_Activity->template Start_Is_Planned<NT>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 				//----------------------------------------------------------------------
@@ -1256,38 +1256,38 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->Mode_Is_Planned<NT>()) mode = _Current_Activity->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				}
 
 
 				//----------------------------------------------------------------------
 				// Get the stratified availability sets
 				std::vector<_Zone_Interface*> zones_near;
-				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);			
+				LOS->template Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_near, prev_loc, start_time, 0, TTIME_SPLIT, mode, true);
 				std::vector<_Zone_Interface*> zones_far;
-				LOS->Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, 1440, mode, false);
+				LOS->template Get_Locations_Within_Range<_Activity_Location_Interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, _Zone_Interface*>(zones_far, prev_loc, start_time, TTIME_SPLIT, 1440, mode, false);
 				std::vector<std::vector<_Zone_Interface*>> available_zones; //0=near-high, 1=near-low, 2=far-high, 3=far-low
 
 				for (int i=0; i<_num_strata; ++i) available_zones.push_back(std::vector<_Zone_Interface*>());
 
-				std::vector<_Zone_Interface*>::iterator z_itr;
+				typename std::vector<_Zone_Interface*>::iterator z_itr;
 				for (z_itr = zones_near.begin(); z_itr != zones_near.end(); ++z_itr)
 				{
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
-					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
+					if (zone->template employment_total<int>() > EMP_SPLIT) available_zones[0].push_back(zone);
 					else available_zones[1].push_back(zone);
 				}
 				for (z_itr = zones_far.begin(); z_itr != zones_far.end(); ++z_itr)
 				{
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
-					if (zone->employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
+					if (zone->template employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
 					else available_zones[3].push_back(zone);
 				}
 
 
 				//----------------------------------------------------------------------
 				// First, always add the home zone (i.e. work at home or nearby or attend school near home) as an option
-				_Zone_Interface* home_zone = _Parent_Person->Home_Location<_Zone_Interface*>();
+				_Zone_Interface* home_zone = _Parent_Person->template Home_Location<_Zone_Interface*>();
 				Create_New_Choice_Option(choice_set,choice_model,home_zone,act_type,prev_loc,next_loc);
 
 
@@ -1325,7 +1325,7 @@ namespace Person_Components
 			void Create_New_Choice_Option(boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
 			{
 				// ignore zone if all employment slots have already been assigned to other agents
-				if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) return;
+				if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->template employment_simulated<int>() >= zone->template employment_total<int>()) return;
 
 				// Get random location within that zone
 				_Activity_Location_Interface* loc;
@@ -1333,15 +1333,15 @@ namespace Person_Components
 				// try to add a random suitable location, if failed then ignore zone
 				if(act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
-					loc = zone->Get_Random_Work_Location<_Activity_Location_Interface*>();
+					loc = zone->template Get_Random_Work_Location<_Activity_Location_Interface*>();
 				}
 				else if (act_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
-					loc = zone->Get_Random_School_Location<_Activity_Location_Interface*>();
+					loc = zone->template Get_Random_School_Location<_Activity_Location_Interface*>();
 				}
 				else
 				{
-					loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
+					loc = zone->template Get_Random_Location<_Activity_Location_Interface*>();
 				}
 
 				if (loc == nullptr) return;
@@ -1350,7 +1350,7 @@ namespace Person_Components
 				Time_Minutes start_time = 540.0;
 				if (_Current_Activity != nullptr)
 				{
-					if (_Current_Activity->Start_Is_Planned<bool>()) start_time = _Current_Activity->Start_Time<Time_Minutes>();
+					if (_Current_Activity->template Start_Is_Planned<bool>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 

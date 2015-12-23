@@ -33,14 +33,15 @@ namespace polaris
 	#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 	#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
-	#define assert_check(TYPE_TO_TEST,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+	#define assert_check(TYPE_TO_TEST,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<TYPE_TO_TEST>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 	#define assert_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(strip_modifiers(TYPE_TO_TEST_1), strip_modifiers(TYPE_TO_TEST_2))>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
 	#define delay_compilation(A_TEMPLATE_ARGUMENT) True_Concept<A_TEMPLATE_ARGUMENT>::value
 
 	//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
 	
-	#define requires(TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
+	//#define requires(TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
+	#define requires(T,...) typename enable_if<__VA_ARGS__ && True_Concept<T>::value>::type* = nullptr
 	#define template_requires(...) typename enable_if<__VA_ARGS__>
 
 	#define method_requires(...) char(*)[__VA_ARGS__]=NULL
@@ -328,32 +329,71 @@ namespace polaris
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
 	///----------------------------------------------------------------------------------------------------
-	/// check_template_method_name - given name must be a method template member -- **********NOT COMPATIBLE WITH MSVC2013
+	/// check_accessor_name - given name must be a method template member -- **********NOT COMPATIBLE WITH MSVC2013
 	///----------------------------------------------------------------------------------------------------
 
-	#define check_template_method_name(CHECK_ALIAS,NAME)\
+	//decltype((NT (_V::Component_Type::*)(void*))&_V::Component_Type::template turn_movements_container<NT>)
+	// ((NT (_V::*)())&_V::NAME<NT>)
+	#define check_accessor_name(CHECK_ALIAS,NAME)\
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename _U>\
-		struct function_check\
-		{\
-			template<typename _V> static small_type has_matching_named_member(void (_V::* arg)() = &_V::NAME<NULLTYPE>);\
-			template<typename _V> static large_type has_matching_named_member(...);\
-			\
-			template<typename _V,bool _P>\
-			struct form_check{ static const bool value = false; };\
-			\
-			template<typename _V>\
-			struct form_check<_V,true>{ static const int value = true;};\
-			\
-			static const bool performcheck = (sizeof(has_matching_named_member<_U>(nullptr))==success);\
-			static const bool value = form_check<_U,performcheck>::value;\
-		};\
+		template<typename _V>\
+		constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((_V*)nullptr)->template NAME<NT*>()),NT*>::value>::type* = nullptr)\
+		{return 1;}\
 		\
-		static const bool value = function_check<TypeChecked>::value;\
+		template<typename _V>\
+		constexpr static bool has_matching_named_member(...)\
+		{return 0;}\
+		\
+		static const bool value = has_matching_named_member<TypeChecked>(0);\
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+	#define check_component_accessor_name(CHECK_ALIAS,NAME)\
+	template<typename TypeChecked>\
+	struct CHECK_ALIAS##_procedure\
+	{\
+		template<typename _V>\
+		constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((typename _V::Component_Type*)nullptr)->template NAME<NT*>()),NT*>::value>::type* = nullptr)\
+		{return 1;}\
+		\
+		template<typename _V>\
+		constexpr static bool has_matching_named_member(...)\
+		{return 0;}\
+		\
+		static const bool value = has_matching_named_member<TypeChecked>(0);\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+//	template<typename _V>\
+//		constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::NAME<NT*>)>::value>::type* = nullptr)\
+//		{return 1;}\
+//		\
+
+//	#define check_accessor_name(CHECK_ALIAS,NAME)\
+//	template<typename TypeChecked>\
+//	struct CHECK_ALIAS##_procedure\
+//	{\
+//		template<typename _U>\
+//		struct function_check\
+//		{\
+//			template<typename _V> static small_type has_matching_named_member(void (_V::* arg)() = &_V::NAME<NULLTYPE>);\
+//			template<typename _V> static large_type has_matching_named_member(...);\
+//			\
+//			template<typename _V,bool _P>\
+//			struct form_check{ static const bool value = false; };\
+//			\
+//			template<typename _V>\
+//			struct form_check<_V,true>{ static const int value = true;};\
+//			\
+//			static const bool performcheck = (sizeof(has_matching_named_member<_U>(nullptr))==success);\
+//			static const bool value = form_check<_U,performcheck>::value;\
+//		};\
+//		\
+//		static const bool value = function_check<TypeChecked>::value;\
+//	};\
+//	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
 	///----------------------------------------------------------------------------------------------------
 	/// check_template_method_type - given name must be a method template member and match signature

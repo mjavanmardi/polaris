@@ -217,7 +217,7 @@ namespace Network_Skimming_Components
 
 				// get reference to the routers used to create path-trees from each origin
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(path_trees_container)> path_trees_itf;
-				typedef Routing_Components::Prototypes::Routing<get_component_type(path_trees_itf)> path_tree_itf;
+				typedef Routing_Components::Prototypes::Routing<get_mapped_component_type(path_trees_itf)> path_tree_itf;
 				
 				path_trees_itf* trees_container = skim->template path_trees_container<path_trees_itf*>();
 				typename path_trees_itf::iterator tree_itr = trees_container->begin();	
@@ -745,7 +745,7 @@ namespace Network_Skimming_Components
 
 				// tree builder interface
 				typedef Pair_Associative_Container< type_of(path_trees_container)> tree_builder_list_itf;
-				typedef Routing_Components::Prototypes::Routing<get_component_type(tree_builder_list_itf)> tree_builder_itf;
+				typedef Routing_Components::Prototypes::Routing<get_mapped_component_type(tree_builder_list_itf)> tree_builder_itf;
 				tree_builder_list_itf* tree_list = this->path_trees_container<tree_builder_list_itf*>();
 
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();	
