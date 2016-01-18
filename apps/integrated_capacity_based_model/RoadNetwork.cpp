@@ -31,10 +31,10 @@ RoadNetwork::RoadNetwork()
 	//ja0
 	vector<pair<int,TurningMovementType>> tm_0_0_0;
 	tm_0_0_0.push_back(pair<int,TurningMovementType>(3,Left));
-	IndividualQueue iq00(10., tm_0_0_0);
+	IndividualQueue iq00(10., 90., tm_0_0_0);
 	vector<pair<int,TurningMovementType>> tm_0_1_0;
 	tm_0_1_0.push_back(pair<int,TurningMovementType>(5,Thru));
-	IndividualQueue iq01(10., tm_0_1_0);
+	IndividualQueue iq01(10., 90., tm_0_1_0);
 	vector<vector<IndividualQueue>> iq;
 	vector<IndividualQueue> temp;
 	temp.push_back(iq00);
@@ -47,7 +47,7 @@ RoadNetwork::RoadNetwork()
 	//ja1
 	vector<pair<int,TurningMovementType>> tm_1_0_0;
 	tm_1_0_0.push_back(pair<int,TurningMovementType>(-1,Thru));
-	IndividualQueue iq10(10.,tm_1_0_0);
+	IndividualQueue iq10(10., 90.,tm_1_0_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq10);
@@ -55,15 +55,22 @@ RoadNetwork::RoadNetwork()
 	JunctionArea* ja1 = new JunctionArea(iq);
 
 	//ja2
-	vector<pair<int,TurningMovementType>> tm_2_0_0;
-	tm_2_0_0.push_back(pair<int,TurningMovementType>(5,Left));
-	IndividualQueue iq20(30, tm_2_0_0);
+	vector<pair<int,TurningMovementType>> tm_2_0_0a;
+	tm_2_0_0a.push_back(pair<int,TurningMovementType>(5,Left));
+	IndividualQueue iq20a(30, 70., tm_2_0_0a);
+
+	vector<pair<int,TurningMovementType>> tm_2_0_0b;
+	tm_2_0_0b.push_back(pair<int,TurningMovementType>(5,Left));
+	tm_2_0_0b.push_back(pair<int,TurningMovementType>(1,Right));
+	IndividualQueue iq20b(30, 40., tm_2_0_0b);
+
 	vector<pair<int,TurningMovementType>> tm_2_1_0;
 	tm_2_1_0.push_back(pair<int,TurningMovementType>(1,Right));
-	IndividualQueue iq21(30, tm_2_1_0);
+	IndividualQueue iq21(30, 70., tm_2_1_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
-	temp.push_back(iq20);
+	temp.push_back(iq20b);
+	temp.push_back(iq20a);
 	iq.push_back(temp);
 	temp.erase(temp.begin());
 	temp.push_back(iq21);
@@ -73,7 +80,7 @@ RoadNetwork::RoadNetwork()
 	//ja3
 	vector<pair<int,TurningMovementType>> tm_3_0_0;
 	tm_3_0_0.push_back(pair<int,TurningMovementType>(-1,Thru));
-	IndividualQueue iq30(10., tm_3_0_0);
+	IndividualQueue iq30(10., 90., tm_3_0_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq30);
@@ -83,11 +90,11 @@ RoadNetwork::RoadNetwork()
 	//ja4
 	vector<pair<int,TurningMovementType>> tm_4_0_0;
 	tm_4_0_0.push_back(pair<int,TurningMovementType>(1,Thru));
-	IndividualQueue iq40(10., tm_4_0_0);
+	IndividualQueue iq40(10., 90., tm_4_0_0);
 	vector<pair<int,TurningMovementType>> tm_4_1_0;
 	tm_4_1_0.push_back(pair<int,TurningMovementType>(1,Thru));
 	tm_4_1_0.push_back(pair<int,TurningMovementType>(3,Right));
-	IndividualQueue iq41(10., tm_4_1_0);
+	IndividualQueue iq41(10., 90., tm_4_1_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq40);
@@ -100,7 +107,7 @@ RoadNetwork::RoadNetwork()
 	//ja5
 	vector<pair<int,TurningMovementType>> tm_5_0_0;
 	tm_5_0_0.push_back(pair<int,TurningMovementType>(-1,Thru));
-	IndividualQueue iq50(10., tm_5_0_0);
+	IndividualQueue iq50(10., 90., tm_5_0_0);
 	iq = vector<vector<IndividualQueue>>();
 	temp = vector<IndividualQueue>();
 	temp.push_back(iq50);

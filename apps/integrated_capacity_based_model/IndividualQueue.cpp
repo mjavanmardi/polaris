@@ -4,10 +4,10 @@ using namespace std;
 
 typedef vector<pair<int,TurningMovementType> >::const_iterator TurnMovIt ;
 
-IndividualQueue::IndividualQueue(double _length, std::vector<std::pair<int,TurningMovementType> > _turningMovements, 
+IndividualQueue::IndividualQueue(double _length, double _positionInRoad, std::vector<std::pair<int,TurningMovementType> > _turningMovements, 
 		double width, double baseSaturationFlowRate, double approachGrade, 
 		double parkingFactor, double busFactor):
-length(_length), turningMovements(_turningMovements), firstCarDistanceToNextRoad(0)
+length(_length), positionInRoad(_positionInRoad), turningMovements(_turningMovements), firstCarDistanceToNextRoad(0)
 {
 	//### Computing the capacities ###
 
@@ -49,13 +49,18 @@ length(_length), turningMovements(_turningMovements), firstCarDistanceToNextRoad
 
 IndividualQueue IndividualQueue::operator=(const IndividualQueue& iq)
 {
-	IndividualQueue queue(iq.getLength(),iq.getTurningMovements());
+	IndividualQueue queue(iq.getLength(),iq.getPositionInRoad(),iq.getTurningMovements());
 	return queue;
 }
 
 double IndividualQueue::getLength() const
 {
 	return length;
+}
+
+double IndividualQueue::getPositionInRoad() const
+{
+	return positionInRoad;
 }
 
 vector<std::pair<int,TurningMovementType> > IndividualQueue::getTurningMovements() const
@@ -97,7 +102,7 @@ void IndividualQueue::insertCarInStuckSection(Car* car)
 {
 	stuckSection.push_back(car);
 	if(car->getDistanceToNextRoad() > firstCarDistanceToNextRoad)
-		firstCarDistanceToNextRoad = car->getDistanceToNextRoad();
+		firstCarDistanceToNextRoad = length + positionInRoad - stuckSection.back()->getDistanceInCurrentRoad();
 }
 
 //Check if road i is in the turning movements of the current individual queue
@@ -122,8 +127,8 @@ map<int,pair<double,double> > IndividualQueue::getStaticCapacities() const
 	return staticCapacities;
 }
 
-//Move the cars in a stuck section located in the last column of the junction area
-bool IndividualQueue::moveLastStuckCar(double dt)
+//Move the cars located in the last column of the junction area
+bool IndividualQueue::moveLastCars(double dt)
 {
 	bool hasMoved = false;
 	if(stuckSection.size() != 0)
@@ -163,6 +168,51 @@ bool IndividualQueue::moveLastStuckCar(double dt)
 		}
 		if(stuckSection.size() !=0)
 			firstCarDistanceToNextRoad = stuckSection.back()->getDistanceToNextRoad();
+	}
+	return hasMoved;
+}
+
+//Move the cars located in the columns before the last column of the junction area
+bool IndividualQueue::moveFirstCars(double dt)
+{
+	bool hasMoved = false;
+	if(stuckSection.size() != 0)
+	{
+		bool firstCarLeft = true;
+		double positionFirstVehicle = -1.;
+		while(firstCarLeft && stuckSection.size() != 0)
+		{
+			firstCarLeft = false;
+			Car* carMoving = *stuckSection.begin();
+			positionFirstVehicle = carMoving->getDistanceInCurrentRoad();
+			MoveResult result = carMoving->goToNextIndividualQueue(dt);
+			//Car tries to leave queue
+			if(result.getHasChangedState())
+			{
+				//We remove the Car
+				stuckSection.erase(stuckSection.begin());
+				if(stuckSection.size()==0)
+					firstCarDistanceToNextRoad = 0;
+			}
+			hasMoved = result.getHasMoved(); //We confirm that the car has actually moved
+		}
+		//Every car after the removed car are moving
+		list<Car*>::iterator it = stuckSection.begin();
+		list<Car*>::iterator nextIt = it;
+		if(it != stuckSection.end())
+			nextIt = next(it);
+		while(nextIt != stuckSection.end())
+		{
+			double frontDistanceAvailable = (*it)->getDistanceInCurrentRoad() - (*nextIt)->getDistanceInCurrentRoad();
+			double frontSpeed = (*it)->getSpeed();
+			bool hasCarMoved = (*nextIt)->moveQueuing(frontDistanceAvailable,frontSpeed,dt);
+			hasMoved = hasMoved || hasCarMoved;
+			it++;
+			if(it != stuckSection.end())
+			    nextIt++;
+		}
+		if(stuckSection.size() !=0)
+			firstCarDistanceToNextRoad = length + positionInRoad - stuckSection.back()->getDistanceInCurrentRoad();
 	}
 	return hasMoved;
 }

@@ -59,6 +59,10 @@ MoveResult Car::travelingAreaMove(double dt)
 			comQueue->addCar(this);
 			state = in_CommonQueue;
 			hasChangedState = true;
+			distanceInTA = 0;
+			distanceInTimeStep += speed*dt;
+			distanceInCurrentRoad += speed*dt;
+			distanceTraveled += speed*dt;
 			return MoveResult(hasMoved,hasChangedState);
 		}
 		else
@@ -95,12 +99,11 @@ MoveResult Car::travelingAreaMove(double dt)
 			return MoveResult(hasMoved,hasChangedState);
 		}
 	}
-	int& nextRoadNodeA = (*nextNodeIterator);
+	int& nextRoadNodeA	= (*nextNodeIterator);
 	int& nextRoadNodeB = (*itNodeB);
 	int nextRoadId = currentRoad->getNodesToRoad()->at(nextRoadNodeA).at(nextRoadNodeB)->getId(); //We get the Id of the next road
 	if(!hasReachedJunctionArea) //if the car has not reached its junction area
 	{
-		
 		pair<bool,double> freePath = juncArea->isPathFree(nextRoadId,-1,-1); //freePath.second is the distance of free flow available in the junction area
 		bool& isFreeFlowPathInJunctionArea = freePath.first;
 		if(isFreeFlowPathInJunctionArea) //If there is a way to go to the next road without queueing
@@ -138,6 +141,9 @@ MoveResult Car::travelingAreaMove(double dt)
 		currentIndivQueue = nextQueue;
 		distanceInTA = 0;
 		hasChangedState = true;
+		distanceInTimeStep += speed*dt;
+		distanceInCurrentRoad += speed*dt;
+		distanceTraveled += speed*dt;
 		return MoveResult(hasMoved,hasChangedState);
 	}
 	else
@@ -146,6 +152,9 @@ MoveResult Car::travelingAreaMove(double dt)
 		comQueue->addCar(this);
 		state = in_CommonQueue;
 		distanceInTA = 0;
+		distanceInTimeStep += speed*dt;
+		distanceInCurrentRoad += speed*dt;
+		distanceTraveled += speed*dt;
 		hasChangedState = true;
 		return MoveResult(hasMoved,hasChangedState);
 	}
@@ -201,6 +210,8 @@ double Car::dBraking(double dt, double acceleration)
 //Used only for the first layer of cars in the Common Queue
 MoveResult Car::travelingCommonQueue(double dt)
 {
+	if(id==98)
+		cout << "debug : " << endl;
 	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
 		return MoveResult(false,false);
 	bool hasMoved = false;
@@ -227,7 +238,8 @@ MoveResult Car::travelingCommonQueue(double dt)
 		bool isJunctionAreaReached = getDistanceToJunctionArea() <= 0;
 		if(isJunctionAreaReached) //If junction area is reached
 		{
-			bool isRoomLeftInJunctionArea = freeRoom >= getLength();
+			double dx = min(maxDistanceInCurrentTimeStep-distanceInTimeStep, (speed * dt)/currentRoad->getCQ()->getNumberOfLanes());
+			bool isRoomLeftInJunctionArea = freeRoom >= getLength() + dx;
 			if(isRoomLeftInJunctionArea) //If there is room for the car to enter the individual queue
 			{
 				hasChangedState = true;
@@ -235,10 +247,13 @@ MoveResult Car::travelingCommonQueue(double dt)
 				juncArea->insertCar(this,nextQueue); //We insert the car in the junction area
 				state = in_JunctionArea;
 				currentIndivQueue = nextQueue;
-				double dx = min(maxDistanceInCurrentTimeStep-distanceInTimeStep, getLength()/currentRoad->getCQ()->getNumberOfLanes());
 				distanceInCurrentRoad += dx;
 				distanceTraveled += dx;
 				distanceInTimeStep += dx;
+			}
+			else
+			{
+				speed = max(0.,speed - type.getMaxDec()*dt);
 			}
 		}
 		else
@@ -335,8 +350,43 @@ bool Car::lastCarProba(double remainingAllowedWeight, double lastCarWeight) cons
 
 	if(1000*remainingAllowedWeight > possible)
 		canCross = true;
-	//cout << "Can cross : " << canCross << endl;
 	return canCross;
+}
+
+//Try to go to the next queue
+//This function is called only when the car is in an individual queue which
+//is not in the last column
+MoveResult Car::goToNextIndividualQueue(double dt)
+{
+	if(distanceInTimeStep >= maxDistanceInCurrentTimeStep) //If the car can't move anymore
+		return MoveResult(false,false);
+	bool hasMoved = true;
+	bool hasChangedState = false;
+	JunctionArea* currentJA = currentRoad->getJA();
+	vector<int>::iterator nextNodeB = next(nextNodeIterator);
+	if (nextNodeB == path.end()) //If this is the car's last road
+	{
+		hasChangedState = true;
+		hasMoved = true;
+		state = in_OutOfNetwork;
+		return MoveResult(hasMoved,hasChangedState);
+	}
+	Road* targetRoad = currentRoad->getNodesToRoad()->at(*nextNodeIterator).at(*nextNodeB);
+	pair<int,int> nextQueue = currentJA->selectNextQueue(currentIndivQueue,targetRoad->getId());
+	if(nextQueue.first == -1 && nextQueue.second == -1)
+		nextQueue = currentJA->selectNextQueue(currentIndivQueue,targetRoad->getId());
+	double distLeftInNextQueue = currentJA->getTotalLengthLeft(nextQueue.first,nextQueue.second);
+	double distLeftInCurQueue = currentJA->getQueueLength(currentIndivQueue) - (distanceInCurrentRoad - currentJA->getIndividualQueuePosition(currentIndivQueue) );
+	double alpha = computeAlpha(dt,distLeftInCurQueue+distLeftInNextQueue);
+	updateSpeedAndDistance(dt,alpha); //Updates distanceInTA, distanceTraveled, distanceInTimeStep and speed
+	distLeftInCurQueue = currentJA->getQueueLength(currentIndivQueue) - (distanceInCurrentRoad - currentJA->getIndividualQueuePosition(currentIndivQueue) );
+	if(distLeftInCurQueue<=0)
+	{
+		hasChangedState = true;
+		currentJA->insertCar(this,nextQueue);
+		currentIndivQueue = nextQueue;
+	}
+	return MoveResult(hasMoved,hasChangedState);
 }
 
 bool Car::moveQueuing(double frontDistanceAvailable,double frontSpeed, double dt)

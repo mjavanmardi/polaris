@@ -29,12 +29,13 @@ public:
 	std::vector<std::map<int,std::pair<double,double> > > getCapacities();
 
 	//### Static methods ###
-	double getQueueLength(int i, int j); //Get the length of a given individual queue
+	double getQueueLength(std::pair<int,int> queue); //Get the length of a given individual queue
 	void speak();
 	double getLength() const;
-	void updateWeightAndLane(double& currentWeight,int& currentLane,int newLane,int column, int nextRoad);
+	void updateWeightAndLane(double& currentWeight,int& currentLane,int newLane,int column, int nextRoad, int formerLane);
 	double getNbLanes() const;
 	std::vector<std::pair<int,TurningMovementType> > getTurningMovements(int idLane);
+	double getIndividualQueuePosition(std::pair<int,int> queue);
 private:
 	double length;
 	const int nbLanes;

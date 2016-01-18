@@ -148,7 +148,7 @@ map<int, Road> openRoad(char *db_path, vector<vector<int>> &nodesToID) { //TODO 
 
 
 //### Query to the SQLite database ###
-	result<polaris::io::Link> links = db->template query<polaris::io::Link>(query<polaris::io::Link>::true_expr);
+	result<polaris::io::Link> links = db->template query<polaris::io::Link>(query<polaris::io::Link>::true_expr); //Give me everything in table Link
 	result<polaris::io::Connect> connections = db->template query<polaris::io::Connect>(query<polaris::io::Connect>::true_expr);
 	vector<int> link, toNodeA, toNodeB;
 	vector<bool> dir;

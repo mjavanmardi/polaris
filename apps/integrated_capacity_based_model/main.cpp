@@ -7,7 +7,7 @@ int main()
 {
 	srand(0);
 	
-	//Build the test network and the test cars
+	//Build the test network and the test cars (defalut constructors build default network and cars)
 	RoadNetwork* testNetwork = new RoadNetwork();
 	CarManager* testCars = new CarManager();
 

@@ -38,6 +38,7 @@ public:
 	MoveResult travelingCommonQueue(double dt);
 	MoveResult leaveRoad(double dt); 
 	MoveResult moveFromLastFreeFlowArea(double dt);
+	MoveResult goToNextIndividualQueue(double dt);
 
 	void postponeEnteringTime(double time);
 	void initTimeStep(double dt); //Set up the car at the beginning of a time step

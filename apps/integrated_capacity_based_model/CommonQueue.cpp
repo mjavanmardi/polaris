@@ -26,6 +26,8 @@ bool CommonQueue::moveCars(double dt)
 	//We move the cars in the first layer
 	while(it < maxIt && carIt != end())
 	{
+		if((*carIt)->getId()==35)
+			cout << "debug : " << endl;
 		MoveResult result = (*carIt)->travelingCommonQueue(dt);
 		if(result.getHasChangedState())
 		{
