@@ -17,9 +17,9 @@ public:
 	double getTotalLengthLeft(int i, int j); //Get the total length left in a given individual queue 
 	double getFreeFlowSectionLeft(std::pair<int,int> queueCoord);
 	bool isQueueEmpty(int i, int j); //Check if a given individual queue is empty
-	bool isStuckSectionEmpty(std::pair<int,int> queueCoord);
+	bool iscarBufferEmpty(std::pair<int,int> queueCoord);
 	void insertCar(Car* car, std::pair<int,int> queue);
-	void insertCarInStuckSection(Car* car, std::pair<int,int> queueCoord);
+	void insertCarIncarBuffer(Car* car, std::pair<int,int> queueCoord);
 
 	//Return true if there is a path free of cars that leads to nextRoad from individualQueue (initI,initJ)
 	//if false, second variable of the pair is the free flow distance

@@ -43,7 +43,7 @@ bool JunctionArea::isQueueEmpty(int i, int j)
 	return(at(i).at(j).isEmpty());
 }
 
-bool JunctionArea::isStuckSectionEmpty(pair<int,int> queueCoord)
+bool JunctionArea::iscarBufferEmpty(pair<int,int> queueCoord)
 {
 	return(at(queueCoord.first).at(queueCoord.second).isEmpty());
 }
@@ -53,9 +53,9 @@ void JunctionArea::insertCar(Car* car, pair<int,int> queue)
 	at(queue.first).at(queue.second).insertCar(car);
 }
 
-void JunctionArea::insertCarInStuckSection(Car* car, pair<int,int> queueCoord)
+void JunctionArea::insertCarIncarBuffer(Car* car, pair<int,int> queueCoord)
 {
-	at(queueCoord.first).at(queueCoord.second).insertCarInStuckSection(car);
+	at(queueCoord.first).at(queueCoord.second).insertCarIncarBuffer(car);
 }
 
 pair<bool,double> JunctionArea::isPathFree(int nextRoad, int initI, int initJ)
@@ -88,10 +88,10 @@ bool JunctionArea::moveCars(double dt)
 	{
 		currentStepMoving = false;
 		//First we take care of the cars in the last column (about to leave the road)
-		bool stuckCarsMove = true;
-		while(stuckCarsMove)
+		bool hasCarMoved = true;
+		while(hasCarMoved)
 		{
-			stuckCarsMove = false;
+			hasCarMoved = false;
 			for(int lane = 0 ; lane < nbLanes;lane++)
 			{
 				bool currentIterLastCarsMove = at(lane).at(nbColumns-1).moveLastCars(dt);
@@ -99,10 +99,10 @@ bool JunctionArea::moveCars(double dt)
 				//Then we take care of the cars in the first columns
 				for(int firstColumns = 0 ; firstColumns < nbColumns-1 ; firstColumns++)
 					currentIterFirstCarsMove = at(lane).at(firstColumns).moveFirstCars(dt);
-				stuckCarsMove = stuckCarsMove || currentIterLastCarsMove || currentIterFirstCarsMove;
+				hasCarMoved = hasCarMoved || currentIterLastCarsMove || currentIterFirstCarsMove;
 			}
 		}
-		currentStepMoving = stuckCarsMove ; //We check if cars have moved during the current iteration
+		currentStepMoving = hasCarMoved ; //We check if cars have moved during the current iteration
 		hasMoved = hasMoved || currentStepMoving; //We check if cars are moving during the whole time steps
 	}
 	return hasMoved;

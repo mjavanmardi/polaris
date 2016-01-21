@@ -70,8 +70,8 @@ vector<std::pair<int,TurningMovementType> > IndividualQueue::getTurningMovements
 
 void IndividualQueue::speak()
 {
-	cout << "Vehicles in stuck section : " ;
-	for(list<Car*>::iterator it = stuckSection.begin();it != stuckSection.end();it++)
+	cout << "Vehicles in the queue : " ;
+	for(list<Car*>::iterator it = carBuffer.begin();it != carBuffer.end();it++)
 	{
 		cout << (*it)->getId() << " ; " ;
 	}
@@ -80,7 +80,7 @@ void IndividualQueue::speak()
 
 int IndividualQueue::getNumberOfCars() const
 {
-	return(stuckSection.size());
+	return(carBuffer.size());
 }
 
 double IndividualQueue::getTotalLengthLeft() const
@@ -90,19 +90,19 @@ double IndividualQueue::getTotalLengthLeft() const
 
 bool IndividualQueue::isEmpty() const
 {
-	return(stuckSection.size() == 0);
+	return(carBuffer.size() == 0);
 }
 
 void IndividualQueue::insertCar(Car* car)
 {
-	insertCarInStuckSection(car);
+	insertCarIncarBuffer(car);
 }
 
-void IndividualQueue::insertCarInStuckSection(Car* car)
+void IndividualQueue::insertCarIncarBuffer(Car* car)
 {
-	stuckSection.push_back(car);
+	carBuffer.push_back(car);
 	if(car->getDistanceToNextRoad() > firstCarDistanceToNextRoad)
-		firstCarDistanceToNextRoad = length + positionInRoad - stuckSection.back()->getDistanceInCurrentRoad();
+		firstCarDistanceToNextRoad = length + positionInRoad - carBuffer.back()->getDistanceInCurrentRoad();
 }
 
 //Check if road i is in the turning movements of the current individual queue
@@ -131,43 +131,43 @@ map<int,pair<double,double> > IndividualQueue::getStaticCapacities() const
 bool IndividualQueue::moveLastCars(double dt)
 {
 	bool hasMoved = false;
-	if(stuckSection.size() != 0)
+	if(carBuffer.size() != 0)
 	{
 		bool firstCarLeft = true;
 		double positionFirstVehicle = -1.;
-		while(firstCarLeft && stuckSection.size() != 0)
+		while(firstCarLeft && carBuffer.size() != 0)
 		{
 			firstCarLeft = false;
-			Car* carMoving = *stuckSection.begin();
+			Car* carMoving = *carBuffer.begin();
 			positionFirstVehicle = carMoving->getDistanceInCurrentRoad();
 			MoveResult result = carMoving->leaveRoad(dt);
 			firstCarLeft = result.getHasChangedState();
 			if(result.getHasChangedState())
 			{
 				//We remove the Car
-				stuckSection.erase(stuckSection.begin());
-				if(stuckSection.size()==0)
+				carBuffer.erase(carBuffer.begin());
+				if(carBuffer.size()==0)
 					firstCarDistanceToNextRoad = 0;
 				hasMoved = true; //We confirm that the car has actually moved
 			}
 		}
 		//Every car after the removed car are moving
-		list<Car*>::iterator it = stuckSection.begin();
+		list<Car*>::iterator it = carBuffer.begin();
 		list<Car*>::iterator nextIt = it;
-		if(it != stuckSection.end())
+		if(it != carBuffer.end())
 			nextIt = next(it);
-		while(nextIt != stuckSection.end())
+		while(nextIt != carBuffer.end())
 		{
 			double frontDistanceAvailable = (*it)->getDistanceInCurrentRoad() - (*nextIt)->getDistanceInCurrentRoad();
 			double frontSpeed = (*it)->getSpeed();
 			bool hasCarMoved = (*nextIt)->moveQueuing(frontDistanceAvailable,frontSpeed,dt);
 			hasMoved = hasMoved || hasCarMoved;
 			it++;
-			if(it != stuckSection.end())
+			if(it != carBuffer.end())
 			    nextIt++;
 		}
-		if(stuckSection.size() !=0)
-			firstCarDistanceToNextRoad = stuckSection.back()->getDistanceToNextRoad();
+		if(carBuffer.size() !=0)
+			firstCarDistanceToNextRoad = carBuffer.back()->getDistanceToNextRoad();
 	}
 	return hasMoved;
 }
@@ -176,43 +176,43 @@ bool IndividualQueue::moveLastCars(double dt)
 bool IndividualQueue::moveFirstCars(double dt)
 {
 	bool hasMoved = false;
-	if(stuckSection.size() != 0)
+	if(carBuffer.size() != 0)
 	{
 		bool firstCarLeft = true;
 		double positionFirstVehicle = -1.;
-		while(firstCarLeft && stuckSection.size() != 0)
+		while(firstCarLeft && carBuffer.size() != 0)
 		{
 			firstCarLeft = false;
-			Car* carMoving = *stuckSection.begin();
+			Car* carMoving = *carBuffer.begin();
 			positionFirstVehicle = carMoving->getDistanceInCurrentRoad();
 			MoveResult result = carMoving->goToNextIndividualQueue(dt);
 			//Car tries to leave queue
 			if(result.getHasChangedState())
 			{
 				//We remove the Car
-				stuckSection.erase(stuckSection.begin());
-				if(stuckSection.size()==0)
+				carBuffer.erase(carBuffer.begin());
+				if(carBuffer.size()==0)
 					firstCarDistanceToNextRoad = 0;
 			}
 			hasMoved = result.getHasMoved(); //We confirm that the car has actually moved
 		}
 		//Every car after the removed car are moving
-		list<Car*>::iterator it = stuckSection.begin();
+		list<Car*>::iterator it = carBuffer.begin();
 		list<Car*>::iterator nextIt = it;
-		if(it != stuckSection.end())
+		if(it != carBuffer.end())
 			nextIt = next(it);
-		while(nextIt != stuckSection.end())
+		while(nextIt != carBuffer.end())
 		{
 			double frontDistanceAvailable = (*it)->getDistanceInCurrentRoad() - (*nextIt)->getDistanceInCurrentRoad();
 			double frontSpeed = (*it)->getSpeed();
 			bool hasCarMoved = (*nextIt)->moveQueuing(frontDistanceAvailable,frontSpeed,dt);
 			hasMoved = hasMoved || hasCarMoved;
 			it++;
-			if(it != stuckSection.end())
+			if(it != carBuffer.end())
 			    nextIt++;
 		}
-		if(stuckSection.size() !=0)
-			firstCarDistanceToNextRoad = length + positionInRoad - stuckSection.back()->getDistanceInCurrentRoad();
+		if(carBuffer.size() !=0)
+			firstCarDistanceToNextRoad = length + positionInRoad - carBuffer.back()->getDistanceInCurrentRoad();
 	}
 	return hasMoved;
 }

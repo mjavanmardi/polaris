@@ -19,13 +19,13 @@ public:
 	//### Dynamic methods ###
 	int getNumberOfCars() const;
 	double getTotalLengthLeft() const; //Return the length that is free in the queue
-	double getStuckSectionLength() const;
+	double getcarBufferLength() const;
 	double getFreeFlowSectionLength() const;
 	bool isEmpty() const;
 	void insertCar(Car* car);
-	void insertCarInStuckSection(Car* car);
+	void insertCarIncarBuffer(Car* car);
 	std::map<int,std::pair<double,double> > IndividualQueue::getStaticCapacities() const;
-	bool moveLastCars(double dt); //Try to move a single stuck car to the next road
+	bool moveLastCars(double dt); //Try to move the leading car to the next road
 	bool IndividualQueue::moveFirstCars(double dt);
 
 	//### Static methods ###
@@ -41,6 +41,6 @@ private:
 	const double positionInRoad; // Distance between the beginning of the road and the beginning of the queue
 	std::map<int,std::pair<double,double> > staticCapacities; //first : nextRoad Id ; second : (capacity at the beginning timestep, capacity left)
 	const std::vector<std::pair<int,TurningMovementType> > turningMovements; //First value of the pair : id of the next road
-	std::list<Car*> stuckSection;
+	std::list<Car*> carBuffer;
 	double firstCarDistanceToNextRoad;
 };
