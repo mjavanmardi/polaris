@@ -87,7 +87,7 @@ bool JunctionArea::moveCars(double dt)
 	while(currentStepMoving) //While its possible to move cars during this timestep
 	{
 		currentStepMoving = false;
-		//First we take car of the stuck cars in the last column (about to leave the road)
+		//First we take care of the cars in the last column (about to leave the road)
 		bool stuckCarsMove = true;
 		while(stuckCarsMove)
 		{
@@ -96,6 +96,7 @@ bool JunctionArea::moveCars(double dt)
 			{
 				bool currentIterLastCarsMove = at(lane).at(nbColumns-1).moveLastCars(dt);
 				bool currentIterFirstCarsMove = false;
+				//Then we take care of the cars in the first columns
 				for(int firstColumns = 0 ; firstColumns < nbColumns-1 ; firstColumns++)
 					currentIterFirstCarsMove = at(lane).at(firstColumns).moveFirstCars(dt);
 				stuckCarsMove = stuckCarsMove || currentIterLastCarsMove || currentIterFirstCarsMove;
