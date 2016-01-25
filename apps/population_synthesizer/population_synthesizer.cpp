@@ -19,12 +19,15 @@ struct MasterType
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
+	typedef polaris::io::Synthetic_Household hh_db_rec_type;
+	typedef polaris::io::Synthetic_Person person_db_rec_type;
 	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
 	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;
 	typedef NULLTYPE network_type;
 };
 void help();
+void generate_scenario();
 
 
 int main(int argc, char* argv[])
@@ -40,7 +43,15 @@ int main(int argc, char* argv[])
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 
-	if (strcmp(scenario_filename, "-h") == 0)
+	if (strcmp(scenario_filename, "-c") == 0)
+	{
+		generate_scenario();
+		char help;
+		cout << "Default scenario file 'scenario_popsyn.json' created in working directory.  Press any key.";
+		cin >> help;
+		return 0;
+	}
+	else if (strcmp(scenario_filename, "-h") == 0)
 	{
 		help();
 		char help;
@@ -166,6 +177,25 @@ void help()
 	outfile << "PERSONMARGVAR	1	6	7	8	30"<< endl;
 	outfile << "PERSONMARGVAR	1	7	8	99	31"<< endl;
 	outfile.close();
+}
+
+void generate_scenario()
+{
+	ofstream outfile;
+	outfile.open("scenario_popsyn.json");
+	outfile<<"{"<<endl;
+	outfile<<"\t"<<"\"output_dir_name\" : \"[Specify directory name]\","<<endl;
+	outfile<<"\t"<<"\"database_name\" : \"[database]\","<<endl;
+	outfile<<"\t"<<"\"percent_to_synthesize\" : 1.0,"<<endl;
+	outfile<<"\t"<<"\"demand_reduction_factor\" : 1.0,"<<endl;
+	outfile<<"\t"<<"\"ipf_tolerance\" : 0.01,"<<endl;
+	outfile<<"\t"<<"\"marginal_tolerance\" : 5,"<<endl;
+	outfile<<"\t"<<"\"maximum_iterations\" : 100,"<<endl;
+	outfile<<"\t"<<"\"write_marginal_output\" : false,"<<endl;
+	outfile<<"\t"<<"\"write_full_output\" : false,"<<endl;
+	outfile<<"\t"<<"\"popsyn_control_file\" : \"[linker file path: use -h for help]\","<<endl;
+	outfile<<"\t"<<"\"write_demand_to_database\" : true"<<endl;
+	outfile<<"}"<<endl;
 }
 
 

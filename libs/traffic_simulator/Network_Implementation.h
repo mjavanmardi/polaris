@@ -27,7 +27,7 @@ namespace Network_Components
 			double operation_calculation_time;
 			double output_calculation_time;
 
-			//boost::container::vector<Link_MOE_Data> link_moe_data_by_type_array;
+			//std::vector<Link_MOE_Data> link_moe_data_by_type_array;
 
 			int num_generated_vehicles;
 			int num_loaded_vehicles;
@@ -57,22 +57,22 @@ namespace Network_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Network_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			m_data(typename MasterType::network_db_reader_type*, db_reader, NONE, NONE);
-			//typedef boost::unordered::unordered_map<long long,void*> type_of_link_dbid_dir_to_ptr_map;
-			//m_data(concat(boost::unordered::unordered_map<long long,void*>), link_dbid_dir_to_ptr_map, NONE, NONE);
+			//typedef std::unordered_map<long long,void*> type_of_link_dbid_dir_to_ptr_map;
+			//m_data(concat(std::unordered_map<long long,void*>), link_dbid_dir_to_ptr_map, NONE, NONE);
 			m_data(concat(std::unordered_map<long long,void*>), link_dbid_dir_to_ptr_map, NONE, NONE);
 
 			m_data(float, max_free_flow_speed, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
-			//m_container(boost::container::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
-
-			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
+			//m_container(std::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
 
 			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);
+
+			//TODO:ROUTING
+			//m_container(std::vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, NONE, NONE);
 
 			//TODO:ROUTING
 			//template<typename TargetType>
@@ -82,17 +82,18 @@ namespace Network_Components
 			//template<typename TargetType>
 			//TargetType realtime_routable_network(){return (TargetType)(_realtime_routable_networks_container[__thread_id]);}tag_getter_as_available(realtime_routable_network);
 
-			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, activity_locations_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations_container, NONE, NONE);
+			m_container(concat(dense_hash_map<int,int>), activity_location_id_to_idx_container, NONE, NONE);
 
 			m_container(concat(dense_hash_map<int,typename MasterType::zone_type*>), zones_container, NONE, NONE);
 
-			m_container(boost::container::vector<int>, zone_ids_container, NONE, NONE);
+			m_container(std::vector<int>, zone_ids_container, NONE, NONE);
 			
-			m_container(boost::container::vector<typename MasterType::movement_type*>, movements_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::movement_type*>, movements_container, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::ramp_metering_type*>, ramp_metering_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::ramp_metering_type*>, ramp_metering_container, NONE, NONE);
 
 			//Null_Prototype<typename MasterType::scenario_type>* _scenario_reference;
 			//template<typename TargetType> void scenario_reference(TargetType val){}
@@ -100,7 +101,7 @@ namespace Network_Components
 
 			m_prototype(Null_Prototype,typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::intersection_control_type*>, intersection_controls_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::intersection_control_type*>, intersection_controls_container, NONE, NONE);
 
 			m_data(float, network_vmt, NONE, NONE);
 
@@ -120,31 +121,31 @@ namespace Network_Components
 			m_data(int, network_vht_compensation, NONE, NONE);
 
 			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, network_snapshot_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_network_type*>, network_snapshot_container, NONE, NONE);
 			
-			m_container(boost::container::vector<typename MasterType::analyze_link_group_type*>, analyze_link_groups_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::analyze_link_group_type*>, analyze_link_groups_container, NONE, NONE);
 
-			typedef boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>> id_to_links_map_type;
+			typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_map_type;
 			m_data(id_to_links_map_type, db_id_to_links_map, NONE, NONE);
 			
 			struct MOE_Data network_moe_data;
 
 			struct MOE_Data realtime_network_moe_data;
 
-			boost::container::vector<struct MOE_Data> td_network_moe_data_array;
+			std::vector<struct MOE_Data> td_network_moe_data_array;
 
-			typedef boost::unordered::unordered_map<int,float> id_to_travel_time_map_type;
+			typedef std::unordered_map<int,float> id_to_travel_time_map_type;
 			
 			//TODO:ROUTING
 			//typedef typename MasterType::routable_network_type routable_network_type;
-			//typedef boost::container::vector<routable_network_type*> network_snapshot_replicas_container_type;
-			//typedef boost::unordered::unordered_map<int, network_snapshot_replicas_container_type> time_to_snapshot_map_type;
+			//typedef std::vector<routable_network_type*> network_snapshot_replicas_container_type;
+			//typedef std::unordered_map<int, network_snapshot_replicas_container_type> time_to_snapshot_map_type;
 			//m_data(time_to_snapshot_map_type, network_snapshots, NONE, NONE);
 
-			typedef boost::container::vector<int> snapshot_times_container_type;
-			m_data(boost::container::vector<int>, snapshot_times, NONE, NONE);
+			typedef std::vector<int> snapshot_times_container_type;
+			m_data(std::vector<int>, snapshot_times, NONE, NONE);
 
-			boost::container::vector<int> ttime_distribution;
+			std::vector<int> ttime_distribution;
 			m_data(_lock, ttime_distribution_lock, NONE, NONE);
 
 			typedef union {
@@ -156,10 +157,10 @@ namespace Network_Components
 				long long movement_id;
 			} long_hash_key_type;
 
-			typedef boost::unordered::unordered_map<long long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
+			typedef std::unordered_map<long long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
 			m_data(type_of_link_turn_movement_map, link_turn_movement_map, NONE, NONE);
 
-			m_container(boost::container::vector<Routable_Network<typename MasterType::routable_network_type>*>,routable_networks,NONE,NONE);
+			m_container(std::vector<Routable_Network<typename MasterType::routable_network_type>*>,routable_networks,NONE,NONE);
 
 			template<typename Routable_Network_Type>
 			Routable_Network<Routable_Network_Type>* routable_network(int thread_index){ return _routable_networks[thread_index]; }
@@ -287,7 +288,7 @@ namespace Network_Components
 
 				string line;
 				int iline = 0;
-				boost::container::vector<string> tokens;
+				std::vector<string> tokens;
 				int token_size;
 				int link_uuid;
 				float link_travel_time;
@@ -296,8 +297,8 @@ namespace Network_Components
 				int num_movements;
 				float maximum_free_flow_speed;
 				Network_Components::Types::Link_ID_Dir link_id_dir;
-				boost::unordered::unordered_map<int,float> link_travel_time_map;
-				boost::unordered::unordered_map<int,float> movement_travel_time_map;
+				std::unordered_map<int,float> link_travel_time_map;
+				std::unordered_map<int,float> movement_travel_time_map;
 				_Link_Interface* link;
 				while (input_network_snapshots_file.good())
 				{
@@ -571,7 +572,7 @@ namespace Network_Components
 					THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
 				}
 				struct Link_Components::Implementations::Link_MOE_Data link_moe_data;
-				boost::container::vector<string> tokens;
+				std::vector<string> tokens;
 				string line;
 				int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
 				int record_time;
@@ -700,7 +701,7 @@ namespace Network_Components
 			template<typename TargetType> TargetType get_routable_network_from_snapshots(int current_time)
 			{
 				typedef Network<routable_network_type> _Routable_Network_Interface;
-				typename boost::container::vector<int>::iterator time_itr;
+				typename std::vector<int>::iterator time_itr;
 				int closest_time = -1;
 				for (time_itr = _snapshot_times.begin(); time_itr != _snapshot_times.end(); time_itr++)
 				{

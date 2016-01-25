@@ -13,17 +13,17 @@ namespace Vehicle_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Vehicle_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Vehicle_Data_Logger_Implementation),Execution_Object>
 		{
-			boost::container::vector<float>* output_data;
-			boost::container::vector<float>* output_data_buffer;
+			std::vector<float>* output_data;
+			std::vector<float>* output_data_buffer;
 
-			//boost::container::vector<char>* output_color_data;
-			//boost::container::vector<char>* output_color_data_buffer;
+			//std::vector<char>* output_color_data;
+			//std::vector<char>* output_color_data_buffer;
 
-			boost::container::vector<float>* buff;
-			boost::container::vector<float>* current;
+			std::vector<float>* buff;
+			std::vector<float>* current;
 
-			//boost::container::vector<char>* color_buff;
-			//boost::container::vector<char>* color_current;
+			//std::vector<char>* color_buff;
+			//std::vector<char>* color_current;
 
 			dense_hash_map<int,long long> index;
 
@@ -46,8 +46,8 @@ namespace Vehicle_Components
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				// initialize storage arrays
-				output_data = new boost::container::vector<float>[num_sim_threads()];
-				output_data_buffer = new boost::container::vector<float>[num_sim_threads()];
+				output_data = new std::vector<float>[num_sim_threads()];
+				output_data_buffer = new std::vector<float>[num_sim_threads()];
 
 				this->_Read = read;
 				this->_bytes_written = 0;
@@ -178,7 +178,7 @@ namespace Vehicle_Components
 				// swap buffer and current for output strings and trip records
 				if(sub_iteration() == 0)
 				{				
-					boost::container::vector<float>* tmp = pthis->buff;
+					std::vector<float>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
 

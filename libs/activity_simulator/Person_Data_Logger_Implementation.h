@@ -13,12 +13,12 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>
 		{
-			boost::container::vector<int> num_acts;
-			boost::container::vector<int>* planned_acts;
-			boost::container::vector<int>* executed_acts;
-			boost::container::vector<int>* ttime_distribution;
-			boost::container::vector<string>* output_data;
-			boost::container::vector<string>* output_data_buffer;
+			std::vector<int> num_acts;
+			std::vector<int>* planned_acts;
+			std::vector<int>* executed_acts;
+			std::vector<int>* ttime_distribution;
+			std::vector<string>* output_data;
+			std::vector<string>* output_data_buffer;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
 
@@ -30,8 +30,8 @@ namespace Person_Components
 			int* num_acts_in_interval;
 
 
-			boost::container::vector<string>* buff;
-			boost::container::vector<string>* current;
+			std::vector<string>* buff;
+			std::vector<string>* current;
 
 
 			m_data(ofstream, log, NONE, NONE);
@@ -58,11 +58,11 @@ namespace Person_Components
 				this->_activity_time_lost = 0;
 
 				// initialize storage arrays
-				planned_acts = new boost::container::vector<int>[num_sim_threads()];
-				executed_acts = new boost::container::vector<int>[num_sim_threads()];
-				ttime_distribution = new boost::container::vector<int>[num_sim_threads()];
-				output_data = new boost::container::vector<string>[num_sim_threads()];
-				output_data_buffer = new boost::container::vector<string>[num_sim_threads()];
+				planned_acts = new std::vector<int>[num_sim_threads()];
+				executed_acts = new std::vector<int>[num_sim_threads()];
+				ttime_distribution = new std::vector<int>[num_sim_threads()];
+				output_data = new std::vector<string>[num_sim_threads()];
+				output_data_buffer = new std::vector<string>[num_sim_threads()];
 
 				//trip_records = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
 				//trip_records_buffer = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
@@ -137,15 +137,15 @@ namespace Person_Components
 				filename_acts << "executed_activities.csv";
 				this->_executed_acts_file.open(filename_acts.str());
 				if (!this->_executed_acts_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
-				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18"<<endl;
+				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,23"<<endl;
 
 				// Initialize data count containers
-				num_acts.resize(20,0);
+				num_acts.resize(24,0);
 				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 
-					executed_acts[i].resize(20,0);
-					planned_acts[i].resize(20,0);
+					executed_acts[i].resize(24,0);
+					planned_acts[i].resize(24,0);
 				}
 
 				// Initialize demand MOE file
@@ -358,7 +358,7 @@ namespace Person_Components
 				// swap buffer and current for output strings and trip records
 				if(sub_iteration() == 0)
 				{				
-					boost::container::vector<string>* tmp = pthis->buff;
+					std::vector<string>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
 
@@ -395,7 +395,7 @@ namespace Person_Components
 				{
 
 					// write out strings in the current buffer to log file and clear it
-					for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
+					for (std::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 					{
 						this->_log << '\n' << *itr;
 					}

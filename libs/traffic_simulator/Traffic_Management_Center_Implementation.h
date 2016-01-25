@@ -29,10 +29,10 @@ namespace Traffic_Management_Center_Components
 		{
 		public:
 			typedef std::vector<AdjNode> AdjListRow;
-			typedef boost::unordered::unordered_map<int, AdjListRow> AdjList;
+			typedef std::unordered_map<int, AdjListRow> AdjList;
 			typedef AdjList::const_iterator AdjListIt;
 			typedef AdjListRow::const_iterator AdjListRowIt;
-			typedef boost::container::set<int> NodeContainer;
+			typedef std::set<int> NodeContainer;
 
 			Digraph() {this->v = 0; this->e = 0;}
 			/// Returns number of vertices in the graph. The vertices counting is not cleanly implemented, so the result is not to be trusted
@@ -46,7 +46,7 @@ namespace Traffic_Management_Center_Components
 				adj_node.dir_link_uid = dir_link_uid;
 				adj_node.downstream_node = w;
 				adj[v].push_back(adj_node);
-				adj[w]; // create empty adjacency boost::container::list to keep the Adj consistent
+				adj[w]; // create empty adjacency std::list to keep the Adj consistent
 				e++;
 				all_nodes.insert(v);
 				all_nodes.insert(w);
@@ -92,7 +92,7 @@ namespace Traffic_Management_Center_Components
 			{
 				v = 0;
 				e = 0;
-				// maps a node to a boost::container::vector of 2-tuples. Each tuple corresponds to an adjacent node
+				// maps a node to a std::vector of 2-tuples. Each tuple corresponds to an adjacent node
 				// first element of the tuple contains the node id and the second constrains link cost
 				adj.clear();
 				all_nodes.clear();
@@ -101,7 +101,7 @@ namespace Traffic_Management_Center_Components
 		private:
 			int v;
 			int e;
-			// maps a node to a boost::container::vector of 2-tuples. Each tuple corresponds to an adjacent node
+			// maps a node to a std::vector of 2-tuples. Each tuple corresponds to an adjacent node
 			// first element of the tuple contains the node id and the second constrains link cost
 			AdjList adj;
 			NodeContainer all_nodes;
@@ -111,9 +111,9 @@ namespace Traffic_Management_Center_Components
 		class WeakCC
 		{
 		private:
-			boost::unordered::unordered_map<int, bool> marked;
-			boost::unordered::unordered_map<int, int> component_id;
-			boost::unordered::unordered_map<int, boost::container::vector<int>> link_component;
+			std::unordered_map<int, bool> marked;
+			std::unordered_map<int, int> component_id;
+			std::unordered_map<int, std::vector<int>> link_component;
 			int count;
 			Digraph* g_reverse;
 			void dfs(const Digraph& g, int v)
@@ -141,7 +141,7 @@ namespace Traffic_Management_Center_Components
 			}
 			bool const Marked(const int& v)
 			{
-				boost::unordered::unordered_map<int, bool>::iterator res = marked.find(v);
+				std::unordered_map<int, bool>::iterator res = marked.find(v);
 				if (res == marked.end())
 				{
 					return false;
@@ -186,7 +186,7 @@ namespace Traffic_Management_Center_Components
 				return component_id.at(v);
 			}
 			/// This is the result of the algorithm, a map: component_id -> component_links
-			const boost::unordered::unordered_map<int, boost::container::vector<int> >& LinkComponents() const
+			const std::unordered_map<int, std::vector<int> >& LinkComponents() const
 			{
 				return link_component;
 			}
@@ -232,16 +232,16 @@ namespace Traffic_Management_Center_Components
 			//			  name of the prototype class		variable name					underlying type
 			m_prototype(Network_Event_Components::Prototypes::Network_Event_Manager, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
-			m_data(boost::container::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
-			m_data(boost::container::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);
-			m_data(boost::container::vector<Advisory_Radio_Interface*>,advisory_radios, NONE, NONE);
+			m_data(std::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
+			m_data(std::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);
+			m_data(std::vector<Advisory_Radio_Interface*>,advisory_radios, NONE, NONE);
 			
-			m_data(boost::container::vector<Depot_Interface*>,depots, NONE, NONE);
-			m_data(boost::container::vector<Link_Control_Interface*>,link_controls, NONE, NONE);
+			m_data(std::vector<Depot_Interface*>,depots, NONE, NONE);
+			m_data(std::vector<Link_Control_Interface*>,link_controls, NONE, NONE);
 
-			m_data(boost::container::vector<Sensor_Interface*>,traffic_sensors, NONE, NONE);
+			m_data(std::vector<Sensor_Interface*>,traffic_sensors, NONE, NONE);
 
-			m_data(boost::container::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
+			m_data(std::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
 
 			//                                          name of the function
 			static void TMC_Conditional(ComponentType* _this,Event_Response& response)
@@ -268,7 +268,7 @@ namespace Traffic_Management_Center_Components
 			{
 				Types::Digraph my_digraph;
 
-				for(typename boost::container::vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin();itr!=_traffic_sensors.end();itr++)
+				for(typename std::vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin();itr!=_traffic_sensors.end();itr++)
 				{
 					Sensor_Interface* sensor = *itr;
 
@@ -296,12 +296,12 @@ namespace Traffic_Management_Center_Components
 
 				my_weakcc.Run(my_digraph);
 
-				const boost::unordered::unordered_map<int, boost::container::vector<int> >& link_components = my_weakcc.LinkComponents();
-				boost::container::vector<typename MasterType::link_type*> affected_links;
+				const std::unordered_map<int, std::vector<int> >& link_components = my_weakcc.LinkComponents();
+				std::vector<typename MasterType::link_type*> affected_links;
 				
 				//cout << "Done analyzing, number of congestion events: " << link_components.size() << endl;
 
-				//for(boost::unordered::unordered_map<int, std::vector<int> >::const_iterator map_itr=link_components.begin();map_itr!=link_components.end();map_itr++)
+				//for(std::unordered_map<int, std::vector<int> >::const_iterator map_itr=link_components.begin();map_itr!=link_components.end();map_itr++)
 				//{
 				//	Congestion_Network_Event_Interface* new_event = (Congestion_Network_Event_Interface*)Allocate<Congestion_Network_Event_Interface::ComponentType>();
 
@@ -309,17 +309,17 @@ namespace Traffic_Management_Center_Components
 
 				//	
 
-				//	boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				//	std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
-				//	for(typename boost::container::vector<int>::const_iterator itr=map_itr->second.begin();itr!=map_itr->second.end();itr++)
+				//	for(typename std::vector<int>::const_iterator itr=map_itr->second.begin();itr!=map_itr->second.end();itr++)
 				//	{
 				//		int link = *itr;
 
 				//		if(db_map.count(link))
 				//		{
-				//			boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
+				//			std::vector<typename MasterType::link_type*>& links=db_map[link];
 
-				//			typename boost::container::vector<typename type_of(MasterType::link)*>::iterator vitr;
+				//			typename std::vector<typename type_of(MasterType::link)*>::iterator vitr;
 
 				//			for(vitr=links.begin();vitr!=links.end();vitr++)
 				//			{
@@ -349,50 +349,50 @@ namespace Traffic_Management_Center_Components
 
 			template<typename TargetType> void Load_New_Events()
 			{
-				boost::container::vector<Base_Network_Event_Interface*> current_events;
+				std::vector<Base_Network_Event_Interface*> current_events;
 				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
 
-				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				for(typename std::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
-				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				for(typename std::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
-				for(typename boost::container::vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				for(typename std::vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
-				for(typename boost::container::vector<Depot_Interface*>::iterator itr=_depots.begin();itr!=_depots.end();itr++)
+				for(typename std::vector<Depot_Interface*>::iterator itr=_depots.begin();itr!=_depots.end();itr++)
 				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 			}
 
 			template<typename TargetType> void DecideOnEventsToBeDisplayed()
 			{
-				boost::container::vector<Base_Network_Event_Interface*> current_events;
+				std::vector<Base_Network_Event_Interface*> current_events;
 
-				_network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>((boost::container::vector<Weather_Network_Event_Interface*>&)current_events);
-				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				_network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>((std::vector<Weather_Network_Event_Interface*>&)current_events);
+				for(typename std::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
-					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
+					//std::vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 
 				current_events.clear();
 
 				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
-				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				for(typename std::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
-					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
+					//std::vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 				}
 			}
 
@@ -404,14 +404,14 @@ namespace Traffic_Management_Center_Components
 			}
 
 			/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector
-			void Train_Detectors(unique_ptr<odb::database>& db, boost::unordered::unordered_map<int, Detector1DU<double> >& out_link_detectors)
+			void Train_Detectors(unique_ptr<odb::database>& db, std::unordered_map<int, Detector1DU<double> >& out_link_detectors)
 			{
 				using namespace odb;
 				using namespace polaris::io;
 
 				int id;
 				Detector1DU<double> detector;
-				boost::container::vector<double> training_data;
+				std::vector<double> training_data;
 
 				result<LinkMOE> rmoe(db->template query<LinkMOE>(query<LinkMOE>::true_expr));
 
@@ -523,7 +523,7 @@ namespace Traffic_Management_Center_Components
 
 				//cout << "\tDetectors" << endl;
 
-				//boost::unordered::unordered_map<int, Detector1DU<double> > link_detectors;
+				//std::unordered_map<int, Detector1DU<double> > link_detectors;
 
 				//Train_Detectors(db, link_detectors);
 
@@ -539,7 +539,7 @@ namespace Traffic_Management_Center_Components
 				//	
 				//	its_component->template Initialize< Fixed_Sensor& >( *db_itr );
 
-				//	its_component->template Attach_Detector< boost::unordered::unordered_map<int, Detector1DU<double> >& >( link_detectors );
+				//	its_component->template Attach_Detector< std::unordered_map<int, Detector1DU<double> >& >( link_detectors );
 
 				//	_traffic_sensors.push_back(its_component);				
 				//}

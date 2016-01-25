@@ -25,13 +25,16 @@ namespace Vehicle_Components
 		implementation struct Switch_Decision_Data_Implementation:public Polaris_Component<MasterType,INHERIT(Switch_Decision_Data_Implementation),Data_Object>
 		{
 			m_data(int, switch_decision_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_container(boost::container::vector<typename MasterType::link_type*>, route_links_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, route_links_container, NONE, NONE);
 		};
 
 		implementation struct Vehicle_Implementation:public Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>
 		{
 
 			m_data(bool, is_integrated, NONE, NONE);
+
+			m_data(bool, is_autonomous, NONE, NONE);
+
 			m_data(bool, its_switch, NONE, NONE);
 			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
 
@@ -56,7 +59,7 @@ namespace Vehicle_Components
 			m_data(float, local_speed, NONE, NONE);
 			m_data(int, downstream_preferred_departure_time, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, NONE, NONE);
 			
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, NONE, NONE);
@@ -426,10 +429,10 @@ namespace Vehicle_Components
 							}
 							else
 							{
-								boost::unordered::unordered_set<_Network_Event_Interface*> events_set;
+								std::unordered_set<_Network_Event_Interface*> events_set;
 								
 								/// case 2.1: VMS
-								((_Link_Interface*)link)->template get_events_from_vms<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+								((_Link_Interface*)link)->template get_events_from_vms<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 
 								bool vms = false;
 								int vms_event_size = int(events_set.size());
@@ -439,7 +442,7 @@ namespace Vehicle_Components
 									vms = true;
 								}
 								/// case 2.2: HAR
-								((_Link_Interface*)link)->template get_events_from_har<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+								((_Link_Interface*)link)->template get_events_from_har<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 								int har_event_size = int(events_set.size()) - vms_event_size;
 								bool har = false;
 								if (har_event_size>0)
@@ -449,7 +452,7 @@ namespace Vehicle_Components
 								/// exploit
 								if (vms || har)
 								{
-									enroute_switching_decision = exploit_events_set<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+									enroute_switching_decision = exploit_events_set<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 									if (enroute_switching_decision)	cause_for_switching = Scenario_Components::Types::Cause_For_Enroute_Switching::ITS_INFORMED;
 								}
 							}
@@ -734,8 +737,8 @@ namespace Vehicle_Components
 				destination_ids.push_back(destination_link->uuid<unsigned int>());
 				
 
-				boost::container::deque<global_edge_id> path_container;
-				boost::container::deque<float> cumulative_cost_container;
+				std::deque<global_edge_id> path_container;
+				std::deque<float> cumulative_cost_container;
 
 				int best_route_link_sum = 0;
 
@@ -814,13 +817,13 @@ namespace Vehicle_Components
 						//	
 						//	cout << "Routed cost container: " << endl;
 
-						//	for(boost::container::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
+						//	for(std::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
 						//	{
 						//		cout << *itr << endl;
 						//	}
 						//	cout << "Routed cost profile: " << endl;
 
-						//	for(boost::container::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
+						//	for(std::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
 						//	{
 						//		_Link_Interface* link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
 
@@ -854,9 +857,9 @@ namespace Vehicle_Components
 
 						//			cout << "Outbound turn movements summary: " << endl;
 
-						//			boost::container::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<boost::container::vector<typename MasterType::turn_movement_type*>*>();
+						//			std::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<std::vector<typename MasterType::turn_movement_type*>*>();
 
-						//			for(boost::container::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
+						//			for(std::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
 						//			{
 						//				Movement<typename MasterType::turn_movement_type>* current_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
 
@@ -975,6 +978,17 @@ namespace Vehicle_Components
 				else
 				{
 					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION;
+				}
+
+				// autonomous vehicle capability
+				r1 = Uniform_RNG.template Next_Rand<double>();//_rng_stream.RandU01();
+				if (r1 <= ((_Scenario_Interface*)_global_scenario)->template cav_market_penetration<double>())
+				{
+					this->is_autonomous(true);
+				}
+				else
+				{
+					this->is_autonomous(false);
 				}
 
 				/// information compliance rate

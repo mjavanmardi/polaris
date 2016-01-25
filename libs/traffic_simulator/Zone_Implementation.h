@@ -139,18 +139,18 @@ namespace Zone_Components
 			tag_getter_as_available(production_count);	
 			tag_getter_as_available(attraction_count);
 
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, origin_activity_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, origin_activity_locations, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::link_type*>, destination_activity_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, destination_activity_locations, NONE, NONE);
 
-			m_container(boost::container::vector<float>, origin_activity_location_choice_cdfs, NONE, NONE);
+			m_container(std::vector<float>, origin_activity_location_choice_cdfs, NONE, NONE);
 
-			m_container(boost::container::vector<float>, destination_activity_location_choice_cdfs, NONE, NONE);
+			m_container(std::vector<float>, destination_activity_location_choice_cdfs, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, home_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, work_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, discretionary_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, school_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, home_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, work_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, discretionary_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, school_locations, NONE, NONE);
 
 		};
 	}

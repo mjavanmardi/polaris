@@ -58,7 +58,8 @@ namespace Person_Components
 			//====================================================================================================================================
 			// Interface definitions
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
-			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_properties_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_properties_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
 			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
@@ -89,7 +90,8 @@ namespace Person_Components
 			virtual double Calculate_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
+				person_properties_itf* properties = _Parent_Person->Properties<person_properties_itf*>();
+				person_static_properties_itf* static_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -112,13 +114,20 @@ namespace Person_Components
 				ttime_after = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes, Time_Minutes>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start_time);
 				if (_previous == _next) ttime_without = 0;
 				else ttime_without = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes, Time_Minutes>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start_time);
-				ttime_deflected = ttime_before + ttime_after - ttime_without;
+				
+				//=====================================
+				// ACCOUNT FOR VOTT changes
+				float VOTT_change = properties->Value_of_Travel_Time_Adjustment<float>();
+
+				//=====================================
+				// Discounted deflected travel time 
+				ttime_deflected = (ttime_before + ttime_after - ttime_without)*VOTT_change;
 				
 				// Get Income/race dif with zone
-				float inc_diff = log(abs(zone->average_household_income<Dollars>() - properties->Income<Dollars>()) + 1.0);
+				float inc_diff = log(abs(zone->average_household_income<Dollars>() - static_properties->Income<Dollars>()) + 1.0);
 				float race_diff;
-				if (properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
-				else if (properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
+				if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
+				else if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
 				else race_diff = zone->race_percent_white<float>() + zone->race_percent_black<float>();
 					
 				float area_res = zone->residential_area<Square_Feet>()/1000000.0;
@@ -145,12 +154,12 @@ namespace Person_Components
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
-					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
+					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
 					// Mode specific effects
 					int ModAuto = 0, ModTran = 0,ModOth = 0;
-					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
+					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
 					if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_AUTOMOBILE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_MOTORCYCLE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_TAXI)
 						ModAuto = 1;
 					else if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_BUS || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_RAILROAD || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_STREETCAR || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_SUBWAY)
@@ -260,7 +269,7 @@ namespace Person_Components
 			virtual void Print_Utility()
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				person_properties_itf* properties = _Parent_Person->Static_Properties<person_properties_itf*>();
+				person_static_properties_itf* static_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -285,10 +294,10 @@ namespace Person_Components
 				ttime_deflected = ttime_before + ttime_after - ttime_without;
 				
 				// Get Income/race dif with zone
-				float inc_diff = log(abs(zone->average_household_income<Dollars>() - properties->Income<Dollars>()) + 1.0);
+				float inc_diff = log(abs(zone->average_household_income<Dollars>() - static_properties->Income<Dollars>()) + 1.0);
 				float race_diff;
-				if (properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
-				else if (properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
+				if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::WHITE_ALONE) race_diff = 1.0 - zone->race_percent_white<float>();
+				else if (static_properties->Race<Person_Components::Types::RACE>() == Person_Components::Types::RACE::BLACK_ALONE) race_diff = 1.0 - zone->race_percent_black<float>();
 				else race_diff = zone->race_percent_white<float>() + zone->race_percent_black<float>();
 					
 				float area_res = zone->residential_area<Square_Feet>()/1000000.0;
@@ -315,12 +324,12 @@ namespace Person_Components
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
-					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
+					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
 					// Mode specific effects
 					int ModAuto = 0, ModTran = 0,ModOth = 0;
-					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
+					Person_Components::Types::JOURNEY_TO_WORK_MODE mode = static_properties->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>();
 					if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_AUTOMOBILE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_MOTORCYCLE || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_TAXI)
 						ModAuto = 1;
 					else if (mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_BUS || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_RAILROAD || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_STREETCAR || mode == Person_Components::Types::JOURNEY_TO_WORK_MODE::WORKMODE_SUBWAY)
@@ -771,7 +780,7 @@ namespace Person_Components
 			{	
 			}
 
-			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Destination(ActivityItfType activity, boost::container::vector<ReturnType>* destinations_to_use=nullptr)
+			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Destination(ActivityItfType activity, std::vector<ReturnType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
@@ -796,12 +805,12 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_choice_set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
 				int selected_index = 0;
-				choice_model->template Evaluate_Choices<NT>();
+				float logsum = choice_model->template Evaluate_Choices<NT>();
 
 				// Get interface to chosen option
 				_Choice_Option_Interface* selected = choice_model->template Choose<_Choice_Option_Interface*>(selected_index);
@@ -830,7 +839,37 @@ namespace Person_Components
 				return return_ptr;	
 			}
 
-			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<TargetType>* destinations_to_use=nullptr)
+			template<typename ActivityItfType, typename ReturnType> ReturnType Evaluate_Destinations(ActivityItfType activity)
+			{
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+
+				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();//(_Choice_Model_Interface*)&a;
+
+				// set the current activity from input
+				this->_Current_Activity = (Current_Activity_type)activity;
+
+				// external knowledge references
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+
+				// selecte locations to choose from - use all if destinations to use not specified
+				_Activity_Locations_Container_Interface* locations;
+				locations= network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
+
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
+
+
+				// Create choice set
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
+				fill_stratified_choice_set<_Activity_Location_Interface*>(locations,loc_options,choice_model);
+
+				// Make choice
+				int selected_index = 0;
+				ReturnType logsum = choice_model->template Evaluate_Choices<NT>();
+				return logsum;
+			}
+
+			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, std::vector<TargetType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 
@@ -855,7 +894,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
 
 				// Make choice
@@ -891,7 +930,7 @@ namespace Person_Components
 				return return_ptr;
 			}
 
-			//template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			//{
 			//	// Get person context and system knowledge
 			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -976,7 +1015,7 @@ namespace Person_Components
 			//	}
 			//}
 
-			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				int strata_size = _choice_set_size / _num_strata;
 				const float EMP_SPLIT = 1000.0;
@@ -1121,7 +1160,7 @@ namespace Person_Components
 				}
 			}
 
-			//template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			//{
 			//	// Get person context and system knowledge
 			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -1146,7 +1185,7 @@ namespace Person_Components
 			//	// select zones to choose from and estimate utility 
 			//	for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
 			//	{
-			//		// First choose a random zone from the zone boost::container::list
+			//		// First choose a random zone from the zone std::list
 			//		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
 
 			//		// ignore zone if all employment slots have already been assigned to other agents
@@ -1177,7 +1216,7 @@ namespace Person_Components
 			//}
 			//
 
-			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				int strata_size = _choice_set_size / _num_strata;
 				const float EMP_SPLIT = 1000.0;
@@ -1283,7 +1322,7 @@ namespace Person_Components
 				}
 			}
 		
-			void Create_New_Choice_Option(boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
+			void Create_New_Choice_Option(std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
 			{
 				// ignore zone if all employment slots have already been assigned to other agents
 				if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) return;

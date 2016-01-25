@@ -18,11 +18,15 @@ namespace Prototypes
 		accessor(choice_model, NONE, NONE);	
 		accessor(Current_Activity, NONE, NONE);
 
-		template<typename ActivityRefType, typename ReturnType> ReturnType Choose_Destination(ActivityRefType current_activity, boost::container::vector<ReturnType>* destinations_to_use=nullptr, requires(ActivityRefType,check(ActivityRefType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+		template<typename ActivityRefType, typename ReturnType> ReturnType Choose_Destination(ActivityRefType current_activity, std::vector<ReturnType>* destinations_to_use=nullptr, requires(ActivityRefType,check(ActivityRefType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 		{
 			return this_component()->template Choose_Destination<ActivityRefType, ReturnType>(current_activity, destinations_to_use);
 		}
-		template<typename ReturnType> ReturnType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<ReturnType>* destinations_to_use=nullptr, requires(ReturnType,check(ReturnType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+		template<typename ActivityRefType, typename ReturnType> ReturnType Evaluate_Destination(ActivityRefType current_activity, std::vector<ReturnType>* destinations_to_use=nullptr, requires(ActivityRefType,check(ActivityRefType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+		{
+			return this_component()->template Evaluate_Destination<ActivityRefType, ReturnType>(current_activity, destinations_to_use);
+		}
+		template<typename ReturnType> ReturnType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, std::vector<ReturnType>* destinations_to_use=nullptr, requires(ReturnType,check(ReturnType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 		{
 			return this_component()->template Choose_Routine_Destination<ReturnType>(act_type, destinations_to_use);
 		}

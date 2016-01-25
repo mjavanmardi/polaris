@@ -39,23 +39,23 @@ public:
 		m_Ptr = NULL;
     }
 
-    s_array_iterator(T* data, boost::container::vector<size_type>* row_sizes, pair<size_type,size_type>* cursor)
+    s_array_iterator(T* data, std::vector<size_type>* row_sizes, pair<size_type,size_type>* cursor)
     {	// copy constructor
 		_fixed_dim = -1;
 		_fixed_dim_val = -1;
-		_row_sizes = (boost::container::vector<size_type>*)row_sizes;
+		_row_sizes = (std::vector<size_type>*)row_sizes;
 		_cursor = pair<size_type,size_type>(cursor->first, cursor->second);
 
 		_data = data;
 		m_Ptr = &_data[get_index(_cursor)];
     }
 
-	s_array_iterator(T* data, boost::container::vector<size_type>* row_sizes, pair<size_type,size_type>* cursor, size_type fixed_dim, size_type fixed_dim_val)
+	s_array_iterator(T* data, std::vector<size_type>* row_sizes, pair<size_type,size_type>* cursor, size_type fixed_dim, size_type fixed_dim_val)
 	{		
 		// copy constructor
 		_fixed_dim = fixed_dim;
 		_fixed_dim_val = fixed_dim_val;
-		_row_sizes = (boost::container::vector<size_type>*)row_sizes;
+		_row_sizes = (std::vector<size_type>*)row_sizes;
 		_cursor = pair<size_type,size_type>(cursor->first, cursor->second);
 
 		m_Ptr = &data[get_index(_cursor)];
@@ -149,7 +149,7 @@ public:
 
 private:
 	T *m_Ptr;                                            // pointer to container value type
-	boost::container::vector<size_type>* _row_sizes;								// dimensional sizes 
+	std::vector<size_type>* _row_sizes;								// dimensional sizes 
 	pair<size_type,size_type> _cursor;
 	T * _data;
 	int _fixed_dim;
@@ -185,8 +185,8 @@ public:
 	typedef const uint&							const_size_type;
 	typedef pair<size_type,size_type>			index_type;
 	typedef const  pair<size_type,size_type>&	const_index_type;
-	typedef const boost::container::vector<size_type>&			const_dimensional_type;
-	typedef  boost::container::vector<size_type>::iterator	dimensional_iterator;
+	typedef const std::vector<size_type>&			const_dimensional_type;
+	typedef  std::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[get_index(i)];}
@@ -275,7 +275,7 @@ public:
 	}
 
 	// MArray constructors/destructor
-	s_array (void){_size = 0;_data=nullptr;}
+	s_array (void){_size = 0;_data=nullptr;_row_sizes.push_back(0);}
 	s_array (const_dimensional_type row_sizes);
 	s_array (const_dimensional_type row_sizes, T init_val);
 	s_array (const s_array& obj);
@@ -337,7 +337,7 @@ public:
 	}
 
 protected:
-	boost::container::vector<size_type> _row_sizes;
+	std::vector<size_type> _row_sizes;
 	index_type _cursor;
 	size_type _size;
 	pointer _data;
@@ -414,6 +414,8 @@ void s_array<T>::_copy(const s_array<T>& obj)
 	_cursor.first = 0;
 	_cursor.second = 0;
 	_size = obj._size;
+
+	if (obj._size == 0) return;
 
 	for (size_type i=0; i<obj._row_sizes.size(); i++)
 	{

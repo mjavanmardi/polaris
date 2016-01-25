@@ -21,9 +21,9 @@ namespace polaris
 		t_data(bool,compiled);
 
 		
-		boost::container::vector< base_edge_type* >* Get_Edges()
+		std::vector< base_edge_type* >* Get_Edges()
 		{
-			return (boost::container::vector< base_edge_type* >*)_ordered_edge_reference;
+			return (std::vector< base_edge_type* >*)_ordered_edge_reference;
 		}
 
 
@@ -57,8 +57,8 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		void Add_Edge( Input_Edge<Edge_Attributes_Type>* new_edge )
 		{
-			if(_input_edge_reference == nullptr) _input_edge_reference = new boost::unordered::unordered_map<edge_id_type,void*>();
-			if(_ordered_input_edge_reference == nullptr) _ordered_input_edge_reference = new boost::container::vector<void*>();
+			if(_input_edge_reference == nullptr) _input_edge_reference = new std::unordered_map<edge_id_type,void*>();
+			if(_ordered_input_edge_reference == nullptr) _ordered_input_edge_reference = new std::vector<void*>();
 
 			if(_input_edge_reference->count(new_edge->edge_id())){ THROW_EXCEPTION("Duplicate Edge Added: " << new_edge->edge_id()); }
 
@@ -74,13 +74,13 @@ namespace polaris
 			size_t current_graph_size = 0;
 			size_t current_edge_size = 0;
 
-			for(boost::container::vector<void*>::iterator edges_itr = _ordered_input_edge_reference->begin(); edges_itr != _ordered_input_edge_reference->end(); edges_itr++)
+			for(std::vector<void*>::iterator edges_itr = _ordered_input_edge_reference->begin(); edges_itr != _ordered_input_edge_reference->end(); edges_itr++)
 			{
 				Input_Edge<Edge_Attributes_Type>* current_edge = (Input_Edge<Edge_Attributes_Type>*) *edges_itr;
 
 				current_edge_size += sizeof(stored_edge_type);
 
-				for(boost::container::deque<Input_Connection_Group*>::iterator groups_itr = current_edge->connection_groups().begin(); groups_itr != current_edge->connection_groups().end(); groups_itr++)
+				for(std::deque<Input_Connection_Group*>::iterator groups_itr = current_edge->connection_groups().begin(); groups_itr != current_edge->connection_groups().end(); groups_itr++)
 				{
 					Input_Connection_Group* current_group = *groups_itr;
 
@@ -102,7 +102,7 @@ namespace polaris
 		{
 			char* graph_itr = _graph;
 
-			for(boost::container::vector<void*>::iterator input_itr = _ordered_input_edge_reference->begin(); input_itr != _ordered_input_edge_reference->end(); input_itr++)
+			for(std::vector<void*>::iterator input_itr = _ordered_input_edge_reference->begin(); input_itr != _ordered_input_edge_reference->end(); input_itr++)
 			{
 				size_t current_edge_size = 0;
 
@@ -123,7 +123,7 @@ namespace polaris
 
 				Anonymous_Connection_Group<MasterType,base_edge_type>* current_connection_group = current_edge->begin_connection_groups();
 
-				for(boost::container::deque<Input_Connection_Group*>::iterator connection_group_itr = current_input_edge->connection_groups().begin(); connection_group_itr!=current_input_edge->connection_groups().end(); connection_group_itr++)
+				for(std::deque<Input_Connection_Group*>::iterator connection_group_itr = current_input_edge->connection_groups().begin(); connection_group_itr!=current_input_edge->connection_groups().end(); connection_group_itr++)
 				{
 					Input_Connection_Group* current_input_connection_group = *connection_group_itr;
 
@@ -147,8 +147,8 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		Interactive_Graph< output_graph_type >* Compile_Graph()
 		{
-			_edge_reference = new boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
-			_ordered_edge_reference = new boost::container::vector<Edge<stored_edge_type>*>();
+			_edge_reference = new std::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			_ordered_edge_reference = new std::vector<Edge<stored_edge_type>*>();
 
 			_graph_size = Compute_Graph_Size<Edge_Attributes_Type>();
 
@@ -164,7 +164,7 @@ namespace polaris
 
 		void Link_Graph()
 		{
-			for(boost::container::vector< Edge<stored_edge_type>* >::iterator edge_itr = _ordered_edge_reference->begin(); edge_itr!=_ordered_edge_reference->end(); edge_itr++)
+			for(std::vector< Edge<stored_edge_type>* >::iterator edge_itr = _ordered_edge_reference->begin(); edge_itr!=_ordered_edge_reference->end(); edge_itr++)
 			{
 				Edge<stored_edge_type>* current_edge = *edge_itr;
 
@@ -182,8 +182,8 @@ namespace polaris
 		{
 			Graph_Implementation* copy = (Graph_Implementation*)new ComponentType();
 			
-			copy->_edge_reference = new boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
-			copy->_ordered_edge_reference = new boost::container::vector<Edge<stored_edge_type>*>();
+			copy->_edge_reference = new std::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			copy->_ordered_edge_reference = new std::vector<Edge<stored_edge_type>*>();
 
 			copy->_graph_id = _graph_id;
 
@@ -197,7 +197,7 @@ namespace polaris
 
 			const long long address_deviation = (long long) ((long long*)copy->_graph - (long long*)_graph);
 			
-			for(boost::container::vector<Edge<stored_edge_type>*>::iterator itr = _ordered_edge_reference->begin();itr != _ordered_edge_reference->end(); itr++)
+			for(std::vector<Edge<stored_edge_type>*>::iterator itr = _ordered_edge_reference->begin();itr != _ordered_edge_reference->end(); itr++)
 			{
 				Edge<stored_edge_type>* current_edge = (Edge<stored_edge_type>*) *itr;
 				Edge<stored_edge_type>* copy_edge = (Edge<stored_edge_type>*)(((long long*) *itr) + address_deviation);
@@ -210,7 +210,7 @@ namespace polaris
 				copy_edge->begin_connection_groups()->Unlink_Edges();
 			}
 
-			for(boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>::iterator itr = _edge_reference->begin();itr != _edge_reference->end(); itr++)
+			for(std::unordered_map<edge_id_type,Edge<stored_edge_type>*>::iterator itr = _edge_reference->begin();itr != _edge_reference->end(); itr++)
 			{
 				(*copy->_edge_reference)[itr->first] = (Edge<stored_edge_type>*)(((long long*)itr->second) + address_deviation);
 			}
@@ -218,11 +218,11 @@ namespace polaris
 			return (Interactive_Graph<ComponentType>*)copy;
 		}
 
-		boost::unordered::unordered_map<edge_id_type,void*>* _input_edge_reference;
-		boost::container::vector<void*>* _ordered_input_edge_reference;
+		std::unordered_map<edge_id_type,void*>* _input_edge_reference;
+		std::vector<void*>* _ordered_input_edge_reference;
 		
-		boost::unordered::unordered_map< edge_id_type, Edge<stored_edge_type>* >* _edge_reference;
-		boost::container::vector< Edge<stored_edge_type>* >* _ordered_edge_reference;
+		std::unordered_map< edge_id_type, Edge<stored_edge_type>* >* _edge_reference;
+		std::vector< Edge<stored_edge_type>* >* _ordered_edge_reference;
 
 		size_t _graph_size;
 		char* _graph;

@@ -18,7 +18,7 @@ prototype struct Attributes_Panel
 	//	this_component()->Push_Schema<ComponentType,CallerType,TargetType>(schema);
 	//}
 
-	void Push_Attributes(boost::container::vector<pair<string,string>>& attributes)
+	void Push_Attributes(std::vector<pair<string,string>>& attributes)
 	{
 		this_component()->Push_Attributes(attributes);
 	}

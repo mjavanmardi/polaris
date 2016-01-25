@@ -16,18 +16,18 @@ namespace Person_Components
 		{
 			//==================================================================================
 			// Data caches for current and historical plot points
-			boost::container::vector<Point_2D<MasterType>> _replanned_activity_count_cache;
-			boost::container::vector<Point_2D<MasterType>> _activity_time_lost_cache;
-			boost::container::vector<Point_2D<MasterType>> _cancelled_activities_cache;
-			boost::container::vector<Point_2D<MasterType>> _ttime_distribution_cache;
-			boost::container::vector<Point_2D<MasterType>> _generated_activity_distribution_cache;
-			boost::container::vector<Point_2D<MasterType>> _executed_activity_distribution_cache;
+			std::vector<Point_2D<MasterType>> _replanned_activity_count_cache;
+			std::vector<Point_2D<MasterType>> _activity_time_lost_cache;
+			std::vector<Point_2D<MasterType>> _cancelled_activities_cache;
+			std::vector<Point_2D<MasterType>> _ttime_distribution_cache;
+			std::vector<Point_2D<MasterType>> _generated_activity_distribution_cache;
+			std::vector<Point_2D<MasterType>> _executed_activity_distribution_cache;
 
-			boost::container::vector<Point_2D<MasterType>> _ref_activity_time_lost_cache;
-			boost::container::vector<Point_2D<MasterType>> _ref_cancelled_activities_cache;
-			boost::container::vector<Point_2D<MasterType>> _ref_ttime_distribution_cache;
-			boost::container::vector<Point_2D<MasterType>> _ref_generated_activity_distribution_cache;
-			boost::container::vector<Point_2D<MasterType>> _ref_executed_activity_distribution_cache;
+			std::vector<Point_2D<MasterType>> _ref_activity_time_lost_cache;
+			std::vector<Point_2D<MasterType>> _ref_cancelled_activities_cache;
+			std::vector<Point_2D<MasterType>> _ref_ttime_distribution_cache;
+			std::vector<Point_2D<MasterType>> _ref_generated_activity_distribution_cache;
+			std::vector<Point_2D<MasterType>> _ref_executed_activity_distribution_cache;
 
 			//==================================================================================
 			// Vectors of historical data read from file on initialization
@@ -35,10 +35,10 @@ namespace Person_Components
 			typedef typename float_map::iterator float_map_itr;
 			float_map reference_activity_time_lost;
 			float_map reference_cancelled_activities;
-			typedef dense_hash_map<int,boost::container::vector<float>> vector_map;
-			typedef typename boost::container::vector_map::iterator vector_map_itr;
-			boost::container::vector_map reference_ttime_distribution;
-			boost::container::vector_map reference_executed_activity_distribution;
+			typedef dense_hash_map<int,std::vector<float>> vector_map;
+			typedef typename std::vector_map::iterator vector_map_itr;
+			std::vector_map reference_ttime_distribution;
+			std::vector_map reference_executed_activity_distribution;
 
 			//==================================================================================
 			// 2D plotting layers
@@ -90,7 +90,7 @@ namespace Person_Components
 				if (demand_moe_reference_file.is_open())
 				{
 					
-					boost::container::vector<string> tokens;
+					std::vector<string> tokens;
 					string line;
 					int token_size = 3;
 					getline(demand_moe_reference_file,line); // skip the first line
@@ -133,7 +133,7 @@ namespace Person_Components
 				if (ttime_distribution_file.is_open())
 				{
 					
-					boost::container::vector<string> tokens;
+					std::vector<string> tokens;
 					string line;
 					int token_size = 26;
 					getline(ttime_distribution_file,line); // skip the first line
@@ -157,13 +157,13 @@ namespace Person_Components
 						}
 						else
 						{
-							boost::container::vector<float> ttimes;
+							std::vector<float> ttimes;
 							for (int i = 1; i < 26; i++)
 							{
 								float ttime = stof(tokens[i]);
 								ttimes.push_back(ttime);
 							}
-							reference_ttime_distribution.insert(pair<int,boost::container::vector<float>>(time,ttimes));
+							reference_ttime_distribution.insert(pair<int,std::vector<float>>(time,ttimes));
 						}
 					}
 				}
@@ -180,7 +180,7 @@ namespace Person_Components
 				if (executed_activity_file.is_open())
 				{
 					
-					boost::container::vector<string> tokens;
+					std::vector<string> tokens;
 					string line;
 					int token_size = 26;
 					getline(executed_activity_file,line); // skip the first line
@@ -204,13 +204,13 @@ namespace Person_Components
 						}
 						else
 						{
-							boost::container::vector<float> gen_acts;
+							std::vector<float> gen_acts;
 							for (int i = 1; i < 20; i++)
 							{
 								float acts = stof(tokens[i]);
 								gen_acts.push_back(acts);
 							}
-							reference_executed_activity_distribution.insert(pair<int,boost::container::vector<float>>(time,gen_acts));
+							reference_executed_activity_distribution.insert(pair<int,std::vector<float>>(time,gen_acts));
 						}
 					}
 				}
@@ -356,7 +356,7 @@ namespace Person_Components
 				//-----------------------------------
 				// Current model
 				_ttime_distribution_cache.clear();
-				boost::container::vector<int> counts;
+				std::vector<int> counts;
 				int count =0;
 				int total =0;
 				for (int j=0; j < ttime_bins; j++)
@@ -387,7 +387,7 @@ namespace Person_Components
 				{
 					_ref_ttime_distribution_cache.clear();
 					int count =0;
-					boost::container::vector_map_itr itr = this->reference_ttime_distribution.find(iteration());
+					std::vector_map_itr itr = this->reference_ttime_distribution.find(iteration());
 					if (itr != this->reference_ttime_distribution.end())
 					{
 						for (int j=0; j < ttime_bins; j++)
@@ -485,7 +485,7 @@ namespace Person_Components
 				if (this->_draw_reference)
 				{
 					_ref_executed_activity_distribution_cache.clear();
-					boost::container::vector_map_itr itr = this->reference_executed_activity_distribution.find(iteration());
+					std::vector_map_itr itr = this->reference_executed_activity_distribution.find(iteration());
 					if (itr != this->reference_executed_activity_distribution.end())
 					{
 						submission._x = 0;
@@ -518,7 +518,7 @@ namespace Person_Components
 						_activity_type_distribution_layer->Push_Element<Regular_Element>((void*)&ref_element_act);
 					}
 					// replot the generated activities curve for comparison
-					for (boost::container::vector<Point_2D<MasterType>>::iterator vitr = _generated_activity_distribution_cache.begin(); vitr != _generated_activity_distribution_cache.end(); ++vitr)
+					for (std::vector<Point_2D<MasterType>>::iterator vitr = _generated_activity_distribution_cache.begin(); vitr != _generated_activity_distribution_cache.end(); ++vitr)
 					{
 						submission._x = vitr->_x + 0.3;
 						submission._y = vitr->_y;

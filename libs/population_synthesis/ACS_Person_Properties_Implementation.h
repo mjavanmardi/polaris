@@ -26,7 +26,7 @@ namespace Person_Components
 			m_data(double,Weight, NONE, NONE);
 			m_data(uint,Index, NONE, NONE);				 //index into the joint-distribution matrix of the region (convert using region.get_index())
 			m_data(uint,Test_Index, NONE, NONE);		//index into the test marginal distribution for this person
-			//m_container(boost::container::vector<double>, Characteristics, NONE, NONE);
+			//m_container(std::vector<double>, Characteristics, NONE, NONE);
 
 			//=================================================================
 			// Census specific individual data, used in ABM routines
@@ -387,7 +387,7 @@ namespace Person_Components
 			tag_getter_setter_as_available(Journey_To_Work_Arrival_Time);
 
 			// Characteristics setter
-			template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
+			template<typename TargetType> void Characteristics(std::vector<double>* data)
 			{
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 				typedef Prototypes::Person_Properties<ComponentType> this_itf;

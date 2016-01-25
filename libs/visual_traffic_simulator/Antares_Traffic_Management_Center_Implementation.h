@@ -35,14 +35,14 @@ namespace Traffic_Management_Center_Components
 		//		cfg.Configure_Static_Points(head_color,8);
 		//		cfg.draw=true;
 		//		
-		//		boost::container::vector<string>* dropdown;
+		//		std::vector<string>* dropdown;
 
-		//		cfg.dropdown_schema.push_back(boost::container::vector<string>());
+		//		cfg.dropdown_schema.push_back(std::vector<string>());
 		//		dropdown=&cfg.dropdown_schema.back();
 		//		dropdown->push_back("Close Lane");
 		//		dropdown->push_back("Open Lane");
 
-		//		boost::container::vector<string>::iterator sitr;
+		//		std::vector<string>::iterator sitr;
 
 		//		for(sitr = _link_control_keys.begin(); sitr != _link_control_keys.end(); sitr++)
 		//		{
@@ -52,7 +52,7 @@ namespace Traffic_Management_Center_Components
 
 		//		_link_control_layer->Initialize<NT>(cfg);
 
-		//		boost::container::vector<Link_Control_Interface*>::iterator itr;
+		//		std::vector<Link_Control_Interface*>::iterator itr;
 		//		
 		//		Point_3D<MasterType> element;
 
@@ -87,7 +87,7 @@ namespace Traffic_Management_Center_Components
 		//	//	cfg.draw=true;
 		//	//	_advisory_radio_layer->Initialize<NT>(cfg);
 
-		//	//	boost::container::vector<Advisory_Radio_Interface*>::iterator itr;
+		//	//	std::vector<Advisory_Radio_Interface*>::iterator itr;
 
 		//	//	for(itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 		//	//	{
@@ -120,20 +120,20 @@ namespace Traffic_Management_Center_Components
 		//		cfg.Configure_Static_Points(head_color,8);
 		//		cfg.draw=true;
 		//		
-		//		boost::container::vector<string>* dropdown;
+		//		std::vector<string>* dropdown;
 
-		//		cfg.dropdown_schema.push_back(boost::container::vector<string>());
+		//		cfg.dropdown_schema.push_back(std::vector<string>());
 		//		dropdown=&cfg.dropdown_schema.back();
 		//		dropdown->push_back("Congestion: I-55");
 		//		dropdown->push_back("Congestion: I-90");
 		//		
-		//		cfg.dropdown_schema.push_back(boost::container::vector<string>());
+		//		cfg.dropdown_schema.push_back(std::vector<string>());
 		//		dropdown=&cfg.dropdown_schema.back();
 		//		dropdown->push_back("Inident: Godzilla Attack");
 		//		dropdown->push_back("Inident: Alien Contact");
 		//		dropdown->push_back("Inident: Killer Robots");
 
-		//		boost::container::vector<string>::iterator sitr;
+		//		std::vector<string>::iterator sitr;
 
 		//		for(sitr = _variable_message_sign_keys.begin(); sitr != _variable_message_sign_keys.end(); sitr++)
 		//		{
@@ -144,7 +144,7 @@ namespace Traffic_Management_Center_Components
 		//		_variable_message_sign_layer->Initialize<NT>(cfg);
 
 
-		//		boost::container::vector<Variable_Message_Sign_Interface*>::iterator itr;
+		//		std::vector<Variable_Message_Sign_Interface*>::iterator itr;
 		//		
 		//		Point_3D<MasterType> element;
 
@@ -178,7 +178,7 @@ namespace Traffic_Management_Center_Components
 		//	//	cfg.draw=true;
 		//	//	_depot_layer->Initialize<NT>(cfg);
 
-		//	//	boost::container::vector<Depot_Interface*>::iterator itr;
+		//	//	std::vector<Depot_Interface*>::iterator itr;
 
 		//	//	for(itr=_depots.begin();itr!=_depots.end();itr++)
 		//	//	{

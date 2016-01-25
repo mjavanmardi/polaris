@@ -426,7 +426,7 @@ namespace polaris
 	class BinaryHeap
 	{
 		private:
-			boost::container::vector<T*> heap;
+			std::vector<T*> heap;
 			int left(int parent);
 			int right(int parent);
 			int parent(int child);

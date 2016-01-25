@@ -288,8 +288,8 @@ namespace Person_Components
 				//---------------------------------------------------------
 				zones_container_interface* zones = this->network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
 				typename zones_container_interface::iterator z_itr;
-				boost::container::vector<zone_interface*> temp_zones;
-				boost::container::vector<float> temp_zone_probabilities;
+				std::vector<zone_interface*> temp_zones;
+				std::vector<float> temp_zone_probabilities;
 				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
 
 				// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
@@ -314,7 +314,7 @@ namespace Person_Components
 				}
 				// calculate probabilities
 				float cum_prob = 0;
-				for (typename boost::container::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
+				for (typename std::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
 				{
 					cum_prob += (*t_itr)->template employment_total<float>() / employment;
 					temp_zone_probabilities.push_back(cum_prob);
@@ -325,8 +325,8 @@ namespace Person_Components
 				//---------------------------------------------------------
 				float r = Uniform_RNG.template Next_Rand<float>();
 				zone_interface* selected_zone = nullptr;
-				typename boost::container::vector<zone_interface*>::iterator t_itr;
-				boost::container::vector<float>::iterator p_itr;
+				typename std::vector<zone_interface*>::iterator t_itr;
+				std::vector<float>::iterator p_itr;
 				for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
 				{
 					if (r<*p_itr) 
@@ -395,8 +395,8 @@ namespace Person_Components
 				//---------------------------------------------------------
 				zones_container_interface* zones = network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
 				typename zones_container_interface::iterator z_itr;
-				boost::container::vector<zone_interface*> temp_zones;
-				boost::container::vector<float> temp_zone_probabilities;
+				std::vector<zone_interface*> temp_zones;
+				std::vector<float> temp_zone_probabilities;
 				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
 
 				//=========================================================
@@ -437,7 +437,7 @@ namespace Person_Components
 
 					// calculate probabilities
 					float cum_prob = 0;
-					for (typename boost::container::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
+					for (typename std::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
 					{
 						cum_prob += (*t_itr)->template school_locations<locations_container_interface*>()->size() / school_locations;
 						temp_zone_probabilities.push_back(cum_prob);
@@ -448,8 +448,8 @@ namespace Person_Components
 					//---------------------------------------------------------
 					float r = Uniform_RNG.template Next_Rand<float>();
 					zone_interface* selected_zone = nullptr;
-					typename boost::container::vector<zone_interface*>::iterator t_itr;
-					boost::container::vector<float>::iterator p_itr;
+					typename std::vector<zone_interface*>::iterator t_itr;
+					std::vector<float>::iterator p_itr;
 					for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
 					{
 						if (r<*p_itr) 

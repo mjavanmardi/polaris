@@ -102,10 +102,10 @@ namespace Household_Components
 
 		//	//=================================================================
 		//	// Container which holds linked persons in ACS File for this household info unit
-		//	m_container(boost::container::vector<typename MasterType::person_static_properties_type*>, Persons_Container, NONE, NONE);
+		//	m_container(std::vector<typename MasterType::person_static_properties_type*>, Persons_Container, NONE, NONE);
 
 		//	// Characteristics setter
-		//	template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
+		//	template<typename TargetType> void Characteristics(std::vector<double>* data)
 		//	{
 		//		// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 		//		typedef Prototypes::Household_Properties<ComponentType> this_itf;

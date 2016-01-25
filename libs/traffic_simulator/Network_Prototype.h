@@ -57,6 +57,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(turn_movements_container, NONE, NONE);
 			accessor(activity_locations_container, NONE, NONE);
+			accessor(activity_location_id_to_idx_container, NONE, NONE);
 			accessor(zones_container, NONE, NONE);
 			accessor(zone_ids_container, NONE, NONE);
 			accessor(ramp_metering_container, NONE, NONE);
@@ -305,7 +306,7 @@ namespace Network_Components
 				this_component()->template update_ttime_distribution<TargetType>(ttime);
 			}
 
-			template<typename TargetType> TargetType get_random_zone(boost::container::vector<TargetType>* available_zones = nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Zone_Components::Concepts::Is_Zone_Prototype)))
+			template<typename TargetType> TargetType get_random_zone(std::vector<TargetType>* available_zones = nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Zone_Components::Concepts::Is_Zone_Prototype)))
 			{
 				
 				typedef  Pair_Associative_Container< typename get_type_of(zones_container)> _Zones_Container_Interface;

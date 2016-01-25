@@ -50,8 +50,8 @@ namespace Person_Components
 
 			//Containers for activity planning events and movement planning events
 			m_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
-			//m_prototype_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
-			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
+			//m_prototype_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,typename MasterType::activity_type,Activity_Container, NONE, NONE);
+			m_container(std::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
 

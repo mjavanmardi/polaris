@@ -12,9 +12,9 @@ namespace Link_Control_Components
 		implementation struct Lane_Link_Control:public Polaris_Component<MasterType,INHERIT(Lane_Link_Control),Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Lane_Link_Control),Data_Object>::Component_Type ComponentType;
-			template<typename TargetType> static void Initialize_Type(/*const boost::container::vector<shared_ptr<polaris::io::Component_Key>>& keys*/)
+			template<typename TargetType> static void Initialize_Type(/*const std::vector<shared_ptr<polaris::io::Component_Key>>& keys*/)
 			{
-				//for(boost::container::vector<shared_ptr<polaris::io::Component_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
+				//for(std::vector<shared_ptr<polaris::io::Component_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
 				//{
 				//	_component_keys.push_back( (*itr)->getKey() );
 				//}
@@ -28,7 +28,7 @@ namespace Link_Control_Components
 
 				const std::vector<int>& db_covered_links = (*link_list).getLinks();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
 
 				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -36,9 +36,9 @@ namespace Link_Control_Components
 
 					if(db_map.count(link))
 					{
-						boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
+						std::vector<typename MasterType::link_type*>& links=db_map[link];
 
-						typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
+						typename std::vector<typename MasterType::link_type*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -55,16 +55,16 @@ namespace Link_Control_Components
 			//m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
-			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
+			m_data(std::vector<Link_Interface*>,covered_links, NONE, NONE);
 			m_data(bool,shoulder_opened, NONE, NONE);
 
 			//m_prototype(Traffic_Management_Center<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);
-			//static m_data(boost::container::vector<string>, component_keys, NONE, NONE);
+			//static m_data(std::vector<string>, component_keys, NONE, NONE);
 			//m_prototype(Link<typename type_of(MasterType::link)>,covered_link, NONE, NONE);
 		};
 
 		//template<typename MasterType,typename InheritanceList>
-		//boost::container::vector<string> Lane_Link_Control<MasterType,InheritanceList>::_component_keys;
+		//std::vector<string> Lane_Link_Control<MasterType,InheritanceList>::_component_keys;
 	}
 }
 

@@ -69,7 +69,7 @@ namespace Depot_Components
 
 
 
-				boost::container::vector<Link_Interface*>& event_links = net_event->affected_links< boost::container::vector<Link_Interface*>& >();
+				std::vector<Link_Interface*>& event_links = net_event->affected_links< std::vector<Link_Interface*>& >();
 
 				if(event_links.size())
 				{
@@ -100,20 +100,20 @@ namespace Depot_Components
 
 			}
 
-			static bool on_submit(const boost::container::list<void*>& selected,const boost::container::vector<string>& attribute_choices,const boost::container::vector<string>& dropdown_choices)
+			static bool on_submit(const std::list<void*>& selected,const std::vector<string>& attribute_choices,const std::vector<string>& dropdown_choices)
 			{
 				string user_event_choice = dropdown_choices[0];
 				bool update_successful = false;
 
-				//for(boost::container::list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
+				//for(std::list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
 				//{
 				//	ComponentType* its_component=(ComponentType*) (*sitr);
 					
 					ComponentType* its_component=(ComponentType*)selected.back();
 
-					boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
+					std::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< std::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
 
-					for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
+					for(std::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
 					{
 						if(user_event_choice == (*itr)->notes<string&>())
 						{
@@ -145,21 +145,21 @@ namespace Depot_Components
 				else return false;
 			}
 
-			static void on_double_click(const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& attributes,boost::container::vector<boost::container::vector<string>>& dropdowns)
+			static void on_double_click(const std::list<void*>& selected,std::vector<pair<string,string>>& attributes,std::vector<std::vector<string>>& dropdowns)
 			{
 				ComponentType* its_component=(ComponentType*)selected.back();
 
 				dropdowns.resize(1);
 
-				boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
+				std::vector< Network_Event< typename MasterType::base_network_event_type >* >& current_events = its_component->_associated_depot->current_events< std::vector< Network_Event< typename MasterType::base_network_event_type >* >& >();
 
-				for(boost::container::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
+				for(std::vector< Network_Event< typename MasterType::base_network_event_type >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
 				{
 					dropdowns[0].push_back( (*itr)->notes<string&>() );
 				}
 			}
 
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -168,7 +168,7 @@ namespace Depot_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -176,7 +176,7 @@ namespace Depot_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -302,20 +302,20 @@ namespace Depot_Components
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 
-				const boost::container::vector<polaris::LinkID>& truck_locations = pthis->_depot_service->getTruckLinks(iteration());
+				const std::vector<polaris::LinkID>& truck_locations = pthis->_depot_service->getTruckLinks(iteration());
 
 				Truck_Location truck_location;
 
 				pthis->_tow_trucks.clear();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 				
 				typename MasterType::tow_truck_type tow_truck;
 
 				Tow_Truck_Interface* tow_truck_itf = (Tow_Truck_Interface*)&tow_truck;
 
 
-				for(boost::container::vector<polaris::LinkID>::const_iterator itr = truck_locations.begin();itr!=truck_locations.end();itr++)
+				for(std::vector<polaris::LinkID>::const_iterator itr = truck_locations.begin();itr!=truck_locations.end();itr++)
 				{
 					if(db_map.count((*itr)))
 					{
@@ -401,7 +401,7 @@ namespace Depot_Components
 				_its_component_layer->Push_Element<Regular_Element>(&its_location);
 			}
 			
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -410,7 +410,7 @@ namespace Depot_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -418,7 +418,7 @@ namespace Depot_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -452,7 +452,7 @@ namespace Depot_Components
 
 				link_line.data = nullptr;
 
-				for(boost::container::vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				for(std::vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
 					Link_Interface* link = (*itr);
 					

@@ -9,8 +9,8 @@
 //{
 //	m_data(long long,id,NONE,NONE);
 //
-//	m_container(boost::container::vector<long long>,forward_edge_ids,NONE,NONE);
-//	m_container(boost::container::vector<long long>,backward_edge_ids,NONE,NONE);
+//	m_container(std::vector<long long>,forward_edge_ids,NONE,NONE);
+//	m_container(std::vector<long long>,backward_edge_ids,NONE,NONE);
 //
 //	m_data(float,pos_x,NONE,NONE);
 //	m_data(float,pos_y,NONE,NONE);
@@ -24,22 +24,22 @@
 //	{
 //		copy._id = _id;
 //
-//		for(boost::container::vector<long long>::iterator itr = _forward_edge_ids.begin();itr!=_forward_edge_ids.end();itr++)
+//		for(std::vector<long long>::iterator itr = _forward_edge_ids.begin();itr!=_forward_edge_ids.end();itr++)
 //		{
 //			copy._forward_edge_ids.push_back( *itr );
 //		}
 //
-//		for(boost::container::vector<float>::iterator itr = _forward_edge_delays.begin();itr!=_forward_edge_delays.end();itr++)
+//		for(std::vector<float>::iterator itr = _forward_edge_delays.begin();itr!=_forward_edge_delays.end();itr++)
 //		{
 //			copy._forward_edge_delays.push_back( *itr );
 //		}
 //
-//		for(boost::container::vector<long long>::iterator itr = _backward_edge_ids.begin();itr!=_backward_edge_ids.end();itr++)
+//		for(std::vector<long long>::iterator itr = _backward_edge_ids.begin();itr!=_backward_edge_ids.end();itr++)
 //		{
 //			copy._backward_edge_ids.push_back( *itr );
 //		}
 //
-//		for(boost::container::vector<float>::iterator itr = _backward_edge_delays.begin();itr!=_backward_edge_delays.end();itr++)
+//		for(std::vector<float>::iterator itr = _backward_edge_delays.begin();itr!=_backward_edge_delays.end();itr++)
 //		{
 //			copy._backward_edge_delays.push_back( *itr );
 //		}
@@ -52,11 +52,11 @@
 //
 //	m_data(long long,id,NONE,NONE);
 //
-//	m_container(boost::container::vector<long long>,forward_edge_ids,NONE,NONE);
-//	m_container(boost::container::vector<float>,forward_edge_delays,NONE,NONE);
+//	m_container(std::vector<long long>,forward_edge_ids,NONE,NONE);
+//	m_container(std::vector<float>,forward_edge_delays,NONE,NONE);
 //
-//	m_container(boost::container::vector<long long>,backward_edge_ids,NONE,NONE);
-//	m_container(boost::container::vector<float>,backward_edge_delays,NONE,NONE);
+//	m_container(std::vector<long long>,backward_edge_ids,NONE,NONE);
+//	m_container(std::vector<float>,backward_edge_delays,NONE,NONE);
 //
 //	m_data(float,pos_x,NONE,NONE);
 //	m_data(float,pos_y,NONE,NONE);
@@ -143,7 +143,7 @@
 //		A_Star_Neighbor<A_Star_Edge<A_Star_Edge_Type>::neighbor_type>* current_neighbor = edge->forward_edges();
 //		const A_Star_Neighbor<A_Star_Edge<A_Star_Edge_Type>::neighbor_type>* const end_neighbor = edge->end_forward_edges();
 //		
-//		boost::container::vector<float>::iterator itr = input_edge->_forward_edge_delays.begin();
+//		std::vector<float>::iterator itr = input_edge->_forward_edge_delays.begin();
 //
 //		while(current_neighbor != end_neighbor)
 //		{
@@ -464,17 +464,17 @@
 //	float latitude;
 //	float longitude;
 //
-//	boost::container::vector<stop_time*> outbound_trip_legs;
+//	std::vector<stop_time*> outbound_trip_legs;
 //};
 //
-//static boost::unordered::unordered_map<unsigned int, long long> trip_index_uuid_map;
-//static boost::unordered::unordered_map<long long, unsigned int> trip_uuid_index_map;
+//static std::unordered_map<unsigned int, long long> trip_index_uuid_map;
+//static std::unordered_map<long long, unsigned int> trip_uuid_index_map;
 //
-//static boost::unordered::unordered_map<long long, boost::container::vector<stop_time*>> stop_times_map;
+//static std::unordered_map<long long, std::vector<stop_time*>> stop_times_map;
 //
-//static boost::unordered::unordered_set<long long> valid_services;
+//static std::unordered_set<long long> valid_services;
 //
-//static boost::unordered::unordered_map<long long, stop_data> stop_data_map;
+//static std::unordered_map<long long, stop_data> stop_data_map;
 //
 //void Read_Calendar(string&& filename)
 //{
@@ -768,7 +768,7 @@
 //
 //	unsigned int skipped = 0;
 //	
-//	boost::container::vector<stop_time*>* previous_stop = nullptr;
+//	std::vector<stop_time*>* previous_stop = nullptr;
 //
 //	unsigned int counter = 0;
 //
@@ -916,7 +916,7 @@
 //
 //	unsigned int counter = 0;
 //
-//	for(boost::unordered::unordered_map<long long,boost::container::vector<stop_time*>>::iterator itr = stop_times_map.begin(); itr != stop_times_map.end(); itr++)
+//	for(std::unordered_map<long long,std::vector<stop_time*>>::iterator itr = stop_times_map.begin(); itr != stop_times_map.end(); itr++)
 //	{
 //		//if(run_once) break;
 //
@@ -926,9 +926,9 @@
 //
 //		++counter;
 //
-//		for(boost::container::vector<stop_time*>::iterator stop_itr = itr->second.begin(); stop_itr != itr->second.end(); stop_itr++)
+//		for(std::vector<stop_time*>::iterator stop_itr = itr->second.begin(); stop_itr != itr->second.end(); stop_itr++)
 //		{
-//			boost::container::vector<stop_time*>* outbound_legs = &(stop_data_map[(*stop_itr)->stop_id].outbound_trip_legs);
+//			std::vector<stop_time*>* outbound_legs = &(stop_data_map[(*stop_itr)->stop_id].outbound_trip_legs);
 //
 //			arrival_time_to_current = (*stop_itr)->arrival_time;
 //			departure_time_from_current = (*stop_itr)->departure_time;
@@ -947,7 +947,7 @@
 //
 //				// next we need to create our "turn penalties" and "incident edges" from the set of stops which depart from this one
 //
-//				for(boost::container::vector<stop_time*>::iterator outbound_leg_itr = outbound_legs->begin(); outbound_leg_itr != outbound_legs->end(); outbound_leg_itr++)
+//				for(std::vector<stop_time*>::iterator outbound_leg_itr = outbound_legs->begin(); outbound_leg_itr != outbound_legs->end(); outbound_leg_itr++)
 //				{
 //					// the "turn penalty" for this edge is the departure time from this stop - the arrival time to this stop
 //					int transfer_time = (*outbound_leg_itr)->departure_time - arrival_time_to_current;
@@ -1068,7 +1068,7 @@
 //	//destination.composite_id.time = 16*60*60+2*60;
 //	//destination.composite_id.trip_index = trip_uuid_index_map[42060791492];
 //
-//	//boost::container::deque<long long> out_path;
+//	//std::deque<long long> out_path;
 //
 //
 //	//A_Star_Edge<typename MasterType::a_star_edge_type>* end = A_Star((A_Star_Graph<typename MasterType::a_star_graph_type>*)a_star_graph,origin.id,destination.id,out_path);
@@ -1077,7 +1077,7 @@
 //
 //	//transit_edge_id current_edge;
 //
-//	//for(boost::container::deque<long long>::iterator itr = out_path.begin();itr!=out_path.end();itr++)
+//	//for(std::deque<long long>::iterator itr = out_path.begin();itr!=out_path.end();itr++)
 //	//{
 //	//	current_edge.id = *itr;
 //
@@ -1099,11 +1099,11 @@
 //
 //
 //
-//	//for(boost::unordered::unordered_map<long long,boost::container::vector<stop_time>>::iterator itr = stop_times_map.begin();itr!=stop_times_map.end();itr++)
+//	//for(std::unordered_map<long long,std::vector<stop_time>>::iterator itr = stop_times_map.begin();itr!=stop_times_map.end();itr++)
 //	//{
 //	//	cout << itr->first << endl;
 //
-//	//	for(boost::container::vector<stop_time>::iterator record_itr = itr->second.begin();record_itr != itr->second.end();record_itr++)
+//	//	for(std::vector<stop_time>::iterator record_itr = itr->second.begin();record_itr != itr->second.end();record_itr++)
 //	//	{
 //	//		cout << "\t" << record_itr->arrival_time << "," << record_itr->departure_time << "," << record_itr->stop_id << endl;
 //	//	}
@@ -1222,7 +1222,7 @@
 //
 //	//a_star_graph = (Interactive_Graph<MasterType::a_star_graph_type>*)&a_star_graph_stack_copy;
 //
-//	//boost::container::deque<int> out_path;
+//	//std::deque<int> out_path;
 //
 //
 //
@@ -1276,7 +1276,7 @@
 //
 //	//a_star_graph->Copy_Graph(a_star_graph_copy);
 //
-//	//boost::unordered::unordered_set<int> negative_edges;
+//	//std::unordered_set<int> negative_edges;
 //	//
 //	//negative_edges.insert(4);
 //
@@ -1291,7 +1291,7 @@
 //	//graph_pool.Add_Graph(a_star_graph_copy);
 //	//graph_pool.Add_Graph(a_star_graph_sub_graph);
 //
-//	//boost::container::vector<int> edge_set;
+//	//std::vector<int> edge_set;
 //	//edge_set.push_back(1);
 //	//edge_set.push_back(4);
 //
@@ -1303,11 +1303,11 @@
 //
 //
 //
-//	//boost::container::vector<int> out_path;
+//	//std::vector<int> out_path;
 //
 //	//A_Star_Edge<typename MasterType::a_star_edge_type>* end = A_Star((A_Star_Graph<typename MasterType::a_star_graph_type>*)a_star_graph_sub_graph,1,12,out_path);
 //
-//	//for(boost::container::vector<int>::iterator itr = out_path.begin();itr!=out_path.end();itr++) cout << *itr << endl;
+//	//for(std::vector<int>::iterator itr = out_path.begin();itr!=out_path.end();itr++) cout << *itr << endl;
 //
 //	//out_path.clear();
 //
@@ -1324,7 +1324,7 @@
 //
 //	//Dijkstra_Edge<typename MasterType::dijkstra_edge_type>* d_end = Dijkstra((Dijkstra_Graph<typename MasterType::dijkstra_graph_type>*)dijkstra_graph,2,11,out_path);
 //
-//	//for(boost::container::vector<int>::iterator itr = out_path.begin();itr!=out_path.end();itr++) cout << *itr << endl;
+//	//for(std::vector<int>::iterator itr = out_path.begin();itr!=out_path.end();itr++) cout << *itr << endl;
 //
 //	//cout << "Done!" << endl;
 //

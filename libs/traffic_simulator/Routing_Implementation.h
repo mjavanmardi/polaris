@@ -125,9 +125,9 @@ namespace Routing_Components
 				}
 
 				//list of edgeid, graph_id tuples; internal edge ids
-				boost::container::deque<global_edge_id> path_container;
+				std::deque<global_edge_id> path_container;
 				//cost of traversing each of the edges
-				boost::container::deque<float> cost_container;
+				std::deque<float> cost_container;
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				float best_route_time_to_destination = 0.0f;
@@ -192,7 +192,7 @@ namespace Routing_Components
 			m_prototype(Network_Skimming_Components::Prototypes::Network_Skimming, typename MasterType::network_skim_type, parent_skimmer,NONE,NONE);
 
 			m_prototype(Link,typename MasterType::link_type,origin_link,NONE,NONE);
-			m_container(boost::container::vector<float>,travel_times_to_link_container, NONE, NONE);
+			m_container(std::vector<float>,travel_times_to_link_container, NONE, NONE);
 
 			//member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
 			

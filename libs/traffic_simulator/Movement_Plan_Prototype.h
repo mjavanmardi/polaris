@@ -196,7 +196,7 @@ namespace Movement_Plan_Components
 				assert_check(ComponentType,Initialize_exists, "No Initialize method defined in component.");
 			}
 #endif
-			void set_trajectory(boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& arrival_time_container)
+			void set_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
 				//TODO: check that this has been correctly translated!
 
@@ -216,8 +216,8 @@ namespace Movement_Plan_Components
 				//trajectory.clear();
 				clear_trajectory();
 
-				typename boost::container::deque<global_edge_id>::iterator itr;
-				typename boost::container::deque<float>::iterator arrival_time_itr;
+				typename std::deque<global_edge_id>::iterator itr;
+				typename std::deque<float>::iterator arrival_time_itr;
 
 				for(itr = path_container.begin(), arrival_time_itr = arrival_time_container.begin(); itr != path_container.end(); itr++,arrival_time_itr++)
 				{
@@ -253,7 +253,7 @@ namespace Movement_Plan_Components
 
 
 				//typename TargetType::reverse_iterator itr;
-				//typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
+				//typename std::vector<float>::reverse_iterator arrival_time_itr;
 				//for(itr = path_container.rbegin(), arrival_time_itr = reversed_arrival_time_container.rbegin(); itr != path_container.rend(); itr++,arrival_time_itr++)
 				//{
 				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
@@ -268,7 +268,7 @@ namespace Movement_Plan_Components
 
 			}
 
-			void update_trajectory(boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& arrival_time_container)
+			void update_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
@@ -285,8 +285,8 @@ namespace Movement_Plan_Components
 				// add the time entering the current link to the relative estimated arrival time for the new trajectory_unit links
 				int stored_ttime = trajectory[current_trajectory_position<int&>()]->template enter_time<int>() - (int)this->departed_time<Time_Seconds>();
 
-				typename boost::container::deque<global_edge_id>::iterator path_itr;
-				typename boost::container::deque<float>::iterator arrival_time_itr;
+				typename std::deque<global_edge_id>::iterator path_itr;
+				typename std::deque<float>::iterator arrival_time_itr;
 				
 				Network_Interface* net = network<Network_Interface*>();
 
@@ -302,7 +302,7 @@ namespace Movement_Plan_Components
 
 
 				//typename TargetType::reverse_iterator itr;
-				//typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
+				//typename std::vector<float>::reverse_iterator arrival_time_itr;
 				//for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
 				//{
 				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();

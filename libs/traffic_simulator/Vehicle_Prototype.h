@@ -70,6 +70,7 @@ namespace Vehicle_Components
 			accessor(local_speed, NONE, NONE);
 			accessor(is_integrated, NONE, NONE);
 			accessor(downstream_preferred_departure_time, NONE, NONE);
+			accessor(is_autonomous, NONE, NONE);
 			
 			//enroute swtiching
 			accessor(rng_stream, NONE, NONE);
@@ -118,7 +119,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> bool exploit_events_set(TargetType events_set)
 			{
-				return this_component()->template exploit_events_boost::container::set< TargetType>(events_set);
+				return this_component()->template exploit_events_set< TargetType>(events_set);
 			}
 
 			template<typename TargetType> void update_vehicle_position()

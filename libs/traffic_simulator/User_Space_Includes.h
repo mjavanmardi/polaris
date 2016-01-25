@@ -16,8 +16,8 @@
 //#include <unordered_map>
 //#include <unordered_set>
 #ifndef _MSC_VER
-#include <tr1/boost::unordered::unordered_map>
-#include <tr1/boost::unordered::unordered_set>
+#include <tr1/std::unordered_map>
+#include <tr1/std::unordered_set>
 using namespace __gnu_cxx;
 #endif
 
@@ -194,7 +194,7 @@ int convert_hhmm_to_seconds(string hhmm)
 	return time_in_seconds;
 };
 
-void string_split(boost::container::vector<std::string>& results, const std::string &source, const int fields)
+void string_split(std::vector<std::string>& results, const std::string &source, const int fields)
 {
 	results.clear();
 	results.resize(fields);
@@ -223,7 +223,7 @@ void string_split(boost::container::vector<std::string>& results, const std::str
 	}
 };
 
-void string_split(boost::container::vector<std::string>& results, const std::string &source)
+void string_split(std::vector<std::string>& results, const std::string &source)
 {
 	results.clear();
 
@@ -308,7 +308,7 @@ string convert_seconds_to_hhmm(int time_in_seconds)
 	return hhmm;
 };
 
-void calculate_mean_standard_deviation(const boost::container::vector<float>& data_array, float& mean, float& standard_deviation)
+void calculate_mean_standard_deviation(const std::vector<float>& data_array, float& mean, float& standard_deviation)
 {
 	int array_size = int(data_array.size());
 	if (array_size>1)
@@ -342,7 +342,7 @@ void calculate_mean_standard_deviation(const boost::container::vector<float>& da
 	}
 };
 
-void calculate_mean(const boost::container::vector<float>& data_array, float& mean)
+void calculate_mean(const std::vector<float>& data_array, float& mean)
 {
 	int array_size = int(data_array.size());
 	if (array_size>1)

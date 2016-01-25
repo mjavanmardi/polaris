@@ -25,7 +25,7 @@ namespace Network_Event_Components
 				this_component()->template Initialize<TargetType>(configuration);
 			}
 			
-			template<typename TargetType> void Initialize(int start_time, int end_time, boost::container::vector<typename TargetType::link_type*>& affected_links)
+			template<typename TargetType> void Initialize(int start_time, int end_time, std::vector<typename TargetType::link_type*>& affected_links)
 			{
 				this_component()->template Initialize<TargetType>(start_time,end_time,affected_links);
 			}
@@ -107,12 +107,12 @@ namespace Network_Event_Components
 				this_component()->template Remove_Network_Event<TargetType>(network_event);
 			}
 
-			template<typename TargetType> void Get_Network_Events(int link,boost::container::vector< Network_Event<TargetType>* >& container)
+			template<typename TargetType> void Get_Network_Events(int link,std::vector< Network_Event<TargetType>* >& container)
 			{
 				this_component()->template Get_Network_Events<TargetType>(link,container);
 			}
 			
-			template<typename TargetType> void Get_Network_Events(boost::container::vector< Network_Event<TargetType>* >& container)
+			template<typename TargetType> void Get_Network_Events(std::vector< Network_Event<TargetType>* >& container)
 			{
 				this_component()->template Get_Network_Events<TargetType>(container);
 			}

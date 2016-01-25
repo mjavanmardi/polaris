@@ -42,7 +42,7 @@ namespace Vehicle_Components
 		{
 			Vehicle_Attribute_Shape vehicle_shape;
 
-			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
+			static std::vector<Point_2D<MasterType>> _num_vehicles_cache;
 			
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,num_vehicles, NONE, NONE);
 
@@ -241,7 +241,7 @@ namespace Vehicle_Components
 			}
 
 
-			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,std::vector<string>& bucket)
 			{
 				//_this->_graphical_network->accent_num_vehicles<NT>();
 
@@ -259,9 +259,9 @@ namespace Vehicle_Components
 				return true;
 			}
 			
-			static bool submit_attributes(Graphical_Vehicle_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool submit_attributes(Graphical_Vehicle_Implementation* _this,std::vector<string>& bucket)
 			{
-				boost::container::vector<string>::iterator itr;
+				std::vector<string>::iterator itr;
 
 				int new_id=atoi(bucket[0].c_str());
 
@@ -294,7 +294,7 @@ namespace Vehicle_Components
 		volatile int Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_vehicles_counter;
 
 		template<typename MasterType,typename InheritanceList>
-		boost::container::vector<Point_2D<MasterType>> Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles_cache;
+		std::vector<Point_2D<MasterType>> Graphical_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles_cache;
 	}
 
 }

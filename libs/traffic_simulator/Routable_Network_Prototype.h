@@ -20,7 +20,7 @@ namespace Routing_Components
 				this_component()->update_edge_turn_cost(edge_id,edge_cost,outbound_turn_index,turn_cost);
 			}
 			
-			void update_edge_turn_costs(unsigned int edge_id,float edge_cost,boost::container::deque<float>& turn_costs)
+			void update_edge_turn_costs(unsigned int edge_id,float edge_cost,std::deque<float>& turn_costs)
 			{
 				this_component()->update_edge_turn_costs(edge_id,edge_cost,turn_costs);
 			}
@@ -37,17 +37,17 @@ namespace Routing_Components
 				this_component()->construct_time_dependent_routable_network(source_network);
 			}
 
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
 			{
 				return this_component()->compute_static_network_path(origins,destinations,path_container,cost_container);
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container, bool debug_route=false)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)
 			{
 				return this_component()->compute_time_dependent_network_path(origins,destinations,start_time,path_container,cost_container, debug_route);
 			}
 
-			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& edge_cost_container)
+			float compute_static_network_tree(unsigned int origin, std::vector<float>& edge_cost_container)
 			{
 				return this_component()->compute_static_network_tree(origin,edge_cost_container);
 			}

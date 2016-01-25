@@ -123,7 +123,7 @@ namespace Choice_Model_Components
 
 			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
 			{
-				// Push item into boost::container::vector as anonymous
+				// Push item into std::vector as anonymous
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
 				typedef Prototypes::Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
@@ -194,13 +194,14 @@ namespace Choice_Model_Components
 			//	}
 
 			//}
-			template<typename TargetType> void Evaluate_Choices(requires(TargetType,check(Component_Type, Concepts::Is_Utility_Based_Model)))
+			template<typename TargetType> float Evaluate_Choices(requires(TargetType,check(Component_Type, Concepts::Is_Utility_Based_Model)))
 			{	
-				this->Evaluate_Utilities<NT>();
+				float logsum = this->Evaluate_Utilities<NT>();
 				this->Evaluate_Probabilities<NT>();
+				return logsum;
 			}	
 			
-			template<typename TargetType> void Evaluate_Utilities(requires(TargetType,check(Component_Type, Concepts::Is_Utility_Based_Model)))
+			template<typename TargetType> float Evaluate_Utilities(requires(TargetType,check(Component_Type, Concepts::Is_Utility_Based_Model)))
 			{	
 				typedef Random_Access_Sequence<typename get_type_of(choice_options)> choice_options_itf;
 				typedef Choice_Option<typename get_component_type(choice_options_itf)> choice_option_itf;
@@ -242,7 +243,7 @@ namespace Choice_Model_Components
 					choices->clear();
 					probs->clear();
 					utils->clear();
-					return;
+					return 0;
 				}
 
 				for (u_itr=utils->begin(); u_itr!= utils->end(); u_itr++)
@@ -252,6 +253,8 @@ namespace Choice_Model_Components
 					if (ISNAN(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); probs->push_back(0.0);}
 					else probs->push_back(p);
 				}
+
+				return log(utility_sum);
 
 			}	
 			template<typename TargetType> void Evaluate_Utilities(requires(TargetType,!check(Component_Type, Concepts::Is_Utility_Based_Model)))
@@ -372,7 +375,7 @@ namespace Choice_Model_Components
 
 			template<typename TargetType> void Add_Sub_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(TargetType,is_pointer)))
 			{
-				// Push item into boost::container::vector as anonymous
+				// Push item into std::vector as anonymous
 				typedef Random_Access_Sequence<typename get_type_of(sub_choice_options)> choice_options_itf;
 				choice_options_itf* options = this->sub_choice_options<choice_options_itf*>();
 				options->push_back((Choice_Option<Implementations::Nested_Choice_Option_Base<NT>>*)choice_option);			

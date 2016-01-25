@@ -56,10 +56,10 @@ namespace polaris
 		void Add_New_Data_Record(unsigned int data_identifier, Field_Type* record)
 		{
 			// Create data containers if not otherwise created
-			if( _data_lookup == nullptr ) _data_lookup = new boost::unordered::unordered_map< edge_id, boost::container::vector< pair< field_hash_code, boost::container::vector< void* > > > >();
-			if( _field_lookup == nullptr ) _field_lookup = new boost::unordered::unordered_map< field_hash_code, pair<field_index,field_size> >();
-			if( _ordered_data_lookup == nullptr ) _ordered_data_lookup = new boost::container::vector<edge_id>();
-			if( _ordered_field_lookup == nullptr ) _ordered_field_lookup = new boost::container::vector<field_hash_code>();
+			if( _data_lookup == nullptr ) _data_lookup = new std::unordered_map< edge_id, std::vector< pair< field_hash_code, std::vector< void* > > > >();
+			if( _field_lookup == nullptr ) _field_lookup = new std::unordered_map< field_hash_code, pair<field_index,field_size> >();
+			if( _ordered_data_lookup == nullptr ) _ordered_data_lookup = new std::vector<edge_id>();
+			if( _ordered_field_lookup == nullptr ) _ordered_field_lookup = new std::vector<field_hash_code>();
 
 
 			// If user is providing a new field, add it
@@ -70,18 +70,18 @@ namespace polaris
 
 			unsigned int field_index = (*_field_lookup)[typeid(Field_Type).hash_code()].first;
 
-			boost::container::vector< pair< field_hash_code, boost::container::vector< void* >> >& fields = (*_data_lookup)[data_identifier];
+			std::vector< pair< field_hash_code, std::vector< void* >> >& fields = (*_data_lookup)[data_identifier];
 
 
 			// build out all fields up to the one added
 			for(int i=0;i<field_index + 1;i++)
 			{
-				fields.push_back( pair< field_hash_code, boost::container::vector< void* >>((*_ordered_field_lookup)[i],boost::container::vector< void* >()) );
+				fields.push_back( pair< field_hash_code, std::vector< void* >>((*_ordered_field_lookup)[i],std::vector< void* >()) );
 			}
 
 
 			// get field corresponding to data of interest
-			boost::container::vector< void* >& data_records = fields[field_index].second;
+			std::vector< void* >& data_records = fields[field_index].second;
 
 
 			// add the data pointer
@@ -95,18 +95,18 @@ namespace polaris
 
 
 			/*
-			_field_hash_to_index = new boost::unordered::unordered_map< field_hash_code, field_index >();
+			_field_hash_to_index = new std::unordered_map< field_hash_code, field_index >();
 
 			// create a mapping between hash code and index
-			for(boost::unordered::unordered_map< field_hash_code, pair<field_index,field_size> >::iterator itr = _field_lookup->begin();itr!= _field_lookup->end();itr++)
+			for(std::unordered_map< field_hash_code, pair<field_index,field_size> >::iterator itr = _field_lookup->begin();itr!= _field_lookup->end();itr++)
 			{
 				(*_field_hash_to_index)[ itr->first ] = itr->second.first;
 			}
 
-			_data_navigation = new boost::unordered::unordered_map< edge_id, Field_Record_Header<NT>** >();
+			_data_navigation = new std::unordered_map< edge_id, Field_Record_Header<NT>** >();
 
 			// go over the edges in the order they were submitted
-			for(boost::container::vector< edge_id >::iterator itr = _ordered_data_lookup->begin();itr != _ordered_data_lookup->end();itr++)
+			for(std::vector< edge_id >::iterator itr = _ordered_data_lookup->begin();itr != _ordered_data_lookup->end();itr++)
 			{
 				// for each edge, allocate enough space to reference all fields submitted
 				(*_data_navigation)[ *itr ] = new Field_Record_Header<NT>*[_field_counter];
@@ -117,13 +117,13 @@ namespace polaris
 				for(unsigned int i=0; i < _field_counter; i++) field_record_itr[i] = nullptr;
 
 				// retrieve the data record submissions for this edge and loop over field submissions
-				boost::container::vector< pair< field_hash_code, boost::container::vector< void* > > >& field_lookup = (*_data_lookup)[ *itr ];
+				std::vector< pair< field_hash_code, std::vector< void* > > >& field_lookup = (*_data_lookup)[ *itr ];
 
-				for(boost::container::vector< pair< field_hash_code, boost::container::vector< void* > > >::iterator field_itr = field_lookup.begin();field_itr!=field_lookup.end();field_itr++)
+				for(std::vector< pair< field_hash_code, std::vector< void* > > >::iterator field_itr = field_lookup.begin();field_itr!=field_lookup.end();field_itr++)
 				{
 					// retrieve records from a particular field for this edge
 
-					pair< field_hash_code, boost::container::vector< void* > >& field = *field_itr;
+					pair< field_hash_code, std::vector< void* > >& field = *field_itr;
 
 					// look up field attributes information necessary to determine the size of the linear allocation to contain all records
 
@@ -141,7 +141,7 @@ namespace polaris
 
 					// copy over each record
 
-					for(boost::container::vector< void* >::iterator record_itr = field.second.begin();record_itr!=field.second.end();record_itr++)
+					for(std::vector< void* >::iterator record_itr = field.second.begin();record_itr!=field.second.end();record_itr++)
 					{
 						memcpy(field_record_iterator,*record_itr,field_info.second);
 
@@ -165,13 +165,13 @@ namespace polaris
 
 
 
-		boost::unordered::unordered_map< field_hash_code, field_index >* _field_hash_to_index;
-		boost::unordered::unordered_map< edge_id, Field_Record_Header<NT>** >* _data_navigation;
+		std::unordered_map< field_hash_code, field_index >* _field_hash_to_index;
+		std::unordered_map< edge_id, Field_Record_Header<NT>** >* _data_navigation;
 
-		boost::unordered::unordered_map< edge_id, boost::container::vector< pair< field_hash_code, boost::container::vector< void* > > > >* _data_lookup;
-		boost::container::vector< edge_id >* _ordered_data_lookup;
+		std::unordered_map< edge_id, std::vector< pair< field_hash_code, std::vector< void* > > > >* _data_lookup;
+		std::vector< edge_id >* _ordered_data_lookup;
 
-		boost::unordered::unordered_map< field_hash_code, pair<field_index,field_size> >* _field_lookup;
-		boost::container::vector< field_hash_code >* _ordered_field_lookup;
+		std::unordered_map< field_hash_code, pair<field_index,field_size> >* _field_lookup;
+		std::vector< field_hash_code >* _ordered_field_lookup;
 	};
 }

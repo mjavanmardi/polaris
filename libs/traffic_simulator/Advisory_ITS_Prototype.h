@@ -32,18 +32,18 @@ namespace Advisory_ITS_Components
 				this_component()->template Initialize<TargetType>(configuration);
 			}
 			
-			template<typename TargetType> void Push_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
+			template<typename TargetType> void Push_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
 			{
 				this_component()->template Accept_Network_Events<TargetType>(network_events);
 			}
 
-			template<typename TargetType> void Push_Displayed_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
+			template<typename TargetType> void Push_Displayed_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
 			{
 				this_component()->template Accept_Displayed_Network_Events<TargetType>(network_events);
 			}
 
 
-			template<typename TargetType> void Get_Displayed_Messages(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket)
+			template<typename TargetType> void Get_Displayed_Messages(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket)
 			{
 				return this_component()->template Get_Displayed_Messages<TargetType>(bucket);
 			}

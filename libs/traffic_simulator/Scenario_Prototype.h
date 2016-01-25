@@ -48,7 +48,9 @@ namespace Scenario_Components
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
-
+			
+			accessor(cav_market_penetration, NONE, NONE);
+			accessor(cav_vott_adjustment, NONE, NONE);
 
 			accessor(current_day_index, NONE, NONE);
 			
@@ -397,6 +399,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("do_planner_routing", this->template do_planner_routing<bool*>()) != PARAMETER_FOUND) this->template do_planner_routing<bool>(false);		
 				if (cfgReader.getParameter("write_demand_to_database", this->template write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->template write_demand_to_database<bool>(false);
 				if (cfgReader.getParameter("read_demand_from_database", this->template read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->template read_demand_from_database<bool>(false);
+				if (cfgReader.getParameter("cav_market_penetration", this->template cav_market_penetration<double*>()) != PARAMETER_FOUND) this->template cav_market_penetration<double>(0.0);
+				if (cfgReader.getParameter("cav_vott_adjustment", this->template cav_vott_adjustment<double*>()) != PARAMETER_FOUND) this->template cav_vott_adjustment<double>(1.0);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
@@ -485,6 +489,8 @@ namespace Scenario_Components
 				// read capacity adjustments 
 				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
 				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
+
+
 
 				//===============================================
 				// Vehicle trajectory tracking parameters
@@ -582,6 +588,10 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
+				else
+				{
+					if (time_dependent_routing<bool>())	THROW_EXCEPTION("ERROR: time_dependent_routing is disabled in current polaris-Master branch. Switch to polaris-R1/R2 development branches to test time-dependent routing.");
+				}
 				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
 				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1500.0);
 				

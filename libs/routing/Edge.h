@@ -8,7 +8,7 @@ namespace polaris
 	template<typename Base_Edge_Type>
 	struct Routing_Data
 	{
-		boost::container::deque< Base_Edge_Type* >* modified_edges;
+		std::deque< Base_Edge_Type* >* modified_edges;
 		boost::intrusive::multiset< Base_Edge_Type >* open_set;
 		Base_Edge_Type* start_edge;
 		Base_Edge_Type* end_edge;

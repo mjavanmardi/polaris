@@ -12,7 +12,7 @@
 implementation class Control_Dialog_Implementation : public Polaris_Component<MasterType,INHERIT(Control_Dialog_Implementation),NULLTYPE>,public wxDialog
 {
 public:
-	Control_Dialog_Implementation(string&,const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&,boost::container::vector<boost::container::vector<string>>&,submission_callback_type);
+	Control_Dialog_Implementation(string&,const std::list<void*>&,std::vector<pair<string,string>>&,std::vector<std::vector<string>>&,submission_callback_type);
 	virtual ~Control_Dialog_Implementation(void){};
 
 	//feature_implementation void Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema);
@@ -34,7 +34,7 @@ public:
 
 	m_data(wxChoice**,dropdown_menus, NONE, NONE);
 
-	m_data(boost::container::list<void*>,selected_elements, NONE,NONE/*check_2(typename MasterType::type_of(antares_layer),is_same)*/);
+	m_data(std::list<void*>,selected_elements, NONE,NONE/*check_2(typename MasterType::type_of(antares_layer),is_same)*/);
 	m_data(submission_callback_type,submission_callback, NONE,NONE/*check_2(typename MasterType::type_of(antares_layer),is_same)*/);
 	
 	m_data(int,num_attributes, NONE, NONE);
@@ -46,11 +46,11 @@ public:
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implementation(string& layer_name,const boost::container::list<void*>& layer_selected_elements,boost::container::vector<pair<string,string>>& attributes,boost::container::vector<boost::container::vector<string>>& dropdown_schema,submission_callback_type layer_submission_callback) : wxDialog(NULL,-1,"",wxDefaultPosition,wxSize(500,550),wxRESIZE_BORDER|wxCAPTION)
+Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implementation(string& layer_name,const std::list<void*>& layer_selected_elements,std::vector<pair<string,string>>& attributes,std::vector<std::vector<string>>& dropdown_schema,submission_callback_type layer_submission_callback) : wxDialog(NULL,-1,"",wxDefaultPosition,wxSize(500,550),wxRESIZE_BORDER|wxCAPTION)
 {
 	_submission_callback = layer_submission_callback;
 
-	for(boost::container::list<void*>::const_iterator itr=layer_selected_elements.begin();itr!=layer_selected_elements.end();itr++) _selected_elements.push_back( *itr );
+	for(std::list<void*>::const_iterator itr=layer_selected_elements.begin();itr!=layer_selected_elements.end();itr++) _selected_elements.push_back( *itr );
 
 	string title=layer_name;
 
@@ -90,7 +90,7 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 
 		int atts_row_counter = 0;
 
-		for(boost::container::vector<pair<string,string>>::iterator itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
+		for(std::vector<pair<string,string>>::iterator itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 		{
 			if(atts_row_counter == 30)
 			{
@@ -120,8 +120,8 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 
 		wxString choices[20];
 
-		boost::container::vector<boost::container::vector<string>>::iterator vitr;
-		boost::container::vector<string>::iterator itr;
+		std::vector<std::vector<string>>::iterator vitr;
+		std::vector<string>::iterator itr;
 
 		_dropdown_menus = new wxChoice* [ _num_dropdowns ];
 		
@@ -419,7 +419,7 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 template<typename MasterType,typename InheritanceList>
 void Control_Dialog_Implementation<MasterType,InheritanceList>::OnOk(wxCommandEvent& event)
 {
-	boost::container::vector<string> attributes_update;
+	std::vector<string> attributes_update;
 	string text;
 
 	if(_num_attributes)
@@ -441,7 +441,7 @@ void Control_Dialog_Implementation<MasterType,InheritanceList>::OnOk(wxCommandEv
 		}
 	}
 		
-	boost::container::vector<string> dropdowns_update;
+	std::vector<string> dropdowns_update;
 
 	if(_num_dropdowns)
 	{

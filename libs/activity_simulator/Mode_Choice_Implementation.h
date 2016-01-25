@@ -77,6 +77,8 @@ namespace Person_Components
 			//====================================================================================================================================
 			// Interface definitions
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_properties_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_itf;
 			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
@@ -146,6 +148,8 @@ namespace Person_Components
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
+				vehicle_itf* vehicle = _Parent_Person->vehicle<vehicle_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -159,14 +163,18 @@ namespace Person_Components
 				if (_current_activity->Start_Is_Planned<bool>()) los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds,los_itf*>(_previous_location,_destination, _current_activity->Start_Time<Time_Seconds>());
 				else los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours,los_itf*>(_previous_location,_destination, 12.0);
 				
+				// account for any VOT changes for this individual (i.e. from CAVS)
+				float vot_change = properties->Value_of_Travel_Time_Adjustment<float>();
+				float parking_cost_factor=1.0; 
+				if (vehicle->is_autonomous<bool>()) parking_cost_factor = 0.0;
 				
 				// Get the differences in characteristics for transit compared to auto mode (CMAP model specified as difference)
-				float ivtt_dif = los->auto_ttime<Time_Minutes>() - los->transit_ttime<Time_Minutes>();
+				float ivtt_dif = los->auto_ttime<Time_Minutes>()*vot_change - los->transit_ttime<Time_Minutes>();
 				float wait_dif = -1.0 * los->transit_wait_time<Time_Minutes>();
 				float transfer_dif = -1.0 * los->transit_walk_access_time<Time_Minutes>();
 				if (los->transit_walk_access_time<Time_Minutes>() > 60.0) transfer_dif = 0;
 				float walk_time_dif = -4.0; // * los->transit_walk_access_time<Time_Minutes>();
-				float cost_dif = los->auto_distance<Miles>()*20.0 + dest_zone->Parking_Cost<Cents>() + los->auto_tolls<Cents>() - los->transit_fare<Cents>();
+				float cost_dif = los->auto_distance<Miles>()*20.0 + dest_zone->Parking_Cost<Cents>()*parking_cost_factor + los->auto_tolls<Cents>() - los->transit_fare<Cents>();
 
 				// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
 				if (!this->_auto_available)
@@ -191,8 +199,13 @@ namespace Person_Components
 			}
 			template<typename TargetType> TargetType Calculate_Utility_For_Unknown_Location()
 			{		
+				// account for any VOT changes for this individual (i.e. from CAVS)
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
+				float vot_change = properties->Value_of_Travel_Time_Adjustment<float>();
+
 				_Zone_Interface* origin_zone = _previous_location->zone<_Zone_Interface*>();
-				float ivtt_dif = origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() - origin_zone->avg_ttime_transit<Time_Minutes>();
+				float ivtt_dif = origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() * vot_change - origin_zone->avg_ttime_transit<Time_Minutes>();
 				float wait_dif = -5.0; // assumed wait time of 5 minutes for transit trips
 				float transfer_dif = 0;
 				float walk_time_dif = -5.0; // assumed average walk time of 5 minutes for transit trips, given walk speed of 3 mph and max distance of 0.5 miles
@@ -206,6 +219,8 @@ namespace Person_Components
 					transfer_dif += 2.0;
 					walk_time_dif += 2.0;
 				}
+
+				
 
 				// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
 				if (origin_zone->avg_ttime_transit<Time_Days>() < 1.0) utility = Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
@@ -432,7 +447,7 @@ namespace Person_Components
 
 				// create local choice model
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
-				boost::container::vector<_Mode_Choice_Option_Interface*> mode_options;
+				std::vector<_Mode_Choice_Option_Interface*> mode_options;
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
