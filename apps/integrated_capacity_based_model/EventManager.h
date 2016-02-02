@@ -16,7 +16,7 @@ public:
 	void runTimeStep();
 	void run();
 private:
-	std::stack<Event> eventStack;
+	std::stack<CMEvent> eventStack;
 	const double dt; //timestep
 	const int numberOfSteps;
 	double time; // Current simulation time

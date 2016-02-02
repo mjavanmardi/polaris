@@ -94,7 +94,7 @@ private:
 	const int id; //Id of the car
 	const CarType type; //Physical characteristics of the car
 	std::vector<int> path; //Successive nodes the car has scheduled to follow
-	const int entryNode; //Node where the car enters the network
+	//const int entryNode; //Node where the car enters the network
 	const int exitingNode; //Node where the car exits the network
 
 };

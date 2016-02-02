@@ -11,11 +11,11 @@ enum EventType {nullEvent,enteringRoad,outgoingRoad,enteringNetwork};
 
 //An event is an order given to an intersection to move certain cars.
 //See documentation
-class Event
+class CMEvent
 {
 public:
-	Event();
-	Event(EventType _type, Road* _road, Intersection* _intersection);
+	CMEvent();
+	CMEvent(EventType _type, Road* _road, Intersection* _intersection);
 	EventType getType() const;
 	Road* getRoad() const;
 	Intersection* getIntersection() const;

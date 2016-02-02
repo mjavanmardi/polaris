@@ -30,9 +30,9 @@ void Intersection::setCapacities(vector< vector < map <int,pair<double,double> >
 	}
 }
 
-vector<Event> Intersection::runEvent(Event ev, double time, double dt)
+vector<CMEvent> Intersection::runEvent(CMEvent ev, double time, double dt)
 {
-	vector<Event> eventsToReschedule(0); 
+	vector<CMEvent> eventsToReschedule(0); 
 	EventType type = ev.getType();
 	switch(type)
 	{
@@ -45,7 +45,7 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 			 {
 				 Intersection* previousIntersection = road->getIntersectionA();
 				 //Reschedule event running the TravelingArea and CommonQueue in current road
-				 eventsToReschedule.push_back(Event(outgoingRoad,road,previousIntersection));
+				 eventsToReschedule.push_back(CMEvent(outgoingRoad,road,previousIntersection));
 			 }
 			 break;
 		 }
@@ -57,11 +57,11 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 			 if(hasMoved) //if at least one car has moved
 			 {
 				 //Rescheduling the entrance of the car that enter the network
-				 eventsToReschedule.push_back(Event(enteringNetwork,NULL,this));
+				 eventsToReschedule.push_back(CMEvent(enteringNetwork,NULL,this));
 				 //Rescheduling entry of cars from the road entering the intersection
 				 for(vector<Road*>::iterator it = enteringRoads.begin();it != enteringRoads.end();it++)
 				 {
-					 eventsToReschedule.push_back(Event(enteringRoad,*it,this));
+					 eventsToReschedule.push_back(CMEvent(enteringRoad,*it,this));
 				 }
 			 }
 			 break;
@@ -98,25 +98,25 @@ vector<Event> Intersection::runEvent(Event ev, double time, double dt)
 	return eventsToReschedule;
 }
 
-std::vector<Event> Intersection::getPossibleEvents()
+std::vector<CMEvent> Intersection::getPossibleEvents()
 {
-	vector<Event> possibleEvents;
+	vector<CMEvent> possibleEvents;
 	//Vehicle entering the network insertion
 	if(enteringCars.size() != 0) //If there are vehicle waiting for entrance
 	{
-		Event enterCar(enteringNetwork,NULL,this);
+		CMEvent enterCar(enteringNetwork,NULL,this);
 		possibleEvents.push_back(enterCar);
 	}
 	//Entering roads
 	for(vector<Road*>::iterator it = enteringRoads.begin();it != enteringRoads.end();it++)
 	{
-		Event moveCarsInEnteringRoad(enteringRoad,(*it),this);
+		CMEvent moveCarsInEnteringRoad(enteringRoad,(*it),this);
 		possibleEvents.push_back(moveCarsInEnteringRoad);
 	}
 	//Outgoing roads
 	for(vector<Road*>::iterator it = outgoingRoads.begin();it != outgoingRoads.end();it++)
 	{
-		Event moveCarsInOutgoingRoad(outgoingRoad,(*it),this);
+		CMEvent moveCarsInOutgoingRoad(outgoingRoad,(*it),this);
 		possibleEvents.push_back(moveCarsInOutgoingRoad);
 	}
 	return possibleEvents;

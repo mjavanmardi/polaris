@@ -1,28 +1,28 @@
 #include "Event.h"
 
-Event::Event() :
+CMEvent::CMEvent() :
 type(nullEvent), road(NULL), intersection(NULL)
 {
 	//default constructor builds a null event
 }
 
-Event::Event(EventType _type, Road* _road, Intersection* _intersection) :
+CMEvent::CMEvent(EventType _type, Road* _road, Intersection* _intersection) :
 	type(_type), road(_road), intersection(_intersection)
 {
 
 }
 
-EventType Event::getType() const
+EventType CMEvent::getType() const
 {
 	return type;
 }
 
-Road* Event::getRoad() const
+Road* CMEvent::getRoad() const
 {
 	return road;
 }
 
-Intersection* Event::getIntersection() const
+Intersection* CMEvent::getIntersection() const
 {
 	return intersection;
 }

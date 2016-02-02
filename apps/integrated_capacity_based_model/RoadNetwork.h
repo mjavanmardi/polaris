@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-
+#include "Polaris_PCH.h"
 #include "Road.h"
 
 //Reminder : capacity[roadId][laneNumber][nextRoadId] = (capacityAtTheBeginingOfTimeStep,capacityLeft)
@@ -11,6 +11,7 @@ class RoadNetwork
 {
 public:
 	RoadNetwork();
+	RoadNetwork(std::unique_ptr<odb::database>);
 	~RoadNetwork();
 	void setupNodesToRoad();
 	void setupCapacities();
@@ -23,8 +24,9 @@ public:
 	Capacity* getNetworkCapacities();
 	void printCapacities();
 private:
-	std::vector<Road*> network;
-	std::vector<Intersection*> intersections;
-	std::vector< std::vector <Road*> > nodesToRoad;
+	std::vector<Road*> network; //contain links
+	std::vector<Intersection*> intersections; //contain intersection
+	//this is an ajencency matrix that maps node ids (i,j) to the link pointer
+	std::vector< std::vector <Road*> > nodesToRoad; //this structure, need to be changed, we cannot support support, for a 30K node road networ, we get close to memory capacity
 	Capacity capacity;
 };

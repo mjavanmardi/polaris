@@ -3,7 +3,7 @@
 using namespace std;
 
 Car::Car(int _id, CarType _type, std::vector<int> _path, double _enteringTime) : 
-	type(_type), path(_path), entryNode(*(path.begin())), exitingNode(path.back()), 
+	type(_type), path(_path), exitingNode(path.back()), 
 	enteringTime(_enteringTime), id(_id)
 {
 	state = in_WaitingForEntry;
@@ -457,7 +457,8 @@ int Car::getId() const
 
 int Car::getEntryNode() const
 {
-	return entryNode;
+	//return entryNode;
+	return *(path.begin());
 }
 
 int Car::getNextNode() const

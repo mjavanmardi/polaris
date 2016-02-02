@@ -5,6 +5,12 @@ using namespace std;
 typedef vector<Intersection*>::iterator interIt;
 typedef vector<Road*>::iterator roadIt;
 
+
+RoadNetwork::RoadNetwork(std::unique_ptr<odb::database> db)
+{
+
+}
+
 RoadNetwork::RoadNetwork()
 {
 	// ### TEST NETWORK ### //

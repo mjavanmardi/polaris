@@ -3,7 +3,7 @@
 #include "Event.h"
 
 class Road;
-class Event;
+class CMEvent;
 
 class Intersection
 {
@@ -12,10 +12,10 @@ public:
 	void addEnteringRoad(Road* newRoad);
 	void addOutgoingRoad(Road* newRoad);
 	void addEnteringCar(Car* car, Road* enteringRoad);
-	std::vector<Event> runEvent(Event ev, double time, double dt);
+	std::vector<CMEvent> runEvent(CMEvent ev, double time, double dt);
 	void setCapacities(std::vector< std::vector < std::map <int,std::pair<double,double> > > >* networkCapacities);
 
-	std::vector<Event> getPossibleEvents(); //Get every event that can happen on the intersection
+	std::vector<CMEvent> getPossibleEvents(); //Get every event that can happen on the intersection
 
 	void speak();
 	int getId() const;
