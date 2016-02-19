@@ -437,114 +437,114 @@ namespace Traffic_Management_Center_Components
 
 			template<typename TargetType> void Read_Database()
 			{
-				using namespace odb;
-				using namespace polaris::io;
-				
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				//using namespace odb;
+				//using namespace polaris::io;
+				//
+				//typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				//string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
-				unique_ptr<database> db (open_sqlite_database (db_name));
-				
-				session s;
+				//unique_ptr<database> db (open_sqlite_database (db_name));
+				//
+				//session s;
 
-				transaction t(db->begin());
+				//transaction t(db->begin());
 
-				cout << "Reading Components" << endl;
+				//cout << "Reading Components" << endl;
 
-				
-				cout << "\tVSS" << endl;
+				//
+				//cout << "\tVSS" << endl;
 
-				result<VSS> vss_component_result=db->template query<VSS>(query<VSS>::true_expr);
-				
-				Variable_Speed_Sign_Interface::template Initialize_Type<NT>();
+				//result<VSS> vss_component_result=db->template query<VSS>(query<VSS>::true_expr);
+				//
+				//Variable_Speed_Sign_Interface::template Initialize_Type<NT>();
 
-				for(typename result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
-				{
-					Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<typename Variable_Speed_Sign_Interface::Component_Type>();
-					its_component->template Initialize< VSS& >( *db_itr );
-					_variable_speed_signs.push_back(its_component);				
-				}
-				
-
-				cout << "\tVWS" << endl;
-
-				result<VMS> vws_component_result=db->template query<VMS>(query<VMS>::true_expr);
-
-				Variable_Word_Sign_Interface::template Initialize_Type<NT>();
-
-				for(typename result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
-				{
-					Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<typename Variable_Word_Sign_Interface::Component_Type>();
-					its_component->template Initialize< VMS& >( *db_itr );
-					_variable_word_signs.push_back(its_component);				
-				}
-
-
-				cout << "\tHAR" << endl;
-
-				result<HAR> har_component_result=db->template query<HAR>(query<HAR>::true_expr);
-
-				Advisory_Radio_Interface::template Initialize_Type<NT>();
-
-				for(typename result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
-				{
-					Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<typename Advisory_Radio_Interface::Component_Type>();
-					its_component->Initialize< HAR& >( *db_itr );
-					_advisory_radios.push_back(its_component);				
-				}
-
-
-				cout << "\tDepot" << endl;
-
-				result<polaris::io::Depot> depot_component_result=db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
-
-				Depot_Interface::template Initialize_Type<NT>();
-
-				for(typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
-				{
-					Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
-					its_component->template Initialize< polaris::io::Depot& >( *db_itr );
-					_depots.push_back(its_component);				
-				}
-
-
-				cout << "\tLink Control" << endl;
-
-				result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
-
-				Link_Control_Interface::template Initialize_Type<NT>();
-
-				for(typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
-				{
-					Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
-					its_component->template Initialize< OpenShoulder& >( *db_itr );
-					_link_controls.push_back(its_component);				
-				}
-
-				//cout << "\tDetectors" << endl;
-
-				//std::unordered_map<int, Detector1DU<double> > link_detectors;
-
-				//Train_Detectors(db, link_detectors);
-
-				//cout << "\tSensor" << endl;
-
-				//result<Fixed_Sensor> sensor_component_result=db->template query<Fixed_Sensor>(query<Fixed_Sensor>::true_expr);
-
-				//Sensor_Interface::template Initialize_Type<NT>();
-
-				//for(typename result<Fixed_Sensor>::iterator db_itr = sensor_component_result.begin (); db_itr != sensor_component_result.end (); ++db_itr)
+				//for(typename result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
 				//{
-				//	Sensor_Interface* its_component = (Sensor_Interface*)Allocate<typename Sensor_Interface::Component_Type>();
-				//	
-				//	its_component->template Initialize< Fixed_Sensor& >( *db_itr );
+				//	Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<typename Variable_Speed_Sign_Interface::Component_Type>();
+				//	its_component->template Initialize< VSS& >( *db_itr );
+				//	_variable_speed_signs.push_back(its_component);				
+				//}
+				//
 
-				//	its_component->template Attach_Detector< std::unordered_map<int, Detector1DU<double> >& >( link_detectors );
+				//cout << "\tVWS" << endl;
 
-				//	_traffic_sensors.push_back(its_component);				
+				//result<VMS> vws_component_result=db->template query<VMS>(query<VMS>::true_expr);
+
+				//Variable_Word_Sign_Interface::template Initialize_Type<NT>();
+
+				//for(typename result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
+				//{
+				//	Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<typename Variable_Word_Sign_Interface::Component_Type>();
+				//	its_component->template Initialize< VMS& >( *db_itr );
+				//	_variable_word_signs.push_back(its_component);				
 				//}
 
-				//cout << "Done Reading" << endl;
+
+				//cout << "\tHAR" << endl;
+
+				//result<HAR> har_component_result=db->template query<HAR>(query<HAR>::true_expr);
+
+				//Advisory_Radio_Interface::template Initialize_Type<NT>();
+
+				//for(typename result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
+				//{
+				//	Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<typename Advisory_Radio_Interface::Component_Type>();
+				//	its_component->Initialize< HAR& >( *db_itr );
+				//	_advisory_radios.push_back(its_component);				
+				//}
+
+
+				//cout << "\tDepot" << endl;
+
+				//result<polaris::io::Depot> depot_component_result=db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
+
+				//Depot_Interface::template Initialize_Type<NT>();
+
+				//for(typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
+				//{
+				//	Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
+				//	its_component->template Initialize< polaris::io::Depot& >( *db_itr );
+				//	_depots.push_back(its_component);				
+				//}
+
+
+				//cout << "\tLink Control" << endl;
+
+				//result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
+
+				//Link_Control_Interface::template Initialize_Type<NT>();
+
+				//for(typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
+				//{
+				//	Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
+				//	its_component->template Initialize< OpenShoulder& >( *db_itr );
+				//	_link_controls.push_back(its_component);				
+				//}
+
+				////cout << "\tDetectors" << endl;
+
+				////std::unordered_map<int, Detector1DU<double> > link_detectors;
+
+				////Train_Detectors(db, link_detectors);
+
+				////cout << "\tSensor" << endl;
+
+				////result<Fixed_Sensor> sensor_component_result=db->template query<Fixed_Sensor>(query<Fixed_Sensor>::true_expr);
+
+				////Sensor_Interface::template Initialize_Type<NT>();
+
+				////for(typename result<Fixed_Sensor>::iterator db_itr = sensor_component_result.begin (); db_itr != sensor_component_result.end (); ++db_itr)
+				////{
+				////	Sensor_Interface* its_component = (Sensor_Interface*)Allocate<typename Sensor_Interface::Component_Type>();
+				////	
+				////	its_component->template Initialize< Fixed_Sensor& >( *db_itr );
+
+				////	its_component->template Attach_Detector< std::unordered_map<int, Detector1DU<double> >& >( link_detectors );
+
+				////	_traffic_sensors.push_back(its_component);				
+				////}
+
+				////cout << "Done Reading" << endl;
 			}
 
 		};

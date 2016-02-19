@@ -12,15 +12,15 @@ namespace Advisory_Radio_Components
 	{
 		implementation struct Highway_Advisory_Radio:public Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Highway_Advisory_Radio)>
 		{
-			template<typename TargetType> void Initialize(polaris::io::HAR& instance)
-			{
-				using namespace polaris::io;
+			//template<typename TargetType> void Initialize(polaris::io::HAR& instance)
+			//{
+			//	using namespace polaris::io;
 
-				std::shared_ptr<LinkList> link_list = instance.getLinks();
+			//	std::shared_ptr<LinkList> link_list = instance.getLinks();
 
-				const std::vector<int>& links = (*link_list).getLinks();
-				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Highway_Advisory_Radio)>*)this)->template Initialize<const std::vector<int>&>(links);
-			}
+			//	const std::vector<int>& links = (*link_list).getLinks();
+			//	((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Highway_Advisory_Radio)>*)this)->template Initialize<const std::vector<int>&>(links);
+			//}
 		};
 	}
 }
