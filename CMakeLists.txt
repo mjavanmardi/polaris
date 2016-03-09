@@ -105,7 +105,6 @@ include_directories(libs/traffic_simulator)
 include_directories(apps)
 include_directories(tests)
 
-include_directories(apps/integrated_capacity_based_model)
 
 #Apply CMake over POLARIS library project structure
 add_subdirectory (libs/core) 
@@ -115,8 +114,6 @@ add_subdirectory (libs/io)
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
-
-add_subdirectory (apps/integrated_capacity_based_model)
 
 
 
@@ -154,7 +151,7 @@ if (MSVC AND Antares)
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
 	add_subdirectory (libs/visual_traffic_simulator)
-	#add_subdirectory (apps/test)
+
 endif()
 
 
@@ -174,10 +171,8 @@ else()
 	add_subdirectory (apps/assignment_analyzer) 
 	add_subdirectory (apps/batch_router) 
 	add_subdirectory (apps/io_demo) 
-	add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
-	#add_subdirectory (apps/dee-test)
 	add_subdirectory (apps/network_validator)
 #	add_subdirectory (apps/Output_Visualizer)
 	add_subdirectory (libs/traffic_simulator)
