@@ -18,7 +18,7 @@ namespace Household_Components
 
 			//=================================================================
 			// Basic Person Characteristics Used in Popsyn algorithms
-			m_data(double,ID, NONE, NONE);
+			m_data(long long,ID, NONE, NONE);
 			m_data(double,Weight, NONE, NONE);
 			m_data(uint,Index, NONE, NONE);				//index into the joint-distribution matrix of the region (convert using region.get_index())
 			m_data(uint,Test_Index, NONE, NONE);		//index into the test marginal distribution for this household

@@ -438,6 +438,7 @@ namespace PopSyn
 						{
 							// initialize the hh - allocates all hh subcomponents
 							household_itf* hh = (household_itf*)*h_itr;
+							
 
 							// call the object initialization handler which passes the object the appropriate base class, based on the analysis type
 							// i.e. creates full agents when connected to an ABM and NetworkType is defined, otherwise does nothing.
@@ -940,18 +941,28 @@ namespace PopSyn
 							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
 							{
 								household_type* hh = (household_type*)*p_itr;
-
+								
 								// create household record using the ACS properties
 								shared_ptr<MasterType::hh_db_rec_type> hh_rec(new MasterType::hh_db_rec_type());
-								hh_rec->setHhold(uuid);
+								//hh_rec->setHhold(hh->ID<double>());
 								Set_HH_Record_Location<shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
 								Fill_HH_Record<typename get_type_of(network_reference),shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
+								
+								//cout << "household: "<<hh_rec->getHousehold();
+								//cout << ", hhold: "<<hh_rec->getHhold();
+								//cout << ", location: "<<hh_rec->getLocation();
+								//cout << ", persons: "<<hh_rec->getPersons();
+								//cout << ", workers: "<<hh_rec->getWorkers();
+								//cout << ", vehicles: "<<hh_rec->getVehicles();
+								//cout << ", income: "<<hh_rec->getIncome();
+								//cout << ", type: "<<hh_rec->getType()<<endl;
+								
 
 								//push to database
 								db->persist(hh_rec);
 
 								person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
-								perid=1;
+								perid=0;
 								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 								{		
 									// update synthesizing persons counter
@@ -1007,6 +1018,7 @@ namespace PopSyn
 			}
 			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
+				hh_rec->setHhold(hh->ID<long long>());
 				hh_rec->setPersons(hh->template Household_size<int>());
 				hh_rec->setWorkers(hh->template Number_of_workers<int>());
 				hh_rec->setVehicles(hh->template Number_of_vehicles<int>());

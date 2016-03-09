@@ -632,7 +632,7 @@ namespace Person_Components
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
 				trip_rec.setConstraint(0);
-				trip_rec.setPerson(person->template uuid<int>());
+				trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
 				trip_rec.setTrip(act->template Activity_Plan_ID<int>());
 				if (new_destination<0) trip_rec.setDestination(dest->template uuid<int>());
 				else trip_rec.setDestination(new_destination);
@@ -679,7 +679,7 @@ namespace Person_Components
 					act_rec.setMode ("TRANSIT");
 				act_rec.setType (act->template Get_Type_String<NT>());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
-				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
+				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
 
