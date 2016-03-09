@@ -10,6 +10,11 @@ can be reused by application developers.
 
 The project is distributed under BSD liense.
 
+Please cite POLARIS using the following reference:
+Auld, J., Hope, M., Ley, H., Sokolov, V., Xu, B., Zhang, K. (2016). POLARIS: Agent-based modeling framework development and 
+	implementation for integrated travel demand and network and operations simulations. Transportation Research Part C:
+	Emerging Technologies. doi:10.1016/j.trc.2015.07.017
+
 POLARIS Dependencies
 --------------------
 Here is the list of dependencies:

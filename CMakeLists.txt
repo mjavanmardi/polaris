@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
-option(Antares "Build with Antares" OFF)
+option(Antares "Build with Antares" ON)
 option(Popsyn "Build Popsyn App" OFF)
 option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
