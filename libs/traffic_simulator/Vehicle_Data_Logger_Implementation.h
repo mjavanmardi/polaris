@@ -267,6 +267,8 @@ namespace Vehicle_Components
 				
 				this->_infile.Read_Value(time);
 
+				cout <<"Reading from file at time="<<time;
+
 				// check if the time has been switched.  If time read in from file does not match current iteration, get the new location from index, read in the new time and validate again
 				if (time != iteration())
 				{
@@ -287,6 +289,9 @@ namespace Vehicle_Components
 
 
 				this->_infile.Read_Value(size);
+
+				cout << ", size="<<size<<endl;
+
 				if (size > 0)
 				{
 					values = new float[size];

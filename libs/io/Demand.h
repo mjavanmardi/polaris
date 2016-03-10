@@ -168,13 +168,13 @@ public:
 	// Default Constructor
 	Household () {}	
 	//Constructor
-	Household ( int hhold_, long long location_, int persons_, int workers_, int vehicles_, int type_, int income_)  
+	Household ( long long hhold_, long long location_, int persons_, int workers_, int vehicles_, int type_, int income_)  
 	: hhold (hhold_), location (location_), persons (persons_), workers (workers_), vehicles (vehicles_), type (type_), income (income_)
 	{
 	}
 	//Accessors
-	const int& getHhold () const {return hhold;}
-	void setHhold (const int& hhold_){hhold = hhold_;}
+	const long long& getHhold () const {return hhold;}
+	void setHhold (const long long& hhold_){hhold = hhold_;}
 	const long long& getLocation () const {return location;}
 	void setLocation (const long long& location_){location = location_;}
 	const int& getPersons () const {return persons;}
@@ -188,14 +188,14 @@ public:
 	const int& getIncome () const {return income;}
 	void setIncome (const int& income_){income = income_;}
 	const unsigned long& getPrimaryKey () const {return household;}
-	const unsigned long& gehousehold () const {return household;}
+	const unsigned long& getHousehold () const {return household;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
 	unsigned long household;
-	int hhold;
+	long long hhold;
 	long long location;
 	int persons;
 	int workers;
@@ -360,7 +360,7 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, /*shared_ptr<Person>*/int person_, /*shared_ptr<Trip>*/unsigned long trip_)
+	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
 	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
 	{
 	}
@@ -381,12 +381,12 @@ public:
 	void setMode (const std::string& mode_) {mode = mode_;}
 	const std::string& getType () const {return type;}
 	void setType (const std::string& type_) {type = type_;}
-	/*const shared_ptr<Person> getPerson () const {return person;}
+	const shared_ptr<Person> getPerson () const {return person;}
 	void setPerson (const shared_ptr<Person> person_) {person = person_;}
-	const shared_ptr<Trip> getTrip () const {return trip;}
+	/*const shared_ptr<Trip> getTrip () const {return trip;}
 	void setTrip (const shared_ptr<Trip> trip_) {trip = trip_;}*/
-	const int& getPerson () const {return person;}
-	void setPerson (const int& person_){person = person_;}
+	/*const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}*/
 	const unsigned long& getTrip () const {return trip;}
 	void setTrip (const unsigned long& trip_){trip = trip_;}
 	//Data Fields
@@ -400,9 +400,9 @@ private:
 	std::string mode;
 	std::string type;
 	#pragma db not_null
-	//shared_ptr<Person> person;
+	shared_ptr<Person> person;
 	//shared_ptr<Trip> trip;
-	int person;
+	//int person;
 	unsigned long trip;
 };
 
@@ -414,15 +414,17 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, int person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
 	//Accessors
 	const int& getHhold () const {return hhold;}
 	void setHhold (const int& hhold_){hhold = hhold_;}
-	const int& getPerson () const {return person;}
-	void setPerson (const int& person_){person = person_;}
+	const shared_ptr<Person> getPerson () const {return person;}
+	void setPerson (const shared_ptr<Person> person_) {person = person_;}
+	/*const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}*/
 	const int& getTour () const {return tour;}
 	void setTour (const int& tour_){tour = tour_;}
 	const int& getTrip () const {return trip;}
@@ -462,7 +464,7 @@ private:
 	#pragma db id auto
 	unsigned long trip_id;
 	int hhold;
-	int person;
+	//int person;
 	int tour;
 	int trip;
 	double start;
@@ -478,6 +480,8 @@ private:
 	int passengers;
 	int type;
 	int partition;
+	#pragma db not_null
+	shared_ptr<Person> person;
 
 };
 

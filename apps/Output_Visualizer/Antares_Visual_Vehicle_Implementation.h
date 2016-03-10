@@ -162,7 +162,7 @@ namespace Vehicle_Components
 				}
 			}
 
-			static void on_select_point(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select_point(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -174,7 +174,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -184,7 +184,7 @@ namespace Vehicle_Components
 				{
 					//Select added new object
 
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self_Point<NT>();
 					}
@@ -199,7 +199,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -214,7 +214,7 @@ namespace Vehicle_Components
 				}
 			}
 
-			static void on_select_shape(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select_shape(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -225,7 +225,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -235,7 +235,7 @@ namespace Vehicle_Components
 				{
 					//Select added new object
 
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self_Shape<NT>();
 					}
@@ -249,7 +249,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Shape<NT>();
 						}
