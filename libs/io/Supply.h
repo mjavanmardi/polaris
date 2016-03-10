@@ -11,6 +11,8 @@ namespace io
 {
 //Forward declarations.
 //
+class MetaData;
+class Tags;
 class Node;
 class Zone;
 //class ZoneLandUse;
@@ -39,6 +41,17 @@ class Veh_Type;
 class Area_Type;
 class Link_Type;
 
+class LinkList;
+class Component;
+class VMS;
+class Fixed_Sensor;
+class HAR;
+class VSS;
+class Depot;
+class OpenShoulder;
+class Action;
+class Action_Key;
+class Microsoft_Event;
 class InputContainer;
 
 
@@ -106,7 +119,33 @@ public:
 	std::map<int,shared_ptr<Area_Type> > Area_Types;
 	std::map<std::string,shared_ptr<Link_Type> > Link_Types;
 };
+#pragma db object
+class MetaData
+{
+public:
+	MetaData() {}
+	MetaData(std::string key_, std::string value_)
+		: key(key_), value(value_)
+	{
+	}
+public:
+	#pragma db id
+	std::string key;
+	std::string value;
+};
 
+#pragma db object
+class Tags
+{
+public:
+	Tags() {};
+	#pragma db id auto
+	int id;
+	std::string table;
+	std::string record_id;
+	std::string key;
+	std::string value;
+};
 #pragma db object //table("NODE")
 class Node
 {
@@ -1685,6 +1724,477 @@ private:
 	std::string superset_of;
 	std::string alternative_labels;
 	std::string notes;
+};
+
+#pragma db object
+class LinkList
+{
+public:
+	// Default Constructor
+	LinkList () {}        
+	LinkList (int id_, std::vector<int > links_)
+	: id (id_), links (links_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const std::vector<int >& getLinks () const {return links;}
+	void setLinks (const std::vector<int >& links_) {links = links_;}
+	void setLink (const int  links_) {links.push_back(links_);}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	std::vector<int > links;
+};
+
+
+#pragma db object
+class Component
+{
+public:
+	// Default Constructor
+	Component () {}        
+	Component (int id_, std::string name_, std::string icon_, std::vector<std::weak_ptr<Action> > actions_)
+	: id (id_), name (name_), icon (icon_), actions (actions_)
+	{
+	}
+	Component (int id_, std::string name_, std::string icon_)
+	: id (id_), name (name_), icon (icon_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const std::string& getName () const {return name;}
+	void setName (const std::string& name_) {name = name_;}
+	const std::string& getIcon () const {return icon;}
+	void setIcon (const std::string& icon_) {icon = icon_;}
+	const std::vector<std::weak_ptr<Action> >& getActions () const {return actions;}
+	void setActions (const std::vector<std::weak_ptr<Action> >& actions_) {actions = actions_;}
+	void setAction (const std::weak_ptr<Action>  actions_) {actions.push_back(actions_);}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	int id;
+	std::string name;
+	std::string icon;
+	#pragma db inverse(component)
+	std::vector<std::weak_ptr<Action> > actions;
+};
+
+
+#pragma db object
+class VMS
+{
+public:
+	// Default Constructor
+	VMS () {}        
+	VMS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_)
+	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
+	{
+	}
+	VMS (int id_, int link_, int dir_, float offset_, float setback_, int initial_event_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const int& getDir () const {return dir;}
+	void setDir (const int& dir_) {dir = dir_;}
+	const float& getOffset () const {return offset;}
+	void setOffset (const float& offset_) {offset = offset_;}
+	const float& getSetback () const {return setback;}
+	void setSetback (const float& setback_) {setback = setback_;}
+	const int& getInitial_Event () const {return initial_event;}
+	void setInitial_Event (const int& initial_event_) {initial_event = initial_event_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	int link;
+	int dir;
+	float offset;
+	float setback;
+	#pragma db default(-1)
+	int initial_event;
+};
+
+
+#pragma db object
+class HAR
+{
+public:
+	// Default Constructor
+	HAR () {}        
+	HAR (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_, shared_ptr<LinkList> links_)
+	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_), links (links_)
+	{
+	}
+	HAR (int id_, int link_, int dir_, float offset_, float setback_, int initial_event_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const int& getDir () const {return dir;}
+	void setDir (const int& dir_) {dir = dir_;}
+	const float& getOffset () const {return offset;}
+	void setOffset (const float& offset_) {offset = offset_;}
+	const float& getSetback () const {return setback;}
+	void setSetback (const float& setback_) {setback = setback_;}
+	const int& getInitial_Event () const {return initial_event;}
+	void setInitial_Event (const int& initial_event_) {initial_event = initial_event_;}
+	const shared_ptr<LinkList> getLinks () const {return links;}
+	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	int link;
+	int dir;
+	float offset;
+	float setback;
+	#pragma db default(-1)
+	int initial_event;
+	shared_ptr<LinkList> links;
+};
+
+
+#pragma db object
+class VSS
+{
+public:
+	// Default Constructor
+	VSS () {}        
+	VSS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_speed_, std::string speed_, shared_ptr<LinkList> links_)
+	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_speed (initial_speed_), speed (speed_), links (links_)
+	{
+	}
+	VSS (int id_, int link_, int dir_, float offset_, float setback_, int initial_speed_, std::string speed_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_speed (initial_speed_), speed (speed_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const int& getDir () const {return dir;}
+	void setDir (const int& dir_) {dir = dir_;}
+	const float& getOffset () const {return offset;}
+	void setOffset (const float& offset_) {offset = offset_;}
+	const float& getSetback () const {return setback;}
+	void setSetback (const float& setback_) {setback = setback_;}
+	const int& getInitial_Speed () const {return initial_speed;}
+	void setInitial_Speed (const int& initial_speed_) {initial_speed = initial_speed_;}
+	const std::string& getSpeed () const {return speed;}
+	void setSpeed (const std::string& speed_) {speed = speed_;}
+	const shared_ptr<LinkList> getLinks () const {return links;}
+	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	int link;
+	int dir;
+	float offset;
+	float setback;
+	#pragma db default(35)
+	int initial_speed;
+	#pragma db default("list(35,40,45,55,60)")
+	std::string speed;
+	shared_ptr<LinkList> links;
+};
+
+
+#pragma db object
+class Depot
+{
+public:
+	// Default Constructor
+	Depot () {}        
+	Depot (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, std::string policy_, shared_ptr<LinkList> links_, int fleet_size_, int available_)
+	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), policy (policy_), links (links_), fleet_size (fleet_size_), available (available_)
+	{
+	}
+	Depot (int id_, int link_, int dir_, float offset_, float setback_, std::string policy_, int fleet_size_, int available_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), policy (policy_), fleet_size (fleet_size_), available (available_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const int& getDir () const {return dir;}
+	void setDir (const int& dir_) {dir = dir_;}
+	const float& getOffset () const {return offset;}
+	void setOffset (const float& offset_) {offset = offset_;}
+	const float& getSetback () const {return setback;}
+	void setSetback (const float& setback_) {setback = setback_;}
+	const std::string& getPolicy () const {return policy;}
+	void setPolicy (const std::string& policy_) {policy = policy_;}
+	const shared_ptr<LinkList> getLinks () const {return links;}
+	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
+	const int& getFleet_Size () const {return fleet_size;}
+	void setFleet_Size (const int& fleet_size_) {fleet_size = fleet_size_;}
+	const int& getAvailable () const {return available;}
+	void setAvailable (const int& available_) {available = available_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	int link;
+	int dir;
+	float offset;
+	float setback;
+	std::string policy;
+	shared_ptr<LinkList> links;
+	#pragma db default(99999)
+	int fleet_size;
+	#pragma db default(99999)
+	int available;
+};
+
+
+#pragma db object
+class OpenShoulder
+{
+public:
+	// Default Constructor
+	OpenShoulder () {}        
+	OpenShoulder (int id_, shared_ptr<Component> component_, shared_ptr<LinkList> links_, bool open_)
+	: id (id_), component (component_), links (links_), open (open_)
+	{
+	}
+	OpenShoulder (int id_, bool open_)
+	: id (id_), open (open_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const shared_ptr<LinkList> getLinks () const {return links;}
+	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
+	const bool& getOpen () const {return open;}
+	void setOpen (const bool& open_) {open = open_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	shared_ptr<LinkList> links;
+	#pragma db default(false)
+	bool open;
+};
+
+
+#pragma db object
+class Action
+{
+public:
+	// Default Constructor
+	Action () {}        
+	Action (int id_, shared_ptr<Component> component_, std::vector<shared_ptr<Action_Key> > keys_, std::string name_, std::string note_)
+	: id (id_), component (component_), keys (keys_), name (name_), note (note_)
+	{
+	}
+	Action (int id_, std::string name_, std::string note_)
+	: id (id_), name (name_), note (note_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
+	const std::vector<shared_ptr<Action_Key> >& getKeys () const {return keys;}
+	void setKeys (const std::vector<shared_ptr<Action_Key> >& keys_) {keys = keys_;}
+	void setKey (const shared_ptr<Action_Key>  keys_) {keys.push_back(keys_);}
+	const std::string& getName () const {return name;}
+	void setName (const std::string& name_) {name = name_;}
+	const std::string& getNote () const {return note;}
+	void setNote (const std::string& note_) {note = note_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	#pragma db not_null
+	shared_ptr<Component> component;
+	std::vector<shared_ptr<Action_Key> > keys;
+	std::string name;
+	std::string note;
+};
+
+#pragma db object
+class Fixed_Sensor
+{
+public:
+	// Default Constructor
+	Fixed_Sensor () {}        
+	Fixed_Sensor (int id_, int link_, bool dir_, double offset_, double sigma_, int aggregation_period_sec_, std::string original_name_)
+		: id (id_), link (link_), dir (dir_), offset (offset_), sigma (sigma_), aggregation_period_sec (aggregation_period_sec_), original_name (original_name_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const bool& getDir () const {return dir;}
+	void setDir (const bool& dir_) {dir = dir_;}
+	const double& getOffset () const {return offset;}
+	void setOffset (const double& offset_) {offset = offset_;}
+	const double& getSigma () const {return sigma;}
+	void setSigma (const double& sigma_) {sigma = sigma_;}
+	const int& getAggregation_Period_Sec () const {return aggregation_period_sec;}
+	void setAggregation_Period_Sec (const int& aggregation_period_sec_) {aggregation_period_sec = aggregation_period_sec_;}
+	const std::string& getOriginal_Name () const {return original_name;}
+	void setOriginal_Name (const std::string& original_name_) {original_name = original_name_;}
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db auto id
+	int id;
+	int link;
+	bool dir;
+	double offset;
+	double sigma;
+	int aggregation_period_sec;
+	std::string original_name;
+};
+#pragma db object
+class Action_Key
+{
+public:
+	// Default Constructor
+	Action_Key () {}        
+	Action_Key (std::string key_, std::string value_type_, std::string value_constraint_, bool required_, std::string note_)
+	: key (key_), value_type (value_type_), value_constraint (value_constraint_), required (required_), note (note_)
+	{
+	}
+	//Accessors
+	const std::string& getKey () const {return key;}
+	void setKey (const std::string& key_) {key = key_;}
+	const std::string& getValue_Type () const {return value_type;}
+	void setValue_Type (const std::string& value_type_) {value_type = value_type_;}
+	const std::string& getValue_Constraint () const {return value_constraint;}
+	void setValue_Constraint (const std::string& value_constraint_) {value_constraint = value_constraint_;}
+	const bool& getRequired () const {return required;}
+	void setRequired (const bool& required_) {required = required_;}
+	const std::string& getNote () const {return note;}
+	void setNote (const std::string& note_) {note = note_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	std::string key;
+	std::string value_type;
+	std::string value_constraint;
+	bool required;
+	std::string note;
+};
+#pragma db object
+class Microsoft_Event
+{
+public:
+	// Default Constructor
+	Microsoft_Event () {}        
+	Microsoft_Event (int incidentId_, int end_, int lastModified_, int start_, int type_, int severity_, std::string description_, std::string congestion_, std::string lane_, double lat_, double lng_, double x_, double y_, bool roadClosed_, bool verified_, int link_id_, double link_distance_)
+		: incidentId (incidentId_), end (end_), lastModified (lastModified_), start (start_), type (type_), severity (severity_), description (description_), congestion (congestion_), lane (lane_), lat (lat_), lng (lng_), x (x_), y (y_), roadClosed (roadClosed_), verified (verified_), link_id (link_id_), link_distance (link_distance_)
+	{
+	}
+	//Accessors
+	const int& getIncidentid () const {return incidentId;}
+	void setIncidentid (const int& incidentId_) {incidentId = incidentId_;}
+	const int& getEnd () const {return end;}
+	void setEnd (const int& end_) {end = end_;}
+	const int& getLastmodified () const {return lastModified;}
+	void setLastmodified (const int& lastModified_) {lastModified = lastModified_;}
+	const int& getStart () const {return start;}
+	void setStart (const int& start_) {start = start_;}
+	const int& getType () const {return type;}
+	void setType (const int& type_) {type = type_;}
+	const int& getSeverity () const {return severity;}
+	void setSeverity (const int& severity_) {severity = severity_;}
+	const std::string& getDescription () const {return description;}
+	void setDescription (const std::string& description_) {description = description_;}
+	const std::string& getCongestion () const {return congestion;}
+	void setCongestion (const std::string& congestion_) {congestion = congestion_;}
+	const std::string& getLane () const {return lane;}
+	void setLane (const std::string& lane_) {lane = lane_;}
+	const double& getLat () const {return lat;}
+	void setLat (const double& lat_) {lat = lat_;}
+	const double& getLng () const {return lng;}
+	void setLng (const double& lng_) {lng = lng_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_) {x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_) {y = y_;}
+	const bool& getRoadclosed () const {return roadClosed;}
+	void setRoadclosed (const bool& roadClosed_) {roadClosed = roadClosed_;}
+	const bool& getVerified () const {return verified;}
+	void setVerified (const bool& verified_) {verified = verified_;}
+	const int& getLink_Id () const {return link_id;}
+	void setLink_Id (const int& link_id_) {link_id = link_id_;}
+	const double& getLink_Distance () const {return link_distance;}
+	void setLink_Distance (const double& link_distance_) {link_distance = link_distance_;}
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int incidentId;
+	int end;
+	int lastModified;
+	int start;
+	int type;
+	int severity;
+	std::string description;
+	std::string congestion;
+	std::string lane;
+	double lat;
+	double lng;
+	double x;
+	double y;
+	bool roadClosed;
+	bool verified;
+	int link_id;
+	double link_distance;
 };
 }//end of io namespace 
 }//end of polaris namespace
