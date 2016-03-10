@@ -76,52 +76,52 @@ namespace Depot_Components
 				// // Do Nothing Currently
 			// }
 
-//			template<typename TargetType> void Initialize(polaris::io::Depot& instance)
-//			{
-//				Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
-//				
-//				////TODO
-////load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
-//				using namespace polaris::io;
-//				
-//				std::shared_ptr<LinkList> link_list = instance.getLinks();
-//
-//				const std::vector<int>& db_covered_links = (*link_list).getLinks();
-//
-//				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
-//
-//				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
-//				{
-//					int link = *itr;
-//
-//					if(db_map.count(link))
-//					{
-//						std::vector<typename MasterType::link_type*>& links=db_map[link];
-//
-//						typename std::vector<typename MasterType::link_type*>::iterator vitr;
-//
-//						for(vitr=links.begin();vitr!=links.end();vitr++)
-//						{
-//							_covered_links.push_back( (Link_Interface*)(*vitr) );
-//						}
-//					}
-//				}
-//
-//				int resident_link_id = instance.getLink();
-//
-//				if(db_map.count(resident_link_id))
-//				{
-//					_resident_link = (Link_Interface*)db_map[resident_link_id][0];
-//				}
-//				else
-//				{
-//					cout << "Resident Depot Link: " << resident_link_id << " not found!" << endl;
-//					exit (0);
-//				}
-//
-//				//TODO
-//				//_depot_service = new polaris::Depot( instance );
-//			}
+			template<typename TargetType> void Initialize(polaris::io::Depot& instance)
+			{
+				Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
+				
+				////TODO
+//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
+				using namespace polaris::io;
+				
+				std::shared_ptr<LinkList> link_list = instance.getLinks();
+
+				const std::vector<int>& db_covered_links = (*link_list).getLinks();
+
+				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
+
+				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
+				{
+					int link = *itr;
+
+					if(db_map.count(link))
+					{
+						std::vector<typename MasterType::link_type*>& links=db_map[link];
+
+						typename std::vector<typename MasterType::link_type*>::iterator vitr;
+
+						for(vitr=links.begin();vitr!=links.end();vitr++)
+						{
+							_covered_links.push_back( (Link_Interface*)(*vitr) );
+						}
+					}
+				}
+
+				int resident_link_id = instance.getLink();
+
+				if(db_map.count(resident_link_id))
+				{
+					_resident_link = (Link_Interface*)db_map[resident_link_id][0];
+				}
+				else
+				{
+					cout << "Resident Depot Link: " << resident_link_id << " not found!" << endl;
+					exit (0);
+				}
+
+				//TODO
+				//_depot_service = new polaris::Depot( instance );
+			}
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			m_data(Link_Interface*,resident_link, NONE, NONE);

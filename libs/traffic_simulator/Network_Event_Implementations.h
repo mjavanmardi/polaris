@@ -53,13 +53,13 @@ namespace Network_Event_Components
 			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(links_container), _Link_Interface2*> _Links_Container_Interface;
 
 
-			//template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
-			//{
-			//	for(typename std::vector<shared_ptr<polaris::io::Event_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
-			//	{
-			//		_event_keys.push_back( (*itr)->getKey() );
-			//	}
-			//}
+			template<typename TargetType> static void Initialize_Type(const std::vector<shared_ptr<polaris::io::Event_Key>>& keys)
+			{
+				for(typename std::vector<shared_ptr<polaris::io::Event_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
+				{
+					_event_keys.push_back( (*itr)->getKey() );
+				}
+			}
 			
 			template<typename TargetType> static void Accept_Subscriber(TargetType callback,int subscriber)
 			{
@@ -103,99 +103,99 @@ namespace Network_Event_Components
 				}
 			}
 
-//			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
-//			{
-//				using namespace polaris::io;
-//				
-//				_active = false;
-//				
-//				_start_time = instance.lock()->getStart_Time();
-//				_end_time = instance.lock()->getEnd_Time();
-//
-//				_notes = instance.lock()->getNote();
-//
-//				const std::vector<int>& links=instance.lock()->getLinks();
-//				// temporary containers used to fill affected zone std::vector			
-//				std::unordered_set<Zone_Interface*> zone_set;
-//				if (links[0] == -1)
-//				{
-//					// affect all links
-//					_Links_Container_Interface& links_container = ((_Network_Interface*)_global_network)->template links_container<_Links_Container_Interface&>();
-//					typename _Links_Container_Interface::iterator link_itr;
-//					for (link_itr = links_container.begin(); link_itr != links_container.end(); link_itr++)
-//					{
-//						Link_Interface* link = (Link_Interface*)(*link_itr);
-//						_affected_links.push_back(link);
-////cout << "link " << link->template internal_id<int>() << " affected" << endl;
-//						Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
-//
-//						// push locations from link to affected locations container
-//						for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
-//						{
-//							Location_Interface* loc = (Location_Interface*)(*litr);
-//								this->_affected_locations.push_back(loc);
-//								zone_set.insert(loc->template zone<Zone_Interface*>());
-//						}
-//					}
-//				}
-//				else
-//				{
-//
-//					std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
-//
-//
-//				
-//					cout << endl << "INITIALIZE NETWORK EVENT:";
-//					for(typename std::vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
-//					{
-//						int link = *itr;
-//
-//						if(db_map.count(link))
-//						{
-//							std::vector<typename MasterType::link_type*>& links=db_map[link];
-//
-//							typename std::vector<typename MasterType::link_type*>::iterator vitr;
-//
-//							for(vitr=links.begin();vitr!=links.end();vitr++)
-//							{
-//								Link_Interface* link = (Link_Interface*)(*vitr);
-//								_affected_links.push_back( (Link_Interface*)(*vitr) );
-//								Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
-//
-//								// push locations from link to affected locations container
-//								for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
-//								{
-//									Location_Interface* loc = (Location_Interface*)(*litr);
-//									 this->_affected_locations.push_back(loc);
-//									 zone_set.insert(loc->template zone<Zone_Interface*>());
-//								}
-//
-//							}
-//						}
-//					}
-//				}
-//			
-//				// create the affected zones std::list
-//				for (typename std::unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
-//				{
-//					Zone_Interface* zone = (Zone_Interface*)(*zitr);
-//					this->_affected_zones.push_back(zone);
-//					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
-//				}
-//
-//				// create the unaffected locations std::list
-//				Location_Container_Interface* all_locations = ((Network<typename MasterType::network_type>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
-//				for (typename Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
-//				{
-//					bool add = true;
-//					for (typename std::vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
-//					{
-//						if ((void*)*litr == (void*)*itr){add=false; break;}
-//					}
-//					if (add) this->_unaffected_locations.push_back((Location_Interface*)*litr);
-//				}
-//				cout << endl << "Total Locations: " << all_locations->size() << ", Affected Locations: " << this->_affected_locations.size() << ", Unaffected Locations: " << this->_unaffected_locations.size();
-//			}
+			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
+			{
+				using namespace polaris::io;
+				
+				_active = false;
+				
+				_start_time = instance.lock()->getStart_Time();
+				_end_time = instance.lock()->getEnd_Time();
+
+				_notes = instance.lock()->getNote();
+
+				const std::vector<int>& links=instance.lock()->getLinks();
+				// temporary containers used to fill affected zone std::vector			
+				std::unordered_set<Zone_Interface*> zone_set;
+				if (links[0] == -1)
+				{
+					// affect all links
+					_Links_Container_Interface& links_container = ((_Network_Interface*)_global_network)->template links_container<_Links_Container_Interface&>();
+					typename _Links_Container_Interface::iterator link_itr;
+					for (link_itr = links_container.begin(); link_itr != links_container.end(); link_itr++)
+					{
+						Link_Interface* link = (Link_Interface*)(*link_itr);
+						_affected_links.push_back(link);
+//cout << "link " << link->template internal_id<int>() << " affected" << endl;
+						Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
+
+						// push locations from link to affected locations container
+						for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+						{
+							Location_Interface* loc = (Location_Interface*)(*litr);
+								this->_affected_locations.push_back(loc);
+								zone_set.insert(loc->template zone<Zone_Interface*>());
+						}
+					}
+				}
+				else
+				{
+
+					std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
+
+
+				
+					cout << endl << "INITIALIZE NETWORK EVENT:";
+					for(typename std::vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
+					{
+						int link = *itr;
+
+						if(db_map.count(link))
+						{
+							std::vector<typename MasterType::link_type*>& links=db_map[link];
+
+							typename std::vector<typename MasterType::link_type*>::iterator vitr;
+
+							for(vitr=links.begin();vitr!=links.end();vitr++)
+							{
+								Link_Interface* link = (Link_Interface*)(*vitr);
+								_affected_links.push_back( (Link_Interface*)(*vitr) );
+								Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
+
+								// push locations from link to affected locations container
+								for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+								{
+									Location_Interface* loc = (Location_Interface*)(*litr);
+									 this->_affected_locations.push_back(loc);
+									 zone_set.insert(loc->template zone<Zone_Interface*>());
+								}
+
+							}
+						}
+					}
+				}
+			
+				// create the affected zones std::list
+				for (typename std::unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				{
+					Zone_Interface* zone = (Zone_Interface*)(*zitr);
+					this->_affected_zones.push_back(zone);
+					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
+				}
+
+				// create the unaffected locations std::list
+				Location_Container_Interface* all_locations = ((Network<typename MasterType::network_type>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
+				for (typename Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
+				{
+					bool add = true;
+					for (typename std::vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
+					{
+						if ((void*)*litr == (void*)*itr){add=false; break;}
+					}
+					if (add) this->_unaffected_locations.push_back((Location_Interface*)*litr);
+				}
+				cout << endl << "Total Locations: " << all_locations->size() << ", Affected Locations: " << this->_affected_locations.size() << ", Unaffected Locations: " << this->_unaffected_locations.size();
+			}
 			
 			static void Incident_Conditional(ComponentType* _this,Event_Response& response)
 			{
@@ -281,81 +281,81 @@ namespace Network_Event_Components
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>*)this)->template Start<NT>();}
 
-			//template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
-			//{
-			//	using namespace polaris::io;
-			//	//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
+			{
+				using namespace polaris::io;
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 
-			//	((Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>*)this)-> Initialize<weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>*)this)-> Initialize<weak_ptr<Event_Instance>& >(instance);
 
-			//	//_start_time = 14400;
-			//	//_end_time = 43200;
+				//_start_time = 14400;
+				//_end_time = 43200;
 
-			//	const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
+				const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-			//	for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
-			//	{
-			//		//_weather_type = Types::WEATHER_TYPE::SNOW;
-			//		//_precipitation_depth = .6;
+				for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				{
+					//_weather_type = Types::WEATHER_TYPE::SNOW;
+					//_precipitation_depth = .6;
 
-			//		if( (*itr)->getKey()->getKey() == "type" )
-			//		{
-			//			if((*itr)->getValue() == "clear_dry_pavement")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::CLEAR_DRY_PAVEMENT;
-			//			}
-			//			else if((*itr)->getValue() == "clear_wet_pavement")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::CLEAR_WET_PAVEMENT;
-			//			}
-			//			else if((*itr)->getValue() == "rain")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::RAIN;
-			//			}
-			//			else if((*itr)->getValue() == "snow")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::SNOW;
-			//			}
-			//			else if((*itr)->getValue() == "temperature")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::TEMP;
-			//			}
-			//			else if((*itr)->getValue() == "wind")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::WIND;
-			//			}
-			//			else if ((*itr)->getValue() == "visibility")
-			//			{
-			//				_weather_type = Types::WEATHER_TYPE::VISIBILITY;
-			//			}
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "snowdepthm" )
-			//		{
-			//			_snow_depth = stof((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "precipm" )
-			//		{
-			//			_precipitation_depth = stof((*itr)->getValue());
+					if( (*itr)->getKey()->getKey() == "type" )
+					{
+						if((*itr)->getValue() == "clear_dry_pavement")
+						{
+							_weather_type = Types::WEATHER_TYPE::CLEAR_DRY_PAVEMENT;
+						}
+						else if((*itr)->getValue() == "clear_wet_pavement")
+						{
+							_weather_type = Types::WEATHER_TYPE::CLEAR_WET_PAVEMENT;
+						}
+						else if((*itr)->getValue() == "rain")
+						{
+							_weather_type = Types::WEATHER_TYPE::RAIN;
+						}
+						else if((*itr)->getValue() == "snow")
+						{
+							_weather_type = Types::WEATHER_TYPE::SNOW;
+						}
+						else if((*itr)->getValue() == "temperature")
+						{
+							_weather_type = Types::WEATHER_TYPE::TEMP;
+						}
+						else if((*itr)->getValue() == "wind")
+						{
+							_weather_type = Types::WEATHER_TYPE::WIND;
+						}
+						else if ((*itr)->getValue() == "visibility")
+						{
+							_weather_type = Types::WEATHER_TYPE::VISIBILITY;
+						}
+					}
+					else if( (*itr)->getKey()->getKey() == "snowdepthm" )
+					{
+						_snow_depth = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "precipm" )
+					{
+						_precipitation_depth = stof((*itr)->getValue());
 
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "vism" )
-			//		{
-			//			_visibility = stof((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "wind" )
-			//		{
-			//			_wind_speed = stof((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "temperature" )
-			//		{
-			//			_wind_speed = stof((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "county" )
-			//		{
-			//			_county = (*itr)->getValue();
-			//		}
-			//	}
-			//}
+					}
+					else if( (*itr)->getKey()->getKey() == "vism" )
+					{
+						_visibility = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "wind" )
+					{
+						_wind_speed = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "temperature" )
+					{
+						_wind_speed = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "county" )
+					{
+						_county = (*itr)->getValue();
+					}
+				}
+			}
 
 			m_data(Types::WEATHER_TYPE,weather_type, NONE, NONE);
 			m_data(float,precipitation_depth, NONE, NONE);
@@ -374,51 +374,51 @@ namespace Network_Event_Components
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Accident_Network_Event)>*)this)->template Start<NT>();}
 
-			//template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
-			//{
-			//	using namespace polaris::io;
+			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
+			{
+				using namespace polaris::io;
 
-			//	//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-			//	((Base_Network_Event<MasterType,INHERIT(Accident_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,INHERIT(Accident_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
 
-			//	//_start_time = 28800 + rand()%(20*60);
-			//	//_start_time = 500;
-			//	Base_Network_Event::_end_time = Base_Network_Event::_end_time * ((_Scenario_Interface*)_global_scenario)->template accident_event_duration_reduction<float>();
+				//_start_time = 28800 + rand()%(20*60);
+				//_start_time = 500;
+				Base_Network_Event::_end_time = Base_Network_Event::_end_time * ((_Scenario_Interface*)_global_scenario)->template accident_event_duration_reduction<float>();
 
-			//	const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
+				const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-			//	for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
-			//	{
-			//		if( (*itr)->getKey()->getKey() == "lanes" )
-			//		{
-			//			_lanes = stoi((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "severity" )
-			//		{
-			//			_severity = stoi((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "vehicles" )
-			//		{
-			//			_vehicles_involved = stoi((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "accident_type" )
-			//		{
-			//			_accident_type = (*itr)->getValue();
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "vehicle_type" )
-			//		{
-			//			_vehicle_type = (*itr)->getValue();
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "injury" )
-			//		{
-			//			_injury_type = (*itr)->getValue();
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "lanes_closed" )
-			//		{
-			//			_lanes_closed = stoi((*itr)->getValue());
-			//		}
-			//	}
-			//}
+				for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				{
+					if( (*itr)->getKey()->getKey() == "lanes" )
+					{
+						_lanes = stoi((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "severity" )
+					{
+						_severity = stoi((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "vehicles" )
+					{
+						_vehicles_involved = stoi((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "accident_type" )
+					{
+						_accident_type = (*itr)->getValue();
+					}
+					else if( (*itr)->getKey()->getKey() == "vehicle_type" )
+					{
+						_vehicle_type = (*itr)->getValue();
+					}
+					else if( (*itr)->getKey()->getKey() == "injury" )
+					{
+						_injury_type = (*itr)->getValue();
+					}
+					else if( (*itr)->getKey()->getKey() == "lanes_closed" )
+					{
+						_lanes_closed = stoi((*itr)->getValue());
+					}
+				}
+			}
 
 			m_data(int,lanes, NONE, NONE);
 			m_data(int,lanes_closed, NONE, NONE);
@@ -441,27 +441,27 @@ namespace Network_Event_Components
 				((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Initialize<MasterType>(start_time,end_time,affected_links);
 			}
 
-			//template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
-			//{
-			//	using namespace polaris::io;
+			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
+			{
+				using namespace polaris::io;
 
-			//	//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-			//	((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
-			//	
-			//	const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
+				
+				const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-			//	for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
-			//	{
-			//		if( (*itr)->getKey()->getKey() == "travel_time" )
-			//		{
-			//			_travel_time = stoi((*itr)->getValue());
-			//		}
-			//		else if( (*itr)->getKey()->getKey() == "slowdown_index" )
-			//		{
-			//			_slowdown_index = stof((*itr)->getValue());
-			//		}
-			//	}
-			//}
+				for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				{
+					if( (*itr)->getKey()->getKey() == "travel_time" )
+					{
+						_travel_time = stoi((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "slowdown_index" )
+					{
+						_slowdown_index = stof((*itr)->getValue());
+					}
+				}
+			}
 
 			m_data(int,travel_time, NONE, NONE);
 			m_data(float,slowdown_index, NONE, NONE);
@@ -474,23 +474,23 @@ namespace Network_Event_Components
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Lane_Closure_Network_Event)>*)this)->template Start<NT>();}
 
-			//template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
-			//{
-			//	using namespace polaris::io;
+			template<typename TargetType> void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
+			{
+				using namespace polaris::io;
 
-			//	//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-			//	((Base_Network_Event<MasterType,INHERIT(Lane_Closure_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,INHERIT(Lane_Closure_Network_Event)>*)this)->template Initialize<weak_ptr<Event_Instance>& >(instance);
 
-			//	const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
+				const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-			//	for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
-			//	{
-			//		if( (*itr)->getKey()->getKey() == "lanes_closed" )
-			//		{
-			//			_lanes = stoi((*itr)->getValue());
-			//		}
-			//	}
-			//}
+				for(typename std::vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				{
+					if( (*itr)->getKey()->getKey() == "lanes_closed" )
+					{
+						_lanes = stoi((*itr)->getValue());
+					}
+				}
+			}
 
 			m_data(int,lanes, NONE, NONE);
 		};
@@ -521,76 +521,76 @@ namespace Network_Event_Components
 
 			template<typename TargetType> void Read_DB()
 			{
-				//using namespace odb;
-				//using namespace polaris;
+				using namespace odb;
+				using namespace polaris;
 
-				//typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				//string name( ((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				string name( ((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
-				//unique_ptr<database> db (open_sqlite_database (name));
+				unique_ptr<database> db (open_sqlite_database (name));
 
-				//session s;
+				session s;
 
-				//transaction t (db->begin());
-				//result<io::Network_Event> r = db->template query<io::Network_Event> (query<io::Network_Event>::true_expr);
+				transaction t (db->begin());
+				result<io::Network_Event> r = db->template query<io::Network_Event> (query<io::Network_Event>::true_expr);
 
-				//for (result<io::Network_Event>::iterator itr=r.begin(); itr!=r.end(); ++itr)
-				//{
-				//	const string& name = itr->getName();
+				for (result<io::Network_Event>::iterator itr=r.begin(); itr!=r.end(); ++itr)
+				{
+					const string& name = itr->getName();
 
-				//	if(name == "Weather")
-				//	{
-				//		Weather_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
-				//	}
-				//	else if(name == "Accident")
-				//	{
-				//		Accident_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
-				//	}
-				//	else if(name == "Congestion")
-				//	{
-				//		Congestion_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
-				//	}
-				//	else if(name == "Lane Closure")
-				//	{
-				//		Lane_Closure_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
-				//	}
-				//	
-				//	const std::vector<weak_ptr<io::Event_Instance> >& instances = itr->getInstances();
+					if(name == "Weather")
+					{
+						Weather_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+					}
+					else if(name == "Accident")
+					{
+						Accident_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+					}
+					else if(name == "Congestion")
+					{
+						Congestion_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+					}
+					else if(name == "Lane Closure")
+					{
+						Lane_Closure_Network_Event_Interface::template Initialize_Type<const std::vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+					}
+					
+					const std::vector<weak_ptr<io::Event_Instance> >& instances = itr->getInstances();
 
-				//	for(typename std::vector<weak_ptr<io::Event_Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
-				//	{
-				//		weak_ptr<io::Event_Instance> _ptr=*vitr;
+					for(typename std::vector<weak_ptr<io::Event_Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
+					{
+						weak_ptr<io::Event_Instance> _ptr=*vitr;
 
-				//		if(name == "Weather")
-				//		{
-				//			Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::weather_network_event_type>();
-				//			net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-				//			net_event->template Start<NT>();
-				//			Add_Network_Event<typename Weather_Network_Event_Interface::ComponentType>(net_event);
-				//		}
-				//		else if(name == "Accident")
-				//		{
-				//			Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::accident_network_event_type>();
-				//			net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-				//			net_event->template Start<NT>();
-				//			Add_Network_Event<typename Accident_Network_Event_Interface::ComponentType>(net_event);
-				//		}
-				//		else if(name == "Congestion")
-				//		{
-				//			Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::congestion_network_event_type>();
-				//			net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-				//			net_event->template Start<NT>();
-				//			Add_Network_Event<typename Congestion_Network_Event_Interface::ComponentType>(net_event);
-				//		}
-				//		else if(name == "Lane Closure")
-				//		{
-				//			Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::lane_closure_network_event_type>();
-				//			net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-				//			net_event->template Start<NT>();
-				//			Add_Network_Event<typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
-				//		}
-				//	}
-				//}
+						if(name == "Weather")
+						{
+							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::weather_network_event_type>();
+							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
+							net_event->template Start<NT>();
+							Add_Network_Event<typename Weather_Network_Event_Interface::ComponentType>(net_event);
+						}
+						else if(name == "Accident")
+						{
+							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::accident_network_event_type>();
+							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
+							net_event->template Start<NT>();
+							Add_Network_Event<typename Accident_Network_Event_Interface::ComponentType>(net_event);
+						}
+						else if(name == "Congestion")
+						{
+							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::congestion_network_event_type>();
+							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
+							net_event->template Start<NT>();
+							Add_Network_Event<typename Congestion_Network_Event_Interface::ComponentType>(net_event);
+						}
+						else if(name == "Lane Closure")
+						{
+							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::lane_closure_network_event_type>();
+							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
+							net_event->template Start<NT>();
+							Add_Network_Event<typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
+						}
+					}
+				}
 			}
 
 			template<typename TargetType> void Get_Network_Events(int link_id,std::vector< Network_Event<TargetType>* >& container/*,requires(TargetType,check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))*/)

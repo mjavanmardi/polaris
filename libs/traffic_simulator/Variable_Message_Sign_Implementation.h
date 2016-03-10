@@ -30,34 +30,34 @@ namespace Variable_Message_Sign_Components
 
 		implementation struct Variable_Speed_Sign:public Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Speed_Sign)>
 		{
-			//template<typename TargetType> void Initialize(polaris::io::VSS& instance)
-			//{
-			//	using namespace polaris::io;
+			template<typename TargetType> void Initialize(polaris::io::VSS& instance)
+			{
+				using namespace polaris::io;
 
-			//	//shared_ptr<LinkList> link_list = instance.getLinks();
+				//shared_ptr<LinkList> link_list = instance.getLinks();
 
-			//	//const std::vector<int>& links = (*link_list).getLinks();
+				//const std::vector<int>& links = (*link_list).getLinks();
 
-			//	std::vector<int> links;
-			//	links.push_back(instance.getLink());
+				std::vector<int> links;
+				links.push_back(instance.getLink());
 
-			//	//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
-			//	((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Speed_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
-			//}
+				//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
+				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Speed_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
+			}
 		};
 
 		implementation struct Variable_Word_Sign:public Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Word_Sign)>
 		{
-			//template<typename TargetType> void Initialize(polaris::io::VMS& instance)
-			//{
-			//	using namespace polaris::io;
+			template<typename TargetType> void Initialize(polaris::io::VMS& instance)
+			{
+				using namespace polaris::io;
 
-			//	std::vector<int> links;
-			//	links.push_back(instance.getLink());
+				std::vector<int> links;
+				links.push_back(instance.getLink());
 
-			//	//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
-			//	((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Word_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
-			//}
+				//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
+				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Word_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
+			}
 		};
 	}
 }
