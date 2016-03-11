@@ -248,6 +248,7 @@ namespace polaris
 		Byte* return_memory = (Byte*)free_block->Allocate<DataType>();
 
 		new (return_memory) DataType();
+		((Execution_Object*)return_memory)->execution_block(free_block);
 
 		// add information about the uuid
 		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
@@ -281,11 +282,11 @@ namespace polaris
 	/// Free - Free an Execution object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	void Execution_Component_Manager<DataType>::Free( DataType* ptr )
-	{
-		ptr->execution_block()->Free(ptr);
-	}
+	//template<typename DataType>
+	//void Execution_Component_Manager<DataType>::Free( DataType* ptr )
+	//{
+	//	ptr->execution_block()->Free(ptr);
+	//}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Free_Array

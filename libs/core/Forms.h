@@ -13,6 +13,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define this_component() ((ComponentType*)this)
+	// %%%RLW ??? #define this_component() (this)
 
 	#define type_of(NAME) NAME##_accessible_type
 	#define get_type_of(NAME) Component_Type::NAME##_accessible_type

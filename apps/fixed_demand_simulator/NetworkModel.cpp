@@ -315,7 +315,7 @@ void run_with_input_from_db(const char* scenario_filename)
 
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
-	
+
 
 
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);

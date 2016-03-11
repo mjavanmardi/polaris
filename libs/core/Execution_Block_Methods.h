@@ -174,7 +174,7 @@ namespace polaris
 				else
 				{
 					// Perform an internal free operation
-					Free( (DataType*)current_object );
+					//Free( (DataType*)current_object );
 				}
 			}
 

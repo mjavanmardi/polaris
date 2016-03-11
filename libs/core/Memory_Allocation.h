@@ -48,17 +48,17 @@ namespace polaris
 	/// Free, Free_Array - pass through to the component_manager
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	void Free( DataType* ptr )
-	{
-#ifdef ENABLE_MEMORY_LOGGING
-		int i=(int)DataType::component_id;
-		int j=thread_id();
-		_type_counter(i,j)-=sizeof(DataType);
-#endif
-		((DataType::component_manager)->Free(ptr));
-		ptr = nullptr;
-	}
+//	template<typename DataType>
+//	void Free( DataType* ptr )
+//	{
+//#ifdef ENABLE_MEMORY_LOGGING
+//		int i=(int)DataType::component_id;
+//		int j=thread_id();
+//		_type_counter(i,j)-=sizeof(DataType);
+//#endif
+//		((DataType::component_manager)->Free(ptr));
+//		ptr = nullptr;
+//	}
 
 	template<typename DataType>
 	void Free_Array( DataType* ptr )

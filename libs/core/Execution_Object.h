@@ -38,7 +38,6 @@ namespace polaris
 	{
 	public:
 		Execution_Object():Base_Object(){ _next_revision = __revision_omega; }
-
 		Execution_Object(size_t component_id,int uuid):Base_Object(component_id,uuid){ _next_revision = __revision_omega; }
 		
 		//----------------------------------------------------------------------------------------------------
@@ -62,6 +61,7 @@ namespace polaris
 		//----------------------------------------------------------------------------------------------------
 
 		inline Execution_Block* execution_block(void){ return _execution_block; }
+		void execution_block(Execution_Block* const pExBlock) { _execution_block = pExBlock; }
 
 	private:
 		friend class Execution_Block;

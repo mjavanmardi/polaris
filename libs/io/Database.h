@@ -68,7 +68,7 @@ namespace io
 
 inline void hadnle_sqlite_error(char **err_msg, int ret)
 {
-	fprintf (stderr, "Error: %s\n", err_msg);
+	fprintf (stderr, "Error: %s\n", *err_msg);
 	fprintf (stderr, "Error code: %d\n", ret);
 	sqlite3_free (err_msg);
 }

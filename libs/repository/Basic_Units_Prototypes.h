@@ -256,7 +256,7 @@ namespace Basic_Units
 			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Length_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				// %%%RLW assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,Concepts::Is_Length_Value) && check(ReturnType,Concepts::Is_Length_Value)))
@@ -559,7 +559,7 @@ namespace Basic_Units
 			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
+				// %%%RLW assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)&& !check_2(ReturnType, Simulation_Timestep_Increment,is_same)))
@@ -811,7 +811,7 @@ namespace Basic_Units
 			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Currency_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
+				// %%%RLW assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
 			}
 
 			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType, Concepts::Is_Currency_Value) && check(ReturnType,Concepts::Is_Currency_Value)))

@@ -57,129 +57,129 @@ namespace polaris
 	/// Free - Deallocate an object from the block's memory pool, this is a thread safe function
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	void Execution_Block::Free(DataType* cell)
-	{
-		// Safe mode locks the execution object for increased thread safety
-#ifdef SAFE_MODE
-		LOCK(cell->_optex_lock);
-#elif defined ENABLE_WARNINGS
-		if( cell->Visiting() && _thread_processing!=__thread_id)
-			{
-				THROW_WARNING("Ureliable free of: " << typeid(DataType).name() << " at " << cell << " Use of the self-free option, or rescheduling when it will be freed is recommended for this object");
-			}
-#endif
-
-		// deschedule the cell immediately to minimize collisions
-		cell->_next_revision = __revision_omega;
-
-		// destruct the cell
-		cell->DataType::~DataType();
-
-#ifdef SAFE_MODE
-		UNLOCK(cell->_optex_lock);
-#endif
-
-		if( _world->Is_Running() )
-		{
-			// _memory_lock ensures that nothing will be allocated (or freed) from the memory pool
-			LOCK(_memory_lock);
-
-			// Start from the "middle", provided cell may be before or after the first free cell
-			DataType* current_cell = (DataType*)_first_free_cell;
-
-			if( ((Byte*)cell) < _first_free_cell )
-			{
-				// cell exists before the first free cell, it becomes ffc and previous ffc links to this cell
-
-				_first_free_cell = (Byte*)cell;
-				((DataType*)_first_free_cell)->_next_free_cell = (Byte*)current_cell;
-			}
-			else
-			{
-				// cell exists after the first free cell, forward scan the list to find where it fits
-
-				while(((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
-
-				// link cell to the cell after it in the free list (current_cell), link that cell to cell
-				cell->_next_free_cell = current_cell->_next_free_cell;
-				current_cell->_next_free_cell = (Byte*)cell;
-			}
-
-			// if this block can now be allocated to, current thread takes responsibility for it
-			// we need to lock this because otherwise another thread may empty an object from this block, making it non-full
-			if( Full() )
-			{
-				DataType::component_manager->Push_Block_With_Free_Cells( this );
-				_memory_managed_by = __thread_id;
-			}
-
-			--_num_allocated;
-
-			// This method may have emptied the block
-			// we need to lock this because otherwise another thread may add an object to this block, making it non-empty
-			// note however that the block cannot be newly with free cells or else the Full() condition above would have caught it
-			if( Empty() )
-			{
-				// Need to note that the "managed_by" thread has an empty block lying around
-				DataType::component_manager->Add_Empty_Block( _memory_managed_by );
-				// Need to remove this block from the execution stream
-				DataType::component_manager->Deactivate_Block( this );
-
-				LOCK( _ptex_lock );
-
-				// deschedule the block
-				_ptex_next_revision = __revision_omega;
-				_ptex_next_next_revision = __revision_omega;
-
-				UNLOCK( _ptex_lock );
-			}
-
-			UNLOCK(_memory_lock);
-		}
-		else
-		{
-			// Start from the "middle", provided cell may be before or after the first free cell
-			DataType* current_cell = (DataType*)_first_free_cell;
-
-			if( ((Byte*)cell) < _first_free_cell )
-			{
-				// cell exists before the first free cell, it becomes ffc and previous ffc links to this cell
-
-				_first_free_cell = (Byte*)cell;
-				((DataType*)_first_free_cell)->_next_free_cell = (Byte*)current_cell;
-			}
-			else
-			{
-				// cell exists after the first free cell, forward scan the list to find where it fits
-
-				while(((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
-
-				// link cell to the cell after it in the free list (current_cell), link that cell to cell
-				cell->_next_free_cell = current_cell->_next_free_cell;
-				current_cell->_next_free_cell = (Byte*)cell;
-			}
-
-			// if this block can now be allocated to, current thread takes responsibility for it
-			// we need to lock this because otherwise another thread may empty an object from this block, making it non-full
-			if( Full() )
-			{
-				DataType::component_manager->Push_Block_With_Free_Cells( this );
-				_memory_managed_by = __thread_id;
-			}
-
-			--_num_allocated;
-
-			// This method may have emptied the block
-			// we need to lock this because otherwise another thread may add an object to this block, making it non-empty
-			if( Empty() )
-			{
-				// Need to note that this thread has an empty block lying around
-				DataType::component_manager->Add_Empty_Block( _memory_managed_by );
-				// Need to remove this block from the execution stream
-				DataType::component_manager->Deactivate_Block( this );
-			}
-		}
-	}
+//	template<typename DataType>
+//	void Execution_Block::Free(DataType* cell)
+//	{
+//		// Safe mode locks the execution object for increased thread safety
+//#ifdef SAFE_MODE
+//		LOCK(cell->_optex_lock);
+//#elif defined ENABLE_WARNINGS
+//		if( cell->Visiting() && _thread_processing!=__thread_id)
+//			{
+//				THROW_WARNING("Ureliable free of: " << typeid(DataType).name() << " at " << cell << " Use of the self-free option, or rescheduling when it will be freed is recommended for this object");
+//			}
+//#endif
+//
+//		// deschedule the cell immediately to minimize collisions
+//		cell->_next_revision = __revision_omega;
+//
+//		// destruct the cell
+//		cell->DataType::~DataType();
+//
+//#ifdef SAFE_MODE
+//		UNLOCK(cell->_optex_lock);
+//#endif
+//
+//		if( _world->Is_Running() )
+//		{
+//			// _memory_lock ensures that nothing will be allocated (or freed) from the memory pool
+//			LOCK(_memory_lock);
+//
+//			// Start from the "middle", provided cell may be before or after the first free cell
+//			DataType* current_cell = (DataType*)_first_free_cell;
+//
+//			if( ((Byte*)cell) < _first_free_cell )
+//			{
+//				// cell exists before the first free cell, it becomes ffc and previous ffc links to this cell
+//
+//				_first_free_cell = (Byte*)cell;
+//				((DataType*)_first_free_cell)->_next_free_cell = (Byte*)current_cell;
+//			}
+//			else
+//			{
+//				// cell exists after the first free cell, forward scan the list to find where it fits
+//
+//				while(((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
+//
+//				// link cell to the cell after it in the free list (current_cell), link that cell to cell
+//				cell->_next_free_cell = current_cell->_next_free_cell;
+//				current_cell->_next_free_cell = (Byte*)cell;
+//			}
+//
+//			// if this block can now be allocated to, current thread takes responsibility for it
+//			// we need to lock this because otherwise another thread may empty an object from this block, making it non-full
+//			if( Full() )
+//			{
+//				DataType::component_manager->Push_Block_With_Free_Cells( this );
+//				_memory_managed_by = __thread_id;
+//			}
+//
+//			--_num_allocated;
+//
+//			// This method may have emptied the block
+//			// we need to lock this because otherwise another thread may add an object to this block, making it non-empty
+//			// note however that the block cannot be newly with free cells or else the Full() condition above would have caught it
+//			if( Empty() )
+//			{
+//				// Need to note that the "managed_by" thread has an empty block lying around
+//				DataType::component_manager->Add_Empty_Block( _memory_managed_by );
+//				// Need to remove this block from the execution stream
+//				DataType::component_manager->Deactivate_Block( this );
+//
+//				LOCK( _ptex_lock );
+//
+//				// deschedule the block
+//				_ptex_next_revision = __revision_omega;
+//				_ptex_next_next_revision = __revision_omega;
+//
+//				UNLOCK( _ptex_lock );
+//			}
+//
+//			UNLOCK(_memory_lock);
+//		}
+//		else
+//		{
+//			// Start from the "middle", provided cell may be before or after the first free cell
+//			DataType* current_cell = (DataType*)_first_free_cell;
+//
+//			if( ((Byte*)cell) < _first_free_cell )
+//			{
+//				// cell exists before the first free cell, it becomes ffc and previous ffc links to this cell
+//
+//				_first_free_cell = (Byte*)cell;
+//				((DataType*)_first_free_cell)->_next_free_cell = (Byte*)current_cell;
+//			}
+//			else
+//			{
+//				// cell exists after the first free cell, forward scan the list to find where it fits
+//
+//				while(((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
+//
+//				// link cell to the cell after it in the free list (current_cell), link that cell to cell
+//				cell->_next_free_cell = current_cell->_next_free_cell;
+//				current_cell->_next_free_cell = (Byte*)cell;
+//			}
+//
+//			// if this block can now be allocated to, current thread takes responsibility for it
+//			// we need to lock this because otherwise another thread may empty an object from this block, making it non-full
+//			if( Full() )
+//			{
+//				DataType::component_manager->Push_Block_With_Free_Cells( this );
+//				_memory_managed_by = __thread_id;
+//			}
+//
+//			--_num_allocated;
+//
+//			// This method may have emptied the block
+//			// we need to lock this because otherwise another thread may add an object to this block, making it non-empty
+//			if( Empty() )
+//			{
+//				// Need to note that this thread has an empty block lying around
+//				DataType::component_manager->Add_Empty_Block( _memory_managed_by );
+//				// Need to remove this block from the execution stream
+//				DataType::component_manager->Deactivate_Block( this );
+//			}
+//		}
+//	}
 
 }

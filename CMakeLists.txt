@@ -25,25 +25,54 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
+# %%%RLW - begine
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
+
+if (MSVC)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob0 /MD /W2 /Oi /bigobj")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+elseif(MINGW)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -std=c++11")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wa,-mbig-obj -std=c++11")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj -std=c++11")
+endif()
+# %%%RLW - end
+
 
 #Set up dependencies
 
 #{
 	#Variable to indicate where most external dependencies live
-	set(DEPS_DIR C:/opt/polarisdeps)
+	#set(DEPS_DIR C:/opt/polarisdeps) %%%RLW
+	set(DEPS_DIR $ENV{POLARIS_DEPS_DIR})
 
 	#Variable to indicate where boost lives
-	set(BOOST_ROOT ${DEPS_DIR}/boost_1_59_0)
-	find_package(Boost 1.59)
-
-	if(Boost_FOUND)
-		#Boost include dependencies
-		include_directories(${Boost_INCLUDE_DIRS})
-	else()
-		message(FATAL_ERROR "Boost not found!")
+	#Variable to indicate where boost lives
+	set(BOOST_ROOT ${DEPS_DIR}/boost_1_60_0)
+	if (MSVC10)
+		set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib64-msvc-10.0)
+	elseif (MSVC14)
+		set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib64-msvc-14.0)
+	elseif (MINGW)
+		set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib64-mingw)
 	endif()
+	
+	# boost
+	set(Boost_NO_SYSTEM_PATHS true)
+	#set (Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
+	set (Boost_USE_STATIC_LIBS ON)
+	set (Boost_USE_MULTITHREADED ON)
+	find_package(Boost 1.60.0 REQUIRED 
+	  COMPONENTS
+	  chrono
+	  timer
+	  filesystem
+	  system
+	  program_options
+	  )
+	include_directories(${Boost_INCLUDE_DIRS})
+	link_libraries(${Boost_LIBRARIES})
 
 	#TC_Malloc include and library dependencies
 	#if (UNIX)
@@ -72,6 +101,22 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 	#endif()
 
 	#ODB include dependencies
+if (MSVC14 OR MSVC10 OR MINGW)
+	#ODB include dependencies
+	include_directories(${DEPS_DIR}/libodb-2.4.0)
+	include_directories(${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0)
+	include_directories(${DEPS_DIR}/libodb-2.4.0/libsqlite3)
+
+	#ODB library dependencies
+	set(odb ${DEPS_DIR}/libodb-2.4.0/lib64/odb.lib)
+	set(odb-d ${DEPS_DIR}/libodb-2.4.0/lib64/odb-d.lib)
+	set(odb_sqlite ${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0/lib64/odb-sqlite.lib)
+	set(odb_sqlite-d ${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0/lib64/odb-sqlite-d.lib)
+	#set(sqlite3 ${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0/etc/sqlite/lib64/sqlite3.lib)
+	#set(sqlite3-d ${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0/etc/sqlite/lib64/sqlite3-d.lib)
+	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
+	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d})
+else()
 	include_directories(${DEPS_DIR}/libodb-2.2.2)
 	include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0)
 	include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite)
@@ -85,6 +130,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 	set(sqlite3-d ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64/sqlite3-d.lib)
 	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
 	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d})
+endif()
 #}
 
 
@@ -178,6 +224,7 @@ else()
 	add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
+	add_subdirectory (apps/randy_test)
 	#add_subdirectory (apps/dee-test)
 	add_subdirectory (apps/network_validator)
 #	add_subdirectory (apps/Output_Visualizer)
