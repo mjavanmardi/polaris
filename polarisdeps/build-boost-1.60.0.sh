@@ -12,8 +12,7 @@ fi
 BOOSTTARFILE=$BASEDIR/boost_1_60_0.tar.bz2
 BOOSTDIR=$BASEDIR/boost_1_60_0
 if [ ! -f $BOOSTTARFILE ];then
-  wget -c 'http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2/download' --directory-prefix=$BASEDIR
-  mv $BASEDIR/download $BOOSTTARFILE
+  wget -c 'http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2' --directory-prefix=$BASEDIR
 fi
 if [ ! -d $BOOSTDIR ];then
   tar xfj $BOOSTTARFILE -C $BASEDIR
