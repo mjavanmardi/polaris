@@ -1,6 +1,6 @@
 #pragma once
 
-#include "activity_simulator\Household_Properties_Prototype.h"
+#include "activity_simulator/Household_Properties_Prototype.h"
 
 
 

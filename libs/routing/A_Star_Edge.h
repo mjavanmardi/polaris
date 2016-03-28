@@ -10,8 +10,8 @@ namespace polaris
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		typedef typename ComponentType::Master_Type Master_Type;
 
-		edge_id_type edge_id(){ return this_component()->edge_id(); }
-		void edge_id(edge_id_type value){ this_component()->edge_id(value); }
+		p_edge_id_type edge_id(){ return this_component()->edge_id(); }
+		void edge_id(p_edge_id_type value){ this_component()->edge_id(value); }
 
 		//const long long id(){ return this_component()->id(); }
 		//

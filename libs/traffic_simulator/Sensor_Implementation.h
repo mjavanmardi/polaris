@@ -3,7 +3,7 @@
 #include "Link_Prototype.h"
 #include "Detector_Implementation.h"
 #ifndef FOR_LINUX_PORTING
-#include "../Repository/Basic_Unit_Implementations.h"
+#include "../repository/Basic_Unit_Implementations.h"
 #endif
 
 namespace Sensor_Components

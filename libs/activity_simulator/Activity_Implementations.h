@@ -6,7 +6,7 @@
 #include "Person_Planner_Prototype.h"
 #include "Activity_Generator_Prototype.h"
 #include "Person_Properties_Prototype.h"
-#include "activity_simulator\Person_Scheduler_Implementations.h"
+#include "activity_simulator/Person_Scheduler_Implementations.h"
 #include "Activity_Prototype.h"
 #include "Activity_Simulator_Forward_Declaration.h"
 
@@ -443,7 +443,7 @@ namespace Activity_Components
 				move->Free_Movement();
 
 				// Free this when able
-				Free<ComponentType>((ComponentType*)this);
+				// %%%RLW - for now - Free<ComponentType>((ComponentType*)this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)

@@ -4,13 +4,13 @@
 //contains all of the parts necessary to construct a routable graph later 
 namespace polaris
 {
-	typedef unsigned long long edge_id_type;
-	typedef unsigned int graph_id_type;
+	typedef unsigned long long p_edge_id_type;
+	typedef unsigned int p_graph_id_type;
 
 	struct global_edge_id
 	{
-		graph_id_type graph_id;
-		edge_id_type edge_id;
+		p_graph_id_type graph_id;
+		p_edge_id_type edge_id;
 	};
 
 	struct Input_Connection_Group
@@ -20,8 +20,8 @@ namespace polaris
 
 		virtual Input_Connection_Group* Create_Copy() = 0;
 
-		virtual graph_id_type neighbor_graph_id() = 0;
-		virtual boost::container::deque<edge_id_type>& neighbors() = 0;
+		virtual p_graph_id_type neighbor_graph_id() = 0;
+		virtual boost::container::deque<p_edge_id_type>& neighbors() = 0;
 	};
 
 	prototype struct Connection;
@@ -82,17 +82,17 @@ namespace polaris
 			return (Input_Connection_Group*)copy;
 		}
 
-		virtual graph_id_type neighbor_graph_id(){ return _neighbor_graph_id; }
+		virtual p_graph_id_type neighbor_graph_id(){ return _neighbor_graph_id; }
 		
-		virtual boost::container::deque<edge_id_type>& neighbors(){ return _neighbors; }
+		virtual boost::container::deque<p_edge_id_type>& neighbors(){ return _neighbors; }
 
-		static graph_id_type _neighbor_graph_id;
-		boost::container::deque<edge_id_type> _neighbors;
+		static p_graph_id_type _neighbor_graph_id;
+		boost::container::deque<p_edge_id_type> _neighbors;
 		boost::container::deque<connection_attributes_type> _neighbor_attributes;
 	};
 	//ADGE ATTRIBUTES TYPES HAS TO BE AN PLAIN old data (POD) so that the copy operation at line 116 works, otherwise need to define a copy operator
 	template<typename Connection_Group_Type>
-	graph_id_type Input_Connection_Group_Implementation<Connection_Group_Type>::_neighbor_graph_id;
+	p_graph_id_type Input_Connection_Group_Implementation<Connection_Group_Type>::_neighbor_graph_id;
 
 	template<typename Edge_Attributes_Type = NT>
 	struct Input_Edge : public Edge_Attributes_Type

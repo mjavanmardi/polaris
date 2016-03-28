@@ -1,7 +1,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#include <boost\format.hpp>
+#include <boost/format.hpp>
 
 namespace Version
 {

@@ -10,66 +10,66 @@ namespace polaris
 {
 	namespace myAgent
 	{
-	//	//need to derive from ComponentType if you want to use the interface to iterate correctly
-	//	prototype struct myAgent : ComponentType
-	//	{
-	//		// required tag to identify this class as a polaris prototype
-	//		tag_as_prototype;
+		//need to derive from ComponentType if you want to use the interface to iterate correctly
+		prototype struct myAgent : ComponentType
+		{
+			// required tag to identify this class as a polaris prototype
+			tag_as_prototype;
 
-	//		// since want x,y&z to be doubles (always) we declare as typed (double)
-	//		// this makes it easier to set/get obj->x() as opposed to obj->x<double>()
-	//		typed_accessor(double, x);
-	//		typed_accessor(double, y);
-	//		typed_accessor(double, z);
+			// since want x,y&z to be doubles (always) we declare as typed (double)
+			// this makes it easier to set/get obj->x() as opposed to obj->x<double>()
+			typed_accessor(double, x);
+			typed_accessor(double, y);
+			typed_accessor(double, z);
 
-	//		// data type for id depends on implementation tho
-	//		accessor(id, NONE, NONE);
-	//		accessor(stuff, NONE, NONE);
-	//		accessor(not_implemented, NONE, NONE);
+			// data type for id depends on implementation tho
+			accessor(id, NONE, NONE);
+			accessor(stuff, NONE, NONE);
+			accessor(not_implemented, NONE, NONE);
 
-	//		// function call, passed through to implementation
-	//		template<typename IdType> void Initialize(double x, double y, double z, IdType id)
-	//		{
-	//			this_component()->Initialize(x, y, z, id);
-	//		}
+			// function call, passed through to implementation
+			template<typename IdType> void Initialize(double x, double y, double z, IdType id)
+			{
+				this_component()->Initialize(x, y, z, id);
+			}
 
-	//		template<typename IdType> void get_id(IdType& id)
-	//		{
-	//			this_component()->get_id(id);
-	//		}
+			template<typename IdType> void get_id(IdType& id)
+			{
+				this_component()->get_id(id);
+			}
 
-	//		string id_desc()
-	//		{
-	//			return this_component()->id_desc();
-	//		}
+			string id_desc()
+			{
+				return this_component()->id_desc();
+			}
 
-	//		template <typename StuffType> StuffType Get_Stuff(int id)
-	//		{
-	//			return this_component()->Get_Stuff<StuffType>(id);
-	//		}
-	//		template<typename StuffType> double stuff_calc()
-	//		{
-	//			return this_component()->stuff_calc();
-	//		}
-	//	};
+			template <typename StuffType> StuffType Get_Stuff(int id)
+			{
+				return this_component()->Get_Stuff<StuffType>(id);
+			}
+			template<typename StuffType> double stuff_calc()
+			{
+				return this_component()->stuff_calc();
+			}
+		};
 
 		// This is a very simple POLARIS component representing an agent in the simulation
 		//     the specifics of this line will be explained in subsequent tutorials
 		implementation struct Agent :public Polaris_Component<MasterType, INHERIT(Agent), Execution_Object>
 		{
-			typed_accessor(double, x);
+			simple_typed_accessor(double, x);
 			m_data(double, x, NONE, NONE);
 
-			typed_accessor(double, y);
+			simple_typed_accessor(double, y);
 			m_data(double, y, NONE, NONE);
 
-			typed_accessor(double, z);
+			simple_typed_accessor(double, z);
 			m_data(double, z, NONE, NONE);
 
-			typed_accessor(int, id);
+			simple_typed_accessor(int, id);
 			m_data(int, id, NONE, NONE);
 
-			typed_accessor(myStuff, stuff);
+			simple_typed_accessor(myStuff, stuff);
 			m_data(myStuff, stuff, NONE, NONE);
 			//myStuff stuff;
 
@@ -113,16 +113,16 @@ namespace polaris
 
 		implementation struct Named_Agent :public Polaris_Component<MasterType, INHERIT(Named_Agent), Execution_Object>
 		{
-			typed_accessor(double,x);
+			simple_typed_accessor(double,x);
 			m_data(double,x, NONE, NONE);
 
-			typed_accessor(double,y);
+			simple_typed_accessor(double,y);
 			m_data(double,y, NONE, NONE);
 
-			typed_accessor(double,z);
+			simple_typed_accessor(double,z);
 			m_data(double,z, NONE, NONE);
 
-			typed_accessor(string,id);
+			simple_typed_accessor(string,id);
 			m_data(string,id, NONE, NONE);
 
 			void Initialize(double _x, double _y, double _z, string _id)
@@ -132,7 +132,7 @@ namespace polaris
 				x(_x);
 				y(_y);
 				z(_z);
-				id<string>(_id);
+				id(_id);
 				this->template Load_Event<Named_Agent>(&Do_Stuff, 0, 0);
 			}
 
@@ -174,9 +174,9 @@ namespace polaris
 			}
 		};
 #if (_MSC_VER != 1600)
-		//template<typename MT>using agent_type = Agent<MT>;
-		//template<typename MT>using agent_named_type = Named_Agent<MT>;
-		//template<typename AgentType> using my_agent_itf = myAgent<AgentType>;
+		template<typename MT>using agent_type = Agent<MT>;
+		template<typename MT>using agent_named_type = Named_Agent<MT>;
+		template<typename AgentType> using my_agent_itf = myAgent<AgentType>;
 #endif
 	};
 };

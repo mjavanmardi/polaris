@@ -28,8 +28,8 @@ namespace polaris
 
 		attribute_type* attributes(){ return this_component()->attributes(); }
 
-		edge_id_type edge_id(){ return this_component()->edge_id(); }
-		void edge_id(edge_id_type value){ this_component()->edge_id(value); }
+		p_edge_id_type edge_id(){ return this_component()->edge_id(); }
+		void edge_id(p_edge_id_type value){ this_component()->edge_id(value); }
 		
 		//unsigned int edge_size(){ return this_component()->edge_size(); }
 		//void edge_size(unsigned int value){ this_component()->edge_size(value); }

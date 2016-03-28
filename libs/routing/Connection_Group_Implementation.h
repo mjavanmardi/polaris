@@ -9,7 +9,10 @@ namespace polaris
 	template<typename MasterType, typename Current_Graph_Type, typename Neighbor_Graph_Type, typename Connection_Attributes_Type>
 	struct Connection_Group_Base : public Anonymous_Connection_Group< MasterType, typename Current_Graph_Type::base_edge_type >
 	{
-		typedef Anonymous_Connection_Group< MasterType, typename Current_Graph_Type::base_edge_type > Anonymous_Connection_Group;
+		// %%%RLW
+		// http://stackoverflow.com/questions/282800/c-odd-compile-error-error-changes-meaning-of-object-from-class-object
+		//
+		typedef Anonymous_Connection_Group< MasterType, typename Current_Graph_Type::base_edge_type > mAnonymous_Connection_Group;
 
 		Connection_Group_Base():_num_forward_edges(0),_num_backward_edges(0){}
 		
@@ -25,12 +28,12 @@ namespace polaris
 		typedef typename current_edge_type::base_edge_type base_edge_type;
 		typedef Connection_Attributes_Type connection_attributes_type;
 
-		virtual Anonymous_Connection_Group* Next_Connection_Group()
+		virtual mAnonymous_Connection_Group* Next_Connection_Group()
 		{
-			return (Anonymous_Connection_Group*)end_forward_edges();
+			return (mAnonymous_Connection_Group*)end_forward_edges();
 		}
 
-		virtual Anonymous_Connection_Group* Unlink_Edges()
+		virtual mAnonymous_Connection_Group* Unlink_Edges()
 		{
 			Connection_Implementation* forward_edge_itr = forward_edges();
 			const Connection_Implementation* const end = end_forward_edges();
@@ -42,10 +45,10 @@ namespace polaris
 				forward_edge_itr = forward_edge_itr->next_connection();
 			}
 
-			return (Anonymous_Connection_Group*)end_forward_edges();
+			return (mAnonymous_Connection_Group*)end_forward_edges();
 		}
 
-		virtual Anonymous_Connection_Group* Link_Edges(void* graph_pool)
+		virtual mAnonymous_Connection_Group* Link_Edges(void* graph_pool)
 		{
 			Graph_Pool<graph_pool_type>* current_graph_pool = (Graph_Pool<graph_pool_type>*)graph_pool;
 
@@ -68,15 +71,15 @@ namespace polaris
 				forward_edge_itr = forward_edge_itr->next_connection();
 			}
 
-			return (Anonymous_Connection_Group*)end_forward_edges();
+			return (mAnonymous_Connection_Group*)end_forward_edges();
 		}
 
-		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			return this_component()->Visit_Neighbors(agent,(current_edge_type*)current,routing_data);
 		};
 
-		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::tree_agent_type>*)agent,(current_edge_type*)current,routing_data);
 		};
@@ -86,31 +89,31 @@ namespace polaris
 		//	return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::time_dependent_agent_type>*)agent,(current_edge_type*)current,routing_data);
 		//};
 
-		static t_data(graph_id_type, linked_graph);
+		static t_data(p_graph_id_type, linked_graph);
 
 		t_data(unsigned int, num_forward_edges);
 		t_data(unsigned int, num_backward_edges);
 
 		struct Connection_Implementation : public connection_attributes_type
 		{
-			typedef neighbor_edge_type neighbor_edge_type;
+			typedef neighbor_edge_type ci_neighbor_edge_type;
 			typedef Connection_Implementation connection_type;
-			typedef connection_attributes_type connection_attributes_type;
+			typedef connection_attributes_type ci_connection_attributes_type;
 
-			connection_attributes_type* connection_attributes(){ return (connection_attributes_type*)this; }
+			ci_connection_attributes_type* connection_attributes(){ return (ci_connection_attributes_type*)this; }
 
-			neighbor_edge_type* neighbor(){return _neighbor;}
+			ci_neighbor_edge_type* neighbor(){return _neighbor;}
 			void neighbor(neighbor_edge_type* value){_neighbor = value;}
 
-			edge_id_type edge_id(){return _edge_id;}
-			void edge_id(edge_id_type value){_edge_id = value;}
+			p_edge_id_type edge_id(){return _edge_id;}
+			void edge_id(p_edge_id_type value){_edge_id = value;}
 
 			connection_type* next_connection(){return (connection_type*)(this + 1);}
 
 			union
 			{
-				neighbor_edge_type* _neighbor;
-				edge_id_type _edge_id;
+				ci_neighbor_edge_type* _neighbor;
+				p_edge_id_type _edge_id;
 			};
 		};
 
@@ -124,5 +127,5 @@ namespace polaris
 	};
 	
 	template<typename MasterType, typename Current_Graph_Type, typename Neighbor_Graph_Type, typename Connection_Attributes_Type>
-	graph_id_type Connection_Group_Base<MasterType,Current_Graph_Type,Neighbor_Graph_Type,Connection_Attributes_Type>::_linked_graph;
+	p_graph_id_type Connection_Group_Base<MasterType,Current_Graph_Type,Neighbor_Graph_Type,Connection_Attributes_Type>::_linked_graph;
 }

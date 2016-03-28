@@ -22,9 +22,9 @@ namespace polaris
 
 	prototype struct Connection
 	{
-		typedef typename ComponentType::neighbor_edge_type neighbor_edge_type;
+		typedef typename ComponentType::ci_neighbor_edge_type neighbor_edge_type;
 		typedef typename ComponentType::connection_type connection_type;
-		typedef typename ComponentType::connection_attributes_type connection_attributes_type;
+		typedef typename ComponentType::ci_connection_attributes_type connection_attributes_type;
 
 		connection_attributes_type* connection_attributes(){ return this_component()->connection_attributes(); }
 
@@ -33,16 +33,16 @@ namespace polaris
 		neighbor_edge_type* neighbor(){ return this_component()->neighbor(); }
 		void neighbor(neighbor_edge_type* value){ this_component()->neighbor(value); }
 
-		edge_id_type edge_id(){ return this_component()->edge_id(); }
-		void edge_id(edge_id_type value){ this_component()->edge_id(value); }			
+		p_edge_id_type edge_id(){ return this_component()->edge_id(); }
+		void edge_id(p_edge_id_type value){ this_component()->edge_id(value); }			
 	};
 
 	prototype struct Connection_Group
 	{
 		typedef typename ComponentType::connection_type connection_type;
 
-		graph_id_type linked_graph() { return this_component()->linked_graph(); }
-		void linked_graph(graph_id_type value) { this_component()->linked_graph(value); }
+		p_graph_id_type linked_graph() { return this_component()->linked_graph(); }
+		void linked_graph(p_graph_id_type value) { this_component()->linked_graph(value); }
 
 		unsigned int num_forward_edges() { return this_component()->num_forward_edges(); }
 		void num_forward_edges(unsigned int value) { this_component()->num_forward_edges(value); }

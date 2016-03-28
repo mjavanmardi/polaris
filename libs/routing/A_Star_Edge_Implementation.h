@@ -48,7 +48,7 @@ namespace polaris
 
 		t_data(void*, came_from);
 		
-		t_data(edge_id_type, edge_id);
+		t_data(p_edge_id_type, edge_id);
 
 		
 		Anonymous_Connection_Group<MasterType,Base_Edge_A_Star>* _begin_connection_groups;

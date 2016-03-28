@@ -123,7 +123,6 @@ void Simulation_Engine::Collect_Core_Diagnostics()
 void Simulation_Engine::Update()
 {
 	// activate new types
-
 	while( _queued_active_types.size() )
 	{
 		Execution_Component_Manager_Base* ptr = &_queued_active_types.front();

@@ -120,7 +120,8 @@ namespace polaris
 		if( _blocks_with_free_cells[__thread_id].empty() )
 		{
 			// Activation occurs once
-			if( !AtomicCompareExchange(&_activated,1,0) ) _world->simulation_engine()->Activate_Type( this );
+			//if( !AtomicCompareExchange(&_activated,1,0) ) _world->simulation_engine()->Activate_Type( this );
+			if (!Activate()) _world->simulation_engine()->Activate_Type(this);
 
 			// Block size is chosen as the nearest page size (or power of 2 if less than page size) which can accommodate the desired objects per block
 

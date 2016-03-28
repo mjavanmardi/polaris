@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Population_Synthesis_Includes.h"
-#include "activity_simulator\Household_Prototype.h"
-#include "activity_simulator\Person_Prototype.h"
+#include "activity_simulator/Household_Prototype.h"
+#include "activity_simulator/Person_Prototype.h"
 #include <iomanip>
 
 namespace PopSyn

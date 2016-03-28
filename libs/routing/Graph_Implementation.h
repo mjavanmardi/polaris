@@ -21,7 +21,7 @@ namespace polaris
 		typedef typename Base_t::ComponentType ComponentType;
 		typedef typename Base_t::Master_Type Master_Type;
 
-		t_data(graph_id_type,graph_id);
+		t_data(p_graph_id_type,graph_id);
 		t_data(bool,compiled);
 
 		
@@ -32,7 +32,7 @@ namespace polaris
 
 
 		template<typename Edge_Type>
-		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)
+		Edge<Edge_Type>* Get_Edge(p_edge_id_type edge_id)
 		{
 			if( _edge_reference->count(edge_id) )
 			{
@@ -45,7 +45,7 @@ namespace polaris
 			}
 		}
 
-		base_edge_type* Get_Edge(edge_id_type edge_id)
+		base_edge_type* Get_Edge(p_edge_id_type edge_id)
 		{
 			if( _edge_reference->count(edge_id) )
 			{
@@ -61,7 +61,7 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		void Add_Edge( Input_Edge<Edge_Attributes_Type>* new_edge )
 		{
-			if(_input_edge_reference == nullptr) _input_edge_reference = new boost::unordered::unordered_map<edge_id_type,void*>();
+			if(_input_edge_reference == nullptr) _input_edge_reference = new boost::unordered::unordered_map<p_edge_id_type,void*>();
 			if(_ordered_input_edge_reference == nullptr) _ordered_input_edge_reference = new boost::container::vector<void*>();
 
 			if(_input_edge_reference->count(new_edge->edge_id())){ THROW_EXCEPTION("Duplicate Edge Added: " << new_edge->edge_id()); }
@@ -151,7 +151,7 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		Interactive_Graph< output_graph_type >* Compile_Graph()
 		{
-			_edge_reference = new boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			_edge_reference = new boost::unordered::unordered_map<p_edge_id_type,Edge<stored_edge_type>*>();
 			_ordered_edge_reference = new boost::container::vector<Edge<stored_edge_type>*>();
 
 			_graph_size = Compute_Graph_Size<Edge_Attributes_Type>();
@@ -186,7 +186,7 @@ namespace polaris
 		{
 			Graph_Implementation* copy = (Graph_Implementation*)new ComponentType();
 			
-			copy->_edge_reference = new boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			copy->_edge_reference = new boost::unordered::unordered_map<p_edge_id_type,Edge<stored_edge_type>*>();
 			copy->_ordered_edge_reference = new boost::container::vector<Edge<stored_edge_type>*>();
 
 			copy->_graph_id = _graph_id;
@@ -222,10 +222,10 @@ namespace polaris
 			return (Interactive_Graph<ComponentType>*)copy;
 		}
 
-		boost::unordered::unordered_map<edge_id_type,void*>* _input_edge_reference;
+		boost::unordered::unordered_map<p_edge_id_type,void*>* _input_edge_reference;
 		boost::container::vector<void*>* _ordered_input_edge_reference;
 		
-		boost::unordered::unordered_map< edge_id_type, Edge<stored_edge_type>* >* _edge_reference;
+		boost::unordered::unordered_map< p_edge_id_type, Edge<stored_edge_type>* >* _edge_reference;
 		boost::container::vector< Edge<stored_edge_type>* >* _ordered_edge_reference;
 
 		size_t _graph_size;

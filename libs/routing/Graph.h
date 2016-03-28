@@ -24,12 +24,12 @@ namespace polaris
 		}
 
 		template<typename Edge_Type>
-		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)
+		Edge<Edge_Type>* Get_Edge(p_edge_id_type edge_id)
 		{
 			return this_component()->Get_Edge<Edge_Type>(edge_id);
 		}
 		
-		base_edge_type* Get_Edge(edge_id_type edge_id)
+		base_edge_type* Get_Edge(p_edge_id_type edge_id)
 		{
 			return this_component()->Get_Edge(edge_id);
 		}
@@ -47,8 +47,8 @@ namespace polaris
 
 		typedef typename ComponentType::output_graph_type output_graph_type;
 
-		graph_id_type graph_id(){ return this_component()->graph_id(); }
-		void graph_id(graph_id_type value){ this_component()->graph_id(value); }
+		p_graph_id_type graph_id(){ return this_component()->graph_id(); }
+		void graph_id(p_graph_id_type value){ this_component()->graph_id(value); }
 	
 		void* graph_pool_reference(){ return this_component()->graph_pool_reference(); }
 		void graph_pool_reference(void* value){ this_component()->graph_pool_reference(value); }

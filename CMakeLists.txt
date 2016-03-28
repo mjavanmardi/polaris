@@ -36,6 +36,10 @@ elseif(MINGW)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -std=c++11")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wa,-mbig-obj -std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj -std=c++11")
+else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -pthread -D__forceinline=inline -m64 -std=c++11 -lrt")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
 # %%%RLW - end
 
@@ -62,17 +66,23 @@ endif()
 	set(Boost_NO_SYSTEM_PATHS true)
 	#set (Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
 	set (Boost_USE_STATIC_LIBS ON)
-	set (Boost_USE_MULTITHREADED ON)
-	find_package(Boost 1.60.0 REQUIRED 
-	  COMPONENTS
-	  chrono
-	  timer
-	  filesystem
-	  system
-	  program_options
-	  )
-	include_directories(${Boost_INCLUDE_DIRS})
-	link_libraries(${Boost_LIBRARIES})
+	# if (UNIX)
+		set (Boost_USE_MULTITHREADED ON)
+		find_package(Boost 1.60.0 REQUIRED)
+		include_directories(${Boost_INCLUDE_DIRS})
+	# else()
+		# set (Boost_USE_MULTITHREADED ON)
+		# find_package(Boost 1.60.0 REQUIRED 
+		  # COMPONENTS
+		  # chrono
+		  # timer
+		  # filesystem
+		  # system
+		  # program_options
+		  # )
+		# include_directories(${Boost_INCLUDE_DIRS})
+		# link_libraries(${Boost_LIBRARIES})
+	# endif()
 
 	#TC_Malloc include and library dependencies
 	#if (UNIX)
@@ -105,7 +115,7 @@ if (MSVC14 OR MSVC10 OR MINGW)
 	#ODB include dependencies
 	include_directories(${DEPS_DIR}/libodb-2.4.0)
 	include_directories(${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0)
-	include_directories(${DEPS_DIR}/libodb-2.4.0/libsqlite3)
+	include_directories(${DEPS_DIR}/libodb-2.4.0/sqlite-amalgamation-3110100)
 
 	#ODB library dependencies
 	set(odb ${DEPS_DIR}/libodb-2.4.0/lib64/odb.lib)
@@ -116,6 +126,21 @@ if (MSVC14 OR MSVC10 OR MINGW)
 	#set(sqlite3-d ${DEPS_DIR}/libodb-2.4.0/libodb-sqlite-2.4.0/etc/sqlite/lib64/sqlite3-d.lib)
 	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
 	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d})
+elseif(UNIX)
+	#ODB include dependencies
+	include_directories(${DEPS_DIR}/libodb-2.4.0/release/include)
+	include_directories(${DEPS_DIR}/libodb-2.4.0/release/odb-sqlite/include)
+	include_directories(${DEPS_DIR}/libodb-2.4.0/release/sqlite3/include)
+
+	#ODB library dependencies
+	set(odb ${DEPS_DIR}/libodb-2.4.0/release/lib/libodb.so)
+	set(odb-d ${DEPS_DIR}/libodb-2.4.0/debug/lib/libodb.so)
+	set(odb_sqlite ${DEPS_DIR}/libodb-2.4.0/release/odb-sqlite/lib/libodb-sqlite.so)
+	set(odb_sqlite-d ${DEPS_DIR}/libodb-2.4.0/debug/odb-sqlite/lib/libodb-sqlite.so)
+	set(sqlite3 ${DEPS_DIR}/libodb-2.4.0/release/sqlite3/lib/libsqlite3.so)
+	set(sqlite3-d ${DEPS_DIR}/libodb-2.4.0/debug/sqlite3/lib/libsqlite3.so)
+	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
+	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d} )
 else()
 	include_directories(${DEPS_DIR}/libodb-2.2.2)
 	include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0)
@@ -144,7 +169,7 @@ include_directories(libs/repository)
 include_directories(libs/flow_lib)
 
 
-include_directories(libs/scenario_manager)
+# %%%RLW include_directories(libs/scenario_manager)
 include_directories(libs/population_synthesis)
 include_directories(libs/activity_simulator)
 include_directories(libs/traffic_simulator)
@@ -218,15 +243,16 @@ elseif(Statewide)
 	add_subdirectory (libs/routing) 
 	add_subdirectory (libs/traffic_simulator)
 else()
-	add_subdirectory (apps/assignment_analyzer) 
-	add_subdirectory (apps/batch_router) 
-	add_subdirectory (apps/io_demo) 
-	add_subdirectory (apps/test) 
+	#add_subdirectory (apps/assignment_analyzer) 
+	#add_subdirectory (apps/batch_router) 
+	#add_subdirectory (apps/io_demo) 
+	#add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
 	add_subdirectory (apps/integrated_abm)
 	add_subdirectory (apps/randy_test)
+	add_subdirectory (apps/atomic_test)
 	#add_subdirectory (apps/dee-test)
-	add_subdirectory (apps/network_validator)
+	#add_subdirectory (apps/network_validator)
 #	add_subdirectory (apps/Output_Visualizer)
 	add_subdirectory (libs/traffic_simulator)
 	add_subdirectory (libs/spatial) 

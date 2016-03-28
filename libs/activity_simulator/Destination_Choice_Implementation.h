@@ -833,8 +833,9 @@ namespace Person_Components
 				else return_ptr = choice_model->template Choice_At<_Destination_Choice_Option_Interface*>(selected_index)->template destination<ReturnType>();
 
 				// free memory allocated locally
-				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
-				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
+				//%%%RLW - for now
+				//for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
+				//Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				return return_ptr;	
 			}
@@ -924,8 +925,9 @@ namespace Person_Components
 				}
 
 				// free memory allocated locally
-				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
-				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
+				// %%%RLW - for now
+				//for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
+				//Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
 				return return_ptr;
 			}

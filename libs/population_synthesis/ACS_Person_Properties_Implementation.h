@@ -1,6 +1,6 @@
 #pragma once
 
-#include "activity_simulator\Person_Properties_Prototype.h"
+#include "activity_simulator/Person_Properties_Prototype.h"
 //#include "Person_Prototype.h"
 //#include "Movement_Plan_Prototype.h"
 //#include "Network_Skimming_Prototype.h"

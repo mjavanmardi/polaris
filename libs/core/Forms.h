@@ -362,6 +362,18 @@ namespace polaris
 				return this_component()->template NAME<ACCESS_TYPE>();\
 			}
 
+#define simple_typed_accessor(ACCESS_TYPE,NAME)\
+		public:\
+			void NAME(ACCESS_TYPE set_value)\
+			{\
+				this->template NAME<ACCESS_TYPE>(set_value);\
+			}\
+			ACCESS_TYPE NAME()\
+			{\
+				return this->template NAME<ACCESS_TYPE>();\
+			}
+
+
 
 	///----------------------------------------------------------------------------------------------------
 	/// explicit_accessor - implements get / set accessors which explicitly access stated value
