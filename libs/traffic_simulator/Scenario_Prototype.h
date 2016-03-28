@@ -1,6 +1,12 @@
 #pragma once
 #include "../scenario_manager/cfg_reader.h"
 #include "User_Space_Includes.h"
+
+// %%%RLW
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 //TODO: put back in?
 //#include "../File_IO/network_scenario_data.h"
 

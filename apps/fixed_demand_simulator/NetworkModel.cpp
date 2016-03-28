@@ -504,7 +504,9 @@ void run_with_input_from_db(const char* scenario_filename)
 		START();
 
 		cout << "Finished!" << endl;
-		system("PAUSE");
+		//system("PAUSE");
+		cout << "Press RETURN key to continue..." << endl;
+                cin.ignore();
 	}
 }
 

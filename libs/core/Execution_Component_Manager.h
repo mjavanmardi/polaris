@@ -43,7 +43,7 @@ namespace polaris
 
 #if (_MSC_VER >= 1900 || !_MSC_VER ) // %%%RLW - need to check this for Visual Studio 12 & 13
 		inline bool Activate() { do {} while (std::atomic_flag_test_and_set(&_activated_set)); bool was_activated = _activated; if (!_activated) _activated = true; std::atomic_flag_clear(&_activated_set); return was_activated; }
-#else if (_MSC_VER)
+#elif (_MSC_VER)
 		inline bool Activate() { return AtomicCompareExchange(&_activated,1,0); }
 #endif
 
