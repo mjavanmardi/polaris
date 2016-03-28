@@ -1,6 +1,6 @@
 #pragma once
 #include "User_Space_Includes.h"
-#include "activity_simulator\Activity_Prototype.h"
+#include "activity_simulator/Activity_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Prototype.h"
 #include "Zone_Prototype.h"

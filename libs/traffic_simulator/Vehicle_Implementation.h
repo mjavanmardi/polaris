@@ -1,7 +1,7 @@
 #pragma once
 #include "Vehicle_Prototype.h"
 #include "Movement_Plan_Prototype.h"
-#include "../Repository/RNG_Implementations.h"
+#include "../repository/RNG_Implementations.h"
 
 namespace Vehicle_Components
 {

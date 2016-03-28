@@ -1,6 +1,6 @@
 #pragma once
 #include "Turn_Movement_Prototype.h"
-#include "../Repository/RNG_Implementations.h"
+#include "../repository/RNG_Implementations.h"
 
 namespace Turn_Movement_Components
 {

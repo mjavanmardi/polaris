@@ -1,5 +1,5 @@
 #pragma once
-#include "../Scenario_Manager/cfg_reader.h"
+#include "../scenario_manager/cfg_reader.h"
 #include "User_Space_Includes.h"
 //TODO: put back in?
 //#include "../File_IO/network_scenario_data.h"

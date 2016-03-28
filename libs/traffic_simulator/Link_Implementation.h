@@ -4,9 +4,9 @@
 #include "Scenario_Implementation.h"
 #include "Vehicle_Prototype.h"
 #include "Traveler_Prototype.h"
-#include "../Repository/RNG_Implementations.h"
+#include "../repository/RNG_Implementations.h"
 #ifndef EXCLUDE_DEMAND
-#include "activity_simulator\Person_Prototype.h"
+#include "activity_simulator/Person_Prototype.h"
 #endif
 #include "Network_Event_Prototype.h"
 #include "Depot_Prototype.h"

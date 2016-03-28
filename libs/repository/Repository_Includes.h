@@ -2,7 +2,7 @@
 
 
 
-#include "../Core/Core.h"
+#include "../core/Core.h"
 
 
 
