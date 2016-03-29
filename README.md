@@ -23,7 +23,7 @@ Here is the list of dependencies:
 * libodb-sqlite-2.4.0
 * sqlite3 (3.11.1)
 
-The POLARIS_DEPS_DIR environment variable must be set to build dependecies and application binaries. You can do this by editing your .bashrc file (in you home directory).
+The POLARIS_DEPS_DIR environment variable must be set to build dependecies and application binaries. You can do this by editing your .bashrc file (in your home directory).
 
 For example:
 
@@ -59,7 +59,7 @@ Example: (NOTE: this should be performed in a Visual Studio Native Tools Command
 	
 Then run the sript to download, extract and build the dependencies:
 
-	cd <??>/pT1/polarisdeps
+	cd pT1/polarisdeps
 	get_deps.cmd
 	
 This may take a while so be patient.
@@ -69,7 +69,7 @@ Building Using Cmake
 
 Linux Build
 -----------
-Download polaris in an appropriate directory (we'll call it pT1).
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set.
 
 	git clone "https://github.com/anl-polaris/polaris.git" pT1
 	cd pT1
@@ -88,7 +88,7 @@ Execution binary is: pT1/build/release/bin/Fixed_Demand_Simulator
 
 Windows Build
 -------------
-Download polaris in an appropriate directory.
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set.
 
 	git clone "https://github.com/anl-polaris/polaris.git" pT1
 	cd pT1
@@ -104,6 +104,10 @@ Open Visual Studio:
 Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
 
 	msbuild polaris.sln /p:Configuration=Debug /p:/Platform=x64 /t:Fixed_Demand_Simulator
+	msbuild polaris.sln /p:Configuration=Release /p:/Platform=x64 /t:Fixed_Demand_Simulator
+	
+Execution binary for debug is pT1\build_vs2015\bin\Debug\Fixed_Demand_Simulator.exe
+Execution binary for release is pT1\build_vs2015\bin\Release\Fixed_Demand_Simulator.exe
 
 
 

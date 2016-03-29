@@ -188,7 +188,6 @@ add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
 
-add_subdirectory (apps/integrated_capacity_based_model)
 
 
 
@@ -248,8 +247,9 @@ else()
 	#add_subdirectory (apps/io_demo) 
 	#add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
-	add_subdirectory (apps/integrated_abm)
+# Add back in later	add_subdirectory (apps/integrated_abm)
 	add_subdirectory (apps/randy_test)
+#	add_subdirectory (apps/integrated_capacity_based_model)
 #	add_subdirectory (apps/atomic_test)
 	#add_subdirectory (apps/dee-test)
 	#add_subdirectory (apps/network_validator)
