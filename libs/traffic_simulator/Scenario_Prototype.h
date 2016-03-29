@@ -2,7 +2,6 @@
 #include "../scenario_manager/cfg_reader.h"
 #include "User_Space_Includes.h"
 
-// %%%RLW
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>

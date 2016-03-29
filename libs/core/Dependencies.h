@@ -31,13 +31,11 @@ using google::sparse_hash_set;
 //#include <vector>
 #include <type_traits>
 #ifdef _WIN32		
-  // %%%RLW
   #include <direct.h>
 #endif
 #include <memory>
 #ifdef _MSC_VER
-// %%%RLW 
-#include <Windows.h>
+  #include <Windows.h>
 #else
 #include <pthread.h>
 #include <unistd.h>

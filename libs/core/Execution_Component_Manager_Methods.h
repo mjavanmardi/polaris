@@ -282,7 +282,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// Free - Free an Execution object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
-
+	//%%%RLW
 	//template<typename DataType>
 	//void Execution_Component_Manager<DataType>::Free( DataType* ptr )
 	//{

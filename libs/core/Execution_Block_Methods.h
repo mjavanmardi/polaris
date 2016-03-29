@@ -174,6 +174,7 @@ namespace polaris
 				else
 				{
 					// Perform an internal free operation
+					//%%%RLW
 					//Free( (DataType*)current_object );
 				}
 			}

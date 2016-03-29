@@ -22,6 +22,7 @@ namespace polaris
 		template<typename DataType>
 		DataType* Allocate();
 		
+		//%%%RLW
 		//template<typename DataType>
 		//void Free(DataType* ptr);
 		
