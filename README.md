@@ -51,11 +51,13 @@ There is a convenience polaris_env.bat script that appends all of the paths with
 the directory where you wish to have you dependecies. The environment is only good for that command shell.
 
 Example: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+
 	copy pT1/polarisdeps/polaris_env.bat c:\opt\polarisdeps
 	cd c:\opt\polarisdeps
 	polaris_env.bat
 	
 Then run the sript to download, extract and build the dependencies:
+
 	cd <??>/pT1/polarisdeps
 	get_deps.cmd
 	
@@ -95,8 +97,11 @@ Download polaris in an appropriate directory.
 	cmake -G "Visual Studio 14 Win64" ..
 
 Open Visual Studio:
+
 	polaris.sln
+	
 Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+
 	msbuild polaris.sln /p:Configuration=Debug /p:/Platform=x64 /t:Fixed_Demand_Simulator
 
 
