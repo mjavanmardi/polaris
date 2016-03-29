@@ -24,8 +24,9 @@ Here is the list of dependencies:
 * sqlite3 (3.11.1)
 
 The POLARIS_DEPS_DIR environment variable must be set to build dependecies and application binaries. You can do this by editing your .bashrc file (in you home directory).
-For exanmple:
-	<other bash stuff here>
+
+For example:
+
 	# User specific aliases and functions
 	module load compiler/gcc510
 
@@ -51,11 +52,13 @@ There is a convenience polaris_env.bat script that appends all of the paths with
 the directory where you wish to have you dependecies. The environment is only good for that command shell.
 
 Example: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+
 	copy pT1/polarisdeps/polaris_env.bat c:\opt\polarisdeps
 	cd c:\opt\polarisdeps
 	polaris_env.bat
 	
 Then run the sript to download, extract and build the dependencies:
+
 	cd <??>/pT1/polarisdeps
 	get_deps.cmd
 	
@@ -95,8 +98,11 @@ Download polaris in an appropriate directory.
 	cmake -G "Visual Studio 14 Win64" ..
 
 Open Visual Studio:
+
 	polaris.sln
+	
 Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+
 	msbuild polaris.sln /p:Configuration=Debug /p:/Platform=x64 /t:Fixed_Demand_Simulator
 
 
