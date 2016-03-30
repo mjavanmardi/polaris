@@ -7,7 +7,7 @@
 
 namespace polaris
 {
-	extern bool _world_is_running();
+	static bool _world_is_running();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Update_Schedule - Thread safe update of the block's internal schedule

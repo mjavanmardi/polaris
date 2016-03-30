@@ -229,12 +229,12 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// Free_Array
 	///----------------------------------------------------------------------------------------------------
-	//%%%RLW
-	template<typename DataType>
-	void Event_Component_Manager<DataType>::Free_Array( DataType* ptr )
-	{
-		static_assert("Array deallocation not supported for execution components");
-	}
+
+	//template<typename DataType>
+	//void Event_Component_Manager<DataType>::Free_Array( DataType* ptr )
+	//{
+	//	static_assert("Array deallocation not supported for execution components");
+	//}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Clean_Up_Thread_Memory - return thread memory to the global allocator
