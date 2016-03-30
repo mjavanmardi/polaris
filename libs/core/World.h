@@ -7,7 +7,7 @@
 
 namespace polaris
 {
-	bool _world_is_running();
+	static bool _world_is_running();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Simulation_Configuration.h - Configuration Object for World
