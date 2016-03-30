@@ -23,8 +23,8 @@ namespace polaris
 		DataType* Allocate();
 		
 		//%%%RLW
-		//template<typename DataType>
-		//void Free(DataType* ptr);
+		template<typename DataType>
+		void Free(DataType* ptr);
 		
 		template<typename DataType>
 		void Lazy_Free(DataType* ptr);

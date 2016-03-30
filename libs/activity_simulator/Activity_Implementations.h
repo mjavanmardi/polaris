@@ -443,7 +443,8 @@ namespace Activity_Components
 				move->Free_Movement();
 
 				// Free this when able
-				// %%%RLW - for now - Free<ComponentType>((ComponentType*)this);
+				// %%%RLW
+				Free<ComponentType>((ComponentType*)this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)

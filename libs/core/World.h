@@ -7,6 +7,7 @@
 
 namespace polaris
 {
+	bool _world_is_running();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Simulation_Configuration.h - Configuration Object for World
@@ -212,6 +213,8 @@ namespace polaris
 	};
 
 	extern World* _world;
+
+	static bool _world_is_running() { return _world->Is_Running(); }
 
 	static unsigned int num_threads(){return _world->num_sim_threads()+1;}
 
