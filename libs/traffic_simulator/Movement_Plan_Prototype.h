@@ -69,7 +69,8 @@ namespace Movement_Plan_Components
 			{
 				if (this == nullptr) return;
 				this->clear_trajectory();
-				// %%%RLW - Free<Component_Type>(this_component());
+				// %%%RLW
+				Free<Component_Type>(this_component());
 			}
 
 			template<typename LocationType> bool Update_Locations(LocationType orig, LocationType dest, requires(LocationType,check(strip_modifiers(LocationType),Activity_Location_Components::Concepts::Is_Activity_Location)))
@@ -325,7 +326,8 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
-					// %%%RLW - fix this later - Free<get_component_type(Trajectory_Container_Interface)>(*itr);
+					// %%%RLW - 
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 				trajectory.clear();
 
@@ -345,7 +347,8 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
-					// %%% RLW - Free<get_component_type(Trajectory_Container_Interface)>(*itr);
+					// %%% RLW - 
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 
 				//erase 
