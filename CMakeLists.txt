@@ -110,6 +110,12 @@ endif()
 	#	set(gtest ${GTEST_LIBRARIES})
 	#endif()
 
+	#if (UNIX)
+	#	find_package(GTest REQUIRED)
+	#	include_directories(${GTEST_INCLUDE_DIR})
+	#	set(gtest ${GTEST_LIBRARIES})
+	#endif()
+
 	#ODB include dependencies
 if (MSVC14 OR MSVC10 OR MINGW)
 	#ODB include dependencies
@@ -265,42 +271,33 @@ if (Coretests)
 	add_subdirectory (tests/core_tests)
 endif()
 
+if (Routertests)
+	#Apply CMake over POLARIS tests project structure
+	add_subdirectory (tests/router)
+endif()
+
 if (CapacityFlow)
 	message(${CapacityFlow})
 	add_subdirectory(libs/flow_lib)
 	add_subdirectory(apps/capacity_based_flow)
 endif()
 
-if (Unittest)
-	# Enable ExternalProject CMake module
-	include(ExternalProject)
-	set(googletest_dir "${CMAKE_SOURCE_DIR}/external/googletest")
-	# Download and install GoogleTest
-	ExternalProject_Add(
-		gtest
-		# URL https://github.com/google/googletest/archive/master.zip
-		SOURCE_DIR ${googletest_dir}
-		# # PREFIX ${gtest_dir}
-		# SOURCE_DIR "${gtest_dir}/src"
-		# CONFIGURE_COMMAND
-			# "${CMAKE_COMMAND}"
-			# "-H${gtest_dir}/src/googletest"
-			# "-B${gtest_dir}/Builds"
-			# "-DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}"		
-	   # BUILD_COMMAND
-			# "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds"
-		# # INSTALL_COMMAND
-			# # "${CMAKE_COMMAND}" --build "${gtest_dir}/Builds" --target install
-	)
-	add_library(libgtest IMPORTED STATIC GLOBAL)
-	add_dependencies(libgtest gtest)
-	# Set gtest properties
-	ExternalProject_Get_Property(gtest source_dir binary_dir)
-	set_target_properties(libgtest PROPERTIES
-		"IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
-		"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-	#    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
-	)
-	# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
-	include_directories("${source_dir}/include")	
-endif()
+if (Unittests)
+	#Google Testing Framework include and library dependencies
+	if (MSVC14)
+		include_directories(${DEPS_DIR}/googletest-release-1.7.0/include)
+		set(gtest ${DEPS_DIR}/googletest-release-1.7.0/build_msvc2015/Release/gtest.lib)
+		set(gtest-d ${DEPS_DIR}/googletest-release-1.7.0/build_msvc2015/Debug/gtest.lib)
+		set(GTEST_LIBRARY optimized ${gtest} debug ${gtest-d})
+		enable_testing()
+	elseif(UNIX)
+		include_directories(${DEPS_DIR}/googletest-release-1.7.0/include)
+		set(gtest ${DEPS_DIR}/googletest-release-1.7.0/build/release/libgtest.a)
+		set(gtest-d ${DEPS_DIR}/googletest-release-1.7.0/build/debug/libgtest.a)
+		set(GTEST_LIBRARY optimized ${gtest} debug ${gtest-d})
+		enable_testing()
+	endif()
+
+	#Apply CMake over POLARIS tests project structure
+	add_subdirectory(tests)
+endif() #Unittest

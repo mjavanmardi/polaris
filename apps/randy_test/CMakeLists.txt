@@ -5,6 +5,6 @@ set(HEADERS version.h myAgent.h myStuff.h)
 add_executable(Randy_Test ${SOURCE} ${HEADERS})
 #target_link_libraries(Randy_Test ${libtcmalloc} ${iolibs} Scenario_Manager Core Routing ${antareslibs})
 
-target_link_libraries(Randy_Test ${libtcmalloc} ${iolibs} Core )
+target_link_libraries(Randy_Test Core )
 
 set_target_properties(Randy_Test PROPERTIES FOLDER apps)
