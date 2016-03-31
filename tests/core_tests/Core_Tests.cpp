@@ -1,6 +1,6 @@
-#include "Core\Core.h"
+#include "core/Core.h"
 
-#include "gtest\gtest.h"
+#include "gtest/gtest.h"
 #include <random>
 
 using namespace polaris;
