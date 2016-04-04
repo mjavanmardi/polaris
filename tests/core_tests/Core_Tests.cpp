@@ -32,7 +32,7 @@ struct Agent : public Polaris_Component<MasterType,INHERIT(Agent),Execution_Obje
 		{
 			++net_agents[__thread_id];
 			Agent* child = Allocate<Agent>();
-			child->Load_Event<MasterType::agent_type>(&MasterType::agent_type::Do_Stuff,iteration() + 1,0);
+			child->template Load_Event<Agent>(&Do_Stuff,iteration() + 1,0);
 		}
 
 		if(number > (1-(death_chance-birth_chance)))
