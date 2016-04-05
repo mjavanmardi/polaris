@@ -202,10 +202,10 @@ if (MSVC AND Antares)
 
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
 	include_directories(${DEPS_DIR}/plplot/include/plplot)
-	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include)
-	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include/msvc)
+	include_directories(${DEPS_DIR}/wxWidgets-3.1.0/include)
+	include_directories(${DEPS_DIR}/wxWidgets-3.1.0/include/msvc)
     set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${DEPS_DIR}/glew-1.7.0/lib ${DEPS_DIR}/plplot/bin)
-    link_directories( ${LINK_DIRECTORIES} ${DEPS_DIR}/wxWidgets-2.9.3/lib/vc_dll )
+    link_directories( ${LINK_DIRECTORIES} ${DEPS_DIR}/wxWidgets-3.1.0/lib/vc_x64_dll )
 
     find_library(glew glew32 ${DEPS_DIR}/glew-1.7.0/bin)
 	find_library(plplotd plplotd ${DEPS_DIR}/plplot/lib)
