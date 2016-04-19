@@ -93,9 +93,8 @@ Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR varia
 	git clone "https://github.com/anl-polaris/polaris.git" pT1
 	cd pT1
 	git checkout T-1
-	mkdir build_msvc2015
-	cd build_msvc2015
-	cmake -G "Visual Studio 14 Win64" ..
+	configure_polaris.cmd
+	cd build_vs2015
 
 Open Visual Studio:
 
@@ -103,11 +102,11 @@ Open Visual Studio:
 	
 Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
 
-	msbuild polaris.sln /p:Configuration=Debug /p:/Platform=x64 /t:Fixed_Demand_Simulator
-	msbuild polaris.sln /p:Configuration=Release /p:/Platform=x64 /t:Fixed_Demand_Simulator
+	msbuild polaris.sln /p:Configuration=Debug /p:Platform=x64
+	msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
 	
-Execution binary for debug is pT1\build_vs2015\bin\Debug\Fixed_Demand_Simulator.exe
-Execution binary for release is pT1\build_vs2015\bin\Release\Fixed_Demand_Simulator.exe
+Execution binary for debug is located in pT1\build_vs2015\bin\Debug
+Execution binary for release is located in pT1\build_vs2015\bin\Release
 
 
 
