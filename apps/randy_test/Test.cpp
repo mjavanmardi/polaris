@@ -1,7 +1,9 @@
-//#include <boost/program_options.hpp>
+#ifdef COMMANDLINE_ARGS
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/timer/timer.hpp>
+#endif
 #include <boost/format.hpp>
-//#include <boost/filesystem.hpp>
-//#include <boost/timer/timer.hpp>
 //#include <chrono>
 #include "myAgent.h"
 #include <algorithm>
@@ -36,7 +38,9 @@ struct options
 	std::string app_name;
 };
 
-//bool parse_commandline(int argc, char* argv[], options& opts);
+#ifdef COMMANDLINE_ARGS
+bool parse_commandline(int argc, char* argv[], options& opts);
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -45,10 +49,11 @@ int main(int argc, char* argv[])
 	opts.num_agents = 1;
 	opts.num_threads = 1;
 
-	//bool bContinue = parse_commandline( argc, argv, opts);
-	//if (!bContinue)
-	//	return 0;
-
+#ifdef COMMANDLINE_ARGS
+	bool bContinue = parse_commandline( argc, argv, opts);
+	if (!bContinue)
+		return 0;
+#endif
 	std::cout << boost::str(boost::format("running %s with:\n\tnum_iterations=%d\n\tnum_agents=%d\n\tnum_threads=%d") % opts.app_name % opts.num_iterations % opts.num_agents % opts.num_threads) << std::endl;
 	
 	// There are several pre-set configurations
@@ -97,7 +102,9 @@ int main(int argc, char* argv[])
 
 	// Begin the simulation  
 	{
-//		boost::timer::auto_cpu_timer t;
+#ifdef COMMANDLINE_ARGS
+		boost::timer::auto_cpu_timer t;
+#endif
 		START();
 	}
 	string int_output_format = "After simulation Agent '%5d'(%3d): x=%6.2f, y=%6.2f, z=%6.2f\n";
@@ -135,95 +142,97 @@ int main(int argc, char* argv[])
     cout << "Done!" << endl;
 }
 
-//bool parse_commandline(int argc, char* argv[], options& opts)
-//{
-//	//std::string app_name;
-//	boost::filesystem::path p(argv[0]);
-//	opts.app_name = p.filename().string();
-//	namespace po = boost::program_options;
-//	po::options_description general("General options");
-//	general.add_options()
-//		("help", "display help message")
-//		("version", "display version information")
-//	;
-//
-//	po::options_description app("Application options");
-//	app.add_options()
-//		("num_iterations", po::value<int>(), "set number of interations")
-//		("num_agents", po::value<int>(), "set number of agents")
-//		("num_threads", po::value<int>(), "set number of threads")
-//	;
-//
-//	po::options_description all("Allowed options");
-//	all.add(general).add(app);
-//
-//
-//	po::variables_map vm;
-//	try
-//	{
-//		po::store(po::parse_command_line(argc, argv, all), vm);
-//		po::notify(vm); 
-//	}
-//	catch(...)
-//	{
-//		std::cout << std::string("ERROR parsing command line arguments...");
-//		return false;
-//	}
-//
-//	if (vm.count("help"))
-//	{
-//		cout << Version::get_version(opts.app_name) << std::endl;
-//		cout << all << "\n";
-//		return false;
-//	}
-//
-//	if (vm.count("version"))
-//	{
-//		cout << Version::get_version(opts.app_name) << std::endl;
-//		return false;
-//	}
-//
-//	if (vm.count("num_iterations"))
-//	{
-//		int iters = vm["num_iterations"].as<int>();
-//		if (iters > 0 && iters <= 10000)
-//		{
-//			opts.num_iterations = iters;
-//		}
-//		else
-//		{
-//			std::cout << boost::str(boost::format("ERROR: num_iterations (%d) is out of range.\n") % iters);
-//			return false;
-//		}
-//	}
-//
-//	if (vm.count("num_agents"))
-//	{
-//		int agents = vm["num_agents"].as<int>();
-//		if (agents > 0 && agents <= 1000)
-//		{
-//			opts.num_agents = agents;
-//		}
-//		else
-//		{
-//			std::cout << boost::str(boost::format("ERROR: num_agents (%d) is out of range.\n") % agents);
-//			return false;
-//		}
-//	}
-//
-//	if (vm.count("num_threads"))
-//	{
-//		int threads = vm["num_threads"].as<int>();
-//		if (threads > 0 && threads <= 100)
-//		{
-//			opts.num_threads = threads;
-//		}
-//		else
-//		{
-//			std::cout << boost::str(boost::format("ERROR: num_threads (%d) is out of range.\n") % threads);
-//			return false;
-//		}
-//	}
-//
-//	return true;
-//}
+#ifdef COMMANDLINE_ARGS
+bool parse_commandline(int argc, char* argv[], options& opts)
+{
+	//std::string app_name;
+	boost::filesystem::path p(argv[0]);
+	opts.app_name = p.filename().string();
+	namespace po = boost::program_options;
+	po::options_description general("General options");
+	general.add_options()
+		("help", "display help message")
+		("version", "display version information")
+	;
+
+	po::options_description app("Application options");
+	app.add_options()
+		("num_iterations", po::value<int>(), "set number of interations")
+		("num_agents", po::value<int>(), "set number of agents")
+		("num_threads", po::value<int>(), "set number of threads")
+	;
+
+	po::options_description all("Allowed options");
+	all.add(general).add(app);
+
+
+	po::variables_map vm;
+	try
+	{
+		po::store(po::parse_command_line(argc, argv, all), vm);
+		po::notify(vm); 
+	}
+	catch(...)
+	{
+		std::cout << std::string("ERROR parsing command line arguments...");
+		return false;
+	}
+
+	if (vm.count("help"))
+	{
+		cout << Version::get_version(opts.app_name) << std::endl;
+		cout << all << "\n";
+		return false;
+	}
+
+	if (vm.count("version"))
+	{
+		cout << Version::get_version(opts.app_name) << std::endl;
+		return false;
+	}
+
+	if (vm.count("num_iterations"))
+	{
+		int iters = vm["num_iterations"].as<int>();
+		if (iters > 0 && iters <= 10000)
+		{
+			opts.num_iterations = iters;
+		}
+		else
+		{
+			std::cout << boost::str(boost::format("ERROR: num_iterations (%d) is out of range.\n") % iters);
+			return false;
+		}
+	}
+
+	if (vm.count("num_agents"))
+	{
+		int agents = vm["num_agents"].as<int>();
+		if (agents > 0 && agents <= 1000)
+		{
+			opts.num_agents = agents;
+		}
+		else
+		{
+			std::cout << boost::str(boost::format("ERROR: num_agents (%d) is out of range.\n") % agents);
+			return false;
+		}
+	}
+
+	if (vm.count("num_threads"))
+	{
+		int threads = vm["num_threads"].as<int>();
+		if (threads > 0 && threads <= 100)
+		{
+			opts.num_threads = threads;
+		}
+		else
+		{
+			std::cout << boost::str(boost::format("ERROR: num_threads (%d) is out of range.\n") % threads);
+			return false;
+		}
+	}
+
+	return true;
+}
+#endif // COMMANDLINE_ARGS

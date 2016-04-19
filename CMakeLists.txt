@@ -9,8 +9,9 @@ option(Antares "Build with Antares" OFF)
 option(Popsyn "Build Popsyn App" OFF)
 option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
-option(Unittest "Include Unit Tests for Other Libraries" OFF)
+option(Unittests "Include Unit Tests for Other Libraries" OFF)
 option(CapacityFlow "Include Traffic Flow Simulator Prototype" OFF)
+option(IntegratedModel "Build Integrated Activity Based Model" OFF)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
@@ -29,15 +30,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
 # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 
+if (COMMANDLINE_ARGS)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOMMANDLINE_ARGS")
+endif()
+
 if (MSVC)
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob0 /MD /W2 /Oi /bigobj")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob0 /MD /W2 /Oi")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 elseif(MINGW)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -std=c++11")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wa,-mbig-obj -std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj -std=c++11")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -pthread -D__forceinline=inline -m64 -std=c++11 -lrt")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -pthread -D__forceinline=inline -m64 -std=c++14 -lrt")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
@@ -66,23 +72,22 @@ endif()
 	set(Boost_NO_SYSTEM_PATHS true)
 	#set (Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
 	set (Boost_USE_STATIC_LIBS ON)
-	# if (UNIX)
+	if (COMMANDLINE_ARGS)
+		set (Boost_USE_MULTITHREADED ON)
+		find_package(Boost 1.60.0 REQUIRED COMPONENTS
+		  chrono
+		  timer
+		  filesystem
+		  system
+		  program_options
+		 )
+		include_directories(${Boost_INCLUDE_DIRS})
+		link_libraries(${Boost_LIBRARIES})
+	else()
 		set (Boost_USE_MULTITHREADED ON)
 		find_package(Boost 1.60.0 REQUIRED)
 		include_directories(${Boost_INCLUDE_DIRS})
-	# else()
-		# set (Boost_USE_MULTITHREADED ON)
-		# find_package(Boost 1.60.0 REQUIRED 
-		  # COMPONENTS
-		  # chrono
-		  # timer
-		  # filesystem
-		  # system
-		  # program_options
-		  # )
-		# include_directories(${Boost_INCLUDE_DIRS})
-		# link_libraries(${Boost_LIBRARIES})
-	# endif()
+	endif()
 
 	#TC_Malloc include and library dependencies
 	#if (UNIX)
@@ -253,7 +258,6 @@ else()
 	#add_subdirectory (apps/io_demo) 
 	#add_subdirectory (apps/test) 
 	add_subdirectory (apps/fixed_demand_simulator) 
-# Add back in later	add_subdirectory (apps/integrated_abm)
 	add_subdirectory (apps/randy_test)
 #	add_subdirectory (apps/integrated_capacity_based_model)
 #	add_subdirectory (apps/atomic_test)
@@ -265,6 +269,9 @@ else()
 	add_subdirectory (libs/routing) 
 endif()
 
+if (IntegratedModel)
+	add_subdirectory (apps/integrated_abm)
+endif()
 
 if (Coretests)
 	#Apply CMake over POLARIS tests project structure
@@ -300,4 +307,4 @@ if (Unittests)
 
 	#Apply CMake over POLARIS tests project structure
 	add_subdirectory(tests)
-endif() #Unittest
+endif() #Unittests
