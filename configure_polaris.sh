@@ -2,13 +2,16 @@
 
 BASEDIR=$PWD
 if [ ! -d $BASEDIR/build ]
-	mkdir $BASEDIR/build
+  then
+    mkdir $BASEDIR/build
 fi 
 if [ ! -d $BASEDIR/build/debug ]
-	mkdir $BASEDIR/build/debug
+  then
+    mkdir $BASEDIR/build/debug
 fi
 if [ ! -d $BASEDIR/build/release ]
-	mkdir $BASEDIR/build/release
+  then
+    mkdir $BASEDIR/build/release
 fi
 
 # configure debug build
