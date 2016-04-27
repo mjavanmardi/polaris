@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 		string name = boost::str(boost::format("bob-%d") % i);
 		// Load the agent's event
 		pAgent->Initialize(i+1, i+2, i+3);
-		pAgent->set_id(name);
+		pAgent->id(name);
 	}
 
 	// Begin the simulation  

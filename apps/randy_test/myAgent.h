@@ -16,14 +16,14 @@ namespace polaris
 		{
 			AgentProto() { ; }
 
-			cast_typed_accessor(double, x);
-			m_data(double, x, NONE, NONE);
+			void x(double val) { _x = val; }
+			double x() { return _x; }
 
-			cast_typed_accessor(double, y);
-			m_data(double, y, NONE, NONE);
+			void y(double val) { _y = val; }
+			double y() { return _y; }
 
-			cast_typed_accessor(double, z);
-			m_data(double, z, NONE, NONE);
+			void z(double val) { _z = val; }
+			double z() { return _z; }
 
 			// Initialize your agent
 			void Initialize(double _x, double _y, double _z)
@@ -46,6 +46,10 @@ namespace polaris
 				resp.next._iteration = iteration() + 1;
 				resp.next._sub_iteration = 0;
 			}
+		private:
+			double _x;
+			double _y;
+			double _z;
 		};
 
 		template <typename Base, typename Derived>
@@ -77,13 +81,14 @@ namespace polaris
 			NewCloneableAgent(const NewCloneableAgent& agent) { ; }
 			NewCloneableAgent<Derived>& operator=(const NewCloneableAgent<Derived>& agent) { return *this(agent); }
 			~NewCloneableAgent() { ; }
-			cast_typed_accessor(int, id);
-			m_data(int, id, NONE, NONE);
 
 			void Initialize(double _x, double _y, double _z)
 			{
 				Initialize_impl(_x, _y, _z, std::is_same<Derived, void>{});
 			}
+
+			void id(int val) { _id = val; }
+			double id() { return _id; }
 
 		private:
 			typedef AgentCloneable<AgentProto<NewCloneableAgent>, NewCloneableAgent> BaseClass;
@@ -133,6 +138,8 @@ namespace polaris
 				out += .01 * iteration;
 				return out;
 			}
+
+			int _id;
 		};
 
 		struct ExtendedAgent : public AgentCloneable<NewCloneableAgent<ExtendedAgent>, ExtendedAgent>
@@ -205,11 +212,10 @@ namespace polaris
 			//simple_typed_accessor(string, id);
 			//m_data(string, id, NONE, NONE);
 			//std::string strId;
-			void set_id(std::string id) { strId = id; }
-			std::string id() { return strId; }
+			void id(std::string val) { _id = val; }
+			std::string id() { return _id; }
 
-			cast_typed_accessor(myStuff, stuff);
-			m_data(myStuff, stuff, NONE, NONE);
+			myStuff& stuff() { return _stuff; }
 
 			void Initialize(double _x, double _y, double _z)
 			{
@@ -253,6 +259,10 @@ namespace polaris
 				resp.next._iteration = iteration() + 1;
 				resp.next._sub_iteration = 0;
 			}
+
+			std::string _id;
+			myStuff _stuff;
+
 		};
 
 	};
