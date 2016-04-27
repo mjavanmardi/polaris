@@ -9,6 +9,7 @@ public:
 	~myStuff();
 
 	myStuff(const myStuff& ref);
+	myStuff& operator=(const myStuff&);
 
 	double calc(double val, int iteration);
 

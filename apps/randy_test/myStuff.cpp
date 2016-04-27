@@ -7,6 +7,7 @@ class myStuff::impl
 public:
 	double calc(double input, int iteration)
 	{
+		//std::cout << "myStuff::calc()" << std::endl;
 		double out = input;
 		for (int i=0; i<1000; ++i)
 		{

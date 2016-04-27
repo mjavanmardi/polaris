@@ -72,11 +72,12 @@ namespace polaris
 		
 		Revision _next_revision;
 
-		union
-		{
+		//%%%RLW ??
+		//union
+		//{
 			Event _event_callback;
 			Byte* _next_free_cell;
-		};
+		//};
 
 		Execution_Block* _execution_block;
 	};

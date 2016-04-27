@@ -13,6 +13,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define this_component() ((ComponentType*)this)
+	#define this_component_cast() (static_cast<ComponentType*>(this))
 
 	#define type_of(NAME) NAME##_accessible_type
 	#define get_type_of(NAME) Component_Type::NAME##_accessible_type
@@ -372,6 +373,16 @@ namespace polaris
 				return this->template NAME<ACCESS_TYPE>();\
 			}
 
+#define cast_typed_accessor(ACCESS_TYPE,NAME)\
+		public:\
+			void NAME(ACCESS_TYPE set_value)\
+			{\
+				this_component_cast()->template NAME<ACCESS_TYPE>(set_value);\
+			}\
+			ACCESS_TYPE NAME()\
+			{\
+				return this_component_cast()->template NAME<ACCESS_TYPE>();\
+			}
 
 
 	///----------------------------------------------------------------------------------------------------

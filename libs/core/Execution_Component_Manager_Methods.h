@@ -114,7 +114,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Execution_Component_Manager<DataType>::Allocate(int uuid)
+	DataType* Execution_Component_Manager<DataType>::Allocate(int uuid, bool bInPlaceNew)
 	{
 		// Check whether thread has memory of this type available
 		if( _blocks_with_free_cells[__thread_id].empty() )
@@ -169,7 +169,7 @@ namespace polaris
 			Execution_Block* new_block=(Execution_Block*)block_memory;
 
 			// Initialization of the new block
-			new_block->Initialize(this );
+			new_block->Initialize<DataType>(this );
 
 			// Thread takes ownership of the block and pushes it into its' free cells of type
 			new_block->memory_managed_by(__thread_id);
@@ -248,13 +248,15 @@ namespace polaris
 		// allocate an object from the block itself
 		Byte* return_memory = (Byte*)free_block->Allocate<DataType>();
 
-		new (return_memory) DataType();
-		((Execution_Object*)return_memory)->execution_block(free_block);
+		if (bInPlaceNew)
+		{
+			new (return_memory) DataType();
+			((DataType*)return_memory)->execution_block(free_block);
+			((DataType*)return_memory)->_uuid = uuid;
+		}
 
 		// add information about the uuid
-		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
-
-		((DataType*)return_memory)->_uuid = uuid;
+		if (uuid != -1) _object_repository[__thread_id][uuid] = return_memory;
 
 		return (DataType*)return_memory;
 	}
@@ -346,6 +348,7 @@ namespace polaris
 	template<typename DataType>
 	void Execution_Component_Manager<DataType>::Step(Revision& out_next_revision)
 	{
+		//cout << "Component_Manger(" << this->name() << ") has " << _active_blocks.size() << " active blocks" << endl;
 		// Thread logs an overly conservative standing guess for when the next event should happen
 		Revision tex_proposed_next_revision = __revision_omega;
 

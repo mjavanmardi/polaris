@@ -50,6 +50,7 @@ namespace polaris
 	#define NULLTYPELIST TypeList<NULLTYPE,NULLTYPE>
 	#define NTL TypeList<NULLTYPE,NULLTYPE>
 	#define INHERIT(IMPLEMENTATION) typename Append<InheritanceList,IMPLEMENTATION<MasterType>>::Result
+	#define PROTO_INHERIT(IMPLEMENTATION) typename Append<InheritanceList,IMPLEMENTATION>::Result
 
 	///----------------------------------------------------------------------------------------------------
 	/// IndexOf Implementation

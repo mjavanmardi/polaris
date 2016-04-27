@@ -12,23 +12,9 @@
 // Most polaris functionality can be found contained within the polaris namespace
 using namespace polaris;
 
+// MasterType is not required any longer - if using the cloneable CRTP patterns
 // The MasterType structure acts as a global directory for all of the other agents to refer to
 //    Use it to define one concrete form of your agent and give it a name
-
-struct MasterType
-{
-#if (_MSC_VER == 1600)
-	typedef myAgent::Agent<MasterType> agent_type;
-	typedef myAgent::Named_Agent<MasterType> agent_named_type;
-	//typedef myAgent::myAgent<MasterType::agent_type> my_agent_itf;
-	//typedef myAgent::myAgent<MasterType::agent_named_type> my_named_agent_itf;
-#else
-	//template<typename AgentType> using my_agent_itf = myAgent::myAgent<AgentType>;
-	using agent_type = myAgent::Agent<MasterType>;
-	using agent_named_type = myAgent::Named_Agent<MasterType>;
-	using my_named_agent = myAgent::my_agent_itf<agent_named_type>;
-#endif
-};
 
 struct options
 {
@@ -64,41 +50,41 @@ int main(int argc, char* argv[])
     // The INITIALIZE_SIMULATION macro informs the Core of what type of simulation to build
     INITIALIZE_SIMULATION(cfg);
 
-#if (_MSC_VER == 1600)
-	std::vector< MasterType::my_agent_itf* > agents;
-#else
-	std::vector< MasterType::agent_type*> agents;
-#endif
-	for (int i=0; i<opts.num_agents;++i)
+	std::vector<myAgent::ExtendedAgent* > extended_agents;
+	for (int i = 0; i < opts.num_agents;++i)
 	{
-		// In order to place agents in the simulation engine
-		//     they must be allocated using the POLARIS allocator
-		MasterType::agent_type* pAgent = Allocate<MasterType::agent_type>(i);
-		agents.push_back(pAgent);
-		// Load the agent's event
-		pAgent->Initialize(i+1, i+2, i+3, i);
+		myAgent::ExtendedAgent* pAgent = myAgent::ExtendedAgent::Allocate(i);
+		extended_agents.push_back(pAgent);
+		pAgent->Initialize(i, i+1, i+2);
+		pAgent->id(i);
+		pAgent->set_num_stuff(38+i);
+		pAgent->set_stuff_name("Thurlow");
 	}
 
-	std::vector<MasterType::agent_named_type*> named_agents;
+	std::vector<myAgent::NewCloneableAgent<>* > agents;
 	for (int i=0; i<opts.num_agents;++i)
 	{
 		// In order to place agents in the simulation engine
 		//     they must be allocated using the POLARIS allocator
-		MasterType::agent_named_type* pAgent = Allocate<MasterType::agent_named_type>(i);
+		myAgent::NewCloneableAgent<>* pAgent = myAgent::NewCloneableAgent<>::Allocate(i);
+		agents.push_back(pAgent);
+		// Load the agent's event
+		pAgent->Initialize(i+1, i+2, i+3);
+		pAgent->id(i);
+	}
+
+	std::vector<myAgent::NewCloneableNamedAgent<>*> named_agents;
+	for (int i=0; i<opts.num_agents;++i)
+	{
+		// In order to place agents in the simulation engine
+		//     they must be allocated using the POLARIS allocator
+		myAgent::NewCloneableNamedAgent<>* pAgent = myAgent::NewCloneableNamedAgent<>::Allocate(i);
 		named_agents.push_back(pAgent);
 		string name = boost::str(boost::format("bob-%d") % i);
 		// Load the agent's event
-		pAgent->Initialize(i+1, i+2, i+3, name);
+		pAgent->Initialize(i+1, i+2, i+3);
+		pAgent->set_id(name);
 	}
-
-	MasterType::agent_type* implAgent = Allocate<MasterType::agent_type>(666);
-	implAgent->Initialize(1, 2, 3, 666);
-
-	//MasterType::agent_named_type* protoAgent = Allocate<MasterType::agent_named_type>();
-	MasterType::my_named_agent* protoAgent = Allocate<MasterType::my_named_agent>();
-	protoAgent->Initialize(3, 4, 5, "Daisy");
-
-
 
 	// Begin the simulation  
 	{
@@ -107,45 +93,39 @@ int main(int argc, char* argv[])
 #endif
 		START();
 	}
+	string int_extended_output_format = "After simulation Agent '%5d'(%3d): x=%6.2f, y=%6.2f, z=%6.2f, num_stuff=%3d, stuff_name=%s\n";
 	string int_output_format = "After simulation Agent '%5d'(%3d): x=%6.2f, y=%6.2f, z=%6.2f\n";
 	string str_output_format = "After simulation Agent '%5s'(%3d): x=%6.2f, y=%6.2f, z=%6.2f\n";
-	for (int i=0; i<agents.size();++i)
+
+	for (const auto& pAgent : extended_agents)
 	{
-		MasterType::agent_type* pAgent = agents[i];
-		//int id;
-		//pAgent->get_id(id);
-		//cout << boost::str(boost::format(output_format) % id % pAgent->uuid() % pAgent->x()   % pAgent->y() % pAgent->z());
+		cout << boost::str(boost::format(int_extended_output_format) % pAgent->id() % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z() % pAgent->num_stuff() % pAgent->stuff_name());
+	}
+
+	for (const auto& pAgent : agents)
+	{
 		cout << boost::str(boost::format(int_output_format) % pAgent->id() % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z());
-		//cout << boost::str(boost::format("After simulation Agent '%6s'(%5d): x=%6.2f, y=%6.2f, z=%6.2f\n") % pAgent->id_desc() % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z());
-		auto uuid = pAgent->uuid();
 	}
 
-	for (int i=0; i<named_agents.size();++i)
+	for (const auto& pAgent : named_agents)
 	{
-		MasterType::agent_named_type* pAgent = named_agents[i];
-		//string id;
-		//pAgent->get_id(id);
-		//cout << boost::str(boost::format("After simulation Agent '%6s'(%5d): x=%6.2f, y=%6.2f, z=%6.2f\n") % id % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z());
 		cout << boost::str(boost::format(str_output_format) % pAgent->id() % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z());
-		//cout << boost::str(boost::format("After simulation Agent '%6s'(%5d): x=%6.2f, y=%6.2f, z=%6.2f\n") % pAgent->id_desc() % pAgent->uuid() % pAgent->x() % pAgent->y() % pAgent->z());
 	}
 
-	cout << boost::str(boost::format(int_output_format) % implAgent->id() % implAgent->uuid() % implAgent->x() % implAgent->y() % implAgent->z());
-	auto uuid = implAgent->id();
-
-	cout << boost::str(boost::format(str_output_format) % protoAgent->id<string>() % protoAgent->uuid() % protoAgent->x() % protoAgent->y() % protoAgent->z());
-	auto uuid2 = protoAgent->id<string>();
-
-	double val = implAgent->x();
-	
 	// The simulation has finished
-    cout << "Done!" << endl;
+	cout << "Finished!" << endl;
+	cout << "Press RETURN key to continue..." << endl;
+	cin.ignore();
 }
 
 #ifdef COMMANDLINE_ARGS
+
+const int MAX_ITERATIONS = 100000;
+const int MAX_AGENTS = 1000;
+const int MAX_THREADS = 100;
+
 bool parse_commandline(int argc, char* argv[], options& opts)
 {
-	//std::string app_name;
 	boost::filesystem::path p(argv[0]);
 	opts.app_name = p.filename().string();
 	namespace po = boost::program_options;
@@ -194,13 +174,13 @@ bool parse_commandline(int argc, char* argv[], options& opts)
 	if (vm.count("num_iterations"))
 	{
 		int iters = vm["num_iterations"].as<int>();
-		if (iters > 0 && iters <= 10000)
+		if (iters > 0 && iters <= MAX_ITERATIONS)
 		{
 			opts.num_iterations = iters;
 		}
 		else
 		{
-			std::cout << boost::str(boost::format("ERROR: num_iterations (%d) is out of range.\n") % iters);
+			std::cout << boost::str(boost::format("ERROR: num_iterations (%d) is out of range (1-%d).\n") % iters % MAX_ITERATIONS);
 			return false;
 		}
 	}
@@ -208,13 +188,13 @@ bool parse_commandline(int argc, char* argv[], options& opts)
 	if (vm.count("num_agents"))
 	{
 		int agents = vm["num_agents"].as<int>();
-		if (agents > 0 && agents <= 1000)
+		if (agents > 0 && agents <= MAX_AGENTS)
 		{
 			opts.num_agents = agents;
 		}
 		else
 		{
-			std::cout << boost::str(boost::format("ERROR: num_agents (%d) is out of range.\n") % agents);
+			std::cout << boost::str(boost::format("ERROR: num_agents (%d) is out of range (1-%d).\n") % agents % MAX_AGENTS);
 			return false;
 		}
 	}
@@ -222,13 +202,13 @@ bool parse_commandline(int argc, char* argv[], options& opts)
 	if (vm.count("num_threads"))
 	{
 		int threads = vm["num_threads"].as<int>();
-		if (threads > 0 && threads <= 100)
+		if (threads > 0 && threads <= MAX_THREADS)
 		{
 			opts.num_threads = threads;
 		}
 		else
 		{
-			std::cout << boost::str(boost::format("ERROR: num_threads (%d) is out of range.\n") % threads);
+			std::cout << boost::str(boost::format("ERROR: num_threads (%d) is out of range (1-%d).\n") % threads % MAX_THREADS);
 			return false;
 		}
 	}

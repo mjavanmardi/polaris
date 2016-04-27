@@ -54,7 +54,7 @@ namespace polaris
 
 			// allocate from the pool
 			DataType* return_val = (DataType*)_first_free_cell;
-			_first_free_cell = ((Execution_Object*)_first_free_cell)->_next_free_cell;
+			_first_free_cell = ((DataType*)_first_free_cell)->_next_free_cell;
 			++_num_allocated;
 
 			// This operation may fill the block, if so it must be removed from consideration for future allocation by this thread
@@ -336,4 +336,68 @@ namespace polaris
 
 		_thread_processing = -1;
 	}
+
+	///----------------------------------------------------------------------------------------------------
+	/// Initialize - Initialize the execution block, set execution characteristics to an unscheduled state
+	///----------------------------------------------------------------------------------------------------
+
+	template<typename DataType>
+	void Execution_Block::Initialize(void* component_manager_ptr)
+	{
+		// Set up the block to an unscheduled state
+		_ptex_next_revision = __revision_omega;
+		_ptex_next_next_revision = __revision_omega;
+		_activated = false;
+
+		_component_manager = component_manager_ptr;
+
+		// Set up block's members
+		_ptex_threads_counter = 0;
+		UNLOCK(_ptex_lock);
+		_thread_processing = -1; // Not being processed by anyone
+		_memory_managed_by = -1; // Not managed by anyone
+
+								 // Set up block's memory-related members 
+		_num_allocated = 0;
+		UNLOCK(_memory_lock);
+
+		// Execution Object memory begins just after this object ends
+		_first_free_cell = ((Byte*)this) + _data_offset;
+
+		// Initialize all execution objects and the free list
+		Byte* current_cell = _first_free_cell;
+		const Byte* const end_cell = _first_free_cell + _num_cells*_cell_size;
+
+		while (current_cell != end_cell)
+		{
+			((DataType*)current_cell)->_execution_block = this;
+			((DataType*)current_cell)->_next_free_cell = current_cell + _cell_size;
+			((DataType*)current_cell)->_next_revision = __revision_omega;
+
+#ifdef SAFE_MODE
+			UNLOCK(((Execution_Object*)current_cell)->_optex_lock);
+#endif
+			Byte* next_cell = current_cell + _cell_size;
+			if (next_cell == end_cell)
+				((DataType*)current_cell)->_next_free_cell = (Byte*)0;
+
+			current_cell = next_cell;
+		}
+
+		//Test - let's iterate through the cells
+		Byte* pCell = _first_free_cell;
+		int num = 0;
+		while (pCell != (Byte*)0)
+		{
+			DataType* pObj = (DataType*)pCell;
+			//printf("%d : At cell %p - next=%p\n", num, pCell, pObj->_next_free_cell);
+			pCell = pObj->_next_free_cell;
+			if (num == _num_cells)
+				assert(pCell == (Byte*)0);
+
+			++num;
+		}
+
+	}
+
 }

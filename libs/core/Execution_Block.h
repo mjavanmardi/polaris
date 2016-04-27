@@ -13,6 +13,7 @@ namespace polaris
 	public:
 		Execution_Block(unsigned int cell_size,unsigned int num_cells):_cell_size(cell_size),_num_cells(num_cells){}
 
+		template<typename DataType>
 		void Initialize(void* component_manager_ptr);
 
 		//----------------------------------------------------------------------------------------------------
