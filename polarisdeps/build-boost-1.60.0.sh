@@ -20,7 +20,7 @@ fi
 
 # if you want to use boost libraries (as opposed to just headers)
 # uncomment the commands here:
-#cd $BOOSTDIR
-#./bootstrap.sh
-#./b2 variant=release install --prefix=$BOOSTDIR
-#./b2 variant=debug install --prefix=$BOOSTDIR
+cd $BOOSTDIR
+./bootstrap.sh
+./b2 variant=release install --prefix=$BOOSTDIR
+./b2 variant=debug install --prefix=$BOOSTDIR

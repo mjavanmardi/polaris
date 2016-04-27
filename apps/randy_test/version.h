@@ -15,7 +15,7 @@ namespace Version
 	const int Version::MAJOR = 0;
 	const int Version::MINOR = 8;
 	const int Version::REVISION = 0;
-	const int Version::BUILD = 20160217;
+	const int Version::BUILD = 20160427;
 
 	std::string get_version(std::string app_name)
 	{

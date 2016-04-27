@@ -16,8 +16,8 @@ fi
 
 # configure debug build
 cd $BASEDIR/build/debug
-cmake -D Unittests=1 -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" $BASEDIR
+cmake -DCOMMANDLINE_ARGS=1 -DUnittests=1 -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" $BASEDIR
 
 #configure release build
 cd $BASEDIR/build/release
-cmake -D Unittests=1 -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" $BASEDIR
+cmake -DCOMMANDLINE_ARGS=1 -DUnittests=1 -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" $BASEDIR

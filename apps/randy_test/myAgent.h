@@ -35,7 +35,7 @@ namespace polaris
 			// Event functions follow a strict format
 			static void Do_Stuff(AgentProto* _this, Event_Response& resp)
 			{
-				Agent<MasterType>* pthis = (Agent<MasterType>*)_this;
+				AgentProto<MasterType>* pthis = (AgentProto<MasterType>*)_this;
 				pthis->x(pthis->stuff().calc(pthis->x(), iteration()));
 				pthis->y(pthis->stuff().calc(pthis->y(), iteration()));
 				pthis->z(pthis->stuff().calc(pthis->z(), iteration()));
@@ -98,7 +98,7 @@ namespace polaris
 			void Initialize_impl(double _x, double _y, double _z, std::false_type)
 			{
 				if (&NewCloneableAgent::Initialize_impl == &Derived::Initialize_impl)
-					Initialize_impl(_x, _y, _z, std::true_type);
+					Initialize_impl(_x, _y, _z, std::true_type());
 				else
 					static_cast<Derived*>(this)->Initialize(_x, _y, _z);
 			}
@@ -107,9 +107,9 @@ namespace polaris
 			{
 				// Tell the simulation engine what the agent should do (Do_Stuff)
 				//    and when to first act (iteration 0, sub-iteration 0)
-				x(_x);
-				y(_y);
-				z(_z);
+				this->x(_x);
+				this->y(_y);
+				this->z(_z);
 				this->template Load_Event<NewCloneableAgent>(&Do_Stuff, 0, 0);
 			}
 
@@ -150,19 +150,19 @@ namespace polaris
 			~ExtendedAgent() { ; }
 
 			void set_num_stuff(int num) { _num_stuff = num; }
-			int num_stuff() { return _num_stuff; }
+			int num_stuff() { return this->_num_stuff; }
 
 			void set_stuff_name(string name) { _stuff_name = name; }
-			string stuff_name() { return _stuff_name; }
+			string stuff_name() { return this->_stuff_name; }
 
 			// Initialize your agent
 			void Initialize(double _x, double _y, double _z)
 			{
 				// Tell the simulation engine what the agent should do (Do_Stuff)
 				//    and when to first act (iteration 0, sub-iteration 0)
-				x(_x);
-				y(_y);
-				z(_z);
+				this->x(_x);
+				this->y(_y);
+				this->z(_z);
 				this->template Load_Event<ExtendedAgent>(&Do_Stuff, 0, 0);
 			}
 
@@ -231,7 +231,7 @@ namespace polaris
 			void Initialize_impl(double _x, double _y, double _z, std::false_type)
 			{
 				if (&NewCloneableNamedAgent::Initialize_impl == &Derived::Initialize_impl)
-					Initialize_impl(_x, _y, _z, std::true_type);
+					Initialize_impl(_x, _y, _z, std::true_type());
 				else
 					static_cast<Derived*>(this)->Initialize(_x, _y, _z);
 			}
@@ -240,9 +240,9 @@ namespace polaris
 			{
 				// Tell the simulation engine what the agent should do (Do_Stuff)
 				//    and when to first act (iteration 0, sub-iteration 0)
-				x(_x);
-				y(_y);
-				z(_z);
+				this->x(_x);
+				this->y(_y);
+				this->z(_z);
 				this->template Load_Event<NewCloneableNamedAgent>(&Do_Stuff, 0, 0);
 			}
 
