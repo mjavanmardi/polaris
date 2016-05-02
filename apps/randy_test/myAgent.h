@@ -209,7 +209,7 @@ namespace polaris
 		{
 			NewCloneableNamedAgent<Derived>() : BaseClass() { ; }
 			NewCloneableNamedAgent<Derived>(const NewCloneableNamedAgent<Derived>& agent) : BaseClass(agent), _id(agent.id()) { ; }
-			NewCloneableNamedAgent<Derived>& operator=(const NewCloneableNamedAgent<Derived>&) { BaseClass::operator=(agent); id(agent.id()); return *this; }
+			NewCloneableNamedAgent<Derived>& operator=(const NewCloneableNamedAgent<Derived>& agent) { BaseClass::operator=(agent); id(agent.id()); return *this; }
 			~NewCloneableNamedAgent<Derived>() { ; }
 
 			//simple_typed_accessor(string, id);
