@@ -50,6 +50,13 @@ int main(int argc, char* argv[])
     // The INITIALIZE_SIMULATION macro informs the Core of what type of simulation to build
     INITIALIZE_SIMULATION(cfg);
 
+	myAgent::ExtendedAgent* pAgent1 = myAgent::ExtendedAgent::Allocate(22);
+	pAgent1->Initialize(1, 2, 3);
+	pAgent1->num_stuff(38);
+	pAgent1->stuff_name("Thurlow");
+	myAgent::ExtendedAgent* pAgent2 = myAgent::ExtendedAgent::Allocate();
+	*pAgent2 = *pAgent1;
+
 	std::vector<myAgent::ExtendedAgent* > extended_agents;
 	for (int i = 0; i < opts.num_agents;++i)
 	{
@@ -57,8 +64,8 @@ int main(int argc, char* argv[])
 		extended_agents.push_back(pAgent);
 		pAgent->Initialize(i, i+1, i+2);
 		pAgent->id(i);
-		pAgent->set_num_stuff(38+i);
-		pAgent->set_stuff_name("Thurlow");
+		pAgent->num_stuff(38+i);
+		pAgent->stuff_name("Thurlow");
 	}
 
 	std::vector<myAgent::NewCloneableAgent<>* > agents;

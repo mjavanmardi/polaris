@@ -15,15 +15,18 @@ namespace polaris
 		implementation struct AgentProto :public Polaris_Component<MasterType, PROTO_INHERIT(MasterType), Execution_Object>
 		{
 			AgentProto() { ; }
+			AgentProto(const AgentProto& agent) : _x(agent.x()), _y(agent.y()), _z(agent.z()) { ; }
+			AgentProto& operator=(const AgentProto& agent) { x(agent.x()), y(agent.y()), z(agent.z()); return *this; }
+			~AgentProto() { ; }
 
 			void x(double val) { _x = val; }
-			double x() { return _x; }
+			double x() const { return _x; }
 
 			void y(double val) { _y = val; }
-			double y() { return _y; }
+			double y() const { return _y; }
 
 			void z(double val) { _z = val; }
-			double z() { return _z; }
+			double z() const { return _z; }
 
 			// Initialize your agent
 			void Initialize(double _x, double _y, double _z)
@@ -77,10 +80,10 @@ namespace polaris
 		template<typename Derived = void>
 		struct NewCloneableAgent : public AgentCloneable<AgentProto<NewCloneableAgent<Derived>>, NewCloneableAgent<Derived>>
 		{
-			NewCloneableAgent() : BaseClass() { ; }
-			NewCloneableAgent(const NewCloneableAgent& agent) { ; }
-			NewCloneableAgent<Derived>& operator=(const NewCloneableAgent<Derived>& agent) { return *this(agent); }
-			~NewCloneableAgent() { ; }
+			NewCloneableAgent<Derived>() : BaseClass() { ; }
+			NewCloneableAgent<Derived>(const NewCloneableAgent<Derived>& agent) : BaseClass(agent), _id(agent.id()) { ; }
+			NewCloneableAgent<Derived>& operator=(const NewCloneableAgent<Derived>& agent) { BaseClass::operator=(agent); id(agent.id()); return *this; }
+			~NewCloneableAgent<Derived>() { ; }
 
 			void Initialize(double _x, double _y, double _z)
 			{
@@ -88,11 +91,11 @@ namespace polaris
 			}
 
 			void id(int val) { _id = val; }
-			double id() { return _id; }
+			double id() const { return _id; }
 
 		private:
-			typedef AgentCloneable<AgentProto<NewCloneableAgent>, NewCloneableAgent> BaseClass;
-			friend struct AgentProto< NewCloneableAgent >;
+			typedef AgentCloneable<AgentProto<NewCloneableAgent<Derived>>, NewCloneableAgent<Derived>> BaseClass;
+			friend struct AgentProto< NewCloneableAgent<Derived> >;
 
 			// Initialize your agent
 			void Initialize_impl(double _x, double _y, double _z, std::false_type)
@@ -145,15 +148,15 @@ namespace polaris
 		struct ExtendedAgent : public AgentCloneable<NewCloneableAgent<ExtendedAgent>, ExtendedAgent>
 		{
 			ExtendedAgent() : BaseClass() { ; }
-			ExtendedAgent(const ExtendedAgent& agent) { ; }
-			ExtendedAgent& operator=(const ExtendedAgent& agent) { return *this; }
+			ExtendedAgent(const ExtendedAgent& agent) : BaseClass(agent) { ; }
+			ExtendedAgent& operator=(const ExtendedAgent& agent) { BaseClass::operator=(agent);num_stuff(agent.num_stuff()); stuff_name(agent.stuff_name()); return *this; }
 			~ExtendedAgent() { ; }
 
-			void set_num_stuff(int num) { _num_stuff = num; }
-			int num_stuff() { return this->_num_stuff; }
+			void num_stuff(int num) { _num_stuff = num; }
+			int num_stuff() const { return this->_num_stuff; }
 
-			void set_stuff_name(string name) { _stuff_name = name; }
-			string stuff_name() { return this->_stuff_name; }
+			void stuff_name(string name) { _stuff_name = name; }
+			string stuff_name() const { return this->_stuff_name; }
 
 			// Initialize your agent
 			void Initialize(double _x, double _y, double _z)
@@ -204,16 +207,16 @@ namespace polaris
 		template<typename Derived = void>
 		struct NewCloneableNamedAgent : public AgentCloneable<AgentProto<NewCloneableNamedAgent<Derived>>, NewCloneableNamedAgent<Derived>>
 		{
-			NewCloneableNamedAgent() : BaseClass() { ; }
-			NewCloneableNamedAgent(const NewCloneableNamedAgent& agent) { ; }
-			~NewCloneableNamedAgent() { ; }
-			NewCloneableNamedAgent& operator=(const NewCloneableNamedAgent&) { ; }
+			NewCloneableNamedAgent<Derived>() : BaseClass() { ; }
+			NewCloneableNamedAgent<Derived>(const NewCloneableNamedAgent<Derived>& agent) : BaseClass(agent), _id(agent.id()) { ; }
+			NewCloneableNamedAgent<Derived>& operator=(const NewCloneableNamedAgent<Derived>&) { BaseClass::operator=(agent); id(agent.id()); return *this; }
+			~NewCloneableNamedAgent<Derived>() { ; }
 
 			//simple_typed_accessor(string, id);
 			//m_data(string, id, NONE, NONE);
 			//std::string strId;
 			void id(std::string val) { _id = val; }
-			std::string id() { return _id; }
+			std::string id() const { return _id; }
 
 			myStuff& stuff() { return _stuff; }
 
@@ -225,7 +228,6 @@ namespace polaris
 		private:
 			typedef AgentCloneable<AgentProto<NewCloneableNamedAgent<Derived>>, NewCloneableNamedAgent<Derived>> BaseClass;
 			friend struct AgentProto< NewCloneableNamedAgent >;
-			std::string strId;
 
 			// Initialize your agent
 			void Initialize_impl(double _x, double _y, double _z, std::false_type)

@@ -72,12 +72,15 @@ namespace polaris
 		
 		Revision _next_revision;
 
-		//%%%RLW ??
-		//union
-		//{
+		//%%%RLW - Why is there a union here? Well...
+		// _event_callback is only used if the Obejct/Cell is allocated
+		// _next_free_cell is only used if it isn't allocated
+		// this MAY save a pointer's worth of bytes for each object/cell - depends on cell sizing
+		union
+		{
 			Event _event_callback;
 			Byte* _next_free_cell;
-		//};
+		};
 
 		Execution_Block* _execution_block;
 	};
