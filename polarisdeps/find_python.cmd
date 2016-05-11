@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 SET MYPYTHONPATH=
 echo Python interpreter accessible through the system PATH:
 where python
