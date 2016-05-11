@@ -52,7 +52,12 @@ There is a convenience polaris_env.bat script that appends all of the paths with
 the directory where you wish to have you dependecies. The environment is only good for that command shell.
 
 Example: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+-- NOTE:
+	get-deps.cmd now locates the proper Visual Studio installation and set it up - so no longer REQUIRES the tools command shell.
 
+--NOTE:
+	The following step is now optional. You can specify the dependency directory as part of the get-deps.cmd call.
+	
 	copy pT1/polarisdeps/polaris_env.bat c:\opt\polarisdeps
 	cd c:\opt\polarisdeps
 	polaris_env.bat
@@ -61,6 +66,8 @@ Then run the sript to download, extract and build the dependencies:
 
 	cd pT1/polarisdeps
 	get_deps.cmd
+	--or optionally
+	get_deps.cmd c:\opt\polarisdeps_vs2015
 	
 This may take a while so be patient.
 
