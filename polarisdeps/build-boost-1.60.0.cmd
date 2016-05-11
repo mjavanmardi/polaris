@@ -27,11 +27,11 @@ myWget.py -u "http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_6
 :: if you want to use boost libraries (as opposed to just headers)
 :: uncomment the commands here:
 
-::cd %BOOSTDIR%
+::cd /D %BOOSTDIR%
 ::call bootstrap.bat
 ::b2 address-model=64 link=shared,static variant=release install --prefix=%BOOSTDIR%
 ::b2 address-model=64 link=shared,static variant=debug install --prefix=%BOOSTDIR%
-::cd %BOOSTDIR%
+::cd /D %BOOSTDIR%
 ::ren lib lib64-msvc-14.0
 
-cd %~dp0
+cd /D %~dp0

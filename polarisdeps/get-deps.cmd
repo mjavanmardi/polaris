@@ -11,12 +11,15 @@ IF NOT "%1" == "" (
 )
 
 echo %BASEDIR%
+IF NOT EXIST %BASEDIR% (
+	MKDIR %BASEDIR%
+)
 COPY polaris_env.bat %BASEDIR%
 
 REM  see if Vsual Studio is already set
 SET VCROOT=
 IF "%VSINSTALLDIR%" == "" (
-	call find_msvc.cmd 14
+	call find_msvc.bat 14
     IF ERRORLEVEL 1 exit /B %ERRORLEVEL%
 ) ELSE IF NOT "%VisualStudioVersion%" == "14.0" (
 	echo "Visual Studio 14.0 (2015) is required"
@@ -36,9 +39,9 @@ set a=%a:/=\%
 echo %a%
 set BASEDIR=%a%
 
-cd %~dp0
+cd /D %~dp0
 call %~dp0build-boost-1.60.0.cmd %BASEDIR%
-cd %~dp0
+cd /D %~dp0
 call %~dp0build-odb-2.4.0.cmd %BASEDIR%
-cd %~dp0
+cd /D %~dp0
 call %~dp0build-gtest-1.7.0.cmd %BASEDIR%

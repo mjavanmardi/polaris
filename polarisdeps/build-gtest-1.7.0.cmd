@@ -25,11 +25,11 @@ myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n
 
 set BUILDDIR=%GTESTDIR%\build_msvc2015
 mkdir %BUILDDIR%
-cd %BUILDDIR%
+cd /D %BUILDDIR%
 
 cmake -D  gtest_force_shared_crt=TRUE -G "Visual Studio 14 Win64" ..
 
 msbuild gtest.sln /p:Configuration=Release /p:Platform=x64
 msbuild gtest.sln /p:Configuration=Debug /p:Platform=x64
 
-cd %~dp0
+cd /D %~dp0

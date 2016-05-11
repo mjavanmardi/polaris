@@ -45,22 +45,22 @@ mkdir %LIBODBDIR%
 echo copy %~dp0libodb-vc14.sln %LIBODBDIR%
 copy %~dp0libodb-vc14.sln %LIBODBDIR%
 copy %~dp0libodb-vc14.vcxproj %LIBODBDIR%\odb
-cd %LIBODBDIR%
+cd /D %LIBODBDIR%
 msbuild libodb-vc14.sln /p:Platform=x64 /p:Configuration=Release
 msbuild libodb-vc14.sln /p:Platform=x64 /p:Configuration=Debug
 
 mkdir %SQLITE3DIR%
-cd %~dp0
+cd /D %~dp0
 copy build_sqlite3_msvc.cmd %SQLITE3DIR%
-cd %SQLITE3DIR%
+cd /D %SQLITE3DIR%
 call build_sqlite3_msvc.cmd
 
 mkdir %LIBSQLITEDIR%
 copy %~dp0libodb-sqlite-vc14.sln %LIBSQLITEDIR%
 copy %~dp0libodb-sqlite-vc14.vcxproj %LIBSQLITEDIR%\odb\sqlite
-cd %LIBSQLITEDIR%
+cd /D %LIBSQLITEDIR%
 msbuild libodb-sqlite-vc14.sln /p:Platform=x64 /p:Configuration=Release
 msbuild libodb-sqlite-vc14.sln /p:Platform=x64 /p:Configuration=Debug
 
 :END
-cd %~dp0
+cd /D %~dp0
