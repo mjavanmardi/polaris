@@ -36,31 +36,35 @@ echo SQLITE3DIR=        %SQLITE3DIR%
 echo filedir=           %~dp0
 
 :: GOTO END
-myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip" -n %ODBZIPFILE% -e %ODBDIR% -o %BASEDIR%
-myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip" -n %LIBODBZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
-myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip" -n %ODBSQLITEBZIPFILE% -e %LIBSQLITEDIR% -o %LIBODBDIR%
-myWget.py -u "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip" -n %SQLITEZIPFILE% -e %SQLITE3DIR% -o %LIBODBDIR%
+
+call find_python.cmd
+IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
+
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip" -n %ODBZIPFILE% -e %ODBDIR% -o %BASEDIR%
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip" -n %LIBODBZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip" -n %ODBSQLITEBZIPFILE% -e %LIBSQLITEDIR% -o %LIBODBDIR%
+%MYPYTHONPATH% myWget.py -u "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip" -n %SQLITEZIPFILE% -e %SQLITE3DIR% -o %LIBODBDIR%
 
 mkdir %LIBODBDIR%
 echo copy %~dp0libodb-vc14.sln %LIBODBDIR%
 copy %~dp0libodb-vc14.sln %LIBODBDIR%
 copy %~dp0libodb-vc14.vcxproj %LIBODBDIR%\odb
-cd %LIBODBDIR%
+cd /D %LIBODBDIR%
 msbuild libodb-vc14.sln /p:Platform=x64 /p:Configuration=Release
 msbuild libodb-vc14.sln /p:Platform=x64 /p:Configuration=Debug
 
 mkdir %SQLITE3DIR%
-cd %~dp0
+cd /D %~dp0
 copy build_sqlite3_msvc.cmd %SQLITE3DIR%
-cd %SQLITE3DIR%
+cd /D %SQLITE3DIR%
 call build_sqlite3_msvc.cmd
 
 mkdir %LIBSQLITEDIR%
 copy %~dp0libodb-sqlite-vc14.sln %LIBSQLITEDIR%
 copy %~dp0libodb-sqlite-vc14.vcxproj %LIBSQLITEDIR%\odb\sqlite
-cd %LIBSQLITEDIR%
+cd /D %LIBSQLITEDIR%
 msbuild libodb-sqlite-vc14.sln /p:Platform=x64 /p:Configuration=Release
 msbuild libodb-sqlite-vc14.sln /p:Platform=x64 /p:Configuration=Debug
 
 :END
-cd %~dp0
+cd /D %~dp0

@@ -21,7 +21,10 @@ set BOOSTDIR=%BASEDIR%\boost_1_60_0
 echo file=%BOOSTZIPFILE%
 echo dir=%BOOSTDIR%
 
-myWget.py -u "http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.zip" -n %BOOSTZIPFILE% -e %BOOSTDIR% -o %BASEDIR%
+call find_python.cmd
+IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
+
+%MYPYTHONPATH% myWget.py -u "http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.zip" -n %BOOSTZIPFILE% -e %BOOSTDIR% -o %BASEDIR%
 
 
 :: if you want to use boost libraries (as opposed to just headers)
