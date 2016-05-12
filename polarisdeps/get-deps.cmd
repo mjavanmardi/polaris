@@ -1,4 +1,4 @@
-rem @ECHO OFF
+@ECHO OFF
 
 IF NOT "%1" == "" (
 	set BASEDIR=%1

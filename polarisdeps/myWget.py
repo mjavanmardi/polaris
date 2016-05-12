@@ -8,7 +8,8 @@ import tarfile
 def download_file(url, outputdir):
 	local_filename = outputdir + url.split('/')[-1]
 	# NOTE the stream=True parameter
-	r = requests.get(url, stream=True, verify=False)
+	# python -mrequests.certs
+	r = requests.get(url, stream=True, verify=True)
 	file_size = int(r.headers['content-length'])
 	print "Downloading: %s Bytes: %s" % (local_filename, file_size)
 	with open(local_filename, 'wb') as f:
@@ -17,9 +18,9 @@ def download_file(url, outputdir):
 			if chunk: # filter out keep-alive new chunks
 				file_size_dl += len(chunk)
 				f.write(chunk)
-				status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-				status = status + chr(8)*(len(status)+1)
-				print status,
+				# status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+				# status = status + chr(8)*(len(status)+1)
+				# print status,
 	return local_filename
 	
 parser = argparse.ArgumentParser(description='Process some files.')
