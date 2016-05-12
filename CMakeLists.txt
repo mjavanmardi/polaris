@@ -55,7 +55,15 @@ endif()
 #{
 	#Variable to indicate where most external dependencies live
 	#set(DEPS_DIR C:/opt/polarisdeps) %%%RLW
-	set(DEPS_DIR $ENV{POLARIS_DEPS_DIR})
+	if(NOT DEPS_DIR)
+		if(DEFINED ENV{POLARIS_DEPS_DIR})
+			set(DEPS_DIR $ENV{POLARIS_DEPS_DIR})
+		else()
+			set(DEPS_DIR C:/opt/polarisdeps)
+		endif()
+	endif()
+	
+	MESSAGE(INFO " DEPS_DIR=${DEPS_DIR}")
 
 	#Variable to indicate where boost lives
 	#Variable to indicate where boost lives

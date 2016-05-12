@@ -88,12 +88,15 @@ Execution binary is: pT1/build/release/bin/Fixed_Demand_Simulator
 
 Windows Build
 -------------
-Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set.
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set or supply the dependency folder to the configure_polaris acript.
+The argument to the configure script will ovrride the environment variable.
 
 	git clone "https://github.com/anl-polaris/polaris.git" pT1
 	cd pT1
 	git checkout T-1
-	configure_polaris.cmd
+	configure_polaris.cmd 
+	or
+	configure_polaris.cmd c:\opt\polarisdeps
 	cd build_vs2015
 
 Open Visual Studio:
