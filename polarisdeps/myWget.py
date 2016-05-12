@@ -46,7 +46,7 @@ if not os.path.exists(abspath):
 	sys.exit()
 
 # does the downloaded file already exist?
-if not os.path.exists(file_dl):
+#if not os.path.exists(file_dl):
 	file_dl = download_file(url, abspath)
 	if args.rename:
 		#build new name
@@ -54,11 +54,11 @@ if not os.path.exists(file_dl):
 		newname = os.path.join(path, args.name)
 		os.rename(file_dl, newname)
 		file_dl = newname
-else:
-	print 'File already downloaded'
+#else:
+#	print 'File already downloaded'
 	
 # does the extracted directory already exist?
-if not os.path.exists(extractdir):
+#if not os.path.exists(extractdir):
 	if file_dl.lower().endswith('.zip'):
 		with zipfile.ZipFile(file_dl, "r") as z:
 			print 'Extracting %s to %s' % (file_dl, abspath)
@@ -67,5 +67,5 @@ if not os.path.exists(extractdir):
 		with tarfile.open(file_dl, 'r:*') as z:
 			print 'Extracting %s to %s' % (file_dl, abspath)
 			z.extractall(abspath)
-else:
-	print 'File already extracted'
+#else:
+#	print 'File already extracted'
