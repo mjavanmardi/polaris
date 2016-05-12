@@ -64,6 +64,10 @@ endif()
 	endif()
 	
 	MESSAGE(INFO " DEPS_DIR=${DEPS_DIR}")
+	if(MSVC)
+		set(DEPS_BINARY_DIR ${DEPS_DIR}/bin)
+		MESSAGE(INFO " DEPS_BINARY_DIR=${DEPS_BINARY_DIR}")
+	endif()
 
 	#Variable to indicate where boost lives
 	#Variable to indicate where boost lives
