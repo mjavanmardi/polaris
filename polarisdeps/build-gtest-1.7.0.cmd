@@ -45,15 +45,24 @@ echo dir=%GTESTDIR%
 call find_python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
+set ERRORLEVEL=
 %MYPYTHONPATH% myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n %GTESTZIPFILE% -e %GTESTDIR% -o %BASEDIR%
+IF ERRORLEVEL 1 (ECHO Download and Extract of '%GTESTZIPFILE%' failed. & EXIT /B 1)
 
 set BUILDDIR=%GTESTDIR%\build_msvc2015
 mkdir %BUILDDIR%
 cd /D %BUILDDIR%
 
+set ERRORLEVEL=
 cmake -D  gtest_force_shared_crt=TRUE -G "Visual Studio 14 Win64" ..
+IF ERRORLEVEL 1 (ECHO CMake was unable to generate project file. & EXIT /B 1)
 
+set ERRORLEVEL=
 msbuild gtest.sln /p:Configuration=Release /p:Platform=x64
+IF ERRORLEVEL 1 (ECHO MSBuild of Release project failed. & EXIT /B 1)
+
+set ERRORLEVEL=
 msbuild gtest.sln /p:Configuration=Debug /p:Platform=x64
+IF ERRORLEVEL 1 (ECHO MSBuild of Debug project failed. & EXIT /B 1)
 
 cd /D %~dp0

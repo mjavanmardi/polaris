@@ -1,4 +1,4 @@
-@ECHO OFF
+::@ECHO OFF
 
 IF NOT "%1" == "" (
 	set BASEDIR=%1
@@ -31,7 +31,7 @@ IF NOT "%VCROOT%" == "" (
     call "%VCROOT%\vcvarsall.bat" amd64
 )
 
-:: cal this because for some goofy reason it fails on the first call - but then works
+:: call this because for some goofy reason it fails on the first call - but then works
 call find_python.cmd
 
 :: Download and expand source files
@@ -51,11 +51,11 @@ IF ERRORLEVEL 1 (ECHO Download and Extract of '%BOOSTZIPFILE%' failed. & EXIT /B
 :: if you want to use boost libraries (as opposed to just headers)
 :: uncomment the commands here:
 
-::cd %BOOSTDIR%
+::cd /D %BOOSTDIR%
 ::call bootstrap.bat
 ::b2 address-model=64 link=shared,static variant=release install --prefix=%BOOSTDIR%
 ::b2 address-model=64 link=shared,static variant=debug install --prefix=%BOOSTDIR%
-::cd %BOOSTDIR%
+::cd /D %BOOSTDIR%
 ::ren lib lib64-msvc-14.0
 
-cd %~dp0
+cd /D %~dp0
