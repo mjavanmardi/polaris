@@ -43,24 +43,48 @@ if not os.path.exists(abspath):
 	os.makedirs(abspath)
 if not os.path.exists(abspath):
 	print 'output path "%s" does not exist' % abspath
-	sys.exit()
+	sys.exit(1)
 
 # does the downloaded file already exist?
-#if not os.path.exists(file_dl):
-file_dl = download_file(url, abspath)
-if args.rename:
-	#build new name
-	path = os.path.dirname(file_dl)
-	newname = os.path.join(path, args.name)
-	os.rename(file_dl, newname)
-	file_dl = newname
-#else:
-#	print 'File already downloaded'
+if not os.path.exists(file_dl):
+	file_dl = download_file(url, abspath)
+	if args.rename:
+		#build new name
+		path = os.path.dirname(file_dl)
+		newname = os.path.join(path, args.name)
+		os.rename(file_dl, newname)
+		file_dl = newname
+else:
+	print 'File already downloaded'
+	try_again=False
+	if zipfile.is_zipfile(file_dl):
+		the_zip_file = zipfile.ZipFile(file_dl)
+		ret = the_zip_file.testzip()
+		if ret is not None:
+			print "First bad file in zip: %s" % ret
+			try_again=True
+		else:
+			print "Zip file is good."
+	else:
+		print "File is not a valid zip file."
+		try_again=True
+	if try_again:
+		# lets tyr the download again
+		print "Trying download again..."
+		file_dl = download_file(url, abspath)
+		if args.rename:
+			#build new name
+			path = os.path.dirname(file_dl)
+			newname = os.path.join(path, args.name)
+			os.rename(file_dl, newname)
+			file_dl = newname
 	
 # does the extracted directory already exist?
 #if not os.path.exists(extractdir):
 if file_dl.lower().endswith('.zip'):
 	with zipfile.ZipFile(file_dl, "r") as z:
+		# may need this to handle very long file names on Windows (MAX_PATH=260)
+		abspath = u'\\\\?\\' + abspath
 		print 'Extracting %s to %s' % (file_dl, abspath)
 		z.extractall(abspath)
 else:
