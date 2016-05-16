@@ -13,9 +13,7 @@ endif()
 set_target_properties(${MODULE_NAME} PROPERTIES FOLDER apps)
 
 if(MSVC)
-	# Configure the template file
-	MESSAGE(INFO " ${MODULE_NAME} - DEPS_BINARY_DIR=${DEPS_BINARY_DIR}")
-	SET(USER_FILE ${MODULE_NAME}.vcxproj.user)
-	SET(OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${USER_FILE})
-	CONFIGURE_FILE(../../ProjectUserTemplate.vcxproj ${USER_FILE})
+	add_custom_command( TARGET ${MODULE_NAME} POST_BUILD 
+		COMMAND xcopy /D /I /Y \"${DEPS_BINARY_DIR}\\$<CONFIGURATION>\\*\" \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>\"		
+		COMMENT "Copying third party dlls to output directory" )
 endif()

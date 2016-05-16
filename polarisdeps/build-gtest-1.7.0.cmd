@@ -17,7 +17,7 @@ set BASEDIR=%a%
 REM  see if Vsual Studio is already set
 SET VCROOT=
 IF "%VSINSTALLDIR%" == "" (
-	call find_msvc.bat 14
+	call find-msvc.bat 14
     IF ERRORLEVEL 1 exit /B %ERRORLEVEL%
 ) ELSE IF NOT "%VisualStudioVersion%" == "14.0" (
 	echo "Visual Studio 14.0 (2015) is required"
@@ -32,7 +32,7 @@ IF NOT "%VCROOT%" == "" (
 )
 
 :: cal this because for some goofy reason it fails on the first call - but then works
-call find_python.cmd
+call find-python.cmd
 
 :: Download and expand source files
 set GTESTZIPFILE=release-1.7.0.zip
@@ -42,7 +42,7 @@ echo file=%GTESTZIPFILE%
 echo dir=%GTESTDIR%
 
 
-call find_python.cmd
+call find-python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=

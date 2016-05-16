@@ -2,24 +2,24 @@
 
 IF NOT "%1" == "" (
 	set BASEDIR=%1
-	call polaris_env.bat %1
+	call polaris-env.bat %1
 ) ELSE IF NOT "%POLARIS_DEPS_DIR%" == "" (
 	set BASEDIR=%POLARIS_DEPS_DIR%
 ) ELSE (
 	set BASEDIR=%CD%
-	call polaris_env.bat %CD%
+	call polaris-env.bat %CD%
 )
 
 echo %BASEDIR%
 IF NOT EXIST %BASEDIR% (
 	MKDIR %BASEDIR%
 )
-COPY polaris_env.bat %BASEDIR%
+COPY polaris-env.bat %BASEDIR%
 
 REM  see if Vsual Studio is already set
 SET VCROOT=
 IF "%VSINSTALLDIR%" == "" (
-	call find_msvc.bat 14
+	call find-msvc.bat 14
     IF ERRORLEVEL 1 exit /B %ERRORLEVEL%
 ) ELSE IF NOT "%VisualStudioVersion%" == "14.0" (
 	echo "Visual Studio 14.0 (2015) is required"
@@ -34,7 +34,7 @@ IF NOT "%VCROOT%" == "" (
 )
 
 :: cal this because for some goofy reason it fails on the first call - but then works
-call find_python.cmd
+call find-python.cmd
 
 :: get our slashes all straightened out :)
 set a=%BASEDIR%
@@ -50,13 +50,17 @@ cd /D %~dp0
 call %~dp0build-gtest-1.7.0.cmd %BASEDIR%
 
 :: as a convenience we copy all dll's to a single folder to save on path entries
-mkdir %BASEDIR%\bin
-COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.dll                                %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.pdb                                %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.dll                              %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.pdb                              %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.dll     %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.pdb     %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.dll   %BASEDIR%\bin
-COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.pdb   %BASEDIR%\bin
+IF NOT EXIST %BASEDIR%\bin ( mkdir %BASEDIR%\bin )
+IF NOT EXIST %BASEDIR%\bin\Debug ( mkdir %BASEDIR%\bin\Debug )
+IF NOT EXIST %BASEDIR%\bin\Release ( mkdir %BASEDIR%\bin\Release )
+COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Release
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.dll                                %BASEDIR%\bin\Release
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.pdb                                %BASEDIR%\bin\Release
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.dll     %BASEDIR%\bin\Release
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.pdb     %BASEDIR%\bin\Release
+
+COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Debug
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.dll                              %BASEDIR%\bin\Debug
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.pdb                              %BASEDIR%\bin\Debug
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.dll   %BASEDIR%\bin\Debug
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.pdb   %BASEDIR%\bin\Debug

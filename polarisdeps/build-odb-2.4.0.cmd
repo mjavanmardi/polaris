@@ -37,7 +37,7 @@ echo filedir=           %~dp0
 
 :: GOTO END
 
-call find_python.cmd
+call find-python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=
@@ -72,11 +72,11 @@ IF ERRORLEVEL 1 (ECHO MSBuild of libodb Debug project failed. & EXIT /B 1)
 
 mkdir %SQLITE3DIR%
 cd /D %~dp0
-copy build_sqlite3_msvc.cmd %SQLITE3DIR%
+copy build-sqlite3-msvc.cmd %SQLITE3DIR%
 cd /D %SQLITE3DIR%
 
 set ERRORLEVEL=
-call build_sqlite3_msvc.cmd
+call build-sqlite3-msvc.cmd
 IF ERRORLEVEL 1 (ECHO Build of sqlite3 project failed. & EXIT /B 1)
 
 mkdir %LIBSQLITEDIR%
