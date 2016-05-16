@@ -15,13 +15,13 @@ set a=%a:/=\%
 ::echo %a%
 set DEPS_DIR=%a%
 
-REM SET DepsDirResponse=
-REM SET /p DepsDirResponse= Use %DEPS_DIR% as dependancy directory?
-REM echo Response=%DepsDirResponse%
-REM SET USE_IT=
-REM IF "%DepsDirResponse%" == "Y" SET USE_IT=1
-REM IF "%DepsDirResponse%" == "y" SET USE_IT=1
-REM IF DEFINED USE_IT ( ECHO Using %DEPS_DIR% as dependency directory.) ELSE ( ECHO Dependency directory is not set. & ECHO Exiting configuration. & EXIT /B 1)
+:: SET DepsDirResponse=
+:: SET /p DepsDirResponse= Use %DEPS_DIR% as dependancy directory?
+:: echo Response=%DepsDirResponse%
+:: SET USE_IT=
+:: IF "%DepsDirResponse%" == "Y" SET USE_IT=1
+:: IF "%DepsDirResponse%" == "y" SET USE_IT=1
+:: IF DEFINED USE_IT ( ECHO Using %DEPS_DIR% as dependency directory.) ELSE ( ECHO Dependency directory is not set. & ECHO Exiting configuration. & EXIT /B 1)
 
 REM  see if Vsual Studio is already set
 SET VCROOT=
