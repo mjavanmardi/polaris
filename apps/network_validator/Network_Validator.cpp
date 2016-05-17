@@ -1,5 +1,7 @@
 #define EXCLUDE_DEMAND
 
+#undef ANTARES
+
 #include "Polaris_PCH.h"
 #include "Application_Includes.h"
 
@@ -135,6 +137,9 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
+	//===============
+	// OUTPUT OPTIONS
+	//----------------
 	string output_dir_name = "";
 
 	GLOBALS::Normal_RNG.Initialize();
@@ -160,8 +165,9 @@ int main(int argc,char** argv)
 
 	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 
-	cout << "reading network data..." <<endl;	
+	cout << "reading network data..."<<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
+	cout << "done."<<endl;
 	typedef Operation<MasterType::operation_type> _Operation_Interface;
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
@@ -193,8 +199,10 @@ int main(int argc,char** argv)
 	network->set_network_bounds<NULLTYPE>();
 	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	MasterType::vehicle_type::Initialize_Layer();
+	
 	network->initialize_antares_layers<NULLTYPE>();
+	MasterType::vehicle_type::Initialize_Layer();
+
 	MasterType::link_type::configure_link_moes_layer();
 #endif
 

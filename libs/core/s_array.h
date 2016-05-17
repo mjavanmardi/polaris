@@ -435,7 +435,7 @@ void s_array<T>::Init(const_dimensional_type row_sizes)
 template <class T>
 void s_array<T>::_init(const_dimensional_type row_sizes)
 {
-	_size = 1;
+	_size = 0;
 	_cursor.first = 0;
 	_cursor.second = 0;
 

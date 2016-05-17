@@ -637,10 +637,21 @@ namespace PopSyn
 				marginal_per_error.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
 				marginal_per_sum.resize(regions->begin()->second->Target_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
 
-				test_marginal_hh_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
-				test_marginal_hh_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
-				test_marginal_per_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
-				test_marginal_per_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				// check if need to do test marginal variable
+				bool do_test_hh = false;
+				//if (regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().size() != 0)
+				//{
+				//	test_marginal_hh_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				//	test_marginal_hh_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				//	do_test_hh = true;
+				//}
+				bool do_test_per = false;
+				//if (regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().size() != 0)
+				//{
+				//	test_marginal_per_error.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				//	test_marginal_per_sum.resize(regions->begin()->second->Synthesis_Zone_Collection<zones_itf*>()->begin()->second->Test_Person_Marginal_Distribution<marginal_itf&>().dimensions(),0);
+				//	do_test_per = true;
+				//}
 
 				joint_hh_error.resize(regions->begin()->second->Target_Joint_Distribution<joint_itf&>().dimensions(),0);
 				joint_hh_sum.resize(regions->begin()->second->Target_Joint_Distribution<joint_itf&>().dimensions(),0);
@@ -668,6 +679,7 @@ namespace PopSyn
 						marginal_itf& syn_marg_hh = zone->template Synthesized_Marginal_Distribution<marginal_itf&>();
 						marginal_itf& syn_marg_per= zone->template Synthesized_Person_Marginal_Distribution<marginal_itf&>();
 							
+						// test results
 						marginal_itf& test_marg_hh =		zone->template Test_Marginal_Distribution<marginal_itf&>();
 						marginal_itf& test_marg_per =		zone->template Test_Person_Marginal_Distribution<marginal_itf&>();
 						marginal_itf& syn_test_marg_hh =	zone->template Synthesized_Test_Marginal_Distribution<marginal_itf&>();
@@ -690,20 +702,26 @@ namespace PopSyn
 							}
 						}
 
-						for (int i = 0; i < (int)test_marg_hh.num_dimensions(); ++i)
+						if (do_test_hh)
 						{
-							for (int d = 0; d < (int)test_marg_hh.dimensions()[i]; ++d)
+							for (int i = 0; i < (int)test_marg_hh.num_dimensions(); ++i)
 							{
-								test_marginal_hh_error[index(i,d)] += abs(syn_test_marg_hh[index(i,d)] - test_marg_hh[index(i,d)]);
-								test_marginal_hh_sum[index(i,d)] += test_marg_hh[index(i,d)];
+								for (int d = 0; d < (int)test_marg_hh.dimensions()[i]; ++d)
+								{
+									test_marginal_hh_error[index(i,d)] += abs(syn_test_marg_hh[index(i,d)] - test_marg_hh[index(i,d)]);
+									test_marginal_hh_sum[index(i,d)] += test_marg_hh[index(i,d)];
+								}
 							}
 						}
-						for (int i = 0; i < (int)test_marg_per.num_dimensions(); ++i)
+						if (do_test_per)
 						{
-							for (int d = 0; d < (int)test_marg_per.dimensions()[i]; ++d)
+							for (int i = 0; i < (int)test_marg_per.num_dimensions(); ++i)
 							{
-								test_marginal_per_error[index(i,d)] += abs(syn_test_marg_per[index(i,d)] - test_marg_per[index(i,d)]);
-								test_marginal_per_sum[index(i,d)] += test_marg_per[index(i,d)];
+								for (int d = 0; d < (int)test_marg_per.dimensions()[i]; ++d)
+								{
+									test_marginal_per_error[index(i,d)] += abs(syn_test_marg_per[index(i,d)] - test_marg_per[index(i,d)]);
+									test_marginal_per_sum[index(i,d)] += test_marg_per[index(i,d)];
+								}
 							}
 						}
 						// get the joint distribution fit results
@@ -764,37 +782,42 @@ namespace PopSyn
 					}
 				}
 				popsyn_log <<"Total,,"<<fixed<<total_per_error/total_per_sum*100.0<<"%"<<endl;
-				popsyn_log <<"WAAPD value for TEST household marginals:"<<setprecision(2)<<endl;
-				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
-				double total_test_hh_error = 0;
-				double total_test_hh_sum = 0;
-				for (int i = 0; i < (int)test_marginal_hh_error.num_dimensions(); ++i)
+				if (do_test_hh)
 				{
-					for (int d = 0; d < (int)test_marginal_hh_error.dimensions()[i]; ++d)
+					popsyn_log <<"WAAPD value for TEST household marginals:"<<setprecision(2)<<endl;
+					popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+					double total_test_hh_error = 0;
+					double total_test_hh_sum = 0;
+					for (int i = 0; i < (int)test_marginal_hh_error.num_dimensions(); ++i)
 					{
-						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_hh_error[index(i,d)]/test_marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
+						for (int d = 0; d < (int)test_marginal_hh_error.dimensions()[i]; ++d)
+						{
+							popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_hh_error[index(i,d)]/test_marginal_hh_sum[index(i,d)]*100.0<<"%"<<endl;
 
-						total_test_hh_error += test_marginal_hh_error[index(i,d)];
-						total_test_hh_sum +=test_marginal_hh_sum[index(i,d)];
+							total_test_hh_error += test_marginal_hh_error[index(i,d)];
+							total_test_hh_sum +=test_marginal_hh_sum[index(i,d)];
+						}
 					}
+					popsyn_log <<"Total,,"<<fixed<<total_test_hh_error/total_test_hh_sum*100.0<<"%"<<endl<<endl;
 				}
-				popsyn_log <<"Total,,"<<fixed<<total_test_hh_error/total_test_hh_sum*100.0<<"%"<<endl<<endl;
-				popsyn_log <<"WAAPD value for TEST person marginals:"<<endl;
-				popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
-				double total_test_per_error = 0;
-				double total_test_per_sum = 0;
-				for (int i = 0; i < (int)test_marginal_per_error.num_dimensions(); ++i)
+				if (do_test_per)
 				{
-					for (int d = 0; d < (int)test_marginal_per_error.dimensions()[i]; ++d)
+					popsyn_log <<"WAAPD value for TEST person marginals:"<<endl;
+					popsyn_log <<"Dimension,Category,WAAPD%"<<endl;
+					double total_test_per_error = 0;
+					double total_test_per_sum = 0;
+					for (int i = 0; i < (int)test_marginal_per_error.num_dimensions(); ++i)
 					{
-						popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_per_error[index(i,d)]/test_marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
+						for (int d = 0; d < (int)test_marginal_per_error.dimensions()[i]; ++d)
+						{
+							popsyn_log <<i<<","<<d<<","<<fixed<<test_marginal_per_error[index(i,d)]/test_marginal_per_sum[index(i,d)]*100.0<<"%"<<endl;
 
-						total_test_per_error += test_marginal_per_error[index(i,d)];
-						total_test_per_sum +=test_marginal_per_sum[index(i,d)];
+							total_test_per_error += test_marginal_per_error[index(i,d)];
+							total_test_per_sum +=test_marginal_per_sum[index(i,d)];
+						}
 					}
+					popsyn_log <<"Total,,"<<fixed<<total_test_per_error/total_test_per_sum*100.0<<"%"<<endl;
 				}
-				popsyn_log <<"Total,,"<<fixed<<total_test_per_error/total_test_per_sum*100.0<<"%"<<endl;
-
 				popsyn_log <<"\n\nHH AAPD results:"<<endl;
 				popsyn_log <<"HH_CELL_ID,AAPD_sim,AAPD_rounding,Avg_Size"<<endl;
 				for (int i = 0; i < (int)joint_hh_error.size(); ++i)
