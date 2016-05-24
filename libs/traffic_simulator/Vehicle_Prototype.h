@@ -71,6 +71,7 @@ namespace Vehicle_Components
 			accessor(is_integrated, NONE, NONE);
 			accessor(downstream_preferred_departure_time, NONE, NONE);
 			accessor(is_autonomous, NONE, NONE);
+			accessor(vehicle_ptr, NONE, NONE);
 			
 			//enroute swtiching
 			accessor(rng_stream, NONE, NONE);
