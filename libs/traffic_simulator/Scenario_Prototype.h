@@ -48,6 +48,7 @@ namespace Scenario_Components
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
+			accessor(simulate_cacc, NONE, NONE);
 			
 			accessor(cav_market_penetration, NONE, NONE);
 			accessor(cav_vott_adjustment, NONE, NONE);
@@ -489,6 +490,7 @@ namespace Scenario_Components
 				// read capacity adjustments 
 				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
 				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
+				if (cfgReader.getParameter("simulate_cacc", simulate_cacc<bool*>()) != PARAMETER_FOUND)simulate_cacc<bool>(false);
 
 
 
