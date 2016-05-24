@@ -87,8 +87,8 @@ namespace Demand_Components
 				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 //				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
-				typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+				//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
+				//typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
 				typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 
@@ -223,6 +223,7 @@ namespace Demand_Components
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
 					vehicle->template router<_Routing_Interface*>(router);
 					vehicle->template is_integrated<bool>(db_itr->getType());
+					vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());
 					vehicle->template initialize<NT>();
 					vehicle->is_integrated(false);
 
@@ -264,8 +265,9 @@ namespace Demand_Components
 					//}
 				}
 				}
-				catch (...)
+				catch (exception& e)
 				{
+					std::cout << "\nException message: " << e.what() << "\n";
 					THROW_EXCEPTION("Error: seems to be an ODB exception here, reading trip number "<<counter<<", trip id="<<trip_id);
 				}
 			}

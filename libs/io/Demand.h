@@ -12,6 +12,7 @@ namespace io
 class Selection;
 class Household;
 class Vehicle;
+class VehicleType;
 class Trip;
 class Plan;
 class Taveler;
@@ -318,7 +319,7 @@ public:
 	// Default Constructor
 	Vehicle () {}	
 	//Constructor
-	Vehicle ( int hhold_, int vehicle_, int parking_, int type_, int subtype_, int partition_ )  
+	Vehicle ( int hhold_, int vehicle_, int parking_, shared_ptr<VehicleType> type_, int subtype_, int partition_ )  
 	: hhold (hhold_), vehicle (vehicle_), parking (parking_), type (type_), subtype (subtype_), partition (partition_)
 	{
 	}
@@ -329,8 +330,8 @@ public:
 	void setVehicle (const int& vehicle_){vehicle = vehicle_;}
 	const int& getParking () const {return parking;}
 	void setParking (const int& parking_){parking = parking_;}
-	const int& getType () const {return type;}
-	void setType (const int& type_){type = type_;}
+	const shared_ptr<VehicleType> getType () const {return type;}
+	void setType (const shared_ptr<VehicleType> type_){type = type_;}
 	const int& getSubtype () const {return subtype;}
 	void setSubtype (const int& subtype_){subtype = subtype_;}
 	const int& getPartition () const {return partition;}
@@ -346,11 +347,42 @@ private:
 	int hhold;
 	int vehicle;
 	int parking;
-	int type;
+	#pragma db not_null
+	shared_ptr<VehicleType> type;
 	int subtype;
 	int partition;
 
 };
+#pragma db object //table("VehicleType")
+class VehicleType
+{
+public:
+	// Default Constructor
+	VehicleType () {}	
+	//Constructor
+	VehicleType ( int type_id_, std::string type_, std::string cav_)  
+	: type_id (type_id_), type (type_), cav (cav_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) { type =  type_;}
+
+	const std::string& getCav () const {return cav;}
+	void setCav (const std::string& cav_) { cav =  cav_;}
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getVehicle_Id () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+	std::string type;
+	std::string cav;
+};
+
 
 
 #pragma db object
@@ -379,7 +411,7 @@ public:
 	const std::string& getMode () const {return mode;}
 	void setMode (const std::string& mode_) {mode = mode_;}
 	const std::string& getType () const {return type;}
-	void setType (const std::string& type_) {type = type_;}
+	void setType (const std::string& type_) { type =  type_;}
 	const shared_ptr<Person> getPerson () const {return person;}
 	void setPerson (const shared_ptr<Person> person_) {person = person_;}
 	/*const shared_ptr<Trip> getTrip () const {return trip;}
@@ -413,7 +445,7 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
@@ -446,8 +478,8 @@ public:
 	void setConstraint (const int& constraint_){constraint = constraint_;}
 	const int& getPriority () const {return priority;}
 	void setPriority (const int& priority_){priority = priority_;}
-	const int& getVehicle () const {return vehicle;}
-	void setVehicle (const int& vehicle_){vehicle = vehicle_;}
+	const shared_ptr<Vehicle> getVehicle () const {return vehicle;}
+	void setVehicle (shared_ptr<Vehicle> vehicle_){vehicle = vehicle_;}
 	const int& getPassengers () const {return passengers;}
 	void setPassengers (const int& passengers_){passengers = passengers_;}
 	const int& getType () const {return type;}
@@ -475,7 +507,7 @@ private:
 	int mode;
 	int constraint;
 	int priority;
-	int vehicle;
+	shared_ptr<Vehicle> vehicle;
 	int passengers;
 	int type;
 	int partition;

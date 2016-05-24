@@ -35,6 +35,8 @@ namespace Vehicle_Components
 
 			m_data(bool, is_autonomous, NONE, NONE);
 
+			m_data(shared_ptr<polaris::io::Vehicle>, vehicle_ptr, NONE, NONE);
+
 			m_data(bool, its_switch, NONE, NONE);
 			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
 
