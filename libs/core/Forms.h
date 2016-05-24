@@ -744,10 +744,10 @@ namespace polaris
 			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
 			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check_2(TargetType,nullptr_t,is_same)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=((PROTOTYPE<COMPONENT_TYPE>*)(&value));}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) || check_2(TargetType,nullptr_t,is_same)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(PROTOTYPE<COMPONENT_TYPE>*)(value);}\
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\

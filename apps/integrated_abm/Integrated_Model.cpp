@@ -534,7 +534,14 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
-	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	if (scenario->read_population_from_database<bool>())
+	{
+		popsyn->Read_From_Database<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	}
+	else
+	{
+		popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 

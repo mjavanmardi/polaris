@@ -311,7 +311,6 @@ private:
 };
 
 
-
 #pragma db object //table("VEHICLE")
 class Vehicle
 {
