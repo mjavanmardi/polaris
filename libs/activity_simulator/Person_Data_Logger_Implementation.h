@@ -465,6 +465,8 @@ namespace Person_Components
 					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 					if (scenario->template write_demand_to_database<bool>())
 					{
+						int count = 0;
+
 						try
 						{
 							odb::transaction t(this->_db_ptr->begin());
@@ -477,12 +479,15 @@ namespace Person_Components
 								unsigned long t_id = this->_db_ptr->persist(t);
 								a.setTrip (t_id);
 								this->_db_ptr->persist(a);
+								count++;
 							}
 							t.commit();
 						}
-						catch (odb::sqlite::database_exception ex)
+						catch (const odb::exception& e)
 						{
-							cout << ex.message()<<". DB error in person_data_logger_implementation, line 519."<<endl;
+							cout << e.what()<<". DB error in person_data_logger_implementation, line 519.  count="<<count<<endl;
+							pair<polaris::io::Trip,polaris::io::Activity> p = activity_records[i][count];
+							
 						}
 
 						// erase buffer

@@ -79,7 +79,13 @@ namespace Person_Components
 
 			// work arrival time conversion functions
 			m_data(Basic_Units::Implementations::Time_Implementation<NT>,_Journey_To_Work_Arrival_Time, NONE, NONE);
-			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType CENSUS_CODE)
+			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType value, requires(TargetType,check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+			{
+				typedef Basic_Units::Prototypes::Time<type_of(typename ComponentType::_Journey_To_Work_Arrival_Time)> _Journey_To_Work_Arrival_Time_itf;
+				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();
+				itf->template Value<TargetType>(value);
+			}
+			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType CENSUS_CODE, requires(TargetType,!check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
 			{
 				int val=0;
 				#pragma region CENSUS_CODE_SWITCH

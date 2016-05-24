@@ -70,10 +70,12 @@ namespace Person_Components
 			// Methods
 			template<typename TargetType> void Initialize()
 			{
-				
 			}
 			template<typename SynthesisZoneType> void Initialize(SynthesisZoneType home_synthesis_zone/*, requires(TargetType,check(SynthesisZoneType, PopSyn::Concepts::Is_Synthesis_Zone) && check(SynthesisZoneType, is_pointer))*/)
 			{	
+				if (home_synthesis_zone == nullptr) return;
+
+
 				// updates for counters
 				this->Count_Array[__thread_id]++;
 				if (this->Count_Array[__thread_id] % 10000 == 0)  
@@ -114,22 +116,6 @@ namespace Person_Components
 				// Available locations
 				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
-				//// assign person to a random activity location in the zone				
-				//if (loc_indices->size() == 0)
-				//{
-				//	_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
-				//}
-				//else
-				//{
-				//	int index = -1;
-				//	index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
-				//	_home_location_id = loc_indices->at(index);
-				//}
-
-				//// get the polaris zone of the synthesized person and increment its population counter;
-				//_Zone_Interface* pzone = _Parent_Person->template Home_Location<_Zone_Interface*>();
-				//pzone->template population<int&>()++;
-
 				// Assign workers to a work location
 				pop_unit_itf* properties = _Parent_Person->template Static_Properties<pop_unit_itf*>();
 				if (properties->template Is_Employed<bool>()) 
@@ -146,6 +132,7 @@ namespace Person_Components
 				//planner->template Write_To_Log<string>(_Parent_Person->template To_String<NT>());
 				//planner->template Write_To_Log<string>("\n");
 			}	
+
 			/*template<typename TargetType> void Initialize(SynthesisZoneType home_synthesis_zone, requires(TargetType,!check(typename SynthesisZoneType, Zone_Components::Concepts::Is_Zone_Prototype) || !check(SynthesisZoneType, is_pointer)))
 			{	
 				assert_check(strip_modifiers(TargetType)::ParamType, Zone_Components::Concepts::Is_Zone_Prototype,"Error: must pass in home zone as a zone_prototype");

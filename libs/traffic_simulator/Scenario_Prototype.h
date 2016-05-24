@@ -18,6 +18,7 @@ namespace Scenario_Components
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
 			accessor(output_popsyn_database_name, NONE, NONE);
+			accessor(input_popsyn_database_name, NONE, NONE);
 			accessor(historical_results_database_name, NONE, NONE);
 
 			accessor(simulation_interval_length, NONE, NONE);
@@ -136,6 +137,7 @@ namespace Scenario_Components
 			accessor(do_planner_routing, NONE, NONE);
 			accessor(write_demand_to_database, NONE, NONE);
 			accessor(read_demand_from_database, NONE, NONE);
+			accessor(read_population_from_database, NONE, NONE);
 			accessor(activity_start_time_model_file_name,NONE,NONE);
 
 			//===============================================
@@ -400,6 +402,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("do_planner_routing", this->template do_planner_routing<bool*>()) != PARAMETER_FOUND) this->template do_planner_routing<bool>(false);		
 				if (cfgReader.getParameter("write_demand_to_database", this->template write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->template write_demand_to_database<bool>(false);
 				if (cfgReader.getParameter("read_demand_from_database", this->template read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->template read_demand_from_database<bool>(false);
+				if (cfgReader.getParameter("read_population_from_database", this->template read_population_from_database<bool*>()) != PARAMETER_FOUND) this->template read_population_from_database<bool>(false);
 				if (cfgReader.getParameter("cav_market_penetration", this->template cav_market_penetration<double*>()) != PARAMETER_FOUND) this->template cav_market_penetration<double>(0.0);
 				if (cfgReader.getParameter("cav_vott_adjustment", this->template cav_vott_adjustment<double*>()) != PARAMETER_FOUND) this->template cav_vott_adjustment<double>(1.0);
 
@@ -436,8 +439,17 @@ namespace Scenario_Components
 				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
-					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago");
+					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("");
 					if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
+					if (cfgReader.getParameter("input_popsyn_database_name", input_popsyn_database_name<string*>())!= PARAMETER_FOUND)
+					{
+						input_popsyn_database_name<std::string>("");
+						this->read_population_from_database(false);
+					}
+					else
+					{
+						this->read_population_from_database(true);
+					}
 				} 
 				else
 				{
