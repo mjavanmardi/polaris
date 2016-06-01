@@ -36,7 +36,6 @@ namespace Link_Components
 		{
 			int start_time;
 			int end_time;
-
 			float link_travel_time;
 			float link_travel_time_standard_deviation;
 			float link_queue_length;
@@ -357,18 +356,39 @@ namespace Link_Components
 				_link_supply = max(0.0,(double)link_available_spaces);
 
 				float current_link_capacity = 0.0;
-				float capacity_adjustment = 1.0;
+				float capacity_adjustment_factor = 1.0;
+				float capacity_adjustment  = 0;
+
+
+				if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<double>()  && _link_origin_vehicle_queue.size() > 0)
+					{
+						int n_cacc = 0;
+						_Vehicle_Interface* vehicle;
+						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
+						{
+							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
+							std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
+							n_cacc += (cav.compare("CACC")==0);
+							//auto type = v->getType()->getCav();
+						}
+						capacity_adjustment = 0.1*n_cacc;
+					}
+
+
 
 				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
+					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
+
 				}
 				else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_arterial<double>();
+					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_arterial<double>();
+					
 				}
 
-				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment;
+				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment_factor;
+				current_link_capacity +=  capacity_adjustment;
 
 				_link_capacity = current_link_capacity;
 			}
