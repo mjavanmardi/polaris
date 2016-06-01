@@ -24,6 +24,8 @@ namespace Demand_Components
 			
 			m_container(std::vector<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
+			m_container(std::vector<typename MasterType::vehicle_characteristics_type*>, vehicle_types_container, NONE, NONE);
+
 			m_data(int, first_vehicle_departure_time, NONE, NONE);
 
 			m_data(int, last_vehicle_departure_time, NONE, NONE);

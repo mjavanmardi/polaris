@@ -658,7 +658,7 @@ namespace Person_Components
 				trip_rec.setStart(move->template departed_time<Time_Seconds>());
 				trip_rec.setTour(0);
 				trip_rec.setPriority(0);
-				trip_rec.setVehicle(9);
+//				trip_rec.setVehicle(9);
 				trip_rec.setType(1);
 					
 

@@ -71,6 +71,7 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<M> vehicle_characteristics_type;
 	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
 	#endif
 
@@ -167,6 +168,8 @@ struct MasterType
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef polaris::io::Household hh_db_rec_type; // these represent the type of database record to write - use Household/Person for writing to Demand or Synthetic_Household/Person for writing to Popsyn only
 	typedef polaris::io::Person person_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -438,15 +441,14 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
-	if (scenario->read_demand_from_database<bool>())
-	{
-		typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
-		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-		demand->scenario_reference<_Scenario_Interface*>(scenario);
-		demand->network_reference<_Network_Interface*>(network);
-		cout << "reading external demand data..." <<endl;
-		demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	}
+	typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	demand->scenario_reference<_Scenario_Interface*>(scenario);
+	demand->network_reference<_Network_Interface*>(network);
+	cout << "reading external demand data..." <<endl;
+	demand->read_vehicle_type_data<NT>();
+	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	
 	
 
 	//==================================================================================================================================
