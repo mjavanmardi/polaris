@@ -10,6 +10,22 @@ can be reused by application developers.
 
 The project is distributed under BSD liense.
 
+Tool Chains
+===========
+
+Linux
+-----
+* git
+* cmake 3.2.2 or newer (3.5.2 recommended)
+* gcc 5.1.0 or newer
+
+Windows
+-------
+* git
+* cmake 3.2.2 or newer (3.5.2 recommended)
+* python 2.7.11 x86 with additional 'requests' package installed
+* Visual Studio 2015 (Update 2 recommended)
+
 POLARIS Dependencies
 ====================
 The dependecies can be downloaded and built using scripts. You MUST set the POLARIS_DEPS_DIR environment variable before you download and build the dependencies.
@@ -48,10 +64,12 @@ Here is the list of dependencies:
 * libodb-sqlite-2.4.0
 * sqlite3 (3.11.1)
 
+The script get-deps.cmd requires Python. It is known to work with Python 2.7.11 32 bit version. It also requirs the "requests" package ('pip install requests').
+
 There is a convenience polaris_env.bat script that appends all of the paths with necessary dlls to the PATH varaible so those can be found when you run an application. Please note that the batch file MUST be copied to 
 the directory where you wish to have you dependecies. The environment is only good for that command shell.
 
-Example: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+Example: (NOTE: this should be performed in a Visual Studio x64 Native Tools Command Shell)
 -- NOTE:
 	get-deps.cmd now locates the proper Visual Studio installation and set it up - so no longer REQUIRES the tools command shell.
 
@@ -65,9 +83,9 @@ Example: (NOTE: this should be performed in a Visual Studio Native Tools Command
 Then run the sript to download, extract and build the dependencies:
 
 	cd pT1/polarisdeps
-	get_deps.cmd
+	get-deps.cmd
 	--or optionally
-	get_deps.cmd c:\opt\polarisdeps_vs2015
+	get-deps.cmd c:\opt\polarisdeps_vs2015
 	
 This may take a while so be patient.
 
@@ -101,9 +119,9 @@ The argument to the configure script will ovrride the environment variable.
 	git clone "https://github.com/anl-polaris/polaris.git" pT1
 	cd pT1
 	git checkout T-1
-	configure_polaris.cmd 
+	configure-polaris.cmd 
 	or
-	configure_polaris.cmd c:\opt\polarisdeps
+	configure-polaris.cmd c:\opt\polarisdeps
 	cd build_vs2015
 
 Open Visual Studio:
@@ -114,6 +132,11 @@ Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools 
 
 	msbuild polaris.sln /p:Configuration=Debug /p:Platform=x64
 	msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
+	-- or
+	build-polaris.cmd
+	
+Or combine the configuration and build steps into one:
+	configure-and-build-polaris.cmd c:\opt\polarisdeps
 	
 Execution binary for debug is located in pT1\build_vs2015\bin\Debug
 Execution binary for release is located in pT1\build_vs2015\bin\Release
