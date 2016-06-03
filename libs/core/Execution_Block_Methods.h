@@ -107,7 +107,14 @@ namespace polaris
 			// Start from the "middle", provided cell may be before or after the first free cell
 			DataType* current_cell = (DataType*)_first_free_cell;
 
-			if (((Byte*)cell) < _first_free_cell)
+			if (Full())
+			{
+				// block is fully allocated - so set first free cell to this one
+
+				_first_free_cell = (Byte*)cell;
+				((DataType*)_first_free_cell)->_next_free_cell = nullptr;
+			}
+			else if (((Byte*)cell) < _first_free_cell)
 			{
 				// cell exists before the first free cell, it becomes ffc and previous ffc links to this cell
 
@@ -118,7 +125,7 @@ namespace polaris
 			{
 				// cell exists after the first free cell, forward scan the list to find where it fits
 
-				while (((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
+				while (current_cell->_next_free_cell && ((Byte*)cell) > current_cell->_next_free_cell) current_cell = (DataType*)current_cell->_next_free_cell;
 
 				// link cell to the cell after it in the free list (current_cell), link that cell to cell
 				cell->_next_free_cell = current_cell->_next_free_cell;

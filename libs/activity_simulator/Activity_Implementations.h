@@ -447,7 +447,7 @@ namespace Activity_Components
 
 				// Free this when able
 				// %%%RLW - need to figure out why first free is set to null
-				//Free<ComponentType>((ComponentType*)this);
+				Free<ComponentType>((ComponentType*)this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)
