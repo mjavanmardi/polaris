@@ -8,6 +8,7 @@
 
 #ifdef CONCEPTS
 #include "core.h"
+//#include "Network_Prototype.h"
 #include <type_traits>
 using namespace std;
 
@@ -51,13 +52,15 @@ prototype struct Link
 //	accessor(network_reference, NONE, NONE);
 //	accessor(link_type, NONE, NONE);
 //	accessor(turn_movements_container, NONE, NONE);
-	accessor(upstream_intersection, NONE, NONE);
+//	accessor(upstream_intersection, NONE, NONE);
 //	accessor(downstream_intersection, NONE, NONE);
 };
 
 struct MasterType
 {
 	typedef float turn_movement_type;
+	typedef int intersection_type;
+	typedef int link_type;
 };
 
 implementation struct Link_Implementation:public Polaris_Component<MasterType,INHERIT(Link_Implementation),Execution_Object>
@@ -69,80 +72,336 @@ implementation struct Link_Implementation:public Polaris_Component<MasterType,IN
 //	m_data(int, network_reference, NONE, NONE);
 //	m_data(int, link_type, NONE, NONE);
 //	m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
+
+	m_container(boost::container::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
+	m_container(boost::container::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
+
 	m_data(int, upstream_intersection, NONE, NONE);
 //	m_data(int, downstream_intersection, NONE, NONE);
+
+	//void read_data(Network_Components::Types::Network_IO_Maps& net_io_maps) {};
+	void read_data() {};
+	int read_data(const string& in) {};
+
+	///*template<typename TargetType>*/ void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
+	/*template<typename TargetType>*/ void read_network_data()
+	{
+		//_db_reader = Allocate<typename remove_pointer<type_of(db_reader)>::type>();
+		//typedef Prototypes::Network_DB_Reader<typename remove_pointer<type_of(db_reader)>::type> _DB_Interface;
+		//_DB_Interface* db = (_DB_Interface*)_db_reader;
+		//db->template network_reference<ComponentType*>((ComponentType*)this);
+
+		//db->template read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
+	}
 };
 
-template<typename TypeChecked>
-struct has_upstream_intersection_procedure
+template<typename, typename T>
+struct has_read_data {
+	static_assert(
+		std::integral_constant<T, false>::value,
+		"Second template parameter needs to be of function type.");
+};
+
+// specialization that does the checking
+
+template<typename C, typename Ret, typename... Args>
+struct has_read_data<C, Ret(Args...)> {
+private:
+	template<typename T>
+	static constexpr auto check_it(T*)
+		-> typename
+		std::is_same<
+		decltype(std::declval<T>().read_data(std::declval<Args>()...)),
+		Ret    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		>::type;  // attempt to call it and see if the return type is correct
+
+	template<typename>
+	static constexpr std::false_type check_it(...);
+
+	typedef decltype(check_it<C>(0)) type;
+
+public:
+	static constexpr bool value = type::value;
+};
+
+#define check_accessor_name_new(CHECK_ALIAS,NAME)\
+		template<typename TypeChecked>\
+		struct CHECK_ALIAS##_procedure\
+		{\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template NAME<NT*>)>::value>::type* = nullptr)\
+			{return 1;}\
+			\
+			template<typename _V>\
+			constexpr static bool has_matching_named_member(...)\
+			{\
+				return 0;\
+			}\
+			\
+			static const bool value = has_matching_named_member<TypeChecked>(0);\
+		};\
+		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+#define check_method_name_new(CHECK_ALIAS,NAME)\
+	template<typename TypeChecked>\
+	struct CHECK_ALIAS##_procedure\
+	{\
+		template<typename _U>\
+		struct function_check\
+		{\
+			template<typename _V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&_V::NAME)>::type);\
+			template<typename _V> static large_type has_matching_named_member(...);\
+			\
+			template<typename _V,bool _P>\
+			struct form_check{\
+				__pragma( message("check_method_name_new can't find " #CHECK_ALIAS "::" #NAME ))\
+				static const bool value = false;\
+			};\
+			\
+			template<typename _V>\
+			struct form_check<_V,true>{ static const bool value = true; };\
+			\
+			static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+			static const bool value = form_check<_U,performcheck>::value;\
+		};\
+		\
+		static const bool value = function_check<TypeChecked>::value;\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+#define check_method_decl(CHECK_ALIAS,NAME, TEMPL_TYPE, Ret, Args)\
+	template<typename, typename TypeChecked>\
+	struct CHECK_ALIAS##_procedure {\
+		static_assert(\
+			std::integral_constant<TypeChecked, false>::value,\
+				"Second template parameter needs to be of function type.");\
+	};\
+	template<typename TypeChecked, typename Ret, typename... Args>\
+	struct CHECK_ALIAS##_procedure<TypeChecked, Ret(Args...)> {\
+	private:\
+		template<typename T>\
+		static constexpr auto checkit(T*)\
+			-> typename\
+			std::is_same<\
+			decltype(std::declval<T>().NAME<TEMPL_TYPE>(std::declval<Args>()...)),\
+			Ret\
+			>::type;\
+		template<typename>\
+		static constexpr std::false_type checkit(...);\
+		typedef decltype(checkit<TypeChecked>(0)) type;\
+	public:\
+		static constexpr bool value = type::value;\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+//template<typename TypeChecked>\
+//	struct CHECK_ALIAS##_procedure\
+//	{\
+//		template<typename _U>\
+//		struct function_check\
+//		{\
+//			template<typename _V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&_V::NAME)>::type);\
+//			template<typename _V> static large_type has_matching_named_member(...);\
+//			\
+//			template<typename _V,bool _P>\
+//			struct form_check{\
+//				__pragma( message("check_method_name_new can't find " #CHECK_ALIAS "::" #NAME ))\
+//				static const bool value = false;\
+//			};\
+//			\
+//			template<typename _V>\
+//			struct form_check<_V,true>{ static const bool value = true; };\
+//			\
+//			static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+//			static const bool value = form_check<_U,performcheck>::value;\
+//		};\
+//		\
+//		static const bool value = function_check<TypeChecked>::value;\
+//	};\
+//	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+
+
+concept struct Is_Network_Compliant
 {
-//	template<typename _V>
-//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::*)())&_V::template upstream_intersection<NT*>)>::value>::type* = nullptr)
-//	{return 1;}
-//
-//	template<typename _V>
-//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
-//	{return 1;}
-
-//	template<typename _V>
-//	constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((_V*)nullptr)->template upstream_intersection<NT*>()),NT*>::value>::type* = nullptr)
-//	{return 1;}
-
-	template<typename _V>
-	constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((typename _V::Component_Type*)nullptr)->template upstream_intersection<NT*>()),NT*>::value>::type* = nullptr)
-	{return 1;}
-
-//	template<typename _V>
-//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
-//	{return 1;}
-
-	template<typename _V>
-	constexpr static bool has_matching_named_member(...)
-	{return 0;}
-
-	static const bool value = has_matching_named_member<TypeChecked>(0);
+	check_component_accessor_name(has_intersections, intersections_container);
+	check_component_accessor_name(has_links, links_container);
+	check_component_accessor_name(has_read_function, read_network_data);
+	check_component_accessor_name(has_read_data, read_data);
+	check_component_accessor_name(has_upstream_intersection, upstream_intersection);
+	//check_method_decl(has_read_member, read_data, int, void, const std::string&);
+	define_sub_check(is_basic_network, has_intersections && has_links /*&& has_read_member && has_read_function*/);
+	define_default_check(is_basic_network);
+//	define_default_check(has_upstream_intersection);
 };
+
+//	template<typename TypeChecked>
+//	struct has_upstream_intersection_procedure
+//	{
+//		//	template<typename _V>
+//		//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::*)())&_V::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//		//	{return 1;}
+//		//
+//		//	template<typename _V>
+//		//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//		//	{return 1;}
+//
+//		//	template<typename _V>
+//		//	constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((_V*)nullptr)->template upstream_intersection<NT*>()),NT*>::value>::type* = nullptr)
+//		//	{return 1;}
+//
+//		template<typename _V>
+//		constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((typename _V::Component_Type*)nullptr)->template upstream_intersection<NT*>()), NT*>::value>::type* = nullptr)
+//		{
+//			return 1;
+//		}
+//
+//		//	template<typename _V>
+//		//	constexpr static bool has_matching_named_member(typename enable_if<is_member_function_pointer<decltype((NT* (_V::Component_Type::*)(void*))&_V::Component_Type::template upstream_intersection<NT*>)>::value>::type* = nullptr)
+//		//	{return 1;}
+//
+//		template<typename _V>
+//		constexpr static bool has_matching_named_member(...)
+//		{
+//#pragma message("What? Something is missing...")
+//			return 0;
+//		}
+//
+//		static const bool value = has_matching_named_member<TypeChecked>(0);
+//
+//	};
+//
+//	//define_default_check(has_upstream_intersection_procedure);
+//
+//};
 
 //decltype((NT* (_V::Component_Type::*)())&_V::Component_Type::NAME<NT*>)
 
-#define check_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
-		template<typename TypeChecked>\
-		struct CHECK_ALIAS##_procedure\
-		{\
-			template<typename _V>\
-			constexpr static bool has_matching_named_member(typename enable_if<is_same<((_V*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
-			{return 1;}\
-			\
-			template<typename _V>\
-			constexpr static bool has_matching_named_member(...)\
-			{return 0;}\
-			\
-			static const bool value = has_matching_named_member<TypeChecked>(0);\
-		};\
-		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+//#define check_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
+//		template<typename TypeChecked>\
+//		struct CHECK_ALIAS##_procedure\
+//		{\
+//			template<typename _V>\
+//			constexpr static bool has_matching_named_member(typename enable_if<is_same<((_V*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
+//			{return 1;}\
+//			\
+//			template<typename _V>\
+//			constexpr static bool has_matching_named_member(...)\
+//			{return 0;}\
+//			\
+//			static const bool value = has_matching_named_member<TypeChecked>(0);\
+//		};\
+//		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+//
+//#define check_component_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
+//		template<typename TypeChecked>\
+//		struct CHECK_ALIAS##_procedure\
+//		{\
+//			template<typename _V>\
+//			constexpr static bool has_matching_named_member(typename enable_if<is_same<((typename _V::Component_Type*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
+//			{return 1;}\
+//			\
+//			template<typename _V>\
+//			constexpr static bool has_matching_named_member(...)\
+//			{return 0;}\
+//			\
+//			static const bool value = has_matching_named_member<TypeChecked>(0);\
+//		};\
+//		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
 
-#define check_component_accessor_name(CHECK_ALIAS,NESTED_TYPE,NAME)\
-		template<typename TypeChecked>\
-		struct CHECK_ALIAS##_procedure\
-		{\
-			template<typename _V>\
-			constexpr static bool has_matching_named_member(typename enable_if<is_same<((typename _V::Component_Type*)nullptr)->template NAME<NT*>(),NT*>::value>::type* = nullptr)\
-			{return 1;}\
-			\
-			template<typename _V>\
-			constexpr static bool has_matching_named_member(...)\
-			{return 0;}\
-			\
-			static const bool value = has_matching_named_member<TypeChecked>(0);\
-		};\
-		static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure<T>::value;
+template<typename, typename T>
+struct has_serialize {
+	static_assert(
+		std::integral_constant<T, false>::value,
+		"Second template parameter needs to be of function type.");
+};
+
+// specialization that does the checking
+
+template<typename C, typename Ret, typename... Args>
+struct has_serialize<C, Ret(Args...)> {
+private:
+	template<typename T>
+	static constexpr auto checkit(T*)
+		-> typename
+		std::is_same<
+		decltype(std::declval<T>().serialize(std::declval<Args>()...)),
+		Ret    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		>::type;  // attempt to call it and see if the return type is correct
+
+	template<typename>
+	static constexpr std::false_type checkit(...);
+
+	typedef decltype(checkit<C>(0)) type;
+
+public:
+	static constexpr bool value = type::value;
+};
+
+template <typename T>
+struct has_serialize_method
+{
+	struct dummy { /* something */ };
+
+	template <typename C, typename P>
+	static auto test(P * p) -> decltype(std::declval<C>().serialize(*p), std::true_type());
+
+	template <typename, typename>
+	static std::false_type test(...);
+
+	typedef decltype(test<T, dummy>(nullptr)) type;
+	static const bool value = std::is_same<std::true_type, decltype(test<T, dummy>(nullptr))>::value;
+};
+
+template<typename T>
+struct X {
+	int serialize(T t) { return 42; }
+};
+
+template<typename T>
+struct Y : X<T> {};
+
+template<typename Whatever>
+struct boom
+{
+	template <typename T>
+	void bam(const T& t)
+	{
+		/* something */
+	}
+};
+
+template <typename T>
+struct has_bam_method
+{
+	struct dummy { /* something */ };
+
+	template <typename C, typename P>
+	static auto test(P * p) -> decltype(std::declval<C>().bam(*p), std::true_type());
+
+	template <typename, typename>
+	static std::false_type test(...);
+
+	typedef decltype(test<T, dummy>(nullptr)) type;
+	static const bool value = std::is_same<std::true_type, decltype(test<T, dummy>(nullptr))>::value;
+};
+
 
 int main(int argc, char *argv[])
 {
+	static_assert(has_bam_method<boom<int>>::value, "has_bam_method not found!");
+	assert_check(boom<int>, has_bam_method, "has_bam_method not found again!");
+ 	static_assert(has_serialize<Y<string>, int(const std::string&)>::value, "has_serialize not found!");
+	//static_assert(has_serialize_method<Y<string>>::value, "has_serialize_method not found!");
+
 	typedef Link<Link_Implementation<MasterType>>* link_itf_ptr;
 	typedef Link<Link_Implementation<MasterType>> link_itf;
-//	typedef typename link_itf::Component_Type CType;
+	//using link_itf = Link<Link_Implementation<MasterType>>;
+	//	typedef typename link_itf::Component_Type CType;
 //	typedef NT* (CType::* bob_t)(void*);
+
+	//static_assert(has_read_data<Link_Implementation<MasterType>, void(Network_Components::Types::Network_IO_Maps&)>::value, "has_read_data not found!");
+	//static_assert(has_read_data<link_itf, void(Network_Components::Types::Network_IO_Maps& net_io_maps)>::value, "has_read_data not found using typedef!");
+	//static_assert(check_method_decl(has_read_data, read_data, int, (const std::string&)));
 
 	//NT (CType::* bob)();
 	//bob_t bob = &CType::template turn_movements_container<NT*>;
@@ -150,7 +409,11 @@ int main(int argc, char *argv[])
 	//decltype((NT (link_itf::*)())&strip_modifiers(link_itf_ptr)::Component_Type::template turn_movements_container<NT>) bob;
 
 	//static_assert(is_same<decltype(judge->template upstream_intersection<NT>()),NT>::value,"Fail!");
-	static_assert(check(strip_modifiers(link_itf_ptr),has_upstream_intersection_procedure),"Fail!");
+	assert_check(link_itf, Is_Network_Compliant<link_itf>::has_upstream_intersection_procedure, "Fail! - 'has_upstream_intersection_procedure' not found");
+	//assert_check(link_itf, Is_Network_Compliant, "Wait! What?");
+	static_assert(check_stripped_type(link_itf, Is_Network_Compliant), "Wait! What?");
+	//static_assert(check_stripped_type(link_itf, Is_Network_Compliant), "Fail! - 'has_upstream_intersection_procedure' not found");
+	//static_assert(check(strip_modifiers(link_itf_ptr),has_upstream_intersection_procedure),"Fail! - 'has_upstream_intersection_procedure' not found");
 
 	//bob_t bob = &link_itf::Component_Type::template upstream_intersection<NT*>;
 	//decltype((NT* (link_itf::Component_Type*)(void*))&link_itf::Component_Type::template upstream_intersection<NT*>) bob;

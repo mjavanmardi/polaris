@@ -189,32 +189,32 @@ namespace Movement_Plan_Components
 			typedef typename Movement_Plan_Implementation<MasterType, INHERIT(Movement_Plan_Record_Implementation)>::Component_Type ComponentType;
 
 // TODO: this does not compile
-//			// Initialize the record with an existing movement plan
-//			template<typename TargetType> void Initialize(TargetType movement_to_copy)
-//			{
-//				// get interface to the input parameter
-//				typedef Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
-//				movement_itf* move = (movement_itf*)movement_to_copy;
-//
-//				// interace to the movement plan trajectory
-//				typedef Prototypes::Trajectory_Unit<typename remove_pointer<typename movement_itf::get_type_of(trajectory_container)::value_type>::type> trajectory_itf;
-//				typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container),trajectory_itf*> trajectory_container_itf;
-//
-//				trajectory_container_itf* trajectory = move->trajectory_container<trajectory_container_itf*>();
-//
-//				// Extract the link pointer from the trajectory unit and store in the movement_plan_record trajectory container
-//				for (typename trajectory_container_itf::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
-//				{
-//					trajectory_itf* traj_unit = *itr;
-//					_trajectory_container.push_back(traj_unit->template link<typename MasterType::link_type*>());
-//				}
-//
-//				// copy valid movement at time of creation
-//				_valid_trajectory = move->template valid_trajectory<bool>();
-//
-//				// copy pointer to the activity reference from original movement plan
-//				_destination_activity_reference = move->template destination_activity_reference<destination_activity_reference_interface*>();
-//			}
+			// Initialize the record with an existing movement plan
+			template<typename TargetType> void Initialize(TargetType movement_to_copy)
+			{
+				// get interface to the input parameter
+				typedef Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
+				movement_itf* move = (movement_itf*)movement_to_copy;
+
+				// interace to the movement plan trajectory
+				typedef Prototypes::Trajectory_Unit<typename remove_pointer<typename movement_itf::get_type_of(trajectory_container)::value_type>::type> trajectory_itf;
+				typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container),trajectory_itf*> trajectory_container_itf;
+
+				trajectory_container_itf* trajectory = move->trajectory_container<trajectory_container_itf*>();
+
+				// Extract the link pointer from the trajectory unit and store in the movement_plan_record trajectory container
+				for (typename trajectory_container_itf::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+				{
+					trajectory_itf* traj_unit = *itr;
+					_trajectory_container.push_back(traj_unit->template link<typename MasterType::link_type*>());
+				}
+
+				// copy valid movement at time of creation
+				_valid_trajectory = move->template valid_trajectory<bool>();
+
+				// copy pointer to the activity reference from original movement plan
+				_destination_activity_reference = move->template destination_activity_reference<destination_activity_reference_interface*>();
+			}
 
 			m_prototype(Null_Prototype, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);

@@ -3,6 +3,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/timer/timer.hpp>
 #endif
+using namespace std;
 #include <boost/format.hpp>
 //#include <chrono>
 #include "myAgent.h"

@@ -17,7 +17,8 @@ namespace PopSyn
 			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			// Initializers, with and without setting a network reference.  If the version without networktype is used the events which require network information are skipped
 			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			template<typename ScenarioType> void Initialize(ScenarioType scenario, requires(ScenarioType, check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
+			template<typename ScenarioType, requires(ScenarioType, check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data))>
+			void Initialize(ScenarioType scenario)
 			{
 				// Add references to other objects to the population synthesizer
 				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
@@ -63,12 +64,14 @@ namespace PopSyn
 
 				((ComponentType*)this)->template Load_Event<ComponentType>(&Popsyn_Event_Controller,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE);
 			}
-			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) && check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
+			template<typename NetworkType, typename ScenarioType> 
+			void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) && check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
 			{
 				this->template Initialize<ScenarioType>(scenario);
 				this->template network_reference<NetworkType>(network);
 			}
-			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) || !check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
+			template<typename NetworkType, typename ScenarioType, requires(NetworkType, !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) || !check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data))>
+			void Initialize(NetworkType network, ScenarioType scenario)
 			{
 				assert_check(NetworkType, Network_Components::Concepts::Is_Transportation_Network, "Error, the specified NetworkType is not a valid Transportation network.");
 				assert_check(ScenarioType, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data, "Error, the specified ScenarioType is not a valid Scenario reference.");
@@ -139,7 +142,7 @@ namespace PopSyn
 			}
 
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at Iteration = 0, timestep 1)
-			template<typename TargetType> bool Read_Input_Popsyn_Event(requires(TargetType,check_stripped_type(ComponentType,Concepts::Uses_Linker_File)))
+			template<typename TargetType, requires(TargetType,check_stripped_type(ComponentType,Concepts::Uses_Linker_File))> bool Read_Input_Popsyn_Event()
 			{
 				cout<<endl<<"====================================================="<<endl<<"Starting synthetic population generation:"<<endl;
 
@@ -281,12 +284,12 @@ namespace PopSyn
 
 				return true;
 			}
-			template<typename TargetType> bool Read_Input_Popsyn_Event(requires(TargetType,check_stripped_type(ComponentType,!Concepts::Uses_Linker_File)))
+			template<typename TargetType, requires(TargetType, check_stripped_type(ComponentType, !Concepts::Uses_Linker_File))> bool Read_Input_Popsyn_Event()
 			{
 				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
 			}
 			
-			template<typename NetworkType> bool Link_Zones_To_Network_Locations(requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, requires(NetworkType, check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network))> bool Link_Zones_To_Network_Locations()
 			{
 				//===============================================================================================================
 				// Fill zonal activity_locations boost::container::list from network reference
@@ -303,6 +306,7 @@ namespace PopSyn
 				typedef get_mapped_component_type(temporary_sample_collection_type)				temp_sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
 				typedef get_mapped_component_type(zone_collection_type)							zone_type;
+				//%%%RLW
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_container_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_itf)>  location_itf;
@@ -357,7 +361,9 @@ namespace PopSyn
 
 				return true;
 			}
-			template<typename NetworkType> bool Link_Zones_To_Network_Locations(requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+
+			template<typename NetworkType, requires(NetworkType, !check(NetworkType, Network_Components::Concepts::Is_Transportation_Network))>
+			bool Link_Zones_To_Network_Locations()
 			{
 				return false;
 			}
@@ -478,11 +484,13 @@ namespace PopSyn
 				cout <<endl<<endl<<"Total Households Synthesized: "<<uuid;
 				cout <<endl		 <<"Total Persons Synthesized: "<<counter<<endl<<endl;
 			}
-			template<typename HHItfType, typename ZoneItfType, typename NetworkItfType, typename ScenarioItfType> void Object_Initialization_Handler(long id, HHItfType hh, ZoneItfType zone, NetworkItfType network, ScenarioItfType scenario, requires(NetworkItfType, check(typename get_type_of(network_reference),Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename HHItfType, typename ZoneItfType, typename NetworkItfType, typename ScenarioItfType, requires(NetworkItfType, check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network))> 
+			void Object_Initialization_Handler(long id, HHItfType hh, ZoneItfType zone, NetworkItfType network, ScenarioItfType scenario)
 			{
 				hh->template Initialize<long,ZoneItfType, NetworkItfType, ScenarioItfType>(id, zone, network, scenario);
 			}
-			template<typename HHItfType, typename ZoneItfType, typename NetworkItfType, typename ScenarioItfType> void Object_Initialization_Handler(long id, HHItfType hh, ZoneItfType zone, NetworkItfType network, ScenarioItfType scenario, requires(NetworkItfType, !check(typename get_type_of(network_reference),Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename HHItfType, typename ZoneItfType, typename NetworkItfType, typename ScenarioItfType, requires(NetworkItfType, !check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network))> 
+			void Object_Initialization_Handler(long id, HHItfType hh, ZoneItfType zone, NetworkItfType network, ScenarioItfType scenario)
 			{
 			}
 			template<typename TargetType> void Write_Files_Event()			
@@ -1035,16 +1043,17 @@ namespace PopSyn
 				return name;
 			}
 
-			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType, requires(NetworkType, check(NetworkType, Network_Components::Concepts::Is_Transportation_Network))> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone)
 			{
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Household_Components::Prototypes::Household_Properties<strip_modifiers(HHType)::get_type_of(Static_Properties)> household_itf;
 
-				Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->template Static_Properties<household_itf*>(),zone);
+				//Fill_HH_Record<NT,household_itf*,ZoneType>(hh_rec,hh->template Static_Properties<household_itf*>(),zone);
+				Fill_HH_Record<NT, HHRecType, household_itf*, ZoneType>(hh_rec, hh->template Static_Properties<household_itf*>(), zone);
 			}
-			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			template<typename NetworkType, typename HHRecType, typename HHType, typename ZoneType, requires(NetworkType, !check(NetworkType, Network_Components::Concepts::Is_Transportation_Network))> void Fill_HH_Record(HHRecType hh_rec, HHType hh, ZoneType zone)
 			{
 				hh_rec->setPersons(hh->template Household_size<int>());
 				hh_rec->setWorkers(hh->template Number_of_workers<int>());
@@ -1073,7 +1082,8 @@ namespace PopSyn
 				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				typedef Person_Components::Prototypes::Person_Properties<strip_modifiers(PerType)::get_type_of(Static_Properties)> person_itf;
 
-				Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->template Static_Properties<person_itf*>(),zone);
+				//Fill_Person_Record<NT,person_itf*,ZoneType>(per_rec,person->template Static_Properties<person_itf*>(),zone);
+				Fill_Person_Record<NT, PerRecType, person_itf*, ZoneType>(per_rec, person->template Static_Properties<person_itf*>(), zone);
 				person->template person_record<shared_ptr<typename MasterType::person_db_rec_type>>(per_rec);
 			}
 			template<typename NetworkType, typename PerRecType, typename PerType, typename ZoneType> void Fill_Person_Record(PerRecType per_rec, PerType person, ZoneType zone, requires(NetworkType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))

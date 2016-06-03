@@ -81,7 +81,7 @@ namespace Depot_Components
 				this->template Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 				
 				////TODO
-//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
+				//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
 				using namespace polaris::io;
 				
 				std::shared_ptr<LinkList> link_list = instance.getLinks();
@@ -120,7 +120,7 @@ namespace Depot_Components
 				}
 
 				//TODO
-				//_depot_service = new polaris::Depot( instance );
+				_depot_service = new polaris::Depot( instance );
 			}
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;

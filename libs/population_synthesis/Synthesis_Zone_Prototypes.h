@@ -78,11 +78,14 @@ namespace PopSyn
 
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, IPU, etc. methods
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible))/* && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)*/))
+			template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType, Concepts::Is_IPF_Compatible) || check(ComponentType, Concepts::Is_IPU_Compatible))/* && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)*/)>
+			void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr)
 			{
 				this_component()->Select_Synthetic_Population_Units<TargetType>(Region_Sample_Ptr);
 			}
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType,Concepts::Is_IPF_Compatible) && !check(ComponentType,Concepts::Is_IPU_Compatible))/* || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))*/)))
+
+			template<typename TargetType, requires(TargetType, !(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType, Concepts::Is_IPF_Compatible) && !check(ComponentType, Concepts::Is_IPU_Compatible))/* || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))*/))>
+			void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr)
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				/*assert_check(TargetType, is_pointer,"Is not a pointer");*/
@@ -91,7 +94,8 @@ namespace PopSyn
 			
 			//===================================================================================================================================
 			// This method creates the actual agent object - if the popsyn is linked to a simulation, otherwise it returns nothing (use this for popsyns which only output the results)
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype)))
+			template<typename TargetType, requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype))>
+			void Create_Household(TargetType static_properties)
 			{
 				//=============================================================================================
 				#pragma region Define interfaces
@@ -103,7 +107,7 @@ namespace PopSyn
 				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> persons_itf;
 				typedef  Person_Components::Prototypes::Person<get_component_type(persons_itf)>  person_itf;
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Household_Components::Prototypes::Household_Properties <get_component_type(sample_itf)>  pop_unit_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <get_mapped_component_type(sample_itf)>  pop_unit_itf;
 				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef  Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				#pragma endregion
@@ -132,7 +136,9 @@ namespace PopSyn
 				}
 				household_container->push_back(hh);
 			}
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			
+			template<typename TargetType, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype))> 
+			void Create_Household(TargetType static_properties)
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				
@@ -144,7 +150,7 @@ namespace PopSyn
 
 				// interface to the ACS sample data classes
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Household_Components::Prototypes::Household_Properties <get_component_type(get_type_of(Sample_Data))>  pop_unit_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <get_mapped_component_type(get_type_of(Sample_Data))>  pop_unit_itf;
 				
 				
 				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
@@ -168,7 +174,9 @@ namespace PopSyn
 
 				household_container->push_back((household_itf*)static_properties);
 			}
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			
+			template<typename TargetType, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype))> 
+			void Create_Household(TargetType static_properties)
 			{
 				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");
 				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");

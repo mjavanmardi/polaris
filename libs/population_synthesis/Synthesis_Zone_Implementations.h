@@ -422,7 +422,8 @@ namespace PopSyn
 			typedef typename Polaris_Component<MasterType,INHERIT(Polaris_Synthesis_Zone_Implementation_Simple),Data_Object>::Component_Type ComponentType;		
 			typedef _Polaris_Synthesis_Zone_Implementation<MasterType> BaseType;
 
-			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same)))
+			template<typename InterfaceType, requires(InterfaceType, check_2(strip_modifiers(InterfaceType)::Component_Type, typename MasterType::household_static_properties_type, is_same))>
+			void Add_To_Synthetic_Distributions(InterfaceType unit, int count)
 			{
 				typedef Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type> linker_itf;
 
@@ -439,7 +440,9 @@ namespace PopSyn
 				// update the test distribution if applicable
 				if (unit->template Test_Index<int>() > 0) this->_Synthesized_Test_Marginal_Distribution(0,unit->template Test_Index<int>())+=count;
 			}
-			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same)))
+
+			template<typename InterfaceType, requires(InterfaceType, check_2(strip_modifiers(InterfaceType)::Component_Type, typename MasterType::person_static_properties_type, is_same))>
+			void Add_To_Synthetic_Distributions(InterfaceType unit, int count)
 			{
 				// Track the updates to the person distributions
 				if (this->_Synthesized_Person_Joint_Distribution.size()>0)
@@ -453,11 +456,12 @@ namespace PopSyn
 				}
 				if (unit->template Test_Index<int>() >= 0) this->_Synthesized_Test_Person_Marginal_Distribution(0,unit->template Test_Index<int>())+=count;
 			}
-			template<typename InterfaceType> void Add_To_Synthetic_Distributions(InterfaceType unit, int count, requires(InterfaceType,!check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same) && !check_2(strip_modifiers(InterfaceType),typename MasterType::household_static_properties_type,is_same)))
+
+			template<typename InterfaceType, requires(InterfaceType, !check_2(strip_modifiers(InterfaceType)::Component_Type, typename MasterType::person_static_properties_type, is_same) && !check_2(strip_modifiers(InterfaceType)::Component_TYpe, typename MasterType::household_static_properties_type, is_same))>
+			void Add_To_Synthetic_Distributions(InterfaceType unit, int count)
 			{
 				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::person_static_properties_type,is_same,"The object type is not the same as defined in MasterType::person_static_properties_type.");
 				assert_check_2(strip_modifiers(InterfaceType)::Component_Type,typename MasterType::household_static_properties_type,is_same,"The object type is not the same as defined in MasterType::household_static_properties_type.");
-
 			}
 
 			using_member(BaseType,Sample_Data);
@@ -595,7 +599,8 @@ namespace PopSyn
 			{
 				typedef Prototypes::Synthesis_Zone<ComponentType> this_itf;
 				typedef Pair_Associative_Container< type_of(Sample_Data)> sample_itf;
-				typedef Household_Components::Prototypes::Household_Properties <get_component_type(sample_itf)>  pop_unit_itf;
+				//%%%RLW
+				typedef Household_Components::Prototypes::Household_Properties <get_mapped_component_type(sample_itf)>  pop_unit_itf;
 				typedef Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
 				typedef Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				typedef Multidimensional_Random_Access_Array< type_of(Target_Joint_Distribution)> mway_itf;
@@ -622,6 +627,16 @@ namespace PopSyn
 
 					persons_remaining--;
 				}
+				//for (const auto& per : persons)
+				//{
+				//	// update joint distribution
+				//	if (mway_per.size()>0) mway_per[per->template Index<int>()] -= 1;
+
+				//	// Track the updates to the person distributions
+				//	pthis->template Add_To_Synthetic_Distributions<person_unit_itf*>(per);
+
+				//	persons_remaining--;
+				//}
 
 			}
 

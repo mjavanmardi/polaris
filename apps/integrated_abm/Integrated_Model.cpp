@@ -358,6 +358,7 @@ int main(int argc,char** argv)
 		{
 			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
+			//%%%RLW
 			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
 			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			tmc->Initialize<NT>();
@@ -372,13 +373,19 @@ int main(int argc,char** argv)
 	typedef Link<remove_pointer<_Network_Interface::get_type_of(links_container)::value_type>::type> _Link_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(links_container),_Link_Interface*> _Links_Container_Interface;
 
-	_Links_Container_Interface::iterator links_itr;
+	//_Links_Container_Interface::iterator links_itr;
 
-	for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
-		links_itr!=network->links_container<_Links_Container_Interface&>().end();
-		links_itr++)
+	//%%%RLW
+	//for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
+	//	links_itr!=network->links_container<_Links_Container_Interface&>().end();
+	//	links_itr++)
+	//{
+	//	((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
+	//}
+	for (const auto& link : network->links_container<_Links_Container_Interface&>())
 	{
-		((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
+		cout << "Link componentmanager = " << link->component_manager->name() << " - " << link->component_id << std::endl;
+		link->Initialize<NULLTYPE>();
 	}
 
 	cout << "initializing intersection agents..." <<endl;
@@ -388,13 +395,19 @@ int main(int argc,char** argv)
 	typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
 
-	_Intersections_Container_Interface::iterator intersections_itr;
+	//_Intersections_Container_Interface::iterator intersections_itr;
 
-	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
-		intersections_itr++)
+	//%%%RLW
+	//for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
+	//	intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
+	//	intersections_itr++)
+	//{
+	//	((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+	//}
+	for (const auto& intersection : network->intersections_container<typename MasterType::network_type::intersections_container_type&>())
 	{
-		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+		cout << "Intersection componentmanager = " << intersection->component_manager->name() << " - " << intersection->component_id << std::endl;
+		intersection->Initialize<NULLTYPE>();
 	}
 
 	cout << "initializing ramp metering agents..." <<endl;
@@ -405,11 +418,16 @@ int main(int argc,char** argv)
 
 	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
 
-	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
-		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
-		ramp_metering_itr++)
+	//for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
+	//	ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
+	//	ramp_metering_itr++)
+	//{
+	//	((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
+	//}
+	for (const auto& ramp : network->ramp_metering_container<_Ramp_Metering_Container_Interface&>())
 	{
-		((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
+		cout << "Ramp Metering componentmanager = " << ramp->component_manager->name() << " - " << ramp->component_id << std::endl;
+		ramp->Initialize<NULLTYPE>();
 	}
 
 	if (scenario->use_network_events<bool>())
@@ -533,6 +551,7 @@ int main(int argc,char** argv)
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
+// %%%RLW
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
 	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 

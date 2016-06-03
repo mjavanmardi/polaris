@@ -219,7 +219,7 @@ namespace Prototypes
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations)>  location_itf;
 			
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
 			
 
 			
@@ -287,7 +287,7 @@ namespace Prototypes
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations)>  location_itf;
 			
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
 
 			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> activity_container_itf;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(activity_container_itf)>  activity_itf;
@@ -405,7 +405,7 @@ namespace Prototypes
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations)>  location_itf;
 			
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
 
 			typedef Random_Access_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> activity_container_itf;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(activity_container_itf)>  activity_itf;
@@ -500,46 +500,46 @@ namespace Prototypes
 		}
 
 // TODO: does not compile (location_itf definition not found)
-//		template<typename TargetType> void Get_Event_Extents(TargetType event, boost::unordered::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
-//		{
-//			// interfaces
-//			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
-//			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-//			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
-//			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-//			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
-//
-//			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container)> trajectory_interface;
-//			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(trajectory_interface)> trajectory_unit_interface;
-//
-//			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
-//			typedef Link_Components::Prototypes::Link<get_component_type(links)>  link_itf;
-//
-//			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
-//			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations)>  location_itf;
-//
-//			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
-//			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
-//
-//
-//			// interface to event
-//			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
-//			weather_itf* my_event = (weather_itf*)event;
-//
-//			// does event affect destination link?
-//			links* affected_links = my_event->template affected_links<links*>();
-//			link_itf* affected_link;
-//			for (typename links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
-//			{
-//				affected_link = *itr;
-//				location_container_itf* locations = affected_link->template activity_locations<location_container_itf*>();
-//				if (locations->size() > 0)
-//				{
-//					location_itf* loc = locations->at(0);
-//					affected_indices.insert(loc->template zone<zone_itf*>()->template uuid<int>());
-//				}
-//			}
-//		}
+		template<typename TargetType> void Get_Event_Extents(TargetType event, boost::unordered::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		{
+			// interfaces
+			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+
+			typedef Random_Access_Sequence<typename movement_itf::get_type_of(trajectory_container)> trajectory_interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(trajectory_interface)> trajectory_unit_interface;
+
+			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+			typedef Link_Components::Prototypes::Link<get_component_type(links)>  link_itf;
+
+			typedef Random_Access_Sequence< typename link_itf::get_type_of(activity_locations)> locations;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations)>  location_itf;
+
+			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
+
+
+			// interface to event
+			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
+			weather_itf* my_event = (weather_itf*)event;
+
+			// does event affect destination link?
+			links* affected_links = my_event->template affected_links<links*>();
+			link_itf* affected_link;
+			for (typename links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
+			{
+				affected_link = *itr;
+				location_container_itf* locations = affected_link->template activity_locations<location_container_itf*>();
+				if (locations->size() > 0)
+				{
+					location_itf* loc = locations->at(0);
+					affected_indices.insert(loc->template zone<zone_itf*>()->template uuid<int>());
+				}
+			}
+		}
 		
 		//========================================================
 		// Pre-trip Replanning Functionality
@@ -622,7 +622,7 @@ namespace Prototypes
 			typedef Link_Components::Prototypes::Link<get_component_type(links)>  link_itf;
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();

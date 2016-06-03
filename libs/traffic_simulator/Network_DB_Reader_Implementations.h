@@ -940,6 +940,7 @@ namespace Network_Components
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename type_of(network_reference)::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
+				//%%%RLW - check into this again
 				//typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename type_of(network_reference)::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
 				//typedef  Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container), _Zone_Interface*> _Zones_Container_Interface;
 

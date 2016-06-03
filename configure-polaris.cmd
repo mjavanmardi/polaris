@@ -31,9 +31,9 @@ cd %BUILDDIR%
 
 :: get additional config setting - if build.cfg file exists
 SET var=
-IF EXIST build.cfg (
+IF EXIST ../build.cfg (
 	SETLOCAL EnableDelayedExpansion
-	FOR /f %%i in (build.cfg) DO (
+	FOR /f %%i in (../build.cfg) DO (
 	   SET var=!var!%%i 
 	)
 	echo !var!

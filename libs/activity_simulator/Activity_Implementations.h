@@ -149,19 +149,19 @@ namespace Activity_Components
 				}
 			}
 // TODO: does not compile
-//			// departure time feature - set by route_handler, =0 before the route is planned
-//			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
-//			{
-//				if (this->Route_Is_Planned<NT>())
-//				{
-//					_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
-//					return move->template departed_time<TargetType>(depart);
-//				}
-//				else
-//				{
-//					return this->template Start_Time<TargetType>();
-//				}
-//			}
+			// departure time feature - set by route_handler, =0 before the route is planned
+			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
+			{
+				if (this->Route_Is_Planned<NT>())
+				{
+					_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
+					return move->template departed_time<TargetType>(depart);
+				}
+				else
+				{
+					return this->template Start_Time<TargetType>();
+				}
+			}
 			
 			// Planning event time members
 			m_data(Revision,Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
@@ -242,29 +242,30 @@ namespace Activity_Components
 				pthis->Deletion_Time(obj->template Deletion_Time<Revision>());
 			}
 // TODO: does not compile
-//			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
-//			{
-//				Revision &start = this->Start_Time_Planning_Time<  Revision&>();
-//				Revision &dur = this->Duration_Planning_Time<  Revision&>();
-//				Revision &loc = this->Location_Planning_Time<  Revision&>();
-//				Revision & mode = this->Mode_Planning_Time<  Revision&>();
-//				Revision & persons = this->Involved_Persons_Planning_Time<  Revision&>();
-//				Revision &route = this->Route_Planning_Time<  Revision&>();
-//
-//				start._iteration = END;
-//				dur._iteration = END;
-//				loc._iteration = END;
-//				mode._iteration = END;
-//				persons._iteration = END;
-//				route._iteration = min(_iteration+1, (int)planning_time);
-//
-//				start._sub_iteration = 0;
-//				dur._sub_iteration = 0;
-//				loc._sub_iteration = 0;
-//				mode._sub_iteration = 0;
-//				persons._sub_iteration = 0;
-//				route._sub_iteration = 5;
-//			}
+			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				Revision &start = this->Start_Time_Planning_Time<  Revision&>();
+				Revision &dur = this->Duration_Planning_Time<  Revision&>();
+				Revision &loc = this->Location_Planning_Time<  Revision&>();
+				Revision & mode = this->Mode_Planning_Time<  Revision&>();
+				Revision & persons = this->Involved_Persons_Planning_Time<  Revision&>();
+				Revision &route = this->Route_Planning_Time<  Revision&>();
+
+				start._iteration = END;
+				dur._iteration = END;
+				loc._iteration = END;
+				mode._iteration = END;
+				persons._iteration = END;
+				route._iteration = min(_iteration+1, (int)planning_time);
+
+				start._sub_iteration = 0;
+				dur._sub_iteration = 0;
+				loc._sub_iteration = 0;
+				mode._sub_iteration = 0;
+				persons._sub_iteration = 0;
+				route._sub_iteration = 5;
+			}
+			
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
 				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
@@ -366,6 +367,7 @@ namespace Activity_Components
 					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
 					{
 						// get a free adult available for escort
+						//%%%RLW
 						_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 						// If no adults free and not school trip - cancel act
@@ -386,6 +388,7 @@ namespace Activity_Components
 					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
 					{
 						// get a free adult available for escort
+						//%%%RLW
 						_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 						// If no adults free, force trip to transit
@@ -443,8 +446,8 @@ namespace Activity_Components
 				move->Free_Movement();
 
 				// Free this when able
-				// %%%RLW
-				Free<ComponentType>((ComponentType*)this);
+				// %%%RLW - need to figure out why first free is set to null
+				//Free<ComponentType>((ComponentType*)this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)

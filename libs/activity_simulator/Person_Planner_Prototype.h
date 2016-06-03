@@ -109,7 +109,8 @@ namespace Person_Components
 				
 				
 				parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
-				parent->parent_itf::template Household<int>();
+				//%%%RLW - check this out: parent->parent_itf::template Household<int>();
+				parent->parent_itf::template Household<household_itf*>();
 				household_itf* household = nullptr;
 
 				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();

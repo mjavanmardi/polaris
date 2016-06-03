@@ -17,7 +17,7 @@ namespace Person_Components
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Activity_Generator_Implementation),Data_Object>::Component_Type ComponentType;
-			typedef typename ComponentType::Master_Type Master_Type;
+			typedef typename MasterType Master_Type;
 
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner,typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
@@ -37,8 +37,9 @@ namespace Person_Components
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 
+			//%%%RLW
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
 			typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
@@ -285,8 +286,9 @@ namespace Person_Components
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 
+			//%%%RLW
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef typename base_type::_Scheduler_Interface _Scheduler_Interface;
 
@@ -343,7 +345,8 @@ namespace Person_Components
 				//=========================================================================================================================
 				// Initialize person with at-home activity
 				At_Home_Activity_Plan* home_act = this->template Create_Home_Activity<NT>(act_count);
-				scheduler->template Update_Current_Activity(home_act);
+				//%%%RLW scheduler->template Update_Current_Activity(home_act);
+				scheduler->Update_Current_Activity(home_act);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 

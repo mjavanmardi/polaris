@@ -7,6 +7,10 @@
 
 namespace polaris
 {
+	#define __STR2__(x) #x
+	#define __STR1__(x) __STR2__(x)
+	#define __LOC__ __FILE__ "("__STR1__(__LINE__)")"
+
 	///----------------------------------------------------------------------------------------------------
 	/// General Definitions
 	///----------------------------------------------------------------------------------------------------
@@ -25,10 +29,17 @@ namespace polaris
 	#define strip_modifiers_nontemplate(TYPE) remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<TYPE>::type>::type>::type>::type
 
 	#define define_default_check(...) static const bool value=( __VA_ARGS__ ); typedef typename conditional<value,true_type,false_type>::type type;
-	#define define_sub_check(CHECK_ALIAS,...) static const bool CHECK_ALIAS=( __VA_ARGS__ );
+	#define define_sub_check(CHECK_ALIAS,...)\
+		/*__pragma( message(__LOC__ "define_sub_check " #CHECK_ALIAS))*/\
+		static const bool CHECK_ALIAS=( __VA_ARGS__ );
 
-	#define assert_default_check(TYPE_TO_TEST,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<TYPE_TO_TEST>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
-	#define assert_sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+	#define assert_default_check(TYPE_TO_TEST,CONCEPT_NAME,ERROR_MESSAGE)\
+		/*__pragma( message(__LOC__ "assert_default_check " #TYPE_TO_TEST #CONCEPT_NAME))*/\
+		static_assert(CONCEPT_NAME<TYPE_TO_TEST>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+
+	#define assert_sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE)\
+		/*__pragma( message(__LOC__ "assert_sub_check " #TYPE_TO_TEST #CONCEPT_NAME #SUB_CHECK_ALIAS))*/\
+		static_assert(CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
 	#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 	#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
@@ -46,14 +57,20 @@ namespace polaris
 
 	#define method_requires(...) char(*)[__VA_ARGS__]=NULL
 
-	#define check(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
+	#define check(TYPE_TO_TEST,CONCEPT_NAME)\
+		/*__pragma( message(__LOC__ "check " #TYPE_TO_TEST #CONCEPT_NAME))*/\
+		CONCEPT_NAME<TYPE_TO_TEST>::value
+
 	#define check_concat(TYPE_TO_TEST,CONCEPT_NAME_PREFIX,CONCEPT_NAME_SUFFIX) CONCEPT_NAME_PREFIX##CONCEPT_NAME_SUFFIX<TYPE_TO_TEST>::value
 	#define check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value
 
 	#define check_stripped_type(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
 	#define check_stripped_type_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<concat(strip_modifiers(TYPE_TO_TEST_1),strip_modifiers(TYPE_TO_TEST_2))>::value
 
-	#define sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS
+	#define sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS)\
+		/*__pragma( message(__LOC__ "sub_check " #TYPE_TO_TEST #CONCEPT_NAME #SUB_CHECK_ALIAS))*/\
+		CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS
+
 	#define sub_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS
 
 	#define null_requirement char(*)[1]=nullptr
@@ -340,11 +357,17 @@ namespace polaris
 	{\
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((_V*)nullptr)->template NAME<NT*>()),NT*>::value>::type* = nullptr)\
-		{return 1;}\
+		{\
+			/*__pragma( message(__LOC__ "check_accessor_name found " #CHECK_ALIAS "::" #NAME ))*/\
+			return 1;\
+		}\
 		\
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(...)\
-		{return 0;}\
+		{\
+			__pragma( message(__LOC__ ">>>>>>>>> check_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))\
+			return 0;\
+		}\
 		\
 		static const bool value = has_matching_named_member<TypeChecked>(0);\
 	};\
@@ -356,11 +379,17 @@ namespace polaris
 	{\
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(typename enable_if<is_same<decltype(((typename _V::Component_Type*)nullptr)->template NAME<NT*>()),NT*>::value>::type* = nullptr)\
-		{return 1;}\
+		{\
+			/*__pragma( message(__LOC__ "check_accessor_name found " #CHECK_ALIAS "::" #NAME ))*/\
+			return 1;\
+		}\
 		\
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(...)\
-		{return 0;}\
+		{\
+			__pragma( message(__LOC__ ">>>>>>>>> check_component_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))\
+			return 0;\
+		}\
 		\
 		static const bool value = has_matching_named_member<TypeChecked>(0);\
 	};\

@@ -207,12 +207,14 @@ namespace Network_Components
 			
 			//------------------------------------------------------------------------------------------------------------------
 
-			template<typename TargetType> void read_network_data(typename TargetType::ParamType data_source, requires(TargetType,check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
+			template<typename TargetType, requires(TargetType, check_2(typename TargetType::NetIOType, Types::ODB_Network, is_same) || check_2(typename TargetType::NetIOType, Types::File_Network, is_same) || check_2(typename TargetType::NetIOType, Types::Regular_Network, is_same))>
+			void read_network_data(typename TargetType::ParamType data_source)
 			{
 				this_component()->template read_network_data<TargetType>(data_source);
 			}
 			
-			template<typename TargetType> void read_realtime_network_data(typename TargetType::ParamType data_source, requires(TargetType,check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
+			template<typename TargetType, requires(TargetType, check_2(typename TargetType::NetIOType, Types::ODB_Network, is_same) || check_2(typename TargetType::NetIOType, Types::File_Network, is_same) || check_2(typename TargetType::NetIOType, Types::Regular_Network, is_same))>
+			void read_realtime_network_data(typename TargetType::ParamType data_source)
 			{
 				this_component()->template read_realtime_network_data<TargetType>(data_source);
 			}

@@ -91,7 +91,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 	
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
@@ -197,7 +197,9 @@ namespace Person_Components
 				
 				return (TargetType)u;				
 			}
-			template<typename TargetType> TargetType Calculate_Utility_For_Unknown_Location()
+
+			template<typename TargetType>
+			TargetType Calculate_Utility_For_Unknown_Location()
 			{		
 				// account for any VOT changes for this individual (i.e. from CAVS)
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -220,15 +222,15 @@ namespace Person_Components
 					walk_time_dif += 2.0;
 				}
 
-				
-
 				// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
-				if (origin_zone->template avg_ttime_transit<Time_Days>() < 1.0) utility = this->template Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
-				else return utility;
+				if (origin_zone->template avg_ttime_transit<Time_Days>() < 1.0)
+					//%%%RLW utility = this->template Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
+					utility = this->Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
+				else
+					return utility;
 
 				if (utility > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif)
 				
-
 				//cout << "O/D=unknown:"<<_previous_location->zone<_Zone_Interface*>()->uuid<int>() <<"/xxx";
 				//cout << ",Auto_TT:"<<origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>()<< ",Transit_TT:"<<origin_zone->avg_ttime_transit<Time_Minutes>();
 				//cout <<",Transit_wait:" << -1.0* wait_dif << ",transfer_time:"<<0;
@@ -286,6 +288,7 @@ namespace Person_Components
 			//	}
 			//	return (TargetType)utility;
 			//}
+
 			float Calculate_Utility_Value(float ivtt_dif, float wait_dif, float transfer_dif, float walk_time_dif, float cost_dif)
 			{
 				float utility;
@@ -413,7 +416,7 @@ namespace Person_Components
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 	
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container),int> _Zone_Ids_Interface;
 

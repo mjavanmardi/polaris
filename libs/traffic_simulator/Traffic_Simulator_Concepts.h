@@ -148,30 +148,30 @@ namespace Network_Components
 		{
 			check_component_accessor_name(has_intersections, intersections_container);
 			check_component_accessor_name(has_links, links_container);
-			check_component_accessor_name(has_read_function, read_network_data);
-			define_default_check(has_intersections && has_links && has_read_function);
+			//%%%RLW check_component_accessor_name(has_read_function, read_network_data);
+			define_default_check(has_intersections && has_links /*&& has_read_function*/);
 		};
 
 		concept struct Is_Basic_Network
 		{
 			check_accessor_name(has_intersections, intersections_container);
 			check_accessor_name(has_links, links_container);
-			check_accessor_name(has_read_function, read_network_data);
+			//%%%RLW check_accessor_name(has_read_function, read_network_data);
 
 			check_concept(is_basic_network_prototype, Is_Basic_Network_Prototype, T, V);
-			define_sub_check(is_basic_network, has_intersections && has_links && has_read_function);
+			define_sub_check(is_basic_network, has_intersections && has_links /*&& has_read_function*/);
 			define_default_check(is_basic_network || is_basic_network_prototype);
 		};
 		
 		concept struct Is_Transportation_Network_Prototype
 		{
 			// TODO: this check fails
-			static const bool value = true;
-//			check_concept(is_basic_network, Is_Basic_Network_Prototype, T, V);
-//			check_component_accessor_name(has_turns, turn_movements_container);
-//			check_component_accessor_name(has_locations, activity_locations_container);
-//			check_component_accessor_name(has_zones, zones_container);
-//			define_default_check(is_basic_network && has_turns && has_locations && has_zones);
+			//static const bool value = true;
+			check_concept(is_basic_network, Is_Basic_Network_Prototype, T, V);
+			check_component_accessor_name(has_turns, turn_movements_container);
+			check_component_accessor_name(has_locations, activity_locations_container);
+			check_component_accessor_name(has_zones, zones_container);
+			define_default_check(is_basic_network && has_turns && has_locations && has_zones);
 		};
 
 		concept struct Is_Transportation_Network

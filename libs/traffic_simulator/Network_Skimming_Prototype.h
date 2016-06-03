@@ -369,14 +369,18 @@ namespace Network_Skimming_Components
 				this_component()->template Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
-			template<typename NetworkType> void Initialize(NetworkType network_pointer, requires(NetworkType,check(NetworkType, is_pointer) && check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+
+			template<typename NetworkType, requires(NetworkType, check(NetworkType, is_pointer) && check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network_Prototype))>
+			void Initialize(NetworkType network_pointer)
 			{
 				// set the network references
 				this->template network_reference<NetworkType>(network_pointer);
 				
 				this->template Initialize<NT>();
 			}
-			template<typename NetworkType> void Initialize(NetworkType network_reference, requires(NetworkType,!check(NetworkType, is_pointer) || !check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+
+			template<typename NetworkType, requires(NetworkType, !check(NetworkType, is_pointer) || !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network_Prototype))>
+			void Initialize(NetworkType network_reference)
 			{
 				assert_check(NetworkType, is_pointer,"TargetType is not a pointer" );
 				assert_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
@@ -384,7 +388,8 @@ namespace Network_Skimming_Components
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
-			}			
+			}
+
 			template<typename TargetType> bool Update_Skim_Tables()
 			{
 				//// Update each modal_skim
@@ -528,8 +533,9 @@ namespace Network_Skimming_Components
 
 				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
+				//%%%RLW
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-				typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();

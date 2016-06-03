@@ -291,7 +291,7 @@ namespace GLOBALS
 		void Correlated_Rands(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
 		{
 			// TODO Normal_RNG not a member of GLOBALS
-			//GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
+			GLOBALS::Normal_RNG.template Correlated_Norms<TargetType>(correlated_random_values, Sigma);
 			
 			for (uint i=0; i<Sigma.num_rows();++i)
 			{

@@ -146,8 +146,8 @@ namespace Person_Components
 				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 
-					executed_acts[i].resize(20,0);
-					planned_acts[i].resize(20,0);
+					executed_acts[i].resize(Activity_Components::Types::ACTIVITY_TYPES::Last+1);
+					planned_acts[i].resize(Activity_Components::Types::ACTIVITY_TYPES::Last + 1);
 				}
 
 				// Initialize demand MOE file
@@ -307,7 +307,7 @@ namespace Person_Components
 				//----------------------------------------------------------
 				//==========================================================
 
-
+				//std::cout << "Incrementing executed_acts: thread_id=" << __thread_id << " Activity index=" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << std::endl;
 				executed_acts[__thread_id][act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
 			
 				// update travel time distributions
