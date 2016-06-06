@@ -61,7 +61,7 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		void Add_Edge( Input_Edge<Edge_Attributes_Type>* new_edge )
 		{
-			if(_input_edge_reference == nullptr) _input_edge_reference = new std::unordered_map<edge_id_type,void*>();
+			if(_input_edge_reference == nullptr) _input_edge_reference = new std::unordered_map<p_edge_id_type,void*>();
 			if(_ordered_input_edge_reference == nullptr) _ordered_input_edge_reference = new std::vector<void*>();
 
 			if(_input_edge_reference->count(new_edge->edge_id())){ THROW_EXCEPTION("Duplicate Edge Added: " << new_edge->edge_id()); }
@@ -151,7 +151,7 @@ namespace polaris
 		template<typename Edge_Attributes_Type>
 		Interactive_Graph< output_graph_type >* Compile_Graph()
 		{
-			_edge_reference = new std::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			_edge_reference = new std::unordered_map<p_edge_id_type,Edge<stored_edge_type>*>();
 			_ordered_edge_reference = new std::vector<Edge<stored_edge_type>*>();
 
 			_graph_size = Compute_Graph_Size<Edge_Attributes_Type>();

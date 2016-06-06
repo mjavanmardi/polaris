@@ -140,7 +140,6 @@ namespace Person_Components
 				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,23"<<endl;
 
 				// Initialize data count containers
-				num_acts.resize(24,0);
 				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 

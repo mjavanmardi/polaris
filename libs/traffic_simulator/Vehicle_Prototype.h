@@ -120,7 +120,7 @@ namespace Vehicle_Components
 			accessor(uuid, NONE, NONE);
 			accessor(internal_id, NONE, NONE);
 			accessor(movement_plan, NONE, NONE);
-			accessor(vehicle_information, NONE, NONE);
+			accessor(vehicle_characteristics, NONE, NONE);
 			accessor(traveler, NONE, NONE);
 			accessor(router, NONE, NONE);
 			accessor(distance_to_stop_bar, NONE, NONE);

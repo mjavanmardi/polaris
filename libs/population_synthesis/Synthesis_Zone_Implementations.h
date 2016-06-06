@@ -110,6 +110,9 @@ namespace PopSyn
 				// Call base initializer
 				_Synthesis_Zone_Base_Implementation<MasterType>::template Initialize<NT>();
 
+				//TODO: remove when done testing popsyn
+				cout << GLOBALS::Uniform_RNG.Next_Rand<double>() << endl;
+
 				// Create the dimension vectors for the hh and person distributions from linker
 				typename Target_Joint_Distribution_type::index_type dimensions_hh;
 				typename Target_Person_Joint_Distribution_type::index_type dimensions_per;

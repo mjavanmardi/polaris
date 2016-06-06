@@ -500,7 +500,7 @@ namespace Prototypes
 		}
 
 // TODO: does not compile (location_itf definition not found)
-		template<typename TargetType> void Get_Event_Extents(TargetType event, boost::unordered::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		template<typename TargetType> void Get_Event_Extents(TargetType event, std::unordered_set<int>& affected_indices, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;

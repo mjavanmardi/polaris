@@ -296,6 +296,7 @@ namespace Link_Components
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
+			typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename _Vehicle_Interface::get_type_of(vehicle_characteristics)> _Vehicle_Characteristics_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
 			typedef Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
@@ -368,8 +369,10 @@ namespace Link_Components
 						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
 						{
 							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
-							std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
-							n_cacc += (cav.compare("CACC")==0);
+							_Vehicle_Characteristics_Interface* veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
+							n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
+							//std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
+							//n_cacc += (cav.compare("CACC")==0);
 							//auto type = v->getType()->getCav();
 						}
 						capacity_adjustment = 0.1*n_cacc;
