@@ -21,7 +21,7 @@ struct MasterType
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
 	typedef polaris::io::Synthetic_Household hh_db_rec_type;
 	typedef polaris::io::Synthetic_Person person_db_rec_type;
-	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
+	typedef RNG_Components::Implementations::MT_Probability<MasterType> rng_type;
 	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;
 	typedef NULLTYPE network_type;
@@ -35,7 +35,6 @@ int main(int argc, char* argv[])
 	Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
-
 
 	//==================================================================================================================================
 	// Scenario initialization
@@ -82,6 +81,8 @@ int main(int argc, char* argv[])
 		GLOBALS::Normal_RNG.Set_Seed<int>();
 		GLOBALS::Uniform_RNG.Set_Seed<int>();
 	}
+	//TODO: remove when done testing popsyn
+	cout << GLOBALS::Uniform_RNG.Next_Rand<double>()<<endl;
 
 	//==================================================================================================================================
 	// Start population synthesis
