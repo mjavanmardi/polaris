@@ -38,7 +38,7 @@ namespace polaris
 		{
 			Execution_Component_Manager_Base::Initialize();
 
-			_blocks_with_free_cells = new boost::container::deque<Event_Block*>[num_sim_threads() + 1];
+			_blocks_with_free_cells = new std::deque<Event_Block*>[num_sim_threads() + 1];
 			_num_empty_blocks = new _atomic_counter[num_sim_threads() + 1]();
 
 			 // build objects which are rounded to the nearest cache line size for fastest possible striding
@@ -57,11 +57,11 @@ namespace polaris
 		virtual void Step( Revision& out_next_revision );
 
 		//boost::intrusive::list<Event_Block> _active_blocks;
-		boost::container::deque<Event_Block*> _active_blocks;
+		std::deque<Event_Block*> _active_blocks;
 
 		boost::intrusive::list<Event_Block> _queued_activated_blocks;
-		boost::container::deque<Event_Block*> _queued_deactivated_blocks;
-		boost::container::deque<Event_Block*>* _blocks_with_free_cells;
+		std::deque<Event_Block*> _queued_deactivated_blocks;
+		std::deque<Event_Block*>* _blocks_with_free_cells;
 
 		_atomic_counter* _num_empty_blocks;
 	};

@@ -37,7 +37,6 @@ namespace Link_Components
 		{
 			int start_time;
 			int end_time;
-
 			float link_travel_time;
 			float link_travel_time_standard_deviation;
 			float link_queue_length;
@@ -88,7 +87,7 @@ namespace Link_Components
 			m_data(float, length, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
 
 			m_data(Link_Components::Types::Link_Type_Keys, link_type, NONE, NONE);
 			
@@ -163,8 +162,8 @@ namespace Link_Components
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
 
-			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
 
 			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
@@ -179,28 +178,28 @@ namespace Link_Components
 		/// Containers of Cached Cumulative Vehicle Statistics
 		//------------------------------------------------------------------------------------------------------------------
 			
-			m_container(boost::container::vector<int>, cached_link_upstream_cumulative_vehicles_array, NONE, NONE);
-			m_container(boost::container::vector<int>, cached_link_downstream_cumulative_vehicles_array, NONE, NONE);
+			m_container(std::vector<int>, cached_link_upstream_cumulative_vehicles_array, NONE, NONE);
+			m_container(std::vector<int>, cached_link_downstream_cumulative_vehicles_array, NONE, NONE);
 
 		//==================================================================================================================
 		/// Vehicle Origin Containers
 		//------------------------------------------------------------------------------------------------------------------
 			m_data(int, link_origin_vehicle_current_position, NONE, NONE);
-			//m_container(boost::container::vector<typename MasterType::vehicle_type*>, link_origin_vehicle_array, NONE, NONE);
-			m_container(boost::container::deque<typename MasterType::vehicle_type*>, link_origin_vehicle_queue, NONE, NONE);
+			//m_container(std::vector<typename MasterType::vehicle_type*>, link_origin_vehicle_array, NONE, NONE);
+			m_container(std::deque<typename MasterType::vehicle_type*>, link_origin_vehicle_queue, NONE, NONE);
 	
 		//==================================================================================================================
 		/// Current Vehicles Containers
 		//------------------------------------------------------------------------------------------------------------------
-			m_container(boost::container::vector<typename MasterType::vehicle_type*>, current_vehicle_queue, NONE, NONE);
+			m_container(std::vector<typename MasterType::vehicle_type*>, current_vehicle_queue, NONE, NONE);
 
 		//==================================================================================================================
 		/// Replicas Container
 		//------------------------------------------------------------------------------------------------------------------
 
 			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_link_type*>, replicas_container, NONE, NONE);
-			//m_container(boost::container::vector<typename MasterType::routable_link_type*>, realtime_replicas_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_link_type*>, replicas_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_link_type*>, realtime_replicas_container, NONE, NONE);
 
 		//==================================================================================================================
 		/// Replicas Containers
@@ -208,7 +207,7 @@ namespace Link_Components
 
 			m_prototype(Null_Prototype,typename MasterType::approach_type, approach, NONE, NONE);
 			m_data(int, link_num_vehicles_in_queue, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_container(boost::container::deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, NONE, NONE);
+			m_container(std::deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, NONE, NONE);
 			m_data(int, num_vehicles_on_link, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 			m_data(_lock,link_lock, NONE, NONE);
@@ -226,7 +225,7 @@ namespace Link_Components
 			struct Link_MOE_Data normal_day_link_moe_data;
 			struct Link_MOE_Data realtime_link_moe_data;
 
-			//boost::container::vector<struct Link_MOE_Data> td_link_moe_data_array;
+			//std::vector<struct Link_MOE_Data> td_link_moe_data_array;
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -279,7 +278,7 @@ namespace Link_Components
 
 			typedef typename MasterType::base_network_event_type base_network_event_type;
 			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
-			m_container(boost::container::vector<_Network_Event_Interface*>, advisory_radio_events, NONE, NONE);
+			m_container(std::vector<_Network_Event_Interface*>, advisory_radio_events, NONE, NONE);
 			
 
 		//==================================================================================================================
@@ -358,18 +357,39 @@ namespace Link_Components
 				_link_supply = max(0.0,(double)link_available_spaces);
 
 				float current_link_capacity = 0.0;
-				float capacity_adjustment = 1.0;
+				float capacity_adjustment_factor = 1.0;
+				float capacity_adjustment  = 0;
+
+
+				if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<double>()  && _link_origin_vehicle_queue.size() > 0)
+					{
+						int n_cacc = 0;
+						_Vehicle_Interface* vehicle;
+						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
+						{
+							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
+							std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
+							n_cacc += (cav.compare("CACC")==0);
+							//auto type = v->getType()->getCav();
+						}
+						capacity_adjustment = 0.1*n_cacc;
+					}
+
+
 
 				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_highway<double>();
+					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_highway<double>();
+
 				}
 				else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)
 				{
-					capacity_adjustment = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_arterial<double>();
+					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_arterial<double>();
+					
 				}
 
-				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment;
+				current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0) * capacity_adjustment_factor;
+				current_link_capacity +=  capacity_adjustment;
 
 				_link_capacity = current_link_capacity;
 			}
@@ -572,7 +592,7 @@ namespace Link_Components
 
 			template<typename TargetType> void link_moving()
 			{
-				typename boost::container::vector<typename MasterType::vehicle_type*>::iterator vehicle_itr;
+				typename std::vector<typename MasterType::vehicle_type*>::iterator vehicle_itr;
 
 				for(vehicle_itr=_current_vehicle_queue.begin();vehicle_itr!=_current_vehicle_queue.end();vehicle_itr++)
 				{
@@ -962,10 +982,10 @@ namespace Link_Components
 			{
 				if (_advisory_radio != nullptr)
 				{
-					boost::container::vector<_Network_Event_Interface*> events;
+					std::vector<_Network_Event_Interface*> events;
 					
 					_advisory_radio->template Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
-					typename boost::container::vector<_Network_Event_Interface*>::iterator event_itr;
+					typename std::vector<_Network_Event_Interface*>::iterator event_itr;
 					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
 					{
 						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);
@@ -978,10 +998,10 @@ namespace Link_Components
 			{
 				if (_variable_word_sign != nullptr)
 				{
-					boost::container::vector<_Network_Event_Interface*> events;
+					std::vector<_Network_Event_Interface*> events;
 					
 					_variable_word_sign->template Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
-					typename boost::container::vector<_Network_Event_Interface*>::iterator event_itr;
+					typename std::vector<_Network_Event_Interface*>::iterator event_itr;
 					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
 					{
 						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);

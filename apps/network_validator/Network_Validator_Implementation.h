@@ -212,7 +212,7 @@ namespace Network_Components
 				}
 
 				// If able to successfully update movement plan, then schedule routing
-				if (Update_Movement_Plan(orig,dest))_router->Schedule_Route_Computation(iteration());
+				if (Update_Movement_Plan(orig,dest))_router->Schedule_Route_Computation(iteration()+1);
 			}
 
 			template<typename TargetType> void Update_Validator()

@@ -240,21 +240,21 @@
 //{
 //	float x;
 //	float y;
-//	boost::container::vector<walk_data> nearby_stops;
-//	boost::container::list<stop_time_data*> outbound_transit_legs;
-//	//boost::container::list<stop_time_data*> outbound_walk_transit_legs;
+//	std::vector<walk_data> nearby_stops;
+//	std::list<stop_time_data*> outbound_transit_legs;
+//	//std::list<stop_time_data*> outbound_walk_transit_legs;
 //};
 //
-//boost::unordered::unordered_map< long long, unsigned int > stop_id_to_index;
+//std::unordered_map< long long, unsigned int > stop_id_to_index;
 //
-//boost::unordered::unordered_map< string, unsigned int > string_to_stop_index;
-//boost::unordered::unordered_map< string, unsigned int > string_to_trip_index;
+//std::unordered_map< string, unsigned int > string_to_stop_index;
+//std::unordered_map< string, unsigned int > string_to_trip_index;
 //
-//boost::unordered::unordered_map< unsigned int, string > stop_index_to_string;
-//boost::unordered::unordered_map< unsigned int, string > trip_index_to_string;
+//std::unordered_map< unsigned int, string > stop_index_to_string;
+//std::unordered_map< unsigned int, string > trip_index_to_string;
 //
-//boost::unordered::unordered_map< unsigned int, stop_data > stops;
-//boost::unordered::unordered_map< unsigned int, boost::container::vector<stop_time_data> > stop_times;
+//std::unordered_map< unsigned int, stop_data > stops;
+//std::unordered_map< unsigned int, std::vector<stop_time_data> > stop_times;
 //
 //void Read_Stops()
 //{
@@ -373,13 +373,13 @@
 //	float sum_nearby_stops = 0.0f;	
 //	float stop_counter = 0.0f;
 //
-//	for(boost::unordered::unordered_map<unsigned int,stop_data>::iterator itr = stops.begin(); itr != stops.end(); itr++)
+//	for(std::unordered_map<unsigned int,stop_data>::iterator itr = stops.begin(); itr != stops.end(); itr++)
 //	{
 //		const long long current_id = itr->first;
 //		const float current_x = itr->second.x;
 //		const float current_y = itr->second.y;
 //
-//		for(boost::unordered::unordered_map<unsigned int,stop_data>::iterator neighbor_itr = stops.begin(); neighbor_itr != stops.end(); neighbor_itr++)
+//		for(std::unordered_map<unsigned int,stop_data>::iterator neighbor_itr = stops.begin(); neighbor_itr != stops.end(); neighbor_itr++)
 //		{
 //			float neighbor_x_delta = abs(neighbor_itr->second.x - current_x);
 //			//neighbor_x_delta *= neighbor_x_delta;
@@ -433,10 +433,10 @@
 //
 //	bool skip_line = true;
 //
-//	boost::container::vector<stop_time_data>* current_stop_time = nullptr;
+//	std::vector<stop_time_data>* current_stop_time = nullptr;
 //
-//	boost::container::vector<stop_time_data> template_stops;
-//	boost::container::vector<stop_time_data>::iterator template_stops_itr;
+//	std::vector<stop_time_data> template_stops;
+//	std::vector<stop_time_data>::iterator template_stops_itr;
 //
 //	enum record_mode { NULL_MODE, STOP_MODE, ARRIVAL_MODE };
 //
@@ -611,12 +611,12 @@
 //
 //void Compute_Outbound_Trip_Options()
 //{
-//	for(boost::unordered::unordered_map<unsigned int,boost::container::vector<stop_time_data>>::iterator itr = stop_times.begin(); itr != stop_times.end(); itr++)
+//	for(std::unordered_map<unsigned int,std::vector<stop_time_data>>::iterator itr = stop_times.begin(); itr != stop_times.end(); itr++)
 //	{
 //		stop_time_data* current_stop_time = nullptr;
 //		stop_time_data* cached_stop_time = nullptr;
 //		
-//		for(boost::container::vector<stop_time_data>::iterator stop_times_itr = itr->second.begin(); stop_times_itr != itr->second.end(); stop_times_itr++)
+//		for(std::vector<stop_time_data>::iterator stop_times_itr = itr->second.begin(); stop_times_itr != itr->second.end(); stop_times_itr++)
 //		{
 //			// the last stop is not really an outbound connection, more of an endpoint
 //
@@ -650,7 +650,7 @@
 //{
 //	less<stop_time_data*> comparator;
 //
-//	for(boost::unordered::unordered_map< unsigned int, stop_data >::iterator itr = stops.begin(); itr != stops.end(); itr++)
+//	for(std::unordered_map< unsigned int, stop_data >::iterator itr = stops.begin(); itr != stops.end(); itr++)
 //	{
 //		itr->second.outbound_transit_legs.sort(comparator);
 //	}
@@ -674,7 +674,7 @@
 //
 //
 //	// scan all stops, create an edge for each one which has outbound trips
-//	for(boost::unordered::unordered_map<unsigned int,stop_data>::iterator itr = stops.begin(); itr != stops.end(); itr++)
+//	for(std::unordered_map<unsigned int,stop_data>::iterator itr = stops.begin(); itr != stops.end(); itr++)
 //	{
 //		// Fill input stop edge attributes
 //		input_stop_edge._x = itr->second.x;
@@ -684,7 +684,7 @@
 //		transit_edge_id linked_transit_edge;
 //
 //		// find the oubound transit legs corresponding to this stop
-//		for(boost::container::list<stop_time_data*>::iterator outbound_itr = itr->second.outbound_transit_legs.begin(); outbound_itr != itr->second.outbound_transit_legs.end(); outbound_itr++)
+//		for(std::list<stop_time_data*>::iterator outbound_itr = itr->second.outbound_transit_legs.begin(); outbound_itr != itr->second.outbound_transit_legs.end(); outbound_itr++)
 //		{
 //			// id for transit is a composite of which trip and when it departs
 //			linked_transit_edge.composite_id.trip_id = (*outbound_itr)->trip_id;
@@ -710,7 +710,7 @@
 //
 //		// find the nearby transit legs corresponding to this stop
 //
-//		for(boost::container::vector<walk_data>::iterator walk_itr = itr->second.nearby_stops.begin();walk_itr != itr->second.nearby_stops.end(); walk_itr++)
+//		for(std::vector<walk_data>::iterator walk_itr = itr->second.nearby_stops.begin();walk_itr != itr->second.nearby_stops.end(); walk_itr++)
 //		{
 //			// add this id, it will be linked upon graph compilation
 //			stop_to_stop_connection_group->_neighbors.push_back(walk_itr->dest_stop_id);
@@ -795,10 +795,10 @@
 //	unsigned int next_stop_id;
 //
 //	// scan stop times
-//	for(boost::unordered::unordered_map< unsigned int, boost::container::vector<stop_time_data> >::iterator itr = stop_times.begin(); itr != stop_times.end(); itr++)
+//	for(std::unordered_map< unsigned int, std::vector<stop_time_data> >::iterator itr = stop_times.begin(); itr != stop_times.end(); itr++)
 //	{
 //		// build one edge for each trip leg which represents the segment from one departure to another
-//		for(boost::container::vector<stop_time_data>::iterator stop_time_itr = itr->second.begin(); stop_time_itr != itr->second.end(); stop_time_itr++)
+//		for(std::vector<stop_time_data>::iterator stop_time_itr = itr->second.begin(); stop_time_itr != itr->second.end(); stop_time_itr++)
 //		{
 //			// peek ahead and, if available, log the "arrival" time for the purposes of adding the time cost
 //
@@ -892,10 +892,10 @@
 //
 //			// add the option to get off the bus and transfer to another trip at the same stop
 //
-//			//boost::container::list<stop_time_data*>* outbound_transit_trips = &stops[stop_time_itr->stop_id].outbound_transit_legs;
-//			boost::container::list<stop_time_data*>* outbound_transit_trips = &stops[next_stop_id].outbound_transit_legs;
+//			//std::list<stop_time_data*>* outbound_transit_trips = &stops[stop_time_itr->stop_id].outbound_transit_legs;
+//			std::list<stop_time_data*>* outbound_transit_trips = &stops[next_stop_id].outbound_transit_legs;
 //
-//			for(boost::container::list<stop_time_data*>::iterator stop_transfer_itr = outbound_transit_trips->begin(); stop_transfer_itr != outbound_transit_trips->end(); stop_transfer_itr++)
+//			for(std::list<stop_time_data*>::iterator stop_transfer_itr = outbound_transit_trips->begin(); stop_transfer_itr != outbound_transit_trips->end(); stop_transfer_itr++)
 //			{
 //				// skip the "ride on" connection, it has already been handled
 //
@@ -931,17 +931,17 @@
 //
 //			// add the option to get off the bus, walk to another stop, and transfer to another trip
 //
-//			//boost::container::vector<walk_data>* nearby_stops = &stops[stop_time_itr->stop_id].nearby_stops;
-//			boost::container::vector<walk_data>* nearby_stops = &stops[next_stop_id].nearby_stops;
+//			//std::vector<walk_data>* nearby_stops = &stops[stop_time_itr->stop_id].nearby_stops;
+//			std::vector<walk_data>* nearby_stops = &stops[next_stop_id].nearby_stops;
 //
-//			for(boost::container::vector<walk_data>::iterator nearby_itr = nearby_stops->begin(); nearby_itr != nearby_stops->end(); nearby_itr++)
+//			for(std::vector<walk_data>::iterator nearby_itr = nearby_stops->begin(); nearby_itr != nearby_stops->end(); nearby_itr++)
 //			{
 //				stop_data* nearby_stop = &stops[nearby_itr->dest_stop_id];
 //				
 //				// 2 mph in m/s - eventually this should probably be more agent-determined
 //				const float walk_time = nearby_itr->distance / 0.89408f;
 //
-//				for(boost::container::list<stop_time_data*>::iterator stop_transfer_itr = nearby_stop->outbound_transit_legs.begin(); stop_transfer_itr != nearby_stop->outbound_transit_legs.end(); stop_transfer_itr++)
+//				for(std::list<stop_time_data*>::iterator stop_transfer_itr = nearby_stop->outbound_transit_legs.begin(); stop_transfer_itr != nearby_stop->outbound_transit_legs.end(); stop_transfer_itr++)
 //				{
 //					//if(stop_time_itr->trip_id == 25980 /*&& arrival_time_to_next == 70283*/ && ((*stop_transfer_itr)->trip_id == 26370 || (*stop_transfer_itr)->trip_id == 26371)) cout << walk_time << "," << (*stop_transfer_itr)->time << "," << (*stop_transfer_itr)->trip_id << "," << arrival_time_to_next << endl;
 //					
@@ -1073,8 +1073,8 @@
 //
 //
 //
-//	//boost::unordered::unordered_map< unsigned int, string > stop_index_to_string;
-//	//boost::unordered::unordered_map< unsigned int, string > trip_index_to_string;
+//	//std::unordered_map< unsigned int, string > stop_index_to_string;
+//	//std::unordered_map< unsigned int, string > trip_index_to_string;
 //
 //	//cout << trip_index_to_string[26369] << "," << trip_index_to_string[26369] << endl;
 //
@@ -1116,7 +1116,7 @@
 //
 //	
 //	
-//	boost::container::deque<global_edge_id> path_container;
+//	std::deque<global_edge_id> path_container;
 //
 //	Routable_Agent_Implementation<MasterType> bob;
 //

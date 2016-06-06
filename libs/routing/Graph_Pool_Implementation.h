@@ -14,7 +14,7 @@ namespace polaris
 		typedef Base_Graph_Type base_graph_type;
 		typedef typename base_graph_type::base_edge_type base_edge_type;
 
-		boost::container::vector<base_edge_type*>* Get_Edges(p_graph_id_type gid)
+		std::vector<base_edge_type*>* Get_Edges(p_graph_id_type gid)
 		{
 			if( gid/*.graph_id*/ < _graphs.size() && gid/*.graph_id*/ >= 0 )
 			{
@@ -116,7 +116,7 @@ namespace polaris
 		}
 
 
-		boost::container::vector<void*> _graphs;
+		std::vector<void*> _graphs;
 
 		p_graph_id_type _num_graphs;
 	};

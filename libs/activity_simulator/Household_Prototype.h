@@ -51,9 +51,18 @@ namespace Prototypes
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, check(ComponentType, Concepts::Has_Initialize))> 
-		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+		template<typename IdType, typename NetworkRefType, typename ScenarioRefType,requires(ScenarioRefType,check(ComponentType,Concepts::Has_Initialize))>
+		void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 		{
+			this_component()->template Initialize< IdType, NetworkRefType, ScenarioRefType>(id, network_ref, scenario_ref);		
+		}
+		template<typename IdType, typename NetworkRefType, typename ScenarioRefType,requires(ScenarioRefType,!check(ComponentType,Concepts::Has_Initialize))>
+		void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		}
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, check(ComponentType, Concepts::Has_Initialize))> 
+		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)		{
 			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 			this->template Set_Home_Location<NT>();
 		}

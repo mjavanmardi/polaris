@@ -32,10 +32,10 @@ namespace Intersection_Components
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);

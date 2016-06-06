@@ -18,7 +18,7 @@ namespace Household_Components
 
 			//=================================================================
 			// Basic Person Characteristics Used in Popsyn algorithms
-			m_data(double,ID, NONE, NONE);
+			m_data(long long,ID, NONE, NONE);
 			m_data(double,Weight, NONE, NONE);
 			m_data(uint,Index, NONE, NONE);				//index into the joint-distribution matrix of the region (convert using region.get_index())
 			m_data(uint,Test_Index, NONE, NONE);		//index into the test marginal distribution for this household
@@ -36,7 +36,7 @@ namespace Household_Components
 			m_container(std::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Persons_Container, NONE, NONE);
 
 			// Characteristics setter
-			template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
+			template<typename TargetType> void Characteristics(std::vector<double>* data)
 			{
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 				typedef Prototypes::Household_Properties<ComponentType> this_itf;

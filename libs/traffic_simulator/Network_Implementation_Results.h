@@ -763,7 +763,7 @@ namespace Network_Components
 
 
 				string line;
-				boost::container::vector<string> tokens;
+				std::vector<string> tokens;
 
 				fstream& _analyze_link_groups_file = ((_Scenario_Interface*)_global_scenario)->template analyze_link_groups_file<fstream&>();
 				getline(_analyze_link_groups_file, line); // skip "number_of_groups" label
@@ -793,13 +793,13 @@ namespace Network_Components
 					for (int j = 0; j < (int)tokens.size(); j++)
 					{
 						int link_id = atoi(tokens[j].c_str());
-						boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+						std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
 
 						if(db_map.count(link_id))
 						{
-							boost::container::vector<typename MasterType::link_type*>& links=db_map[link_id];
+							std::vector<typename MasterType::link_type*>& links=db_map[link_id];
 
-							typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
+							typename std::vector<typename MasterType::link_type*>::iterator vitr;
 
 							for(vitr=links.begin();vitr!=links.end();vitr++)
 							{

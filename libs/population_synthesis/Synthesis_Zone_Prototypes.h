@@ -145,8 +145,8 @@ namespace PopSyn
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
 				typedef  Household_Components::Prototypes::Household_Properties<get_component_type(get_type_of(Synthetic_Households_Container))>  household_itf;
 				
-				typedef  Random_Access_Sequence<typename get_type_of(Synthetic_Persons_Container)> persons_itf;
-				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(get_type_of(Synthetic_Persons_Container))>  person_itf;
+				typedef  Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> persons_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<typename get_component_type(persons_itf)>  person_itf;
 
 				// interface to the ACS sample data classes
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
@@ -158,19 +158,19 @@ namespace PopSyn
 				
 
 				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<households_itf*>();
-				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
+				//persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 
-				// create new household using sample unit
-				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
-				person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
+				//// create new household using sample unit
+				//pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
+				//person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
 
-				// create new person agent from each person unit properties class in the hh unit properties class
-				typename person_sample_itf::iterator person_unit_itr = person_units->begin();
-				for (;person_unit_itr != person_units->end(); ++person_unit_itr)
-				{
-					person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
-					person_container->push_back((person_itf*)person);
-				}
+				//// create new person agent from each person unit properties class in the hh unit properties class
+				//typename person_sample_itf::iterator person_unit_itr = person_units->begin();
+				//for (;person_unit_itr != person_units->end(); ++person_unit_itr)
+				//{
+				//	person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
+				//	person_container->push_back((person_itf*)person);
+				//}
 
 				household_container->push_back((household_itf*)static_properties);
 			}

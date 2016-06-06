@@ -14,13 +14,11 @@ namespace Person_Components
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>::Component_Type ComponentType;
-
-			boost::container::vector<int> num_acts;
-			boost::container::vector<int>* planned_acts;
-			boost::container::vector<int>* executed_acts;
-			boost::container::vector<int>* ttime_distribution;
-			boost::container::vector<string>* output_data;
-			boost::container::vector<string>* output_data_buffer;
+			std::vector<int>* planned_acts;
+			std::vector<int>* executed_acts;
+			std::vector<int>* ttime_distribution;
+			std::vector<string>* output_data;
+			std::vector<string>* output_data_buffer;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
 
@@ -32,8 +30,8 @@ namespace Person_Components
 			int* num_acts_in_interval;
 
 
-			boost::container::vector<string>* buff;
-			boost::container::vector<string>* current;
+			std::vector<string>* buff;
+			std::vector<string>* current;
 
 
 			m_data(ofstream, log, NONE, NONE);
@@ -60,11 +58,11 @@ namespace Person_Components
 				this->_activity_time_lost = 0;
 
 				// initialize storage arrays
-				planned_acts = new boost::container::vector<int>[num_sim_threads()];
-				executed_acts = new boost::container::vector<int>[num_sim_threads()];
-				ttime_distribution = new boost::container::vector<int>[num_sim_threads()];
-				output_data = new boost::container::vector<string>[num_sim_threads()];
-				output_data_buffer = new boost::container::vector<string>[num_sim_threads()];
+				planned_acts = new std::vector<int>[num_sim_threads()];
+				executed_acts = new std::vector<int>[num_sim_threads()];
+				ttime_distribution = new std::vector<int>[num_sim_threads()];
+				output_data = new std::vector<string>[num_sim_threads()];
+				output_data_buffer = new std::vector<string>[num_sim_threads()];
 
 				//trip_records = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
 				//trip_records_buffer = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
@@ -139,10 +137,10 @@ namespace Person_Components
 				filename_acts << "executed_activities.csv";
 				this->_executed_acts_file.open(filename_acts.str());
 				if (!this->_executed_acts_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
-				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18"<<endl;
+				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,23"<<endl;
 
 				// Initialize data count containers
-				num_acts.resize(20,0);
+				num_acts.resize(24,0);
 				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 
@@ -360,7 +358,7 @@ namespace Person_Components
 				// swap buffer and current for output strings and trip records
 				if(sub_iteration() == 0)
 				{				
-					boost::container::vector<string>* tmp = pthis->buff;
+					std::vector<string>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
 
@@ -397,7 +395,7 @@ namespace Person_Components
 				{
 
 					// write out strings in the current buffer to log file and clear it
-					for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
+					for (std::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 					{
 						this->_log << '\n' << *itr;
 					}
@@ -467,6 +465,8 @@ namespace Person_Components
 					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 					if (scenario->template write_demand_to_database<bool>())
 					{
+						int count = 0;
+
 						try
 						{
 							odb::transaction t(this->_db_ptr->begin());
@@ -479,12 +479,15 @@ namespace Person_Components
 								unsigned long t_id = this->_db_ptr->persist(t);
 								a.setTrip (t_id);
 								this->_db_ptr->persist(a);
+								count++;
 							}
 							t.commit();
 						}
-						catch (odb::sqlite::database_exception ex)
+						catch (const odb::exception& e)
 						{
-							cout << ex.message()<<". DB error in person_data_logger_implementation, line 519."<<endl;
+							cout << e.what()<<". DB error in person_data_logger_implementation, line 519.  count="<<count<<endl;
+							pair<polaris::io::Trip,polaris::io::Activity> p = activity_records[i][count];
+							
 						}
 
 						// erase buffer
@@ -634,7 +637,7 @@ namespace Person_Components
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
 				trip_rec.setConstraint(0);
-				trip_rec.setPerson(person->template uuid<int>());
+				trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
 				trip_rec.setTrip(act->template Activity_Plan_ID<int>());
 				if (new_destination<0) trip_rec.setDestination(dest->template uuid<int>());
 				else trip_rec.setDestination(new_destination);
@@ -655,7 +658,7 @@ namespace Person_Components
 				trip_rec.setStart(move->template departed_time<Time_Seconds>());
 				trip_rec.setTour(0);
 				trip_rec.setPriority(0);
-				trip_rec.setVehicle(9);
+//				trip_rec.setVehicle(9);
 				trip_rec.setType(1);
 					
 
@@ -681,7 +684,7 @@ namespace Person_Components
 					act_rec.setMode ("TRANSIT");
 				act_rec.setType (act->template Get_Type_String<NT>());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
-				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
+				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
 

@@ -98,7 +98,7 @@ namespace Routing_Components
 		m_data(int,first_layer_id,NONE,NONE);
 		m_data(int,layer_step,NONE,NONE);
 
-		m_data(boost::container::vector<DataRecord>,layer_data,NONE,NONE);
+		m_data(std::vector<DataRecord>,layer_data,NONE,NONE);
 	};
 
 
@@ -151,7 +151,7 @@ namespace Routing_Components
 
 			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
 
-			static m_data(concat(boost::unordered::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
 
 			static void initialize_moe_data()
 			{
@@ -444,7 +444,7 @@ namespace Routing_Components
 			{
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
-				boost::container::deque< global_edge_id > path;
+				std::deque< global_edge_id > path;
 
 				global_edge_id start;
 
@@ -464,7 +464,7 @@ namespace Routing_Components
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -500,7 +500,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container, bool debug_route=false)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -537,7 +537,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& cost_container)
+			float compute_static_network_tree(unsigned int origin, std::vector<float>& cost_container)
 			{
 				Routable_Agent<typename MT::tree_agent_type> proxy_agent;
 
@@ -659,6 +659,6 @@ namespace Routing_Components
 		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_moe_data;
 
 		template<typename MasterType, typename InheritanceList>
-		boost::unordered::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
+		std::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
 	}
 }

@@ -62,19 +62,19 @@ namespace Trip_Components
 			typedef strip_modifiers(network_reference_type) network_itf;
 			typedef strip_modifiers(router_type) router_itf;
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-			typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
+			typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
 			typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_itf)> turn_itf;
+			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename router_itf::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
-			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 
-			//m_container(boost::container::vector<get_component_type(_Trajectory_Container_Interface)*>, result_trajectory, NONE,NONE);
-			m_container(boost::container::vector<_Trajectory_Unit_Interface*>, result_trajectory, NONE, NONE);
+			//m_container(std::vector<typename get_component_type(_Trajectory_Container_Interface)*>, result_trajectory, NONE,NONE);
+			m_container(std::vector<_Trajectory_Unit_Interface*>, result_trajectory, NONE, NONE);
 
 		};
 	}

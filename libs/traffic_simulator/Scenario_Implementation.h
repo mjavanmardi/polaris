@@ -19,6 +19,7 @@ namespace Scenario_Components
 			m_data(string, output_results_database_name, NONE, NONE);
 			m_data(string, output_demand_database_name, NONE, NONE);
 			m_data(string, output_popsyn_database_name, NONE, NONE);
+			m_data(string, input_popsyn_database_name, NONE, NONE);
 			m_data(string, historical_results_database_name, NONE, NONE);
 
 			m_data(int, simulation_interval_length, NONE, NONE);
@@ -48,6 +49,7 @@ namespace Scenario_Components
 
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
+			m_data(double, simulate_cacc,NONE,NONE);
 
 			m_data(double, cav_market_penetration, NONE, NONE);
 			m_data(double, cav_vott_adjustment, NONE, NONE);
@@ -98,6 +100,7 @@ namespace Scenario_Components
 
 			m_data(bool, calculate_realtime_moe, NONE, NONE);
 			
+			m_data(bool, read_population_from_database, NONE, NONE);
 			m_data(bool, read_demand_from_database, NONE, NONE);
 			m_data(bool, write_demand_to_database, NONE, NONE);
 			m_data(bool, write_activity_output, NONE, NONE);

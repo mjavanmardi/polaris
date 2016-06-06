@@ -25,7 +25,7 @@ namespace Network_Event_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::ComponentType ComponentType;
 			
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -33,7 +33,7 @@ namespace Network_Event_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -41,7 +41,7 @@ namespace Network_Event_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -53,7 +53,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				pair<string,string> key_value_pair;
 				
@@ -109,7 +109,7 @@ namespace Network_Event_Components
 			{
 				if(_active)
 				{
-					boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr;
+					std::vector<Link<typename MasterType::link_type>*>::iterator itr;
 
 					Link_Line_Segment* segments = new Link_Line_Segment[ _affected_links.size() ];
 					
@@ -155,7 +155,7 @@ namespace Network_Event_Components
 				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Initialize<weak_ptr<polaris::io::Event_Instance>&>(instance);
 			}
 
-			template<typename TargetType> void Initialize(int start_time, int end_time, boost::container::vector<typename MasterType::link_type*>& affected_links)
+			template<typename TargetType> void Initialize(int start_time, int end_time, std::vector<typename MasterType::link_type*>& affected_links)
 			{
 				InheritanceTemplate<MasterType,INHERIT(Base_Antares_Network_Event)>::Initialize<MasterType::link_type*>(start_time,end_time,affected_links);
 			}
@@ -192,7 +192,7 @@ namespace Network_Event_Components
 
 				if(pthis->_active)
 				{
-					boost::container::vector<Link<typename MasterType::link_type>*>::iterator itr;
+					std::vector<Link<typename MasterType::link_type>*>::iterator itr;
 
 					Link_Line_Segment* segments = new Link_Line_Segment[ pthis->_affected_links.size() ];
 					
@@ -301,7 +301,7 @@ namespace Network_Event_Components
 
 				const int* y_iterator = y_begin;
 
-				for(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++,x_iterator++,y_iterator++)
+				for(std::vector<pair<Point_3D<MasterType>,Colored_Particle>>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++,x_iterator++,y_iterator++)
 				{
 					if(drops_iterator == drops_end) drops_iterator=drops_begin;
 					if(x_iterator == x_end) x_iterator=x_begin;
@@ -330,7 +330,7 @@ namespace Network_Event_Components
 
 				Colored_Particle precipitation_particle;
 
-				for(boost::container::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
+				for(std::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
 				{
 					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
@@ -419,7 +419,7 @@ namespace Network_Event_Components
 				_particle_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			m_data(concat(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
+			m_data(concat(std::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
 
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,particle_layer, NONE, NONE);
 		};
@@ -465,7 +465,7 @@ namespace Network_Event_Components
 
 				//const int* drops_iterator = drops_begin;
 
-				//for(boost::container::vector<Colored_Particle>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++)
+				//for(std::vector<Colored_Particle>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++)
 				//{
 				//	if(drops_iterator == drops_end) drops_iterator=drops_begin;
 
@@ -516,7 +516,7 @@ namespace Network_Event_Components
 
 				const int* y_iterator = y_begin;
 
-				for(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++,x_iterator++,y_iterator++)
+				for(std::vector<pair<Point_3D<MasterType>,Colored_Particle>>::iterator itr=_precipitation_particles.begin();itr!=_precipitation_particles.end();itr++,drops_iterator++,x_iterator++,y_iterator++)
 				{
 					if(drops_iterator == drops_end) drops_iterator=drops_begin;
 					if(x_iterator == x_end) x_iterator=x_begin;
@@ -544,7 +544,7 @@ namespace Network_Event_Components
 
 				Colored_Particle precipitation_particle;
 
-				for(boost::container::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
+				for(std::vector<Link_Interface*>::iterator itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
 				{
 					Link<typename MasterType::link_type>* link = (Link<typename MasterType::link_type>*)(*itr);
 					
@@ -660,7 +660,7 @@ namespace Network_Event_Components
 				_particle_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			m_data(concat(boost::container::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
+			m_data(concat(std::vector<pair<Point_3D<MasterType>,Colored_Particle>>),precipitation_particles, NONE, NONE);
 
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,particle_layer, NONE, NONE);
 		};

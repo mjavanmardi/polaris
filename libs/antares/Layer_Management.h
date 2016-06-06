@@ -41,7 +41,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Toggle_Layer(int identif
 
 	int counter=0;
 
-	boost::container::list<Antares_Layer_Interface*>::iterator itr;
+	std::list<Antares_Layer_Interface*>::iterator itr;
 
 	for(itr=_layers.begin();itr!=_layers.end();++itr,++counter)
 	{
@@ -66,7 +66,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Select_Layer(int identif
 
 	int counter=0;
 
-	boost::container::list<Antares_Layer_Interface*>::iterator itr;
+	std::list<Antares_Layer_Interface*>::iterator itr;
 
 	for(itr=_layers.begin();itr!=_layers.end();++itr,++counter)
 	{

@@ -41,17 +41,17 @@ public:
 		   m_Ptr = NULL;
        }
 
-      m_array_iterator(T* data, boost::container::vector<size_type>* dim_sizes, boost::container::vector<size_type>* cursor)
+      m_array_iterator(T* data, std::vector<size_type>* dim_sizes, std::vector<size_type>* cursor)
        {	// copy constructor
 			_fixed_dim = -1;
 			_fixed_dim_val = -1;
-			_dimensions = (boost::container::vector<size_type>*)dim_sizes;
+			_dimensions = (std::vector<size_type>*)dim_sizes;
 			for (size_type i = 0; i< cursor->size(); i++) _cursor.push_back((*cursor)[i]);
 			m_Ptr = &data[get_index(_cursor)];
 			_data = data;
        }
 
-	  m_array_iterator(T* data, boost::container::vector<size_type>* dim_sizes, boost::container::vector<size_type>* cursor, size_type fixed_dimension_index, size_type fixed_dimension_value)
+	  m_array_iterator(T* data, std::vector<size_type>* dim_sizes, std::vector<size_type>* cursor, size_type fixed_dimension_index, size_type fixed_dimension_value)
        {	// copy constructor
 			_fixed_dim = fixed_dimension_index;
 			_fixed_dim_val = fixed_dimension_value;
@@ -138,19 +138,19 @@ public:
               return (!(m_Ptr == _Right.m_Ptr));
        }
 
-	const boost::container::vector<size_type>& get_index()
+	const std::vector<size_type>& get_index()
 	{
 		return _cursor;
 	}
 
 private:
 	T *m_Ptr;                                            // pointer to container value type
-	boost::container::vector<size_type>* _dimensions;								// dimensional sizes 
-	boost::container::vector<size_type> _cursor;
+	std::vector<size_type>* _dimensions;								// dimensional sizes 
+	std::vector<size_type> _cursor;
 	T * _data;
 	int _fixed_dim;
 	int _fixed_dim_val;
-	uint get_index(boost::container::vector<size_type>& index)
+	uint get_index(std::vector<size_type>& index)
 	{
 		uint ind=0;
 
@@ -185,10 +185,10 @@ public:
 	typedef int							difference_type;
 	typedef uint						size_type;
 	typedef const uint					const_size_type;
-	typedef boost::container::vector<size_type>			index_type;
-	typedef const boost::container::vector<size_type>&	const_index_type;
-	typedef const boost::container::vector<size_type>&	const_dimensional_type;
-	typedef const boost::container::vector<size_type>::iterator	dimensional_iterator;
+	typedef std::vector<size_type>			index_type;
+	typedef const std::vector<size_type>&	const_index_type;
+	typedef const std::vector<size_type>&	const_dimensional_type;
+	typedef const std::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[get_index(i)];}
@@ -234,7 +234,7 @@ public:
 	iterator		end() {return iterator();}
 	bool			empty(){ return (_size==0);}
 	void			clear(){_cleanup();}
-	void			resize(boost::container::vector<size_type> new_dimensions)
+	void			resize(std::vector<size_type> new_dimensions)
 	{
 		if (new_dimensions.size() == 0) return;
 
@@ -247,7 +247,7 @@ public:
 
 		for (itr; itr != this->end(); ++itr)
 		{
-			const boost::container::vector<size_type>& index = itr.get_index();
+			const std::vector<size_type>& index = itr.get_index();
 			if (tmp.valid_index(index))
 			{
 				size_type i = tmp.get_index(index);
@@ -257,7 +257,7 @@ public:
 			
 		}
 	}
-	void			resize(boost::container::vector<size_type> new_dimensions, value_type value)
+	void			resize(std::vector<size_type> new_dimensions, value_type value)
 	{
 		if (new_dimensions.size() == 0) return;
 
@@ -751,7 +751,7 @@ public:
 	typedef pair<size_type,size_type>	index_type;
 	typedef const index_type&			const_index_type;
 	typedef const index_type&			const_dimensional_type;
-	typedef const boost::container::vector<size_type>::iterator	dimensional_iterator;
+	typedef const std::vector<size_type>::iterator	dimensional_iterator;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[i];}

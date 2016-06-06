@@ -21,7 +21,7 @@ namespace polaris
 		virtual Input_Connection_Group* Create_Copy() = 0;
 
 		virtual p_graph_id_type neighbor_graph_id() = 0;
-		virtual boost::container::deque<p_edge_id_type>& neighbors() = 0;
+		virtual std::deque<p_edge_id_type>& neighbors() = 0;
 	};
 
 	prototype struct Connection;
@@ -62,7 +62,7 @@ namespace polaris
 
 		virtual size_t Connection_Group_Size( ){ return ( sizeof(connection_group_type) + sizeof(connection_type)*_neighbors.size() ); }
 
-		boost::container::deque<connection_attributes_type>& neighbor_attributes(){ return _neighbor_attributes; }
+		std::deque<connection_attributes_type>& neighbor_attributes(){ return _neighbor_attributes; }
 
 		virtual Input_Connection_Group* Create_Copy()
 		{
@@ -84,11 +84,11 @@ namespace polaris
 
 		virtual p_graph_id_type neighbor_graph_id(){ return _neighbor_graph_id; }
 		
-		virtual boost::container::deque<p_edge_id_type>& neighbors(){ return _neighbors; }
+		virtual std::deque<p_edge_id_type>& neighbors(){ return _neighbors; }
 
 		static p_graph_id_type _neighbor_graph_id;
-		boost::container::deque<p_edge_id_type> _neighbors;
-		boost::container::deque<connection_attributes_type> _neighbor_attributes;
+		std::deque<p_edge_id_type> _neighbors;
+		std::deque<connection_attributes_type> _neighbor_attributes;
 	};
 	//ADGE ATTRIBUTES TYPES HAS TO BE AN PLAIN old data (POD) so that the copy operation at line 116 works, otherwise need to define a copy operator
 	template<typename Connection_Group_Type>
@@ -106,7 +106,7 @@ namespace polaris
 
 			(*these_attributes) = (*original_attributes);
 
-			for(boost::container::deque<Input_Connection_Group*>::const_iterator itr = original._connection_groups.begin();itr!=original._connection_groups.end();itr++)
+			for(std::deque<Input_Connection_Group*>::const_iterator itr = original._connection_groups.begin();itr!=original._connection_groups.end();itr++)
 			{
 				Input_Connection_Group* neighbor_set_copy = (*itr)->Create_Copy();
 
@@ -121,7 +121,7 @@ namespace polaris
 			(*edge_attributes) = (*these_attributes);
 		}
 
-		t_object(boost::container::deque<Input_Connection_Group*>,connection_groups);
+		t_object(std::deque<Input_Connection_Group*>,connection_groups);
 	};
 
 

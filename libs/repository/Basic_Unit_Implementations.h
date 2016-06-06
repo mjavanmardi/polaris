@@ -63,6 +63,11 @@ namespace Basic_Units
 			typedef true_type Inches_tag;
 		};
 
+		implementation struct Acceleration_Implementation : public Speed_Implementation<MasterType,INHERIT(Acceleration_Implementation)>
+		{
+			typedef true_type Acceleration_tag; 
+		};
+
 		//================================================================================================
 		/// Basic Currency base clase.
 		implementation struct Currency_Implementation : public Polaris_Component<MasterType,INHERIT(Currency_Implementation),NT>

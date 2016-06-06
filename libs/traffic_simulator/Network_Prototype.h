@@ -309,7 +309,7 @@ namespace Network_Components
 				this_component()->template update_ttime_distribution<TargetType>(ttime);
 			}
 
-			template<typename TargetType> TargetType get_random_zone(boost::container::vector<TargetType>* available_zones = nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Zone_Components::Concepts::Is_Zone_Prototype)))
+			template<typename TargetType> TargetType get_random_zone(std::vector<TargetType>* available_zones = nullptr, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Zone_Components::Concepts::Is_Zone_Prototype)))
 			{
 				
 				typedef  Pair_Associative_Container< typename get_type_of(zones_container)> _Zones_Container_Interface;

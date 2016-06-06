@@ -45,7 +45,7 @@ namespace Depot_Components
 				//ComponentType::template Initialize<TargetType>(configuration);
 			}
 
-			template<typename TargetType> void Push_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
+			template<typename TargetType> void Push_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
 			{
 				this_component()->template Accept_Network_Events<TargetType>(network_events);
 			}

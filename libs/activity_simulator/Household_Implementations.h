@@ -38,7 +38,8 @@ namespace Household_Components
 			
 	
 			// Household members
-			m_container(boost::container::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Persons_Container, NONE, NONE);
+			m_container(std::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Persons_Container, NONE, NONE);
+			m_container(std::vector<Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>*>, Vehicles_Container, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
@@ -70,13 +71,17 @@ namespace Household_Components
 
 				
 			}
-			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+			template<typename IdType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
 				this->Initialize<IdType>(id);
-				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
 				this->network_reference<NetworkRefType>(network_ref);
 				this->scenario_reference<ScenarioRefType>(scenario_ref);
 
+			}
+			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+			{
+				this->Initialize<IdType,NetworkRefType,ScenarioRefType>(id,network_ref,scenario_ref);
+				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
 			}
 
 			template<typename TargetType> void Set_Home_Location()

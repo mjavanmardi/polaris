@@ -5,6 +5,40 @@ namespace Vehicle_Components
 {
 	namespace Types
 	{
+		enum Powertrain_Type_Keys
+		{
+			CONVENTIONAL=0,
+			HEV,
+			PHEV,
+			BEV,
+			FCEV
+		};
+		enum Fuel_Type_Keys
+		{
+			GASOLINE=0,
+			DIESEL,
+			CNG,
+			H2,
+			ELECTRIC
+		};
+		enum EPA_Vehicle_Class_Keys
+		{
+			CAR_MINI_COMPACT=0,
+			CAR_SUB_COMPACT,
+			CAR_COMPACT,
+			CAR_MID_SIZE,
+			CAR_FULL_SIZE,
+			WAGON_COMPACT,
+			WAGON_MID_SIZE,
+			WAGON_FULL_SIZE,
+			SUV_MID_SIZE,
+			SUV_FULL_SIZE,
+			TRUCK_MID_SIZE,
+			TRUCK_FULL_SIZE,
+			VAN_MID_SIZE,
+			VAN_FULL_SIZE
+		};
+
 		enum Vehicle_Type_Keys
 		{
 			SOV=0,
@@ -56,6 +90,29 @@ namespace Vehicle_Components
 			accessor(route_links_container, NONE, NONE);
 		};
 
+		prototype struct Vehicle_Characteristics ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+			typed_accessor(Types::EPA_Vehicle_Class_Keys, vehicle_class);
+			typed_accessor(Types::Powertrain_Type_Keys, powertrain_type);
+			typed_accessor(Types::Fuel_Type_Keys, fuel_type);
+			typed_accessor(int, ID);
+			typed_accessor(int,capacity);
+			typed_accessor(bool,has_connectivity);
+			typed_accessor(bool,has_cacc);
+			typed_accessor(bool,has_acc);
+			typed_accessor(bool,has_connected_signal);
+			typed_accessor(bool,has_full_automation);
+			accessor(length,check(TargetType,Basic_Units::Concepts::Is_Length_Value),check(TargetType,Basic_Units::Concepts::Is_Length_Value));
+			accessor(max_speed,check(TargetType,Basic_Units::Concepts::Is_Speed_Value),check(TargetType,Basic_Units::Concepts::Is_Speed_Value));
+			accessor(max_accel,check(TargetType,Basic_Units::Concepts::Is_Acceleration_Value),check(TargetType,Basic_Units::Concepts::Is_Acceleration_Value));
+			accessor(max_decel,check(TargetType,Basic_Units::Concepts::Is_Acceleration_Value),check(TargetType,Basic_Units::Concepts::Is_Acceleration_Value));
+			template<typename TargetType> void initialize(TargetType db_itr)
+			{
+				this_component()->initialize(db_itr);
+			}
+		};
+
 		prototype struct Vehicle ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
@@ -71,6 +128,7 @@ namespace Vehicle_Components
 			accessor(is_integrated, NONE, NONE);
 			accessor(downstream_preferred_departure_time, NONE, NONE);
 			accessor(is_autonomous, NONE, NONE);
+			accessor(vehicle_ptr, NONE, NONE);
 			
 			//enroute swtiching
 			accessor(rng_stream, NONE, NONE);

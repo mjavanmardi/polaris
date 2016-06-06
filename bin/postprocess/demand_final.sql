@@ -1,4 +1,4 @@
-Attach 'C:\Users\jauld\Desktop\POLARIS_DATA\AnnArbor\annarbor-Supply.sqlite' as supply; 
+Attach 'C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor-Supply.sqlite' as supply; 
 --############################################################
 -- GENERATE TRAVEL TIME DISTRIBUTION
 
@@ -884,4 +884,4 @@ FROM Trip_zone_tmp
 INNER JOIN a.Location
 ON trip_zone_tmp.destination=a.Location.location;
   
-create table trip_with_dist as select trip_with_loc.*,sqrt(pow(orig_x-dest_x,2)+pow(orig_y-dest_y,2))/1000 as Dist, mode from trip_with_loc where start> 62
+create table trip_with_dist as select trip_with_loc.*,sqrt(pow(orig_x-dest_x,2)+pow(orig_y-dest_y,2))/1000 as Dist, mode from trip_with_loc where start> 62

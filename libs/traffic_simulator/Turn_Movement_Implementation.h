@@ -45,8 +45,8 @@ namespace Turn_Movement_Components
 			m_data(float, minimum_merge_rate, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
-			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
 
 
 			//==================================================================================================================
@@ -97,10 +97,10 @@ namespace Turn_Movement_Components
 
 			float _realtime_forward_link_turn_travel_time;
 
-			m_container(boost::container::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
+			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
-			m_container(boost::container::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
+			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
 

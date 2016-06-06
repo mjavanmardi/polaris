@@ -200,6 +200,26 @@ namespace Basic_Units
 			check_typedef_type(Is_Speed, Component_Type::Speed_tag, true_type);
 			define_default_check(Is_Speed && Is_Prototype);
 		};
+		concept struct Is_Acceleration_Value
+		{
+			check_typedef_type(Is_Acceleration, Acceleration_tag, true_type);
+			check_concept(Is_Time, Concepts::Is_Time_Value, T, V);
+			check_concept(Is_Length, Concepts::Is_Length_Value, T, V);
+			define_default_check(Is_Acceleration && Is_Time && Is_Length);
+		};
+		/// Check if a type meets the requirements of being a basic 'Time' component
+		concept struct Is_Acceleration_Component
+		{
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_typedef_type(Is_Acceleration, Acceleration_tag, true_type);
+			define_default_check(Is_Component && Is_Acceleration);
+		};
+		concept struct Is_Acceleration_Prototype
+		{
+			check_concept(Is_Prototype,Is_Prototype, T, V);
+			check_typedef_type(Is_Acceleration, Component_Type::Acceleration_tag, true_type);
+			define_default_check(Is_Acceleration && Is_Prototype);
+		};
 		#pragma endregion
 
 		#pragma region Currency Concepts
@@ -744,25 +764,25 @@ namespace Basic_Units
 			typedef Time<ComponentType> time_base;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val );
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
 				assert_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				this_component()->template Value<Value_Type>(Value_Type(value * time_val / len_val));
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
@@ -777,17 +797,59 @@ namespace Basic_Units
 
 			}
 			
-			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			//{
+			//	Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
+			//	Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
+			//	return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			//}
+			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			//{
+			//	assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+			//	assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
+			//}
+		};
+
+		prototype struct Acceleration : protected Speed<ComponentType>
+		{
+			tag_as_prototype;
+
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists)  && check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
 			{
-				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
-				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
-				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
+				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val / time_val );
 			}
-			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
 			{
-				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
-				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value, "The specified TargetType is not a valid Acceleration data structure, ensure that TargetType has tags: {Acceleration_Type, Length_Type and Time_Type}");
+				assert_check(ComponentType,Concepts::Is_Acceleration_Component, "The specified ComponentType is not a valid Acceleration component, ensure that ComponentType is tagged as a Acceleration_Type and has Value member}");
 			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			{
+				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
+				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+				this_component()->template Value<Value_Type>(Value_Type(value * time_val * time_val / len_val));
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			{
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Acceleration data structure, ensure that TargetType has tags: {Acceleration_Type, Length_Type and Time_Type}");
+			}
+			
+			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			//{
+			//	Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
+			//	Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
+			//	return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			//}
+			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			//{
+			//	assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+			//	assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
+			//}
 		};
 		
 		prototype struct Currency

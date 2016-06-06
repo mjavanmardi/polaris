@@ -26,6 +26,7 @@ for scenario in s_doc['scenarios']:
 		if parameter_key not in params: params.append(parameter_key)
 	
 # write header:
+outfile.write('scenario,')
 for key in params:
 	print key
 	outfile.write(key+",")
@@ -34,25 +35,29 @@ outfile.write("time,loaded,departed,arrived,in_network,switched,VMT,VHT,avg_trav
 # Next, read all scenario results
 scenario_id = 1
 for scenario in s_doc['scenarios']:
+	# write results - make sure scenario was actually run first
 	scenario_name = study_id + "_" + str(scenario_id)
 	
-	# write param values for scenario
-	for parameter_key in params:
-		if parameter_key in scenario:
-			outfile.write(str(scenario[parameter_key])+",")
-		else:
-			outfile.write(",")
-	
-	# write results
-	with open(scenario_name + "\\summary.csv") as sumamry_file:
-		reader = csv.reader(sumamry_file,delimiter=',')
-		last_row=[]
-		for row in reader:
-			last_row=row
-			pass
-		for value in last_row:
-			outfile.write(str(value) + ",")
-		outfile.write("\n")
+	try:
+		with open(scenario_name + "\\summary.csv") as summary_file:	
+			# write param values for scenario
+			outfile.write(scenario_name + ',')
+			for parameter_key in params:
+				if parameter_key in scenario:
+					outfile.write(str(scenario[parameter_key])+",")
+				else:
+					outfile.write(",")
+			
+			reader = csv.reader(summary_file,delimiter=',')
+			last_row=[]
+			for row in reader:
+				last_row=row
+				pass
+			for value in last_row:
+				outfile.write(str(value) + ",")
+			outfile.write("\n")
+	except:
+		pass
 		
 	scenario_id+=1	
 	

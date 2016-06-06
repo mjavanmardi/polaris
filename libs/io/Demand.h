@@ -12,11 +12,17 @@ namespace io
 class Selection;
 class Household;
 class Vehicle;
+class Vehicle_Type;
 class Trip;
 class Plan;
 class Taveler;
 class Person;
 class Activity;
+class Powertrain_Type;
+class Vehicle_Class;
+class Fuel_Type;
+class Automation_Type;
+class Connectivity_Type;
 
 
 #pragma db object //table("SELECTION")
@@ -168,13 +174,13 @@ public:
 	// Default Constructor
 	Household () {}	
 	//Constructor
-	Household ( int hhold_, long long location_, int persons_, int workers_, int vehicles_, int type_, int income_)  
+	Household ( long long hhold_, long long location_, int persons_, int workers_, int vehicles_, int type_, int income_)  
 	: hhold (hhold_), location (location_), persons (persons_), workers (workers_), vehicles (vehicles_), type (type_), income (income_)
 	{
 	}
 	//Accessors
-	const int& getHhold () const {return hhold;}
-	void setHhold (const int& hhold_){hhold = hhold_;}
+	const long long& getHhold () const {return hhold;}
+	void setHhold (const long long& hhold_){hhold = hhold_;}
 	const long long& getLocation () const {return location;}
 	void setLocation (const long long& location_){location = location_;}
 	const int& getPersons () const {return persons;}
@@ -188,14 +194,14 @@ public:
 	const int& getIncome () const {return income;}
 	void setIncome (const int& income_){income = income_;}
 	const unsigned long& getPrimaryKey () const {return household;}
-	const unsigned long& gehousehold () const {return household;}
+	const unsigned long& getHousehold () const {return household;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
 	unsigned long household;
-	int hhold;
+	long long hhold;
 	long long location;
 	int persons;
 	int workers;
@@ -311,7 +317,6 @@ private:
 };
 
 
-
 #pragma db object //table("VEHICLE")
 class Vehicle
 {
@@ -319,23 +324,19 @@ public:
 	// Default Constructor
 	Vehicle () {}	
 	//Constructor
-	Vehicle ( int hhold_, int vehicle_, int parking_, int type_, int subtype_, int partition_ )  
-	: hhold (hhold_), vehicle (vehicle_), parking (parking_), type (type_), subtype (subtype_), partition (partition_)
+	Vehicle ( int hhold_, int parking_, shared_ptr<Vehicle_Type> type_, int subtype_)  
+	: hhold (hhold_), parking (parking_), type (type_), subtype (subtype_)
 	{
 	}
 	//Accessors
 	const int& getHhold () const {return hhold;}
 	void setHhold (const int& hhold_){hhold = hhold_;}
-	const int& getVehicle () const {return vehicle;}
-	void setVehicle (const int& vehicle_){vehicle = vehicle_;}
 	const int& getParking () const {return parking;}
 	void setParking (const int& parking_){parking = parking_;}
-	const int& getType () const {return type;}
-	void setType (const int& type_){type = type_;}
+	const shared_ptr<Vehicle_Type> getType () const {return type;}
+	void setType (const shared_ptr<Vehicle_Type> type_){type = type_;}
 	const int& getSubtype () const {return subtype;}
 	void setSubtype (const int& subtype_){subtype = subtype_;}
-	const int& getPartition () const {return partition;}
-	void setPartition (const int& partition_){partition = partition_;}
 	const unsigned long& getPrimaryKey () const {return vehicle_id;}
 	const unsigned long& getVehicle_Id () const {return vehicle_id;}
 
@@ -345,12 +346,214 @@ private:
 	#pragma db id auto
 	unsigned long vehicle_id;
 	int hhold;
-	int vehicle;
 	int parking;
-	int type;
+	#pragma db not_null
+	shared_ptr<Vehicle_Type> type;
 	int subtype;
-	int partition;
+};
 
+#pragma db object //table("VEHICLE_TYPE")
+class Vehicle_Type
+{
+public:
+	// Default Constructor
+	Vehicle_Type () {}	
+	//Constructor
+	Vehicle_Type ( int type_id_)  
+	: type_id (type_id_)
+	{
+	}
+	//Accessors
+	const shared_ptr<Powertrain_Type> getPowertrain_type () const {return powertrain_type;}
+	void setPowertrain_type (const shared_ptr<Powertrain_Type> powertrain_type_){powertrain_type = powertrain_type_;}
+	const shared_ptr<Vehicle_Class> getVehicle_class () const {return vehicle_class;}
+	void setVehicle_class (const shared_ptr<Vehicle_Class> vehicle_class_){vehicle_class = vehicle_class_;}
+	const shared_ptr<Fuel_Type> getFuel_type () const {return fuel_type;}
+	void setFuel_type (const shared_ptr<Fuel_Type> fuel_type_){fuel_type = fuel_type_;}
+	const shared_ptr<Automation_Type> getAutomation_type () const {return automation_type;}
+	void setAutomation_type (const shared_ptr<Automation_Type> automation_type_){automation_type = automation_type_;}
+	const shared_ptr<Connectivity_Type> getConnectivity_type () const {return connectivity_type;}
+	void setConnectivity_type (const shared_ptr<Connectivity_Type> connectivity_type_){connectivity_type = connectivity_type_;}
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getVehicle_Id () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+
+	#pragma db not_null
+	shared_ptr<Powertrain_Type> powertrain_type;
+	#pragma db not_null
+	shared_ptr<Vehicle_Class> vehicle_class;
+	#pragma db not_null
+	shared_ptr<Fuel_Type> fuel_type;
+	#pragma db not_null
+	shared_ptr<Automation_Type> automation_type;
+	#pragma db not_null
+	shared_ptr<Connectivity_Type> connectivity_type;
+};
+
+#pragma db object //table("Powertrain_Type")
+class Powertrain_Type
+{
+public:
+	// Default Constructor
+	Powertrain_Type () {}	
+	//Constructor
+	Powertrain_Type ( int type_id_, std::string type_)  
+	: type_id (type_id_), type (type_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) { type =  type_;}
+
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getPowertrain_type () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+	std::string type;
+};
+
+#pragma db object //table("Vehicle_Class")
+class Vehicle_Class
+{
+public:
+	// Default Constructor
+	Vehicle_Class () {}	
+	//Constructor
+	Vehicle_Class ( int class_id_, std::string type_)  
+	: class_id (class_id_), class_type (type_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return class_type;}
+	void setType (const std::string& type_) { class_type =  type_;}
+	const unsigned long& getPrimaryKey () const {return class_id;}
+	const unsigned long& getVehicle_class () const {return class_id;}
+	const int& getCapacity () const {return capacity;}
+	void setCapacity (const int& capacity_){capacity = capacity_;}
+	const double& getLength () const {return length;}
+	void setLength (const double& length_){length = length_;}
+	const double& getMax_Speed () const {return max_speed;}
+	void setMax_Speed (const double& max_speed_){max_speed = max_speed_;}
+	const double& getMax_Accel () const {return max_accel;}
+	void setMax_Accel (const double& max_accel_){max_accel = max_accel_;}
+	const double& getMax_Decel () const {return max_decel;}
+	void setMax_Decel (const double& max_decel_){max_decel = max_decel_;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long class_id;
+	std::string class_type;
+	int capacity;
+	double length;
+	double max_speed;
+	double max_accel;
+	double max_decel;
+};
+
+#pragma db object //table("Fuel_Type")
+class Fuel_Type
+{
+public:
+	// Default Constructor
+	Fuel_Type () {}	
+	//Constructor
+	Fuel_Type ( int type_id_, std::string type_)  
+	: type_id (type_id_), type (type_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) { type =  type_;}
+
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getFuel_type () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+	std::string type;
+};
+
+#pragma db object //table("Automation_Type")
+class Automation_Type
+{
+public:
+	// Default Constructor
+	Automation_Type () {}	
+	//Constructor
+	Automation_Type ( int type_id_, std::string type_)  
+	: type_id (type_id_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) { type =  type_;}
+	const bool& getAcc () const {return acc;}
+	void setAcc (const bool& acc_) { acc =  acc_;}
+	const bool& getCacc () const {return cacc;}
+	void setCacc (const bool& cacc_) { cacc =  cacc_;}
+	const bool& getConnected_signal () const {return connected_signal;}
+	void setConnected_signal (const bool& connected_signal_) { connected_signal =  connected_signal_;}
+	const bool& getFully_autonomous () const {return fully_autonomous;}
+	void setFully_autonomous (const bool& fully_autonomous_) { fully_autonomous =  fully_autonomous_;}
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getAutomation_type () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+	std::string type;
+	bool acc;
+	bool cacc;
+	bool connected_signal;
+	bool fully_autonomous;
+};
+
+#pragma db object //table("Connectivity_Type")
+class Connectivity_Type
+{
+public:
+	// Default Constructor
+	Connectivity_Type () {}	
+	//Constructor
+	Connectivity_Type ( int type_id_, std::string type_)  
+	: type_id (type_id_), type (type_)
+	{
+	}
+	//Accessors
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) { type =  type_;}
+
+	const unsigned long& getPrimaryKey () const {return type_id;}
+	const unsigned long& getConnectivity_type () const {return type_id;}
+
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long type_id;
+	std::string type;
 };
 
 
@@ -360,7 +563,7 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, /*shared_ptr<Person>*/int person_, /*shared_ptr<Trip>*/unsigned long trip_)
+	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
 	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
 	{
 	}
@@ -380,13 +583,13 @@ public:
 	const std::string& getMode () const {return mode;}
 	void setMode (const std::string& mode_) {mode = mode_;}
 	const std::string& getType () const {return type;}
-	void setType (const std::string& type_) {type = type_;}
-	/*const shared_ptr<Person> getPerson () const {return person;}
+	void setType (const std::string& type_) { type =  type_;}
+	const shared_ptr<Person> getPerson () const {return person;}
 	void setPerson (const shared_ptr<Person> person_) {person = person_;}
-	const shared_ptr<Trip> getTrip () const {return trip;}
+	/*const shared_ptr<Trip> getTrip () const {return trip;}
 	void setTrip (const shared_ptr<Trip> trip_) {trip = trip_;}*/
-	const int& getPerson () const {return person;}
-	void setPerson (const int& person_){person = person_;}
+	/*const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}*/
 	const unsigned long& getTrip () const {return trip;}
 	void setTrip (const unsigned long& trip_){trip = trip_;}
 	//Data Fields
@@ -400,9 +603,9 @@ private:
 	std::string mode;
 	std::string type;
 	#pragma db not_null
-	//shared_ptr<Person> person;
+	shared_ptr<Person> person;
 	//shared_ptr<Trip> trip;
-	int person;
+	//int person;
 	unsigned long trip;
 };
 
@@ -414,15 +617,17 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, int person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
 	//Accessors
 	const int& getHhold () const {return hhold;}
 	void setHhold (const int& hhold_){hhold = hhold_;}
-	const int& getPerson () const {return person;}
-	void setPerson (const int& person_){person = person_;}
+	const shared_ptr<Person> getPerson () const {return person;}
+	void setPerson (const shared_ptr<Person> person_) {person = person_;}
+	/*const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}*/
 	const int& getTour () const {return tour;}
 	void setTour (const int& tour_){tour = tour_;}
 	const int& getTrip () const {return trip;}
@@ -445,8 +650,8 @@ public:
 	void setConstraint (const int& constraint_){constraint = constraint_;}
 	const int& getPriority () const {return priority;}
 	void setPriority (const int& priority_){priority = priority_;}
-	const int& getVehicle () const {return vehicle;}
-	void setVehicle (const int& vehicle_){vehicle = vehicle_;}
+	const shared_ptr<Vehicle> getVehicle () const {return vehicle;}
+	void setVehicle (shared_ptr<Vehicle> vehicle_){vehicle = vehicle_;}
 	const int& getPassengers () const {return passengers;}
 	void setPassengers (const int& passengers_){passengers = passengers_;}
 	const int& getType () const {return type;}
@@ -462,7 +667,7 @@ private:
 	#pragma db id auto
 	unsigned long trip_id;
 	int hhold;
-	int person;
+	//int person;
 	int tour;
 	int trip;
 	double start;
@@ -474,10 +679,12 @@ private:
 	int mode;
 	int constraint;
 	int priority;
-	int vehicle;
+	shared_ptr<Vehicle> vehicle;
 	int passengers;
 	int type;
 	int partition;
+	#pragma db not_null
+	shared_ptr<Person> person;
 
 };
 

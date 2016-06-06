@@ -300,12 +300,12 @@ namespace Zone_Components
 				_graphical_zone_group->accept_zone_information<Point_3D<MasterType>, int>(coordinate, this, prod_height*height_scale, att_height*height_scale);
 			}
 			
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 
 			}
 
-			static bool fetch_attributes(Graphical_Zone_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool fetch_attributes(Graphical_Zone_Implementation* _this,std::vector<string>& bucket)
 			{
 				this_itf* this_ptr = (this_itf*)_this;
 				stringstream s;
@@ -328,11 +328,11 @@ namespace Zone_Components
 
 				return true;
 			}
-			static bool submit_attributes(Graphical_Zone_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool submit_attributes(Graphical_Zone_Implementation* _this,std::vector<string>& bucket)
 			{
 				this_itf* this_ptr = (this_itf*)_this;
 
-				boost::container::vector<string>::iterator itr;
+				std::vector<string>::iterator itr;
 
 
 				if(bucket[4] == "True" ||bucket[4] == "true" || bucket[4] == "t" || bucket[4] == "T" )

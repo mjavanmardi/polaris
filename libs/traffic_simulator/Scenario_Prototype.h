@@ -24,6 +24,7 @@ namespace Scenario_Components
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
 			accessor(output_popsyn_database_name, NONE, NONE);
+			accessor(input_popsyn_database_name, NONE, NONE);
 			accessor(historical_results_database_name, NONE, NONE);
 
 			accessor(simulation_interval_length, NONE, NONE);
@@ -54,6 +55,7 @@ namespace Scenario_Components
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
+			accessor(simulate_cacc, NONE, NONE);
 			
 			accessor(cav_market_penetration, NONE, NONE);
 			accessor(cav_vott_adjustment, NONE, NONE);
@@ -141,6 +143,7 @@ namespace Scenario_Components
 			accessor(do_planner_routing, NONE, NONE);
 			accessor(write_demand_to_database, NONE, NONE);
 			accessor(read_demand_from_database, NONE, NONE);
+			accessor(read_population_from_database, NONE, NONE);
 			accessor(activity_start_time_model_file_name,NONE,NONE);
 
 			//===============================================
@@ -405,6 +408,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("do_planner_routing", this->template do_planner_routing<bool*>()) != PARAMETER_FOUND) this->template do_planner_routing<bool>(false);		
 				if (cfgReader.getParameter("write_demand_to_database", this->template write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->template write_demand_to_database<bool>(false);
 				if (cfgReader.getParameter("read_demand_from_database", this->template read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->template read_demand_from_database<bool>(false);
+				if (cfgReader.getParameter("read_population_from_database", this->template read_population_from_database<bool*>()) != PARAMETER_FOUND) this->template read_population_from_database<bool>(false);
 				if (cfgReader.getParameter("cav_market_penetration", this->template cav_market_penetration<double*>()) != PARAMETER_FOUND) this->template cav_market_penetration<double>(0.0);
 				if (cfgReader.getParameter("cav_vott_adjustment", this->template cav_vott_adjustment<double*>()) != PARAMETER_FOUND) this->template cav_vott_adjustment<double>(1.0);
 
@@ -441,8 +445,17 @@ namespace Scenario_Components
 				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
-					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago");
+					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("");
 					if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
+					if (cfgReader.getParameter("input_popsyn_database_name", input_popsyn_database_name<string*>())!= PARAMETER_FOUND)
+					{
+						input_popsyn_database_name<std::string>("");
+						this->read_population_from_database(false);
+					}
+					else
+					{
+						this->read_population_from_database(true);
+					}
 				} 
 				else
 				{
@@ -495,6 +508,7 @@ namespace Scenario_Components
 				// read capacity adjustments 
 				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
 				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
+				if (cfgReader.getParameter("simulate_cacc", simulate_cacc<bool*>()) != PARAMETER_FOUND)simulate_cacc<bool>(false);
 
 
 
@@ -594,6 +608,10 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
+				else
+				{
+					if (time_dependent_routing<bool>())	THROW_EXCEPTION("ERROR: time_dependent_routing is disabled in current polaris-Master branch. Switch to polaris-R1/R2 development branches to test time-dependent routing.");
+				}
 				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
 				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1500.0);
 				

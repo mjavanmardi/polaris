@@ -163,7 +163,7 @@ namespace Network_Skimming_Components
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				network_itf* network = this->network_reference<network_itf*>();
 
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::mapped_type>::type> zone_itf;
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),int,zone_itf*> zones_itf;
 
@@ -210,7 +210,7 @@ namespace Network_Skimming_Components
 					int num_locations = (int)available_locations.size();
 					zone_origins_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
 					
-					// Add all locations to boost::container::list if less than the number required
+					// Add all locations to std::list if less than the number required
 					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
@@ -229,7 +229,7 @@ namespace Network_Skimming_Components
 						int num_successful = 0;
 
 						// make nodes_per_zone attempts to pick origin locations
-						boost::container::vector<origin_location_itf*> available_locations_temp;
+						std::vector<origin_location_itf*> available_locations_temp;
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((origin_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
@@ -239,7 +239,7 @@ namespace Network_Skimming_Components
 							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							origin_location_itf* loc = (origin_location_itf*)available_locations_temp[rand_loc_index];
 
-							// If the location does not have valid links or is already in the boost::container::list, skip
+							// If the location does not have valid links or is already in the std::list, skip
 							if (loc->template Is_Routable_Location<bool>())
 							{
 								origin_locations->push_back(loc);
@@ -256,7 +256,7 @@ namespace Network_Skimming_Components
 						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	origin_location_itf* loc = (origin_location_itf*)available_locations[rand_loc_index];
 
-						//	// If the location does not have valid links or is already in the boost::container::list, skip
+						//	// If the location does not have valid links or is already in the std::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
 						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
@@ -291,7 +291,7 @@ namespace Network_Skimming_Components
 					int num_locations = (int)available_locations.size();
 					zone_destinations_count.insert(pair<long,int>(dest_zone->template internal_id<long>(),0));
 					
-					// Add all locations to boost::container::list if less than the number required
+					// Add all locations to std::list if less than the number required
 					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
@@ -312,7 +312,7 @@ namespace Network_Skimming_Components
 						int num_successful = 0;
 
 						// make nodes_per_zone attempts to pick origin locations
-						boost::container::vector<destination_location_itf*> available_locations_temp;
+						std::vector<destination_location_itf*> available_locations_temp;
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((destination_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
@@ -322,7 +322,7 @@ namespace Network_Skimming_Components
 							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							destination_location_itf* loc = (destination_location_itf*)available_locations_temp[rand_loc_index];
 
-							// If the location does not have valid links or is already in the boost::container::list, skip
+							// If the location does not have valid links or is already in the std::list, skip
 							if (loc->template Is_Routable_Location<bool>())
 							{
 								destination_locations->push_back(loc);
@@ -340,7 +340,7 @@ namespace Network_Skimming_Components
 						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	destination_location_itf* loc = (destination_location_itf*)available_locations[rand_loc_index];
 
-						//	// If the location does not have valid links or is already in the boost::container::list, skip
+						//	// If the location does not have valid links or is already in the std::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
 						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
@@ -467,7 +467,7 @@ namespace Network_Skimming_Components
 			// This returns the full level of service information for the O/D pair at a specific time
 			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType  Get_LOS(LocationType Origin, LocationType Destination, TimeType Start_Time, requires(ReturnType,check(strip_modifiers(ReturnType), Concepts::Is_LOS_Prototype)))
 			{
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
@@ -531,7 +531,7 @@ namespace Network_Skimming_Components
 			{
 				available_set.clear();
 
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
 				//%%%RLW
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
@@ -584,7 +584,7 @@ namespace Network_Skimming_Components
 			//{
 			//	available_set.clear();
 
-			//	// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+			//	// create the references to network items and create the std::lists of origins/destination to route from/to
 			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
 			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
 			//	typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;

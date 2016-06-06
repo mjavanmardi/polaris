@@ -26,7 +26,7 @@ namespace Person_Components
 			m_data(double,Weight, NONE, NONE);
 			m_data(uint,Index, NONE, NONE);				 //index into the joint-distribution matrix of the region (convert using region.get_index())
 			m_data(uint,Test_Index, NONE, NONE);		//index into the test marginal distribution for this person
-			//m_container(boost::container::vector<double>, Characteristics, NONE, NONE);
+			//m_container(std::vector<double>, Characteristics, NONE, NONE);
 
 			//=================================================================
 			// Census specific individual data, used in ABM routines
@@ -79,7 +79,13 @@ namespace Person_Components
 
 			// work arrival time conversion functions
 			m_data(Basic_Units::Implementations::Time_Implementation<NT>,_Journey_To_Work_Arrival_Time, NONE, NONE);
-			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType CENSUS_CODE)
+			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType value, requires(TargetType,check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+			{
+				typedef Basic_Units::Prototypes::Time<type_of(typename ComponentType::_Journey_To_Work_Arrival_Time)> _Journey_To_Work_Arrival_Time_itf;
+				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();
+				itf->template Value<TargetType>(value);
+			}
+			template<typename TargetType> void Journey_To_Work_Arrival_Time(TargetType CENSUS_CODE, requires(TargetType,!check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
 			{
 				int val=0;
 				#pragma region CENSUS_CODE_SWITCH
@@ -387,7 +393,7 @@ namespace Person_Components
 			tag_getter_setter_as_available(Journey_To_Work_Arrival_Time);
 
 			// Characteristics setter
-			template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
+			template<typename TargetType> void Characteristics(std::vector<double>* data)
 			{
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 				typedef Prototypes::Person_Properties<ComponentType> this_itf;

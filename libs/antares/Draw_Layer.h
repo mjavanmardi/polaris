@@ -57,7 +57,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	const bool enable_textures = head_texture || primitive_texture || group_texture;
 	const bool texture_coordinates = enable_textures && (primitive_type != _POINT && primitive_type != _LINE);
 
-	const boost::container::vector<int>& texture_map=layer->texture_map< const boost::container::vector<int>& > ();
+	const std::vector<int>& texture_map=layer->texture_map< const std::vector<int>& > ();
 	const float texture_coordinates_map_x[4] = {0.0f,1.0f,1.0f,0.0f};
 	const float texture_coordinates_map_y[4] = {1.0f,1.0f,0.0f,0.0f};
 
@@ -86,7 +86,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 		/*if(!grouped) */glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	}
 
-	const Dynamic_Multi_Buffer< boost::container::vector<int>* >& storage=layer->storage<Dynamic_Multi_Buffer< boost::container::vector<int>* >&>();
+	const Dynamic_Multi_Buffer< std::vector<int>* >& storage=layer->storage<Dynamic_Multi_Buffer< std::vector<int>* >&>();
 
 	//---- draw main layer ----
 
@@ -136,7 +136,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = storage[current_iteration];
 
 		for(unsigned int i=0;i<num_antares_threads();i++)
 		{
@@ -292,7 +292,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 
 	//---- draw layer accents in the second pass ----
 
-	const Dynamic_Multi_Buffer< boost::container::vector<int>* >& accent_storage=layer->accent_storage<Dynamic_Multi_Buffer< boost::container::vector<int>* >&>();
+	const Dynamic_Multi_Buffer< std::vector<int>* >& accent_storage=layer->accent_storage<Dynamic_Multi_Buffer< std::vector<int>* >&>();
 	
 	switch(primitive_type)
 	{
@@ -337,7 +337,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	
 	while(current_iteration <= end_iteration)
 	{
-		const boost::container::vector<int>* geometry_by_thread = accent_storage[current_iteration];
+		const std::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
 		for(unsigned int i=0;i<num_antares_threads();i++)
 		{

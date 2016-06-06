@@ -780,7 +780,7 @@ namespace Person_Components
 			{	
 			}
 
-			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Destination(ActivityItfType activity, boost::container::vector<ReturnType>* destinations_to_use=nullptr)
+			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Destination(ActivityItfType activity, std::vector<ReturnType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
@@ -805,7 +805,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_choice_set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
@@ -861,7 +861,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_choice_set<_Activity_Location_Interface*>(locations,loc_options,choice_model);
 
 				// Make choice
@@ -870,7 +870,7 @@ namespace Person_Components
 				return logsum;
 			}
 
-			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<TargetType>* destinations_to_use=nullptr)
+			template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, std::vector<TargetType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 
@@ -895,7 +895,7 @@ namespace Person_Components
 
 
 				// Create choice set
-				boost::container::vector<_Destination_Choice_Option_Interface*> loc_options;
+				std::vector<_Destination_Choice_Option_Interface*> loc_options;
 				fill_stratified_routine_choice_set<TargetType>(act_type, locations,loc_options,choice_model);
 
 				// Make choice
@@ -932,7 +932,7 @@ namespace Person_Components
 				return return_ptr;
 			}
 
-			//template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//template<typename TargetType> void fill_choice_set(_Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			//{
 			//	// Get person context and system knowledge
 			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -1017,7 +1017,7 @@ namespace Person_Components
 			//	}
 			//}
 
-			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_stratified_choice_set(_Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				int strata_size = _choice_set_size / _num_strata;
 				const float EMP_SPLIT = 1000.0;
@@ -1162,7 +1162,7 @@ namespace Person_Components
 				}
 			}
 
-			//template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//template<typename TargetType> void fill_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			//{
 			//	// Get person context and system knowledge
 			//	person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -1187,7 +1187,7 @@ namespace Person_Components
 			//	// select zones to choose from and estimate utility 
 			//	for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
 			//	{
-			//		// First choose a random zone from the zone boost::container::list
+			//		// First choose a random zone from the zone std::list
 			//		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
 
 			//		// ignore zone if all employment slots have already been assigned to other agents
@@ -1218,7 +1218,7 @@ namespace Person_Components
 			//}
 			//
 
-			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType> void fill_stratified_routine_choice_set(Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Locations_Container_Interface* available_set, std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				int strata_size = _choice_set_size / _num_strata;
 				const float EMP_SPLIT = 1000.0;
@@ -1324,7 +1324,7 @@ namespace Person_Components
 				}
 			}
 		
-			void Create_New_Choice_Option(boost::container::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
+			void Create_New_Choice_Option(std::vector<_Destination_Choice_Option_Interface*>& choice_set, _Choice_Model_Interface* choice_model,_Zone_Interface* zone, Activity_Components::Types::ACTIVITY_TYPES act_type, _Activity_Location_Interface* prev_loc, _Activity_Location_Interface* next_loc, float bias_correction=1.0, bool display=false)
 			{
 				// ignore zone if all employment slots have already been assigned to other agents
 				if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->template employment_simulated<int>() >= zone->template employment_total<int>()) return;

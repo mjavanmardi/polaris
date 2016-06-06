@@ -100,7 +100,7 @@ namespace Vehicle_Components
 			Vehicle_Attribute_Shape vehicle_shape;
 			True_Color_RGBA<NT> vehicle_color;
 
-			static boost::container::vector<Point_2D<MasterType>> _num_vehicles_cache;
+			static std::vector<Point_2D<MasterType>> _num_vehicles_cache;
 		
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,num_vehicles, NONE, NONE);
 
@@ -1406,7 +1406,7 @@ namespace Vehicle_Components
 				}
 			}
 
-			static void on_select_point(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select_point(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -1418,7 +1418,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -1428,7 +1428,7 @@ namespace Vehicle_Components
 				{
 					//Select added new object
 
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self_Point<NT>();
 					}
@@ -1443,7 +1443,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -1458,7 +1458,7 @@ namespace Vehicle_Components
 				}
 			}
 
-			static void on_select_shape(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select_shape(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -1469,7 +1469,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Point<NT>();
 						}
@@ -1479,7 +1479,7 @@ namespace Vehicle_Components
 				{
 					//Select added new object
 
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self_Shape<NT>();
 					}
@@ -1493,7 +1493,7 @@ namespace Vehicle_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self_Shape<NT>();
 						}
@@ -1667,7 +1667,7 @@ namespace Vehicle_Components
 				_vehicle_points->Push_Element<Accented_Element>(&coordinate);
 			}
 			
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				typedef Link<typename MasterType::link_type> _Link_Interface;
 				typedef Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
@@ -1762,12 +1762,12 @@ namespace Vehicle_Components
 
 					Activity_Plans* acts = scheduler->Activity_Container<Activity_Plans*>();
 					
-					//boost::container::list<activity_interface*>* activities = scheduler->Activity_Container<boost::container::list<activity_interface*>*>();
+					//std::list<activity_interface*>* activities = scheduler->Activity_Container<std::list<activity_interface*>*>();
 
 					stringstream ss("");
 					time_str;
 					int i = 1;
-					//for (typename boost::container::list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+					//for (typename std::list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
 					for (Activity_Plans::iterator itr = acts->begin(); itr != acts->end(); ++itr, ++i)
 					{
 						// blank space
@@ -2220,7 +2220,7 @@ namespace Vehicle_Components
 		volatile int Antares_Vehicle_Implementation<MasterType,InheritanceList>::_vehicles_counter;
 
 		template<typename MasterType,typename InheritanceList>
-		boost::container::vector<Point_2D<MasterType>> Antares_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles_cache;
+		std::vector<Point_2D<MasterType>> Antares_Vehicle_Implementation<MasterType,InheritanceList>::_num_vehicles_cache;
 
 		template<typename MasterType,typename InheritanceList>
 		typename MasterType::vehicle_type* Antares_Vehicle_Implementation<MasterType,InheritanceList>::_route_displayed_vehicle;

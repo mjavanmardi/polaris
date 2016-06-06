@@ -21,7 +21,7 @@ public:
 	{
 		Antares_Layer_Interface* new_layer=nullptr;
 
-		boost::container::list< Information_Page<typename MasterType::information_page_type>* >::iterator itr;
+		std::list< Information_Page<typename MasterType::information_page_type>* >::iterator itr;
 
 		bool blank_page_skipped=false;
 
@@ -60,7 +60,7 @@ public:
 	
 	m_data(int,cached_iteration, NONE, NONE);
 
-	boost::container::list< Information_Page<typename MasterType::information_page_type>* > _2D_layers;
+	std::list< Information_Page<typename MasterType::information_page_type>* > _2D_layers;
 
 	m_data(bool,initialized, NONE, NONE);
 };

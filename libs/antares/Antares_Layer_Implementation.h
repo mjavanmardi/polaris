@@ -33,14 +33,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 
 		for(unsigned int i=0;i<_storage.buffer_size;i++)
 		{
-			_storage.multi_buffer[i] = new boost::container::vector<int>[num_antares_threads()];
+			_storage.multi_buffer[i] = new std::vector<int>[num_antares_threads()];
 		}
 
 		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, 1);
 		
 		for(unsigned int i=0;i<_accent_storage.buffer_size;i++)
 		{
-			_accent_storage.multi_buffer[i] = new boost::container::vector<int>[num_antares_threads()];
+			_accent_storage.multi_buffer[i] = new std::vector<int>[num_antares_threads()];
 		}
 
 		_draw=cfg.draw;
@@ -138,7 +138,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		//Null texture
 		_texture_map.push_back(1);
 
-		for(boost::container::vector<string>::iterator itr = cfg.textures.begin();itr!=cfg.textures.end();itr++)
+		for(std::vector<string>::iterator itr = cfg.textures.begin();itr!=cfg.textures.end();itr++)
 		{
 			wxImage tex_image;
 
@@ -220,11 +220,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		int* const beg_write_itr = (int*)&result;
 		const int* const end_write_itr = (int*)&result + sizeof(Point_3D<NT>)/sizeof(int);
 
-		boost::container::vector<int>* geometry_by_thread = _storage[iteration];
+		std::vector<int>* geometry_by_thread = _storage[iteration];
 
-		boost::container::vector<int>* const storage_reference=& (geometry_by_thread[thread_id()]);
+		std::vector<int>* const storage_reference=& (geometry_by_thread[thread_id()]);
 
-		//boost::container::vector<int>& storage_reference=_accent_storage[iteration][__thread_id];
+		//std::vector<int>& storage_reference=_accent_storage[iteration][__thread_id];
 
 		if(primitive_type == _PLOT)
 		{
@@ -563,7 +563,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		Point_3D<NT> c;
 		Point_3D<NT> result;
 
-		boost::container::vector<int>& storage_reference=_accent_storage[iteration][__thread_id];
+		std::vector<int>& storage_reference=_accent_storage[iteration][__thread_id];
 
 		if(primitive_type == _PLOT)
 		{
@@ -833,7 +833,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	template<typename TargetType> void Select(/*requires(TargetType,check_2(typename MasterType::canvas_type,is_same))*/)
 	{
 //TODO
-//		//_attributes_panel->Push_Schema<Target_Type<NT,NT,boost::container::vector<string>&>>(_attributes_schema);
+//		//_attributes_panel->Push_Schema<Target_Type<NT,NT,std::vector<string>&>>(_attributes_schema);
 	}
 	
 	//template<typename TargetType> void Select(requires(TargetType,!check_2(typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
@@ -845,11 +845,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 			_added_elements.clear();
 			
 			_deselected_elements.clear();
-			for(boost::container::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++){ _deselected_elements.push_back( *itr ); }
+			for(std::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++){ _deselected_elements.push_back( *itr ); }
 
 			_selected_elements.clear();
 
-			boost::container::vector<pair<string,string>> bucket;
+			std::vector<pair<string,string>> bucket;
 
 			(*_selection_callback)( _deselected_elements, _added_elements, _selected_elements, bucket );
 		}
@@ -867,8 +867,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	{
 		if(_selected_elements.size() && _double_click_callback!=nullptr/* && _submission_callback!=nullptr*/)
 		{
-			boost::container::vector<pair<string,string>> dialog_key_value;
-			boost::container::vector<boost::container::vector<string>> dialog_dropdown;
+			std::vector<pair<string,string>> dialog_key_value;
+			std::vector<std::vector<string>> dialog_dropdown;
 
 			(*_double_click_callback)(_selected_elements,dialog_key_value,dialog_dropdown);
 
@@ -890,7 +890,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		//	_control_dialog = (control_dialog_interface*)new type_of(control_dialog)(_name);
 
 //TODO
-//		//	_control_dialog->Push_Schema<Target_Type<NT,NT,boost::container::vector<string>&,vector<vector<string>>&>>(_attributes_schema,_dropdown_schema);
+//		//	_control_dialog->Push_Schema<Target_Type<NT,NT,std::vector<string>&,vector<vector<string>>&>>(_attributes_schema,_dropdown_schema);
 
 		//	if(_submission_callback != nullptr)
 		//	{
@@ -902,10 +902,10 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 		//{
 		//	if(_selection_callback != nullptr)
 		//	{
-		//		boost::container::vector<string> bucket;
+		//		std::vector<string> bucket;
 		//		_selection_callback( *((void**)_selected_elements[0]), bucket );
 //TODO
-//		//		_control_dialog->Push_Attributes<Target_Type<NT,NT,boost::container::vector<string>&>>(bucket);
+//		//		_control_dialog->Push_Attributes<Target_Type<NT,NT,std::vector<string>&>>(bucket);
 
 		//		if(_submission_callback != nullptr)
 		//		{
@@ -925,7 +925,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 
 	template<typename TargetType> void Clear_Accented()
 	{
-		boost::container::vector<int>* geometry_by_thread = _accent_storage[iteration()];
+		std::vector<int>* geometry_by_thread = _accent_storage[iteration()];
 
 		for(int i=0;i<num_antares_threads();i++)
 		{
@@ -940,11 +940,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 			_added_elements.clear();
 			_deselected_elements.clear();
 			
-			boost::container::vector<pair<string,string>> bucket;
+			std::vector<pair<string,string>> bucket;
 			_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
 			
 //TODO
-//			_attributes_panel->Push_Attributes<Target_Type<NT,NT,boost::container::vector<pair<string,string>>&>>(bucket);
+//			_attributes_panel->Push_Attributes<Target_Type<NT,NT,std::vector<pair<string,string>>&>>(bucket);
 		}
 		else
 		{
@@ -955,8 +955,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	m_data(bool,dynamic_data, NONE, NONE);
 	m_data(int,target_sub_iteration, NONE, NONE);
 
-	m_data(Dynamic_Multi_Buffer< boost::container::vector<int>* >,storage,NONE,NONE);
-	m_data(Dynamic_Multi_Buffer< boost::container::vector<int>* >,accent_storage,NONE,NONE);
+	m_data(Dynamic_Multi_Buffer< std::vector<int>* >,storage,NONE,NONE);
+	m_data(Dynamic_Multi_Buffer< std::vector<int>* >,accent_storage,NONE,NONE);
 
 	// Identification values
 	m_data(string,name, NONE, NONE);
@@ -975,7 +975,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	//member_data(True_Color_RGBA<MasterType>,head_accent_color,none,none);
 	m_data(int,head_texture, NONE, NONE);
 
-	m_data(boost::container::vector<unsigned int>,texture_map, NONE, NONE);
+	m_data(std::vector<unsigned int>,texture_map, NONE, NONE);
 
 	m_data(bool,grouped, NONE, NONE);
 	m_data(bool,group_color, NONE, NONE);
@@ -1015,9 +1015,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	m_prototype(Attributes_Panel,typename MasterType::attributes_panel_type,attributes_panel, NONE, NONE);
 	m_prototype(Control_Dialog,typename MasterType::control_dialog_type,control_dialog, NONE, NONE);
 
-	m_data(boost::container::list<void*>,selected_elements, NONE, NONE);
-	m_data(boost::container::list<void*>,deselected_elements, NONE, NONE);
-	m_data(boost::container::list<void*>,added_elements, NONE, NONE);
+	m_data(std::list<void*>,selected_elements, NONE, NONE);
+	m_data(std::list<void*>,deselected_elements, NONE, NONE);
+	m_data(std::list<void*>,added_elements, NONE, NONE);
 
 	m_data(string,x_label, NONE, NONE);
 	m_data(string,y_label, NONE, NONE);
@@ -1352,7 +1352,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 //
 //	Dynamic_Multi_Buffer<vector<buffer_unit>> storage; //Multi_Buffer needs to be dynamic on buffer_size and buffer_period
 //	string identifier; // for labeling
-//	int boost::container::list_index; // for ordering
+//	int std::list_index; // for ordering
 //	PrimitiveType primitive_type;
 //	bool draw; // check whether to draw or not, probably better to have a conditional callback here to determine, more flexible
 //

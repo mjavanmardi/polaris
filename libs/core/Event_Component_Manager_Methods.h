@@ -26,7 +26,7 @@ namespace polaris
 				//_active_blocks.erase( _active_blocks.iterator_to(*block) );
 					
 				// linear search when deque is used as fundamental container
-				for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+				for(std::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 				{
 					if((*active_itr) == block)
 					{
@@ -154,7 +154,7 @@ namespace polaris
 							// Do the slow (but most conceptually simple) thing and remove it from the de-activation queue
 							// This condition almost never gets hit in practice, so it is ok to spend some time here
 
-							for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
+							for(std::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
 							{
 								if((*itr) == free_block)
 								{
@@ -256,7 +256,7 @@ namespace polaris
 		{
 			// This iteration is safe because only this thread can grow this list
 
-			for(boost::container::deque<Event_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
+			for(std::deque<Event_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
 			{
 				// This check is safe because only this thread can make these blocks non-empty or (by extension) activated
 				// Skip blocks which are "activated", they must be in the deactivation queue (or at least they should be), and must be removed from the intrusive list in the update step
@@ -302,7 +302,7 @@ namespace polaris
 
 		// loop over the execution blocks which are active this event step
 		//boost::intrusive::list<Event_Block>::iterator itr = _active_blocks.begin();
-		boost::container::deque<Event_Block*>::iterator itr = _active_blocks.begin();
+		std::deque<Event_Block*>::iterator itr = _active_blocks.begin();
 
 		while(true)
 		{
@@ -426,14 +426,14 @@ namespace polaris
 		{
 			// remove queued deactivated blocks, they are locked against _tex, so you are ok here
 
-			for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
+			for(std::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
 			{
 				if((*itr)->activated())
 				{
 					//_active_blocks.erase( _active_blocks.iterator_to( *(*itr) ) );
 
 					// linear search when deque is used as fundamental container
-					for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+					for(std::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 					{
 						if((*active_itr) == (*itr))
 						{

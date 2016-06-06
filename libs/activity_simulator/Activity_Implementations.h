@@ -109,7 +109,7 @@ namespace Activity_Components
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Actual_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
-			m_container(boost::container::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Involved_Persons_Container, NONE, NONE);
+			m_container(std::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Involved_Persons_Container, NONE, NONE);
 			// Error checking features for the _Start_Time member feature
 			template<typename TargetType> TargetType Start_Time()
 			{

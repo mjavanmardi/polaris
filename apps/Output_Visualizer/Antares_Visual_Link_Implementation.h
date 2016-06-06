@@ -492,7 +492,7 @@ namespace Link_Components
 				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_box);
 			}
 
-			static bool submit_attributes(Antares_Visual_Link_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool submit_attributes(Antares_Visual_Link_Implementation* _this,std::vector<string>& bucket)
 			{
 				// not supported yet
 				return true;
@@ -679,7 +679,7 @@ namespace Link_Components
 			}			
 
 			// Elements passed through callback as void pointers whihc represent the start of the geometry-head, the first element of which is a pointer to the actual object, making it castable to that object
-			static void on_select(const boost::container::list<void*>& removed,const boost::container::list<void*>& added,const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& bucket)
+			static void on_select(const std::list<void*>& removed,const std::list<void*>& added,const std::list<void*>& selected,std::vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
 				{
@@ -687,7 +687,7 @@ namespace Link_Components
 
 					if(selected.size())
 					{
-						for(boost::container::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						for(std::list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 						{
 							((ComponentType*)*itr)->Accent_Self<NT>();
 						}
@@ -695,7 +695,7 @@ namespace Link_Components
 				}
 				else if(added.size())
 				{
-					for(boost::container::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					for(std::list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
 					{
 						((ComponentType*)*itr)->Accent_Self<NT>();
 					}
@@ -721,7 +721,7 @@ namespace Link_Components
 				((MasterType::network_type*) _global_network)->_link_lines->Push_Element<Accented_Element>(&accented_line);
 			}
 			
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				plot_link_moe();
@@ -883,7 +883,7 @@ namespace Link_Components
 				bucket.push_back(key_value_pair);
 			}
 
-			static bool fetch_attributes(Antares_Visual_Link_Implementation* _this,boost::container::vector<string>& bucket)
+			static bool fetch_attributes(Antares_Visual_Link_Implementation* _this,std::vector<string>& bucket)
 			{
 				_this->plot_link_moe();
 
@@ -1112,21 +1112,21 @@ namespace Link_Components
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_travel_time_ratio_layer, NONE, NONE);
 			static m_prototype(Antares_Layer,typename MasterType::antares_layer_type,link_queue_length_layer, NONE, NONE);
 
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_travel_time_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_speed_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_density_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_travel_time_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_speed_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_density_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,link_queue_length_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_travel_time_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_speed_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_density_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_travel_time_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_speed_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_density_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,link_queue_length_cache, NONE, NONE);
 
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_travel_time_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_speed_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_density_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_travel_time_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_speed_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_density_ratio_cache, NONE, NONE);
-			m_data(boost::container::vector<Point_2D<MasterType>>,historic_link_queue_length_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_travel_time_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_speed_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_density_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_travel_time_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_speed_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_density_ratio_cache, NONE, NONE);
+			m_data(std::vector<Point_2D<MasterType>>,historic_link_queue_length_cache, NONE, NONE);
 
 			m_data(Link_Line<MasterType>, displayed_line, NONE, NONE);
 

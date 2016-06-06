@@ -15,8 +15,91 @@ namespace Vehicle_Components
 		implementation struct Switch_Decision_Data_Implementation:public Polaris_Component<MasterType,INHERIT(Switch_Decision_Data_Implementation),Data_Object>
 		{
 			m_data(int, switch_decision_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_container(boost::container::vector<typename MasterType::link_type*>, route_links_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, route_links_container, NONE, NONE);
 		};
+
+		implementation struct Vehicle_Characteristics_Implementation :public Polaris_Component<MasterType,INHERIT(Vehicle_Characteristics_Implementation),Data_Object>
+		{
+			m_data(int, ID, NONE, NONE);
+			m_data(Types::EPA_Vehicle_Class_Keys, vehicle_class,NONE,NONE);
+			m_data(Types::Powertrain_Type_Keys, powertrain_type,NONE,NONE);
+			m_data(Types::Fuel_Type_Keys, fuel_type,NONE,NONE);
+			m_data(int,capacity,NONE,NONE);
+			m_data(bool,has_connectivity,NONE,NONE);
+			m_data(bool,has_cacc,NONE,NONE);
+			m_data(bool,has_acc,NONE,NONE);
+			m_data(bool,has_connected_signal,NONE,NONE);
+			m_data(bool,has_full_automation,NONE,NONE);
+
+			member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
+			member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+			member_component_and_feature_accessor(max_decel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+
+			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
+			{
+				this->ID(db_itr->getPrimaryKey());
+				this->capacity(db_itr->getVehicle_class()->getCapacity());
+				this->length((Basic_Units::Length_Variables::Meters)db_itr->getVehicle_class()->getLength());
+				this->max_speed((Basic_Units::Speed_Variables::Meters_Per_Second)db_itr->getVehicle_class()->getMax_Speed());
+				this->max_accel((Basic_Units::Acceleration_Variables::Meters_Per_Second_Squared)db_itr->getVehicle_class()->getMax_Accel());
+				this->max_decel((Basic_Units::Acceleration_Variables::Meters_Per_Second_Squared)db_itr->getVehicle_class()->getMax_Decel());
+				this->has_connected_signal(db_itr->getAutomation_type()->getConnected_signal());
+				this->has_acc(db_itr->getAutomation_type()->getAcc());
+				this->has_cacc(db_itr->getAutomation_type()->getCacc());
+				this->has_full_automation(db_itr->getAutomation_type()->getFully_autonomous());
+
+				bool has_connectivity = false;
+				const char* connectivity_str = db_itr->getFuel_type()->getType().c_str();
+				if (strcmp(connectivity_str, "Yes")==0) has_connectivity=true;
+				this->has_connectivity(has_connectivity);
+
+				Vehicle_Components::Types::Fuel_Type_Keys fuel;
+				const char* fuel_str = db_itr->getFuel_type()->getType().c_str();
+				if (strcmp(fuel_str, "Gas")==0) fuel = Vehicle_Components::Types::Fuel_Type_Keys::GASOLINE;
+				else if (strcmp(fuel_str, "Diesel")==0) fuel = Vehicle_Components::Types::Fuel_Type_Keys::DIESEL;
+				else if (strcmp(fuel_str, "CNG")==0) fuel = Vehicle_Components::Types::Fuel_Type_Keys::CNG;
+				else if (strcmp(fuel_str, "H2")==0) fuel = Vehicle_Components::Types::Fuel_Type_Keys::H2;
+				else if (strcmp(fuel_str, "BEV")==0) fuel = Vehicle_Components::Types::Fuel_Type_Keys::ELECTRIC;
+				else THROW_EXCEPTION("Error: invalid fuel type specified in input Demand database: "<<fuel_str);
+				this->fuel_type(fuel);
+
+				Vehicle_Components::Types::Powertrain_Type_Keys powertrain;
+				const char* pt_str = db_itr->getPowertrain_type()->getType().c_str();
+				if (strcmp(pt_str, "Conventional")==0) powertrain = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
+				else if (strcmp(pt_str, "HEV")==0) powertrain = Vehicle_Components::Types::Powertrain_Type_Keys::HEV;
+				else if (strcmp(pt_str, "PHEV")==0) powertrain = Vehicle_Components::Types::Powertrain_Type_Keys::PHEV;
+				else if (strcmp(pt_str, "BEV")==0) powertrain = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
+				else if (strcmp(pt_str, "FCEV")==0) powertrain = Vehicle_Components::Types::Powertrain_Type_Keys::FCEV;
+				else THROW_EXCEPTION("Error: invalid powertrain type specified in input Demand database: "<<pt_str);
+				this->powertrain_type(powertrain);
+
+				Vehicle_Components::Types::EPA_Vehicle_Class_Keys vclass;
+				const char* class_str = db_itr->getVehicle_class()->getType().c_str();
+				if (strcmp(class_str, "CAR_MINI_COMPACT")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MINI_COMPACT;
+				else if (strcmp(class_str, "CAR_SUB_COMPACT")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_SUB_COMPACT;
+				else if (strcmp(class_str, "CAR_COMPACT")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
+				else if (strcmp(class_str, "CAR_MID_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MID_SIZE;
+				else if (strcmp(class_str, "CAR_FULL_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_FULL_SIZE;
+				else if (strcmp(class_str, "WAGON_COMPACT")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_COMPACT;
+				else if (strcmp(class_str, "WAGON_MID_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_MID_SIZE;
+				else if (strcmp(class_str, "WAGON_FULL_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_FULL_SIZE;
+				else if (strcmp(class_str, "SUV_MID_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
+				else if (strcmp(class_str, "SUV_FULL_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_FULL_SIZE;
+				else if (strcmp(class_str, "TRUCK_MID_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;
+				else if (strcmp(class_str, "TRUCK_FULL_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_FULL_SIZE;
+				else if (strcmp(class_str, "VAN_MID_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::VAN_MID_SIZE;
+				else if (strcmp(class_str, "VAN_FULL_SIZE")==0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::VAN_FULL_SIZE;
+				else THROW_EXCEPTION("Error: invalid vehicle class type specified in input Demand database: "<<class_str);
+				this->vehicle_class(vclass);
+			}
+			template <typename T> void initialize(T db_itr, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
+			{
+				static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
+			}
+
+		};
+
 
 		implementation struct Vehicle_Implementation:public Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>
 		{
@@ -24,6 +107,8 @@ namespace Vehicle_Components
 			m_data(bool, is_integrated, NONE, NONE);
 
 			m_data(bool, is_autonomous, NONE, NONE);
+
+			m_data(shared_ptr<polaris::io::Vehicle>, vehicle_ptr, NONE, NONE);
 
 			m_data(bool, its_switch, NONE, NONE);
 			m_data(Vehicle_Components::Types::Type_Vehicle_Action_keys, suggested_action, NONE, NONE);
@@ -46,10 +131,12 @@ namespace Vehicle_Components
 #endif
 			m_prototype(Routing_Components::Prototypes::Routing, typename MasterType::routing_type, router, NONE, NONE);
 
+			m_prototype(Vehicle_Components::Prototypes::Vehicle_Characteristics, typename MasterType::vehicle_characteristics_type, vehicle_characteristics, NONE, NONE);
+
 			m_data(float, local_speed, NONE, NONE);
 			m_data(int, downstream_preferred_departure_time, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, NONE, NONE);
+			m_container(std::vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, NONE, NONE);
 			
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, NONE, NONE);
@@ -419,10 +506,10 @@ namespace Vehicle_Components
 							}
 							else
 							{
-								boost::unordered::unordered_set<_Network_Event_Interface*> events_set;
+								std::unordered_set<_Network_Event_Interface*> events_set;
 								
 								/// case 2.1: VMS
-								((_Link_Interface*)link)->template get_events_from_vms<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+								((_Link_Interface*)link)->template get_events_from_vms<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 
 								bool vms = false;
 								int vms_event_size = int(events_set.size());
@@ -432,7 +519,7 @@ namespace Vehicle_Components
 									vms = true;
 								}
 								/// case 2.2: HAR
-								((_Link_Interface*)link)->template get_events_from_har<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+								((_Link_Interface*)link)->template get_events_from_har<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 								int har_event_size = int(events_set.size()) - vms_event_size;
 								bool har = false;
 								if (har_event_size>0)
@@ -442,7 +529,7 @@ namespace Vehicle_Components
 								/// exploit
 								if (vms || har)
 								{
-									enroute_switching_decision = exploit_events_set<boost::unordered::unordered_set<_Network_Event_Interface*>&>(events_set);
+									enroute_switching_decision = exploit_events_set<std::unordered_set<_Network_Event_Interface*>&>(events_set);
 									if (enroute_switching_decision)	cause_for_switching = Scenario_Components::Types::Cause_For_Enroute_Switching::ITS_INFORMED;
 								}
 							}
@@ -728,8 +815,8 @@ namespace Vehicle_Components
 				destination_ids.push_back(destination_link->template uuid<unsigned int>());
 				
 
-				boost::container::deque<global_edge_id> path_container;
-				boost::container::deque<float> cumulative_cost_container;
+				std::deque<global_edge_id> path_container;
+				std::deque<float> cumulative_cost_container;
 
 				int best_route_link_sum = 0;
 
@@ -808,13 +895,13 @@ namespace Vehicle_Components
 						//	
 						//	cout << "Routed cost container: " << endl;
 
-						//	for(boost::container::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
+						//	for(std::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
 						//	{
 						//		cout << *itr << endl;
 						//	}
 						//	cout << "Routed cost profile: " << endl;
 
-						//	for(boost::container::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
+						//	for(std::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
 						//	{
 						//		_Link_Interface* link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
 
@@ -848,9 +935,9 @@ namespace Vehicle_Components
 
 						//			cout << "Outbound turn movements summary: " << endl;
 
-						//			boost::container::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<boost::container::vector<typename MasterType::turn_movement_type*>*>();
+						//			std::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<std::vector<typename MasterType::turn_movement_type*>*>();
 
-						//			for(boost::container::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
+						//			for(std::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
 						//			{
 						//				Movement<typename MasterType::turn_movement_type>* current_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
 
@@ -951,6 +1038,7 @@ namespace Vehicle_Components
 			template<typename TargetType> void initialize()
 			{
 				//_is_integrated=false;
+
 				
 				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
 
