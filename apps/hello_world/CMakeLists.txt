@@ -1,0 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(Hello_World hello_world.cpp)
+target_link_libraries(Hello_World ${libtcmalloc} Core )
+set_target_properties(Hello_World PROPERTIES FOLDER apps)

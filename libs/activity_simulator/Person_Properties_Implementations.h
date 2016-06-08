@@ -166,6 +166,7 @@ namespace Person_Components
 // TODO: does not compile ActType not visible
 			template<typename ActivitytypeType, typename TimeType> void Average_Activity_Duration(ActivitytypeType act_type, TimeType value)
 			{
+
 				// duration stored in minutes
 				Time_Minutes duration = GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Minutes>(value);
 
@@ -177,7 +178,7 @@ namespace Person_Components
 				}
 				else
 				{
-					this->template _average_activity_frequency_and_duration_container.insert(pair<ActType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
+					this->template _average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
 				}
 			}
 
@@ -207,7 +208,7 @@ namespace Person_Components
 				}
 				else
 				{
-					this->template _average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<ValueType,ValueType> >(act_type, pair<ValueType,ValueType>(value,0)));
+					this->template _average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<TimeType, TimeType> >(act_type, pair<TimeType, TimeType>(value,0)));
 				}
 			}
 

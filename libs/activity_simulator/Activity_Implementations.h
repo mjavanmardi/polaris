@@ -150,7 +150,8 @@ namespace Activity_Components
 			}
 // TODO: does not compile
 			// departure time feature - set by route_handler, =0 before the route is planned
-			template<typename TargetType> TargetType Departure_Time(requires(TargetType,check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value)))
+			template<typename TargetType, requires(TargetType, check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value))> 
+			TargetType Departure_Time()
 			{
 				if (this->Route_Is_Planned<NT>())
 				{

@@ -515,7 +515,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename ComponentType,typename K = typename ComponentType::key_type> 
-	struct Simple_Associative_Container
+	struct Simple_Associative_Container ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
@@ -586,7 +586,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename ComponentType,typename K = typename ComponentType::key_type,typename T = typename ComponentType::value_type::second_type> 
-	struct Pair_Associative_Container
+	struct Pair_Associative_Container ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
@@ -664,7 +664,7 @@ namespace polaris
 	};
 
 	template<typename ComponentType,typename K = typename ComponentType::key_type, template<typename T=NULLTYPE> class value_prototype=NULLTEMPLATE>
-	struct Prototype_Pair_Associative_Container
+	struct Prototype_Pair_Associative_Container ADD_DEBUG_INFO
 	{
 		static_assert(is_pointer<typename ComponentType::mapped_type>::value,"Container must hold pointer types");
 
