@@ -365,7 +365,7 @@ namespace polaris
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(...)\
 		{\
-			__pragma( message(__LOC__ ">>>>>>>>> check_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))\
+			/*__pragma( message(__LOC__ ">>>>>>>>> check_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))*/\
 			return 0;\
 		}\
 		\
@@ -387,7 +387,7 @@ namespace polaris
 		template<typename _V>\
 		constexpr static bool has_matching_named_member(...)\
 		{\
-			__pragma( message(__LOC__ ">>>>>>>>> check_component_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))\
+			/*__pragma( message(__LOC__ ">>>>>>>>> check_component_accessor_name can't find " #CHECK_ALIAS "::" #NAME ))*/\
 			return 0;\
 		}\
 		\
