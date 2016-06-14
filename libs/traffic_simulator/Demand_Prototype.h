@@ -173,7 +173,7 @@ namespace Demand_Components
 				float demand_percentage= scenario->template demand_reduction_factor<float>();
 
 				cout << "Demand Percentage: " << demand_percentage;
-
+				shared_ptr<Trip> tt (db->load<Trip> (1));
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 					// perform demand reduction

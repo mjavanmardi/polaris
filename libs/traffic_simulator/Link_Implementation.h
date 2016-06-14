@@ -369,9 +369,10 @@ namespace Link_Components
 						{
 							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
 							_Vehicle_Characteristics_Interface* veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
-							n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
-							//std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
-							//n_cacc += (cav.compare("CACC")==0);
+							//n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
+							bool cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getFully_autonomous();
+							cav = cav || vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getCacc();
+							n_cacc += (cav == true);
 							//auto type = v->getType()->getCav();
 						}
 						capacity_adjustment = 0.1*n_cacc;
