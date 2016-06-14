@@ -305,8 +305,8 @@ namespace Demand_Components
 
 			template<typename TargetType> void read_demand_data(requires(TargetType,!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
-				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType is ill-defined");
-				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
+				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same, "TargetType is ill-defined");
+				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same, "TargetType should indicate ODB_Network if you want to read it in with ODB");
 				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
 			}
 

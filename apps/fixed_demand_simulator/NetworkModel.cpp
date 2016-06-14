@@ -45,6 +45,8 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<MasterType> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 #endif
 
 	//==============================================================================================

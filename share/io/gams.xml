@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="V" pragma="object">
+		<field name="v" type="std::string"/>
+	</type>	
+	<type name="I" pragma="object">
+		<field name="I" type="std::string"/>
+	</type>	
+	<type name="E" pragma="object">
+		<field name="v" type="std::string"/>
+		<field name="I" type="std::string"/>
+		<field name="I2" type="std::string"/>
+	</type>	
+	<type name="O" pragma="object">
+		<field name="v" type="std::string"/>
+		<field name="value" type="double"/>
+	</type>	
+	<type name="time_e" pragma="object">
+		<field name="v" type="std::string"/>
+		<field name="I" type="std::string"/>
+		<field name="J" type="std::string"/>
+		<field name="level" type="double"/>
+		<field name="lo" type="double"/>
+		<field name="up" type="double"/>
+		<field name="marginal" type="double"/>
+	</type>	
+	<type name="time_w" pragma="object">
+		<field name="v" type="std::string"/>
+		<field name="I" type="std::string"/>
+		<field name="J" type="std::string"/>
+		<field name="level" type="double"/>
+		<field name="lo" type="double"/>
+		<field name="up" type="double"/>
+		<field name="marginal" type="double"/>
+	</type>		
+</root>
