@@ -9,7 +9,16 @@ def download_file(url, outputdir):
 	local_filename = outputdir + url.split('/')[-1]
 	# NOTE the stream=True parameter
 	# python -mrequests.certs
-	r = requests.get(url, stream=True, verify=True)
+	r = requests.get(url, stream=True, verify=True, allow_redirects=True)
+	if r.history:
+		print "Request was redirected"
+		for resp in r.history:
+			print resp.status_code, resp.url
+		print "Final destination:"
+		print r.status_code, r.url
+	else:
+		print "Request was not redirected"
+		print r.status_code, r.url
 	file_size = int(r.headers['content-length'])
 	print "Downloading: %s Bytes: %s" % (local_filename, file_size)
 	with open(local_filename, 'wb') as f:
@@ -57,27 +66,28 @@ if not os.path.exists(file_dl):
 else:
 	print 'File already downloaded'
 	try_again=False
-	if zipfile.is_zipfile(file_dl):
-		the_zip_file = zipfile.ZipFile(file_dl)
-		ret = the_zip_file.testzip()
-		if ret is not None:
-			print "First bad file in zip: %s" % ret
-			try_again=True
+	if file_dl.lower().endswith('.zip'):
+		if zipfile.is_zipfile(file_dl):
+			the_zip_file = zipfile.ZipFile(file_dl)
+			ret = the_zip_file.testzip()
+			if ret is not None:
+				print "First bad file in zip: %s" % ret
+				try_again=True
+			else:
+				print "Zip file is good."
 		else:
-			print "Zip file is good."
-	else:
-		print "File is not a valid zip file."
-		try_again=True
-	if try_again:
-		# lets tyr the download again
-		print "Trying download again..."
-		file_dl = download_file(url, abspath)
-		if args.rename:
-			#build new name
-			path = os.path.dirname(file_dl)
-			newname = os.path.join(path, args.name)
-			os.rename(file_dl, newname)
-			file_dl = newname
+			print "File is not a valid zip file."
+			try_again=True
+		if try_again:
+			# lets tyr the download again
+			print "Trying download again..."
+			file_dl = download_file(url, abspath)
+			if args.rename:
+				#build new name
+				path = os.path.dirname(file_dl)
+				newname = os.path.join(path, args.name)
+				os.rename(file_dl, newname)
+				file_dl = newname
 	
 # does the extracted directory already exist?
 #if not os.path.exists(extractdir):
@@ -85,6 +95,10 @@ if file_dl.lower().endswith('.zip'):
 	with zipfile.ZipFile(file_dl, "r") as z:
 		# may need this to handle very long file names on Windows (MAX_PATH=260)
 		abspath = u'\\\\?\\' + abspath
+		print 'Extracting %s to %s' % (file_dl, abspath)
+		z.extractall(abspath)
+elif file_dl.lower().endswith('tar.gz'):
+	with tarfile.open(file_dl, 'r:gz') as z:
 		print 'Extracting %s to %s' % (file_dl, abspath)
 		z.extractall(abspath)
 else:
