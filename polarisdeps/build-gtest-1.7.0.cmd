@@ -46,7 +46,7 @@ call find-python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n %GTESTZIPFILE% -e %GTESTDIR% -o %BASEDIR%
+%MYPYTHONPATH% myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n %GTESTZIPFILE% -e %BASEDIR% -o %BASEDIR%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%GTESTZIPFILE%' failed. & EXIT /B 1)
 
 set BUILDDIR=%GTESTDIR%\build_msvc2015

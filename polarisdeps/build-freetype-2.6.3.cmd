@@ -17,14 +17,14 @@ set BASEDIR=%a%
 
 :: Download and expand source files
 set FREETYPEZIPFILE=ft263.zip
-set FREETYPEDIR=%BASEDIR%\FreeType-2.6.3
+set FREETYPEDIR=%BASEDIR%\freetype-2.6.3
 
 echo FREETYPEZIPFILE=	%FREETYPEZIPFILE%
 echo FREETYPEDIR=		%FREETYPEDIR%
 echo filedir=           %~dp0
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/projects/freetype/files/freetype2/2.6.3/ft263.zip" -n %FREETYPEZIPFILE% -e %FREETYPEDIR% -o %BASEDIR% -r
+%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/projects/freetype/files/freetype2/2.6.3/ft263.zip" -n %FREETYPEZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%FREETYPEZIPFILE%' failed. & cd /D %~dp0 & EXIT /B 1)
 
 set BUILDDIR=%FREETYPEDIR%\build_vs2015

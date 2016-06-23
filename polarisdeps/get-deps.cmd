@@ -42,16 +42,51 @@ set a=%a:/=\%
 echo %a%
 set BASEDIR=%a%
 
+::cd /D %~dp0
+::call %~dp0build-boost-1.60.0.cmd %BASEDIR%
+::cd /D %~dp0
+::call %~dp0build-odb-2.4.0.cmd %BASEDIR%
+::cd /D %~dp0
+::call %~dp0build-gtest-1.7.0.cmd %BASEDIR%
+
+SET LOGDIR=%BASEDIR%\builds
+IF NOT EXIST %LOGDIR% ( mkdir %LOGDIR% )
+DEL %LOGDIR%\boost_build.log
+DEL %LOGDIR%\odb_build.log
+DEL %LOGDIR%\gtest_build.log
+DEL %LOGDIR%\antares_build.log
+
+set BOOST_BUILD=0
+set ODB_BUILD=0
+set GTEST_BUILD=0
+set ANTARES_BUILD=0
+set BUILD_ERROR=0
+
 cd /D %~dp0
-call %~dp0build-boost-1.60.0.cmd %BASEDIR%
+set ERRORLEVEL=
+call %~dp0build-boost-1.60.0.cmd %BASEDIR%	| tee %LOGDIR%\boost_build.log
+IF %ERRORLEVEL% NEQ 0 (SET BOOST_BUILD=1 & set BUILD_ERROR=1)
+
 cd /D %~dp0
-call %~dp0build-odb-2.4.0.cmd %BASEDIR%
+set ERRORLEVEL=
+call %~dp0build-odb-2.4.0.cmd %BASEDIR%		| tee %LOGDIR%\odb_build.log
+IF %ERRORLEVEL% NEQ 0 (SET ODB_BUILD=1 & set BUILD_ERROR=1)
+
 cd /D %~dp0
-call %~dp0build-gtest-1.7.0.cmd %BASEDIR%
+set ERRORLEVEL=
+call %~dp0build-gtest-1.7.0.cmd %BASEDIR%	| tee %LOGDIR%\gtest_build.log
+IF %ERRORLEVEL% NEQ 0 (SET GTEST_BUILD=1 & set BUILD_ERROR=1)
+
+cd /D %~dp0
+set ERRORLEVEL=
+::call %~dp0get-antares-deps.cmd %BASEDIR%
+IF %ERRORLEVEL% NEQ 0 (SET ANTARES_BUILD=1 & set BUILD_ERROR=1)
+
+cd /D %~dp0
 
 :: as a convenience we copy all dll's to a single folder to save on path entries
 IF NOT EXIST %BASEDIR%\bin ( mkdir %BASEDIR%\bin )
-IF NOT EXIST %BASEDIR%\bin\Debug ( mkdir %BASEDIR%\bin\Debug )
+
 IF NOT EXIST %BASEDIR%\bin\Release ( mkdir %BASEDIR%\bin\Release )
 COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Release
 COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.dll                                %BASEDIR%\bin\Release
@@ -59,8 +94,19 @@ COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.pdb                              
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.dll     %BASEDIR%\bin\Release
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.pdb     %BASEDIR%\bin\Release
 
+IF NOT EXIST %BASEDIR%\bin\Debug ( mkdir %BASEDIR%\bin\Debug )
 COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.dll                              %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.pdb                              %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.dll   %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.pdb   %BASEDIR%\bin\Debug
+
+IF %BOOST_BUILD%	NEQ 0 (ECHO Build of Boost 1.60.0 failed.)
+IF %ODB_BUILD%		NEQ 0 (ECHO Build of ODB 2.4.0 failed.)
+IF %GTEST_BUILD%	NEQ 0 (ECHO Build of GTest 1.7.0 failed.)
+IF %ANTARES_BUILD%	NEQ 0 (ECHO Build of Antares dependencies failed.)
+
+cd /D %~dp0
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & EXIT /B 1)
+ECHO STATUS: SUCCESS
+

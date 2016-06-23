@@ -19,6 +19,7 @@ def download_file(url, outputdir):
 	else:
 		print "Request was not redirected"
 		print r.status_code, r.url
+	print r.headers
 	file_size = int(r.headers['content-length'])
 	print "Downloading: %s Bytes: %s" % (local_filename, file_size)
 	with open(local_filename, 'wb') as f:
@@ -39,6 +40,8 @@ parser.add_argument("-e", "--extracted_dir", type=str, required=True, help='DIRE
 parser.add_argument("-o", "--output_dir", type=str, default="./", help='output directory (default: current directory)')
 parser.add_argument("-r", "--rename", help='RENAME the dowloaded file using the --name argument', action="store_true")
 args=parser.parse_args()
+
+print args
 
 url = args.url
 outdir = args.output_dir
@@ -94,16 +97,18 @@ else:
 if file_dl.lower().endswith('.zip'):
 	with zipfile.ZipFile(file_dl, "r") as z:
 		# may need this to handle very long file names on Windows (MAX_PATH=260)
-		abspath = u'\\\\?\\' + abspath
-		print 'Extracting %s to %s' % (file_dl, abspath)
-		z.extractall(abspath)
+		extractdir = u'\\\\?\\' + extractdir
+		print 'Extracting %s to %s' % (file_dl, extractdir)
+		z.extractall(extractdir)
 elif file_dl.lower().endswith('tar.gz'):
 	with tarfile.open(file_dl, 'r:gz') as z:
-		print 'Extracting %s to %s' % (file_dl, abspath)
-		z.extractall(abspath)
+		print 'Extracting %s to %s' % (file_dl, extractdir)
+		z.extractall(extractdir)
+elif file_dl.lower().endswith('.patch'):
+		print 'Patch file %s downloaded to %s' % (file_dl, extractdir)
 else:
 	with tarfile.open(file_dl, 'r:*') as z:
-		print 'Extracting %s to %s' % (file_dl, abspath)
-		z.extractall(abspath)
+		print 'Extracting %s to %s' % (file_dl, extractdir)
+		z.extractall(extractdir)
 #else:
 #	print 'File already extracted'

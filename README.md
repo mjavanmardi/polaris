@@ -25,6 +25,8 @@ Windows
 * cmake 3.2.2 or newer (3.5.2 recommended)
 * python 2.7.11 x86 with additional 'requests' package installed
 * Visual Studio 2015 (Update 2 recommended)
+	- Note that there is an issue when running Visual Studio on machines older than WIndows 10.
+	- See https://support.microsoft.com/en-us/kb/3118401
 
 POLARIS Dependencies
 ====================

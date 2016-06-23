@@ -41,19 +41,19 @@ call find-python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip" -n %ODBZIPFILE% -e %ODBDIR% -o %BASEDIR%
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip" -n %ODBZIPFILE% -e %BASEDIR% -o %BASEDIR%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%ODBZIPFILE%' failed. & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip" -n %LIBODBZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip" -n %LIBODBZIPFILE% -e %BASEDIR% -o %BASEDIR%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%LIBODBZIPFILE%' failed. & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip" -n %ODBSQLITEBZIPFILE% -e %LIBSQLITEDIR% -o %LIBODBDIR%
+%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip" -n %ODBSQLITEBZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%ODBSQLITEBZIPFILE%' failed. & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip" -n %SQLITEZIPFILE% -e %SQLITE3DIR% -o %LIBODBDIR%
+%MYPYTHONPATH% myWget.py -u "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip" -n %SQLITEZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%SQLITEZIPFILE%' failed. & EXIT /B 1)
 
 mkdir %LIBODBDIR%
