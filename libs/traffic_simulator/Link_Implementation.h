@@ -323,12 +323,6 @@ namespace Link_Components
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 
-				int a;
-				if (current_simulation_interval_index == 170)
-				{
-					a = 10;
-				}
-
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				//Newell's model
 				int link_upstream_cumulative_vehicles_by_t_minus_one = 0;	
@@ -360,29 +354,31 @@ namespace Link_Components
 				float capacity_adjustment_factor = 1.0;
 				float capacity_adjustment  = 0;
 
-
-				if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<double>()  && _link_origin_vehicle_queue.size() > 0)
-					{
-						int n_cacc = 0;
-						_Vehicle_Interface* vehicle;
-						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
-						{
-							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
-							_Vehicle_Characteristics_Interface* veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
-							//n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
-							bool cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getFully_autonomous();
-							cav = cav || vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getCacc();
-							n_cacc += (cav == true);
-							//auto type = v->getType()->getCav();
-						}
-						capacity_adjustment = 0.1*n_cacc;
-					}
-
-
-
 				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 				{
 					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
+					if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<bool>()  && _link_origin_vehicle_queue.size() > 0)
+					{
+						int n_cacc = 0;
+						_Vehicle_Interface* vehicle;
+						_Vehicle_Characteristics_Interface* veh_type;
+						bool cacc;
+						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
+						{
+							vehicle = (_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
+							veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
+							//n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
+							cacc =         vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getFully_autonomous();
+							cacc = cacc || vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getCacc();
+							n_cacc += (cacc == true);
+							//auto type = v->getType()->getCav();
+						}
+						//capacity_adjustment = 0.2*n_cacc;
+						// percent of the vehicle with CACC
+						int temp = _link_origin_vehicle_queue.size();
+						float cacc_percent = (float)n_cacc/temp;
+						capacity_adjustment_factor += 0.86*cacc_percent;
+					}
 
 				}
 				else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)

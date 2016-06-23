@@ -23,7 +23,31 @@ class Vehicle_Class;
 class Fuel_Type;
 class Automation_Type;
 class Connectivity_Type;
+class Track_Trips;
 
+
+#pragma db object //table("SELECTION")
+class Track_Trips
+{
+public:
+	// Default Constructor
+	Track_Trips () {}	
+	//Constructor
+	Track_Trips ( int trip_id_)  
+	: trip_id (trip_id_)
+	{
+	}
+	//Accessors
+	const int& getTrip_id () const {return trip_id;}
+	void setTrip_id (const int& trip_id_){trip_id = trip_id_;}
+	const int& getPrimaryKey () const {return trip_id;}
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	int trip_id;
+};
 
 #pragma db object //table("SELECTION")
 class Selection

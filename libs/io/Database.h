@@ -26,10 +26,12 @@ using std::unique_ptr;
 #include "Supply-odb.hxx"
 #include "System-odb.hxx"
 #include "Result-odb.hxx"
+#include "Popsyn-odb.hxx"
+//#include "Gams-odb.hxx"
 
 #include <iostream>
 #include <fstream>
-
+#include <cassert>
 using std::vector;
 using std::string;
 using std::cout;
@@ -52,6 +54,7 @@ namespace io
 		result.push_back("System");
 		result.push_back("Network_Event");
 		result.push_back("Popsyn");
+		//result.push_back("Gams");
 		assert(result.size() > 0);
 		return result;
 	}
@@ -240,11 +243,21 @@ inline shared_ptr<odb::database> open_sqlite_database_shared(const std::string& 
 	}
 	return db;
 }
-
+inline bool file_exists (const std::string& name) {
+    ifstream f(name.c_str());
+    return f.good();
+}
 inline unique_ptr<odb::database> open_sqlite_database(const std::string& name)
 {
 	using namespace polaris::io;
-	unique_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
+	std::string db_name = make_name(name, db_inventory[0]);
+	bool file_flag = file_exists(db_name);
+	if (!file_flag)
+	{
+		std::cout << "Database file does not exist: " << db_name << "\n";
+		assert(file_flag);
+	}
+	unique_ptr<odb::database> db (new odb::sqlite::database (db_name, SQLITE_OPEN_READWRITE));	
 	odb::transaction t (db->begin());
 	//shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
 	t.commit();

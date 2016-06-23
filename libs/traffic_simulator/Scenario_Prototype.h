@@ -164,6 +164,7 @@ namespace Scenario_Components
 
 			accessor(write_node_control_state, NONE, NONE);
 			accessor(write_vehicle_trajectory, NONE, NONE);
+			accessor(use_vehicle_tracking_table, NONE, NONE);
 			accessor(write_network_link_flow, NONE, NONE);
 			accessor(write_network_link_turn_time, NONE, NONE);
 			accessor(write_output_summary, NONE, NONE);
@@ -509,6 +510,7 @@ namespace Scenario_Components
 				//===============================================
 				// Vehicle trajectory tracking parameters
 				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
+				if (cfgReader.getParameter("use_vehicle_tracking_table", use_vehicle_tracking_table<bool*>())!= PARAMETER_FOUND) use_vehicle_tracking_table<bool>(false);
 				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
 				if (cfgReader.getParameter("vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<string*>())!= PARAMETER_FOUND)
 				{

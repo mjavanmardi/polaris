@@ -172,8 +172,23 @@ namespace Demand_Components
 
 				float demand_percentage= scenario->template demand_reduction_factor<float>();
 
+				std::unordered_set<int> tracking_list;
+				if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_table<bool>())
+				{
+					cout << "Read Track_Trips table: " << "\n";
+					//read the table 
+					result<Track_Trips> trip_result=db->template query<Track_Trips>(query<Track_Trips>::true_expr);
+					int trip_id;
+					
+					for(result<Track_Trips>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
+					{
+						trip_id = db_itr->getPrimaryKey();
+						tracking_list.insert(trip_id);
+					}
+				}
+
+
 				cout << "Demand Percentage: " << demand_percentage;
-				shared_ptr<Trip> tt (db->load<Trip> (1));
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 					// perform demand reduction
@@ -257,6 +272,15 @@ namespace Demand_Components
 					vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());
 					vehicle->template initialize<NT>();
 					vehicle->is_integrated(false);
+					if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_table<bool>())
+					{
+						std::unordered_set<int>::iterator itr = tracking_list.find(vehicle->template uuid<int>());
+						if (itr != tracking_list.end())
+						{
+							vehicle->write_trajectory(true);
+						}
+					}
+
 
 					traveler->template uuid<int>(traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);

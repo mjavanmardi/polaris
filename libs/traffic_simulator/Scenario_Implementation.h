@@ -49,7 +49,7 @@ namespace Scenario_Components
 
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
-			m_data(double, simulate_cacc,NONE,NONE);
+			m_data(bool, simulate_cacc,NONE,NONE);
 
 			m_data(double, cav_market_penetration, NONE, NONE);
 			m_data(double, cav_vott_adjustment, NONE, NONE);
@@ -172,6 +172,7 @@ namespace Scenario_Components
 
 			m_data(bool, write_node_control_state, NONE, NONE);
 			m_data(bool, write_vehicle_trajectory, NONE, NONE);
+			m_data(bool, use_vehicle_tracking_table, NONE, NONE);
 			m_data(bool, write_network_link_flow, NONE, NONE);
 			m_data(bool, write_network_link_turn_time, NONE, NONE);
 			m_data(bool, write_output_summary, NONE, NONE);
