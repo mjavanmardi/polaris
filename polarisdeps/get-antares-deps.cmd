@@ -53,28 +53,28 @@ cd /D %~dp0
 DEL %LOGDIR%\shapelib_build.log
 set SHAPELIB_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-shapelib-1.3.0.cmd %BASEDIR%
+call %~dp0build-shapelib-1.3.0.cmd %BASEDIR% > %LOGDIR%\shapelib_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (SET SHAPELIB_BUILD=1 & set BUILD_ERROR=1)
 
 cd /D %~dp0
 DEL %LOGDIR%\freetype_build.log
 set FREETYPE_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-freetype-2.6.3.cmd %BASEDIR%
+call %~dp0build-freetype-2.6.3.cmd %BASEDIR% > %LOGDIR%\freetype_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (SET FREETYPE_BUILD=1 & set BUILD_ERROR=1)
 
 cd /D %~dp0
 DEL %LOGDIR%\wxWidgets_build.log
 set WXWIDGETS_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-wxWidgets-3.1.0.cmd %BASEDIR%
+call %~dp0build-wxWidgets-3.1.0.cmd %BASEDIR% > %LOGDIR%\wxWidgets_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (SET WXWIDGETS_BUILD=1 & set BUILD_ERROR=1)
 
 cd /D %~dp0
 DEL %LOGDIR%\agg_build.log
 set AGG_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-agg-2.4.cmd %BASEDIR%
+call %~dp0build-agg-2.4.cmd %BASEDIR% > %LOGDIR%\agg_build.log 2>&1 
 IF %ERRORLEVEL% NEQ 0 (SET AGG_BUILD=1 & set BUILD_ERROR=1)
 
 
@@ -83,7 +83,7 @@ cd /D %~dp0
 DEL %LOGDIR%\plplot_build.log
 SET PLPLOT_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-plplot-5.11.1.cmd %BASEDIR%
+call %~dp0build-plplot-5.11.1.cmd %BASEDIR% > %LOGDIR%\plplot_build.log 2>&1 
 IF %ERRORLEVEL% NEQ 0 (SET PLPLOT_BUILD=1 & set BUILD_ERROR=1)
 
 

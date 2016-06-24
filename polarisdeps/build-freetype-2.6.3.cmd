@@ -51,5 +51,5 @@ IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of FreeType 2.6.3 Release project failed.
 IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of FreeType 2.6.3 Debug project failed.)
 
 cd /D %~dp0
-IF %BUILD_ERROR% NEQ 0 (EXIT /B 1)
-
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & EXIT /B 1)
+ECHO STATUS: SUCCESS

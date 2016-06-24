@@ -54,7 +54,7 @@ IF %ERRORLEVEL% NEQ 0 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
 
 IF %DLL_RELEASE_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 DLL Release project failed.)
 IF %DLL_DEBUG_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 DLL Debug project failed.)
-IF %RELEAE_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 LIB Release project failed.)
+IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 LIB Release project failed.)
 IF %DEBUG_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 LIB Debug project failed.)
 
 cd /D %~dp0
