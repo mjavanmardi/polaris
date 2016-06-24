@@ -264,6 +264,7 @@ namespace Demand_Components
 					movement_plan->network<_Network_Interface*>(network);
 
 					vehicle->template uuid<int>(++traveler_id_counter);
+					vehicle->template trip_id<int>(trip_id);
 					vehicle->template internal_id<int>(traveler_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
@@ -274,7 +275,7 @@ namespace Demand_Components
 					vehicle->is_integrated(false);
 					if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_table<bool>())
 					{
-						std::unordered_set<int>::iterator itr = tracking_list.find(vehicle->template uuid<int>());
+						std::unordered_set<int>::iterator itr = tracking_list.find(trip_id);
 						if (itr != tracking_list.end())
 						{
 							vehicle->write_trajectory(true);

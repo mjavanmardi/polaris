@@ -811,6 +811,7 @@ namespace Scenario_Components
 
 						vehicle_trajectory_file<fstream&>() 
 							<< "vehicle" <<  ","
+							<< "trip" <<  ","
 							<< "link_number" <<  ","
 							<< "link_id" <<  ","
 							<< "link_dir" << ","

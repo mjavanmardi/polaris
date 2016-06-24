@@ -68,6 +68,7 @@ namespace Network_Components
 							_Movement_Plan_Interface* movement_plan = vehicle->template movement_plan<_Movement_Plan_Interface*>();
 							
 							int vehicle_id = vehicle->template uuid<int>();
+							int trip_id = vehicle->template trip_id<int>();
 							int origin_zone_index = 0;
 							int destination_zone_index = 0;
 							int origin_activity_location_index = 0;
@@ -131,6 +132,7 @@ namespace Network_Components
 								{
 									vehicle_trajectory_file
 										<< vehicle_id << ","
+										<< trip_id << ","
 										<<route_link_counter + 1 << ","
 										<<(route_link_id - route_link_id%2)/2<< ","
 										<<route_link_id%2<< ","

@@ -118,6 +118,7 @@ namespace Vehicle_Components
 			tag_as_prototype;
 			accessor(simulation_status, NONE, NONE);
 			accessor(uuid, NONE, NONE);
+			accessor(trip_id, NONE, NONE);
 			accessor(internal_id, NONE, NONE);
 			accessor(movement_plan, NONE, NONE);
 			accessor(vehicle_characteristics, NONE, NONE);

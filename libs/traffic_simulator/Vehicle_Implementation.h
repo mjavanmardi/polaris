@@ -115,6 +115,7 @@ namespace Vehicle_Components
 		{
 
 			m_data(bool, is_integrated, NONE, NONE);
+			m_data(int, trip_id, NONE, NONE);
 
 			m_data(bool, is_autonomous, NONE, NONE);
 
@@ -1126,6 +1127,8 @@ namespace Vehicle_Components
 						_write_trajectory = true;
 					}
 				}
+				if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_table<bool>())
+					_write_trajectory = false;
 			}
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination)
