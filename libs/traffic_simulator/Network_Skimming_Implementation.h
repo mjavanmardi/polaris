@@ -923,7 +923,7 @@ namespace Network_Skimming_Components
 						// create LOS matrix using default values
 						//-------------------------------------------------
 						//TODO: remove when done testing:
-						cout <<"Preallocation for start = " <<start <<" ...";
+						//cout <<"Preallocation for start = " <<start <<" ...";
 						/*cin >> test;
 						cout <<test;*/
 						//-------------------------------------------------
@@ -931,7 +931,7 @@ namespace Network_Skimming_Components
 						//typename MasterType::los_value_type* temp_los_array = new typename MasterType::los_value_type[num_zones*num_zones];
 						//-------------------------------------------------
 						//TODO: remove when done testing:
-						cout <<" array allocated."<<endl;
+						//cout <<" array allocated."<<endl;
 						//cin >> test;
 						//cout <<test;
 						//-------------------------------------------------
@@ -944,14 +944,14 @@ namespace Network_Skimming_Components
 						}
 						//-------------------------------------------------
 						//TODO: remove when done testing:
-						cout <<" Record memory allocated."<<endl;
+						//cout <<" Record memory allocated."<<endl;
 						//cin >> test;
 						//cout <<test;
 						//-------------------------------------------------
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
 						//-------------------------------------------------
 						//TODO: remove when done testing:
-						cout <<" Skim table copy complete."<<endl;
+						//cout <<" Skim table copy complete."<<endl;
 						//cin >> test;
 						//cout <<test;
 						//-------------------------------------------------

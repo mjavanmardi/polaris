@@ -106,7 +106,8 @@ namespace Link_Components
 			m_data(float, link_bwtt, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, link_fftt_cached_simulation_interval_size, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, link_bwtt_cached_simulation_interval_size, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			
+			m_data(int, n_cacc, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
 			//current interval
 			m_data(float, link_capacity, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, link_supply, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -114,6 +115,8 @@ namespace Link_Components
 			m_data(int, link_upstream_arrived_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, link_downstream_departed_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			
+			
+
 			m_data(int, link_origin_arrived_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, link_origin_departed_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, link_origin_loaded_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -353,31 +356,16 @@ namespace Link_Components
 				float current_link_capacity = 0.0;
 				float capacity_adjustment_factor = 1.0;
 				float capacity_adjustment  = 0;
-
 				if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 				{
 					capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->capacity_adjustment_highway<double>();
-					if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<bool>()  && _link_origin_vehicle_queue.size() > 0)
+					bool cacc_adj_flag = ((_Scenario_Interface*)_global_scenario)->simulate_cacc<bool>();
+					if (cacc_adj_flag && _n_cacc > 0 && _num_vehicles_on_link > 0)
 					{
-						int n_cacc = 0;
-						_Vehicle_Interface* vehicle;
-						_Vehicle_Characteristics_Interface* veh_type;
-						bool cacc;
-						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
-						{
-							vehicle = (_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
-							veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
-							//n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
-							cacc =         vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getFully_autonomous();
-							cacc = cacc || vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getCacc();
-							n_cacc += (cacc == true);
-							//auto type = v->getType()->getCav();
-						}
-						//capacity_adjustment = 0.2*n_cacc;
-						// percent of the vehicle with CACC
-						int temp = _link_origin_vehicle_queue.size();
-						float cacc_percent = (float)n_cacc/temp;
-						capacity_adjustment_factor += 0.86*cacc_percent;
+
+						float cacc_percent = (float)_n_cacc/_num_vehicles_on_link;
+						capacity_adjustment_factor *= (1+0.86*cacc_percent);
+						//std::cout << "Link " << _uuid << "; cacc_percent: " << cacc_percent << "\n";
 					}
 
 				}
@@ -489,12 +477,6 @@ namespace Link_Components
 					//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 					{	
 						float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
-
-						//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
-						//{
-						//	cout << cost_update << endl;
-						//}
-
 						for(Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>::iterator routable_itr = routable_networks->begin();routable_itr != routable_networks->end();routable_itr++)
 						{
 							Routable_Network<typename MasterType::routable_network_type>* current_network = *routable_itr;
@@ -522,8 +504,8 @@ namespace Link_Components
 
 			template<typename TargetType> void accept_vehicle_from_origin(TargetType veh)
 			{
-				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 
+				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 				LOCK(_link_lock);
 				_link_origin_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 				UNLOCK(_link_lock);
@@ -672,6 +654,7 @@ namespace Link_Components
 			template<typename TargetType> void load_vehicles(int num_departed_vehicles)
 			{
 				_Vehicle_Interface* vehicle;
+				//_Vehicle_Characteristics_Interface* veh_type;
 				for (int iv=0;iv<num_departed_vehicles;iv++)
 				{
 					vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue.front();
@@ -682,8 +665,13 @@ namespace Link_Components
 					_link_origin_cumulative_departed_vehicles++;
 					_link_origin_departed_vehicles++;
 					_link_origin_arrived_vehicles--;
-					//vehicle->template distance_to_stop_bar<float>(((_Link_Interface*)this)->template length<float>());
-					//((_Link_Interface*)this)->template push_vehicle<_Vehicle_Interface*>(vehicle);
+					//veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();						//n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
+					//cacc =         vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getFully_autonomous();
+					//cacc = cacc || vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getAutomation_type()->getCacc();
+					//if (cacc)
+					//{
+					//	_n_cacc --;
+					//}
 					if (((_Scenario_Interface*)_global_scenario)->template vehicle_taking_action<bool>())
 					{
 						vehicle->template make_suggestion<Vehicle_Components::Types::Type_Vehicle_Action_keys>(Vehicle_Components::Types::MOVE_TO_ORIGIN_LINK);
@@ -740,28 +728,7 @@ namespace Link_Components
 				_link_destination_arrived_vehicles = 0;
 				_link_origin_vehicle_current_position = 0;
 				_link_origin_loaded_capacity_leftover = 0.0;
-				
-				//supply
-				//_num_vehicles_under_jam_density = _num_lanes * _length * _jam_density/5280.0f;
-				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density) + 30;
-				//_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density);
-
-				//if(_link_type == Link_Components::Types::LOCAL || _link_type == Link_Components::Types::ARTERIAL)
-				//{
-				//	// num_lanes += (int)min(ceil(2.0f*(60.0f/link->template length<float>())),2.0f);
-
-				//	// assuming an average pocket length of 60 meters and a pocket lane on either side
-				//	float adjusted_lanes = ((float)_num_lanes) + min(2.0f*(196.85f/_length),2.0f);
-				//	_num_vehicles_under_jam_density = adjusted_lanes * _length * _jam_density/5280.0f;
-				//	_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
-
-				//	//cout << adjusted_lanes << "," << _num_lanes << endl;
-				//}
-				//else
-				//{
-				//	_num_vehicles_under_jam_density = ((float)_num_lanes) * _length * _jam_density/5280.0f;
-				//	_num_vehicles_under_jam_density = max(((float)_num_lanes) * 2.0f,_num_vehicles_under_jam_density);
-				//}
+				_n_cacc = 0;
 
 				float adjusted_lanes = ((float)_num_lanes) + ((float)_pocket_data.num_pockets)*( _pocket_data.pocket_length/_length );
 

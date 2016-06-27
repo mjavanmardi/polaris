@@ -107,6 +107,7 @@ namespace Link_Components
 			accessor(link_bwtt, NONE, NONE);
 			accessor(link_fftt_cached_simulation_interval_size, NONE, NONE);
 			accessor(link_bwtt_cached_simulation_interval_size, NONE, NONE);
+			accessor(n_cacc, NONE, NONE);
 			
 			accessor(link_capacity, NONE, NONE);
 			accessor(link_supply, NONE, NONE);

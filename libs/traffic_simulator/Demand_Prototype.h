@@ -175,7 +175,7 @@ namespace Demand_Components
 				std::unordered_set<int> tracking_list;
 				if (((_Scenario_Interface*)_global_scenario)->use_vehicle_tracking_table<bool>())
 				{
-					cout << "Read Track_Trips table: " << "\n";
+					cout << "Read Track_Trips table" << "\n";
 					//read the table 
 					result<Track_Trips> trip_result=db->template query<Track_Trips>(query<Track_Trips>::true_expr);
 					int trip_id;
@@ -188,7 +188,10 @@ namespace Demand_Components
 				}
 
 
-				cout << "Demand Percentage: " << demand_percentage;
+				cout << "simulate_cacc: " << ((_Scenario_Interface*)_global_scenario)->simulate_cacc<bool>() << "\n";
+
+
+				cout << "demand_reduction_factor: " << demand_percentage << "\n";
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 					// perform demand reduction
