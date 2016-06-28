@@ -20,7 +20,9 @@ def download_file(url, outputdir):
 		print "Request was not redirected"
 		print r.status_code, r.url
 	print r.headers
-	file_size = int(r.headers['content-length'])
+	# sometimes content-length is not provided
+	#file_size = int(r.headers['content-length']) 
+	file_size = len(r.content)
 	print "Downloading: %s Bytes: %s" % (local_filename, file_size)
 	with open(local_filename, 'wb') as f:
 		file_size_dl = 0
