@@ -1,5 +1,7 @@
 @ECHO OFF
 
+SETLOCAL
+
 IF NOT "%1" == "" (
 	set BASEDIR=%1
 ) ELSE IF NOT "%POLARIS_DEPS_DIR%" == "" (
@@ -25,7 +27,7 @@ echo filedir=   %~dp0
 
 set ERRORLEVEL=
 %MYPYTHONPATH% myWget.py -u "https://sourceforge.net/code-snapshots/svn/a/ag/agg/svn/agg-svn-117.zip" -n %ZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
-IF ERRORLEVEL 1 (ECHO Download and Extract of '%FREETYPEZIPFILE%' failed. & cd /D %~dp0 & EXIT /B 1)
+IF ERRORLEVEL 1 (ECHO Download and Extract of '%FREETYPEZIPFILE%' - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
 
 set BUILDDIR=%LIBDIR%\build_vs2015
 IF NOT EXIST %BUILDDIR% ( mkdir %BUILDDIR% )
@@ -47,11 +49,13 @@ set ERRORLEVEL=
 msbuild antigrain.sln /p:Platform=x64 /p:Configuration=Debug
 IF %ERRORLEVEL% NEQ 0 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
 
-IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of AGG 2.4 Release project failed.)
-IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of AGG 2.4 Debug project failed.)
+IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of AGG 2.4 Release project - FAIL)
+IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of AGG 2.4 Debug project - FAIL)
 
 cd /D %~dp0
-IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & EXIT /B 1)
+call DisplayDate.cmd
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
+ENDLOCAL
 ECHO STATUS: SUCCESS
 
 

@@ -1,4 +1,8 @@
 @ECHO OFF
+::ECHO This is just a test
+::EXIT /B 1
+
+SETLOCAL
 
 IF NOT "%1" == "" (
 	set BASEDIR=%1
@@ -47,11 +51,15 @@ IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=
 %MYPYTHONPATH% myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n %GTESTZIPFILE% -e %BASEDIR% -o %BASEDIR%
-IF ERRORLEVEL 1 (ECHO Download and Extract of '%GTESTZIPFILE%' failed. & EXIT /B 1)
+IF ERRORLEVEL 1 (ECHO Download and Extract of '%GTESTZIPFILE%' failed. & ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
 
 set BUILDDIR=%GTESTDIR%\build_msvc2015
 mkdir %BUILDDIR%
 cd /D %BUILDDIR%
+
+set DEBUG_BUILD=0
+set RELEASE_BUILD=0
+set BUILD_ERROR=0
 
 set ERRORLEVEL=
 cmake -D  gtest_force_shared_crt=TRUE -G "Visual Studio 14 Win64" ..
@@ -59,10 +67,17 @@ IF ERRORLEVEL 1 (ECHO CMake was unable to generate project file. & EXIT /B 1)
 
 set ERRORLEVEL=
 msbuild gtest.sln /p:Configuration=Release /p:Platform=x64
-IF ERRORLEVEL 1 (ECHO MSBuild of Release project failed. & EXIT /B 1)
+IF ERRORLEVEL 1 (SET RELEASE_BUILD=1 & set BUILD_ERROR=1)
 
 set ERRORLEVEL=
 msbuild gtest.sln /p:Configuration=Debug /p:Platform=x64
-IF ERRORLEVEL 1 (ECHO MSBuild of Debug project failed. & EXIT /B 1)
+IF ERRORLEVEL 1 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
+
+IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of gtest 1.7.0 Release project - FAIL )
+IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of gtest 1.7.0 Debug project - FAIL )
 
 cd /D %~dp0
+call DisplayDate.cmd
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
+ENDLOCAL
+ECHO STATUS: SUCCESS

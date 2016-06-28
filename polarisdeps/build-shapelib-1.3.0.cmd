@@ -1,5 +1,7 @@
 @ECHO OFF
 
+SETLOCAL
+
 IF NOT "%1" == "" (
 	set BASEDIR=%1
 ) ELSE IF NOT "%POLARIS_DEPS_DIR%" == "" (
@@ -25,7 +27,7 @@ echo filedir=	%~dp0
 
 set ERRORLEVEL=
 %MYPYTHONPATH% myWget.py -u "http://download.osgeo.org/shapelib/shapelib-1.3.0.zip" -n %ZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
-IF ERRORLEVEL 1 (ECHO Download and Extract of '%ZIPFILE%' failed. & cd /D %~dp0 & EXIT /B 1)
+IF ERRORLEVEL 1 (ECHO Download and Extract of '%ZIPFILE%' - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
 
 set DEBUG_BUILD=0
 set RELEASE_BUILD=0
@@ -51,11 +53,13 @@ move *.dll lib
 mkdir bin
 move *.exe bin
 
-IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of ShapeLib 1.3.0 Release project failed.)
-IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of ShapeLib 1.3.0 Debug project failed.)
+IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of ShapeLib 1.3.0 Release project - FAIL )
+IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of ShapeLib 1.3.0 Debug project - FAIL )
 
 cd /D %~dp0
-IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & EXIT /B 1)
+call DisplayDate.cmd
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
+ENDLOCAL
 ECHO STATUS: SUCCESS
 
 

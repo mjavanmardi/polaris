@@ -1,5 +1,7 @@
 @ECHO OFF
 
+SETLOCAL
+
 IF NOT "%1" == "" (
 	set BASEDIR=%1
 	call polaris-env.bat %1
@@ -10,7 +12,7 @@ IF NOT "%1" == "" (
 	call polaris-env.bat %CD%
 )
 
-echo %BASEDIR%
+echo BASEDIR=%BASEDIR%
 IF NOT EXIST %BASEDIR% (
 	MKDIR %BASEDIR%
 )
@@ -33,54 +35,37 @@ IF NOT "%VCROOT%" == "" (
     call "%VCROOT%\vcvarsall.bat" amd64
 )
 
-:: cal this because for some goofy reason it fails on the first call - but then works
-call find-python.cmd
+:: call this because for some goofy reason it fails on the first call - but then works
+call find-python.cmd > nul 2>&1
 
 :: get our slashes all straightened out :)
 set a=%BASEDIR%
 set a=%a:/=\%
-echo %a%
+echo BASEDIR=%a% with slashed fixed
 set BASEDIR=%a%
-
-::cd /D %~dp0
-::call %~dp0build-boost-1.60.0.cmd %BASEDIR%
-::cd /D %~dp0
-::call %~dp0build-odb-2.4.0.cmd %BASEDIR%
-::cd /D %~dp0
-::call %~dp0build-gtest-1.7.0.cmd %BASEDIR%
 
 SET LOGDIR=%BASEDIR%\builds
 IF NOT EXIST %LOGDIR% ( mkdir %LOGDIR% )
-DEL %LOGDIR%\boost_build.log
-DEL %LOGDIR%\odb_build.log
-DEL %LOGDIR%\gtest_build.log
-DEL %LOGDIR%\antares_build.log
+IF EXIST %LOGDIR%\boost_build.log (DEL %LOGDIR%\boost_build.log)
+IF EXIST %LOGDIR%\odb_build.log (DEL %LOGDIR%\odb_build.log)
+IF EXIST %LOGDIR%\gtest_build.log (DEL %LOGDIR%\gtest_build.log)
 
-set BOOST_BUILD=0
-set ODB_BUILD=0
-set GTEST_BUILD=0
-set ANTARES_BUILD=0
 set BUILD_ERROR=0
 
 cd /D %~dp0
 set ERRORLEVEL=
-call %~dp0build-boost-1.60.0.cmd %BASEDIR%	| tee %LOGDIR%\boost_build.log
-IF %ERRORLEVEL% NEQ 0 (SET BOOST_BUILD=1 & set BUILD_ERROR=1)
+call %~dp0build-boost-1.60.0.cmd %BASEDIR%	> %LOGDIR%\boost_build.log 2>&1
+IF %ERRORLEVEL% NEQ 0 (ECHO Build of Boost 1.60.0  - FAIL  & set BUILD_ERROR=1)
 
 cd /D %~dp0
 set ERRORLEVEL=
-call %~dp0build-odb-2.4.0.cmd %BASEDIR%		| tee %LOGDIR%\odb_build.log
-IF %ERRORLEVEL% NEQ 0 (SET ODB_BUILD=1 & set BUILD_ERROR=1)
+call %~dp0build-odb-2.4.0.cmd %BASEDIR%	> %LOGDIR%\odb_build.log 2>&1
+IF %ERRORLEVEL% NEQ 0 (ECHO Build of ODB 2.4.0  - FAIL & set BUILD_ERROR=1)
 
 cd /D %~dp0
 set ERRORLEVEL=
-call %~dp0build-gtest-1.7.0.cmd %BASEDIR%	| tee %LOGDIR%\gtest_build.log
-IF %ERRORLEVEL% NEQ 0 (SET GTEST_BUILD=1 & set BUILD_ERROR=1)
-
-cd /D %~dp0
-set ERRORLEVEL=
-::call %~dp0get-antares-deps.cmd %BASEDIR%
-IF %ERRORLEVEL% NEQ 0 (SET ANTARES_BUILD=1 & set BUILD_ERROR=1)
+call %~dp0build-gtest-1.7.0.cmd %BASEDIR% > %LOGDIR%\gtest_build.log 2>&1
+IF %ERRORLEVEL% NEQ 0 (ECHO Build of GTest 1.7.0 - FAIL  & set BUILD_ERROR=1)
 
 cd /D %~dp0
 
@@ -101,12 +86,8 @@ COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.pdb                            
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.dll   %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-d-2.4-vc14.pdb   %BASEDIR%\bin\Debug
 
-IF %BOOST_BUILD%	NEQ 0 (ECHO Build of Boost 1.60.0 failed.)
-IF %ODB_BUILD%		NEQ 0 (ECHO Build of ODB 2.4.0 failed.)
-IF %GTEST_BUILD%	NEQ 0 (ECHO Build of GTest 1.7.0 failed.)
-IF %ANTARES_BUILD%	NEQ 0 (ECHO Build of Antares dependencies failed.)
-
 cd /D %~dp0
-IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & EXIT /B 1)
+call DisplayDate.cmd
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
+ENDLOCAL
 ECHO STATUS: SUCCESS
-
