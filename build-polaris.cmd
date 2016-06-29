@@ -1,5 +1,7 @@
 @ECHO OFF
 
+SETLOCAL
+
 REM  see if Vsual Studio is already set
 SET VCROOT=
 IF "%VSINSTALLDIR%" == "" (
@@ -20,19 +22,22 @@ IF NOT "%VCROOT%" == "" (
 cd /D %~dp0build_vs2015
 
 SET ERRORLEVEL=
+SET BUILD_ERROR=0
 SET DEBUG_BUILD_ERROR=0
 SET RELEASE_BUILD_ERROR=0
 msbuild polaris.sln /p:Configuration=Debug /p:Platform=x64
-IF %ERRORLEVEL% NEQ 0 (ECHO Error building Debug Polaris. & SET DEBUG_BUILD_ERROR=1)
+IF %ERRORLEVEL% NEQ 0 ( SET DEBUG_BUILD_ERROR=1 & SET BUILD_ERROR=1)
 SET ERRORLEVEL=
 msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
-IF %ERRORLEVEL% NEQ 0 (ECHO Error building Release Polaris. & SET RELEASE_BUILD_ERROR=1)
+IF %ERRORLEVEL% NEQ 0 ( SET RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
 cd /D %~dp0
 
-IF %DEBUG_BUILD_ERROR% NEQ 0 GOTO ERR
-IF %RELEASE_BUILD_ERROR% NEQ 0 GOTO ERR
-GOTO END
-:ERR
-ECHO Error building Polaris.
-EXIT /B 1
+IF %DEBUG_BUILD_ERROR% NEQ 0 ( ECHO Building Debug Polaris - FAIL )
+IF %RELEASE_BUILD_ERROR% NEQ 0 ( ECHO Building Release Polaris - FAIL )
+
+call polarisdeps\DisplayDate.cmd
+IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
+ENDLOCAL
+ECHO STATUS: SUCCESS
+
 

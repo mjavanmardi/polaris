@@ -41,7 +41,7 @@ call find-python.cmd > nul 2>&1
 :: get our slashes all straightened out :)
 set a=%BASEDIR%
 set a=%a:/=\%
-echo BASEDIR=%a% with slashed fixed
+echo BASEDIR=%a% with slashes fixed
 set BASEDIR=%a%
 
 SET LOGDIR=%BASEDIR%\builds

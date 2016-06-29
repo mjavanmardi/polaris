@@ -18,15 +18,15 @@ set BASEDIR=%a%
 
 
 :: Download and expand source files
-set ZIPFILE=agg-svn-117.zip
-set LIBDIR=%BASEDIR%\agg-svn-117\agg-2.4
+set ZIPFILE=agg-2.5.zip
+set LIBDIR=%BASEDIR%\agg-2.5
 
 echo ZIPFILE=	%ZIPFILE%
 echo LIBDIR=	%LIBDIR%
 echo filedir=   %~dp0
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/code-snapshots/svn/a/ag/agg/svn/agg-svn-117.zip" -n %ZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
+%MYPYTHONPATH% myWget.py -u "http://www.antigrain.com/agg-2.5.zip" -n %ZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%FREETYPEZIPFILE%' - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
 
 set BUILDDIR=%LIBDIR%\build_vs2015
@@ -35,7 +35,7 @@ cd %BUILDDIR%
 
 SET ERRORLEVEL=
 cmake -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
-IF ERRORLEVEL 1 (ECHO Error configuring AGG 2.4 projects. & cd /D %~dp0 & EXIT /B 1)
+IF ERRORLEVEL 1 (ECHO Error configuring AGG 2.5 projects. & cd /D %~dp0 & EXIT /B 1)
 
 set DEBUG_BUILD=0
 set RELEASE_BUILD=0
