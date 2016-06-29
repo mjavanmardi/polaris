@@ -52,6 +52,7 @@ IF EXIST %LOGDIR%\freetype_build.log ( DEL %LOGDIR%\freetype_build.log )
 IF EXIST %LOGDIR%\wxWidgets_build.log ( DEL %LOGDIR%\wxWidgets_build.log )
 IF EXIST %LOGDIR%\agg_build.log ( DEL %LOGDIR%\agg_build.log )
 IF EXIST %LOGDIR%\plplot_build.log ( DEL %LOGDIR%\plplot_build.log )
+IF EXIST %LOGDIR%\glew_build.log ( DEL %LOGDIR%\glew_build.log )
 
 set BUILD_ERROR=0
 
@@ -76,17 +77,20 @@ IF %ERRORLEVEL% NEQ 0 (ECHO Build of wxWidgets 3.1.0 - FAIL & set BUILD_ERROR=1)
 cd /D %~dp0
 set AGG_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-agg-2.5.cmd %BASEDIR% > %LOGDIR%\agg_build.log 2>&1
+::call %~dp0build-agg-2.5.cmd %BASEDIR% > %LOGDIR%\agg_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (ECHO Build of AGG 2.4 - FAIL & set BUILD_ERROR=1)
 
-
-::Now that the dependencies are built go ahead and build plplot
 cd /D %~dp0
 SET PLPLOT_BUILD=0
 set ERRORLEVEL=
 call %~dp0build-plplot-5.11.1.cmd %BASEDIR% > %LOGDIR%\plplot_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (ECHO Build of plPlot 5.11.1 - FAIL & set BUILD_ERROR=1)
 
+cd /D %~dp0
+SET GLEW_BUILD=0
+set ERRORLEVEL=
+call %~dp0build-glew-1.13.0.cmd %BASEDIR% > %LOGDIR%\glew_build.log 2>&1
+IF %ERRORLEVEL% NEQ 0 (ECHO Build of Glew 1.13.0 - FAIL & set BUILD_ERROR=1)
 
 :: as a convenience we copy all dll's to a single folder to save on path entries
 IF NOT EXIST %BASEDIR%\bin ( mkdir %BASEDIR%\bin )
