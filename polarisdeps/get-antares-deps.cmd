@@ -76,7 +76,7 @@ IF %ERRORLEVEL% NEQ 0 (ECHO Build of wxWidgets 3.1.0 - FAIL & set BUILD_ERROR=1)
 cd /D %~dp0
 set AGG_BUILD=0
 set ERRORLEVEL=
-call %~dp0build-agg-2.4.cmd %BASEDIR% > %LOGDIR%\agg_build.log 2>&1
+call %~dp0build-agg-2.5.cmd %BASEDIR% > %LOGDIR%\agg_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (ECHO Build of AGG 2.4 - FAIL & set BUILD_ERROR=1)
 
 
