@@ -474,7 +474,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#ifdef ANTARES
 	typedef polaris::Pair_Associative_Container<typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-	typedef Zone_Components::Prototypes::Zone<get_component_type(_Zones_Container_Interface)> _Zone_Interface;
+	typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
 

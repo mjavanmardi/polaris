@@ -21,19 +21,34 @@ IF NOT "%VCROOT%" == "" (
 
 cd /D %~dp0build_vs2015
 
-SET ERRORLEVEL=
 SET BUILD_ERROR=0
 SET DEBUG_BUILD_ERROR=0
 SET RELEASE_BUILD_ERROR=0
+SET ANTARES_DEBUG_BUILD_ERROR=0
+SET ANTARES_RELEASE_BUILD_ERROR=0
+
+SET ERRORLEVEL=
 msbuild polaris.sln /p:Configuration=Debug /p:Platform=x64
 IF %ERRORLEVEL% NEQ 0 ( SET DEBUG_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+
 SET ERRORLEVEL=
 msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
 IF %ERRORLEVEL% NEQ 0 ( SET RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+
+SET ERRORLEVEL=
+::msbuild polaris_antares.sln /p:Configuration=Debug /p:Platform=x64
+IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_DEBUG_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+
+SET ERRORLEVEL=
+::msbuild polaris_antares.sln /p:Configuration=Release /p:Platform=x64
+IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+
 cd /D %~dp0
 
 IF %DEBUG_BUILD_ERROR% NEQ 0 ( ECHO Building Debug Polaris - FAIL )
 IF %RELEASE_BUILD_ERROR% NEQ 0 ( ECHO Building Release Polaris - FAIL )
+IF %ANTARES_DEBUG_BUILD_ERROR% NEQ 0 ( ECHO Building Debug Antares Polaris - FAIL )
+IF %ANTARES_RELEASE_BUILD_ERROR% NEQ 0 ( ECHO Building Release Antares Polaris - FAIL )
 
 call polarisdeps\DisplayDate.cmd
 IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)

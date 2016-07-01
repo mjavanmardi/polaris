@@ -47,11 +47,13 @@ set BUILD_ERROR=0
 ::IF %ERRORLEVEL% NEQ 0 (SET DLL_DEBUG_BUILD=1 & set BUILD_ERROR=1)
 
 set ERRORLEVEL=
-msbuild wx_vc14.sln /p:Platform=x64 /p:Configuration=Release
+::msbuild wx_vc14.sln /p:Platform=x64 /p:Configuration=Release
+nmake /f makefile.vc BUILD=release SHARED=1 TARGET_CPU=X64
 IF %ERRORLEVEL% NEQ 0 (SET RELEASE_BUILD=1 & set BUILD_ERROR=1)
 
 set ERRORLEVEL=
-msbuild wx_vc14.sln /p:Platform=x64 /p:Configuration=Debug
+::msbuild wx_vc14.sln /p:Platform=x64 /p:Configuration=Debug
+nmake /f makefile.vc BUILD=debug SHARED=1 TARGET_CPU=X64
 IF %ERRORLEVEL% NEQ 0 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
 
 IF %DLL_RELEASE_BUILD% NEQ 0 (ECHO MSBuild of wxWidgets 3.1.0 DLL Release project - FAIL)

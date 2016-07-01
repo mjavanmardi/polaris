@@ -38,6 +38,9 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
 	typedef NULLTYPE visual_vehicle_type;
 
+	//%%RLW
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 #else
 
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<MasterType> network_type;
