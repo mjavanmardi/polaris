@@ -315,6 +315,7 @@ namespace Demand_Components
 					router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
 					traveler->Schedule_New_Departure(departed_time);
+					traveler->Schedule_Wehicle_Write();
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 

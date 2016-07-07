@@ -389,6 +389,13 @@ namespace Turn_Movement_Components
 						int b  = ((_Link_Interface*)_outbound_link)->template uuid<int&>();
 						((_Link_Interface*)_inbound_link)->template n_cacc<int&>()--;
 						((_Link_Interface*)_outbound_link)->template n_cacc<int&>()++;
+						if (((_Link_Interface*)_outbound_link)->template n_cacc<int&>() > 1) //there are vehicles to platoon with
+						{
+							float temp =  vehicle->template cacc_vmt<float>();
+							temp += ((_Link_Interface*)_outbound_link)->template length<float>();
+							vehicle->template cacc_vmt<float>(temp);
+						}
+
 					}
 
 					((_Link_Interface*)_outbound_link)->template link_upstream_arrived_vehicles<int&>()++;

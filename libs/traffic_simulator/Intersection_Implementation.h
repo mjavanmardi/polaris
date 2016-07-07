@@ -55,15 +55,12 @@ namespace Intersection_Components
 				_Movement_Interface* inbound_movement;
 				_Link_Interface* inbound_link;
 				typename _Movements_Container_Interface::iterator inbound_itr;
-
-				float outbound_link_capacity = ((_Link_Interface*)_outbound_link_reference)->template link_capacity<float>();
 				int inbound_turn_movement_size=(int)_inbound_movements.size();
 				if(inbound_turn_movement_size >= 1)
 				{
 					if (inbound_turn_movement_size == 1)
 					{
 						((_Movement_Interface*)_inbound_movements[0])->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>());
-						//((_Movement_Interface*)_inbound_movements[0])->template movement_capacity<float>(outbound_link_capacity * 1.0f);
 					}
 					else
 					{//divide space based on merging policy
@@ -97,12 +94,7 @@ namespace Intersection_Components
 								for(inbound_itr=_inbound_movements.begin();inbound_itr!=_inbound_movements.end();inbound_itr++)
 								{
 									inbound_movement=(_Movement_Interface*)(*inbound_itr);
-									//inbound_movement->template movement_supply<float>(inbound_movement->template movement_demand<float>());
 									inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>());
-									//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-									//	inbound_movement->template movement_capacity<float>(outbound_link_capacity / (float)inbound_turn_movement_size);
-									//else
-									//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 								}
 							}
 							else
@@ -118,10 +110,6 @@ namespace Intersection_Components
 											if (inbound_movement->template internal_id<int>() != protected_turn_movement->template internal_id<int>())
 											{
 												inbound_movement->template movement_supply<float>(0.0);
-												//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-												//	inbound_movement->template movement_capacity<float>(0.0f);
-												//else
-												//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 												
 											}
 										}
@@ -138,16 +126,7 @@ namespace Intersection_Components
 											inbound_movement=(_Movement_Interface*)(*inbound_itr);
 											if (inbound_movement->template internal_id<int>() != protected_turn_movement->template internal_id<int>())
 											{
-												inbound_movement->template movement_supply<float>(link_supply_leftover * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
-/*												if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-												{
-													if (((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() == 0.0f)
-														inbound_movement->template movement_capacity<float>(0.0f);
-													else
-														inbound_movement->template movement_capacity<float>(outbound_link_capacity * inbound_movement->template movement_supply<float>() / ((_Link_Interface*)_outbound_link_reference)->template link_supply<float>());
-												}
-												else
-													inbound_movement->template movement_capacity<float>(outbound_link_capacity);	*/											
+												inbound_movement->template movement_supply<float>(link_supply_leftover * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));										
 											}
 										}
 									}
@@ -158,10 +137,6 @@ namespace Intersection_Components
 									{
 										inbound_movement=(_Movement_Interface*)(*inbound_itr);
 										inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
-										//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-										//	inbound_movement->template movement_capacity<float>(outbound_link_capacity * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
-										//else
-										//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 										
 									}
 										
@@ -177,19 +152,10 @@ namespace Intersection_Components
 								if (inbound_movement->template movement_rule<int>() == Turn_Movement_Components::Types::Turn_Movement_Rule_Keys::ALLOWED)
 								{
 									inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() / (num_allowed_movements*1.0f));
-									//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-									//	inbound_movement->template movement_capacity<float>(outbound_link_capacity / float(num_allowed_movements));
-									//else
-									//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 								}
 								else
 								{
-									inbound_movement->template movement_supply<float>(0.0f);
-									//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-									//	inbound_movement->template movement_capacity<float>(0.0f);
-									//else
-									//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
-									
+									inbound_movement->template movement_supply<float>(0.0f);									
 								}
 
 							}
@@ -224,7 +190,6 @@ namespace Intersection_Components
 				{//only one inbound turn movement - allocate full space of outbound link to inbound turn movement
 					inbound_movement = (_Movement_Interface*)(*_inbound_movements.begin());
 					inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>());
-					//inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 				}
 				else
 				{//divide space based on merging policy
@@ -244,19 +209,11 @@ namespace Intersection_Components
 							{//case 2: total_transfer_demand<= link_supply_array
 								inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
 							}
-							//if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-							//	inbound_movement->template movement_capacity<float>(outbound_link_capacity * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
-							//else
-							//	inbound_movement->template movement_capacity<float>(outbound_link_capacity);
 							
 						}
 						else
 						{
-							inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() / (inbound_turn_movement_size*1.0f));
-/*							if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-								inbound_movement->template movement_capacity<float>(outbound_link_capacity / float(inbound_turn_movement_size));
-							else
-								inbound_movement->template movement_capacity<float>(outbound_link_capacity);*/							
+							inbound_movement->template movement_supply<float>(((_Link_Interface*)_outbound_link_reference)->template link_supply<float>() / (inbound_turn_movement_size*1.0f));						
 							
 						}	
 					}
@@ -277,10 +234,6 @@ namespace Intersection_Components
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
 						inbound_movement->template movement_supply<float>(supply_per_movement);
-/*						if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-							inbound_movement->template movement_capacity<float>(outbound_link_capacity / (float)inbound_turn_movement_size);
-						else
-							inbound_movement->template movement_capacity<float>(outbound_link_capacity);	*/		
 						
 					}
 				}
@@ -302,11 +255,7 @@ namespace Intersection_Components
 						for(inbound_itr=_inbound_movements.begin();inbound_itr!=_inbound_movements.end();inbound_itr++)
 						{
 							inbound_movement=(_Movement_Interface*)(*inbound_itr);
-							inbound_movement->template movement_supply<float>(supply_per_lane * inbound_movement->template num_turn_lanes<int>() * 1.0f);
-/*							if (((_Scenario_Interface*)_global_scenario)->template maximum_flow_rate_constraints_enforced<bool>())
-								inbound_movement->template movement_capacity<float>(outbound_link_capacity * inbound_movement->template num_turn_lanes<float>() / (float)num_inbound_turn_lanes);
-							else
-								inbound_movement->template movement_capacity<float>(outbound_link_capacity);*/								
+							inbound_movement->template movement_supply<float>(supply_per_lane * inbound_movement->template num_turn_lanes<int>() * 1.0f);							
 							
 						}
 					}

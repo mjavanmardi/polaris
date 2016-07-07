@@ -15,14 +15,36 @@ namespace Traveler_Components
 	{
 		implementation struct Traveler_Implementation:public Polaris_Component<MasterType,INHERIT(Traveler_Implementation),Execution_Object>
 		{
+			void Write_Vehicle_Data()
+			{
+				
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+				float temp = _vehicle->template cacc_vmt<float&>();
+				if (temp > 0)
+				{
+					fstream& vehicle_cacc_vmt_file = scenario->template vehicle_cacc_vmt_file<fstream&>();
+					vehicle_cacc_vmt_file
+						<< _vehicle->template trip_id<int>()  << ","
+						<< _vehicle->template cacc_vmt<float>() << "\n";
+				}
+
+			}
 			static void Initiate_Departure_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
 				{
 					_this->Initiate_Departure();
-					response.next._iteration=END;
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION;
+					response.next._iteration=std::max(iteration()+1,(int)END-2);
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION;
 				}
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION)
+				{
+					_this->Write_Vehicle_Data();
+					response.next._iteration=END;
+					response.next._sub_iteration=END;
+				}
+
 			}
 
 			void Initiate_Departure()
@@ -51,6 +73,12 @@ namespace Traveler_Components
 
 				// other stuff than routing
 				Load_Event<ComponentType>(&Initiate_Departure_Conditional,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION);
+				
+			}
+
+			void Schedule_Wehicle_Write()
+			{
+				//Load_Event<ComponentType>(&Write_Vehicle_Data,END,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION);
 			}
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));

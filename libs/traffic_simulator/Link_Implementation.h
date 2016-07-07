@@ -219,7 +219,7 @@ namespace Link_Components
 			m_data(Pocket_Data, pocket_data, NONE, NONE);
 
 			m_data(float, link_vht, NONE, NONE);
-			m_data(float, C, NONE, NONE);
+			m_data(float, bigC, NONE, NONE);
 			m_data(float, Q, NONE, NONE);
 
 			struct Link_MOE_Data link_moe_data;
@@ -399,7 +399,7 @@ namespace Link_Components
 					link_shifted_cumulative_arrived_vehicles = 0;
 				}
 
-				_C = _link_upstream_cumulative_vehicles + _link_capacity;
+				_bigC = _link_upstream_cumulative_vehicles + _link_capacity;
 				int link_downstream_cumulative_vehicles_by_t_minus_bwtt = 0;	
 				//N(a,L(a),t-bwtt)
 				if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
@@ -531,6 +531,9 @@ namespace Link_Components
 						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 						UNLOCK(_link_lock);
 					}
+
+
+
 					int departure_time = mp->template departed_time<Time_Seconds>();
 					int arrival_time = mp->template arrived_time<Time_Seconds>();
 					float travel_time = float ((arrival_time - departure_time)/60.0f);
@@ -796,7 +799,7 @@ namespace Link_Components
 				_shoulder_opened = false;
 
 				_Q = 0.0;
-				_C = 0.0;
+				_bigC = 0.0;
 			}
 
 			void initialize_moe()

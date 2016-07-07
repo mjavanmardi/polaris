@@ -58,7 +58,9 @@ namespace Scenario_Components
 			m_data(string, output_dir_name, NONE, NONE);
 				
 			m_data(string, vehicle_trajectory_file_name, NONE, NONE);
+			m_data(string, vehicle_cacc_vmt_file_name, NONE, NONE);
 			m_data(fstream, vehicle_trajectory_file, NONE, NONE);
+			m_data(fstream, vehicle_cacc_vmt_file, NONE, NONE);
 			m_data(double, vehicle_trajectory_sample_rate, NONE, NONE);
 			m_data(string, vehicle_tracking_list_file_name, NONE, NONE);
 			m_container(std::unordered_set<int>, vehicle_tracking_list, NONE, NONE);
@@ -172,6 +174,7 @@ namespace Scenario_Components
 
 			m_data(bool, write_node_control_state, NONE, NONE);
 			m_data(bool, write_vehicle_trajectory, NONE, NONE);
+			m_data(bool, write_vehicle_cacc_vmt, NONE, NONE);
 			m_data(bool, use_vehicle_tracking_table, NONE, NONE);
 			m_data(bool, write_network_link_flow, NONE, NONE);
 			m_data(bool, write_network_link_turn_time, NONE, NONE);

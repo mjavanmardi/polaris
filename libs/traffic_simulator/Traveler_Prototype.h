@@ -20,6 +20,7 @@ namespace Traveler_Components
 			accessor(plan, NONE, NONE);
 
 			void Schedule_New_Departure(int departed_time){this_component()->Schedule_New_Departure(departed_time);}
+			void Schedule_Wehicle_Write(){this_component()->Schedule_Wehicle_Write();}
 		};
 	}
 }

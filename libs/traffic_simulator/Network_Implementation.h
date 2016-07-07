@@ -727,6 +727,9 @@ namespace Network_Components
 				typedef Network<typename MasterType::network_type> _Network_Interface;
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
+				//int temp = _this_ptr->template start_of_current_simulation_interval_absolute<int>() ;
+				//int temp1 = _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>();
+				//int v_size = 
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();

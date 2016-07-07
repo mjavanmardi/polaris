@@ -16,7 +16,8 @@ namespace Network_Components
 
 		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		 void Network_Implementation<MasterType,InheritanceList>::write_vehicle_trajectory()
+
+		void Network_Implementation<MasterType,InheritanceList>::write_vehicle_trajectory()
 		{
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;

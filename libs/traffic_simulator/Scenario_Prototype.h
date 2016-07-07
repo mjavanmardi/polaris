@@ -78,7 +78,9 @@ namespace Scenario_Components
 				
 			// accessors for vehicle trajectory tracking, use either random selection or list-based selection for tracking vehicles
 			accessor(vehicle_trajectory_file_name, NONE, NONE);
+			accessor(vehicle_cacc_vmt_file_name, NONE, NONE);
 			accessor(vehicle_trajectory_file, NONE, NONE);
+			accessor(vehicle_cacc_vmt_file, NONE, NONE);
 			accessor(vehicle_trajectory_sample_rate, NONE, NONE);
 			accessor(vehicle_tracking_list_file_name, NONE, NONE);
 			accessor(vehicle_tracking_list, NONE, NONE);
@@ -164,6 +166,7 @@ namespace Scenario_Components
 
 			accessor(write_node_control_state, NONE, NONE);
 			accessor(write_vehicle_trajectory, NONE, NONE);
+			accessor(write_vehicle_cacc_vmt, NONE, NONE);
 			accessor(use_vehicle_tracking_table, NONE, NONE);
 			accessor(write_network_link_flow, NONE, NONE);
 			accessor(write_network_link_turn_time, NONE, NONE);
@@ -510,6 +513,7 @@ namespace Scenario_Components
 				//===============================================
 				// Vehicle trajectory tracking parameters
 				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
+				if (cfgReader.getParameter("write_vehicle_cacc_vmt", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
 				if (cfgReader.getParameter("use_vehicle_tracking_table", use_vehicle_tracking_table<bool*>())!= PARAMETER_FOUND) use_vehicle_tracking_table<bool>(false);
 				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
 				if (cfgReader.getParameter("vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<string*>())!= PARAMETER_FOUND)
@@ -781,6 +785,21 @@ namespace Scenario_Components
 				odb::transaction t3(db3->begin());
 				t3.commit();
 
+				if (this->template write_vehicle_cacc_vmt<bool>())
+				{
+					vehicle_cacc_vmt_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_cacc_vmt.csv");
+					vehicle_cacc_vmt_file<fstream&>().open(vehicle_cacc_vmt_file_name<string&>(),fstream::out);
+					if(vehicle_cacc_vmt_file<fstream&>().is_open())  
+					{
+						vehicle_cacc_vmt_file<fstream&>()
+							<< "vehicle" << ","
+							<< "cacc_vmt" << "\n";
+					}
+					else
+					{
+						cout << "Cannot open file - " << vehicle_cacc_vmt_file_name<string&>() << "\n";
+					}
+				}
 
 				//vehicle trajectory
 				if (this->template write_vehicle_trajectory<bool>())
