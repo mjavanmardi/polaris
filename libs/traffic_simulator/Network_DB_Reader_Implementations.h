@@ -697,9 +697,12 @@ namespace Network_Components
 				int counter=-1;
 
 				cout << "Reading Connections" << endl;
-
+				unsigned long connect_id;
+				try
+				{
 				for(typename result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
 				{
+					connect_id = db_itr->getPrimaryKey();
 					const string& inbound_link_type = db_itr->getLink()->getType()->getLink_Type();
 					const string& outbound_link_type = db_itr->getTo_Link()->getType()->getLink_Type();
 
@@ -842,7 +845,10 @@ namespace Network_Components
 
 					turn_movements_container.push_back(turn_movement);
 				}
-
+				}
+				catch (const odb::exception& e) {
+					std::cout << "Problem reading connection " << connect_id << "\n";
+					THROW_EXCEPTION(e.what());}
 				cout << "Configuring Connections" << endl;
 
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
