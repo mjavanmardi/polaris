@@ -237,13 +237,15 @@ int main(int argc, char* argv[])
 
 	int num_threads = 1;
 	if (argc >= 3) num_threads = std::max(atoi(argv[2]),num_threads);
+	int num_iterarations;
+	if (argc >= 4) num_iterarations = std::max(atoi(argv[3]),num_iterarations);
 
 	cout << "Running NetworkModel" << endl;
 
 	//initialize the core
 	Simulation_Configuration cfg;
 	//nuber of iterations, number of threads, TODO: should use argv instedad
-	cfg.Multi_Threaded_Setup(24*60*60,num_threads);
+	cfg.Multi_Threaded_Setup(num_iterarations,num_threads);
 	INITIALIZE_SIMULATION(cfg);
 
     Average_Execution_Objects_Hint<MasterType::routing_type>(27784950);

@@ -21,7 +21,7 @@ namespace Traveler_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 				float temp = _vehicle->template cacc_vmt<float&>();
-				if (temp > 0)
+				if (temp > 0 && scenario->template write_vehicle_cacc_vmt<bool>())
 				{
 					fstream& vehicle_cacc_vmt_file = scenario->template vehicle_cacc_vmt_file<fstream&>();
 					vehicle_cacc_vmt_file
