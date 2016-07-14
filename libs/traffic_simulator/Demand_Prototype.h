@@ -237,6 +237,10 @@ namespace Demand_Components
 					_Activity_Location_Interface* destination_activity_location = activity_id_to_ptr[dst_key];
 					_Link_Interface* origin_link = origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
 					_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
+					bool flag = false;
+					flag = origin_link->template internal_id<int>() == destination_link->template internal_id<int>();
+					flag = origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0;
+					flag = destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0;
 					if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
 						// No path can be found. Discard the trip

@@ -1278,6 +1278,7 @@ namespace Network_Components
 						++counter;
 					}
 					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
+					//catch (exception& e)  {    cout << e.what() << '\n';  }
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
 
