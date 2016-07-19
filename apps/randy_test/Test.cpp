@@ -7,6 +7,7 @@ using namespace std;
 #include <boost/format.hpp>
 //#include <chrono>
 #include "myAgent.h"
+#include "TryThis.h"
 #include <algorithm>
 #include "version.h"
 
@@ -30,6 +31,33 @@ bool parse_commandline(int argc, char* argv[], options& opts);
 #endif
 
 int main(int argc, char* argv[])
+{
+	// There are several pre-set configurations
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(10);
+
+	// The INITIALIZE_SIMULATION macro informs the Core of what type of simulation to build
+	INITIALIZE_SIMULATION(cfg);
+
+	DerivedProto<MasterType::derived_type>* dp = (DerivedProto<MasterType::derived_type>*)Allocate<MasterType::derived_type>();
+	dp->Initialize<MasterType::derived_type>();
+	dp->x1<int>(1);
+	int x1 = dp->x1<int>();
+	dp->x2<double>(2);
+	double x2 = dp->x2<double>();
+	dp->x3(3);
+	double x3_again = dp->x3<double>();
+
+		//DerivedTry dt;
+		//dt.x1(1);
+		//dt.x2(2);
+		//dt.x3(3.00);
+		//int x3 = dt.x3<double>();
+
+	return 0;
+}
+
+int DontCallThis(int argc, char* argv[])
 {
 	options opts;
 	opts.num_iterations = 1000;
@@ -124,6 +152,8 @@ int main(int argc, char* argv[])
 	cout << "Finished!" << endl;
 	cout << "Press RETURN key to continue..." << endl;
 	cin.ignore();
+
+	return 0;
 }
 
 #ifdef COMMANDLINE_ARGS

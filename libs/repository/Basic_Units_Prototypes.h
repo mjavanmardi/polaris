@@ -815,25 +815,33 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists)  && check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			
+			template<typename TargetType, requires(TargetType, check(ComponentType, Get_Value_exists) && check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
+			TargetType Value()
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val / time_val );
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			
+			template<typename TargetType, requires(TargetType, !check(ComponentType, Get_Value_exists) || !check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
+			TargetType Value()
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value, "The specified TargetType is not a valid Acceleration data structure, ensure that TargetType has tags: {Acceleration_Type, Length_Type and Time_Type}");
 				assert_check(ComponentType,Concepts::Is_Acceleration_Component, "The specified ComponentType is not a valid Acceleration component, ensure that ComponentType is tagged as a Acceleration_Type and has Value member}");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			
+			template<typename TargetType, requires(TargetType, check(ComponentType, Set_Value_exists) && check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
+			void Value(TargetType value)
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				this_component()->template Value<Value_Type>(Value_Type(value * time_val * time_val / len_val));
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(strip_modifiers(TargetType),Concepts::Is_Acceleration_Value)))
+			
+			template<typename TargetType, requires(TargetType, !check(ComponentType, Set_Value_exists) || !check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
+			void Value(TargetType value)
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Acceleration data structure, ensure that TargetType has tags: {Acceleration_Type, Length_Type and Time_Type}");
