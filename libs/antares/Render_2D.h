@@ -26,7 +26,8 @@ void Information_Panel_Implementation<MasterType,InheritanceList>::Render()
 
 	Information_Page<typename MasterType::information_page_type>* active_page = (Information_Page<typename MasterType::information_page_type>*)_information_book->GetPage(_information_book->GetSelection());
 	
-	if(active_page->layer<void*>()!=nullptr)
+	//RLW%%%
+	if(active_page != nullptr && active_page->layer<void*>()!=nullptr)
 	{
 		active_page->Draw_Layer<NULLTYPE>(current_iteration,current_iteration);
 	}

@@ -45,7 +45,7 @@ IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd 
 
 :: now generate ANtares projects/soultion
 SET ERRORLEVEL=
-::cmake -DDEPS_DIR=%DEPS_DIR% !var! -DAntares=1 -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
+cmake -DDEPS_DIR=%DEPS_DIR% !var! -DAntares=1 -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
 IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd .. & EXIT /B 1)
 
 ENDLOCAL

@@ -27,23 +27,21 @@ ECHO wxWidgets_LIBRARY_DIRS=%wxWidgets_LIBRARY_DIRS%
 set PLPLOTZIPFILE=plplot-5.11.1.tar.gz
 set PLPLOTDIR=%BASEDIR%\plplot-5.11.1
 
-echo PLPLOTZIPFILE=		%PLPLOTZIPFILE%
+::echo PLPLOTZIPFILE=		%PLPLOTZIPFILE%
 echo PLPLOTDIR=		    %PLPLOTDIR%
 echo filedir=           %~dp0
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/projects/plplot/files/plplot/5.11.1 Source/plplot-5.11.1.tar.gz" -n %PLPLOTZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
-IF ERRORLEVEL 1 (ECHO Download and Extract of '%PLPLOTZIPFILE%' - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
-
-::apply patch
-::set ERRORLEVEL=
-::%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/p/plplot/bugs/_discuss/thread/b199e922/490a/attachment/patch" -n plplot.patch -e %PLPLOTDIR% -o %PLPLOTDIR% -r
-::IF ERRORLEVEL 1 (ECHO Download and Extract of 'patch' - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
-
-::CD /D %PLPLOTDIR%
-::git apply --stat --apply plplot.patch
-
-copy %~dp0FindwxWidgets.cmake %PLPLOTDIR%\cmake\modules
+::%MYPYTHONPATH% myWget.py -u "https://sourceforge.net/projects/plplot/files/plplot/5.11.1 Source/plplot-5.11.1.tar.gz" -n %PLPLOTZIPFILE% -e %BASEDIR% -o %BASEDIR% -r
+:: There are problems building the 5.11.1 release with VS2015
+:: It required too many modifications for it to build correctly
+:: the following commit (later than 5.11.1) does build
+:: commit fdd31ce68b219dbbde39e92fcd2be976c9c6c2c6
+:: so clone the reposirory andreset to that commit until the latest release is sorted
+git clone "git://git.code.sf.net/p/plplot/plplot" %PLPLOTDIR%
+CD /D %PLPLOTDIR%
+git checkout fdd31ce68b219dbbde39e92fcd2be976c9c6c2c6
+IF ERRORLEVEL 1 (ECHO Clone of PLPlot reposirory had issues - FAIL & cd /D %~dp0 & ENDLOCAL & EXIT /B 1)
 
 echo creating build directories
 set BUILDDIR=%PLPLOTDIR%\build_vs2015

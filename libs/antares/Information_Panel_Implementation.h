@@ -84,6 +84,7 @@ Information_Panel_Implementation<MasterType,InheritanceList>::Information_Panel_
 
 	_information_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP|wxAUI_NB_SCROLL_BUTTONS);
 
+	//RLW%%%
 	for(int i=0;i<25;i++)
 	{
 		Information_Page<typename MasterType::information_page_type>* layer = (Information_Page<typename MasterType::information_page_type>*) new typename MasterType::information_page_type(_information_book);

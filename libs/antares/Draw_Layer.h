@@ -138,7 +138,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	{
 		const std::vector<int>* geometry_by_thread = storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(unsigned int i=0;i<num_antares_threads() && i < geometry_by_thread->size() ;i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -339,7 +339,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	{
 		const std::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(unsigned int i=0;i<num_antares_threads() && i<geometry_by_thread->size();i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);

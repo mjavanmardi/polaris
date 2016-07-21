@@ -3,6 +3,7 @@ if(Antares)
 else()
 	PROJECT(polaris CXX)
 endif()
+
 cmake_minimum_required(VERSION 2.8)
 
 #Add capability to create visual studio solution folders
@@ -219,6 +220,11 @@ add_subdirectory (libs/activity_simulator)
 
 
 if (MSVC AND Antares)
+	if(MSVC)
+		set(ANTARES_DEPS_BINARY_DIR ${DEPS_DIR}/antares_bin)
+		MESSAGE(INFO " ANTARES_DEPS_BINARY_DIR=${ANTARES_DEPS_BINARY_DIR}")
+	endif()
+
 	include_directories(libs/visual_traffic_simulator)
 
 	include_directories(${DEPS_DIR}/glew-1.13.0/include)
@@ -242,7 +248,7 @@ if (MSVC AND Antares)
 
     find_library(glewd glew32d ${DEPS_DIR}/glew-1.13.0/build_vs2015/lib/Debug)
 	find_library(plplotd plplot ${DEPS_DIR}/plplot-5.11.1/build_vs2015/debug/src/Debug)
-	find_library(plplotcxxd plplotcxx ${DEPS_DIR}\\plplot-5.11.1\\build_vs2015\\debug\\bindings\\c++\\Debug)
+	set(plplotcxxd ${DEPS_DIR}/plplot-5.11.1/build_vs2015/debug/bindings/c++/Debug/plplotcxx.lib)
 	find_library(csirocsad csirocsa ${DEPS_DIR}/plplot-5.11.1/build_vs2015/debug/lib/csa/Debug)
 	find_library(qsastimed qsastime ${DEPS_DIR}/plplot-5.11.1/build_vs2015/debug/lib/qsastime/Debug)
 	find_library(plplotwxwidgetsd plplotwxwidgets ${DEPS_DIR}/plplot-5.11.1/build_vs2015/debug/bindings/wxwidgets/Debug)

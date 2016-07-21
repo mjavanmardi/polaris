@@ -93,14 +93,18 @@ call %~dp0build-glew-1.13.0.cmd %BASEDIR% > %LOGDIR%\glew_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (ECHO Build of Glew 1.13.0 - FAIL & set BUILD_ERROR=1)
 
 :: as a convenience we copy all dll's to a single folder to save on path entries
-IF NOT EXIST %BASEDIR%\bin ( mkdir %BASEDIR%\bin )
-IF NOT EXIST %BASEDIR%\bin\Debug ( mkdir %BASEDIR%\bin\Debug )
-IF NOT EXIST %BASEDIR%\bin\Release ( mkdir %BASEDIR%\bin\Release )
-::COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Release
-::COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.dll                                %BASEDIR%\bin\Release
+IF NOT EXIST %BASEDIR%\antares_bin ( mkdir %BASEDIR%\antares_bin )
+IF NOT EXIST %BASEDIR%\_antares_bin\Debug ( mkdir %BASEDIR%\antares_bin\Debug )
+IF NOT EXIST %BASEDIR%\antares_bin\Release ( mkdir %BASEDIR%\antares_bin\Release )
 
-::COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Debug
-::COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.dll                              %BASEDIR%\bin\Debug
+COPY %BASEDIR%\glew-1.13.0\build_vs2015\bin\Debug\*.dll		%BASEDIR%\antares_bin\Debug
+COPY %BASEDIR%\glew-1.13.0\build_vs2015\bin\Release\*.dll	%BASEDIR%\antares_bin\Release
+
+COPY %BASEDIR%\shapelib-1.3.0\lib\shapelib_d.dll			%BASEDIR%\antares_bin\Debug
+COPY %BASEDIR%\\shapelib-1.3.0\lib\shapelib.dll				%BASEDIR%\antares_bin\Release
+
+copy %BASEDIR%\wxWidgets-3.1.0\lib\vc_x64_dll\wx*310ud_*.dll %BASEDIR%\antares_bin\Debug
+copy %BASEDIR%\wxWidgets-3.1.0\lib\vc_x64_dll\wx*310u_*.dll %BASEDIR%\antares_bin\Release
 
 cd /D %~dp0
 call DisplayDate.cmd

@@ -37,9 +37,11 @@ Information_Page_Implementation<MasterType,InheritanceList>::Information_Page_Im
 	_sizer = new wxBoxSizer( wxVERTICAL );
 	//wxPLPLOT_BACKEND_GC
 	//_plotwindow = new wxPLplotwindow( this, -1, wxDefaultPosition, wxSize(1920,1080), wxWANTS_CHARS, wxPLPLOT_DRAW_TEXT|wxPLPLOT_BACKEND_GC );
-	_plotwindow = new wxPLplotwindow<wxPanel>();
-	_plotwindow->Create(this, -1, wxDefaultPosition, wxSize(1920, 1080), wxWANTS_CHARS);
-	_plotwindow->SetMaxSize( wxSize(1920,1080) );
+	_plotwindow = new wxPLplotwindow<wxPanel>(false, wxSize(1920,1080));
+	//_plotwindow = new wxPLplotwindow<wxPanel>();
+	//_plotwindow->Create((this, -1, wxDefaultPosition, wxSize(1920, 1080), wxWANTS_CHARS);
+	_plotwindow->Create(this);
+	//_plotwindow->SetMaxSize( wxSize(1920,1080) );
 
 	_sizer->Add( _plotwindow, 1, wxEXPAND );
 	
