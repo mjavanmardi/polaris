@@ -819,8 +819,8 @@ namespace Basic_Units
 			template<typename TargetType, requires(TargetType, check(ComponentType, Get_Value_exists) && check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
 			TargetType Value()
 			{
-				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
-				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+                TargetType len_val = Speed<ComponentType>::length_base::template Conversion_Factor<TargetType>();
+                TargetType time_val = Speed<ComponentType>::time_base::template Conversion_Factor<TargetType>();
 				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val / time_val );
 			}
 			
@@ -835,8 +835,8 @@ namespace Basic_Units
 			template<typename TargetType, requires(TargetType, check(ComponentType, Set_Value_exists) && check(strip_modifiers(TargetType), Concepts::Is_Acceleration_Value))>
 			void Value(TargetType value)
 			{
-				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
-				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+                TargetType len_val = Speed<ComponentType>::length_base::template Conversion_Factor<TargetType>();
+                TargetType time_val = Speed<ComponentType>::time_base::template Conversion_Factor<TargetType>();
 				this_component()->template Value<Value_Type>(Value_Type(value * time_val * time_val / len_val));
 			}
 			

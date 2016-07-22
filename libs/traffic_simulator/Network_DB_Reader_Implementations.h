@@ -41,7 +41,7 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_scenario_reference = _network_reference->scenario_reference<_Scenario_Interface*>();
 
-				cout << "Open database: "<<_scenario_reference->database_name<string&>()<<"...";
+                cout << "Open database: "<<_scenario_reference->template database_name<string&>()<<"...";
 
 				string name(_scenario_reference->template database_name<string&>());
 				unique_ptr<database> db (open_sqlite_database (name));

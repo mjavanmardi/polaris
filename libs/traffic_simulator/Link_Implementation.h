@@ -362,14 +362,14 @@ namespace Link_Components
 				float capacity_adjustment  = 0;
 
 
-				if ( ((_Scenario_Interface*)_global_scenario)->simulate_cacc<double>()  && _link_origin_vehicle_queue.size() > 0)
+                if ( ((_Scenario_Interface*)_global_scenario)->template simulate_cacc<double>()  && _link_origin_vehicle_queue.size() > 0)
 					{
 						int n_cacc = 0;
 						_Vehicle_Interface* vehicle;
 						for (int iv=0;iv<_link_origin_vehicle_queue.size();iv++)
 						{
 							vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
-							_Vehicle_Characteristics_Interface* veh_type = vehicle->vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
+                            _Vehicle_Characteristics_Interface* veh_type = vehicle->template vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
 							n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
 							//std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
 							//n_cacc += (cav.compare("CACC")==0);

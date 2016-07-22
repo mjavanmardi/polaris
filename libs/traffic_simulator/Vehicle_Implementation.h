@@ -31,10 +31,10 @@ namespace Vehicle_Components
 			m_data(bool,has_connected_signal,NONE,NONE);
 			m_data(bool,has_full_automation,NONE,NONE);
 
-			member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
-			member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
-			member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
-			member_component_and_feature_accessor(max_decel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+            //member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+            //member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
+            //member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+            //member_component_and_feature_accessor(max_decel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
 
 			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
 			{
@@ -93,9 +93,10 @@ namespace Vehicle_Components
 				else THROW_EXCEPTION("Error: invalid vehicle class type specified in input Demand database: "<<class_str);
 				this->vehicle_class(vclass);
 			}
-			template <typename T> void initialize(T db_itr, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
+            template <typename T, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same))>
+            void initialize(T db_itr)
 			{
-				static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
+                //RLW%%% - figure this out - static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
 			}
 
 		};
@@ -652,7 +653,7 @@ namespace Vehicle_Components
 			{
 				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
 				{
-					response.result=false;
+                    //response.result=false;
 					response.next._iteration=END;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION)
@@ -661,20 +662,20 @@ namespace Vehicle_Components
 					//response.result=true;
 					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 					{
-						response.next._iteration=_iteration;
+                        response.next._iteration = iteration();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 					}
 					else
 					{
-						response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+                        response.next._iteration = iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
 					}
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION)
 				{
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+                    //response.result=true;
+                    response.next._iteration = iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 				}
 				else

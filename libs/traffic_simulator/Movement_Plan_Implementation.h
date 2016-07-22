@@ -213,7 +213,7 @@ namespace Movement_Plan_Components
 				_valid_trajectory = move->template valid_trajectory<bool>();
 
 				// copy pointer to the activity reference from original movement plan
-				_destination_activity_reference = move->template destination_activity_reference<destination_activity_reference_interface*>();
+                //_destination_activity_reference = move->template destination_activity_reference<destination_activity_reference_interface*>();
 			}
 
 			m_prototype(Null_Prototype, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);

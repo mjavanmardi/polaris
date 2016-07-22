@@ -201,7 +201,97 @@ namespace RNG_Components
 
 namespace GLOBALS
 {
-	implementation struct _Global_RNG : public Polaris_Component<MasterType,INHERIT(_Global_RNG),NULLTYPE>
+    implementation struct _Global_Normal_RNG : public Polaris_Component<MasterType,INHERIT(_Global_Normal_RNG),NULLTYPE>
+    {
+        typedef RNG_Components::Implementations::MT_Normal<NULLTYPE> RNG_type;
+
+        _Global_Normal_RNG()
+        {
+
+        }
+        void Initialize()
+        {
+            thread_rng = new RNG_type[num_sim_threads()+1];
+
+            for (unsigned int i=0; i < num_sim_threads()+1; i++)
+            {
+                typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+                rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+                int seed = sin((float)i+1)*(float)INT_MAX;
+                rng->Initialize<int>(seed);
+            }
+        }
+        void Initialize_Single_Threaded()
+        {
+            //TODO: Initialize after start up
+            thread_rng = new RNG_type[1];
+
+            typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+            rng_itf* rng = (rng_itf*)&this->thread_rng[0];
+            // TODO i was used here before, is 1 correct?
+            rng->Initialize<int>(abs(std::sin((float)1+1)*(float)INT_MAX));
+        }
+
+
+        template <typename TargetType>
+        void Set_Seed(TargetType random_seed)
+        {
+            for (unsigned int i=0; i < num_sim_threads()+1; i++)
+            {
+                typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+                rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+                rng->Initialize<TargetType>((TargetType)(sin((float)(i+1)*random_seed)*(float)INT_MAX) + random_seed);
+            }
+        }
+        template <typename TargetType>
+        void Set_Seed()
+        {
+            for (unsigned int i=0; i < num_sim_threads()+1; i++)
+            {
+                TargetType random_seed = time(NULL);
+                typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+                rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+                // TODO i was used here before, is 1 correct?
+                rng->Initialize<TargetType>((TargetType)(abs(std::sin((float)(1+1)*random_seed)*(float)INT_MAX)) + random_seed);
+            }
+        }
+
+        template <typename TargetType>
+        TargetType Next_Rand(TargetType mu=0, TargetType sigma=1)
+        {
+            typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
+            rng_itf* rng = (rng_itf*)&this->thread_rng[__thread_id];
+            TargetType r = rng->Next_Rand<TargetType>();
+            return r*sigma + mu;
+        }
+
+
+
+        template <typename TargetType>
+        void Correlated_Norms(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
+        {
+            correlated_random_values.clear();
+
+            // factor the covariance matrix
+            matrix<TargetType> L;
+            Sigma.cholesky(L);
+
+            // create std::vector of uncorrelated normals
+            matrix<TargetType> norm = matrix<TargetType>(typename matrix<TargetType>::index_type(Sigma.num_rows(),1),0);
+            for (uint i = 0; i < Sigma.num_rows(); ++i) norm(i,0) = this->Next_Rand<TargetType>();
+
+            // correlate the normals and populate the return std::vector
+            matrix<TargetType> corr_norm = L*norm;
+            for (uint i = 0; i < Sigma.num_rows(); ++i) correlated_random_values.push_back(corr_norm(i,0));
+        }
+    private:
+         RNG_type* thread_rng;
+    };
+
+    //TODO: should be extern
+    static _Global_Normal_RNG<NULLTYPE> Normal_RNG;
+
+    implementation struct _Global_RNG : public Polaris_Component<MasterType,INHERIT(_Global_RNG),NULLTYPE>
 	{
 		typedef RNG_Components::Implementations::MT_Probability<NULLTYPE> RNG_type;
 		_Global_RNG()
@@ -304,96 +394,6 @@ namespace GLOBALS
 		 RNG_type* thread_rng;
 	};
 	static _Global_RNG<NULLTYPE> Uniform_RNG;
-
-	implementation struct _Global_Normal_RNG : public Polaris_Component<MasterType,INHERIT(_Global_Normal_RNG),NULLTYPE>
-	{
-		typedef RNG_Components::Implementations::MT_Normal<NULLTYPE> RNG_type;
-
-		_Global_Normal_RNG()
-		{
-			
-		}
-		void Initialize()
-		{
-			thread_rng = new RNG_type[num_sim_threads()+1];
-			
-			for (unsigned int i=0; i < num_sim_threads()+1; i++)
-			{
-				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
-				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				int seed = sin((float)i+1)*(float)INT_MAX;
-				rng->Initialize<int>(seed);
-			}
-		}
-		void Initialize_Single_Threaded()
-		{
-			//TODO: Initialize after start up
-			thread_rng = new RNG_type[1];
-		
-			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
-			rng_itf* rng = (rng_itf*)&this->thread_rng[0];
-			// TODO i was used here before, is 1 correct?
-			rng->Initialize<int>(abs(std::sin((float)1+1)*(float)INT_MAX));
-		}
-
-
-		template <typename TargetType>
-		void Set_Seed(TargetType random_seed)
-		{
-			for (unsigned int i=0; i < num_sim_threads()+1; i++)
-			{
-				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
-				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<TargetType>((TargetType)(sin((float)(i+1)*random_seed)*(float)INT_MAX) + random_seed);
-			}
-		}
-		template <typename TargetType>
-		void Set_Seed()
-		{
-			for (unsigned int i=0; i < num_sim_threads()+1; i++)
-			{
-				TargetType random_seed = time(NULL);
-				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
-				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				// TODO i was used here before, is 1 correct?
-				rng->Initialize<TargetType>((TargetType)(abs(std::sin((float)(1+1)*random_seed)*(float)INT_MAX)) + random_seed);
-			}
-		}
-
-		template <typename TargetType>
-		TargetType Next_Rand(TargetType mu=0, TargetType sigma=1)
-		{
-			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
-			rng_itf* rng = (rng_itf*)&this->thread_rng[__thread_id];
-			TargetType r = rng->Next_Rand<TargetType>();
-			return r*sigma + mu;
-		}
-
-
-
-		template <typename TargetType>
-		void Correlated_Norms(std::vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
-		{
-			correlated_random_values.clear();
-
-			// factor the covariance matrix
-			matrix<TargetType> L;
-			Sigma.cholesky(L);
-
-			// create std::vector of uncorrelated normals
-			matrix<TargetType> norm = matrix<TargetType>(typename matrix<TargetType>::index_type(Sigma.num_rows(),1),0);
-			for (uint i = 0; i < Sigma.num_rows(); ++i) norm(i,0) = this->Next_Rand<TargetType>();
-
-			// correlate the normals and populate the return std::vector
-			matrix<TargetType> corr_norm = L*norm;
-			for (uint i = 0; i < Sigma.num_rows(); ++i) correlated_random_values.push_back(corr_norm(i,0));
-		}
-	private:
-		 RNG_type* thread_rng;
-	};
-
-	//TODO: should be extern
-	static _Global_Normal_RNG<NULLTYPE> Normal_RNG;
 }
 
 using namespace GLOBALS;

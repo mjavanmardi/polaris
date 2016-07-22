@@ -596,11 +596,11 @@ namespace Network_Event_Components
 // TODO: does not compile
 			template<typename TargetType> void Get_Network_Events(int link_id,boost::container::vector< Network_Event<TargetType>* >& container/*,requires(TargetType,check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
-				std::list<Network_Event<TargetType,NT>*>* events_of_type = (std::list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_id]);
+                std::list<Network_Event<TargetType>*>* events_of_type = (std::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
 
-				for(typename std::list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+                for(typename std::list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<TargetType,NT>* network_event=*itr;
+                    Network_Event<TargetType>* network_event=*itr;
 
 					if(network_event->template active<bool>())
 					{
@@ -664,9 +664,9 @@ namespace Network_Event_Components
 // TODO: does not compile
 			template<typename TargetType> void Remove_Network_Event(Network_Event<TargetType>* network_event)
 			{
-				std::list<Network_Event<typename TargetType::ControlType,NT>*>* events_of_type = (list<Network_Event<typename TargetType::ControlType,NT>*>*) & (_network_event_container[TargetType::ControlType::component_id]);
+                std::list<Network_Event<typename TargetType::ControlType>*>* events_of_type = (std::list<Network_Event<typename TargetType::ControlType>*>*) & (_network_event_container[TargetType::ControlType::component_id]);
 
-				for(typename std::list< Network_Event<typename TargetType::ControlType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+                for(typename std::list< Network_Event<typename TargetType::ControlType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
 					if( (*itr) == network_event )
 					{

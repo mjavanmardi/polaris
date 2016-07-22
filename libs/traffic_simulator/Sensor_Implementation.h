@@ -32,10 +32,10 @@ namespace Sensor_Components
 // TODO: does not compile
 			template<typename TargetType> void Sensor_Conditional()
 			{
-				response.next._iteration = _iteration + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+                //response.next._iteration = iteration() + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+                //response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
 
-				response.result = true;
+                //response.result = true;
 			}
 			
 			declare_event(Sensor_Event)
@@ -121,11 +121,11 @@ namespace Sensor_Components
 
 				if(db_map.count(link_id_dir.id_dir))
 				{
-					covered_link_interface* polaris_link = (covered_link_interface*)db_map[link_id_dir.id_dir];
+                    _covered_link = db_map[link_id_dir.id_dir];
 
-					_covered_link = polaris_link;
+                    //_covered_link = polaris_link;
 
-					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
+                    _covered_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
 
 					typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 					//TODO

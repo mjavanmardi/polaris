@@ -120,7 +120,7 @@ namespace Depot_Components
 				}
 
 				//TODO
-				_depot_service = new polaris::Depot( instance );
+                //RLW%%% _depot_service = new polaris::Depot( instance );
 			}
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
