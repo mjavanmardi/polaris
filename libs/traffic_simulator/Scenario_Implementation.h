@@ -21,6 +21,7 @@ namespace Scenario_Components
 			m_data(string, output_popsyn_database_name, NONE, NONE);
 			m_data(string, input_popsyn_database_name, NONE, NONE);
 			m_data(string, historical_results_database_name, NONE, NONE);
+			m_data(string, input_db_path, NONE, NONE);
 
 			m_data(int, simulation_interval_length, NONE, NONE);
 			m_data(int, assignment_interval_length, NONE, NONE);

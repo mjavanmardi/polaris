@@ -441,7 +441,7 @@ namespace Traffic_Management_Center_Components
 				using namespace polaris::io;
 				
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				string db_name(((_Scenario_Interface*)_global_scenario)->template input_db_path<string&>());
 
 				unique_ptr<database> db (open_sqlite_database (db_name));
 				

@@ -276,7 +276,7 @@ namespace Operation_Components
 				using namespace odb;
 				using namespace polaris::io;
 
-				string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				string name(((_Scenario_Interface*)_global_scenario)->template input_db_path<string&>());
 				unique_ptr<database> db (open_sqlite_database (name));
 				transaction t(db->begin());
 

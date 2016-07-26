@@ -525,7 +525,7 @@ namespace Network_Event_Components
 				using namespace polaris;
 
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				string name( ((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				string name( ((_Scenario_Interface*)_global_scenario)->template input_db_path<string&>());
 
 				unique_ptr<database> db (open_sqlite_database (name));
 

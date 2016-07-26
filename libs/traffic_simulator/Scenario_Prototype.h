@@ -20,6 +20,7 @@ namespace Scenario_Components
 			accessor(output_popsyn_database_name, NONE, NONE);
 			accessor(input_popsyn_database_name, NONE, NONE);
 			accessor(historical_results_database_name, NONE, NONE);
+			accessor(input_db_path, NONE, NONE);
 
 			accessor(simulation_interval_length, NONE, NONE);
 			accessor(assignment_interval_length, NONE, NONE);
@@ -628,8 +629,12 @@ namespace Scenario_Components
 				else use_buildings(true);
 				
 
+				if (cfgReader.getParameter("input_dir_name", input_dir_name<string*>())!= PARAMETER_FOUND) input_dir_name<string>("");
+				_input_db_path.append(_input_dir_name);
+				_input_db_path.append(_database_name);
+
 				//output_dir_name<string&>() = "";
-				input_dir_name<string&>() = "";
+				//input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
 				open_input_files<NULLTYPE>();
 

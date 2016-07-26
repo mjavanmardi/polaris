@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 
 	int num_threads = 1;
 	if (argc >= 3) num_threads = std::max(atoi(argv[2]),num_threads);
-	int num_iterarations;
+	int num_iterarations = 24*60*60;
 	if (argc >= 4) num_iterarations = std::max(atoi(argv[3]),num_iterarations);
 
 	cout << "Running NetworkModel" << endl;

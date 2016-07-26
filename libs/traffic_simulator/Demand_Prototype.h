@@ -62,7 +62,7 @@ namespace Demand_Components
 					typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
 					typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
 
-					string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
+					string name(scenario_reference<_Scenario_Interface*>()->template input_db_path<string&>());
 					unique_ptr<database> db (open_sqlite_demand_database (name));
 
 					transaction t(db->begin());
@@ -94,7 +94,7 @@ namespace Demand_Components
 				using namespace polaris::io;
 				typedef  Scenario_Components::Prototypes::Scenario< typename get_type_of(scenario_reference)> _Scenario_Interface;
 
-				string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
+				string name(scenario_reference<_Scenario_Interface*>()->template input_db_path<string&>());
 				unique_ptr<database> db (open_sqlite_demand_database (name));
 
 				typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;

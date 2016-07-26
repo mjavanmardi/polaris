@@ -28,7 +28,7 @@ namespace Network_Components
 			using namespace odb;
 			using namespace polaris::io;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-			string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
+			string name(scenario_reference<_Scenario_Interface*>()->template input_db_path<string&>());
 			auto_ptr<database> db (open_sqlite_database (name));
 			transaction t(db->begin());
 
