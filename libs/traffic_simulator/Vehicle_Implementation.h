@@ -31,10 +31,10 @@ namespace Vehicle_Components
 			m_data(bool,has_connected_signal,NONE,NONE);
 			m_data(bool,has_full_automation,NONE,NONE);
 
-            //member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
-            //member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
-            //member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
-            //member_component_and_feature_accessor(max_decel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+            member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+            member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
+            member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
+            member_component_and_feature_accessor(max_decel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
 
 			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
 			{
@@ -96,7 +96,7 @@ namespace Vehicle_Components
             template <typename T, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same))>
             void initialize(T db_itr)
 			{
-                //RLW%%% - figure this out - static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
+                static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
 			}
 
 		};

@@ -35,13 +35,13 @@ SET ERRORLEVEL=
 msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
 IF %ERRORLEVEL% NEQ 0 ( SET RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
 
-SET ERRORLEVEL=
-msbuild polaris_antares.sln /p:Configuration=Debug /p:Platform=x64
-IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_DEBUG_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+::SET ERRORLEVEL=
+::msbuild polaris_antares.sln /p:Configuration=Debug /p:Platform=x64
+::IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_DEBUG_BUILD_ERROR=1 & SET BUILD_ERROR=1)
 
-SET ERRORLEVEL=
-msbuild polaris_antares.sln /p:Configuration=Release /p:Platform=x64
-IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
+::SET ERRORLEVEL=
+::msbuild polaris_antares.sln /p:Configuration=Release /p:Platform=x64
+::IF %ERRORLEVEL% NEQ 0 ( SET ANTARES_RELEASE_BUILD_ERROR=1 & SET BUILD_ERROR=1)
 
 cd /D %~dp0
 
