@@ -479,7 +479,7 @@ namespace Network_Components
 
 			//Types::Link_ID_Dir link_id_dir;
 
-			cout << "Reading Activity Locations" << endl;
+			cout << "Reading Zones" << endl;
 
 			int counter=-1;
 
@@ -559,7 +559,7 @@ namespace Network_Components
 
 			Types::Link_ID_Dir link_id_dir;
 
-			cout << "Reading Zones " << endl;
+			cout << "Reading Activity Lications " << endl;
 
 			int counter=-1;
 

@@ -155,6 +155,7 @@ namespace Vehicle_Components
 			m_data(float, relative_indifference_band_route_choice, NONE, NONE);
 			m_data(float, minimum_travel_time_saving, NONE, NONE);
 			m_data(float, cacc_vmt, NONE, NONE); // VMT driven whil platooning with another vehicle
+			m_data(float, total_vmt, NONE, NONE); // Total VMT driven
 			
 			//m_data(bool, enroute_updated, NONE, NONE);
 			m_data(int, last_enroute_switching_route_check_time, NONE, NONE);
@@ -1081,6 +1082,7 @@ namespace Vehicle_Components
 				}
 
 				this->cacc_vmt(0.0);
+				this->total_vmt(0.0);
 
 				/// information compliance rate
 				r1 = ((_Scenario_Interface*)_global_scenario)->template information_compliance_rate_mean<double>();

@@ -26,7 +26,8 @@ namespace Traveler_Components
 					fstream& vehicle_cacc_vmt_file = scenario->template vehicle_cacc_vmt_file<fstream&>();
 					vehicle_cacc_vmt_file
 						<< _vehicle->template trip_id<int>()  << ","
-						<< _vehicle->template cacc_vmt<float>() << "\n";
+						<< _vehicle->template cacc_vmt<float>()/3280.84 << ","
+						<< _vehicle->template total_vmt<float>()/3280.84 << "\n";
 				}
 
 			}
@@ -63,6 +64,10 @@ namespace Traveler_Components
 
 						origin_link->push_vehicle_from_origin(_vehicle);
 					}
+				}
+				else
+				{
+					cout << "Trip " << _vehicle->_trip_id << " was not routed\n";
 				}
 			}
 

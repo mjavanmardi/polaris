@@ -1277,7 +1277,7 @@ namespace Network_Components
 						loc_id_to_idx_container.insert(pair<int,int>(activity_location->uuid<int>(),activity_location->internal_id<int>()));
 						++counter;
 					}
-					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
+					catch (const odb::exception& e) {THROW_WARNING(e.what()); cout << e.what() << "\n"; continue;}
 					//catch (exception& e)  {    cout << e.what() << '\n';  }
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}

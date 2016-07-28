@@ -397,6 +397,7 @@ namespace Turn_Movement_Components
 						}
 
 					}
+					vehicle->template total_vmt<float>(vehicle->template total_vmt<float>() + ((_Link_Interface*)_outbound_link)->template length<float>());
 
 					((_Link_Interface*)_outbound_link)->template link_upstream_arrived_vehicles<int&>()++;
 					((_Link_Interface*)_outbound_link)->template link_upstream_cumulative_arrived_vehicles<int&>()++;

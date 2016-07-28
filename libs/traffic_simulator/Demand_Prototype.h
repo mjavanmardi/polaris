@@ -85,7 +85,7 @@ namespace Demand_Components
 			template<typename TargetType> void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(TargetType,check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
-				int counter = -1;
+				int counter = 0;
 				int trip_id = 0;
 
 				try
@@ -199,12 +199,6 @@ namespace Demand_Components
 
 					trip_id = db_itr->getPrimaryKey();
 
-
-					if (++counter % 100000 == 0)
-					{
-						cout << counter << " trips processed" << endl;
-					}
-
 					departed_time = db_itr->getStart();
 
 					if (departed_time < simulation_start_time || departed_time >= simulation_end_time) {
@@ -243,7 +237,7 @@ namespace Demand_Components
 					flag = destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0;
 					if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
-						// No path can be found. Discard the trip
+						cout << "Trip " << trip_id << " had the same origin and destimation and was not loaded\n";
 						continue;
 					}
 
@@ -322,7 +316,10 @@ namespace Demand_Components
 					traveler->Schedule_Wehicle_Write();
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
-
+					if (++counter % 100000 == 0)
+					{
+						cout << counter << " trips processed" << endl;
+					}
 					//if(traveler_id_counter%10000==0)
 					//{
 					//	cout << "\t" << traveler_id_counter << endl;
@@ -334,6 +331,7 @@ namespace Demand_Components
 					std::cout << "\nException message: " << e.what() << "\n";
 					THROW_EXCEPTION("Error: seems to be an ODB exception here, reading trip number "<<counter<<", trip id="<<trip_id);
 				}
+			cout << counter << "Total trips processed" << endl;
 			}
 
 			template<typename TargetType> void read_demand_data(requires(TargetType,!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))

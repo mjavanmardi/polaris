@@ -132,6 +132,7 @@ namespace Vehicle_Components
 			accessor(vehicle_ptr, NONE, NONE);
 
 			accessor(cacc_vmt, NONE, NONE);
+			accessor(total_vmt, NONE, NONE);
 			
 			//enroute swtiching
 			accessor(rng_stream, NONE, NONE);

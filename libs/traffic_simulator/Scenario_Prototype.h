@@ -630,8 +630,10 @@ namespace Scenario_Components
 				
 
 				if (cfgReader.getParameter("input_dir_name", input_dir_name<string*>())!= PARAMETER_FOUND) input_dir_name<string>("");
-				_input_db_path.append(_input_dir_name);
-				_input_db_path.append(_database_name);
+				input_db_path<string>(input_db_path<string>().append(input_dir_name<string>()));
+				input_db_path<string>(input_db_path<string>().append(database_name<string>()));
+				//_input_db_path.append(_input_dir_name);
+				//_input_db_path.append(_database_name);
 
 				//output_dir_name<string&>() = "";
 				//input_dir_name<string&>() = "";
@@ -800,8 +802,9 @@ namespace Scenario_Components
 					if(vehicle_cacc_vmt_file<fstream&>().is_open())  
 					{
 						vehicle_cacc_vmt_file<fstream&>()
-							<< "vehicle" << ","
-							<< "cacc_vmt" << "\n";
+							<< "trip_id" << ","
+							<< "cacc_vkt" << ","
+							<< "total_vkt" << "\n";
 					}
 					else
 					{
