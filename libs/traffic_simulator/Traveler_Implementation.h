@@ -67,7 +67,7 @@ namespace Traveler_Components
 				}
 				else
 				{
-					cout << "Trip " << _vehicle->_trip_id << " was not routed\n";
+					cout << "Trip " << _vehicle->template trip_id<int>() << " was not routed\n";
 				}
 			}
 
