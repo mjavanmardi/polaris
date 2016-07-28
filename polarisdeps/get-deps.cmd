@@ -79,6 +79,13 @@ COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.pdb                              
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.dll     %BASEDIR%\bin\Release
 COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.pdb     %BASEDIR%\bin\Release
 
+IF NOT EXIST %BASEDIR%\bin\RelWithDebInfo ( mkdir %BASEDIR%\bin\RelWithDebInfo )
+COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\RelWithDebInfo
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.dll                                %BASEDIR%\bin\RelWithDebInfo
+COPY %BASEDIR%\libodb-2.4.0\bin64\odb-2.4-vc14.pdb                                %BASEDIR%\bin\RelWithDebInfo
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.dll     %BASEDIR%\bin\RelWithDebInfo
+COPY %BASEDIR%\libodb-2.4.0\libodb-sqlite-2.4.0\bin64\odb-sqlite-2.4-vc14.pdb     %BASEDIR%\bin\RelWithDebInfo
+
 IF NOT EXIST %BASEDIR%\bin\Debug ( mkdir %BASEDIR%\bin\Debug )
 COPY %BASEDIR%\odb-2.4.0-i686-windows\bin\odb.exe								  %BASEDIR%\bin\Debug
 COPY %BASEDIR%\libodb-2.4.0\bin64\odb-d-2.4-vc14.dll                              %BASEDIR%\bin\Debug
