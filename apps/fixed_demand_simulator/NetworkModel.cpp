@@ -507,7 +507,7 @@ void run_with_input_from_db(char* scenario_filename)
 		START();
 
 		cout << "Finished!" << endl;
-		system("PAUSE");
+		//system("PAUSE");
 	}
 }
 
