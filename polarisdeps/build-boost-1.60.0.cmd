@@ -59,24 +59,24 @@ IF ERRORLEVEL 1 ( ECHO Download and Extract of '%BOOSTZIPFILE%' - FAIL  & ECHO S
 :: if you want to use boost libraries (as opposed to just headers)
 :: uncomment the commands here:
 
-cd /D %BOOSTDIR%
-call bootstrap.bat
+::cd /D %BOOSTDIR%
+::call bootstrap.bat
 
-set ERRORLEVEL=
-b2 address-model=64 link=shared,static variant=release install --prefix=%BOOSTDIR% --without-python
-IF ERRORLEVEL 1 (SET RELEASE_BUILD=1 & set BUILD_ERROR=1)
+::set ERRORLEVEL=
+::b2 address-model=64 link=shared,static variant=release install --prefix=%BOOSTDIR% --without-python
+::IF ERRORLEVEL 1 (SET RELEASE_BUILD=1 & set BUILD_ERROR=1)
 
-set ERRORLEVEL=
-b2 address-model=64 link=shared,static variant=debug install --prefix=%BOOSTDIR% --without-python
-IF ERRORLEVEL 1 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
+::set ERRORLEVEL=
+::b2 address-model=64 link=shared,static variant=debug install --prefix=%BOOSTDIR% --without-python
+::IF ERRORLEVEL 1 (SET DEBUG_BUILD=1 & set BUILD_ERROR=1)
 
-cd /D %BOOSTDIR%
-ren lib lib64-msvc-14.0
+::cd /D %BOOSTDIR%
+::ren lib lib64-msvc-14.0
 
-IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of Boost 1.60.0 Release project - FAIL )
-IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of Boost 1.60.0 Debug project - FAIL )
+::IF %RELEASE_BUILD% NEQ 0 (ECHO MSBuild of Boost 1.60.0 Release project - FAIL )
+::IF %DEBUG_BUILD% NEQ 0  (ECHO MSBuild of Boost 1.60.0 Debug project - FAIL )
 
-cd /D %~dp0
+::cd /D %~dp0
 call DisplayDate.cmd
 IF %BUILD_ERROR% NEQ 0 (ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
 ENDLOCAL
