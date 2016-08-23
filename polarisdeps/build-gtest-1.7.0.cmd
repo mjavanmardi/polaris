@@ -39,7 +39,7 @@ IF NOT "%VCROOT%" == "" (
 call find-python.cmd
 
 :: Download and expand source files
-set GTESTZIPFILE=release-1.7.0.zip
+set GTESTZIPFILE=%BASEDIR%\release-1.7.0.zip
 set GTESTDIR=%BASEDIR%\googletest-release-1.7.0
 
 echo file=%GTESTZIPFILE%
@@ -50,7 +50,10 @@ call find-python.cmd
 IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://github.com/google/googletest/archive/release-1.7.0.zip" -n %GTESTZIPFILE% -e %BASEDIR% -o %BASEDIR%
+IF NOT EXIST %GTESTDIR% ( mkdir %GTESTDIR% )
+cd /D %BASEDIR%
+%~dp0utils\wget --show-progress=off -O %GTESTZIPFILE% "https://github.com/google/googletest/archive/release-1.7.0.zip"
+%~dp0utils\unzip -o -q %GTESTZIPFILE%
 IF ERRORLEVEL 1 (ECHO Download and Extract of '%GTESTZIPFILE%' failed. & ECHO STATUS: FAIL & ENDLOCAL & EXIT /B 1)
 
 set BUILDDIR=%GTESTDIR%\build_msvc2015
