@@ -376,9 +376,6 @@ int main(int argc,char** argv)
 	typedef Link<remove_pointer<_Network_Interface::get_type_of(links_container)::value_type>::type> _Link_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(links_container),_Link_Interface*> _Links_Container_Interface;
 
-	//_Links_Container_Interface::iterator links_itr;
-
-
 	for (const auto& link : network->links_container<_Links_Container_Interface&>())
 	{
 		link->Initialize<NULLTYPE>();
@@ -390,8 +387,6 @@ int main(int argc,char** argv)
 	
 	typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
-
-	//_Intersections_Container_Interface::iterator intersections_itr;
 
 	for (const auto& intersection : network->intersections_container<typename MasterType::network_type::intersections_container_type&>())
 	{
@@ -405,7 +400,6 @@ int main(int argc,char** argv)
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(ramp_metering_container),_Ramp_Metering_Interface*> _Ramp_Metering_Container_Interface;
 
 	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
-
 
 	for (const auto& ramp : network->ramp_metering_container<_Ramp_Metering_Container_Interface&>())
 	{

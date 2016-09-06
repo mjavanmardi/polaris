@@ -1,6 +1,4 @@
-@ECHO OFF
-::ECHO This is just a test
-::EXIT /B 1
+::@ECHO OFF
 
 SETLOCAL
 
@@ -18,11 +16,30 @@ set a=%a:/=\%
 echo %a%
 set BASEDIR=%a%
 
+IF NOT EXIST %BASEDIR% ( mkdir %BASEDIR% )
+
+REM  see if Vsual Studio is already set
+SET VCROOT=
+IF "%VSINSTALLDIR%" == "" (
+	call find-msvc.bat 14
+    IF ERRORLEVEL 1 exit /B %ERRORLEVEL%
+) ELSE IF NOT "%VisualStudioVersion%" == "14.0" (
+	echo "Visual Studio 14.0 (2015) is required"
+	exit /B 1
+) ELSE IF NOT "%Platform%" == "X64" (
+	echo "Visual Studio 14.0 (2015) must be set for X64 platform"
+	exit /B 1
+)
+
+IF NOT "%VCROOT%" == "" (
+    call "%VCROOT%\vcvarsall.bat" amd64
+)
+
 :: Download and expand source files
-set ODBZIPFILE=odb-2.4.0-i686-windows.zip
-set LIBODBZIPFILE=libodb-2.4.0.zip
-set ODBSQLITEBZIPFILE=libodb-sqlite-2.4.0.zip
-set SQLITEZIPFILE=sqlite-amalgamation-3110100.zip
+set ODBZIPFILE=%BASEDIR%\odb-2.4.0-i686-windows.zip
+set LIBODBZIPFILE=%BASEDIR%\libodb-2.4.0.zip
+set ODBSQLITEBZIPFILE=%BASEDIR%\libodb-sqlite-2.4.0.zip
+set SQLITEZIPFILE=%BASEDIR%\sqlite-amalgamation-3110100.zip
 
 set ODBDIR=%BASEDIR%\odb-2.4.0-i686-windows
 set LIBODBDIR=%BASEDIR%\libodb-2.4.0
@@ -50,23 +67,30 @@ set LIBSQLITE_DEBUG_BUILD=0
 set LIBSQLITE_RELEASE_BUILD=0
 set BUILD_ERROR=0
 
-call find-python.cmd
-IF "%MYPYTHONPATH%" == "" ( ECHO "Can't find python" & EXIT /B 1)
-
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip" -n %ODBZIPFILE% -e %BASEDIR% -o %BASEDIR%
+cd /D %BASEDIR%
+%~dp0utils\wget --show-progress=off -O %ODBZIPFILE% "http://www.codesynthesis.com/download/odb/2.4/odb-2.4.0-i686-windows.zip"
+%~dp0utils\unzip -o -q %ODBZIPFILE%
 IF ERRORLEVEL 1 ( SET DOWNLOAD_ODB=1 & SET BUILD_ERROR=1 )
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip" -n %LIBODBZIPFILE% -e %BASEDIR% -o %BASEDIR%
+cd /D %BASEDIR%
+%~dp0utils\wget --show-progress=off -O %LIBODBZIPFILE% "http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.zip"
+%~dp0utils\unzip -o -q %LIBODBZIPFILE%
 IF ERRORLEVEL 1 ( SET DOWNLOAD_LIBODB=1 & SET BUILD_ERROR=1 )
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip" -n %ODBSQLITEBZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
+IF NOT EXIST %LIBODBDIR% ( mkdir %LIBODBDIR% )
+cd /D %BASEDIR%
+%~dp0utils\wget --show-progress=off -O %ODBSQLITEBZIPFILE% "http://www.codesynthesis.com/download/odb/2.4/libodb-sqlite-2.4.0.zip"
+%~dp0utils\unzip -o -q %ODBSQLITEBZIPFILE% -d %LIBODBDIR%
 IF ERRORLEVEL 1 ( SET DOWNLOAD_LIBSQLITE=1 & SET BUILD_ERROR=1 )
 
 set ERRORLEVEL=
-%MYPYTHONPATH% myWget.py -u "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip" -n %SQLITEZIPFILE% -e %LIBODBDIR% -o %BASEDIR%
+IF NOT EXIST %LIBODBDIR% ( mkdir %LIBODBDIR% )
+cd /D %BASEDIR%
+%~dp0utils\wget --show-progress=off -O %SQLITEZIPFILE% "https://www.sqlite.org/2016/sqlite-amalgamation-3110100.zip"
+%~dp0utils\unzip -o -q %SQLITEZIPFILE% -d %LIBODBDIR%
 IF ERRORLEVEL 1 ( SET DOWNLOAD_SQLITE=1 & SET BUILD_ERROR=1 )
 
 mkdir %LIBODBDIR%

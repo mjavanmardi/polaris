@@ -96,7 +96,7 @@ namespace Vehicle_Components
             template <typename T, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same))>
             void initialize(T db_itr)
 			{
-                //RLW%%% - figure this out - static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
+                static_assert(false,"Error, typename T must be the same as MasterType::vehicle_type_db_rec_type.");
 			}
 
 		};

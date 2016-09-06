@@ -15,13 +15,9 @@ set a=%a:/=\%
 ::echo %a%
 set DEPS_DIR=%a%
 
-:: SET DepsDirResponse=
-:: SET /p DepsDirResponse= Use %DEPS_DIR% as dependancy directory?
-:: echo Response=%DepsDirResponse%
-:: SET USE_IT=
-:: IF "%DepsDirResponse%" == "Y" SET USE_IT=1
-:: IF "%DepsDirResponse%" == "y" SET USE_IT=1
-:: IF DEFINED USE_IT ( ECHO Using %DEPS_DIR% as dependency directory.) ELSE ( ECHO Dependency directory is not set. & ECHO Exiting configuration. & EXIT /B 1)
+:: temporary fix for RelWithDebInfo
+:: at some point it would be nice to have debug info in the 3rd party libs also
+IF NOT EXIST %DEPS_DIR%\bin\RelWithDebInfo ( mkdir %DEPS_DIR%\bin\RelWithDebInfo & xcopy %DEPS_DIR%\bin\Release\* %DEPS_DIR%\bin\RelWithDebInfo\* )
 
 set BUILDDIR=%~dp0\build_vs2015
 IF NOT EXIST %BUILDDIR% ( mkdir %BUILDDIR% )
@@ -40,13 +36,13 @@ IF EXIST ../build.cfg (
 )
 
 SET ERRORLEVEL=
-cmake -DDEPS_DIR=%DEPS_DIR% !var! -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
+cmake -DDEPS_DIR=%DEPS_DIR% !var! -DCMAKE_CONFIGURATION_TYPES="Debug;Release;RelWithDebInfo" -G "Visual Studio 14 Win64" ..
 IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd .. & EXIT /B 1)
 
-:: now generate ANtares projects/soultion
-SET ERRORLEVEL=
-cmake -DDEPS_DIR=%DEPS_DIR% !var! -DAntares=1 -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
-IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd .. & EXIT /B 1)
+:: now generate Antares projects/soultion
+::SET ERRORLEVEL=
+::cmake -DDEPS_DIR=%DEPS_DIR% !var! -DAntares=1 -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -G "Visual Studio 14 Win64" ..
+::IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd .. & EXIT /B 1)
 
 ENDLOCAL
 cd ..
