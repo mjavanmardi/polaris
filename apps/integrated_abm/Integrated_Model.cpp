@@ -378,16 +378,9 @@ int main(int argc,char** argv)
 
 	//_Links_Container_Interface::iterator links_itr;
 
-	//%%%RLW
-	//for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
-	//	links_itr!=network->links_container<_Links_Container_Interface&>().end();
-	//	links_itr++)
-	//{
-	//	((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
-	//}
+
 	for (const auto& link : network->links_container<_Links_Container_Interface&>())
 	{
-		cout << "Link componentmanager = " << link->component_manager->name() << " - " << link->component_id << std::endl;
 		link->Initialize<NULLTYPE>();
 	}
 
@@ -400,16 +393,8 @@ int main(int argc,char** argv)
 
 	//_Intersections_Container_Interface::iterator intersections_itr;
 
-	//%%%RLW
-	//for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
-	//	intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
-	//	intersections_itr++)
-	//{
-	//	((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
-	//}
 	for (const auto& intersection : network->intersections_container<typename MasterType::network_type::intersections_container_type&>())
 	{
-		cout << "Intersection componentmanager = " << intersection->component_manager->name() << " - " << intersection->component_id << std::endl;
 		intersection->Initialize<NULLTYPE>();
 	}
 
@@ -421,15 +406,9 @@ int main(int argc,char** argv)
 
 	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
 
-	//for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
-	//	ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
-	//	ramp_metering_itr++)
-	//{
-	//	((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
-	//}
+
 	for (const auto& ramp : network->ramp_metering_container<_Ramp_Metering_Container_Interface&>())
 	{
-		cout << "Ramp Metering componentmanager = " << ramp->component_manager->name() << " - " << ramp->component_id << std::endl;
 		ramp->Initialize<NULLTYPE>();
 	}
 

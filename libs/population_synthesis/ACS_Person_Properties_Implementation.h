@@ -399,22 +399,22 @@ namespace Person_Components
 				typedef Prototypes::Person_Properties<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				
-				pthis->Age<int>((*data)[7]);
-				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)(*data)[8]);
-				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)(*data)[17]);
-				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)(*data)[23]);
-				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)(*data)[21]);
+				pthis->Age<int>((*data)[0]);
+				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)(*data)[1]);
+				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)(*data)[2]);
+				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)(*data)[3]);
+				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)(*data)[4]);
 				pthis->Gender<Types::GENDER>((Types::GENDER)(int)(*data)[5]);
-				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[29]);
-				pthis->Journey_To_Work_Arrival_Time<int>((*data)[24]);
-				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)(*data)[11]);
+				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[6]);
+				pthis->Journey_To_Work_Arrival_Time<int>((*data)[7]);
+				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)(*data)[8]);
 				pthis->Journey_To_Work_Travel_Time<Time_Minutes>((*data)[9]);
 				pthis->Journey_To_Work_Vehicle_Occupancy<int>((*data)[10]);
-				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)(*data)[12]);
-				pthis->Race<Types::RACE>((Types::RACE)(int)(*data)[6]);
-				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)(*data)[15]);
-				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)(*data)[16]);
-				pthis->Work_Hours<Time_Hours>((*data)[19]);
+				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)(*data)[11]);
+				pthis->Race<Types::RACE>((Types::RACE)(int)(*data)[12]);
+				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)(*data)[13]);
+				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)(*data)[14]);
+				pthis->Work_Hours<Time_Hours>((*data)[15]);
 			}
 		};
 

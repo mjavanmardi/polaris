@@ -42,11 +42,11 @@ namespace Household_Components
 				typedef Prototypes::Household_Properties<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 						
-				pthis->Household_type<Types::HHTYPE>((Types::HHTYPE)(int)(*data)[3]);
-				pthis->Household_size<int>((*data)[4]);
-				pthis->Number_of_vehicles<int>((*data)[8]);
-				pthis->Number_of_workers<int>((*data)[25]);
-				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[14]);
+				pthis->Household_type<Types::HHTYPE>((Types::HHTYPE)(int)(*data)[0]);
+				pthis->Household_size<int>((*data)[1]);
+				pthis->Number_of_vehicles<int>((*data)[2]);
+				pthis->Number_of_workers<int>((*data)[3]);
+				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[4]);
 
 			}
 		};

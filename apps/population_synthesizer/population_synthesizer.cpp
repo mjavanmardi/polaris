@@ -118,9 +118,10 @@ void help()
 	outfile << "# Specify the region id, the sample id, and the weight from the Person Pums file"<< endl;
 	outfile << "PERSON	0	1	4"<< endl;
 	outfile << endl;
-	outfile << "# Specify all columns (0-indexed) to retain from the pums files for later processing"<< endl;
-	outfile << "HHDATA	2	3	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31"<< endl;
-	outfile << "PERSONDATA	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29"<< endl;
+	outfile << "# Specify all columns (0-indexed) for the following variables: hhtype, hhsize, nveh, nworkers, income"<< endl;
+	outfile << "HHDATA	10	9	43	84	57"<< endl;
+	outfile << "# Specify all columns (0-indexed) for the following variables: age, COW, educ, empl_industry, emp_status, gender, income, work arrival time, work mode, work travel time, work_veh_occ, marital_status, race, school_enroll, school_level, work hours" << endl;
+	outfile << "PERSONDATA	8	12	67	93	88	69	111	94	36	34	35	38	122	65	66	73"<< endl;
 	outfile << endl;
 	outfile << "# Specify the variable id (starting from 0) and column number in the pums files wher the variable is located"<< endl;
 	outfile << "HHVAR	0	7"<< endl;
