@@ -634,18 +634,18 @@ namespace Prototypes
 
 
 			/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
-			location_itf* orig = movements->template origin<location_itf*>();
-			location_itf* dest = movements->template destination<location_itf*>();
-			zone_itf* dest_zone = dest->template zone<zone_itf*>();
-			Miles dist = dest->template distance<location_itf*,Miles>(orig);
-			Miles max_walk_distance = 0;
-			if (dest_zone->template areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
-			else if (dest_zone->template areatype<int>() == 2) max_walk_distance = 0.75;	// Downtown
-			else if (dest_zone->template areatype<int>() == 3) max_walk_distance = 0.33;		// Rest of chicago
-			else if (dest_zone->template areatype<int>() >= 4 && dest_zone->template areatype<int>() >= 6) max_walk_distance = 0.33; // Suburban
-			else if (dest_zone->template areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
-			else max_walk_distance = 0.0;	
-			if (dist <max_walk_distance) act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
+			//location_itf* orig = movements->template origin<location_itf*>();
+			//location_itf* dest = movements->template destination<location_itf*>();
+			//zone_itf* dest_zone = dest->template zone<zone_itf*>();
+			//Miles dist = dest->template distance<location_itf*,Miles>(orig);
+			//Miles max_walk_distance = 0;
+			//if (dest_zone->template areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
+			//else if (dest_zone->template areatype<int>() == 2) max_walk_distance = 0.75;	// Downtown
+			//else if (dest_zone->template areatype<int>() == 3) max_walk_distance = 0.33;		// Rest of chicago
+			//else if (dest_zone->template areatype<int>() >= 4 && dest_zone->template areatype<int>() >= 6) max_walk_distance = 0.33; // Suburban
+			//else if (dest_zone->template areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
+			//else max_walk_distance = 0.0;	
+			//if (dist <max_walk_distance) act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 
 			// If no movement involved - i.e. different activity at same location, do auto arrive
 			if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())

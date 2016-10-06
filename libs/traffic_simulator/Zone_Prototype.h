@@ -79,7 +79,11 @@ namespace Zone_Components
 			accessor(accessibility_employment_other, NONE, NONE);
 
 			accessor(avg_ttime_transit, NONE, NONE);
-			accessor(avg_ttime_auto_to_transit_accessible_zones, NONE, NONE);
+			accessor(avg_wait_transit, NONE, NONE);
+			accessor(avg_ovtt_transit, NONE, NONE);
+			accessor(avg_fare_transit, NONE, NONE);
+			accessor(avg_distance, NONE, NONE);
+			//accessor(avg_ttime_auto_to_transit_accessible_zones, NONE, NONE);
 			accessor(avg_ttime_auto_peak, NONE, NONE);
 			accessor(avg_ttime_auto_offpeak, NONE, NONE);
 
@@ -185,7 +189,10 @@ namespace Zone_Components
 			{
 				return this_component()->template attraction_count<T>();
 			}
-
+			template<typename AreaType, typename ReturnType> ReturnType population_density()
+			{
+				return this_component()->template population_density<AreaType,ReturnType>();
+			}
 			accessor(employment_simulated, NONE, NONE);
 		};
 	}

@@ -59,6 +59,7 @@ SELECT
 	sum(CASE WHEN mode= 'AUTO' THEN 1 END) as Auto,
 	sum(CASE WHEN mode= 'HOV' THEN 1 END) as HOV,
 	sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as Transit,
+	sum(CASE WHEN mode= 'WALK' THEN 1 END) as Walk,
 	sum(1) AS total
 FROM 
 	Activity
@@ -234,6 +235,21 @@ SELECT Activity.location_id, Activity.start_time AS Start, round((end-start)/60)
 FROM Trip
 INNER JOIN Activity
 ON Activity.trip=Trip.trip_id;
+
+DROP TABLE IF EXISTS Mode_TTime_Distribution;
+CREATE TABLE Mode_TTime_Distribution As
+SELECT 
+	TTime,
+        sum(CASE WHEN mode= 'AUTO' THEN 1 END) as AUTO,
+	sum(CASE WHEN mode= 'HOV' THEN 1 END) as HOV,
+        sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as TRANSIT,
+	sum(CASE WHEN mode= 'WALK' THEN 1 END) as WALK,
+	sum(1) AS total
+FROM 
+	Activity_TTime_tmp
+GROUP BY 
+	TTime;
+
 
 
 DROP TABLE IF EXISTS Activity_TTime_Distribution;

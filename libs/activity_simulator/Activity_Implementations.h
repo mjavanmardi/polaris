@@ -242,7 +242,7 @@ namespace Activity_Components
 				pthis->Route_Planning_Time(obj->template Route_Planning_Time<Revision>());
 				pthis->Deletion_Time(obj->template Deletion_Time<Revision>());
 			}
-// TODO: does not compile
+
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
 				Revision &start = this->Start_Time_Planning_Time<  Revision&>();
@@ -595,7 +595,7 @@ namespace Activity_Components
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
 					return string("WORK");
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
-					return string("WORK");
+					return string("PART_WORK");
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::RECREATION_ACTIVITY)
 					return string("RECREATION");
 				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY)

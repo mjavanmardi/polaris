@@ -42,12 +42,15 @@ namespace Vehicle_Components
 		enum Vehicle_Type_Keys
 		{
 			SOV=0,
+			AUTO,
 			HOV,
 			TRUCK,
 			BUS,
 			RAIL,
+			NONMOTORIZED,
 			BICYCLE,
-			WALK
+			WALK,
+			TAXI
 		};
 
 		enum Route_Choice_Use_Class_Keys

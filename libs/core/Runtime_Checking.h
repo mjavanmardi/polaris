@@ -26,11 +26,12 @@ namespace polaris
 	/// SAFE_MODE - Enables all general purpose safeties during run
 	///----------------------------------------------------------------------------------------------------
 	//#define SAFE_MODE
-
+	//#define ENABLE_WARNINGS
+	#define ENABLE_MESSAGES
 	///----------------------------------------------------------------------------------------------------
 	/// FORWARD_SIMULATION_MODE - Enforces monotonically forward stepping simulation
 	///----------------------------------------------------------------------------------------------------
-	#define FORWARD_SIMULATION_MODE
+	//#define FORWARD_SIMULATION_MODE
 
 	
 	///----------------------------------------------------------------------------------------------------

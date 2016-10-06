@@ -677,8 +677,12 @@ namespace Person_Components
 					act_rec.setMode ("AUTO");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
 					act_rec.setMode ("HOV");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)
+					act_rec.setMode("TAXI");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
 					act_rec.setMode ("WALK");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+					act_rec.setMode("BIKE");
 				else
 					act_rec.setMode ("TRANSIT");
 				act_rec.setType (act->template Get_Type_String<NT>());

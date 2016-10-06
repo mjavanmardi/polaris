@@ -19,6 +19,7 @@ namespace Activity_Location_Components
 			LU_MIXED_USE,
 			LU_NONE,
 			LU_RESIDENTIAL,
+			LU_RESIDENTIAL_MULTI,
 			LU_RECREATION,
 			LU_SPECIAL_GENERATOR,
 			TRANSIT_STOP
@@ -103,7 +104,7 @@ namespace Activity_Location_Components
 			}
 			template<typename TargetType> bool is_residential_location()
 			{
-				if (this->land_use_type<Types::LAND_USE>() == Types::LAND_USE::LU_ALL || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL || this->land_use_type<Types::LAND_USE>() == Types::LU_MIXED_USE) return true;
+				if (this->land_use_type<Types::LAND_USE>() == Types::LAND_USE::LU_ALL || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL || this->land_use_type<Types::LAND_USE>() == Types::LU_MIXED_USE || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL_MULTI) return true;
 				else return false;
 			}
 

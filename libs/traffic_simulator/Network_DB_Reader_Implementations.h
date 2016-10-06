@@ -1207,6 +1207,14 @@ namespace Network_Components
 						{
 							code=Activity_Location_Components::Types::LU_RESIDENTIAL;
 						}
+						else if (strcmp(land_use, "RESIDENTIAL-SINGLE") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_RESIDENTIAL;
+						}
+						else if (strcmp(land_use, "RESIDENTIAL-MULTI") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_RESIDENTIAL_MULTI;
+						}
 						else if (strcmp(land_use,"SPECIAL_GEN")==0)
 						{
 							code=Activity_Location_Components::Types::LU_SPECIAL_GENERATOR;
@@ -1256,6 +1264,11 @@ namespace Network_Components
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						}
 						if (code == Activity_Location_Components::Types::LU_RESIDENTIAL)
+						{
+							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (code == Activity_Location_Components::Types::LU_RESIDENTIAL_MULTI)
 						{
 							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);

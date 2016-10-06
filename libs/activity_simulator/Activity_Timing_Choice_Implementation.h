@@ -70,8 +70,9 @@ namespace Person_Components
 				// make sure valid entry is found
 				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) 
 				{
-					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
-					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].begin();
+					THROW_WARNING("WARNING: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand <<", using last pair in list.");
+					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end();
+					itr--;
 				}
 				pair<ReturnType,ReturnType> return_val;
 
@@ -94,6 +95,7 @@ namespace Person_Components
 					return_val.second = GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END);
 				}
 				
+				//cout << "START TIME:" << return_val.first << ",DUR:" << return_val.second << endl;
 				return return_val;
 			}
 			template<typename ReturnTimeType, typename ActivityType, typename InputTimeType> pair<ReturnTimeType,ReturnTimeType> Get_Start_Time_and_Duration(ActivityType activity_ref, InputTimeType range_start, InputTimeType range_end)

@@ -44,7 +44,7 @@ namespace Choice_Model_Components
 			m_container(std::vector<double>,choice_probabilities, NONE, NONE);
 		};
 
-		implementation struct Nested_Logit_Model_Implementation : public Polaris_Component<MT,INHERIT(Nested_Logit_Model_Implementation),Data_Object>
+		implementation struct NL_Model_Implementation : public Polaris_Component<MT,INHERIT(NL_Model_Implementation),Data_Object>
 		{
 			typedef true_type Nested_Logit_Model_tag;
 			typedef true_type Probabilistic_Choice_tag;

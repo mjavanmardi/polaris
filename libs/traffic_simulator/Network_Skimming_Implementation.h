@@ -721,7 +721,7 @@ namespace Network_Skimming_Components
 				}
 
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
-				pthis->template nodes_per_zone<long>(2);
+				pthis->template nodes_per_zone<long>(1);
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
@@ -814,11 +814,17 @@ namespace Network_Skimming_Components
 				// Read transit input data if required
 				if (skim->template read_transit<bool>())
 				{	
-					transit_infile.template Read_Array<float>(transit_ttime, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_wait_time, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_fare, num_zones*num_zones);
+					this->template Read_Binary_Data<float*>(transit_ttime, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_walk_access_time, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(auto_distance, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_wait_time, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_fare, transit_infile, num_zones);
+
+					//transit_infile.template Read_Array<float>(transit_ttime, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_wait_time, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_fare, num_zones*num_zones);
 
 				}
 				// otherwise initialize to unavailable
@@ -1013,9 +1019,10 @@ namespace Network_Skimming_Components
 					float C_ind=0;
 					float C_oth=0;
 
-					float auto_ttime_avg=0, auto_ttime_avg_comp=0, auto_ttime_offpeak_avg=0, auto_ttime_offpeak_avg_comp=0, tran_ttime_avg=0;
-					int count=0, count_comp=0;
-					float attract_count = 0, attract_count_comp=0;
+					float auto_ttime_avg = 0, auto_ttime_avg_comp = 0, auto_ttime_offpeak_avg = 0, auto_ttime_offpeak_avg_comp = 0, distance_avg = 0;
+					float tran_ttime_avg = 0, tran_ovtt_avg = 0, tran_wait_avg = 0, tran_fare_avg = 0;
+					int count=0, count_transit=0;
+					float attract_count = 0, attract_count_transit=0;
 								
 					// loop through all destination zones
 					for (zone_iterator d_zone_itr = zones_container->begin(); d_zone_itr != zones_container->end(); ++d_zone_itr)
@@ -1030,6 +1037,11 @@ namespace Network_Skimming_Components
 						Time_Minutes ttime_auto_peak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
 						Time_Minutes ttime_auto_offpeak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
 						Time_Minutes ttime_transit = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
+						los_value_itf* los_value = skim->Get_LOS<zone_itf*, Time_Minutes, los_value_itf*>(zone, dzone, 9.0);
+						Time_Minutes ovtt_transit = los_value->transit_walk_access_time<Time_Minutes>();
+						Time_Minutes wait_transit = los_value->transit_wait_time<Time_Minutes>();
+						Dollars fare_transit = los_value->transit_fare<Dollars>();
+						Miles distance = los_value->auto_distance<Miles>();
 
 						// update the accessibilty factors: (1/Nz-1) * (sum(Emp * exp(alpha*ttime)))
 						C_gov += Nz_inv * dzone->template employment_government<float>() * exp(alpha*ttime_auto_peak);
@@ -1042,19 +1054,21 @@ namespace Network_Skimming_Components
 						float attract = dzone->template employment_total<float>() + dzone->template pop_persons<float>();
 
 						// update the average travel time from 'zone' for transit and auto if transit is available
-						if (ttime_transit < 1440 && ttime_auto_peak < 1440)
+						if (ttime_transit < 1440 && ttime_transit > 0) // exponential decay in weighting of transit wait, ovtt, fare with transit travel time
 						{			
-							auto_ttime_avg_comp += (ttime_auto_peak * attract);
-							auto_ttime_offpeak_avg_comp += (ttime_auto_offpeak * attract);
-							tran_ttime_avg += (ttime_transit * attract);
-							count_comp++;
-							attract_count_comp += attract;
+							tran_ttime_avg += attract * exp(alpha * ttime_transit);
+							tran_fare_avg += attract * exp(alpha * ttime_transit) * fare_transit;
+							tran_ovtt_avg += attract * exp(alpha * ttime_transit) * ovtt_transit;
+							tran_wait_avg += attract * exp(alpha * ttime_transit) * wait_transit;
+							count_transit++;
+							attract_count_transit += attract;
 						}
 						// updata average auto travel times if auto is available
-						if (ttime_auto_peak < 1440)
+						if (ttime_auto_peak < 1440 && ttime_auto_peak > 0)
 						{
-							auto_ttime_avg += (ttime_auto_peak * attract);
-							auto_ttime_offpeak_avg += (ttime_auto_offpeak * attract);
+							auto_ttime_avg += attract * exp(alpha * ttime_auto_peak);
+							auto_ttime_offpeak_avg += attract * exp(alpha * ttime_auto_offpeak);
+							distance_avg += attract * exp(alpha * ttime_auto_peak) * distance;
 							count++;
 							attract_count += attract;
 						}
@@ -1068,17 +1082,37 @@ namespace Network_Skimming_Components
 					zone->accessibility_employment_retail(C_ret);
 					zone->accessibility_employment_services(C_ser);
 
-					//cout << C_gov <<" , " << C_ind <<" , " << C_man <<" , " << C_oth <<" , " << C_ret <<" , " << C_ser<<endl;
-
 					// update the average travel times to all other zones for 'zone' by mode - weighted by attractiveness of zone (i.e. how well served are the attractive zones)
-					zone->template avg_ttime_auto_offpeak<Time_Minutes>(auto_ttime_offpeak_avg/attract_count);
-					zone->template avg_ttime_auto_peak<Time_Minutes>(auto_ttime_avg/attract_count);
-					if (count_comp > 10) zone->template avg_ttime_transit<Time_Minutes>(tran_ttime_avg/attract_count_comp);
-					else zone->template avg_ttime_transit<Time_Minutes>(9999);
-					if (count_comp > 10) zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>((0.5*auto_ttime_avg_comp + 0.5*auto_ttime_offpeak_avg_comp)/attract_count_comp);
-					else zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>(9999);
+					zone->template avg_ttime_auto_offpeak<Time_Minutes>(1.0 / alpha * log(auto_ttime_offpeak_avg/attract_count));
+					zone->template avg_ttime_auto_peak<Time_Minutes>(1.0 / alpha * log(auto_ttime_avg / attract_count));
+					zone->template avg_distance<Miles>(distance_avg / auto_ttime_avg);
+					if (count_transit > 2)
+					{
+						zone->template avg_ttime_transit<Time_Minutes>(1.0 / alpha * log(tran_ttime_avg / attract_count_transit));
+						zone->template avg_ovtt_transit<Time_Minutes>(tran_ovtt_avg / tran_ttime_avg);
+						zone->template avg_fare_transit<Dollars>(tran_fare_avg / tran_ttime_avg);
+						zone->template avg_wait_transit<Time_Minutes>(tran_wait_avg / tran_ttime_avg);
+					}
+					else
+					{
+						zone->template avg_ttime_transit<Time_Minutes>(9999);
+						zone->template avg_ovtt_transit<Time_Minutes>(9999);
+						zone->template avg_fare_transit<Time_Minutes>(9999);
+						zone->template avg_wait_transit<Time_Minutes>(9999);
+					}
+					//if (count_comp > 10) zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>((0.5*auto_ttime_avg_comp + 0.5*auto_ttime_offpeak_avg_comp)/attract_count_comp);
+					//else zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>(9999);
+
+					//cout << zone->uuid<int>() << ","
+					//	<< zone->template avg_ttime_auto_peak<Time_Minutes>() << ","
+					//	<< zone->template avg_distance<Miles>() << ","
+					//	<< zone->template avg_ttime_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_ovtt_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_wait_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_fare_transit<Dollars>() << endl;
 
 				}
+				
 			}
 
 			void Write_Binary_Header()
@@ -1136,16 +1170,14 @@ namespace Network_Skimming_Components
 				else
 				{
 					this->_highway_input_file.Version('0');
+					this->_transit_input_file.Version('0');
 					Read_Binary_Headers_Unversioned(num_modes,num_zones,return_intervals,perform_checks);
 				}
 			}
 	
 			void Read_Binary_Headers_Unversioned(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr,bool perform_checks=true)
 			{
-				//network_itf* network = this->template network_reference<network_itf*>();
-				//skimmer_itf* skim = (skimmer_itf*)this;
-				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
-	
+
 				int update_increment;//, num_zones_transit, num_zones_hcost;
 
 				// read for time-varying highway skims
@@ -1157,30 +1189,24 @@ namespace Network_Skimming_Components
 				_highway_input_file.template Read_Value<int>(num_zones);
 				_highway_input_file.template Read_Value<int>(update_increment);
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, nullptr, update_increment);
-				//Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
-				//if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
-				//int skimmer_num_zones = zones_container->size();
-				//if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
-
-
-				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_transit<bool>())
-				//{		
-				//	transit_infile.template Read_Value<int>(num_zones_transit);
-				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
-				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_highway_cost<bool>())
-				//{		
-				//	highway_cost_infile.template Read_Value<int>(num_zones_hcost);
-				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
+				//if (perform_checks) Do_Header_Validation_Checks(num_modes, nullptr, nullptr, nullptr, update_increment);
+				network_itf* network = this->template network_reference<network_itf*>();
+				skimmer_itf* skim = (skimmer_itf*)this;
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+				int skimmer_num_zones = zones_container->size();
+				if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+				Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
+				if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
 			}
 
 			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
-				int num_intervals;//, num_zones_transit, num_zones_hcost;
+				//=======================================
+				// READ HIGHWAY HEADER
+				//---------------------------------------
+				int num_intervals;
+				//, num_zones_hcost;
+
 				update_interval_endpoints_type intervals;
 				std::vector<pair<int,int>> return_zones_container;
 
@@ -1223,7 +1249,47 @@ namespace Network_Skimming_Components
 				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals, &return_zones_container);
+
+
+				//==============================================
+				// READ TRANSIT HEADER
+				//----------------------------------------------
+				// get versioning info
+				char version[9]; version[8] = '\0';
+				_transit_input_file.template Read_Array<char>(version, 8);
+				// call associated read function
+				if (strcmp(version, "SKIM:V01") != 0)
+				{
+					THROW_EXCEPTION("ERROR: Transit skim binary does not seem to be in V01 format. Use skim_analyzer.pyw to verify.");
+				}
+				else this->_transit_input_file.Version('1');
+
+				int num_zones_transit;
+				std::vector<pair<int, int>> return_transit_zones_container;
+				if (read_transit<bool>())
+				{
+					_transit_input_file.template Read_Array<char>(tag, 4);
+					if (strcmp(tag, "BZON") == 0)
+					{
+						_transit_input_file.template Read_Value<int>(num_zones);
+						for (int i = 0; i<num_zones; i++)
+						{
+							int id, index;
+							_transit_input_file.template Read_Value<int>(id);
+							_transit_input_file.template Read_Value<int>(index);
+							return_transit_zones_container.push_back(pair<int, int>(id, index));
+						}
+						_transit_input_file.template Read_Array<char>(tag, 4);
+						if (strcmp(tag, "EZON") != 0) THROW_EXCEPTION("ERROR: End zone information tag 'EZON' missing from binary file, possible versioning issue.");
+					}
+					else THROW_EXCEPTION("ERROR: Start zone information tag 'BZON' missing from binary trasnit skim file, possible versioning issue.");
+				}
+
+
+				//==============================================
+				// VALIDATION
+				//----------------------------------------------
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, &intervals, &return_zones_container, &return_transit_zones_container);
 
 				// return the read in interval values if requested
 				if (return_intervals != nullptr)
@@ -1233,8 +1299,9 @@ namespace Network_Skimming_Components
 				}
 			}
 
-			void Do_Header_Validation_Checks(int num_modes, int num_zones, update_interval_endpoints_type* intervals, std::vector<pair<int,int>>* return_zones_container, int increment=0)
+			void Do_Header_Validation_Checks(int num_modes, update_interval_endpoints_type* intervals, std::vector<pair<int,int>>* return_zones_container, std::vector<pair<int, int>>* return_transit_zones_container, int increment=0)
 			{
+				int num_zones = return_zones_container->size();
 				network_itf* network = this->template network_reference<network_itf*>();
 				skimmer_itf* skim = (skimmer_itf*)this;
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
@@ -1275,8 +1342,7 @@ namespace Network_Skimming_Components
 				// header validation checks for transit and cost skims - make sure number of zones specified correctly
 				if (read_transit<bool>())
 				{		
-					int num_zones_transit;
-					_transit_input_file.template Read_Value<int>(num_zones_transit);
+					int num_zones_transit = return_transit_zones_container->size();
 					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
 				}
 				if (read_highway_cost<bool>())

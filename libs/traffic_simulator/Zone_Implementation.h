@@ -86,7 +86,11 @@ namespace Zone_Components
 			member_component_and_feature_accessor(school_area,Value,Basic_Units::Prototypes::Area,Basic_Units::Implementations::Area_Implementation<NT>);
 
 			member_component_and_feature_accessor(avg_ttime_transit,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
-			member_component_and_feature_accessor(avg_ttime_auto_to_transit_accessible_zones,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_ovtt_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_fare_transit, Value, Basic_Units::Prototypes::Currency, Basic_Units::Implementations::Currency_Implementation<NT>);
+			member_component_and_feature_accessor(avg_wait_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_distance, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			//member_component_and_feature_accessor(avg_ttime_auto_to_transit_accessible_zones,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ttime_auto_peak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ttime_auto_offpeak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 
@@ -141,6 +145,11 @@ namespace Zone_Components
 			}	
 			tag_getter_as_available(production_count);	
 			tag_getter_as_available(attraction_count);
+
+			template<typename AreaType, typename ReturnType> ReturnType population_density(requires(ReturnType, check(ReturnType, is_arithmetic)))
+			{
+				return (ReturnType)this->_pop_persons / (ReturnType)this->area<AreaType>();
+			}
 
 			m_container(std::vector<typename MasterType::activity_location_type*>, origin_activity_locations, NONE, NONE);
 
