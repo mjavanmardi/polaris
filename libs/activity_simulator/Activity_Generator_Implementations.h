@@ -262,6 +262,7 @@ namespace Person_Components
 			static float other_shopping_activity_freq[8];
 			static float personal_business_activity_freq[8];
 			static float religious_or_civic_activity_freq[8];
+			static float recreation_activity_freq[8];
 			static float service_vehicle_activity_freq[8];
 			static float social_activity_freq[8];
 
@@ -433,8 +434,27 @@ namespace Person_Components
 
 		};
 		//============================================
-		#pragma region Static member initialization
-		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::work_activity_freq[] = { 0,0,0,1.23595951577694,0,0,0,0 };
+		#pragma region Static member initialization 
+		//																																							student-driver, school child, pre-school, full-time, part-time, non-worker, senior, adult-student
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::work_activity_freq[] = { 0,0,0,1.17114433653373,0,0,0,0 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::part_time_work_activity_freq[] = { 0.00700125285577419,0,0,0,0.525218331986168,0.0198731108044916,0.0197172699406381,0.0429368430786302 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::school_activity_freq[] = { 0.887132434225072,0.905430052081557,0.338047211983374,0.0225387887937393,0.192641133320773,0.00583805682289839,0.00520570487129086,0.664180254600376 };
+
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::eat_out_activity_freq[] = { 0.0880039059621195,0.0695757393311594,0.0986902988000941,0.219896894805232,0.215543961153012,0.186377119560776,0.208285141453395,0.187575131769565 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::errands_activity_freq[] = { 0,0,0,0,0,0,0,0 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::healthcare_activity_freq[] = { 0,0,0,0,0,0,0,0 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::leisure_activity_freq[] = { 0.0249834180853416,0.0254539938405239,0.0186902988000941,0.0322400143336681,0.046462019046693,0.0232160113075292,0.0248503188027861,0.0282341337114324 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::major_shopping_activity_freq[] = { 0.0407270248360233,0.0142321762659087,0.0149760803074269,0.0459073025404392,0.0693344596853102,0.0450410170366133,0.059941207542872,0.0221927688561477 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::other_activity_freq[] = { 0,0,0,0,0,0,0,0 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::other_shopping_activity_freq[] = { 0.180088805365171,0.0800720134243183,0.0783781664183201,0.365543014851964,0.543368602736063,0.598986553078561,0.556293679516307,0.361202724778843 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::personal_business_activity_freq[] = { 0.347630628638809,0.340365735062565,0.423279742765273,0.385353545915498,0.548239669873528,0.578866650961765,0.577980516407494,0.408177418857689 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::recreation_activity_freq[] = { 0.159315351168104,0.135248595655911,0.0381115206650459,0.077968711230282,0.110533416796825,0.0850228121709783,0.0811862173514332,0.0899731837376321 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::religious_or_civic_activity_freq[] = { 0.0428826737416169,0.0566876411840587,0.0189883146419889,0.0487016895754781,0.101836601982461,0.0686512534274345,0.064062963304788,0.0184631507567118 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::service_vehicle_activity_freq[] = { 0,0,0,0,0,0,0,0 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::social_activity_freq[] = { 0.181986513376078,0.105497785152111,0.0835824641204611,0.0811299180844432,0.154728551199383,0.155050648307957,0.120241767779613,0.153160928397497 };
+
+
+	/*	template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::work_activity_freq[] = { 0,0,0,1.23595951577694,0,0,0,0 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::part_time_work_activity_freq[] = { 0.00657894736842105,0,0,0,0.73030303030303,0.0318203088441741,0.0254604550379198,0.0634920634920635 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::school_activity_freq[] = { 0.947368421052632,0.903969270166453,0.336854460093897,0.020837467751538,0.212727272727273,0.00655124005615349,0.00541711809317443,0.724867724867725 };
 		
@@ -447,11 +467,31 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::other_shopping_activity_freq[] = { 0.190789473684211,0.0810926163038839,0.0809859154929577,0.380432625520937,0.536969696969697,0.672437997192326,0.631094257854821,0.375661375661376 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::personal_business_activity_freq[] = { 0.128786719706242,0.0695486943914666,0.0711538915233444,0.106524183829895,0.154975747144422,0.199903836695218,0.178870182307738,0.220620620620621 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::religious_or_civic_activity_freq[] = { 0.0460526315789474,0.058898847631242,0.0211267605633803,0.0470331414963286,0.0824242424242424,0.0954609265325222,0.0937161430119177,0.0317460317460317 };
+		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::recreation_activity_freq[] = { 0.0460526315789474,0.058898847631242,0.0211267605633803,0.0470331414963286,0.0824242424242424,0.0954609265325222,0.0937161430119177,0.0317460317460317 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::service_vehicle_activity_freq[] = { 0.0318428702570379,0.0194771919075846,0.0311298275414632,0.0913526665918876,0.0892020028164607,0.0845103782570973,0.0803090614442905,0.0829400829400829 };
 		template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::social_activity_freq[] = { 0.200657894736842,0.117370892018779,0.107981220657277,0.102996626314745,0.197575757575758,0.195601310248011,0.169014084507042,0.19047619047619 };
-
+		*/
 		template<typename MasterType, typename InheritanceList> int Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count_Array[];
 		template<typename MasterType, typename InheritanceList> int Simple_Activity_Generator_Implementation<MasterType,  InheritanceList>::Generator_Count;
+
+		/* Chicago model activity generation values
+		{0, 0, 0, 1.0, 0, 0, 0, 0};
+		{0, 0, 0, 0, 0.75, 0.15, 0, 0};
+		{0.75, 0.75, 0, 0, 0, 0, 0, 0.25};
+
+		{0.134, 0.125, 0.158, 0.260, 0.236, 0.234, 0.248, 0.178};
+		{0.033, 0.052, 0.093, 0.108, 0.156, 0.198, 0.181, 0.070};
+		{0.030, 0.034, 0.053, 0.051, 0.070, 0.110, 0.142, 0.046};
+		{0.198, 0.271, 0.234, 0.161, 0.213, 0.236, 0.184, 0.206};
+		{0.007, 0.014, 0.022, 0.028, 0.039, 0.041, 0.041, 0.015};
+		{0.008, 0.016, 0.021, 0.027, 0.023, 0.034, 0.031, 0.028};
+		{0.174, 0.203, 0.320, 0.359, 0.484, 0.658, 0.598, 0.302};
+		{0.117, 0.082, 0.110, 0.097, 0.133, 0.206, 0.167, 0.197};
+		{0.059, 0.069, 0.033, 0.049, 0.074, 0.113, 0.103, 0.043};
+		{0, 0, 0, 0, 0, 0, 0, 0};
+		{0.021, 0.023, 0.043, 0.080, 0.076, 0.077, 0.076, 0.061};
+		{0.227, 0.188, 0.215, 0.129, 0.211, 0.225, 0.189, 0.200};*/
+
 		#pragma endregion
 	}
 	

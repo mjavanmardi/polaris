@@ -364,12 +364,31 @@ namespace Activity_Components
 				// If this is a child needing an escort
 				if (properties->template Age<int>()<6 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 				{
-					// Require parent escort when using HOV
-					if(this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
+					// Require parent escort for preschool children
+					// get a free adult available for escort
+					//%%%RLW
+					_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+
+					// If no adults free and not school trip - cancel act
+					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+					// if no adult but is school activity, force trip to transit
+					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+					// otherwise, assign escort duty to adult
+					else
+					{
+						_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
+						gen->template Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+					}
+				}
+				// require escort for all modes except bus (i.e. kids can take schoolbus by themselves)
+				else if (properties->template Age<int>()<10 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
+				{
+					// Attempt parent escort for all modes but transit - if fails force to transit
+					if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::BUS)
 					{
 						// get a free adult available for escort
 						//%%%RLW
-						_person_itf* adult = household->template Get_Free_Escort<_person_itf*,Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
+						_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 						// If no adults free and not school trip - cancel act
 						if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
@@ -379,7 +398,7 @@ namespace Activity_Components
 						else
 						{
 							_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
-							gen->template Create_Activity<Types::ACTIVITY_TYPES,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY,iteration()+2,this->Location<_activity_location_itf*>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,this->Start_Time<Time_Seconds>(),300);
+							gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, this->Start_Time<Time_Seconds>(), 300);
 						}
 					}
 				}
