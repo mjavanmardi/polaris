@@ -771,9 +771,9 @@ namespace Person_Components
 					}
 				}
 
-				if (utility < -999999.0) MESSAGE("WARNING: utility=-inf, (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT): " << household->uuid<int>() << "," << this->_mode_type << "," << AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr);
-				if (utility > 100.0) MESSAGE("WARNING: utility=+inf (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT): " << household->uuid<int>() << "," << this->_mode_type << "," << AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr);
-				if (ISNAN(utility) ) MESSAGE("WARNING: utility=NaN, (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT): "<< household->uuid<int>()<<","<<this->_mode_type<<","<< AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT<<","<<TRAN_COST<<","<<WALK_TTr);
+				if (utility < -999999.0) MESSAGE("WARNING: utility=-inf, (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT,O,D): " << household->uuid<int>() << "," << this->_mode_type << "," << AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr<<","<<orig_zone->uuid<int>()<<","<<dest_zone->uuid<int>());
+				if (utility > 100.0) MESSAGE("WARNING: utility=+inf (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT): " << household->uuid<int>() << "," << this->_mode_type << "," << AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr << "," << orig_zone->uuid<int>() << "," << dest_zone->uuid<int>());
+				if (ISNAN(utility) ) MESSAGE("WARNING: utility=NaN, (Tripd,Mode,AutoTT,AutoCost,TranTT,TranOVTT,TranWait,TranFare,WalkTT): "<< household->uuid<int>()<<","<<this->_mode_type<<","<< AUTO_TT << "," << AUTO_COST << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT<<","<<TRAN_COST<<","<<WALK_TTr << "," << orig_zone->uuid<int>() << "," << dest_zone->uuid<int>());
 				return utility;
 			}
 

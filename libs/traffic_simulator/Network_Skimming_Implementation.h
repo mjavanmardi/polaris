@@ -1254,20 +1254,20 @@ namespace Network_Skimming_Components
 				//==============================================
 				// READ TRANSIT HEADER
 				//----------------------------------------------
-				// get versioning info
-				char version[9]; version[8] = '\0';
-				_transit_input_file.template Read_Array<char>(version, 8);
-				// call associated read function
-				if (strcmp(version, "SKIM:V01") != 0)
-				{
-					THROW_EXCEPTION("ERROR: Transit skim binary does not seem to be in V01 format. Use skim_analyzer.pyw to verify.");
-				}
-				else this->_transit_input_file.Version('1');
-
 				int num_zones_transit;
 				std::vector<pair<int, int>> return_transit_zones_container;
 				if (read_transit<bool>())
 				{
+					// get versioning info
+					char version[9]; version[8] = '\0';
+					_transit_input_file.template Read_Array<char>(version, 8);
+					// call associated read function
+					if (strcmp(version, "SKIM:V01") != 0)
+					{
+						THROW_EXCEPTION("ERROR: Transit skim binary does not seem to be in V01 format. Use skim_analyzer.pyw to verify.");
+					}
+					else this->_transit_input_file.Version('1');
+
 					_transit_input_file.template Read_Array<char>(tag, 4);
 					if (strcmp(tag, "BZON") == 0)
 					{

@@ -255,8 +255,6 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Add_Summary_Record(TargetType act_record, bool is_executed)
 			{		
-				if (!is_executed) return;
-
 				stringstream s;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
@@ -276,7 +274,7 @@ namespace Person_Components
 					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
 					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 
-					Push_To_Demand_Database<TargetType>(act_record);
+					Push_To_Demand_Database<TargetType>(act_record, is_executed);
 
 					//movement_itf* move = act->template movement_plan<movement_itf*>();
 					//zone_itf* orig = move->template origin<location_itf*>()->template zone<zone_itf*>();
@@ -301,6 +299,9 @@ namespace Person_Components
 					//	Push_To_Demand_Database<TargetType>(act_record);
 					//}
 				}
+
+				if (!is_executed) return;
+
 				//----------------------------------------------------------
 				//==========================================================
 
@@ -459,7 +460,7 @@ namespace Person_Components
 					}
 
 
-					// database write for external trips
+					// database write for trips
 					typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 					if (scenario->template write_demand_to_database<bool>())
@@ -475,7 +476,12 @@ namespace Person_Components
 							{
 								polaris::io::Trip& t = itr->first;
 								polaris::io::Activity& a = itr->second;
-								unsigned long t_id = this->_db_ptr->persist(t);
+
+								unsigned long t_id;
+								// only write trip if the type is not -1 (i.e. for executed trips)
+								if (t.getType() != -1) t_id = this->_db_ptr->persist(t);
+
+								else t_id = 0;
 								a.setTrip (t_id);
 								this->_db_ptr->persist(a);
 								count++;
@@ -612,7 +618,7 @@ namespace Person_Components
 
 
 
-			template<typename TargetType> void Push_To_Demand_Database(TargetType act_record, int new_origin=-1, int new_destination=-1)
+			template<typename TargetType> void Push_To_Demand_Database(TargetType act_record, bool is_executed, int new_origin=-1, int new_destination=-1)
 			{
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
@@ -630,35 +636,43 @@ namespace Person_Components
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 				household_itf* hh = person->person_itf::template Household<household_itf*>();
 
+
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
-				trip_rec.setConstraint(0);
-				trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
-				trip_rec.setTrip(act->template Activity_Plan_ID<int>());
-				if (new_destination<0) trip_rec.setDestination(dest->template uuid<int>());
-				else trip_rec.setDestination(new_destination);
-				trip_rec.setDuration(act->template Duration<Time_Seconds>());
-				//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
-				trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
-				trip_rec.setHhold(hh->template uuid<int>());
-				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec.setMode(0);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
-				else trip_rec.setMode(3);
-				if (new_origin <0) trip_rec.setOrigin(orig->template uuid<int>());
-				else trip_rec.setOrigin(new_origin);
-				trip_rec.setPartition(move->template routed_travel_time<int>());
-				trip_rec.setPassengers(0);
-				trip_rec.setPurpose(0);
-				//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
-				trip_rec.setStart(move->template departed_time<Time_Seconds>());
-				trip_rec.setTour(0);
-				trip_rec.setPriority(0);
-//				trip_rec.setVehicle(9);
-				trip_rec.setType(1);
+				if (is_executed)
+				{
+					trip_rec.setConstraint(0);
+					trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
+					trip_rec.setTrip(act->template Activity_Plan_ID<int>());
+					if (new_destination < 0) trip_rec.setDestination(dest->template uuid<int>());
+					else trip_rec.setDestination(new_destination);
+					trip_rec.setDuration(act->template Duration<Time_Seconds>());
+					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
+					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec.setHhold(hh->template uuid<int>());
+					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec.setMode(0);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
+					else trip_rec.setMode(3);
+					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
+					else trip_rec.setOrigin(new_origin);
+					trip_rec.setPartition(move->template routed_travel_time<int>());
+					trip_rec.setPassengers(0);
+					trip_rec.setPurpose(0);
+					//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
+					trip_rec.setStart(move->template departed_time<Time_Seconds>());
+					trip_rec.setTour(0);
+					trip_rec.setPriority(0);
+					//				trip_rec.setVehicle(9);
+					trip_rec.setType(1);
+				}
+				else
+				{
+					trip_rec.setType(-1); // use this to flag a null trip when writing to database
+				}
 					
 
 				//==============================================================================================
