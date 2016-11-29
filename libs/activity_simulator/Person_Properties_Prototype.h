@@ -378,6 +378,30 @@ namespace Person_Components
 			MIL_MILITARY_RESERVES_OR_NATIONAL_GUARD=9870,
 			INDUSTRY_UNEMPLOYED=9920,	
 		};
+		enum EMPLOYMENT_INDUSTRY_BASE
+		{
+			IND_NA,
+			IND_AGRICULTURE,
+			IND_EXTRACTION,
+			IND_UTILITIES,
+			IND_CONSTRUCTION,
+			IND_MANUFACTURING,
+			IND_WHOLESALE,
+			IND_RETAIL,
+			IND_TRANSPORTATION,
+			IND_INFORMATION,
+			IND_FINANCE,
+			IND_REALESTATE,
+			IND_PROFESSIONAL,
+			IND_EDUCATION,
+			IND_MEDICAL,
+			IND_SOCIALWORK,
+			IND_ENTERTAINMENT,
+			IND_SERVICES,
+			IND_ADMINISTRATION,
+			IND_MILITARY,
+			IND_UNEMPLOYED
+		};
 		enum EMPLOYMENT_INDUSTRY_SIMPLE
 		{
 			RETAIL,
@@ -386,6 +410,14 @@ namespace Person_Components
 			INDUSTRIAL,
 			MANUFACTURING,
 			OTHER
+		};
+		enum TELECOMMUTE_FREQUENCY
+		{
+			TC_NEVER = 0,
+			TC_YEARLY,
+			TC_MONTHLY,
+			TC_WEEKLY,
+			TC_DAILY
 		};
 	}
 
@@ -455,6 +487,8 @@ namespace Person_Components
 			accessor(Journey_To_Work_Arrival_Time, check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value), NONE);
 			accessor(Income, NONE, NONE);
 
+			accessor(Telecommute_Frequency, NONE, NONE);
+
 			// Non-static properties
 			accessor(work_location_id, NONE, NONE);
 			accessor(school_location_id, NONE, NONE);
@@ -506,12 +540,30 @@ namespace Person_Components
 				this_component()->Initialize<TargetType>(home_zone);
 			}
 
+			local_check_template_method_name(Set_Locations_exists, Set_Locations);
+			template<typename TargetType> void Set_Locations()
+			{
+				assert_check(ComponentType, Set_Locations_exists, "ComponentType does not have 'Set_Locations' method defined.");
+
+				this_component()->Set_Locations<TargetType>();
+			}
+
+
 			local_check_template_method_name(Is_Employed_exists,Is_Employed);
 			template<typename TargetType> bool Is_Employed()
 			{
 				assert_check(ComponentType,Is_Employed_exists,"ComponentType does not have 'Is_Employed' method defined.");
 
 				return this_component()->Is_Employed<TargetType>();
+			}
+			bool Is_Fulltime_Worker()
+			{
+				return this_component()->Is_Employed<NT>() && this_component()->Work_Hours<Time_Minutes>() >= 30;
+
+			}
+			bool Is_Parttime_Worker()
+			{
+				return this_component()->Is_Employed<NT>() && this_component()->Work_Hours<Time_Minutes>() < 30;
 			}
 
 			local_check_template_method_name(Is_Student_exists,Is_Student);
@@ -539,14 +591,40 @@ namespace Person_Components
 				assert_check_2(TargetType, std::vector<double>*, is_same, "TargetType must be specified as a pointer to a vector of doubles.");
 			}
 
+			template<typename TargetType> Types::EMPLOYMENT_INDUSTRY_BASE Employment_Industry_Base()
+			{
+				int i = this->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>();
+
+				if (i <= 290) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_AGRICULTURE;
+				else if (i <= 490) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_EXTRACTION;
+				else if (i <= 690) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_UTILITIES;
+				else if (i <= 770) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_CONSTRUCTION;
+				else if (i <= 3990) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_MANUFACTURING;
+				else if (i <= 4590) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_WHOLESALE;
+				else if (i <= 5790) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_RETAIL;
+				else if (i <= 6390) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_TRANSPORTATION;
+				else if (i <= 6780) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_INFORMATION;
+				else if (i <= 6990) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_FINANCE;
+				else if (i <= 7190) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_REALESTATE;
+				else if (i <= 7790) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_PROFESSIONAL;
+				else if (i <= 7890) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_EDUCATION;
+				else if (i <= 8290) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_MEDICAL;
+				else if (i <= 8470) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_SOCIALWORK;
+				else if (i <= 8690) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_ENTERTAINMENT;
+				else if (i <= 9290) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_SERVICES;
+				else if (i <= 9590) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_ADMINISTRATION;
+				else if (i <= 9870) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_MILITARY;
+				else if (i <= 9920) return Types::EMPLOYMENT_INDUSTRY_BASE::IND_UNEMPLOYED;
+				else return Types::EMPLOYMENT_INDUSTRY_BASE::IND_NA;
+			}
 			template<typename TargetType> Types::EMPLOYMENT_INDUSTRY_SIMPLE Employment_Industry_Simple()
 			{
 				int i = this->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>();
 
-				if (i <= 770 || (i >=6070 && i <= 6390)) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::INDUSTRIAL;
+				if (i <= 770 || (i >= 6070 && i <= 6390)) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::INDUSTRIAL;
 				else if (i <= 3990) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::MANUFACTURING;
 				else if (i <= 5790) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::RETAIL;
-				else if (i <= 7790 || (i >=8660 && i <=9290)) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::SERVICE;
+				else if (i <= 7790 || (i >= 8660 && i <= 9290)) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::SERVICE;
 				else if ((i >= 7860 && i <= 7890) || (i >= 9370 && i <= 9870)) return Types::EMPLOYMENT_INDUSTRY_SIMPLE::GOVERNMENT;
 				else return Types::EMPLOYMENT_INDUSTRY_SIMPLE::OTHER;
 			}

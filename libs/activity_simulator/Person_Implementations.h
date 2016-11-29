@@ -107,6 +107,8 @@ namespace Person_Components
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
 			typedef Prototypes::Mode_Chooser<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)> mode_choice_itf;
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;
+			typedef Prototypes::Telecommute_Chooser<typename type_of(Planning_Faculty)::type_of(Telecommuting_Choice_Faculty)> telecommute_choice_itf;
+			
 			
 			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container)> zones_container_interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;
@@ -132,6 +134,7 @@ namespace Person_Components
 				_Planning_Faculty = (Planning_Faculty_interface*)Allocate<type_of(Planning_Faculty)>();	
 				_Planning_Faculty->template Parent_Person<ComponentType*>(this);
 				_Planning_Faculty->template Initialize<NULLTYPE>();
+
 				generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)>();
 				generator->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
 				_Planning_Faculty->template Activity_Generation_Faculty<generator_itf*>(generator);
@@ -147,6 +150,10 @@ namespace Person_Components
 				timing_choice_itf* timing_chooser = (timing_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)>();
 				timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
 				_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
+
+				telecommute_choice_itf* telecommute_chooser = (telecommute_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Telecommuting_Choice_Faculty)>();
+				telecommute_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+				_Planning_Faculty->template Telecommuting_Choice_Faculty<telecommute_choice_itf*>(telecommute_chooser);
 
 				// Create and Initialize the Scheduling faculty and its subcomponents
 				_Scheduling_Faculty = (Scheduling_Faculty_interface*)Allocate<type_of(Scheduling_Faculty)>();
@@ -278,280 +285,14 @@ namespace Person_Components
 
 			template<typename TargetType> void Set_Locations()
 			{
-				// This call sets the work/school locations from the properties sub class and uses the functions below
-				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
-			}
-
-			template<typename TargetType> void Choose_Work_Location()
-			{
-				// interface to this
-				this_itf* pthis = (this_itf*)this;
-				destination_choice_itf* dest_chooser = this->_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>();
-				
-				
-				// first, make sure person is worker, if not exit
-				EMPLOYMENT_STATUS status = _Static_Properties->template Employment_Status<EMPLOYMENT_STATUS>();
-				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
-				{
-					pthis->template Work_Location<int>(-1);
-					return;
-				}
-
-				location_interface* dest=nullptr;
-
-				// Do work at home choice first, if working from home, do not do destination choice		
-				if (!this->Work_At_Home_Choice())
-				{
-					dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
-				}
-
-				if (dest == nullptr) pthis->template Work_Location<location_interface*>(pthis->template Home_Location<location_interface*>());
-				else pthis->template Work_Location<location_interface*>(dest);
-
-				scenario_reference_interface* scenario = pthis->template scenario_reference<scenario_reference_interface*>();
-				zone_interface* zone = pthis->template Work_Location<zone_interface*>();
-				
-				// update the simulated employment in the work zone
-				zone->template employment_simulated<int&>() += 1.0f / scenario->template percent_to_synthesize<float>();
-			}
-
-			template<typename TargetType> void Choose_Work_Location_Based_On_Census()
-			{
-				// interface to this
-				this_itf* pthis = (this_itf*)this;
-
-
-				// first, make sure person is worker, if not exit
-				EMPLOYMENT_STATUS status = _Static_Properties->template Employment_Status<EMPLOYMENT_STATUS>();
-				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
-				{
-					pthis->template Work_Location<int>(-1);
-					return;
-				}
-
-
-				// Get the expected travel time from the persons static properties
-				Time_Minutes ttime = _Static_Properties->template Journey_To_Work_Travel_Time<Time_Minutes>();
-
-				// if minimimal travel time, assign the home location as the work location
-				if (ttime < 2)
-				{
-					pthis->template Work_Location<int>(pthis->template Home_Location<int>());
-					return;
-				}
-
-				//=========================================================
-				// Find available zones within the specified target range of the given work travel time
-				//---------------------------------------------------------
-				zones_container_interface* zones = this->network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
-				typename zones_container_interface::iterator z_itr;
-				std::vector<zone_interface*> temp_zones;
-				std::vector<float> temp_zone_probabilities;
-				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
-
-				// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
-				float time_range_to_search = 2.0;
-				int employment = 0;
-				while (temp_zones.size() == 0)
-				{
-					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
-					{
-						zone_interface* zone = z_itr->second;
-						Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours,Time_Minutes>(orig,zone, Vehicle_Components::Types::SOV,7);
-						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->template work_locations<locations_container_interface*>()->size() > 0 && zone->template employment_total<int>() > 0)
-						{
-							employment += zone->template employment_total<int>();
-							temp_zones.push_back(zone);
-						}
-					}
-					// expand the search time radius if no available zones found
-					if (time_range_to_search >= 20) break;
-					time_range_to_search += time_range_to_search;
-					
-				}
-				// calculate probabilities
-				float cum_prob = 0;
-				for (typename std::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
-				{
-					cum_prob += (*t_itr)->template employment_total<float>() / employment;
-					temp_zone_probabilities.push_back(cum_prob);
-				}
-
-				//=========================================================
-				// select zone
-				//---------------------------------------------------------
-				float r = Uniform_RNG.template Next_Rand<float>();
-				zone_interface* selected_zone = nullptr;
-				typename std::vector<zone_interface*>::iterator t_itr;
-				std::vector<float>::iterator p_itr;
-				for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
-				{
-					if (r<*p_itr) 
-					{
-						selected_zone = *t_itr;
-						break;
-					}
-				}
-				
-				//=========================================================
-				// Select location from within the zone
-				//---------------------------------------------------------
-				// set work location to home if no valid locations found
-				if (selected_zone == nullptr)
-				{
-					pthis->template Work_Location<int>(pthis->template Home_Location<int>());
-					//THROW_WARNING("WARNING: no valid work zone found for person id: " << pthis->uuid<int>() << ", setting work location to home location.");
-				}
-
-				// select work location from within available work locations in the zone
-				else
-				{
-					locations_container_interface* work_locations = selected_zone->template work_locations<locations_container_interface*>();
-					float size = work_locations->size();
-
-					if (size == 0)
-					{
-						pthis->template Work_Location<int>(pthis->template Home_Location<int>());
-					}
-					else
-					{
-						int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
-						location_interface* work_loc = (*work_locations)[index];
-
-						if (work_loc == nullptr)
-						{
-							pthis->template Work_Location<int>(pthis->template Home_Location<int>());
-						}
-						else
-						{
-							pthis->template Work_Location<int>(work_loc->template internal_id<int>());
-						}
-					}
-				}
-			}
-
-			template<typename TargetType> void Choose_School_Location()
-			{
-				// interface to this
-				this_itf* pthis = (this_itf*)this;
-				zone_interface* selected_zone = nullptr;
-
-
-				//=========================================================
-				// first, make sure person is student, if not exit
-				//---------------------------------------------------------
-				SCHOOL_ENROLLMENT status = _Static_Properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (status != SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC && status != SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
-				{
-					pthis->template School_Location<int>(-1);
-					return;
-				}
-
-				//=========================================================
-				// Find available zones within the specified target range of the given work travel time
-				//---------------------------------------------------------
-				zones_container_interface* zones = network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
-				typename zones_container_interface::iterator z_itr;
-				std::vector<zone_interface*> temp_zones;
-				std::vector<float> temp_zone_probabilities;
-				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
-
-				//=========================================================
-				// if origin zone has school locations, select, else search
-				//---------------------------------------------------------
-				if (orig->template school_locations<locations_container_interface*>()->size() > 0)
-				{
-					selected_zone = orig;
-				}
-				else
-				{
-					// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
-					float time_range_to_search = 15.0;
-					int school_locations = 0;
-					while (temp_zones.size() == 0)
-					{
-						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
-						{
-							zone_interface* zone = (zone_interface*)(z_itr->second);
-							Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours,Time_Minutes>(orig,zone, Vehicle_Components::Types::SOV,9);
-							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
-							{
-								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();
-								temp_zones.push_back(zone);
-							}
-						}
-						// expand the search time radius if no available zones found
-						if (time_range_to_search >= 60) break;
-						time_range_to_search += time_range_to_search;
-					
-					}
-
-					if (temp_zones.size()==0)
-					{
-						pthis->template School_Location<int>(pthis->template Home_Location<int>());
-						return;
-					}
-
-					// calculate probabilities
-					float cum_prob = 0;
-					for (typename std::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
-					{
-						cum_prob += (*t_itr)->template school_locations<locations_container_interface*>()->size() / school_locations;
-						temp_zone_probabilities.push_back(cum_prob);
-					}
-
-					//=========================================================
-					// select zone
-					//---------------------------------------------------------
-					float r = Uniform_RNG.template Next_Rand<float>();
-					zone_interface* selected_zone = nullptr;
-					typename std::vector<zone_interface*>::iterator t_itr;
-					std::vector<float>::iterator p_itr;
-					for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
-					{
-						if (r<*p_itr) 
-						{
-							selected_zone = *t_itr;
-							break;
-						}
-					}
-				}
-				
-				//=========================================================
-				// Select location from within the zone
-				//---------------------------------------------------------
-				// set school location to home if no valid locations found
-				if (selected_zone == nullptr)
-				{
-					pthis->template School_Location<int>(pthis->template Home_Location<int>());
-				}
-
-				// select school location from within available school locations in the zone
-				else
-				{
-					locations_container_interface* school_locations = selected_zone->template school_locations<locations_container_interface*>();
-					float size = school_locations->size();
-					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
-					location_interface* loc = (location_interface*)((*school_locations)[index]);
-
-					if (loc != nullptr) pthis->template School_Location<int>(loc->template internal_id<int>());
-					else pthis->template School_Location<int>(pthis->template Home_Location<int>());
-				}
+				// This call sets the work/school locations from the properties sub class
+				_Properties->template Set_Locations<NT>();
 			}
 
 			template<typename TargetType> void arrive_at_destination()
 			{
 
 			}
-
-			bool Work_At_Home_Choice()
-			{
-				// This is a placeholder for the work at home choice decision.
-				// Currently returns a randomized selection based on the average % of people working from home in CMAP 2007 survey
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < 0.072) return true;
-				else return false;
-			}
-
 
 			//=======================================================================================================================================================================
 			// PASS THROUGH FEATURES -> dispatched to member sub-objects

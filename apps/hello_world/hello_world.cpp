@@ -1,7 +1,7 @@
 
 using namespace std;
 
-#include "Core.h"
+#include "Repository.h"
 
 using namespace polaris;
 
@@ -111,6 +111,10 @@ int main(int argc, char* argv[])
 	my_link->the_agent(my_agent);
 	my_link->initialize(1);
 
+	RNG_Components::Implementations::MT_Normal<NT> nrm1;
+	float p1 = nrm1.Cumulative_Distribution<float>(0.5);
+
+	float p2 = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(0, 0, 1);
 
 	START();
 

@@ -291,6 +291,7 @@ namespace Person_Components
 			accessor(Destination_Choice_Faculty, NONE, NONE);
 			accessor(Mode_Choice_Faculty, NONE, NONE);
 			accessor(Timing_Chooser, NONE, NONE);
+			accessor(Telecommuting_Choice_Faculty, NONE, NONE);
 
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan)
 			{

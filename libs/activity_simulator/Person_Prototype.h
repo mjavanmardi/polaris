@@ -374,21 +374,21 @@ namespace Prototypes
 			assert_check(strip_modifiers(TargetType), is_integral, "Error, work location can only be set by passing an integral index from network::activity_locations_container");
 		}
 		
-		local_check_template_method_name(has_Choose_Work_Location,Choose_Work_Location);
-		template<typename TargetType> void Choose_Work_Location(/*requires(TargetType,check(ComponentType,has_Choose_Work_Location))*/)
-		{
-			assert_check(ComponentType,has_Choose_Work_Location,"ComponentType does not have Choose_Work_Location feature.");
+		//local_check_template_method_name(has_Choose_Work_Location,Choose_Work_Location);
+		//template<typename TargetType> void Choose_Work_Location(/*requires(TargetType,check(ComponentType,has_Choose_Work_Location))*/)
+		//{
+		//	assert_check(ComponentType,has_Choose_Work_Location,"ComponentType does not have Choose_Work_Location feature.");
 
-			this_component()->template Choose_Work_Location<TargetType>();
-		}
+		//	this_component()->template Choose_Work_Location<TargetType>();
+		//}
 
-		local_check_template_method_name(has_Choose_School_Location,Choose_School_Location);
-		template<typename TargetType> void Choose_School_Location(requires(TargetType,check(ComponentType,has_Choose_School_Location)))
-		{
-			assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
+		//local_check_template_method_name(has_Choose_School_Location,Choose_School_Location);
+		//template<typename TargetType> void Choose_School_Location(requires(TargetType,check(ComponentType,has_Choose_School_Location)))
+		//{
+		//	assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
 
-			this_component()->template Choose_School_Location<TargetType>();
-		}
+		//	this_component()->template Choose_School_Location<TargetType>();
+		//}
 
 		template<typename TargetType> string To_String()
 		{

@@ -120,6 +120,7 @@ namespace Person_Components
 			m_prototype(Prototypes::Destination_Chooser, typename MasterType::person_destination_chooser_type, Destination_Choice_Faculty, NONE, NONE);
 			m_prototype(Prototypes::Mode_Chooser, typename MasterType::person_mode_chooser_type, Mode_Choice_Faculty, NONE, NONE);
 			m_prototype(Prototypes::Activity_Timing_Chooser, typename MasterType::activity_timing_chooser_type, Timing_Chooser, NONE, NONE);
+			m_prototype(Prototypes::Telecommute_Chooser, typename MasterType::telecommute_chooser_type, Telecommuting_Choice_Faculty, NONE, NONE);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_component_and_feature_accessor(Next_Activity_Generation_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);

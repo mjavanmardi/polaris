@@ -712,6 +712,7 @@ namespace polaris
 			PROTOTYPE<COMPONENT_TYPE>* _##NAME;\
 		public:\
 			typedef PROTOTYPE<COMPONENT_TYPE>* NAME##_type;\
+			typedef PROTOTYPE<COMPONENT_TYPE> NAME##_interface;\
 			typedef COMPONENT_TYPE NAME##_component_type;\
 			typedef NAME##_component_type NAME##_accessible_type;\
 			template<typename TargetType>\

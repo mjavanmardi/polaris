@@ -164,6 +164,7 @@ namespace Person_Components {
 		template<typename ComponentType> struct Destination_Choice_Option;
 		template<typename ComponentType> struct Mode_Chooser;
 		template<typename ComponentType> struct Mode_Choice_Option;
+		template<typename ComponentType> struct Telecommute_Chooser;
 		template<typename ComponentType> struct Person_Planner;
 		template<typename ComponentType> struct Person_Properties;
 		template<typename ComponentType> struct Person_Perception;
@@ -238,7 +239,6 @@ namespace Activity_Components {
 			First= WORK_AT_HOME_ACTIVITY,
 			Last= PART_TIME_WORK_ACTIVITY
 		};
-
 	}
 };
 namespace Network_Skimming_Components {

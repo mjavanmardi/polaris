@@ -353,14 +353,25 @@ namespace Person_Components
 
 				//=========================================================================================================================
 				// Generate work activity
+				//--------------------------------
+				// determine if working from home on this day
+				ACTIVITY_TYPES work_type = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;
+				float p_work_from_home = 0.0;
+				if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_DAILY) p_work_from_home = 1.0;
+				else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY) p_work_from_home = 1.5/7.0;
+				else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_MONTHLY) p_work_from_home = 1.5/30.0;
+				else p_work_from_home = 0.0;
+
 				EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();
 				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
 				{
 					float num_work = work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
+					if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type,act_count, start_plan_time);
 
 					float num_pwork = part_time_work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(PART_TIME_WORK_ACTIVITY,act_count, start_plan_time);
+					if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY;
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type,act_count, start_plan_time);
 				}
 				//-------------------------------------------------------------------------------------------------------------------------
 

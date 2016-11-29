@@ -62,19 +62,47 @@ namespace Person_Components
 			//m_data(int, home_location_id, NONE, NONE);
 			m_data(int, work_location_id, NONE, NONE);
 			m_data(int, school_location_id, NONE, NONE);
+			m_data(Types::TELECOMMUTE_FREQUENCY, Telecommute_Frequency, NONE, NONE);
 			
 			typedef Prototypes::Person<type_of(Parent_Person)> person_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
-			// Methods
-			template<typename TargetType> void Initialize()
-			{
-			}
-			template<typename SynthesisZoneType> void Initialize(SynthesisZoneType home_synthesis_zone/*, requires(TargetType,check(SynthesisZoneType, PopSyn::Concepts::Is_Synthesis_Zone) && check(SynthesisZoneType, is_pointer))*/)
-			{	
-				if (home_synthesis_zone == nullptr) return;
+			//=======================================================================================================================================================================
+			// INTERFACE DEFINITIONS
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//typedef Prototypes::Person<ComponentType> this_itf;
+			typedef Prototypes::Person_Properties<ComponentType> this_itf;
+			typedef Network_Components::Prototypes::Network<typename Parent_Person_interface::get_type_of(Perception_Faculty)::type_of(Network)> network_reference_interface;
+			typedef Scenario_Components::Prototypes::Scenario<typename Parent_Person_interface::get_type_of(Perception_Faculty)::type_of(Scenario)> scenario_reference_interface;
+			typedef Prototypes::Person_Properties<typename Parent_Person_interface::get_type_of(Static_Properties)> Static_Properties_interface;
+			typedef Prototypes::Person_Mover<typename Parent_Person_interface::get_type_of(Moving_Faculty)> Moving_Faculty_interface;
+			typedef Prototypes::Person_Planner<typename Parent_Person_interface::get_type_of(Planning_Faculty)> Planning_Faculty_interface;
+			typedef Prototypes::Person_Scheduler<typename Parent_Person_interface::get_type_of(Scheduling_Faculty)> Scheduling_Faculty_interface;
+			typedef Prototypes::Person_Perception<typename Parent_Person_interface::get_type_of(Perception_Faculty)> Perception_Faculty_interface;
+			typedef Routing_Components::Prototypes::Routing<typename Parent_Person_interface::get_type_of(router)> router_interface;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename Parent_Person_interface::get_type_of(vehicle)> vehicle_interface;
+			typedef Prototypes::Activity_Generator<typename Planning_Faculty_interface::get_type_of(Activity_Generation_Faculty)> generator_itf;
+			typedef Prototypes::Destination_Chooser<typename Planning_Faculty_interface::get_type_of(Destination_Choice_Faculty)> destination_choice_itf;
+			typedef Prototypes::Mode_Chooser<typename Planning_Faculty_interface::get_type_of(Mode_Choice_Faculty)> mode_choice_itf;
+			typedef Prototypes::Activity_Timing_Chooser<typename Planning_Faculty_interface::get_type_of(Timing_Chooser)> timing_choice_itf;
+			typedef Prototypes::Telecommute_Chooser<typename Planning_Faculty_interface::get_type_of(Telecommuting_Choice_Faculty)> telecommute_choice_itf;
+			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container)> zones_container_interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;
+			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container)> locations_container_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
+			typedef Back_Insertion_Sequence< typename Parent_Person_interface::get_type_of(Activity_Record_Container)> Activity_Records;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)> Activity_Record;
+			typedef PopSyn::Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type> synthesis_zone_interface;
 
+			//==========================================================
+			// Initializer - called from person_implementation
+			template<typename TargetType> void Initialize()
+			{}
+
+			template<typename TargetType> void Set_Locations()
+			{	
+				Static_Properties_interface* properties = _Parent_Person->template Static_Properties<Static_Properties_interface*>();
 
 				// updates for counters
 				this->Count_Array[__thread_id]++;
@@ -84,63 +112,176 @@ namespace Person_Components
 					cout << '\r' << "Agent Home-Work-School Location Choice: " << this->Count << "                                                                           ";
 				}
 				
-
-				//===============================================================================================================
-				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS
-				//---------------------------------------------------------------------------------------------------------------
-				// get an interface to the given home zone;
-				typedef PopSyn::Prototypes::Synthesis_Zone<typename MasterType::synthesis_zone_type> zone_itf;
-				typedef Prototypes::Person_Properties<typename type_of(Parent_Person)::get_type_of(Static_Properties)> pop_unit_itf;
-				
-				// useful interfaces
-				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
-				typedef Network_Components::Prototypes::Network<typename type_of(Parent_Person)::get_type_of(network_reference)> network_itf;
-				typedef Person_Planner<typename type_of(Parent_Person)::get_type_of(Planning_Faculty)> planner_itf;
-				
-				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
-				
-				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
-				
-			
-				zone_itf* zone = (zone_itf*)home_synthesis_zone;
-				network_itf* network = _Parent_Person->template network_reference<network_itf*>();
-				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
-
 				// initialize location indices
-				//_home_location_id = -1;
 				_work_location_id = -1;
 				_school_location_id = -1;
-				
-				// Available locations
-				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
 				// Assign workers to a work location
-				pop_unit_itf* properties = _Parent_Person->template Static_Properties<pop_unit_itf*>();
-				if (properties->template Is_Employed<bool>()) 
-				{
-					_Parent_Person->template Choose_Work_Location<NT>();
-				}
+				if (properties->template Is_Employed<bool>()) Choose_Work_Location<NT>();
 
-				if (properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
-				{
-					_Parent_Person->template Choose_School_Location<NT>();
-				}
+				// Assign school location
+				if (properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Choose_School_Location<NT>();
 
-				//planner_itf* planner = this->_Parent_Person->template Planning_Faculty<planner_itf*>();
-				//planner->template Write_To_Log<string>(_Parent_Person->template To_String<NT>());
-				//planner->template Write_To_Log<string>("\n");
+				// Determine the telecommute behavior - if person always telecommutes, reset work location to home
+				this->_Telecommute_Frequency = _Parent_Person->Planning_Faculty<Planning_Faculty_interface*>()->Telecommuting_Choice_Faculty<telecommute_choice_itf*>()->Telecommute_Choice<Types::TELECOMMUTE_FREQUENCY>();
+
+				// update work location if always telecommuting
+				if (this->_Telecommute_Frequency == Types::TC_DAILY) this->work_location_id(_Parent_Person->Home_Location<int>());
 			}	
 
-			/*template<typename TargetType> void Initialize(SynthesisZoneType home_synthesis_zone, requires(TargetType,!check(typename SynthesisZoneType, Zone_Components::Concepts::Is_Zone_Prototype) || !check(SynthesisZoneType, is_pointer)))
-			{	
-				assert_check(strip_modifiers(TargetType)::ParamType, Zone_Components::Concepts::Is_Zone_Prototype,"Error: must pass in home zone as a zone_prototype");
-				assert_check(strip_modifiers(TargetType)::ParamType, is_pointer, "Error: must pass in home zone as a pointer.");
-			}*/
+			//==============================================================
+			// Location setters
+			template<typename TargetType> void Choose_Work_Location()
+			{
+				// interface to this
+				this_itf* pthis = (this_itf*)this;
+				destination_choice_itf* dest_chooser = _Parent_Person->Planning_Faculty<Planning_Faculty_interface*>()->template Destination_Choice_Faculty<destination_choice_itf*>();
 
+
+				// first, make sure person is worker, if not exit
+				EMPLOYMENT_STATUS status = _Parent_Person->Static_Properties<Static_Properties_interface*>()->Employment_Status<EMPLOYMENT_STATUS>();
+				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
+				{
+					this->work_location_id(-1);
+					return;
+				}
+
+				location_interface* dest = nullptr;
+
+				// Do work at home choice first, if working from home, do not do destination choice		
+				dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
+
+				// work location choice failed, make this person a telecommuter
+				if (dest == nullptr)
+				{
+					this->work_location_id<int>(_Parent_Person->Home_Location<int>());
+					//pthis->template Work_Location<location_interface*>(pthis->template Home_Location<location_interface*>());
+				}
+
+				else this->work_location_id<int>(dest->internal_id<int>());
+				//else pthis->template Work_Location<location_interface*>(dest);
+
+				scenario_reference_interface* scenario = _Parent_Person->template scenario_reference<scenario_reference_interface*>();
+				zone_interface* zone = _Parent_Person->template Work_Location<zone_interface*>();
+
+				// update the simulated employment in the work zone
+				zone->template employment_simulated<int&>() += 1.0f / scenario->template percent_to_synthesize<float>();
+			}
+			template<typename TargetType> void Choose_School_Location()
+			{
+				// interface to this
+				this_itf* pthis = (this_itf*)this;
+				zone_interface* selected_zone = nullptr;
+
+
+				//=========================================================
+				// first, make sure person is student, if not exit
+				//---------------------------------------------------------
+				SCHOOL_ENROLLMENT status = _Parent_Person->Static_Properties<Static_Properties_interface*>()->template School_Enrollment<SCHOOL_ENROLLMENT>();
+				if (status != SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC && status != SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+				{
+					this->school_location_id<int>(-1);
+					//pthis->template School_Location<int>(-1);
+					return;
+				}
+
+				//=========================================================
+				// Find available zones within the specified target range of the given work travel time
+				//---------------------------------------------------------
+				zones_container_interface* zones = _Parent_Person->network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
+				typename zones_container_interface::iterator z_itr;
+				std::vector<zone_interface*> temp_zones;
+				std::vector<float> temp_zone_probabilities;
+				zone_interface* orig = _Parent_Person->template Home_Location<zone_interface*>();
+
+				//=========================================================
+				// if origin zone has school locations, select, else search
+				//---------------------------------------------------------
+				if (orig->template school_locations<locations_container_interface*>()->size() > 0)
+				{
+					selected_zone = orig;
+				}
+				else
+				{
+					// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
+					float time_range_to_search = 15.0;
+					int school_locations = 0;
+					while (temp_zones.size() == 0)
+					{
+						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+						{
+							zone_interface* zone = (zone_interface*)(z_itr->second);
+							Time_Minutes t = _Parent_Person->network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(orig, zone, Vehicle_Components::Types::SOV, 9);
+							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
+							{
+								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();
+								temp_zones.push_back(zone);
+							}
+						}
+						// expand the search time radius if no available zones found
+						if (time_range_to_search >= 60) break;
+						time_range_to_search += time_range_to_search;
+
+					}
+
+					if (temp_zones.size() == 0)
+					{
+						this->school_location_id<int>(_Parent_Person->Home_Location<int>());
+						//pthis->template School_Location<int>(pthis->template Home_Location<int>());
+						return;
+					}
+
+					// calculate probabilities
+					float cum_prob = 0;
+					for (typename std::vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
+					{
+						cum_prob += (*t_itr)->template school_locations<locations_container_interface*>()->size() / school_locations;
+						temp_zone_probabilities.push_back(cum_prob);
+					}
+
+					//=========================================================
+					// select zone
+					//---------------------------------------------------------
+					float r = Uniform_RNG.template Next_Rand<float>();
+					zone_interface* selected_zone = nullptr;
+					typename std::vector<zone_interface*>::iterator t_itr;
+					std::vector<float>::iterator p_itr;
+					for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
+					{
+						if (r<*p_itr)
+						{
+							selected_zone = *t_itr;
+							break;
+						}
+					}
+				}
+
+				//=========================================================
+				// Select location from within the zone
+				//---------------------------------------------------------
+				// set school location to home if no valid locations found
+				if (selected_zone == nullptr)
+				{
+					this->school_location_id<int>(_Parent_Person->Home_Location<int>());
+					//pthis->template School_Location<int>(pthis->template Home_Location<int>());
+				}
+
+				// select school location from within available school locations in the zone
+				else
+				{
+					locations_container_interface* school_locations = selected_zone->template school_locations<locations_container_interface*>();
+					float size = school_locations->size();
+					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
+					location_interface* loc = (location_interface*)((*school_locations)[index]);
+
+					if (loc != nullptr) this->school_location_id<int>(loc->template internal_id<int>()); //pthis->template School_Location<int>(loc->template internal_id<int>());
+					else this->school_location_id<int>(_Parent_Person->Home_Location<int>());
+				}
+			}
+
+
+			//==============================================================
 			// Getter / setter for the average activity duration
-
 			template<typename ActivitytypeType, typename ReturnTimeType> ReturnTimeType Average_Activity_Duration(ActivitytypeType act_type)
 			{
 				Time_Minutes value;
@@ -181,7 +322,6 @@ namespace Person_Components
 					this->template _average_activity_frequency_and_duration_container.insert(pair<ActivitytypeType, pair<TimeType,TimeType> >(act_type, pair<TimeType,TimeType>(0,duration)));
 				}
 			}
-
 			// Getter / Setter for the activity frequency
 			template<typename ActivitytypeType, typename ReturnType> ReturnType Average_Activity_Frequency(ActivitytypeType act_type)
 			{
@@ -212,6 +352,7 @@ namespace Person_Components
 				}
 			}
 
+			//====================================================================
 			// VOTT adjustment
 			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
 			{

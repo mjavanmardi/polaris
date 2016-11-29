@@ -117,6 +117,11 @@ namespace RNG_Components
 				return (TargetType) _distribution(GrandBaseType::_generator);
 			}
 
+			template<typename TargetType> TargetType Cumulative_Distribution(TargetType x)
+			{
+				return Phi(x, _location, _scale);
+			}
+
 			template<typename TargetType> static TargetType Cumulative_Distribution(TargetType x, TargetType Mu, TargetType S)
 			{
 				return Phi(x, Mu, S);

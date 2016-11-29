@@ -1363,7 +1363,7 @@ namespace Activity_Components
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 
 				// School Activity start time (randomly between 7 and 9AM)
-				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY || act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY )
+				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY || act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY || act_type == ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY )
 				{
 					// interfaces
 					_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();

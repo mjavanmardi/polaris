@@ -60,6 +60,8 @@ namespace Person_Components
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_properties_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
+			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_static_properties_itf;
 			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
@@ -92,6 +94,8 @@ namespace Person_Components
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
 				person_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<person_static_properties_itf*>();
+				household_itf* _Parent_Household = _Parent_Person->person_itf::template Household<household_itf*>();
+				household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<household_static_properties_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -145,12 +149,13 @@ namespace Person_Components
 				float emp_srv = zone->template employment_services<double>()/1000.0;
 				float emp_ret = zone->template employment_retail<double>()/1000.0;
 
-				float thetag = zone->template accessibility_employment_government<double>()/1000.0;
-				float thetam = zone->template accessibility_employment_manufacturing<double>()/1000.0;
-				float thetar = zone->template accessibility_employment_retail<double>()/1000.0;
-				float thetas = zone->template accessibility_employment_services<double>()/1000.0;
-				float thetai = zone->template accessibility_employment_industrial<double>()/1000.0;
-				float thetao = zone->template accessibility_employment_other<double>()/1000.0;
+				// I don't think these need to be divided by 1000
+				float thetag = zone->template accessibility_employment_government<double>();// / 1000.0;
+				float thetam = zone->template accessibility_employment_manufacturing<double>();
+				float thetar = zone->template accessibility_employment_retail<double>();
+				float thetas = zone->template accessibility_employment_services<double>();
+				float thetai = zone->template accessibility_employment_industrial<double>();
+				float thetao = zone->template accessibility_employment_other<double>();
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
@@ -209,6 +214,13 @@ namespace Person_Components
 					{
 						THROW_WARNING("WARNING: utility is not numeric, possible misspecification in utility function for destination choice. [Pop,emp,ttime]=, " << ttime_deflected);
 						u = -99999.9;
+					}
+
+					//TODO: remove when done testing
+					if (_Parent_Household->uuid<int>() < 20)
+					{
+						THROW_WARNING("PRINTING WORK LOCATION UTILITY CALCULATIONS FOR HOUSEHOLDS 1-20 ---> REMOVE WHEN DONE TESTING")
+						Print_Utility();
 					}
 				}
 				else if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY)
@@ -1190,8 +1202,6 @@ namespace Person_Components
 			//		// First choose a random zone from the zone std::list
 			//		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second; //network->get_random_zone<_Zone_Interface*>();
 
-			//		// ignore zone if all employment slots have already been assigned to other agents
-			//		if ((act_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY) && zone->employment_simulated<int>() >= zone->employment_total<int>()) continue;
 
 			//		// Get random location within that zone
 			//		_Activity_Location_Interface* loc = zone->Get_Random_Location<_Activity_Location_Interface*>();
@@ -1290,7 +1300,7 @@ namespace Person_Components
 				//----------------------------------------------------------------------
 				// First, always add the home zone (i.e. work at home or nearby or attend school near home) as an option
 				_Zone_Interface* home_zone = _Parent_Person->template Home_Location<_Zone_Interface*>();
-				Create_New_Choice_Option(choice_set,choice_model,home_zone,act_type,prev_loc,next_loc);
+				//Create_New_Choice_Option(choice_set,choice_model,home_zone,act_type,prev_loc,next_loc);
 
 
 				//----------------------------------------------------------------------

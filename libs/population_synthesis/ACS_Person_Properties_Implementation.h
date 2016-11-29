@@ -395,6 +395,7 @@ namespace Person_Components
 			// Characteristics setter
 			template<typename TargetType> void Characteristics(std::vector<double>* data)
 			{
+				if (data->size() != 16) THROW_EXCEPTION("ERROR: linker file definition out of date.")
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 				typedef Prototypes::Person_Properties<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;

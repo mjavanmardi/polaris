@@ -160,6 +160,7 @@ namespace Person_Components
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SOCIAL_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PART_TIME_WORK_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::WORK_AT_HOME_ACTIVITY, map_type()));
 
 				// add items
 				ifstream data_file;
@@ -175,6 +176,12 @@ namespace Person_Components
 				while(data_file >> act_type >> start >> dur >> prob )
 				{
 					_start_time_duration_container[act_type].insert(record_type(prob,data_type(start,dur)));
+				}
+
+				//copy primary work into work_at_home
+				for (map_type::iterator itr = _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
+				{
+					_start_time_duration_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
 				}
 			}
 		};

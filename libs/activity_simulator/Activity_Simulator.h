@@ -11,6 +11,7 @@
 #include "Destination_Choice_Implementation.h"
 #include "Mode_Choice_Implementation.h"
 #include "Activity_Timing_Choice_Implementation.h"
+#include "Telecommute_Choice_Implementation.h"
 #include "Person_Properties_Implementations.h"
 #include "Person_Scheduler_Implementations.h"
 #include "Person_Perception_Implementation.h"

@@ -37,6 +37,32 @@ WHERE
 	Start > 62 and mode = 0
 GROUP BY 
 	TTime_minutes;
+	
+DROP TABLE IF EXISTS TTime_By_Act_Distribution;
+CREATE TABLE IF NOT EXISTS TTime_By_Act_Distribution As
+SELECT 
+	round((end-start)/60) as TTime_minutes,
+	sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
+	sum(CASE WHEN type= 'ERRANDS' THEN 1 END) as ERRANDS,
+	sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
+	sum(CASE WHEN type= 'HOME' THEN 1 END) as HOME,
+	sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
+	sum(CASE WHEN type= 'PERSONAL' THEN 1 END) as PERSONAL,
+	sum(CASE WHEN type= 'PICKUP-DROPOFF' THEN 1 END) as PICKUP,
+	sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+	sum(CASE WHEN type= 'SCHOOL' THEN 1 END) as SCHOOL,
+	sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
+	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
+	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
+	sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
+	sum(1) AS total
+FROM 
+	Trip
+WHERE
+	Start > 62 and mode = 0
+GROUP BY 
+	TTime_minutes;
 
 DROP TABLE IF EXISTS TTime_Distribution;
 CREATE TABLE TTime_Distribution ( TTime_minutes INT, Count INT);
@@ -75,19 +101,19 @@ DROP TABLE IF EXISTS Activity_Start_Distribution;
 CREATE TABLE IF NOT EXISTS Activity_Start_Distribution As
 SELECT 
 	cast(start_time/60 as int),
-        sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
+	sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
 	sum(CASE WHEN type= 'ERRANDS' THEN 1 END) as ERRANDS,
-        sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
+	sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
 	sum(CASE WHEN type= 'HOME' THEN 1 END) as HOME,
-        sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
+	sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
 	sum(CASE WHEN type= 'PERSONAL' THEN 1 END) as PERSONAL,
 	sum(CASE WHEN type= 'PICKUP-DROPOFF' THEN 1 END) as PICKUP,
-        sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+	sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
 	sum(CASE WHEN type= 'SCHOOL' THEN 1 END) as SCHOOL,
-        sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
+	sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
 	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
 	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
-        sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+	sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
 	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
 	sum(1) AS total
 FROM 

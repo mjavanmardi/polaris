@@ -490,9 +490,17 @@ namespace Person_Components
 						}
 						catch (const odb::exception& e)
 						{
-							cout << e.what()<<". DB error in person_data_logger_implementation, line 519.  count="<<count<<endl;
+							cout << e.what()<<". DB error in person_data_logger_implementation, line 493.  count="<<count<<endl;
 							pair<polaris::io::Trip,polaris::io::Activity> p = activity_records[i][count];
 							
+						}
+						catch (std::exception& e)
+						{
+							cout << e.what() << ". DB error in person_data_logger_implementation, line 499.  count=" << count << endl;
+						}
+						catch (...)
+						{
+							cout << "some other error in database writing" << endl;
 						}
 
 						// erase buffer
