@@ -90,6 +90,7 @@ namespace Prototypes
 		accessor(internal_id, NONE, NONE);
 
 		accessor(Persons_Container, NONE, NONE);
+		accessor(Vehicles_Container, NONE, NONE);
 
 		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
 		{

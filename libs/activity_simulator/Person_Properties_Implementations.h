@@ -148,7 +148,7 @@ namespace Person_Components
 
 				location_interface* dest = nullptr;
 
-				// Do work at home choice first, if working from home, do not do destination choice		
+				// do workplace destination choice		
 				dest = dest_chooser->template Choose_Routine_Destination<location_interface*>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY);
 
 				// work location choice failed, make this person a telecommuter

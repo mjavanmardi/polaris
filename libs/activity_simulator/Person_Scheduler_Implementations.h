@@ -302,7 +302,7 @@ namespace Person_Components
 				return (ReturnType)dest;
 			}
 
-			// Simplified timing conflict resolution - only modifying the new activity
+			// Simplified timing conflict resolution - only modifying the new activity (except for split activities)
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
 			{
 				bool at_home_activity_modified = false;
@@ -395,6 +395,7 @@ namespace Person_Components
 				// determine conflict regimes and modify appropriately
 				Time_Seconds available_time = end_max - start_min;
 
+				Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>* new_act = nullptr;
 
 				// 0. insertion conflicts
 				// check for insertion conflicts - does not work with the current start_min/end_max setup
@@ -405,7 +406,7 @@ namespace Person_Components
 					if (prev_act->template Duration<Time_Hours>() > 2.0 && prev_act->template Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->template Start_Time<Time_Seconds>() && prev_act->template End_Time<Time_Seconds>() >= act->template End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
 						//Allocate new activity for the split half and copy from the other half
-						auto new_act = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
+						new_act = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
 						new_act->template Copy<Activity_Plan*>(prev_act);
 						new_act->template Activity_Plan_ID<int>(prev_act->template Activity_Plan_ID<int>() + 1000);
 						new_act->template Start_Time<Time_Seconds>(act->template End_Time<Time_Seconds>()+ttime_prev);
@@ -420,6 +421,12 @@ namespace Person_Components
 
 						//update movement plans
 						if (update_movement_plans) move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev);
+
+						Time_Seconds ttime_new = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(loc, prev_loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, new_act->template Start_Time<Time_Seconds>());
+
+						//update the start and end constraints to account for the new split time
+						start_min = prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>() + ttime_prev;
+						end_max = new_act->template Start_Time<Time_Seconds>() - ttime_new;
 					}
 				}
 
@@ -483,7 +490,15 @@ namespace Person_Components
 				// 3. can't fit, delete activity
 				else
 				{
-					if (next_act != nullptr) 
+					// handle the split of the previous activity - rejoin and delete new act
+					if (new_act != nullptr)
+					{
+						prev_act->End_Time(new_act->End_Time<Time_Minutes>(),false);
+						this->Remove_Activity_Plan(new_act);
+					}
+
+					// otherwise, just update the modified travel between the existing activities
+					else if (next_act != nullptr) 
 					{
 						if (prev_loc == nullptr) prev_loc =  _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						if (next_loc == nullptr) next_loc =  _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
@@ -564,6 +579,19 @@ namespace Person_Components
 				// get the associated activity
 				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
 
+				//TODO: remove when done testing scheduler code
+				if (_Parent_Person->Household<_Household_Interface*>()->uuid<int>() == 11)
+				{
+					int test = 1;
+				}
+
+				//======================================================
+				// log the activity throught the global person logger
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+				typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
+				if (scenario->template write_activity_output<bool>()) ((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act, false);
+
 
 				// catch skipped movement plans
 				if (move->template departed_time<Simulation_Timestep_Increment>() < iteration()) return;
@@ -617,13 +645,6 @@ namespace Person_Components
 				//	next_act->template Update_Movement_Plan<_Activity_Location_Interface*>(orig,dest,end);
 				//}
 
-				
-
-				// log the activity throught the global person logger
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-				typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
-				if (scenario->template write_activity_output<bool>()) ((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act,false);
 
 				// no logging if the movement is a return home movement
 				if (act == nullptr) return;

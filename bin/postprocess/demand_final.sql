@@ -1,4 +1,4 @@
-Attach 'C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor-Supply.sqlite' as supply; 
+Attach 'C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor-Supply.sqlite' as a; 
 --############################################################
 -- GENERATE TRAVEL TIME DISTRIBUTION
 
@@ -315,17 +315,17 @@ ON Activity.trip=Trip.trip_id;
 
 DROP TABLE IF EXISTS Activity_With_Zone_tmp;
 CREATE TABLE Activity_With_Zone_tmp As
-SELECT Activity_TTime_tmp.*, supply.Location.zone as origzone
+SELECT Activity_TTime_tmp.*, a.Location.zone as origzone
 FROM Activity_TTime_tmp
-INNER JOIN supply.Location
-ON Activity_TTime_tmp.origin=supply.Location.location;
+INNER JOIN a.Location
+ON Activity_TTime_tmp.origin=a.Location.location;
 
 DROP TABLE IF EXISTS Activity_With_Zone;
 CREATE TABLE Activity_With_Zone As
-SELECT Activity_With_Zone_tmp.*, supply.Location.zone as destzone
+SELECT Activity_With_Zone_tmp.*, a.Location.zone as destzone
 FROM Activity_With_Zone_tmp
-INNER JOIN supply.Location
-ON Activity_With_Zone_tmp.destination=supply.Location.location;
+INNER JOIN a.Location
+ON Activity_With_Zone_tmp.destination=a.Location.location;
 
 DROP TABLE IF EXISTS Activity_TTime_tmp;
 DROP TABLE IF EXISTS Activity_With_Zone_tmp;
@@ -340,15 +340,15 @@ where Person.household = household.household;
 
 DROP TABLE IF EXISTS Person_Work_Distance_tmp2;
 CREATE TABLE Person_Work_Distance_tmp2 As
-SELECT Person_Work_Distance_tmp.person, Person_Work_Distance_tmp.ID, Person_Work_Distance_tmp.household, supply.location.X as work_x, supply.location.Y as work_y, Person_Work_Distance_tmp.house_loc as house_loc
-FROM Person_Work_Distance_tmp, supply.location
-where Person_Work_Distance_tmp.work_loc = supply.location.location;
+SELECT Person_Work_Distance_tmp.person, Person_Work_Distance_tmp.ID, Person_Work_Distance_tmp.household, a.location.X as work_x, a.location.Y as work_y, Person_Work_Distance_tmp.house_loc as house_loc
+FROM Person_Work_Distance_tmp, a.location
+where Person_Work_Distance_tmp.work_loc = a.location.location;
 
 DROP TABLE IF EXISTS Person_Work_Distance_tmp3;
 CREATE TABLE Person_Work_Distance_tmp3 As
-SELECT Person_Work_Distance_tmp2.person, Person_Work_Distance_tmp2.ID, Person_Work_Distance_tmp2.household, Person_Work_Distance_tmp2.work_x, Person_Work_Distance_tmp2.work_y, supply.location.X as home_x, supply.location.Y as home_y
-FROM Person_Work_Distance_tmp2, supply.location
-where Person_Work_Distance_tmp2.house_loc = supply.location.location;
+SELECT Person_Work_Distance_tmp2.person, Person_Work_Distance_tmp2.ID, Person_Work_Distance_tmp2.household, Person_Work_Distance_tmp2.work_x, Person_Work_Distance_tmp2.work_y, a.location.X as home_x, a.location.Y as home_y
+FROM Person_Work_Distance_tmp2, a.location
+where Person_Work_Distance_tmp2.house_loc = a.location.location;
 
 CREATE TABLE Person_Work_Distance As
 SELECT Person_Work_Distance_tmp3.*, Sqrt(Pow((home_x - work_x),2) + Pow((home_y - work_y),2)) as Dist, Round(Sqrt(Pow((home_x - work_x),2) + Pow((home_y - work_y),2))/1000,1) AS Dist_Rnd
@@ -377,17 +377,17 @@ ON Activity.trip=Trip.trip_id;
 
 DROP TABLE IF EXISTS Activity_With_OD_tmp;
 CREATE TABLE Activity_With_OD_tmp As
-SELECT Activity_With_OD.*, supply.Location.x as Orig_X, supply.Location.y as Orig_Y
+SELECT Activity_With_OD.*, a.Location.x as Orig_X, a.Location.y as Orig_Y
 FROM Activity_With_OD
-INNER JOIN supply.Location
-ON Activity_With_OD.origin=supply.Location.location;
+INNER JOIN a.Location
+ON Activity_With_OD.origin=a.Location.location;
 
 DROP TABLE IF EXISTS Activity_With_OD_tmp2;
 CREATE TABLE Activity_With_OD_tmp2 As
-SELECT Activity_With_OD_tmp.*, supply.Location.x as Dest_X,supply.Location.y as Dest_Y
+SELECT Activity_With_OD_tmp.*, a.Location.x as Dest_X,a.Location.y as Dest_Y
 FROM Activity_With_OD_tmp
-INNER JOIN supply.Location
-ON Activity_With_OD_tmp.destination=supply.Location.location;
+INNER JOIN a.Location
+ON Activity_With_OD_tmp.destination=a.Location.location;
 
 DROP TABLE IF EXISTS Activity_With_Distance;
 CREATE TABLE Activity_With_Distance As
@@ -412,6 +412,7 @@ SELECT
 	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
 	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
       sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+	  sum(CASE WHEN type= 'WORK AT HOME' THEN 1 END) as WORK_HOME,
 	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
 	sum(1) AS total
 FROM 
@@ -462,10 +463,10 @@ DROP TABLE IF EXISTS Activity_With_Zone_tmp;
 -- GENERATE MODE DISTRIBUTION TO EACH DESTINATION ZONE
 DROP TABLE IF EXISTS Modes_by_Destination_all;
 CREATE TABLE Modes_by_Destination_all As
-SELECT supply.Location.zone as Zone, Activity.Mode, Activity.type, id
+SELECT a.Location.zone as Zone, Activity.Mode, Activity.type, id
 FROM Activity
-INNER JOIN supply.Location
-ON supply.Location.location =Activity.location_id;
+INNER JOIN a.Location
+ON a.Location.location =Activity.location_id;
 
 
 DROP TABLE IF EXISTS Mode_By_Destination_Distribution;
@@ -486,10 +487,10 @@ DROP TABLE IF EXISTS Modes_by_Destination_all;
 
 DROP TABLE IF EXISTS Modes_by_Destination_all;
 CREATE TABLE Modes_by_Destination_all As
-SELECT supply.Location.zone as Zone, Activity.Mode, Activity.type, id
+SELECT a.Location.zone as Zone, Activity.Mode, Activity.type, id
 FROM Activity
-INNER JOIN supply.Location
-ON supply.Location.location =Activity.location_id
+INNER JOIN a.Location
+ON a.Location.location =Activity.location_id
 WHERE Activity.type='WORK';
 
 
@@ -519,19 +520,19 @@ ON Trip.trip_id =Activity.id;
 
 DROP TABLE IF EXISTS Modes_by_Origin_Temp_2;
 CREATE TABLE Modes_by_Origin_Temp_2 As
-SELECT supply.Location.zone as OrigZone, Modes_by_Origin_Temp.destination as destination, Modes_by_Origin_Temp.Mode, Modes_by_Origin_Temp.type,Modes_by_Origin_Temp.id, Start_Time
+SELECT a.Location.zone as OrigZone, Modes_by_Origin_Temp.destination as destination, Modes_by_Origin_Temp.Mode, Modes_by_Origin_Temp.type,Modes_by_Origin_Temp.id, Start_Time
 FROM Modes_by_Origin_Temp
-INNER JOIN supply.Location
-ON supply.Location.location =Modes_by_Origin_Temp.orig;
+INNER JOIN a.Location
+ON a.Location.location =Modes_by_Origin_Temp.orig;
 
 
 
 DROP TABLE IF EXISTS Modes_by_Origin_Temp_3;
 CREATE TABLE Modes_by_Origin_Temp_3 As
-SELECT Modes_by_Origin_Temp_2.OrigZone as OrigZone, supply.Location.zone as DestZone, Modes_by_Origin_Temp_2.Mode, Modes_by_Origin_Temp_2.type,Modes_by_Origin_Temp_2.id, Start_Time
+SELECT Modes_by_Origin_Temp_2.OrigZone as OrigZone, a.Location.zone as DestZone, Modes_by_Origin_Temp_2.Mode, Modes_by_Origin_Temp_2.type,Modes_by_Origin_Temp_2.id, Start_Time
 FROM Modes_by_Origin_Temp_2
-INNER JOIN supply.Location
-ON supply.Location.location =Modes_by_Origin_Temp_2.destination;
+INNER JOIN a.Location
+ON a.Location.location =Modes_by_Origin_Temp_2.destination;
 
 
 DROP TABLE IF EXISTS Mode_By_Origin_Distribution;
@@ -579,19 +580,19 @@ ON Trip.trip_id =Activity.id;
 
 DROP TABLE IF EXISTS Modes_by_Destination_Temp_2;
 CREATE TABLE Modes_by_Destination_Temp_2 As
-SELECT supply.Location.zone as OrigZone, Modes_by_Destination_Temp.destination as destination, Modes_by_Destination_Temp.Mode, Modes_by_Destination_Temp.type,Modes_by_Destination_Temp.id, Start_Time
+SELECT a.Location.zone as OrigZone, Modes_by_Destination_Temp.destination as destination, Modes_by_Destination_Temp.Mode, Modes_by_Destination_Temp.type,Modes_by_Destination_Temp.id, Start_Time
 FROM Modes_by_Destination_Temp
-INNER JOIN supply.Location
-ON supply.Location.location = Modes_by_Destination_Temp.orig;
+INNER JOIN a.Location
+ON a.Location.location = Modes_by_Destination_Temp.orig;
 
 
 
 DROP TABLE IF EXISTS Modes_by_Destination_Temp_3;
 CREATE TABLE Modes_by_Destination_Temp_3 As
-SELECT Modes_by_Destination_Temp_2.OrigZone as OrigZone, supply.Location.zone as DestZone, Modes_by_Destination_Temp_2.Mode, Modes_by_Destination_Temp_2.type,Modes_by_Destination_Temp_2.id, Start_Time
+SELECT Modes_by_Destination_Temp_2.OrigZone as OrigZone, a.Location.zone as DestZone, Modes_by_Destination_Temp_2.Mode, Modes_by_Destination_Temp_2.type,Modes_by_Destination_Temp_2.id, Start_Time
 FROM Modes_by_Destination_Temp_2
-INNER JOIN supply.Location
-ON supply.Location.location =Modes_by_Destination_Temp_2.destination;
+INNER JOIN a.Location
+ON a.Location.location =Modes_by_Destination_Temp_2.destination;
 
 
 DROP TABLE IF EXISTS Mode_By_Destination_Distribution;
@@ -632,10 +633,10 @@ DROP TABLE IF EXISTS Modes_by_Destination_Temp_3;
 -- GENERATE EMPLOYMENT DISTRIBUTION
 DROP TABLE IF EXISTS PersonWorkplaceTemp;
 CREATE TABLE PersonWorkplaceTemp As
-SELECT supply.Location.zone as workzone, person, id
+SELECT a.Location.zone as workzone, person, id
 FROM Person
-INNER JOIN supply.Location
-ON supply.Location.location =Person.work_location_id;
+INNER JOIN a.Location
+ON a.Location.location =Person.work_location_id;
 
 DROP TABLE IF EXISTS Employment_Distribution_By_Zone;
 CREATE TABLE IF NOT EXISTS Employment_Distribution_By_Zone As
@@ -662,18 +663,18 @@ ON Person.household  = Household.household;
 
 DROP TABLE IF EXISTS PersonWorkplaceTemp2;
 CREATE TABLE PersonWorkplaceTemp2 As
-SELECT supply.Location.zone as workzone, person, id, PersonWorkplaceTemp1.home_location as home_location
+SELECT a.Location.zone as workzone, person, id, PersonWorkplaceTemp1.home_location as home_location
 FROM PersonWorkplaceTemp1
-INNER JOIN supply.Location
-ON supply.Location.location =PersonWorkplaceTemp1.work_location_id;
+INNER JOIN a.Location
+ON a.Location.location =PersonWorkplaceTemp1.work_location_id;
 
 
 DROP TABLE IF EXISTS PersonWorkplaceTemp3;
 CREATE TABLE PersonWorkplaceTemp3 As
-SELECT supply.Location.zone as homezone, person, id, workzone
+SELECT a.Location.zone as homezone, person, id, workzone
 FROM PersonWorkplaceTemp2
-INNER JOIN supply.Location
-ON supply.Location.location =PersonWorkplaceTemp2.home_location;
+INNER JOIN a.Location
+ON a.Location.location =PersonWorkplaceTemp2.home_location;
 
 
 DROP TABLE IF EXISTS CBDEmploymentByOriginZone;
@@ -807,10 +808,10 @@ select * from external_trips_all where external_trips_all.hhold in external_hous
  --#########################################################################################
 -- UPDATE ORIGIN/DESTINATION activity locations for external trips for cut-down model
 create table trip_temp1 as
-select trip.*, supply.location.zone as orig_zone from trip, supply.location where origin = supply.location.location;
+select trip.*, a.location.zone as orig_zone from trip, a.location where origin = a.location.location;
 
 create table trip_temp2 as
-select trip_temp1.*, supply.location.zone as dest_zone from trip_temp1, supply.location where destination = supply.location.location;
+select trip_temp1.*, a.location.zone as dest_zone from trip_temp1, a.location where destination = a.location.location;
 
 
 UPDATE trip_temp2
@@ -863,17 +864,17 @@ FROM LinkMOE_2 GROUP BY link,dir,hr;
 
 DROP TABLE IF EXISTS Trip_Zone_tmp;
 CREATE TABLE Trip_Zone_tmp As
-SELECT Trip.*, supply.Location.zone as origzone
+SELECT Trip.*, a.Location.zone as origzone
 FROM Trip
-INNER JOIN supply.Location
-ON trip.origin=supply.Location.location;
+INNER JOIN a.Location
+ON trip.origin=a.Location.location;
 
 DROP TABLE IF EXISTS Trip_With_Zone;
 CREATE TABLE Trip_With_Zone As
-SELECT Trip_Zone_tmp.*, supply.Location.zone as destzone
+SELECT Trip_Zone_tmp.*, a.Location.zone as destzone
 FROM Trip_Zone_tmp
-INNER JOIN supply.Location
-ON Trip_Zone_tmp.destination=supply.Location.location;
+INNER JOIN a.Location
+ON Trip_Zone_tmp.destination=a.Location.location;
 
 DROP TABLE IF EXISTS Trip_Zone_tmp;
 

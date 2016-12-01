@@ -69,6 +69,7 @@ namespace Household_Components
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
 
+				// Fill the vehicle list
 				
 			}
 			template<typename IdType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)

@@ -1381,16 +1381,17 @@ namespace Activity_Components
 				else THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
 
 
-				//========================================================================
-				// Resolve timing conflicts when timing is known
-				//------------------------------------------------------------------------
-				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
-				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
-				if (!is_scheduled) 
-				{
-					//pthis->template Free_Activity<NT>();
-					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
-				}
+				////========================================================================
+				//// Resolve timing conflicts when timing is known
+				////------------------------------------------------------------------------
+				//bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
+				//
+				//// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
+				//if (!is_scheduled) 
+				//{
+				//	//pthis->template Free_Activity<NT>();
+				//	scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
+				//}
 
 
 				//========================================================================

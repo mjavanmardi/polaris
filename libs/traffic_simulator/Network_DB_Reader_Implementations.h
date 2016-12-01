@@ -1207,6 +1207,10 @@ namespace Network_Components
 						{
 							code=Activity_Location_Components::Types::LU_RESIDENTIAL;
 						}
+						else if (strcmp(land_use, "NON_RESIDENTIAL") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_NON_RESIDENTIAL;
+						}
 						else if (strcmp(land_use, "RESIDENTIAL-SINGLE") == 0)
 						{
 							code = Activity_Location_Components::Types::LU_RESIDENTIAL;

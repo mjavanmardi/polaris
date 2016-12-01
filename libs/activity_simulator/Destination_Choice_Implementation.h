@@ -216,12 +216,6 @@ namespace Person_Components
 						u = -99999.9;
 					}
 
-					//TODO: remove when done testing
-					if (_Parent_Household->uuid<int>() < 20)
-					{
-						THROW_WARNING("PRINTING WORK LOCATION UTILITY CALCULATIONS FOR HOUSEHOLDS 1-20 ---> REMOVE WHEN DONE TESTING")
-						Print_Utility();
-					}
 				}
 				else if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY)
 				{

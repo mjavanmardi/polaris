@@ -1,0 +1,78 @@
+#USE THIS FILE AS A TEMPLATE TO GENERATE A VALID LINKER FILE FOR POPSYN
+
+# Specify input files for sample and marginal variables
+HHFILE	pums_file.txt
+PERSONFILE	pums_person_file.txt
+ZONEFILE	sf1_file.txt
+
+# enter the size of each dimension for the household and person marginal data - this should correspond exactly with what is defined using HHHHMARGVAR and PERSONHHMARGVAR
+HHDIMS	12	7
+PERSONDIMS	2	18	7
+
+# Specify the region id, hhid and weight columns from the HH Pums file
+REGION	3	2	6
+# Specify the zone id and region id columns in the SF3 file
+ZONE	0	1
+# Specify the region id, the sample id and the weight, from the Person Pums file
+PERSON	0	1	4
+
+# Specify all columns (0-indexed) for the following variables: hhtype, hhsize, nveh, nworkers, income
+HHDATA	7	8	12	29	18
+# Specify all columns (0-indexed) for the following variables: age, COW, educ, empl_industry, emp_status, gender, income, work arrival time, work mode, work travel time, work_veh_occ, marital_status, race, school_enroll, school_level, work hours
+PERSONDATA	7	8	17	23	21	5	29	24	11	9	10	12	6	15	16	19
+
+# Specify the variable id (starting from 0) and column number in the pums files where the variable is located
+HHVAR	0	7
+HHVAR	1	8
+PERSONVAR	0	5
+PERSONVAR	1	7
+PERSONVAR	2	6
+
+# Specify the marginal variables giving the variable id, index of the marginal (starting from 0 for each variable), low value (inclusive), high value (exclusive), and column number in the SF3 File
+# Use the keyword for each marginal value for each variable - making sure that the number added equals that specified using the HHDIMS and PERSONDIMS commands
+HHMARGVAR	0	0	1	2	33
+HHMARGVAR	0	1	2	3	34
+HHMARGVAR	0	2	3	4	35
+HHMARGVAR	0	3	4	5	36
+HHMARGVAR	0	4	5	6	37
+HHMARGVAR	0	5	6	7	38
+HHMARGVAR	0	6	7	8	39
+HHMARGVAR	0	7	8	9	40
+HHMARGVAR	0	8	9	10	41
+HHMARGVAR	0	9	10	11	42
+HHMARGVAR	0	10	11	12	43
+HHMARGVAR	0	11	12	99	44
+HHMARGVAR	1	0	1	2	45
+HHMARGVAR	1	1	2	3	46
+HHMARGVAR	1	2	3	4	47
+HHMARGVAR	1	3	4	5	48
+HHMARGVAR	1	4	5	6	49
+HHMARGVAR	1	5	6	7	50
+HHMARGVAR	1	6	7	99	51
+PERSONMARGVAR	0	0	1	2	22
+PERSONMARGVAR	0	1	2	3	23
+PERSONMARGVAR	1	0	0	5	4
+PERSONMARGVAR	1	1	5	10	5
+PERSONMARGVAR	1	2	10	15	6
+PERSONMARGVAR	1	3	15	20	7
+PERSONMARGVAR	1	4	20	25	8
+PERSONMARGVAR	1	5	25	30	9
+PERSONMARGVAR	1	6	30	35	0
+PERSONMARGVAR	1	7	35	40	11
+PERSONMARGVAR	1	8	40	45	12
+PERSONMARGVAR	1	9	45	50	13
+PERSONMARGVAR	1	10	50	55	14
+PERSONMARGVAR	1	11	55	60	15
+PERSONMARGVAR	1	12	60	65	16
+PERSONMARGVAR	1	13	65	70	17
+PERSONMARGVAR	1	14	70	75	18
+PERSONMARGVAR	1	15	75	80	19
+PERSONMARGVAR	1	16	80	85	20
+PERSONMARGVAR	1	17	85	199	21
+PERSONMARGVAR	2	0	1	2	24
+PERSONMARGVAR	2	1	2	3	25
+PERSONMARGVAR	2	2	3	6	26
+PERSONMARGVAR	2	3	6	7	27
+PERSONMARGVAR	2	4	7	8	28
+PERSONMARGVAR	2	5	8	9	29
+PERSONMARGVAR	2	6	9	10	30

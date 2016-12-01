@@ -18,6 +18,7 @@ namespace Activity_Location_Components
 			LU_MEDICAL,
 			LU_MIXED_USE,
 			LU_NONE,
+			LU_NON_RESIDENTIAL,
 			LU_RESIDENTIAL,
 			LU_RESIDENTIAL_MULTI,
 			LU_RECREATION,

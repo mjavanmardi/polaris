@@ -416,8 +416,12 @@ def ReadTransitSkims_CSV(transit_ttime_file, transit_walk_files, transit_wait_fi
 	ignored_zones = []
 	
 	# read in each individual matrix and store_const
+	delim = ','
+	if '.txt' in transit_ttime_file: delim = '\t'
+	else: delim = ','
+	
 	with open(transit_ttime_file, 'r') as infile:
-		cr = csv.reader(infile,delimiter =',')
+		cr = csv.reader(infile,delimiter =delim)
 		try:
 			for row in cr:
 				if len(row) > 2:
@@ -431,10 +435,12 @@ def ReadTransitSkims_CSV(transit_ttime_file, transit_walk_files, transit_wait_fi
 						skims.transit_ttime[o,d] = float(row[2])
 		except ValueError:
 			print row[2]
-		
+	
 	for transit_walk_file in transit_walk_files:
+		if '.txt' in transit_walk_file: delim = '\t'
+		else: delim = ','
 		with open(transit_walk_file, 'r') as infile:
-			cr = csv.reader(infile,delimiter =',')
+			cr = csv.reader(infile,delimiter =delim)
 			try:
 				for row in cr:
 					if len(row) > 2:
@@ -450,9 +456,11 @@ def ReadTransitSkims_CSV(transit_ttime_file, transit_walk_files, transit_wait_fi
 					print row[2]
 	
 	for transit_wait_file in transit_wait_files:
+		if '.txt' in transit_wait_file: delim = '\t'
+		else: delim = ','
 		with open(transit_wait_file, 'r') as infile:
 			try:
-				cr = csv.reader(infile,delimiter =',')
+				cr = csv.reader(infile,delimiter =delim)
 				for row in cr:
 					if len(row) > 2:
 						if int(row[0]) not in skims.zone_id_to_index_map:
@@ -465,9 +473,11 @@ def ReadTransitSkims_CSV(transit_ttime_file, transit_walk_files, transit_wait_fi
 							skims.transit_wait_time[o,d] += float(row[2])
 			except ValueError:
 				print row[2]
-			
+				
+	if '.txt' in transit_wait_file: delim = '\t'
+	else: delim = ','		
 	with open(transit_fare_file, 'r') as infile:
-		cr = csv.reader(infile,delimiter =',')
+		cr = csv.reader(infile,delimiter =delim)
 		try:
 			for row in cr:
 				if len(row) > 2:
@@ -482,8 +492,10 @@ def ReadTransitSkims_CSV(transit_ttime_file, transit_walk_files, transit_wait_fi
 		except ValueError:
 				print row[2]
 	
+	if '.txt' in transit_wait_file: delim = '\t'
+	else: delim = ','
 	with open(auto_distance_file, 'r') as infile:
-		cr = csv.reader(infile,delimiter =',')
+		cr = csv.reader(infile,delimiter =delim)
 		try:
 			for row in cr:
 				if len(row) > 2:
