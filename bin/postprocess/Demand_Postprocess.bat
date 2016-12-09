@@ -1,15 +1,19 @@
+REM *****************************************
+REM Param 1 is the output folder from the run
+REM *****************************************
 
-set demand_database=C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor_cav_study_110\annarbor-Demand.sqlite
-set supply_database=C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor-Supply.sqlite
+set DEMAND=%1
+set SUPPLY=%2
+set REPO=c:\Users\jauld\Desktop\Research\Projects\POLARIS\polaris_T1
 
-@echo Attach '%supply_database%' as supply; > demand_final.sql
-type C:\Users\jauld\Desktop\Research\Projects\POLARIS\polaris_Develop\bin\postprocess\demand.sql >> demand_final.sql
+pushd %~dp0
+
+@echo Attach '%SUPPLY%' as a; > demand_final.sql
+type %REPO%\bin\postprocess\demand_final.sql >> demand_final.sql
+
+REM xcopy %DEMAND% %backup\demand_database% /y
+
+c:\sqlite\spatialite %DEMAND% < demand_final.sql
 
 pause
-
-
-xcopy %demand_database% %backup\demand_database% /y
-
-c:\sqlite\sqlite3 %demand_database% < demand_final.sql
-
-pause
+popd

@@ -1,4 +1,11 @@
-Attach 'C:\Users\jauld\Desktop\Research\Projects\POLARIS\POLARIS_STUDIES\AnnArbor_CAV_studies\annarbor_cav_study\annarbor-Supply.sqlite' as a; 
+--############################################################
+-- CREATE INDICES TO SPEED UP QUERIES
+CREATE INDEX activity_person_idx ON "Activity" (person);
+CREATE INDEX activity_trip_idx ON "Activity" (trip);
+CREATE INDEX activity_location_idx ON "Activity" (location_id);
+CREATE INDEX person_household_idx ON "Person" (household);
+CREATE INDEX person_work_idx ON "Person" (work_location_id);
+
 --############################################################
 -- GENERATE TRAVEL TIME DISTRIBUTION
 
@@ -55,6 +62,8 @@ SELECT
 	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
 	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
 	sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+	sum(CASE WHEN type= 'WORK AT HOME' THEN 1 END) as WORK_HOME,
+	sum(CASE WHEN type= 'PART_WORK' THEN 1 END) as WORK_PART,
 	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
 	sum(1) AS total
 FROM 
@@ -64,16 +73,61 @@ WHERE
 GROUP BY 
 	TTime_minutes;
 
-DROP TABLE IF EXISTS TTime_Distribution;
-CREATE TABLE TTime_Distribution ( TTime_minutes INT, Count INT);
-INSERT INTO 
-	TTime_Distribution(TTime_minutes, Count)
-SELECT
-	[round((end-start)/60)], total
-FROM 
-	TTime_Distribution_tmp;
-DROP TABLE TTime_Distribution_tmp;
 
+--############################################################
+-- ACTIVITY GENERATION RESULTS
+DROP TABLE IF EXISTS Person_types;
+CREATE TABLE IF NOT EXISTS Person_types As
+SELECT 
+case when (employment = 4 or employment = 1) and work_hours >= 30 then 3
+	when (employment = 4 or employment = 1) then 4
+	when (school_enrollment = 3 or school_enrollment = 2) and age > 18 then 7
+	when age >= 65 then 6
+	when age < 65 and age > 18 then 5
+	when age >= 16 and age <= 18 then 0
+	when age < 16 and age >= 5 then 1
+	when age < 5 then 2
+	else 5
+end as per_cat,
+sum(1) AS total
+from person
+GROUP BY 
+	per_cat;
+	
+DROP TABLE IF EXISTS Activity_with_person;
+CREATE TABLE IF NOT EXISTS Activity_with_person As
+SELECT 
+case when (employment = 4 or employment = 1) and work_hours >= 30 then 3
+	when (employment = 4 or employment = 1) then 4
+	when (school_enrollment = 3 or school_enrollment = 2) and age > 18 then 7
+	when age >= 65 then 6
+	when age < 65 and age > 18 then 5
+	when age >= 16 and age <= 18 then 0
+	when age < 16 and age >= 5 then 1
+	when age < 5 then 2
+	else 5
+end as per_cat,
+sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
+sum(CASE WHEN type= 'ERRANDS' THEN 1 END) as ERRANDS,
+sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
+sum(CASE WHEN type= 'HOME' THEN 1 END) as HOME,
+sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
+sum(CASE WHEN type= 'PERSONAL' THEN 1 END) as PERSONAL,
+sum(CASE WHEN type= 'PICKUP-DROPOFF' THEN 1 END) as PICK_DROP,
+sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+sum(CASE WHEN type= 'SCHOOL' THEN 1 END) as SCHOOL,
+sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
+sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
+sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
+sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+sum(CASE WHEN type= 'WORK AT HOME' THEN 1 END) as WORK_HOME,
+sum(CASE WHEN type= 'PART_WORK' THEN 1 END) as WORK_PART,
+sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
+sum(1) AS total
+from person, activity
+where person.person = activity.person and activity.Start_Time > 62
+GROUP BY 
+	per_cat;
 
 --############################################################
 -- GENERATE ACTIVITY TYPE BY MODAL DISTRIBUTION
@@ -86,6 +140,8 @@ SELECT
 	sum(CASE WHEN mode= 'HOV' THEN 1 END) as HOV,
 	sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as Transit,
 	sum(CASE WHEN mode= 'WALK' THEN 1 END) as Walk,
+	sum(CASE WHEN mode= 'BIKE' THEN 1 END) as Bike,
+	sum(CASE WHEN mode= 'TAXI' THEN 1 END) as Taxi,
 	sum(1) AS total
 FROM 
 	Activity
@@ -139,18 +195,18 @@ DROP TABLE IF EXISTS Activity_Distribution_By_Person;
 CREATE TABLE IF NOT EXISTS Activity_Distribution_By_Person As
 SELECT 
 	person,
-        sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
+    sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
 	sum(CASE WHEN type= 'ERRANDS' THEN 1 END) as ERRANDS,
-        sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
+    sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
 	sum(CASE WHEN type= 'HOME' THEN 1 END) as HOME,
-        sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
+    sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
 	sum(CASE WHEN type= 'PERSONAL' THEN 1 END) as PERSONAL,
-        sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+    sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
 	sum(CASE WHEN type= 'SCHOOL' THEN 1 END) as SCHOOL,
-        sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
+    sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
 	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
 	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
-        sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+    sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
 	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
 	sum(1) AS total
 FROM 
@@ -282,18 +338,21 @@ DROP TABLE IF EXISTS Activity_TTime_Distribution;
 CREATE TABLE Activity_TTime_Distribution As
 SELECT 
 	TTime,
-        sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
+    sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
 	sum(CASE WHEN type= 'ERRANDS' THEN 1 END) as ERRANDS,
-        sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
+    sum(CASE WHEN type= 'HEALTHCARE' THEN 1 END) as HEALTHCARE,
 	sum(CASE WHEN type= 'HOME' THEN 1 END) as HOME,
-        sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
+    sum(CASE WHEN type= 'LEISURE' THEN 1 END) as LEISURE,
 	sum(CASE WHEN type= 'PERSONAL' THEN 1 END) as PERSONAL,
-        sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+    sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN 1 END) as RELIGIOUS,
+	sum(CASE WHEN type= 'PICKUP-DROPOFF' THEN 1 END) as PICK_DRIP,
 	sum(CASE WHEN type= 'SCHOOL' THEN 1 END) as SCHOOL,
-        sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
+    sum(CASE WHEN type= 'SERVICE' THEN 1 END) as SERVICE,
 	sum(CASE WHEN type= 'SHOP-MAJOR' THEN 1 END) as SHOP_MAJOR,
 	sum(CASE WHEN type= 'SOCIAL' THEN 1 END) as SOCIAL,
-        sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+    sum(CASE WHEN type= 'WORK' THEN 1 END) as WORK,
+	sum(CASE WHEN type= 'WORK AT HOME' THEN 1 END) as WORK_HOME,
+	sum(CASE WHEN type= 'PART_WORK' THEN 1 END) as WORK_PART,
 	sum(CASE WHEN type= 'SHOP-OTHER' THEN 1 END) as SHOP_OTHER,
 	sum(1) AS total
 FROM 
@@ -313,12 +372,17 @@ FROM Trip
 INNER JOIN Activity
 ON Activity.trip=Trip.trip_id;
 
+CREATE INDEX activity_tmp_orig_idx ON "Activity_TTime_tmp" (origin);
+
+
 DROP TABLE IF EXISTS Activity_With_Zone_tmp;
 CREATE TABLE Activity_With_Zone_tmp As
 SELECT Activity_TTime_tmp.*, a.Location.zone as origzone
 FROM Activity_TTime_tmp
 INNER JOIN a.Location
 ON Activity_TTime_tmp.origin=a.Location.location;
+
+CREATE INDEX activity_tmp_dest_idx ON "Activity_With_Zone_tmp" (destination);
 
 DROP TABLE IF EXISTS Activity_With_Zone;
 CREATE TABLE Activity_With_Zone As
@@ -338,11 +402,15 @@ SELECT Person.person, Person.ID, Person.household, Person.Work_Location_id as wo
 FROM Person, Household
 where Person.household = household.household;
 
+CREATE INDEX work_loc_idx ON "Person_Work_Distance_tmp" (work_loc);
+
 DROP TABLE IF EXISTS Person_Work_Distance_tmp2;
 CREATE TABLE Person_Work_Distance_tmp2 As
 SELECT Person_Work_Distance_tmp.person, Person_Work_Distance_tmp.ID, Person_Work_Distance_tmp.household, a.location.X as work_x, a.location.Y as work_y, Person_Work_Distance_tmp.house_loc as house_loc
 FROM Person_Work_Distance_tmp, a.location
 where Person_Work_Distance_tmp.work_loc = a.location.location;
+
+CREATE INDEX house_loc_idx ON "Person_Work_Distance_tmp2" (house_loc);
 
 DROP TABLE IF EXISTS Person_Work_Distance_tmp3;
 CREATE TABLE Person_Work_Distance_tmp3 As
@@ -350,6 +418,7 @@ SELECT Person_Work_Distance_tmp2.person, Person_Work_Distance_tmp2.ID, Person_Wo
 FROM Person_Work_Distance_tmp2, a.location
 where Person_Work_Distance_tmp2.house_loc = a.location.location;
 
+DROP TABLE IF EXISTS Person_Work_Distance;
 CREATE TABLE Person_Work_Distance As
 SELECT Person_Work_Distance_tmp3.*, Sqrt(Pow((home_x - work_x),2) + Pow((home_y - work_y),2)) as Dist, Round(Sqrt(Pow((home_x - work_x),2) + Pow((home_y - work_y),2))/1000,1) AS Dist_Rnd
 FROM Person_Work_Distance_tmp3;
@@ -358,12 +427,12 @@ DROP TABLE IF EXISTS Person_Work_Distance_tmp;
 DROP TABLE IF EXISTS Person_Work_Distance_tmp2;
 DROP TABLE IF EXISTS Person_Work_Distance_tmp3;
 
-SELECT 
-	Dist_rnd, count(1)
-FROM 
-	Person_Work_Distance
-GROUP BY 
-	Dist_rnd;
+--SELECT 
+--	Dist_rnd, count(1)
+--FROM 
+--	Person_Work_Distance
+--GROUP BY 
+--	Dist_rnd;
 
 
 --############################################################
@@ -375,12 +444,17 @@ FROM Trip
 INNER JOIN Activity
 ON Activity.trip=Trip.trip_id;
 
+CREATE INDEX origin_idx ON "Activity_With_OD" (origin);
+
+
 DROP TABLE IF EXISTS Activity_With_OD_tmp;
 CREATE TABLE Activity_With_OD_tmp As
 SELECT Activity_With_OD.*, a.Location.x as Orig_X, a.Location.y as Orig_Y
 FROM Activity_With_OD
 INNER JOIN a.Location
 ON Activity_With_OD.origin=a.Location.location;
+
+CREATE INDEX destination_idx ON "Activity_With_OD_tmp" (destination);
 
 DROP TABLE IF EXISTS Activity_With_OD_tmp2;
 CREATE TABLE Activity_With_OD_tmp2 As
@@ -398,6 +472,8 @@ DROP TABLE IF EXISTS Activity_With_OD;
 DROP TABLE IF EXISTS Activity_With_OD_tmp;
 DROP TABLE IF EXISTS Activity_With_OD_tmp2;
 
+DROP TABLE IF EXISTS Activity_Distance_Distribution;
+CREATE TABLE Activity_Distance_Distribution As
 SELECT 
 	Dist_rnd,
       sum(CASE WHEN type= 'EAT OUT' THEN 1 END) as EAT_OUT,
@@ -442,21 +518,19 @@ GROUP BY destzone;
 
 --############################################################
 -- IF DOING PUMA-level analysis, make sure to attach zone to puma crosswalk table
-DROP TABLE IF EXISTS Activity_With_Zone_tmp;
-CREATE TABLE Activity_With_Zone_tmp As
-SELECT Activity_With_Zone.*, Zone_To_Area_Crosswalk.PUMA as orig_puma
-FROM Activity_With_Zone
-INNER JOIN Zone_To_Area_Crosswalk
-ON Activity_With_Zone.origzone=Zone_To_Area_Crosswalk.zone;
-
-DROP TABLE IF EXISTS Activity_With_PUMA;
-CREATE TABLE Activity_With_PUMA As
-SELECT Activity_With_Zone_tmp.*, Zone_To_Area_Crosswalk.PUMA as dest_puma
-FROM Activity_With_Zone_tmp
-INNER JOIN Zone_To_Area_Crosswalk
-ON Activity_With_Zone_tmp.destzone=Zone_To_Area_Crosswalk.zone;
-
-DROP TABLE IF EXISTS Activity_With_Zone_tmp;
+--DROP TABLE IF EXISTS Activity_With_Zone_tmp;
+--CREATE TABLE Activity_With_Zone_tmp As
+--SELECT Activity_With_Zone.*, Zone_To_Area_Crosswalk.PUMA as orig_puma
+--FROM Activity_With_Zone
+--INNER JOIN Zone_To_Area_Crosswalk
+--ON Activity_With_Zone.origzone=Zone_To_Area_Crosswalk.zone;
+--DROP TABLE IF EXISTS Activity_With_PUMA;
+--CREATE TABLE Activity_With_PUMA As
+--SELECT Activity_With_Zone_tmp.*, Zone_To_Area_Crosswalk.PUMA as dest_puma
+--FROM Activity_With_Zone_tmp
+--INNER JOIN Zone_To_Area_Crosswalk
+--ON Activity_With_Zone_tmp.destzone=Zone_To_Area_Crosswalk.zone;
+--DROP TABLE IF EXISTS Activity_With_Zone_tmp;
 
 
 --############################################################
@@ -518,6 +592,8 @@ FROM Activity
 INNER JOIN Trip
 ON Trip.trip_id =Activity.id;
 
+CREATE INDEX orig_idx ON "Modes_by_Origin_Temp" (orig);
+
 DROP TABLE IF EXISTS Modes_by_Origin_Temp_2;
 CREATE TABLE Modes_by_Origin_Temp_2 As
 SELECT a.Location.zone as OrigZone, Modes_by_Origin_Temp.destination as destination, Modes_by_Origin_Temp.Mode, Modes_by_Origin_Temp.type,Modes_by_Origin_Temp.id, Start_Time
@@ -525,7 +601,7 @@ FROM Modes_by_Origin_Temp
 INNER JOIN a.Location
 ON a.Location.location =Modes_by_Origin_Temp.orig;
 
-
+CREATE INDEX destination_idx ON "Modes_by_Origin_Temp_2" (destination);
 
 DROP TABLE IF EXISTS Modes_by_Origin_Temp_3;
 CREATE TABLE Modes_by_Origin_Temp_3 As
@@ -578,6 +654,8 @@ FROM Activity
 INNER JOIN Trip
 ON Trip.trip_id =Activity.id;
 
+CREATE INDEX orig_idx ON "Modes_by_Destination_Temp" (orig);
+
 DROP TABLE IF EXISTS Modes_by_Destination_Temp_2;
 CREATE TABLE Modes_by_Destination_Temp_2 As
 SELECT a.Location.zone as OrigZone, Modes_by_Destination_Temp.destination as destination, Modes_by_Destination_Temp.Mode, Modes_by_Destination_Temp.type,Modes_by_Destination_Temp.id, Start_Time
@@ -585,7 +663,7 @@ FROM Modes_by_Destination_Temp
 INNER JOIN a.Location
 ON a.Location.location = Modes_by_Destination_Temp.orig;
 
-
+CREATE INDEX destination_idx ON "Modes_by_Destination_Temp_2" (destination);
 
 DROP TABLE IF EXISTS Modes_by_Destination_Temp_3;
 CREATE TABLE Modes_by_Destination_Temp_3 As
@@ -660,6 +738,7 @@ SELECT Household.location as home_location, Person.person,  Person.id,  Person.w
 FROM Person
 INNER JOIN Household
 ON Person.household  = Household.household;
+CREATE INDEX work_location_idx ON "PersonWorkplaceTemp1" (work_location_id);
 
 DROP TABLE IF EXISTS PersonWorkplaceTemp2;
 CREATE TABLE PersonWorkplaceTemp2 As
@@ -667,7 +746,7 @@ SELECT a.Location.zone as workzone, person, id, PersonWorkplaceTemp1.home_locati
 FROM PersonWorkplaceTemp1
 INNER JOIN a.Location
 ON a.Location.location =PersonWorkplaceTemp1.work_location_id;
-
+CREATE INDEX home_location_idx ON "PersonWorkplaceTemp2" (home_location);
 
 DROP TABLE IF EXISTS PersonWorkplaceTemp3;
 CREATE TABLE PersonWorkplaceTemp3 As
@@ -696,235 +775,16 @@ DROP TABLE IF EXISTS PersonWorkplaceTemp3;
 
 --############################################################
 -- PUMA Level OD table
-CREATE TABLE IF NOT EXISTS Origin_Destination_by_PUMA As
-SELECT 
-	OriginPuma,
-	sum(CASE WHEN dest_puma = 'AUTO' THEN 1 ELSE 0 END) as Auto,
-	sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as Transit,
-	sum(1) AS total
-FROM 
-	Activity_With_Puma
-GROUP BY 
-	OriginPuma;
+--CREATE TABLE IF NOT EXISTS Origin_Destination_by_PUMA As
+--SELECT 
+--	OriginPuma,
+--	sum(CASE WHEN dest_puma = 'AUTO' THEN 1 ELSE 0 END) as Auto,
+--	sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as Transit,
+--	sum(1) AS total
+--FROM 
+--	Activity_With_Puma
+--GROUP BY 
+--	OriginPuma;
 
 	
 
-
---############################################################
--- CREATE LOCATIONS TABLE - and add geocolumn
-CREATE TABLE "Location" (
-  "location" INTEGER NOT NULL PRIMARY KEY,
-  "link" INTEGER,
-  "dir" INTEGER DEFAULT 0 NOT NULL,
-  "offset" REAL DEFAULT 0,
-  "setback" REAL DEFAULT 0,
-  "zone" INTEGER,
-  "location_data" INTEGER,
-  "x" DOUBLE,
-  "y" DOUBLE, "Geo" POINT,
-  CONSTRAINT "link_fk"
-    FOREIGN KEY ("link")
-    REFERENCES "Link" ("link")
-    DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT "zone_fk"
-    FOREIGN KEY ("zone")
-    REFERENCES "Zone" ("zone")
-    DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT "location_data_fk"
-    FOREIGN KEY ("location_data")
-    REFERENCES "LocationData" ("location")
-    DEFERRABLE INITIALLY DEFERRED)
-	
-Select AddGeometryColumn ('Location', 'Geo', 26916, 'POINT', 2)
-UPDATE Location SET Geometry=MakePoint(x, y, 26916)
-
-CREATE TABLE "LocationData" (
-  "location" INTEGER NOT NULL PRIMARY KEY,
-  "truck_org" INTEGER DEFAULT 0 NOT NULL,
-  "truck_des" INTEGER DEFAULT 0 NOT NULL,
-  "auto_org" INTEGER DEFAULT 0 NOT NULL,
-  "auto_des" INTEGER DEFAULT 0 NOT NULL,
-  "transit" INTEGER DEFAULT 0 NOT NULL,
-  "areatype" INTEGER DEFAULT 0 NOT NULL,
-  "LU_AREA" REAL DEFAULT 0 NOT NULL,
-  "notes" TEXT DEFAULT '' NOT NULL,
-  "census_zone" REAL DEFAULT 0,
-  "x" REAL DEFAULT 0,
-  "y" REAL DEFAULT 0,
-  "land_use" TEXT DEFAULT '' NOT NULL)
-  
---############################################################
--- IDENTIFY TRANSIT STOPS
-create TABLE Transit_Stops as
-select location, link, dir, zone from location where link in ( 
-
-select link from link where type is not 'HEAVYRAIL' and type is not 'WALKWAY' and (node_a in (
-
-select node_a from link where type = 'WALKWAY' union select node_b from link where type = 'WALKWAY'
-) or node_b in (
-
-select node_a from link where type = 'WALKWAY' union select node_b from link where type = 'WALKWAY'
-) )
-)
-update Locationdata set land_use = 'TRANSIT_STOP'
-	where Locationdata.location in (select location from transit_stops where transit_stops.location = locationdata.location)
-	
---############################################################
--- Manual databases corrects: Correct for zones with no activity locations - shift nearest to zone
- update location set zone = 1405 where location = 140771
- update location set zone = 1405 where location = 64958
- update location set zone = 97 where location = 20558
- update location set zone = 97 where location = 96800
- update location set zone = 1071 where location = 59971
- update location set zone = 1071 where location = 135913
- 
- 
- --#########################################################################################
--- SELECT EXTERNAL-INTERNAL and INTERNAL-EXTERNAL trips from non CBD residents
-
--- attach the cbd database and extract the internal locations
-ATTACH DATABASE 'c:\users\jauld\desktop\chicago-Supply.sqlite' as a;
-create TEMP table location_cbd as select location from a.location;
-
--- get all trips from full model which either originate OR terminate in the CBD
-create TEMP table  external_trips_all AS
-select * from trip where (
-destination in location_cbd
-and origin not in location_cbd )
-or (
-origin in location_cbd
-and destination not in location_cbd )
-;
-
--- get list of non-CBD residents
-create TEMP table  external_household AS
-select hhold from household where location not in location_cbd;
-
--- select all E-I and I-E trips from non-CBD residents
-create table External_Trip
-select * from external_trips_all where external_trips_all.hhold in external_household;
-
-
- --#########################################################################################
--- UPDATE ORIGIN/DESTINATION activity locations for external trips for cut-down model
-create table trip_temp1 as
-select trip.*, a.location.zone as orig_zone from trip, a.location where origin = a.location.location;
-
-create table trip_temp2 as
-select trip_temp1.*, a.location.zone as dest_zone from trip_temp1, a.location where destination = a.location.location;
-
-
-UPDATE trip_temp2
-SET
-      origin = (SELECT cbd_entry_points.activity_location 
-                            FROM cbd_entry_points
-                            WHERE cbd_entry_points.entry_zone = orig_zone );
-
-WHERE
-    orig_zone in (select entry_zone from cbd_entry_points)
-	
-UPDATE trip_temp2
-SET
-      destination  = (SELECT cbd_entry_points.activity_location 
-                            FROM cbd_entry_points
-                            WHERE cbd_entry_points.entry_zone = dest_zone )
-
-WHERE
-    dest_zone in (select entry_zone from cbd_entry_points);
-	
---#########################################################################################
--- EXPRESSWAY LINK DELAY FOR RESULTS DATABASE	
-create table Expressway_Link_Delay as
-select 
-	start_time, link_travel_delay * link_out_volume as delay_minutes
-from 
-	linkmoe
-where 
-	link_type = 0 or link_type = 3
-Group by
-	start_time
-	
---#########################################################################################
--- CREATE HOUSEHOLD ACTIVITY TABLE	
-SELECT HH, PER, AGE, activity.type as ACTIVITY, cast(cast(activity.start_time/86400*24 as int)as string) ||":"|| cast( cast((activity.start_time/86400*24 - cast(activity.start_time/86400*24 as int))*60 as int) as string) as START, activity.mode as MODE from activity, (select person.person as PER, household.household as HH, person.Age as AGE from person, household where person.household = household.household) where activity.person = PER order by HH, PER
-
-DROP TABLE IF EXISTS LinkMOE_2;
-CREATE TABLE IF NOT EXISTS LinkMOE_2 as
-SELECT cast(link_uid/2 as int) as LINK, link_uid - 2* cast(link_uid/2 as int) as DIR, cast(start_time/3600 as int) as HR, link_speed as speed, link_travel_time as ttime, link_out_volume as volume
-FROM LinkMOE;
-
-DROP TABLE IF EXISTS LinkMOE_agg;
-CREATE TABLE IF NOT EXISTS LinkMOE_agg as
-SELECT LINK, DIR, HR, avg(speed) as speed, avg(ttime) as ttime, sum(volume) as volume
-FROM LinkMOE_2 GROUP BY link,dir,hr;
-
-
-
-
-
-DROP TABLE IF EXISTS Trip_Zone_tmp;
-CREATE TABLE Trip_Zone_tmp As
-SELECT Trip.*, a.Location.zone as origzone
-FROM Trip
-INNER JOIN a.Location
-ON trip.origin=a.Location.location;
-
-DROP TABLE IF EXISTS Trip_With_Zone;
-CREATE TABLE Trip_With_Zone As
-SELECT Trip_Zone_tmp.*, a.Location.zone as destzone
-FROM Trip_Zone_tmp
-INNER JOIN a.Location
-ON Trip_Zone_tmp.destination=a.Location.location;
-
-DROP TABLE IF EXISTS Trip_Zone_tmp;
-
-DROP TABLE IF EXISTS Productions_tmp;
-CREATE TABLE Productions_tmp As
-SELECT 
-  origzone, cast(start/3600 as int) as hr
-FROM Trip_With_Zone
-WHERE
-start > 62 and mode = 0;
-
-DROP TABLE IF EXISTS Productions;
-CREATE TABLE Productions As
-SELECT 
-  origzone, hr, count(1) as Prod
-FROM Productions_tmp
-GROUP BY
-  origzone,hr;
-  
- DROP TABLE IF EXISTS Attractions_tmp;
-CREATE TABLE Attractions_tmp As
-SELECT 
-  destzone, cast(start/3600 as int) as hr
-FROM Trip_With_Zone
-WHERE
-start > 62 and mode = 0;
-
-DROP TABLE IF EXISTS Attractions;
-CREATE TABLE Attractions As
-SELECT 
-  destzone, hr, count(1) as Attr
-FROM Attractions_tmp
-GROUP BY
-  destzone,hr;
-  
-  SELECT * FROM activity_with_zone where origzone=destzone and origzone < 78 and start_time > 62;
-
-  
- 
- 
-CREATE TABLE Trip_Zone_tmp As
-SELECT Trip.*, a.Location.x as orig_x, a.Location.y as orig_y
-FROM Trip
-INNER JOIN a.Location
-ON trip.origin=a.Location.location;
-  
-CREATE TABLE Trip_with_loc As
-SELECT Trip_zone_tmp.*, a.Location.x as dest_x, a.Location.y as dest_y
-FROM Trip_zone_tmp
-INNER JOIN a.Location
-ON trip_zone_tmp.destination=a.Location.location;
-  
-create table trip_with_dist as select trip_with_loc.*,sqrt(pow(orig_x-dest_x,2)+pow(orig_y-dest_y,2))/1000 as Dist, mode from trip_with_loc where start> 62

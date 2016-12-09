@@ -692,6 +692,7 @@ namespace Prototypes
 		//--------------------------------------------------------
 		template<typename TargetType> void Arrive_At_Destination()
 		{
+
 			// free up movement schedule
 			this->Movement_Scheduled<bool>(false);
 
@@ -709,16 +710,19 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename network_itf::get_type_of(skimming_faculty)> skim_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
-			
+			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;		
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links_container_itf;
-			typedef Link_Components::Prototypes::Link<get_component_type(links_container_itf)>  link_itf;
-			
+			typedef Link_Components::Prototypes::Link<get_component_type(links_container_itf)>  link_itf;	
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(turn_movements_container)> turns_container_itf;
 			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_container_itf)>  turn_itf;
-			
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
+
+			//TODO: remove when done testing scheduler code
+			//if (_Parent_Person->Household<Household_Itf*>()->uuid<int>() == 1293)
+			//{
+			//	int test = 1;
+			//}
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();

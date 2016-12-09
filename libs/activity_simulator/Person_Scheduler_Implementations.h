@@ -56,6 +56,8 @@ namespace Person_Components
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
 
 			// Interface definitions
+			typedef Person_Components::Prototypes::Person_Planner< typename type_of(Parent_Person)::get_type_of(Planning_Faculty)> _Planner_Interface;
+			typedef Person_Components::Prototypes::Activity_Generator< typename _Planner_Interface::get_type_of(Activity_Generation_Faculty)> _Generator_Interface;
 			typedef Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(Perception_Faculty)::type_of(Scenario)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(Perception_Faculty)::type_of(Network)> _Network_Interface;
@@ -395,7 +397,7 @@ namespace Person_Components
 				// determine conflict regimes and modify appropriately
 				Time_Seconds available_time = end_max - start_min;
 
-				Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>* new_act = nullptr;
+				Activity_Plan* new_act = nullptr;
 
 				// 0. insertion conflicts
 				// check for insertion conflicts - does not work with the current start_min/end_max setup
@@ -405,16 +407,21 @@ namespace Person_Components
 				{
 					if (prev_act->template Duration<Time_Hours>() > 2.0 && prev_act->template Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->template Start_Time<Time_Seconds>() && prev_act->template End_Time<Time_Seconds>() >= act->template End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
+						_Planner_Interface* planner = _Parent_Person->Planning_Faculty<_Planner_Interface*>();
+						_Generator_Interface* generator = planner->template Activity_Generation_Faculty<_Generator_Interface*>();
+
 						//Allocate new activity for the split half and copy from the other half
-						new_act = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
-						new_act->template Copy<Activity_Plan*>(prev_act);
-						new_act->template Activity_Plan_ID<int>(prev_act->template Activity_Plan_ID<int>() + 1000);
+						//new_act = (Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type>*)Allocate<MasterType::activity_plan_type>();
+						//new_act->template Copy<Activity_Plan*>(prev_act);
+						//new_act->template Activity_Plan_ID<int>(prev_act->template Activity_Plan_ID<int>() + 1000);
+
+						new_act = generator->Create_Activity<Activity_Plan*>(prev_act);
 						new_act->template Start_Time<Time_Seconds>(act->template End_Time<Time_Seconds>()+ttime_prev);
 						new_act->template End_Time<Time_Seconds>(prev_act->template End_Time<Time_Seconds>(), false);
-						Revision &route = new_act->template Route_Planning_Time<Revision&>();
-						route._iteration = iteration() + 1;
-						route._sub_iteration = 0;
-						new_act->template Schedule_Activity_Events<NT>();
+						//Revision &route = new_act->template Route_Planning_Time<Revision&>();
+						//route._iteration = iteration() + 1;
+						//route._sub_iteration = 0;
+						//new_act->template Schedule_Activity_Events<NT>();
 					
 						//modify the preceding portion of the split activity
 						prev_act->template End_Time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev,false);
@@ -580,7 +587,7 @@ namespace Person_Components
 				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
 
 				//TODO: remove when done testing scheduler code
-				if (_Parent_Person->Household<_Household_Interface*>()->uuid<int>() == 11)
+				if (_Parent_Person->Household<_Household_Interface*>()->uuid<int>() == 1293)
 				{
 					int test = 1;
 				}

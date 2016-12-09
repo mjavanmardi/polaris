@@ -90,7 +90,15 @@ namespace Person_Components
 				//load_event(ComponentType,Generator_Conditional,Activity_Generation_Event,first_iter,Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,NULLTYPE);
 				((ComponentType*)this)->template Load_Event<ComponentType>(&Activity_Generation_Event_Controller,first_iter,Scenario_Components::Types::ACTIVITY_GENERATION_SUB_ITERATION);
 			}
-
+			template<typename TargetType> TargetType Create_Activity(TargetType act, requires(TargetType, check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Simulator::Activity_Concepts::Is_Activity_Plan_Prototype)))
+			{
+				return this_component()->Create_Activity<TargetType>(act);
+			}
+			template<typename TargetType> TargetType Create_Activity(TargetType act, requires(TargetType, !check(TargetType, is_pointer) || !check(strip_modifiers(TargetType), Activity_Simulator::Activity_Concepts::Is_Activity_Plan_Prototype)))
+			{
+				assert_check(TargetType, is_pointer, "target type must be a pointer");
+				assert_check(strip_modifiers(TargetType), Activity_Simulator::Activity_Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");
+			}
 			template<typename TargetType, typename LocationType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location)
 			{
 				this_component()->Create_Activity<TargetType,LocationType>(act_type,start_plan_time,location);
