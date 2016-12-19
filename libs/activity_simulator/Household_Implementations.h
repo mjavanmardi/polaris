@@ -27,6 +27,7 @@ namespace Household_Components
 			m_prototype(PopSyn::Prototypes::Synthesis_Zone, typename MasterType::synthesis_zone_type, home_synthesis_zone, NONE, NONE);	
 			m_prototype(Household_Components::Prototypes::Household_Properties, typename MasterType::household_properties_type, Properties, NONE,NONE);
 			m_prototype(Household_Components::Prototypes::Household_Properties,typename MasterType::household_static_properties_type, Static_Properties, NONE, NONE);
+			m_prototype(Household_Components::Prototypes::Vehicle_Chooser, typename MasterType::vehicle_chooser_type, Vehicle_Chooser, NONE, NONE);
 			
 			// Physical world elements
 			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, network_reference, NONE, NONE);
@@ -64,12 +65,14 @@ namespace Household_Components
 				_Properties->template Initialize<void>();
 				_Properties->template Parent_Household<ComponentType*>(this);
 
+				_Vehicle_Chooser = (Vehicle_Chooser_type)Allocate<type_of(Vehicle_Chooser)>();
+				//_Vehicle_Chooser->Initialize<void>();
+				_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
 					
 				// Add basic traveler properties							
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
 
-				// Fill the vehicle list
 				
 			}
 			template<typename IdType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
@@ -83,6 +86,8 @@ namespace Household_Components
 			{
 				this->Initialize<IdType,NetworkRefType,ScenarioRefType>(id,network_ref,scenario_ref);
 				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
+
+				this->_Vehicle_Chooser->Select_Vehicles<SynthesisZoneType>(home_zone);
 			}
 
 			template<typename TargetType> void Set_Home_Location()

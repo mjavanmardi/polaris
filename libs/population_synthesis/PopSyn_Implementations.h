@@ -1021,6 +1021,28 @@ namespace PopSyn
 									++perid;
 								}
 
+								/////// CHANGE THIS TO OUTPUT VEHICLES TO DB
+								//person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
+								//perid = 0;
+								//for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+								//{
+								//	// update synthesizing persons counter
+								//	if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+
+								//	person_type* person = (person_type*)(*p_itr);
+
+								//	shared_ptr<MasterType::person_db_rec_type> per_rec(new MasterType::person_db_rec_type());
+								//	per_rec->setId(perid);
+								//	per_rec->setHousehold(hh_rec);
+								//	Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+								//	Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+
+								//	//push to database
+								//	db->persist(per_rec);
+								//	counter++;
+								//	++perid;
+								//}
+
 								++uuid;
 								++perid;
 

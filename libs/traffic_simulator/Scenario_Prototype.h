@@ -147,6 +147,11 @@ namespace Scenario_Components
 			accessor(activity_start_time_model_file_name,NONE,NONE);
 
 			//===============================================
+			// Vehicle Choice parameters
+			//-----------------------------------------------
+			accessor(vehicle_distribution_file_name, NONE, NONE);
+
+			//===============================================
 			// Popsyn parameters
 			//-----------------------------------------------
 			accessor(percent_to_synthesize, NONE, NONE);
@@ -411,6 +416,12 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("read_population_from_database", this->template read_population_from_database<bool*>()) != PARAMETER_FOUND) this->template read_population_from_database<bool>(false);
 				if (cfgReader.getParameter("cav_market_penetration", this->template cav_market_penetration<double*>()) != PARAMETER_FOUND) this->template cav_market_penetration<double>(0.0);
 				if (cfgReader.getParameter("cav_vott_adjustment", this->template cav_vott_adjustment<double*>()) != PARAMETER_FOUND) this->template cav_vott_adjustment<double>(1.0);
+
+				//=======================================================================================================================================================
+				// Vehicle Choice Model parameters
+				// Start time model parameters
+				if (cfgReader.getParameter("vehicle_distribution_file_name", this->template vehicle_distribution_file_name<string*>()) != PARAMETER_FOUND) this->template vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
+
 
 				//=======================================================================================================================================================
 				// PopSyn parameters

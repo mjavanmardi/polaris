@@ -4,6 +4,7 @@
 
 void* _global_network;
 void* _global_scenario;
+void* _global_demand;
 void* _global_person_logger;
 void* _global_vehicle_logger;
 

@@ -133,6 +133,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
+	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
@@ -441,7 +442,7 @@ int main(int argc,char** argv)
 	cout << "reading external demand data..." <<endl;
 	demand->read_vehicle_type_data<NT>();
 	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	
+	_global_demand = demand;
 	
 
 	//==================================================================================================================================
@@ -521,8 +522,12 @@ int main(int argc,char** argv)
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
+
 	// Initialize person properties with average activity frequency and duration
 	MasterType::person_properties_type::Static_Initializer();
+	
+	// Initialize Vehicle Choice Model
+	MasterType::vehicle_chooser_type::static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
 
 	//==================================================================================================================================
 	// POPSYN stuff

@@ -96,9 +96,9 @@ namespace Vehicle_Components
 		prototype struct Vehicle_Characteristics ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
-			typed_accessor(Types::EPA_Vehicle_Class_Keys, vehicle_class);
-			typed_accessor(Types::Powertrain_Type_Keys, powertrain_type);
-			typed_accessor(Types::Fuel_Type_Keys, fuel_type);
+			accessor(vehicle_class,NONE,NONE);
+			accessor(powertrain_type, NONE, NONE);
+			accessor(fuel_type, NONE, NONE);
 			typed_accessor(int, ID);
 			typed_accessor(int,capacity);
 			typed_accessor(bool,has_connectivity);
