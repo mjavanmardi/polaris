@@ -381,7 +381,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long type_id;
 
 	#pragma db not_null
@@ -418,7 +418,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long type_id;
 	std::string type;
 };
@@ -454,7 +454,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long class_id;
 	std::string class_type;
 	int capacity;
@@ -486,7 +486,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long type_id;
 	std::string type;
 };
@@ -520,7 +520,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long type_id;
 	std::string type;
 	bool acc;
@@ -551,7 +551,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id auto
+	#pragma db id //auto
 	unsigned long type_id;
 	std::string type;
 };

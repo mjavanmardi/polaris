@@ -138,29 +138,29 @@ namespace Scenario_Components
 			//===============================================
 			// Demand model parameters
 			//-----------------------------------------------
-			accessor(write_activity_output, NONE, NONE);
-			accessor(aggregate_routing, NONE, NONE);
-			accessor(do_planner_routing, NONE, NONE);
-			accessor(write_demand_to_database, NONE, NONE);
-			accessor(read_demand_from_database, NONE, NONE);
-			accessor(read_population_from_database, NONE, NONE);
+			accessor(write_activity_output, NONE, NONE);			// deprecated
+			accessor(aggregate_routing, NONE, NONE);				// do routing calculations at aggregate time-steps
+			accessor(do_planner_routing, NONE, NONE);				// calculate route when planning trips in place of skims
+			accessor(write_demand_to_database, NONE, NONE);			//
+			accessor(read_demand_from_database, NONE, NONE);		// 
+			accessor(read_population_from_database, NONE, NONE);	// run model with pre-existing synthetic population *must reference <db>-Popsyn.sqlite database
 			accessor(activity_start_time_model_file_name,NONE,NONE);
 
 			//===============================================
 			// Vehicle Choice parameters
 			//-----------------------------------------------
-			accessor(vehicle_distribution_file_name, NONE, NONE);
+			accessor(vehicle_distribution_file_name, NONE, NONE);	// file containing the vehicle type distribution by taz
 
 			//===============================================
 			// Popsyn parameters
 			//-----------------------------------------------
-			accessor(percent_to_synthesize, NONE, NONE);
-			accessor(ipf_tolerance, NONE, NONE);
+			accessor(percent_to_synthesize, NONE, NONE);			// percent to synthesize 0-1.0, setting to 0 will run only fixed demand
+			accessor(ipf_tolerance, NONE, NONE);	
 			accessor(marginal_tolerance, NONE, NONE);
 			accessor(maximum_iterations, NONE, NONE);
 			accessor(write_marginal_output, NONE, NONE);
 			accessor(write_full_output, NONE, NONE);
-			accessor(popsyn_control_file_name, NONE, NONE);
+			accessor(popsyn_control_file_name, NONE, NONE);			// reference to popsyn linker file
 
 			accessor(database_name, NONE, NONE);
 
@@ -590,7 +590,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool*>())!= PARAMETER_FOUND) load_analyze_link_groups_from_file<bool>(false);
 				if (cfgReader.getParameter("analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<string*>())!= PARAMETER_FOUND) analyze_link_groups_file_path_name<string>("analyze_link_groups");
 
-				if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
+				//if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool*>())!= PARAMETER_FOUND) write_ttime_distribution_from_network_model<bool>(false);
 				if (cfgReader.getParameter("vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int*>())!= PARAMETER_FOUND) vehicle_trajectory_output_threshold<int>(-1.0);
 
@@ -782,11 +782,44 @@ namespace Scenario_Components
 
 				//----------------------
 				// demand database
-				results_name = output_dir_name<string>().append(this->database_name<string&>());
+				// copy default demand tables - vehicle type, class....
+				string name(this->database_name<string&>());
+				unique_ptr<odb::database> db_demand(open_sqlite_database<unique_ptr<odb::database> > (name));
+				odb::transaction td(db_demand->begin());
+
+				///// ---- COPY QUERY RESULTS FROM ORIGINAL DEMAND DATABASE INTO TEMP STRUCTURE ---- CAN"T HAVE 2 TRANSACTIONS OPEN AT SAME TIME.....
+				vector<shared_ptr<polaris::io::Automation_Type>> a_vec;
+				vector<shared_ptr<polaris::io::Connectivity_Type>> c_vec;
+				vector<shared_ptr<polaris::io::Fuel_Type>> f_vec;
+				vector<shared_ptr<polaris::io::Powertrain_Type>> p_vec;
+				vector<shared_ptr<polaris::io::Vehicle_Class>> v_vec;
+				vector<shared_ptr<polaris::io::Vehicle_Type>> vt_vec;
+
+				odb::result<polaris::io::Automation_Type> a_result = db_demand->query<polaris::io::Automation_Type>(odb::query<polaris::io::Automation_Type>::true_expr);
+				odb::result<polaris::io::Connectivity_Type> c_result = db_demand->query<polaris::io::Connectivity_Type>(odb::query<polaris::io::Connectivity_Type>::true_expr);
+				odb::result<polaris::io::Fuel_Type> f_result = db_demand->query<polaris::io::Fuel_Type>(odb::query<polaris::io::Fuel_Type>::true_expr);
+				odb::result<polaris::io::Powertrain_Type> p_result = db_demand->query<polaris::io::Powertrain_Type>(odb::query<polaris::io::Powertrain_Type>::true_expr);
+				odb::result<polaris::io::Vehicle_Class> v_result = db_demand->query<polaris::io::Vehicle_Class>(odb::query<polaris::io::Vehicle_Class>::true_expr);
+				odb::result<polaris::io::Vehicle_Type> vt_result = db_demand->query<polaris::io::Vehicle_Type>(odb::query<polaris::io::Vehicle_Type>::true_expr);
+
+				for (typename odb::result<polaris::io::Automation_Type>::iterator a_itr = a_result.begin(); a_itr != a_result.end(); ++a_itr) a_vec.push_back(a_itr.load());		
+				for (typename odb::result<polaris::io::Connectivity_Type>::iterator c_itr = c_result.begin(); c_itr != c_result.end(); ++c_itr) c_vec.push_back(c_itr.load());
+				for (typename odb::result<polaris::io::Fuel_Type>::iterator f_itr = f_result.begin(); f_itr != f_result.end(); ++f_itr) f_vec.push_back(f_itr.load());
+				for (typename odb::result<polaris::io::Powertrain_Type>::iterator p_itr = p_result.begin(); p_itr != p_result.end(); ++p_itr) p_vec.push_back(p_itr.load());
+				for (typename odb::result<polaris::io::Vehicle_Class>::iterator v_itr = v_result.begin(); v_itr != v_result.end(); ++v_itr) v_vec.push_back(v_itr.load());
+				for (typename odb::result<polaris::io::Vehicle_Type>::iterator vt_itr = vt_result.begin(); vt_itr != vt_result.end(); ++vt_itr) vt_vec.push_back(vt_itr.load());
+				td.commit();
+
 				unique_ptr<odb::database> db2(create_sqlite_database(results_name, polaris::io::db_inventory[2]));
 				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[2]));
 				odb::transaction t2(db2->begin());
-				t2.commit();
+				for (typename vector<shared_ptr<polaris::io::Automation_Type>>::iterator a_itr = a_vec.begin(); a_itr != a_vec.end(); ++a_itr) db2->persist(*a_itr);
+				for (typename vector<shared_ptr<polaris::io::Connectivity_Type>>::iterator c_itr = c_vec.begin(); c_itr != c_vec.end(); ++c_itr) db2->persist(*c_itr);
+				for (typename vector<shared_ptr<polaris::io::Fuel_Type>>::iterator f_itr = f_vec.begin(); f_itr != f_vec.end(); ++f_itr) db2->persist(*f_itr);
+				for (typename vector<shared_ptr<polaris::io::Powertrain_Type>>::iterator p_itr = p_vec.begin(); p_itr != p_vec.end(); ++p_itr) db2->persist(*p_itr);
+				for (typename vector<shared_ptr<polaris::io::Vehicle_Class>>::iterator v_itr = v_vec.begin(); v_itr != v_vec.end(); ++v_itr) db2->persist(*v_itr);
+				for (typename vector<shared_ptr<polaris::io::Vehicle_Type>>::iterator vt_itr = vt_vec.begin(); vt_itr != vt_vec.end(); ++vt_itr) db2->persist(*vt_itr);
+				t2.commit();		
 
 				//----------------------
 				// synthetic population database

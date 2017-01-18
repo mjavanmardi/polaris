@@ -134,6 +134,10 @@ namespace Prototypes
 			return nullptr;
 		}
 		
+		template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle(requires(VehicleItfType, check(VehicleItfType, is_pointer)))// && check_stripped_type(PersonItfType, Activity_Simulator::Person_Concepts::Is_Person)))
+		{
+			return this_component()->Get_Free_Vehicle<VehicleItfType>();
+		}
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))

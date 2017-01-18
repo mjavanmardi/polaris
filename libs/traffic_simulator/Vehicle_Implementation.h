@@ -30,6 +30,7 @@ namespace Vehicle_Components
 			m_data(bool,has_acc,NONE,NONE);
 			m_data(bool,has_connected_signal,NONE,NONE);
 			m_data(bool,has_full_automation,NONE,NONE);
+			m_data(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, db_ptr, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same), check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same));
 
             member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
             member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
@@ -38,6 +39,8 @@ namespace Vehicle_Components
 
 			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
 			{
+				this->_db_ptr = db_itr; // store db_ptr
+
 				this->ID(db_itr->getPrimaryKey());
 				this->capacity(db_itr->getVehicle_class()->getCapacity());
 				this->length((Basic_Units::Length_Variables::Meters)db_itr->getVehicle_class()->getLength());
@@ -125,11 +128,9 @@ namespace Vehicle_Components
 			m_data(float, distance_to_stop_bar, NONE, NONE);
 
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
-#ifndef EXCLUDE_DEMAND
+
 			m_prototype(Null_Prototype,typename MasterType::person_type, traveler, NONE, NONE);
-#else
-			m_prototype(Null_Prototype,typename MasterType::traveler_type, traveler, NONE, NONE);
-#endif
+
 			m_prototype(Routing_Components::Prototypes::Routing, typename MasterType::routing_type, router, NONE, NONE);
 
 			m_prototype(Vehicle_Components::Prototypes::Vehicle_Characteristics, typename MasterType::vehicle_characteristics_type, vehicle_characteristics, NONE, NONE);
@@ -189,6 +190,21 @@ namespace Vehicle_Components
 			typedef  Random_Access_Sequence< typename _Regular_Network_Interface::get_type_of(links_container), _Regular_Link_Interface3*> _Regular_Links_Container_Interface;
 
 			typedef Network_Event<typename MasterType::base_network_event_type> _Base_Event_Interface;
+
+			//bool is_autonomous()
+			//{
+			//	return this->_vehicle_characteristics->has_full_automation();
+			//}
+
+			bool available()
+			{
+				return this->_traveler == nullptr;
+			}
+
+			void Unassign_From_Person()
+			{
+				this->_traveler = nullptr;
+			}
 
 			template<typename TargetType> void load(requires(TargetType,check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
@@ -304,7 +320,10 @@ namespace Vehicle_Components
 
 				if (mp->template trajectory_size<int>() == 0)
 				{
-					THROW_EXCEPTION("Error, empty trajectory for vehicle " << _uuid);
+					((_Vehicle_Interface*)this)->template unload<NULLTYPE>();
+					((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
+					cout << "WARNING, empty trajectory for vehicle " << _uuid;
+					return;
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
@@ -825,14 +844,14 @@ namespace Vehicle_Components
 
 				float best_route_time_to_destination = 0.0f;
 
-				//if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
-				//{
+				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
+				{
 					best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids,destination_ids,path_container,cumulative_cost_container);
-				//}
-				//else
-				//{
-				//	best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_link->template uuid<int>(),destination_link->template uuid<int>(),iteration(),path_container,cumulative_cost_container);
-				//}
+				}
+				else
+				{
+					best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids,iteration(),path_container,cumulative_cost_container);
+				}
 
 
 
@@ -1036,12 +1055,25 @@ namespace Vehicle_Components
 				//}
 			}
 
+			template<typename TargetType> void initialize(TargetType characteristics, int household_id)
+			{
+				vehicle_characteristics<TargetType>(characteristics);
+
+				initialize<NT>();
+
+				// create db_pointer
+				_vehicle_ptr = make_shared<polaris::io::Vehicle>();
+				_vehicle_ptr->setHhold(household_id);
+				_vehicle_ptr->setParking(0);
+				_vehicle_ptr->setSubtype(0);
+				_vehicle_ptr->setType(_vehicle_characteristics->db_ptr<shared_ptr<typename MasterType::vehicle_type_db_rec_type>>());
+			}
 			template<typename TargetType> void initialize()
 			{
 				//_is_integrated=false;
 
-				
 				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
+				_traveler = nullptr;
 
 				///
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
@@ -1118,6 +1150,9 @@ namespace Vehicle_Components
 						_write_trajectory = true;
 					}
 				}
+
+				// create DB writing pointer
+
 			}
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination)

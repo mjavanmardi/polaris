@@ -63,6 +63,8 @@ namespace PopSyn
 			typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
 			typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 			typedef Household_Components::Prototypes::Household<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+			typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicle_collection_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicle_collection_itf)> vehicle_itf;
 			//typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
 			//typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 			typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
@@ -957,12 +959,15 @@ namespace PopSyn
 				{
 					// Start database transaction
 					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
-					odb::transaction t(db->begin());
+					//odb::transaction t(db->begin());
 				
 
 					typename regions_itf::iterator r_itr;
 					typename zones_itf::iterator z_itr;
-					typename household_collection_itf::iterator p_itr;
+					typename household_collection_itf::iterator h_itr;
+
+					vehicle_itf* veh;
+
 					int counter = 0;
 
 					// Loop through all regions
@@ -977,9 +982,11 @@ namespace PopSyn
 							
 							// loop through each synthesized person
 							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
-							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+							for (h_itr = households->begin(); h_itr != households->end(); ++h_itr)
 							{
-								household_type* hh = (household_type*)*p_itr;
+								household_type* hh = (household_type*)*h_itr;
+
+								odb::transaction t(db->begin());
 								
 								// create household record using the ACS properties
 								shared_ptr<MasterType::hh_db_rec_type> hh_rec(new MasterType::hh_db_rec_type());
@@ -1021,35 +1028,29 @@ namespace PopSyn
 									++perid;
 								}
 
-								/////// CHANGE THIS TO OUTPUT VEHICLES TO DB
-								//person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
-								//perid = 0;
-								//for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
-								//{
-								//	// update synthesizing persons counter
-								//	if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+								// CHANGE THIS TO OUTPUT VEHICLES TO DB
+								vehicle_collection_itf* vehicles = hh->Vehicles_Container<vehicle_collection_itf*>();
+								for (typename vehicle_collection_itf::iterator v_itr = vehicles->begin(); v_itr != vehicles->end(); ++v_itr)
+								{
+									veh = (vehicle_itf*)(*v_itr);
 
-								//	person_type* person = (person_type*)(*p_itr);
+									shared_ptr<MasterType::vehicle_db_rec_type> veh_rec(veh->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
+									veh_rec->setHhold(hh_rec->getHousehold());
+									//Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+									//Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
 
-								//	shared_ptr<MasterType::person_db_rec_type> per_rec(new MasterType::person_db_rec_type());
-								//	per_rec->setId(perid);
-								//	per_rec->setHousehold(hh_rec);
-								//	Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
-								//	Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+									//push to database
+									db->persist(veh_rec);
+									counter++;
+								}
 
-								//	//push to database
-								//	db->persist(per_rec);
-								//	counter++;
-								//	++perid;
-								//}
+								t.commit();
 
 								++uuid;
-								++perid;
-
 							}
 						}
 					}
-					t.commit();
+					//t.commit();
 				}
 				catch (odb::sqlite::database_exception ex)
 				{

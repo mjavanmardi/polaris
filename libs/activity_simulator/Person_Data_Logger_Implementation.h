@@ -276,28 +276,6 @@ namespace Person_Components
 
 					Push_To_Demand_Database<TargetType>(act_record, is_executed);
 
-					//movement_itf* move = act->template movement_plan<movement_itf*>();
-					//zone_itf* orig = move->template origin<location_itf*>()->template zone<zone_itf*>();
-					//zone_itf* dest = move->template destination<location_itf*>()->template zone<zone_itf*>();
-					//planner_itf* planner = act->template Parent_Planner<planner_itf*>();
-					//person_itf* person = planner->template Parent_Person<person_itf*>();
-					//zone_itf* home = person->template Home_Location<zone_itf*>();
-					//int O, D, H;
-					//O = orig->template uuid<int>();
-					//D = dest->template uuid<int>();
-					//H = home->template uuid<int>();
-					//if(is_external_internal_trip(O,D,H)) 
-					//{
-					//	//int new_origin = get_nearest_external_location<zone_itf*>(orig);
-					//	//Push_To_Demand_Database<TargetType>(act_record, new_origin);
-					//	Push_To_Demand_Database<TargetType>(act_record);
-					//}
-					//else if (is_internal_external_trip(O,D,H))
-					//{
-					//	//int new_destination = get_nearest_external_location<zone_itf*>(dest);
-					//	//Push_To_Demand_Database<TargetType>(act_record, -1, new_destination);
-					//	Push_To_Demand_Database<TargetType>(act_record);
-					//}
 				}
 
 				if (!is_executed) return;
@@ -635,6 +613,8 @@ namespace Person_Components
 				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
 				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
 
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
@@ -661,7 +641,11 @@ namespace Person_Components
 					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
 					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
 					trip_rec.setHhold(hh->template uuid<int>());
-					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec.setMode(0);
+					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+					{
+						trip_rec.setMode(0);
+						trip_rec.setVehicle(person->vehicle<vehicle_itf*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+					}
 					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
 					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
 					else trip_rec.setMode(3);

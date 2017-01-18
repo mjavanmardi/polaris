@@ -65,6 +65,8 @@ namespace Person_Components
 			m_data(Types::TELECOMMUTE_FREQUENCY, Telecommute_Frequency, NONE, NONE);
 			
 			typedef Prototypes::Person<type_of(Parent_Person)> person_itf;
+			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+			typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
@@ -205,14 +207,14 @@ namespace Person_Components
 				//else
 				//{
 					// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
-					float time_range_to_search = 20.0;
+					float time_range_to_search = 15.0;
 					if (properties->Age<int>() > 10) time_range_to_search += 10;
 					if (properties->Age<int>() > 18) time_range_to_search += 15;
 
 					std::vector<zone_interface*> zones_near;
 					_Parent_Person->network_reference<network_reference_interface*>()->template Get_Locations_Within_Range<zone_interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, zone_interface*>(zones_near, orig, 480.0, 0, time_range_to_search, SOV, true);
 
-					int school_locations = 0;
+					float school_locations = 0;
 					//while (temp_zones.size() == 0)
 					//{
 						//for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
@@ -365,13 +367,21 @@ namespace Person_Components
 			// VOTT adjustment
 			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
 			{
-				vehicle_interface* veh = _Parent_Person->template vehicle<vehicle_interface*>();
-				if (veh->template is_autonomous<bool>())
+				vehicles_container_itf* vehicles = _Parent_Person->Household<household_itf*>()->Vehicles_Container<vehicles_container_itf*>();
+
+				for (vehicles_container_itf::iterator v_itr = vehicles->begin(); v_itr != vehicles->end(); ++v_itr)
 				{
-					TargetType adj = ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
-					return adj;
+					if ((*v_itr)->is_autonomous<bool>()) return ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
 				}
-				else return 1.0;
+				return 1.0;
+
+				//vehicle_interface* veh = _Parent_Person->template vehicle<vehicle_interface*>();
+				//if (veh->template is_autonomous<bool>())
+				//{
+				//	TargetType adj = ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
+				//	return adj;
+				//}
+				//else return 1.0;
 			}
 		};
 		template<typename MasterType, typename InheritanceList> int* ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count_Array;

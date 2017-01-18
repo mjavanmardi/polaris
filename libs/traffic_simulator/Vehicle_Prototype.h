@@ -96,6 +96,7 @@ namespace Vehicle_Components
 		prototype struct Vehicle_Characteristics ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
+			accessor(db_ptr,NONE,NONE);
 			accessor(vehicle_class,NONE,NONE);
 			accessor(powertrain_type, NONE, NONE);
 			accessor(fuel_type, NONE, NONE);
@@ -145,6 +146,11 @@ namespace Vehicle_Components
 			accessor(suggested_action, NONE, NONE);
 
 			typed_accessor(bool,write_trajectory);
+
+			bool available()
+			{
+				return this_component()->available();
+			}
 
 			template<typename TargetType> void advance()
 			{
@@ -197,9 +203,23 @@ namespace Vehicle_Components
 			{
 				this_component()->template initialize< TargetType>();
 			}
+			template<typename TargetType> void initialize(TargetType characteristics, int hh_id)
+			{
+				this_component()->initialize(characteristics, hh_id);
+			}
 			template<typename TargetType> void initialize(int num_vehicles, float* data)
 			{
 				this_component()->template initialize< TargetType>(num_vehicles,data);
+			}
+
+			template<typename PersonItfType> void Assign_To_Person(PersonItfType person_ptr, requires(PersonItfType, check(PersonItfType, is_pointer)))
+			{
+				this->traveler(person_ptr);
+				person_ptr->vehicle(this);
+			}
+			void Unassign_From_Person()
+			{
+				this_component()->Unassign_From_Person();
 			}
 
 			template<typename TargetType> void update_eta()

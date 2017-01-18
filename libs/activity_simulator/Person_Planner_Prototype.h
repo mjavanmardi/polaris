@@ -106,88 +106,97 @@ namespace Person_Components
 				
 				typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+
+				typedef Random_Access_Sequence< typename household_itf::get_type_of(Vehicles_Container)> _Vehicles_Container_Interface;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename parent_itf::get_type_of(vehicle)> _Vehicle_Interface;
 				
-				
+				typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
+
+				typedef Activity_Components::Prototypes::Activity_Planner< typename Movement_Plan::get_type_of(destination_activity_reference)> Activity_Plan;
+
 				parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
 				//%%%RLW - check this out: parent->parent_itf::template Household<int>();
-				parent->parent_itf::template Household<household_itf*>();
-				household_itf* household = nullptr;
+				//parent->parent_itf::template Household<household_itf*>();
+				household_itf* household = parent->Household<household_itf*>();
 
 				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
 				_Movement_Faculty_Interface* movement_faculty = parent->template Moving_Faculty<_Movement_Faculty_Interface*>();
 
-				
-				// Get reference to vehicle, and add current movement plan to it for routing
-				typedef Vehicle_Components::Prototypes::Vehicle<typename parent_itf::get_type_of(vehicle)> vehicle_itf;
-				vehicle_itf* vehicle = parent->template vehicle<vehicle_itf*>();
+
 
 				// Get reference to movement plans
-				typedef Back_Insertion_Sequence<typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
-				
-				typedef Activity_Components::Prototypes::Activity_Planner< typename Movement_Plan::get_type_of(destination_activity_reference)> Activity_Plan;
 				Movement_Plans* movements = parent->template Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans*>();
 				typename Movement_Plans::iterator move_itr = movements->begin();
 
 				while (move_itr != movements->end())
 				{
 					Movement_Plan* move = *move_itr;
+					Activity_Plan* act = move->destination_activity_reference<Activity_Plan*>();
 
+					//=====================================================================================================================================================
 					// if movement happens in the current planning increment, execute movement
+					//=====================================================================================================================================================
 					if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.template Current_Time<Simulation_Timestep_Increment>() &&
 						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
-						//if (parent->uuid<int>() == 3 && household->uuid<int>() == 946)
-						//{
-						//	DEBUG_MESSAGE("Debugging...");
-						//	parent->Display_Activities(cout);
-						//}
-				
-						// make sure vehicle is not already being simulated, skip movement if it is
-						if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
+						//===============================================================================
+						// IF IT IS AN SOV MOVEMENT - do vehicle selection
+						if (act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::SOV)
 						{
-							// increment the zone origin/destination counters based on movement plan
-							_Activity_Location_Interface* orig = move->template origin<_Activity_Location_Interface*>();
-							_Activity_Location_Interface* dest = move->template destination<_Activity_Location_Interface*>();
-							_Zone_Interface* orig_zone = orig->template zone<_Zone_Interface*>();
-							_Zone_Interface* dest_zone = dest->template zone<_Zone_Interface*>();
-
-							// if origin or destination zones are unavailable, abort trip
-							if (orig_zone->template zone_is_available<bool>()== false || dest_zone->template zone_is_available<bool>() == false)
+							_Vehicle_Interface* vehicle = parent->vehicle<_Vehicle_Interface*>();					// get current vehicle (s.b. nullptr if starting at home
+							if (vehicle == nullptr) vehicle = household->Get_Free_Vehicle<_Vehicle_Interface*>();	// if no current assigned vehicle, get a new one from the household vehicle list
+							if (vehicle != nullptr)
 							{
-								cout << endl << "zone is unavailable";
-								typename Movement_Plans::iterator prev = move_itr++;
-								movements->erase(prev);
-								return;
+								vehicle->Assign_To_Person(parent);								// if none available, throw error - should not get here
+								// make sure vehicle is not already being simulated, skip movement if it is
+								if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
+								{
+									vehicle->template movement_plan<Movement_Plan*>(move);
+								}
+								else
+								{
+									act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
+									continue;
+								}
 							}
-
-
-							// increment counters for display
-							orig_zone->template production_count<int&>()++;
-							dest_zone->template attraction_count<int&>()++;
-
-
-							// if null trip, print out and remove from schedule
-							//if (orig->template internal_id<int>() == dest->template internal_id<int>())
-							//{
-							//	typename Movement_Plans::iterator prev = move_itr++;
-							//	movements->erase(prev);
-							//	return;
-							//}
-
-							// if already moving, skip movement
-							if (movement_faculty->template Movement_Scheduled<bool>() == true)
+							else
 							{
-								//Movement_Plan* cur_move = movement_faculty->template Movement<Movement_Plan*>();
-								//Activity_Plan* cur_act = cur_move->template destination_activity_reference<Activity_Plan*>();
-								//THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.   " << "Act in progress: "<<cur_act->template Activity_Plan_ID<int>()<<", departure time="<<cur_move->template departed_time<Time_Seconds>()<<", expected start time=" << cur_act->template Start_Time<Time_Seconds>()<<", cur trajactory position: " << cur_move->template current_trajectory_position<int>() <<" of " << cur_move->template trajectory_size<int>()<<", mode="<<cur_act->template Mode<int>()<<endl);
-								typename Movement_Plans::iterator prev = move_itr++;
-								//movements->erase(prev);
-								return;
+								int test = 1; //THROW_EXCEPTION("NO VEHICLES AVAILABLE");
+								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV); // no vehicles available, make it an HOV
 							}
-							vehicle->template movement_plan<Movement_Plan*>(move);
-							movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment,Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(),move);
+							
 						}
+
+						// increment the zone origin/destination counters based on movement plan
+						_Activity_Location_Interface* orig = move->template origin<_Activity_Location_Interface*>();
+						_Activity_Location_Interface* dest = move->template destination<_Activity_Location_Interface*>();
+						_Zone_Interface* orig_zone = orig->template zone<_Zone_Interface*>();
+						_Zone_Interface* dest_zone = dest->template zone<_Zone_Interface*>();
+
+						// if origin or destination zones are unavailable, abort trip
+						if (orig_zone->template zone_is_available<bool>()== false || dest_zone->template zone_is_available<bool>() == false)
+						{
+							cout << endl << "zone is unavailable";
+							typename Movement_Plans::iterator prev = move_itr++;
+							//movements->erase(prev);
+							return;
+						}
+
+
+						// increment counters for display
+						orig_zone->template production_count<int&>()++;
+						dest_zone->template attraction_count<int&>()++;
+
+						// if already moving, skip movement
+						if (movement_faculty->template Movement_Scheduled<bool>() == true)
+						{
+							typename Movement_Plans::iterator prev = move_itr++;
+							//movements->erase(prev);
+							return;
+						}
+							
+						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment,Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(),move);
 	
 						//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
 						typename Movement_Plans::iterator prev = move_itr++;
@@ -214,6 +223,7 @@ namespace Person_Components
 					WHILE_PRINT("movement planning event while loop");
 				}
 			}
+
 
 			//=========================================================================================================
 			// Member functions

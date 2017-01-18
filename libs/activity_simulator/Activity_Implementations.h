@@ -288,7 +288,7 @@ namespace Activity_Components
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 				move->template network<_network_itf*>(network);
-				move->traveler_id(person->template vehicle<_vehicle_Itf*>()->template uuid<int>());
+				move->traveler_id(person->template uuid<int>());
 			
 				// Get the origin and destination locations
 				_activity_location_itf* orig;

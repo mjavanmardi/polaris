@@ -50,6 +50,8 @@ namespace Household_Components
 			
 			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
+
+			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(Vehicles_Container_type)> vehicle_interface;
 			
 
 			//=======================================================================================================================================================================
@@ -93,6 +95,15 @@ namespace Household_Components
 			template<typename TargetType> void Set_Home_Location()
 			{
 				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
+			}
+
+			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
+			{
+				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
+				{
+					if ((*v_itr)->available()) return *v_itr;
+				}
+				return nullptr;
 			}
 
 		};
