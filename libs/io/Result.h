@@ -18,7 +18,9 @@ class link_travel;
 class Path;
 class Link_Probability;
 class LinkMOE;
+class RealtimeLinkMOE;
 class TurnMOE;
+class RealtimeTurnMOE;
 
 
 #pragma db value
@@ -501,6 +503,9 @@ private:
 	float num_vehicles_in_link;
 };
 #pragma db object
+class RealtimeLinkMOE : public LinkMOE
+{};
+#pragma db object
 class TurnMOE
 {
 public:
@@ -555,6 +560,9 @@ private:
 	float outbound_turn_travel_time;
 	float turn_flow_rate;
 };
+#pragma db object
+class RealtimeTurnMOE : public TurnMOE
+{};
 }//end of io namespace
 }//end of polaris namespace
 #endif // IOResult
