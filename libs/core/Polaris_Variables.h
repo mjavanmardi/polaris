@@ -75,7 +75,7 @@ namespace Area_Variables
 	polaris_variable(Square_Feet, length_data_type, Length_tag, Area_tag, Feet_tag);
 	polaris_variable(Square_Miles, length_data_type, Length_tag, Area_tag, Miles_tag);
 	polaris_variable(Square_Centimeters, length_data_type, Length_tag, Area_tag, Centimeters_tag);
-	polaris_variable(Square_Meters, length_data_type, Length_tag, Area_tag,  Meters_tag);
+	polaris_variable(Square_Meters, length_data_type, Length_tag, Area_tag, Meters_tag);
 	polaris_variable(Square_Kilometers, length_data_type, Length_tag, Area_tag, Kilometers_tag);
 }
 

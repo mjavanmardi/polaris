@@ -619,10 +619,6 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
 
 				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
-				else
-				{
-					if (time_dependent_routing<bool>())	THROW_EXCEPTION("ERROR: time_dependent_routing is disabled in current polaris-Master branch. Switch to polaris-R1/R2 development branches to test time-dependent routing.");
-				}
 				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
 				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1500.0);
 				

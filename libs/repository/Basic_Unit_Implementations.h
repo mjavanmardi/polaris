@@ -122,7 +122,7 @@ static Basic_Units::Prototypes::Length<Basic_Length> Length_Converter;
 static Basic_Units::Prototypes::Area<Basic_Area> Area_Converter;
 static Basic_Units::Prototypes::Speed<Basic_Speed> Speed_Converter;
 
-template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Time_Value)))
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Time_Value) && !check(Output_Unit_Type,Basic_Units::Concepts::Is_Speed_Value)))
 {
 	return Time_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
@@ -130,7 +130,7 @@ template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type C
 {
 	return Currency_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
-template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Length_Value)))
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Length_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Area_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Speed_Value)))
 {
 	return Length_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
