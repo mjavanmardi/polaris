@@ -93,8 +93,8 @@ namespace Household_Components
 			//static m_container(std::unordered_map<SynthesisZoneType, Veh_Type>, vehicle_distribution_container, NONE, NONE);
 			typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type> vehicle_characteristics_interface;
 			typedef pair<vehicle_characteristics_interface*, float> vehicle_probability_pair_type;
-			typedef pair<double, vector<vehicle_probability_pair_type>> vehicle_distribution_pair_type;
-			typedef std::unordered_map<double, vector<vehicle_probability_pair_type>> vehicle_distribution_container_type;
+			typedef pair<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_pair_type;
+			typedef std::unordered_map<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_container_type;
 			static m_container(vehicle_distribution_container_type, vehicle_distribution_container, NONE, NONE);
 
 
@@ -111,7 +111,7 @@ namespace Household_Components
 				this->_Parent_Household->network_reference<_Network_Interface*>();
 				household_static_properties_itf* household_properties = _Parent_Household->Static_Properties<household_static_properties_itf*>();
 
-				int lookup_id = census_zone->ID<int>();
+				long long lookup_id = census_zone->ID<long long>();
 
 				// create a vehicle for num vehicles in the household
 				for (int i = 0; i < household_properties->Number_of_vehicles<int>(); ++i)
@@ -122,27 +122,27 @@ namespace Household_Components
 					// home census tract could not be found in vehicle type distribution file!
 					if (itr == _vehicle_distribution_container.end())
 					{
-						THROW_EXCEPTION("ERROR: home census tract could not be found in vehicle type distribution file!");
+						cout << "WARNING: home census tract '"<< lookup_id<< "' could not be found in vehicle type distribution file!"<<endl;
+						itr = _vehicle_distribution_container.begin();
 					}
-					else
-					{												
-						//_Vehicle_Types_Interface veh_types = (*itr)->second;  //.push_back(vehicle_probability_pair_type(veh_char, prob));
-						double sumProb = 0;
-						for (auto x = (*itr).second.begin(); x != (*itr).second.end(); x++)						
+											
+					//_Vehicle_Types_Interface veh_types = (*itr)->second;  //.push_back(vehicle_probability_pair_type(veh_char, prob));
+					double sumProb = 0;
+					for (auto x = (*itr).second.begin(); x != (*itr).second.end(); x++)						
+					{
+						sumProb += x->second;
+						if (sumProb >= rand)
 						{
-							sumProb += x->second;
-							if (sumProb >= rand)
-							{
-								// Allocate a new vehicle
-								_Vehicle_Interface* veh = (_Vehicle_Interface*)Allocate<_Vehicle_type>();
-								veh->initialize(x->first, _Parent_Household->uuid<int>());
-								veh->is_integrated(true);
-								// Push to household vehicle container
-								vehicles->push_back(veh);
-								break;
-							}
-						}							
-					}
+							// Allocate a new vehicle
+							_Vehicle_Interface* veh = (_Vehicle_Interface*)Allocate<_Vehicle_type>();
+							veh->initialize(x->first, _Parent_Household->uuid<int>());
+							veh->is_integrated(true);
+							// Push to household vehicle container
+							vehicles->push_back(veh);
+							break;
+						}
+					}							
+					
 
 					/*
 					// 1. Draw a random set of vehicle properties from your input file for the current zone
@@ -182,7 +182,7 @@ namespace Household_Components
 				if (!data_file.is_open()) cout << endl << "Could not open 'vehicle_distribution.txt' in the working directory.  Check to make sure the vehicle_distribution.txt file exists.";
 
 				string line;
-				double census_tract;
+				long long census_tract;
 				float prob ;
 				string veh_class_txt, pt_type_txt;
 				string strCensusTract;
@@ -197,7 +197,7 @@ namespace Household_Components
 					std::stringstream   linestream(line);
 					//linestream >> strCensusTract;
 					std::getline(linestream, strCensusTract, '\t');
-					census_tract = stod(strCensusTract);
+					census_tract = stoll(strCensusTract);
 					std::getline(linestream, veh_class_txt, '\t');
 					std::getline(linestream, pt_type_txt, '\t');
 					linestream >> prob;
@@ -254,7 +254,7 @@ namespace Household_Components
 		};
 				
 		template<typename MasterType, typename InheritanceList> typename Vehicle_Chooser_Implementation <MasterType, InheritanceList>::type_of(is_initialized) Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_is_initialized = false;		
-		template<typename MasterType, typename InheritanceList> std::unordered_map<double, vector<pair<Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type>*,float>>> Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_vehicle_distribution_container;		
+		template<typename MasterType, typename InheritanceList> std::unordered_map<long long, vector<pair<Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type>*,float>>> Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_vehicle_distribution_container;		
 	}
 }
 

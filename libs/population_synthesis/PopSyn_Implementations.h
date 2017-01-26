@@ -958,7 +958,8 @@ namespace PopSyn
 				try
 				{
 					// Start database transaction
-					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
+					//unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
+					shared_ptr<odb::database> db = Get_Output_DB<NT>();
 					//odb::transaction t(db->begin());
 				
 
@@ -979,6 +980,8 @@ namespace PopSyn
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_itf* zone = z_itr->second;
+
+							odb::transaction t(db->begin());
 							
 							// loop through each synthesized person
 							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
@@ -986,7 +989,7 @@ namespace PopSyn
 							{
 								household_type* hh = (household_type*)*h_itr;
 
-								odb::transaction t(db->begin());
+								
 								
 								// create household record using the ACS properties
 								shared_ptr<MasterType::hh_db_rec_type> hh_rec(new MasterType::hh_db_rec_type());
@@ -1044,10 +1047,10 @@ namespace PopSyn
 									counter++;
 								}
 
-								t.commit();
-
 								++uuid;
 							}
+
+							t.commit();
 						}
 					}
 					//t.commit();
@@ -1058,6 +1061,14 @@ namespace PopSyn
 				}
 
 				cout << endl<<"Results output runtime (s): " << this->timer<Counter&>().Stop()/1000.0<<endl;
+			}
+			template<typename T> shared_ptr<odb::database> Get_Output_DB(requires(T, check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				return this->_scenario_reference->demand_db_ptr<shared_ptr<odb::database>>();
+			}
+			template<typename T> shared_ptr<odb::database> Get_Output_DB(requires(T, !check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				return this->_scenario_reference->popsyn_db_ptr<shared_ptr<odb::database>>();
 			}
 			template<typename T> string Get_Output_DB_Name(requires(T,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{

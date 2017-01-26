@@ -52,7 +52,7 @@ namespace Network_Components
 			typename _Links_Container_Interface::iterator link_itr;
 
 			// output link moe to database
-			shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
+			shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template demand_db_ptr<shared_ptr<odb::database>>();
 			odb::transaction t(db_ptr->begin());
 
 			
@@ -82,7 +82,7 @@ namespace Network_Components
 							//int origin_loading_time = trajectory_unit->template enter_time<int>();
 							//int loading_delay = origin_loading_time - entry_time;
 
-							path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getVehicle_Id());
+							path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 							//path_db_record->setOrigin_Zone(movement_plan->template origin<_Zone_Interface*>()->template uuid<int>());
 							//path_db_record->setDestination_Zone(movement_plan->template destination<_Zone_Interface*>()->template uuid<int>());
 							path_db_record->setOrigin_Activity_Location(movement_plan->template origin<_Activity_Location_Interface*>()->template uuid<int>());
@@ -120,7 +120,7 @@ namespace Network_Components
 									path_link_record.setEntering_Time(route_link_enter_time);
 									path_link_record.setTravel_Time(route_link_travel_time);
 									path_link_record.setDelayed_Time(route_link_delayed_time);
-									path_link_record.setExit_Position(start += route_link->template length<float>());
+									path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
 
 									path_db_record->setLink(path_link_record);
 
