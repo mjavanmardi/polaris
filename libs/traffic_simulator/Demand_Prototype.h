@@ -117,6 +117,9 @@ namespace Demand_Components
 				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
+				typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
+
 				typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
 				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
@@ -258,7 +261,7 @@ namespace Demand_Components
 					vehicle->template router<_Routing_Interface*>(router);
 					vehicle->template is_integrated<bool>(db_itr->getType());
 					vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());
-					vehicle->template initialize<NT>();
+					vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), traveler_id_counter);
 					vehicle->is_integrated(false);
 
 					traveler->template uuid<int>(traveler_id_counter);
@@ -293,11 +296,26 @@ namespace Demand_Components
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
+					
+
 					//if(traveler_id_counter%10000==0)
 					//{
 					//	cout << "\t" << traveler_id_counter << endl;
 					//}
 				}
+				t.commit();
+
+				// write vehicles to output demand database
+				shared_ptr<odb::database> out_db_ptr = scenario->template demand_db_ptr<shared_ptr<odb::database>>();
+				transaction t2(out_db_ptr->begin());
+
+				for (typename _Vehicles_Container_Interface::iterator v_itr = vehicles_container<_Vehicles_Container_Interface&>().begin(); v_itr != vehicles_container<_Vehicles_Container_Interface&>().end(); ++v_itr)
+				{
+					shared_ptr<MasterType::vehicle_db_rec_type> veh_rec((*v_itr)->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
+					out_db_ptr->persist(veh_rec);
+					counter++;
+				}
+				t2.commit();
 				}
 				catch (exception& e)
 				{

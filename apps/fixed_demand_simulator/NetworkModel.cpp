@@ -52,6 +52,7 @@ struct MasterType
 	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
 #endif
 
 	//==============================================================================================
@@ -331,6 +332,7 @@ void run_with_input_from_db(const char* scenario_filename)
 	demand->template scenario_reference<_Scenario_Interface*>(scenario);
 	demand->template network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
+	demand->read_vehicle_type_data<NT>();
 	demand->template read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
