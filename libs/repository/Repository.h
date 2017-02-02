@@ -6,6 +6,7 @@
 #pragma warning(disable : 4305)
 #pragma warning(disable : 4503)
 #pragma warning(disable : 4800)
+#pragma warning(disable : 4838)
 
 #include "Basic_Unit_Implementations.h"
 #include "Choice_Model_Implementations.h"

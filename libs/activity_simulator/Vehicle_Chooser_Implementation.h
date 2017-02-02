@@ -122,7 +122,7 @@ namespace Household_Components
 					// home census tract could not be found in vehicle type distribution file!
 					if (itr == _vehicle_distribution_container.end())
 					{
-						cout << "WARNING: home census tract '"<< lookup_id<< "' could not be found in vehicle type distribution file!"<<endl;
+						THROW_WARNING("WARNING: home census tract '"<< lookup_id<< "' could not be found in vehicle type distribution file!"<<endl);
 						itr = _vehicle_distribution_container.begin();
 					}
 											

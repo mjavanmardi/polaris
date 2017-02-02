@@ -179,7 +179,8 @@ namespace polaris
 	///		includes a tagless check on whether the implementation has corresponding accessors
 	///----------------------------------------------------------------------------------------------------
 
-	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	// THIS ONE DOESNT CHECK IF THE M_ EXISTS IN THE IMPLEMENTATION
+	#define basic_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
 			template<typename TargetType>\
 			void NAME(TargetType set_value)\
@@ -194,8 +195,8 @@ namespace polaris
 				return this_component()->template NAME<TargetType>();\
 			}\
 
-
-	#define required_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	// THIS CHECK WAS MICHAEL'S NEW IMPLEMENTATION - THE NAMED MEMBER sTUFF DOESN"T WORK
+	#define tagless_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
 			template<typename TypeChecked>\
 			struct NAME##_set_check\
@@ -462,10 +463,10 @@ namespace polaris
 
 	///----------------------------------------------------------------------------------------------------
 	/// tag_based_accessor - implements the standard get / set accessors
-	///		includes a tag-based check on whether the implementation has corresponding accessors
+	///		includes a tag-based check on whether the implementation has corresponding accessors - This is the only one which works currently
 	///----------------------------------------------------------------------------------------------------
 
-	#define tag_based_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
 			template<typename T>\
 			struct NAME##_set_check\
@@ -482,7 +483,7 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
-				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
+				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for \"" #NAME "\" exists in implementation. Check to make sure data member is defined using m_data, m_prototype, m_container, etc. ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
 			}\
 			template<typename T>\
@@ -500,7 +501,7 @@ namespace polaris
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
-				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
+				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for \"" #NAME "\" exists in implementation. Check to make sure data member is defined using m_data, m_prototype, m_container, etc. ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
 			}\
 
@@ -552,7 +553,8 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
-
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
 	///----------------------------------------------------------------------------------------------------
 	/// t_* - implements get / set and member placement which explicitly access stated value
 	///		includes a tagless check on whether the implementation has corresponding accessors
@@ -733,9 +735,11 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
 
 
-       #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
+    #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
 	   define_get_set_exists_check(MEMBER_COMPONENT_NAME,get_##MEMBER_COMPONENT_NAME##_##MEMBER_COMPONENT_FEATURE, set_##MEMBER_COMPONENT_NAME##_##MEMBER_COMPONENT_FEATURE);\
        template<typename TargetType>\
        TargetType FEATURE_NAME()\
@@ -754,7 +758,7 @@ namespace polaris
        tag_getter_as_available(FEATURE_NAME);\
        tag_setter_as_available(FEATURE_NAME);
 
-       #define member_component_and_feature_accessor(FEATURE_NAME, MEMBER_COMPONENT_FEATURE_TO_ACCESS, MEMBER_COMPONENT_PROTOTYPE, MEMBER_COMPONENT_TYPE)\
+    #define member_component_and_feature_accessor(FEATURE_NAME, MEMBER_COMPONENT_FEATURE_TO_ACCESS, MEMBER_COMPONENT_PROTOTYPE, MEMBER_COMPONENT_TYPE)\
        m_data(MEMBER_COMPONENT_TYPE,_##FEATURE_NAME,NONE,NONE);\
        member_component_feature(FEATURE_NAME,_##FEATURE_NAME,MEMBER_COMPONENT_FEATURE_TO_ACCESS,MEMBER_COMPONENT_PROTOTYPE);
 
