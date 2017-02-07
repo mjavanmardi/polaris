@@ -279,6 +279,29 @@ int main(int argc,char** argv)
 	}
 
 
+	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
+	_global_scenario = scenario;
+
+	
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+
+
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -286,20 +309,12 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
+	cout << "allocating data structures..." << endl;
+
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
 	string output_dir_name = "";
-
-	GLOBALS::Normal_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Initialize();
-
-	cout << "allocating data structures..." <<endl;	
-
-
-	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
-	_global_scenario = scenario;
 
 	typedef Network<typename MasterType::network_type> _Network_Interface;
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
@@ -418,20 +433,7 @@ int main(int argc,char** argv)
 	#pragma endregion
 	
 
-	//==================================================================================================================================
-	// Initialize global randon number generators - if seed set to zero or left blank use system time
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	int seed = scenario->iseed<int>();
-	if (seed != 0)
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
-	}
-	else
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
-	}
+
 
 
 	//==================================================================================================================================

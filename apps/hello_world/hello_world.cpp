@@ -18,8 +18,16 @@ prototype struct Agent
 		this_component()->initialize(start_time);
 	}
 	accessor(name, true, true);
-	accessor(my_subiteration, true, true);
+	accessor(my_subiteration,true,true);
 	accessor(money, true, true);
+	accessor(my_parent, true, true);
+};
+
+prototype struct Link
+{
+	tag_as_prototype;
+	accessor(name, NONE, NONE);
+	accessor(agent, NONE, NONE);
 };
 
 implementation struct base_agent_impl : public Polaris_Component<MasterType, INHERIT(base_agent_impl),Execution_Object>
@@ -42,11 +50,11 @@ implementation struct base_agent_impl : public Polaris_Component<MasterType, INH
 
 	m_data(string, name, true, true);
 	m_data(int, my_subiteration, true, true);
-	
-
+	//m_data(int, money,true,true);
 };
 implementation struct other_agent_impl : public base_agent_impl<MasterType, INHERIT(other_agent_impl)>
 {
+	m_data(float, money, true, true);
 	void initialize(int start_time)
 	{
 		_name = "Other";
@@ -64,7 +72,7 @@ implementation struct other_agent_impl : public base_agent_impl<MasterType, INHE
         cout << "Hello world, I am " << this->template name<string>() << " this is iteration " << iteration() << ", subiteration " << sub_iteration() << endl;
 	}
 
-	m_data(int, money, true, true);
+	m_prototype(Agent, typename MasterType::base_agent_type, my_parent, true, true);
 };
 
 implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(link_impl), Execution_Object>
@@ -75,6 +83,7 @@ implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(l
 		agent_itf* my_agent = (agent_itf*)Allocate<typename MasterType::agent_type>();
 		my_agent->initialize(2, 2);
 		this->the_agent(my_agent);
+		my_agent->money<float>(3.0f);
 
         this->template Load_Event<link_impl>(&Do_stuff, start_time, 0);
 	}
@@ -88,8 +97,10 @@ implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(l
 	void Do_the_stuff()
 	{
         cout << "I am link. My agent has " << this->_the_agent->template money<int>() << " money." << endl;
+		this->_the_agent->my_parent<void*>();
 	}
 
+	m_data(string, name, true, true);
 	m_prototype(Agent, typename MasterType::agent_type, the_agent, true, true);
 };
 
@@ -97,7 +108,7 @@ struct MasterType
 {
 	typedef base_agent_impl<MasterType> agent_type;
 	typedef link_impl<MasterType> link_type;
-
+	typedef base_agent_impl<MasterType> base_agent_type;
 };
 
 int main(int argc, char* argv[])

@@ -708,14 +708,14 @@ namespace Basic_Units
 			// Time value accessors for:
 			//------------------------------------------------------------------------------------------------
 			/// Time component accessor - returns the requested portion of the current time
-			accessor(Time_Component, NONE, NONE);
-			/// Display the time
-			template<typename TargetType> void Write()
-			{
-				//cout <<"Total Seconds: "<<pthis->Total_Seconds<  TargetType>()<<endl;
-				cout << "Day "<< this->Time_Component<Time_Days>()<<":  ";
-				cout << this->Time_Component<Time_Hours>()<<":"<<this->Time_Component<Time_Minutes>()<<":"<<this->Time_Component<Time_Seconds>()<<"."<< this->Time_Component<Time_DRSeconds>();
-			}
+			//accessor(Time_Component, NONE, NONE);
+			///// Display the time
+			//template<typename TargetType> void Write()
+			//{
+			//	//cout <<"Total Seconds: "<<pthis->Total_Seconds<  TargetType>()<<endl;
+			//	cout << "Day "<< this->Time_Component<Time_Days>()<<":  ";
+			//	cout << this->Time_Component<Time_Hours>()<<":"<<this->Time_Component<Time_Minutes>()<<":"<<this->Time_Component<Time_Seconds>()<<"."<< this->Time_Component<Time_DRSeconds>();
+			//}
 		};
 
 		prototype struct Rate : protected Time<ComponentType>

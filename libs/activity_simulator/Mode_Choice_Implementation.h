@@ -17,19 +17,11 @@ namespace Person_Components
 
 
 			// data members
-			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
-			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, current_activity, NONE, NONE );
-			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, previous_activity, NONE, NONE );
-			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, next_activity, NONE, NONE );
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, destination, NONE, NONE );
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, previous_location, NONE, NONE );
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, next_location, NONE, NONE );
+			m_prototype(Prototypes::Mode_Chooser, typename MasterType::person_mode_chooser_type, Mode_Chooser, NONE, NONE);
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode_type, NONE, NONE);
-			m_data(bool, home_based, NONE, NONE);
-			m_data(bool, auto_available, NONE, NONE);
-			m_data(bool, to_CBD, NONE, NONE);
 
 			// PARAMETER DECLARATIONS
+			#pragma region static parameters
 			static m_data(float, BHW_IVTT, NONE, NONE);
 			static m_data(float, BHW_CBD_IVTT, NONE, NONE);
 			static m_data(float, BHO_IVTT, NONE, NONE);
@@ -71,16 +63,19 @@ namespace Person_Components
 			static m_data(float, BHO_CBD_BIAS, NONE, NONE);
 			static m_data(float, BNH_BIAS, NONE, NONE);
 			static m_data(float, BNH_CBD_BIAS, NONE, NONE);
-
+			#pragma endregion
 
 			//====================================================================================================================================
 			// Interface definitions
-			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person_Planner<typename type_of(Mode_Chooser)::type_of(Parent_Planner)> planner_itf;
+			typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_properties_itf;
+			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_static_properties_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_itf;
 			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
-			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
-			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
+			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> _Scenario_Interface;
+			typedef Network_Components::Prototypes::Network< typename person_itf::get_type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
@@ -114,25 +109,27 @@ namespace Person_Components
 				}
 				else
 				{
-					// Determine if the trip is from home
-					person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-					if (_previous_location == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) _home_based=true;
-					else _home_based = false;
+					utility = this->template Calculate_Utility_For_Known_Location<double>();
 
-					// Determine if the trip destination is known, and if it is destined for the CBD
-					if (this->_current_activity->template Location_Is_Planned<bool>())
-					{
-						_Zone_Interface* dest_zone = this->_destination->template zone<_Zone_Interface*>();
-						if (dest_zone->template uuid<int>() < 88) _to_CBD = true;
-						else _to_CBD = false;
-						
-						utility = this->template Calculate_Utility_For_Known_Location<double>();
-					}
-					else 
-					{
-						_to_CBD = false;
-						utility = this->template Calculate_Utility_For_Unknown_Location<double>();
-					}
+					//// Determine if the trip is from home
+					//person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+					//if (_previous_location == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) _home_based=true;
+					//else _home_based = false;
+
+					//// Determine if the trip destination is known, and if it is destined for the CBD
+					//if (this->_current_activity->template Location_Is_Planned<bool>())
+					//{
+					//	_Zone_Interface* dest_zone = this->_destination->template zone<_Zone_Interface*>();
+					//	if (dest_zone->template uuid<int>() < 88) _to_CBD = true;
+					//	else _to_CBD = false;
+					//	
+					//	utility = this->template Calculate_Utility_For_Known_Location<double>();
+					//}
+					//else 
+					//{
+					//	_to_CBD = false;
+					//	utility = this->template Calculate_Utility_For_Unknown_Location<double>();
+					//}
 				}
 				return utility;				
 			}
@@ -145,27 +142,40 @@ namespace Person_Components
 			// Local features
 			template<typename TargetType> TargetType Calculate_Utility_For_Known_Location()
 			{
-				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				los_itf* los = _Mode_Chooser->los<los_itf*>();
+				person_itf* _Parent_Person = this->_Mode_Chooser->Parent_Planner<planner_itf*>()->template Parent_Person<person_itf*>();
+				household_itf* household = _Parent_Person->Household<household_itf*>();
+				household_static_properties_itf* hh_properties = household->Static_Properties<household_static_properties_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
 				vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
+				_Zone_Interface* dest_zone = _Mode_Chooser->destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
+				_Zone_Interface* orig_zone = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
+				Activity_Plan* current_activity = _Mode_Chooser->current_activity<Activity_Plan*>();
+				Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
-				// external knowledge references
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Skim_Interface* skim = network->template skimming_faculty<_Skim_Interface*>();
-				_Zone_Interface* dest_zone = _destination->template zone<_Zone_Interface*>();
 
-				// get the travel time to the destination
-				los_itf* los;
-				if (_current_activity->template Start_Is_Planned<bool>()) los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds,los_itf*>(_previous_location,_destination, _current_activity->template Start_Time<Time_Seconds>());
-				else los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours,los_itf*>(_previous_location,_destination, 12.0);
+				//person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				//scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				//person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
+				//vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
+
+				//// external knowledge references
+				//_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				//_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				//_Activity_Locations_Container_Interface* locations = network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
+				//_Skim_Interface* skim = network->template skimming_faculty<_Skim_Interface*>();
+				//_Zone_Interface* dest_zone = _destination->template zone<_Zone_Interface*>();
+
+				//// get the travel time to the destination
+				//los_itf* los;
+				//if (_current_activity->template Start_Is_Planned<bool>()) los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds,los_itf*>(_previous_location,_destination, _current_activity->template Start_Time<Time_Seconds>());
+				//else los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours,los_itf*>(_previous_location,_destination, 12.0);
 				
 				// account for any VOT changes for this individual (i.e. from CAVS)
 				float vot_change = properties->template Value_of_Travel_Time_Adjustment<float>();
 				float parking_cost_factor=1.0; 
-				if (vehicle->template is_autonomous<bool>()) parking_cost_factor = 0.0;
+				//if (vehicle->template is_autonomous<bool>()) parking_cost_factor = 0.0;
 				
 				// Get the differences in characteristics for transit compared to auto mode (CMAP model specified as difference)
 				float ivtt_dif = los->template auto_ttime<Time_Minutes>()*vot_change - los->template transit_ttime<Time_Minutes>();
@@ -176,7 +186,7 @@ namespace Person_Components
 				float cost_dif = los->template auto_distance<Miles>()*20.0 + dest_zone->template Parking_Cost<Cents>()*parking_cost_factor + los->template auto_tolls<Cents>() - los->template transit_fare<Cents>();
 
 				// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
-				if (!this->_auto_available)
+				if (!_Mode_Chooser->auto_available<bool>())
 				{
 					wait_dif += 30.0;
 					transfer_dif += 2.0;
@@ -197,59 +207,72 @@ namespace Person_Components
 				return (TargetType)u;				
 			}
 
-			template<typename TargetType>
-			TargetType Calculate_Utility_For_Unknown_Location()
-			{		
-				// account for any VOT changes for this individual (i.e. from CAVS)
-				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
-				person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
-				float vot_change = properties->template Value_of_Travel_Time_Adjustment<float>();
+			//template<typename TargetType>
+			//TargetType Calculate_Utility_For_Unknown_Location()
+			//{		
+			//	los_itf* los = _Mode_Chooser->los<los_itf*>();
+			//	person_itf* _Parent_Person = this->_Mode_Chooser->Parent_Planner<planner_itf*>()->template Parent_Person<person_itf*>();
+			//	household_itf* household = _Parent_Person->Household<household_itf*>();
+			//	household_properties_itf* hh_properties = household->Static_Properties<household_properties_itf*>();
+			//	scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+			//	person_properties_itf* properties = _Parent_Person->template Static_Properties<person_properties_itf*>();
+			//	vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
+			//	_Zone_Interface* dest_zone = _Mode_Chooser->destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
+			//	_Zone_Interface* origin_zone = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
+			//	Activity_Plan* current_activity = _Mode_Chooser->current_activity<Activity_Plan*>();
+			//	Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
-				_Zone_Interface* origin_zone = _previous_location->template zone<_Zone_Interface*>();
-				float ivtt_dif = origin_zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() * vot_change - origin_zone->template avg_ttime_transit<Time_Minutes>();
-				float wait_dif = -5.0; // assumed wait time of 5 minutes for transit trips
-				float transfer_dif = 0;
-				float walk_time_dif = -5.0; // assumed average walk time of 5 minutes for transit trips, given walk speed of 3 mph and max distance of 0.5 miles
-				float cost_dif = 0;
-				float utility = -1.0 * FLT_MAX;
 
-				// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
-				if (!this->_auto_available)
-				{
-					wait_dif += 30.0;
-					transfer_dif += 2.0;
-					walk_time_dif += 2.0;
-				}
+			//	// account for any VOT changes for this individual (i.e. from CAVS)
+			//	//person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+			//	//person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
+			//	float vot_change = properties->template Value_of_Travel_Time_Adjustment<float>();
 
-				// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
-				if (origin_zone->template avg_ttime_transit<Time_Days>() < 1.0)
-					//%%%RLW utility = this->template Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
-					utility = this->Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
-				else
-					return utility;
+			//	//_Zone_Interface* origin_zone = _previous_location->template zone<_Zone_Interface*>();
+			//	float ivtt_dif = origin_zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() * vot_change - origin_zone->template avg_ttime_transit<Time_Minutes>();
+			//	float wait_dif = -5.0; // assumed wait time of 5 minutes for transit trips
+			//	float transfer_dif = 0;
+			//	float walk_time_dif = -5.0; // assumed average walk time of 5 minutes for transit trips, given walk speed of 3 mph and max distance of 0.5 miles
+			//	float cost_dif = 0;
+			//	float utility = -1.0 * FLT_MAX;
 
-				if (utility > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif)
-				
-				//cout << "O/D=unknown:"<<_previous_location->zone<_Zone_Interface*>()->uuid<int>() <<"/xxx";
-				//cout << ",Auto_TT:"<<origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>()<< ",Transit_TT:"<<origin_zone->avg_ttime_transit<Time_Minutes>();
-				//cout <<",Transit_wait:" << -1.0* wait_dif << ",transfer_time:"<<0;
-				//cout <<",Auto_cost:" << 0;
-				//cout <<",Transit_fare:" << 0 << ",utility:"<< utility << endl;
+			//	// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
+			//	if (!_Mode_Chooser->auto_available<bool>())
+			//	{
+			//		wait_dif += 30.0;
+			//		transfer_dif += 2.0;
+			//		walk_time_dif += 2.0;
+			//	}
 
-				// Otherwise return the transit utility based on Zonal average characteristics
-				return utility;			
-			}
+			//	// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
+			//	if (origin_zone->template avg_ttime_transit<Time_Days>() < 1.0)
+			//		//%%%RLW utility = this->template Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
+			//		utility = this->Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
+			//	else
+			//		return utility;
+
+			//	if (utility > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif)
+			//	
+			//	//cout << "O/D=unknown:"<<_previous_location->zone<_Zone_Interface*>()->uuid<int>() <<"/xxx";
+			//	//cout << ",Auto_TT:"<<origin_zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>()<< ",Transit_TT:"<<origin_zone->avg_ttime_transit<Time_Minutes>();
+			//	//cout <<",Transit_wait:" << -1.0* wait_dif << ",transfer_time:"<<0;
+			//	//cout <<",Auto_cost:" << 0;
+			//	//cout <<",Transit_fare:" << 0 << ",utility:"<< utility << endl;
+
+			//	// Otherwise return the transit utility based on Zonal average characteristics
+			//	return utility;			
+			//}
 
 			float Calculate_Utility_Value(float ivtt_dif, float wait_dif, float transfer_dif, float walk_time_dif, float cost_dif)
 			{
 				float utility;
 
-				Activity_Components::Types::ACTIVITY_TYPES activity_type = _current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				Activity_Components::Types::ACTIVITY_TYPES activity_type = _Mode_Chooser->current_activity<Activity_Plan*>()->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
 				// Split mode choice model by in/out of CBD for Home-based Work, Home-based other and non-home based
-				if (_to_CBD)
+				if (_Mode_Chooser->to_CBD<bool>())
 				{
-					if (_home_based)
+					if (_Mode_Chooser->home_based<bool>())
 					{
 						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 						{
@@ -267,7 +290,7 @@ namespace Person_Components
 				}
 				else
 				{
-					if (_home_based)
+					if (_Mode_Chooser->home_based<bool>())
 					{
 						if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY || activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 						{
@@ -342,10 +365,27 @@ namespace Person_Components
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
 
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, current_activity, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, previous_activity, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, next_activity, NONE, NONE);
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, destination, NONE, NONE);
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, previous_location, NONE, NONE);
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, next_location, NONE, NONE);
+			m_prototype(Network_Skimming_Components::Prototypes::LOS, typename MasterType::los_value_type, los, NONE, NONE);
+			m_data(bool, home_based, NONE, NONE);
+			m_data(bool, to_work_school, NONE, NONE);
+			m_data(bool, from_work_school, NONE, NONE);
+			m_data(bool, auto_available, NONE, NONE);
+			m_data(bool, to_CBD, NONE, NONE);
+			m_data(bool, delete_los, NONE, NONE);
+
 			// Interface definitions	
 			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
 			typedef Prototypes::Mode_Choice_Option<typename MasterType::mode_choice_option_type> _Mode_Choice_Option_Interface;
 			typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
+
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_invariant_value_type> los_invariant_itf;
 
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
@@ -378,6 +418,120 @@ namespace Person_Components
 			{
 			}
 
+			template<typename ActivityItfType> void Define_Travel_Context(ActivityItfType activity)
+			{
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				household_itf* _Parent_Household = _Parent_Person->person_itf::template Household<household_itf*>();
+				household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<household_static_properties_itf*>();
+				_delete_los = false;
+
+				// If no vehicles in the household, automatically assume transit
+				_auto_available = true;
+				if (household_properties->template Number_of_vehicles<int>() < 1) _auto_available = false;
+
+				// external knowledge references
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Skim_Interface* skim = network->template skimming_faculty<_Skim_Interface*>();
+
+				_current_activity = (Activity_Plan*)activity;
+
+				// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
+				if (_current_activity->template Start_Is_Planned<bool>())
+				{
+					_previous_activity = _Parent_Person->template previous_activity_plan<Time_Seconds, Activity_Plan*>(_current_activity->template Start_Time<Time_Seconds>());
+					_previous_location = scheduler->template previous_location<Activity_Plan*, _Activity_Location_Interface*>(_current_activity);
+					if (_previous_location == nullptr) _previous_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+					_next_activity = _Parent_Person->template next_activity_plan<Time_Seconds, Activity_Plan*>(_current_activity->template Start_Time<Time_Seconds>());
+					_next_location = scheduler->template next_location<Activity_Plan*, _Activity_Location_Interface*>(_current_activity);
+					if (_next_location == nullptr) _next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+					// check for auto availability constraints - make sure it is not a home/work based activity and see if previous mode is non-auto
+					if (_previous_location != _Parent_Person->template Home_Location<_Activity_Location_Interface*>() && _previous_location != _Parent_Person->template Work_Location<_Activity_Location_Interface*>() && _previous_location != _Parent_Person->template School_Location<_Activity_Location_Interface*>())
+					{
+						if (_previous_activity->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) _auto_available = false;
+					}
+				}
+				// Otherwise, next activities not known, assume start and end tour location is home
+				else
+				{
+					_previous_activity = nullptr;
+					_previous_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+					_next_activity = nullptr;
+					_next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				}
+
+				// See if this is a trip to/from CBD
+				if (_current_activity->template Location_Is_Planned<bool>())
+				{
+					_destination = _current_activity->template Location<_Activity_Location_Interface*>();
+					int orig_zone = _previous_location->zone<_Zone_Interface*>()->uuid<int>();
+					int dest_zone = _destination->zone<_Zone_Interface*>()->uuid<int>();
+					if ((orig_zone > 159 && orig_zone < 216) || (dest_zone > 159 && dest_zone < 216)) _to_CBD = true;
+					else _to_CBD = false;
+				}
+				else
+				{
+					_destination = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				}
+
+				//=========================================================
+				// Find trip typology
+				//---------------------------------------------------------
+				// Determine if the trip is from home
+				if (_previous_location == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) _home_based = true;
+				else _home_based = false;
+
+				// Determine if trip is to work
+				Activity_Components::Types::ACTIVITY_TYPES activity_type = _current_activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY ||
+					activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY ||
+					activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY ||
+					activity_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				{
+					this->_to_work_school = true;
+				}
+
+				// Determine if trip is from work/school
+				if (_previous_activity != nullptr)
+				{
+					activity_type = _previous_activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+					if (activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY ||
+						activity_type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_WORK_ACTIVITY ||
+						activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY ||
+						activity_type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+					{
+						this->_from_work_school = true;
+					}
+					else this->_from_work_school = false;
+				}
+				else this->_from_work_school = false;
+
+				//=========================================================
+				// set the level of service for this context
+				//---------------------------------------------------------
+				if (_current_activity->template Location_Is_Planned<bool>())
+				{
+					if (_current_activity->template Start_Is_Planned<bool>()) _los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds, los_itf*>(_previous_location, _destination, _current_activity->template Start_Time<Time_Seconds>());
+					else _los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours, los_itf*>(_previous_location, _destination, 12.0);
+				}
+				else
+				{
+					_delete_los = true;
+					_Zone_Interface* origin_zone = _previous_location->zone<_Zone_Interface*>();
+					los_itf* los = (los_itf*)Allocate<typename MasterType::los_value_type>();
+					los_invariant_itf* ilos = (los_invariant_itf*)Allocate<typename MasterType::los_invariant_value_type>();
+					los->LOS_time_invariant(ilos);
+					los->auto_ttime(origin_zone->template avg_ttime_auto_peak<Time_Minutes>());
+					los->transit_ttime(origin_zone->avg_ttime_transit<Time_Minutes>());
+					los->transit_fare(origin_zone->avg_fare_transit<Dollars>());
+					los->transit_walk_access_time(origin_zone->avg_ovtt_transit<Time_Minutes>());
+					los->transit_wait_time(origin_zone->avg_wait_transit<Time_Minutes>());
+					los->auto_distance(origin_zone->avg_distance<Miles>());
+					this->_los = los;
+				}
+			}
+
 			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
@@ -385,70 +539,72 @@ namespace Person_Components
 				household_itf* _Parent_Household = _Parent_Person->person_itf::template Household<household_itf*>();
 				household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<household_static_properties_itf*>();
 
-				// If no vehicles in the household, automatically assume transit
-				bool auto_available = true;
-				if (household_properties->template Number_of_vehicles<int>() < 1) auto_available = false;
+
+				this->Define_Travel_Context(activity);
 
 				// create local choice model
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)Allocate<typename MasterType::mnl_model_type>();
 				std::vector<_Mode_Choice_Option_Interface*> mode_options;
 
-				// external knowledge references
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				//// external knowledge references
+				//_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				//_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
 
-				Activity_Plan* cur_act = (Activity_Plan*)activity;
-				Activity_Plan* prev_act, *next_act;
-				_Activity_Location_Interface* prev_location, *next_location, *dest_location;
+				//Activity_Plan* cur_act = (Activity_Plan*)activity;
+				//Activity_Plan* prev_act, *next_act;
+				//_Activity_Location_Interface* prev_location, *next_location, *dest_location;
 
-				// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
-				if (cur_act->template Start_Is_Planned<bool>())
-				{
-					prev_act = _Parent_Person->template previous_activity_plan<Time_Seconds, Activity_Plan*>(cur_act->template Start_Time<Time_Seconds>());
-					prev_location = scheduler->template previous_location<Activity_Plan*, _Activity_Location_Interface*>(cur_act);
-					if (prev_location == nullptr) prev_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-					next_act = _Parent_Person->template next_activity_plan<Time_Seconds, Activity_Plan*>(cur_act->template Start_Time<Time_Seconds>());
-					next_location = scheduler->template next_location<Activity_Plan*, _Activity_Location_Interface*>(cur_act);
-					if (next_location == nullptr) next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-				}
-				// Otherwise, next activities not known, assume start and end tour location is home
-				else
-				{
-					prev_act = nullptr;
-					prev_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-					next_act = nullptr;
-					next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-				}
-				if (cur_act->template Location_Is_Planned<bool>())
-				{
-					dest_location = cur_act->template Location<_Activity_Location_Interface*>();
-				}
-				else
-				{
-					dest_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-				}
+				//// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
+				//if (cur_act->template Start_Is_Planned<bool>())
+				//{
+				//	prev_act = _Parent_Person->template previous_activity_plan<Time_Seconds, Activity_Plan*>(cur_act->template Start_Time<Time_Seconds>());
+				//	prev_location = scheduler->template previous_location<Activity_Plan*, _Activity_Location_Interface*>(cur_act);
+				//	if (prev_location == nullptr) prev_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				//	next_act = _Parent_Person->template next_activity_plan<Time_Seconds, Activity_Plan*>(cur_act->template Start_Time<Time_Seconds>());
+				//	next_location = scheduler->template next_location<Activity_Plan*, _Activity_Location_Interface*>(cur_act);
+				//	if (next_location == nullptr) next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				//}
+				//// Otherwise, next activities not known, assume start and end tour location is home
+				//else
+				//{
+				//	prev_act = nullptr;
+				//	prev_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				//	next_act = nullptr;
+				//	next_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				//}
+				//if (cur_act->template Location_Is_Planned<bool>())
+				//{
+				//	dest_location = cur_act->template Location<_Activity_Location_Interface*>();
+				//}
+				//else
+				//{
+				//	dest_location = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				//}
 
 				//============================================================================================
 				// add the SOV choice option
 				_Mode_Choice_Option_Interface* choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-				choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
-				choice->template current_activity<ActivityItfType>(activity);
-				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+				choice->Mode_Chooser(this);
+				//choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
+				//choice->current_activity<ActivityItfType>(activity);
+				choice_model->Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				mode_options.push_back(choice);
 
 				// add the transit choice option
 				choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
-				choice->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
-				choice->template current_activity<ActivityItfType>(activity);
-				choice->template destination<_Activity_Location_Interface*>(dest_location);
-				choice->template previous_activity<Activity_Plan*>(prev_act);
-				choice->template previous_location<_Activity_Location_Interface*>(prev_location);
-				choice->template next_activity<Activity_Plan*>(next_act);
-				choice->template next_location<_Activity_Location_Interface*>(next_location);
-				choice->template auto_available<bool>(auto_available);
-				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+				//choice->Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+				choice->Mode_Chooser(this);
+				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+				
+				//choice->current_activity<ActivityItfType>(activity);
+				//choice->destination<_Activity_Location_Interface*>(dest_location);
+				//choice->previous_activity<Activity_Plan*>(prev_act);
+				//choice->previous_location<_Activity_Location_Interface*>(prev_location);
+				//choice->next_activity<Activity_Plan*>(next_act);
+				//choice->next_location<_Activity_Location_Interface*>(next_location);
+				//choice->auto_available<bool>(auto_available);
+				choice_model->Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 				mode_options.push_back(choice);
 
 				// Make choice
@@ -467,16 +623,16 @@ namespace Person_Components
 				//============================================================================================
 				//Account for touring - if previous act is not at an anchor location and not using auto, then auto not available
 				//-need to update to disable auto mode when not available at the anchor location as well
-				if (prev_location != _Parent_Person->template Home_Location<_Activity_Location_Interface*>() &&
-					prev_location != _Parent_Person->template Work_Location<_Activity_Location_Interface*>() &&
-					prev_location != _Parent_Person->template School_Location<_Activity_Location_Interface*>() &&
-					prev_act != nullptr)
-				{
-					//if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS || prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV)
-					//{
-					//	if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
-					//}
-				}
+				//if (prev_location != _Parent_Person->template Home_Location<_Activity_Location_Interface*>() &&
+				//	prev_location != _Parent_Person->template Work_Location<_Activity_Location_Interface*>() &&
+				//	prev_location != _Parent_Person->template School_Location<_Activity_Location_Interface*>() &&
+				//	prev_act != nullptr)
+				//{
+				//	//if (prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == BUS || prev_act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == HOV)
+				//	//{
+				//	//	if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+				//	//}
+				//}
 
 				// free memory allocated locally
 				// %%%RLW

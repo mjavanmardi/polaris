@@ -82,14 +82,9 @@ struct MasterType
 	
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	//TODO:ROUTING
-	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
 
-	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
-	//typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
-	
 	typedef Demand_Components::Implementations::Demand_Implementation<MasterType> demand_type;
 
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<MasterType> activity_location_type;
@@ -99,15 +94,6 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
 
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
 	typedef Operation_Components::Implementations::Operation_Implementation<MasterType> operation_type;
 	

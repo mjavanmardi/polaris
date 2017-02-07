@@ -328,9 +328,7 @@ namespace Prototypes
 
 				if (old_dest_id == -1)
 				{
-					//TODO: remove
 					cout <<endl<<"Why is this destination null? personid="<<person->template uuid<int>() <<": type="<<activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-					//if (activity->Location<location_itf*>() != nullptr) cout <<", zone="<<activity->Location<location_itf*>()->zone<zone_itf*>()->uuid<int>();
 				}
 
 				activity_itf* prev_act = person->template previous_activity_plan<Simulation_Timestep_Increment,activity_itf*>(iteration());
@@ -718,11 +716,6 @@ namespace Prototypes
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
 
-			//TODO: remove when done testing scheduler code
-			//if (_Parent_Person->Household<Household_Itf*>()->uuid<int>() == 1293)
-			//{
-			//	int test = 1;
-			//}
 
  			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
@@ -943,11 +936,6 @@ namespace Prototypes
 				if (next_movement->template origin<location_itf*>() != destination)
 				{
 					next_act->template Update_Movement_Plan<location_itf*>(destination,next_movement->template destination<location_itf*>(),end_this);
-				}
-				//TODO: remove when done testing
-				if (next_movement->template departed_time<Time_Seconds>() > (END)*2.0)
-				{
-					THROW_WARNING("Error, next_movement departure time is out of simulation time frame. next move depart time="<<next_movement->template departed_time<Time_Seconds>()<<", next act start time="<<next_act->template Start_Time<Time_Seconds>());
 				}
 				act->template End_Time<Time_Seconds>(next_movement->template departed_time<Time_Seconds>(),false);
 			}

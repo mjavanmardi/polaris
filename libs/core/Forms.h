@@ -195,6 +195,117 @@ namespace polaris
 				return this_component()->template NAME<TargetType>();\
 			}\
 
+	// THIS IS JOSH's TESTING ACCESSOR CODE
+	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		public:\
+			template<typename TypeChecked>\
+			struct NAME##_data_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename _U>\
+				struct function_check<_U,true>\
+				{\
+					template<typename _V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&_V::_##NAME)>::type);\
+					template<typename _V> static large_type has_matching_named_member(...);\
+					\
+					template<typename _V,bool _P>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename _V>\
+					struct form_check<_V,true>{ static const bool value = true; };\
+					\
+					static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+					static const bool value = form_check<_U,performcheck>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TypeChecked>\
+			struct NAME##_set_func_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename _U>\
+				struct function_check<_U,true>\
+				{\
+					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().NAME<int>(0)), void>::type);\
+					template<typename _V> static large_type has_matching_named_member(...);\
+					\
+					template<typename _V,bool _P>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename _V>\
+					struct form_check<_V,true>{ static const bool value = true; };\
+					\
+					static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+					static const bool value = form_check<_U,performcheck>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename T>\
+			struct NAME##_set_tag_check\
+			{\
+				template<typename U> static small_type has_matching_typename(typename U::NAME##_setter_tag*);\
+				template<typename U> static large_type has_matching_typename(...);\
+				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+			};\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(TargetType,(check(ComponentType,NAME##_data_check) || check(ComponentType,NAME##_set_tag_check) || check(ComponentType,NAME##_set_func_check)) && (SETTER_REQUIREMENTS)))\
+			{\
+				this_component()->template NAME<TargetType>(set_value);\
+			}\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(TargetType,(!check(ComponentType,NAME##_data_check) && !check(ComponentType,NAME##_set_tag_check) && !check(ComponentType,NAME##_set_func_check)) || !(SETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_data_check<ComponentType>::value || NAME##_set_func_check<ComponentType>::value || NAME##_set_tag_check<ComponentType>::value,"\n\n\n[--------- Can't find set accessor, data member, or tag for '" #NAME "' in implementation ---------]\n\n");\
+				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+			\
+			template<typename T>\
+			struct NAME##_get_tag_check\
+			{\
+				template<typename U> static small_type has_matching_typename(typename U::NAME##_getter_tag*);\
+				template<typename U> static large_type has_matching_typename(...);\
+				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+			};\
+			template<typename TypeChecked>\
+			struct NAME##_get_func_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename _U>\
+				struct function_check<_U,true>\
+				{\
+					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().NAME<int>()), int>::type);\
+					template<typename _V> static large_type has_matching_named_member(...);\
+					\
+					template<typename _V,bool _P>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename _V>\
+					struct form_check<_V,true>{ static const bool value = true; };\
+					\
+					static const bool performcheck = (sizeof(has_matching_named_member<_U>(true_val))==success);\
+					static const bool value = form_check<_U,performcheck>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,(check(ComponentType,NAME##_data_check) || check(ComponentType,NAME##_get_func_check) || check(ComponentType,NAME##_get_tag_check)) && (GETTER_REQUIREMENTS)))\
+			{\
+				return this_component()->template NAME<TargetType>();\
+			}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,(!check(ComponentType,NAME##_data_check) && !check(ComponentType,NAME##_get_func_check) && !check(ComponentType,NAME##_get_tag_check)) || !(GETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_data_check<ComponentType>::value || NAME##_get_func_check<ComponentType>::value || NAME##_get_tag_check<ComponentType>::value,"\n\n\n[--------- Can't find get accesor, data member, or tag for '" #NAME "' in implementation ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+
 	// THIS CHECK WAS MICHAEL'S NEW IMPLEMENTATION - THE NAMED MEMBER sTUFF DOESN"T WORK
 	#define tagless_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
@@ -466,7 +577,7 @@ namespace polaris
 	///		includes a tag-based check on whether the implementation has corresponding accessors - This is the only one which works currently
 	///----------------------------------------------------------------------------------------------------
 
-	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	#define tag_based_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		public:\
 			template<typename T>\
 			struct NAME##_set_check\
