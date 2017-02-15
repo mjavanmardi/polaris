@@ -122,6 +122,9 @@ namespace Demand_Components
 				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
+				typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
+
 				typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
 				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);

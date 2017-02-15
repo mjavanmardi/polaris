@@ -29,9 +29,6 @@ namespace RNG_Components
 			}
 			template<typename TargetType> void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(TargetType,check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				//TODO: workaround for MSVC error in <random> header - this is fixed in msvc2012 and the code below is not needed
-				if(seed_value <=0) seed_value = abs(seed_value);
-
 				_seed = seed_value;
 				_generator.seed(_seed);
 			}
@@ -65,9 +62,6 @@ namespace RNG_Components
 
 			template<typename TargetType> void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(TargetType,check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				//TODO: workaround for MSVC error in <random> header - this is fixed in msvc2012 and the code below is not needed
-				if(seed_value <=0) seed_value = 1;
-
 				BaseType::_generator.seed((unsigned long)seed_value/*BaseType::_seed*/);
 				this->template minimum< TargetType>(min);
 				this->template maximum< TargetType>(max);
@@ -100,9 +94,6 @@ namespace RNG_Components
 
 			template<typename TargetType> void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(TargetType,check(strip_modifiers(TargetType),is_arithmetic)))
 			{
-				//TODO: workaround for MSVC error in <random> header - this is fixed in msvc2012 and the code below is not needed
-				if(seed_value <=0) seed_value = abs(seed_value);
-
 				//state_check(Is_Positive)(this,_scale);
 				GrandBaseType::_generator.seed((unsigned long)seed_value/* GrandBaseType::_seed*/);
 				this->template location< TargetType>(location);

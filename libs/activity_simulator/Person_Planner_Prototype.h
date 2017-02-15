@@ -207,12 +207,6 @@ namespace Person_Components
 					else if (move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Current_Time<Simulation_Timestep_Increment>())
 					{
 						typename Movement_Plans::iterator prev = move_itr++;
-						//movements->erase(prev);
-						//
-						//// increment the deleted activities counter
-						//typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::Master_Type::person_data_logger_type> _Logger_Interface;
-						//_Logger_Interface* logger = (_Logger_Interface*)_global_person_logger;
-						//logger->template Increment_Cancelled_Activities<NT>();
 					}
 					// exit if no movements in current timestep
 					else

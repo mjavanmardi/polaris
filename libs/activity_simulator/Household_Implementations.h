@@ -50,6 +50,8 @@ namespace Household_Components
 			
 			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
+
+			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(Vehicles_Container_type)> vehicle_interface;
 			
 
 			//=======================================================================================================================================================================
@@ -65,12 +67,14 @@ namespace Household_Components
 				_Properties->template Initialize<void>();
 				_Properties->template Parent_Household<ComponentType*>(this);
 
+				_Vehicle_Chooser = (Vehicle_Chooser_type)Allocate<type_of(Vehicle_Chooser)>();
+				//_Vehicle_Chooser->Initialize<void>();
+				_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
 					
 				// Add basic traveler properties							
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
 
-				// Fill the vehicle list
 				
 			}
 			template<typename IdType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
@@ -84,6 +88,8 @@ namespace Household_Components
 			{
 				this->Initialize<IdType,NetworkRefType,ScenarioRefType>(id,network_ref,scenario_ref);
 				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
+
+				this->_Vehicle_Chooser->Select_Vehicles<SynthesisZoneType>(home_zone);
 			}
 
 			template<typename TargetType> void Set_Home_Location()
@@ -99,6 +105,15 @@ namespace Household_Components
 				}
 				return nullptr;
 			}
+			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
+			{
+				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
+				{
+					if ((*v_itr)->available()) return *v_itr;
+				}
+				return nullptr;
+			}
+
 		};
 
 	}

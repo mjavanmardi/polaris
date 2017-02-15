@@ -708,7 +708,6 @@ namespace Network_Skimming_Components
 				}
 				else
 				{
-					this->_update_interval_endpoints.push_back(0);
 					std::vector<int>* intervals = scenario->template skim_interval_endpoint_minutes<std::vector<int>*>();
 					for (std::vector<int>::iterator itr = intervals->begin(); itr != intervals->end(); ++itr)
 					{

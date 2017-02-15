@@ -35,7 +35,7 @@ namespace PopSyn
 				if (_parent_reference == nullptr)
 				{
 					parent_reference_type pthis = (parent_reference_type)this;
-					pthis->scenario_reference<TargetType>();
+					return pthis->scenario_reference<TargetType>();
 				}
 				else
 				{
@@ -47,7 +47,7 @@ namespace PopSyn
 				if (_parent_reference == nullptr)
 				{
 					parent_reference_type pthis = (parent_reference_type)this;
-					pthis->network_reference<TargetType>();
+					return pthis->network_reference<TargetType>();
 				}
 				else
 				{
@@ -59,7 +59,7 @@ namespace PopSyn
 				if (_parent_reference == nullptr)
 				{
 					parent_reference_type pthis = (parent_reference_type)this;
-					pthis->file_linker_reference<TargetType>();
+					return pthis->file_linker_reference<TargetType>();
 				}
 				else
 				{
@@ -109,9 +109,6 @@ namespace PopSyn
 			{
 				// Call base initializer
 				_Synthesis_Zone_Base_Implementation<MasterType>::template Initialize<NT>();
-
-				//TODO: remove when done testing popsyn
-				cout << GLOBALS::Uniform_RNG.Next_Rand<double>() << endl;
 
 				// Create the dimension vectors for the hh and person distributions from linker
 				typename Target_Joint_Distribution_type::index_type dimensions_hh;

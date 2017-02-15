@@ -18,6 +18,7 @@ namespace PopSyn
 			/// Pointer to the top-level population synthesizer class		
 
 			m_prototype(PopSyn::Prototypes::Population_Synthesizer,typename MasterType::population_synthesis_type, parent_reference, NONE, NONE);
+			
 
 			/// Temporary container used to associate households with persons, keyed on household id
 			typedef dense_hash_map<typename MasterType::household_static_properties_type::ID_type, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __temp_sample_map_type;		

@@ -486,8 +486,6 @@ namespace Person_Components
 						// update the following movement plan to account for new travel time
 						if (next_act != nullptr && next_move != nullptr) 
 						{
-							//TODO: verify this code-> changed because origin links were not updating properly
-							//next_move->template origin<_Activity_Location_Interface*>(loc);
 							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->template destination<_Activity_Location_Interface*>());
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
@@ -567,11 +565,6 @@ namespace Person_Components
 				// get maximum end time of current activity given departure time for next activity
 				new_end = act->template Start_Time<Time_Seconds>() - ttime;
 
-				//TODO: remove when done testing
-				if (new_end > (END)*2.0)
-				{
-					THROW_WARNING("Error, invalid value when setting end_time: "<<new_end<<", act.start="<<act->Start_Time<Time_Seconds>()<<", start="<<start<<", ttime="<<ttime<<", prev="<<prev_loc->zone<_Zone_Interface*>()->uuid<int>()<<", next="<<loc->zone<_Zone_Interface*>()->uuid<int>());
-				}
 				prev_act->template End_Time<Time_Seconds>(new_end,false);
 			}
 

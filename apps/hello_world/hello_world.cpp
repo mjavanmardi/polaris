@@ -39,7 +39,8 @@ implementation struct my_agent_impl : public Polaris_Component<MasterType, INHER
     void initialize(int start_time)
     {
         //this->template Load_Event<my_agent_impl>(&Do_stuff, start_time, this->my_subiteration<int>());
-        this->template Load_Event<my_agent_impl>(&Do_stuff, start_time, this->my_subiteration<int>());
+		_name = "Base";
+        this->template Load_Event<base_agent_impl>(&Do_stuff, start_time, this->my_subiteration<int>());
     }
 
     static void Do_stuff(my_agent_impl* _this, Event_Response& response)
@@ -104,6 +105,12 @@ implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(l
 {
     void initialize(int start_time)
     {
+		typedef Agent<MasterType::agent_type> agent_itf;
+		agent_itf* my_agent = (agent_itf*)Allocate<typename MasterType::agent_type>();
+		my_agent->initialize(2, 2);
+		this->the_agent(my_agent);
+		my_agent->money<float>(3.0f);
+
         this->template Load_Event<link_impl>(&Do_stuff, start_time, 0);
     }
     static void Do_stuff(link_impl* _this, Event_Response& response)
@@ -145,7 +152,7 @@ struct MasterType
 {
     typedef other_agent_impl<MasterType> agent_type;
     typedef link_impl<MasterType> link_type;
-
+	typedef base_agent_impl<MasterType> base_agent_type;
 };
 
 int main(int argc, char* argv[])
