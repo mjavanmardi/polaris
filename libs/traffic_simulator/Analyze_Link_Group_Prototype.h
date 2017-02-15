@@ -13,7 +13,7 @@ namespace Analyze_Link_Group_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Analyze_Link_Group
+		prototype struct Analyze_Link_Group ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			accessor(links_container, NONE, NONE);

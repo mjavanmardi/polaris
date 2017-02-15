@@ -205,6 +205,7 @@ namespace Routing_Components
 			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
 			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
 
+			tag_getter_as_available(update_increment);
 			template <typename TargetType> TargetType update_increment()
 			{
 				return this->_parent_skimmer->template update_increment<TargetType>();

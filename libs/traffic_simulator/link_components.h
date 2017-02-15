@@ -1,4 +1,0 @@
-#ifndef LINK_COMPONENTS_H
-#define LINK_COMPONENTS_H
-
-#endif // LINK_COMPONENTS_H

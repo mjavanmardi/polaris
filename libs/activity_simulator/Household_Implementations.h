@@ -27,6 +27,7 @@ namespace Household_Components
 			m_prototype(PopSyn::Prototypes::Synthesis_Zone, typename MasterType::synthesis_zone_type, home_synthesis_zone, NONE, NONE);	
 			m_prototype(Household_Components::Prototypes::Household_Properties, typename MasterType::household_properties_type, Properties, NONE,NONE);
 			m_prototype(Household_Components::Prototypes::Household_Properties,typename MasterType::household_static_properties_type, Static_Properties, NONE, NONE);
+			m_prototype(Household_Components::Prototypes::Vehicle_Chooser, typename MasterType::vehicle_chooser_type, Vehicle_Chooser, NONE, NONE);
 			
 			// Physical world elements
 			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, network_reference, NONE, NONE);
@@ -89,7 +90,15 @@ namespace Household_Components
 			{
 				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
 			}
-
+			
+			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
+			{
+				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
+				{
+					if ((*v_itr)->available()) return *v_itr;
+				}
+				return nullptr;
+			}
 		};
 
 	}

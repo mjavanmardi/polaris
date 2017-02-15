@@ -38,11 +38,11 @@ namespace Link_Components
 		// Adjustment factors recommended by the Guidebook on the Analysis of ATDM Strategies.
 
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_capacity_adjustment_factors_for_weather[19] 
-			= {1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.20, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89};
+		float Link_Implementation<MasterType, InheritanceList>::link_capacity_adjustment_factors_for_weather[19]
+			= { 1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.20, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89 };
 		
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_free_flow_speed_adjustment_factors_for_weather[19][5]
+		float Link_Implementation<MasterType, InheritanceList>::link_free_flow_speed_adjustment_factors_for_weather[19][5]
 			= {
 				{1.00, 1.00, 1.00, 1.00, 1.00},
 				{0.97, 0.96, 0.96, 0.95, 0.94},
@@ -66,7 +66,7 @@ namespace Link_Components
 			};
 
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
+		float Link_Implementation<MasterType, InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
 			= {
 				{0.93, 0.79, 0.01, 0.01, 0.01},
 				{0.95, 0.81, 0.35, 0.01, 0.01},
@@ -96,7 +96,7 @@ namespace Link_Components
 			{
 				int lanes = min(8, _num_lanes);
 				int lanes_closed = min(3, ((typename MasterType::accident_network_event_type*)_current_accident_event)->_lanes_closed);	
-				capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[lanes - 1][lanes_closed + 1];
+				capacity_adjustment_rate = 1.0; //RLW%%% link_capacity_adjustment_factors_for_accident[lanes - 1][lanes_closed + 1];
 				_num_lanes = _num_lanes - ((typename MasterType::accident_network_event_type*)_current_accident_event)->_lanes_closed;
 			}
 			_lane_adjustment_due_to_accident = prev_num_lanes - _num_lanes;
@@ -142,7 +142,7 @@ namespace Link_Components
 			
 			int weather_index = get_weather_index<TargetType>((typename MasterType::weather_network_event_type*)_current_weather_event);
 			
-			capacity_adjustment_rate = link_capacity_adjustment_factors_for_weather[weather_index];
+			capacity_adjustment_rate = 1.0; //RLW%%% link_capacity_adjustment_factors_for_weather[weather_index];
 			//capacity_adjustment_rate = 0.2;
 			_capacity_adjustment_factor_due_to_weather = capacity_adjustment_rate;
 			//_maximum_flow_rate *= capacity_adjustment_rate;

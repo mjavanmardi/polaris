@@ -656,6 +656,11 @@ namespace Prototypes
 			{
 				this->Schedule_Artificial_Arrival_Event<NT>();
 			}
+			// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point
+			else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			{
+				this->Schedule_Artificial_Arrival_Event<NT>();
+			}
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
 			else if (movements->template valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
 			{
@@ -674,11 +679,6 @@ namespace Prototypes
 					this->Schedule_Artificial_Arrival_Event<NT>();
 				}
 			}
-			// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point
-			else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-			{
-				this->Schedule_Artificial_Arrival_Event<NT>();
-			}
 			// else, if no valid trajectory, unschedule movement
 			else
 			{
@@ -692,6 +692,7 @@ namespace Prototypes
 		//--------------------------------------------------------
 		template<typename TargetType> void Arrive_At_Destination()
 		{
+
 			// free up movement schedule
 			this->Movement_Scheduled<bool>(false);
 
@@ -709,18 +710,21 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename network_itf::get_type_of(skimming_faculty)> skim_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
-			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;
-			
+			typedef Zone_Components::Prototypes::Zone< typename location_itf::get_type_of(zone)> zone_itf;		
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links_container_itf;
-			typedef Link_Components::Prototypes::Link<get_component_type(links_container_itf)>  link_itf;
-			
+			typedef Link_Components::Prototypes::Link<get_component_type(links_container_itf)>  link_itf;	
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(turn_movements_container)> turns_container_itf;
 			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_container_itf)>  turn_itf;
-			
 			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
 
-			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			//TODO: remove when done testing scheduler code
+			//if (_Parent_Person->Household<Household_Itf*>()->uuid<int>() == 1293)
+			//{
+			//	int test = 1;
+			//}
+
+ 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 			Planner_Itf* planner = person->template Planning_Faculty<Planner_Itf*>();
 			Routing_Itf* itf= person->template router<Routing_Itf*>();
@@ -732,12 +736,6 @@ namespace Prototypes
 			movement_itf* movements = this->Movement<movement_itf*>();
 	
 
-			//if (person->uuid<int>() == 3 && household->uuid<int>() == 946)
-			//{
-			//	DEBUG_MESSAGE("Debugging...");
-			//	person->Display_Activities(cout);
-			//}
-			//
 
 			//=====================================================================
 			// schedule departure from destination if no following activity
@@ -886,7 +884,6 @@ namespace Prototypes
 				// then remove from the scheduler activity and movement containers
 				scheduler->template Update_Current_Activity<Activity_Itf*>(act);
 				scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
-				//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 				return;
 			}
 
@@ -907,7 +904,6 @@ namespace Prototypes
 				// then remove from the scheduler activity and movement containers
 				scheduler->template Update_Current_Activity<Activity_Itf*>(act);
 				scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
-				//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
 				return;
 			}
 			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
@@ -928,11 +924,6 @@ namespace Prototypes
 				// GENERATE A NEW AT HOME ACTIVITY
 				Time_Seconds duration = (begin_next - ttime_home_to_next) - (end_this + ttime_this_to_home);
 
-				//typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
-				//at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
-				//new_act->template Parent_Planner<Planner_Itf*>(planner);
-				//new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
-
 				at_home_activity_itf* new_act = generator->template Create_Home_Activity<at_home_activity_itf*,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 
 				//TODO: remove when done testing
@@ -942,7 +933,6 @@ namespace Prototypes
 					THROW_WARNING("Invalid start/duration for at home activity. Start="<<end_this+ttime_this_to_home<<", duration="<<duration<<", departure time="<<end_this<<", travel time="<<ttime_this_to_home);
 				}
 
-				//new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 			}
 
 			//=====================================================================
@@ -971,7 +961,16 @@ namespace Prototypes
 			// then remove from the scheduler activity and movement containers
 			scheduler->template Update_Current_Activity<Activity_Itf*>(act);
 			scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
-			//scheduler->Remove_Movement_Plan<movement_itf*>(movements);
+
+
+			//====================================================================
+			// Unassign vehicle after returning home
+			if (destination == household->Home_Location<location_itf*>() && vehicle != nullptr)
+			{
+				person->vehicle<Vehicle_Itf*>(nullptr);
+				vehicle->Unassign_From_Person();
+			}
+
 		}
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()

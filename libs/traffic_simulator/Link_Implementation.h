@@ -230,42 +230,9 @@ namespace Link_Components
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
 	
-			template<typename TargetType> TargetType travel_time(null_requirement){return (TargetType)(_travel_time);}
-			template<typename TargetType> void travel_time(TargetType set_value,null_requirement)
-			{
-				_travel_time = (float)set_value;
+			m_data(float, travel_time, NONE, NONE);
+			m_data(float, realtime_travel_time, NONE, NONE);
 
-				//TODO:ROUTING_OPERATION
-				//// update replicas
-				//typedef Link<typename MasterType::routable_link_type> replica_interface;
-				//typename replicas_container_type::iterator replica_itr;
-				//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				//{
-				//	replica_interface* replica = (replica_interface*)(*replica_itr);
-				//	replica->template travel_time<float>(_travel_time);
-				//}
-			}
-
-			float _travel_time;
-
-
-			template<typename TargetType> TargetType realtime_travel_time(null_requirement){return (TargetType)(_realtime_travel_time);}
-			template<typename TargetType> void realtime_travel_time(TargetType set_value,null_requirement)
-			{
-				_realtime_travel_time = (float)set_value;
-
-				////TODO:ROUTING_OPERATION
-				//// update replicas
-				//typedef Link<typename MasterType::routable_link_type> replica_interface;
-				//typename replicas_container_type::iterator replica_itr;
-				//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				//{
-				//	replica_interface* replica = (replica_interface*)(*replica_itr);
-				//	replica->template travel_time<float>(_realtime_travel_time);
-				//}
-			}
-
-			float _realtime_travel_time;
 
 		//==================================================================================================================
 		/// Events
@@ -297,6 +264,7 @@ namespace Link_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename _Vehicle_Interface::get_type_of(vehicle_characteristics)> _Vehicle_Characteristics_Interface;
+			//RLW%%% typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<decltype(Vehicle_Components::Implementations::Vehicle_Implementation<MasterType,NT>::vehicle_characteristics())> _Vehicle_Characteristics_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
 			typedef Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 

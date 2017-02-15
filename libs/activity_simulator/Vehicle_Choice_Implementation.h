@@ -26,47 +26,47 @@ namespace Person_Components
 			m_data(bool, to_CBD, NONE, NONE);
 
 			// PARAMETER DECLARATIONS
-			static m_data(float, BHW_IVTT, NONE, NONE);
-			static m_data(float, BHW_CBD_IVTT, NONE, NONE);
-			static m_data(float, BHO_IVTT, NONE, NONE);
-			static m_data(float, BHO_CBD_IVTT, NONE, NONE);
-			static m_data(float, BNH_IVTT, NONE, NONE);
-			static m_data(float, BNH_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BHW_IVTT, NONE, NONE);
+			m_static_data(float, BHW_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BHO_IVTT, NONE, NONE);
+			m_static_data(float, BHO_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BNH_IVTT, NONE, NONE);
+			m_static_data(float, BNH_CBD_IVTT, NONE, NONE);
 
-			static m_data(float, BHW_WAIT, NONE, NONE);
-			static m_data(float, BHW_CBD_WAIT, NONE, NONE);
-			static m_data(float, BHO_WAIT, NONE, NONE);
-			static m_data(float, BHO_CBD_WAIT, NONE, NONE);
-			static m_data(float, BNH_WAIT, NONE, NONE);
-			static m_data(float, BNH_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BHW_WAIT, NONE, NONE);
+			m_static_data(float, BHW_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BHO_WAIT, NONE, NONE);
+			m_static_data(float, BHO_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BNH_WAIT, NONE, NONE);
+			m_static_data(float, BNH_CBD_WAIT, NONE, NONE);
 			
-			static m_data(float, BHW_TRANSFER, NONE, NONE);
-			static m_data(float, BHW_CBD_TRANSFER, NONE, NONE);
-			static m_data(float, BHO_TRANSFER, NONE, NONE);
-			static m_data(float, BHO_CBD_TRANSFER, NONE, NONE);
-			static m_data(float, BNH_TRANSFER, NONE, NONE);
-			static m_data(float, BNH_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BHW_TRANSFER, NONE, NONE);
+			m_static_data(float, BHW_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BHO_TRANSFER, NONE, NONE);
+			m_static_data(float, BHO_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BNH_TRANSFER, NONE, NONE);
+			m_static_data(float, BNH_CBD_TRANSFER, NONE, NONE);
 			
-			static m_data(float, BHW_WALK, NONE, NONE);
-			static m_data(float, BHW_CBD_WALK, NONE, NONE);
-			static m_data(float, BHO_WALK, NONE, NONE);
-			static m_data(float, BHO_CBD_WALK, NONE, NONE);
-			static m_data(float, BNH_WALK, NONE, NONE);
-			static m_data(float, BNH_CBD_WALK, NONE, NONE);
+			m_static_data(float, BHW_WALK, NONE, NONE);
+			m_static_data(float, BHW_CBD_WALK, NONE, NONE);
+			m_static_data(float, BHO_WALK, NONE, NONE);
+			m_static_data(float, BHO_CBD_WALK, NONE, NONE);
+			m_static_data(float, BNH_WALK, NONE, NONE);
+			m_static_data(float, BNH_CBD_WALK, NONE, NONE);
 			
-			static m_data(float, BHW_COST, NONE, NONE);
-			static m_data(float, BHW_CBD_COST, NONE, NONE);
-			static m_data(float, BHO_COST, NONE, NONE);
-			static m_data(float, BHO_CBD_COST, NONE, NONE);
-			static m_data(float, BNH_COST, NONE, NONE);
-			static m_data(float, BNH_CBD_COST, NONE, NONE);
+			m_static_data(float, BHW_COST, NONE, NONE);
+			m_static_data(float, BHW_CBD_COST, NONE, NONE);
+			m_static_data(float, BHO_COST, NONE, NONE);
+			m_static_data(float, BHO_CBD_COST, NONE, NONE);
+			m_static_data(float, BNH_COST, NONE, NONE);
+			m_static_data(float, BNH_CBD_COST, NONE, NONE);
 			
-			static m_data(float, BHW_BIAS, NONE, NONE);
-			static m_data(float, BHW_CBD_BIAS, NONE, NONE);
-			static m_data(float, BHO_BIAS, NONE, NONE);
-			static m_data(float, BHO_CBD_BIAS, NONE, NONE);
-			static m_data(float, BNH_BIAS, NONE, NONE);
-			static m_data(float, BNH_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BHW_BIAS, NONE, NONE);
+			m_static_data(float, BHW_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BHO_BIAS, NONE, NONE);
+			m_static_data(float, BHO_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BNH_BIAS, NONE, NONE);
+			m_static_data(float, BNH_CBD_BIAS, NONE, NONE);
 
 
 			//====================================================================================================================================
@@ -322,7 +322,7 @@ namespace Person_Components
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
 			
-			static m_data(int, choice_set_size, NONE, NONE);
+			m_static_data(int, choice_set_size, NONE, NONE);
 
 			// Interface definitions	
 			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;

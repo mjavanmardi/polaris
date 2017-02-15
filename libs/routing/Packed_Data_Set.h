@@ -23,7 +23,7 @@ namespace polaris
 		void* begin();
 	};
 
-	prototype struct Packed_Data_Set
+	prototype struct Packed_Data_Set ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 		
@@ -68,7 +68,7 @@ namespace polaris
 		//};
 	};
 
-	prototype struct Packed_Data_Set_Assembler
+	prototype struct Packed_Data_Set_Assembler ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 

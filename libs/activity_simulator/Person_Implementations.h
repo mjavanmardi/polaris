@@ -174,39 +174,17 @@ namespace Person_Components
 				_Moving_Faculty = (Moving_Faculty_interface*)Allocate<type_of(Moving_Faculty)>();
 				_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
-				// Create and Initialize the vehicle		
-				_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
-				_vehicle->template uuid<int>(this->_Household->uuid<int>()*100 + id);
-				_vehicle->template internal_id<int>(id);
-				_vehicle->template traveler<ComponentType*>(this);
-				_vehicle->template router<router_interface*>(_router);
-				_vehicle->template initialize<NT>();
-				_vehicle->template is_integrated<bool>(true);
+				_vehicle = nullptr;
 
-				// Check if this vehicle is tracked for trajectory output
-				//if (((scenario_reference_interface*)_global_scenario)->use_vehicle_tracking_list<bool>())
-				//{
-				//	std::unordered_set<int>& tracking_list = ((scenario_reference_interface*)_global_scenario)->vehicle_tracking_list<std::unordered_set<int>&>();
-				//	std::unordered_set<int>::iterator itr = tracking_list.find(_vehicle->template uuid<int>());
-				//	if (itr != tracking_list.end())
-				//	{
-				//		_vehicle->write_trajectory(true);
-				//	}
-				//}
-				//else
-				//{
-				//	float x = ((scenario_reference_interface*)_global_scenario)->template vehicle_trajectory_sample_rate<float>();
-				//	if (x < 0.99999999)
-				//	{
-				//		float r = GLOBALS::Uniform_RNG. template Next_Rand<float>();
-				//		if (r < x) _vehicle->write_trajectory(true);
-				//	}
-				//	else
-				//	{
-				//		_vehicle->write_trajectory(true);
-				//	}
-				//}
-				
+				// Create and Initialize the vehicle		
+				//_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
+				//_vehicle->template uuid<int>(this->_Household->uuid<int>()*100 + id);
+				//_vehicle->template internal_id<int>(id);
+				//_vehicle->template traveler<ComponentType*>(this);
+				//_vehicle->template router<router_interface*>(_router);
+				//_vehicle->template initialize<NT>();
+				//_vehicle->template is_integrated<bool>(true);
+
 
 				this->_current_location = nullptr;
 

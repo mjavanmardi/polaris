@@ -159,6 +159,8 @@ namespace Person_Components
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
+					float WORK_TTIME_CALIBRATION_FACTOR = -0.02;
+
 					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->template Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
@@ -208,7 +210,10 @@ namespace Person_Components
 					//ttime_deflected = ttime_deflected *0.5;
 
 					// Old values - with time strata at (45A/60T/20W)
-					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
+					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res +
+						_BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + 
+						_BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + ttime_deflected * WORK_TTIME_CALIBRATION_FACTOR + 
+						thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
 					if (zone->template employment_total<int>() < 1.0) u = -9999999;
 					if (ISNAN(u))
 					{

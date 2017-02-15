@@ -11,7 +11,7 @@ namespace Network_Event_Components
 
 	namespace Prototypes
 	{
-		prototype struct Network_Event:public ComponentType
+		prototype struct Network_Event ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			
@@ -86,8 +86,8 @@ namespace Network_Event_Components
 			typedef void (*type)(void*,Prototypes::Network_Event<EventType>*);
 		};
 
-		prototype struct Network_Event_Manager
-		{
+		prototype struct Network_Event_Manager ADD_DEBUG_INFO
+ 		{
 			tag_as_prototype;
 			
 			// Create new network event automatically starts it upon allocation

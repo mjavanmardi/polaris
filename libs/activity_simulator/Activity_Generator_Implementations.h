@@ -84,6 +84,20 @@ namespace Person_Components
 				activity_count++;
 				return activity;
 			}
+			template<typename TargetType> TargetType Create_Activity(TargetType act)
+			{
+				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+				activity->Copy<TargetType>(act);
+				activity->Activity_Plan_ID<int>(act->Activity_Plan_ID<int>() + 1000);
+
+				Revision &route = activity->Route_Planning_Time<Revision&>();
+				route._iteration = iteration() + 1;
+				route._sub_iteration = 0;
+
+				activity->template Schedule_Activity_Events<NT>();
+				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+				return (TargetType)activity;
+			}
 			template<typename TargetType> Activity_Plan* Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();

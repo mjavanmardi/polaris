@@ -190,7 +190,7 @@ namespace Activity_Components
 			// Basic Activity Events - Plan route and add to schedule
 			//template<typename TargetType> void Initialize(TargetType act_type)
 			//{
-			//	this_itf* pthis = (this_itf*)this;
+			//	this_itf* pthis = static_cast<this_itf*>(this);
 			//	pthis->Activity_Type<TargetType>(act_type);
 			//	pthis->Duration<Time_Seconds>(END);
 			//	pthis->Start_Time<Time_Seconds>(END);
@@ -208,8 +208,8 @@ namespace Activity_Components
 
 			template<typename TargetType> void Copy(TargetType activity)
 			{
-				this_itf* obj = (this_itf*)activity;
-				this_itf* pthis = (this_itf*)this;
+				this_itf* obj = static_cast<this_itf*>(activity);
+				this_itf* pthis = static_cast<this_itf*>(this);
 
 				pthis->is_valid(obj->is_valid<bool>());
 				pthis->Parent_Planner(obj->Parent_Planner<Parent_Planner_type>());
@@ -280,15 +280,15 @@ namespace Activity_Components
 				_household_itf* household = person->_person_itf::template Household<_household_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
-				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+				_scenario_itf* scenario = static_cast<_scenario_itf*>(_global_scenario);
 
 
 				// Create movement plan and give it an ID
-				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<get_component_type(_movement_plans_container_itf)>();
+				_movement_plan_itf* move = static_cast<_movement_plan_itf*>(Allocate<get_component_type(_movement_plans_container_itf)>());
 				move->template initialize_trajectory<NULLTYPE>();
-				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
+				move->template destination_activity_reference<ComponentType*>(static_cast<omponentType*>(this));
 				move->template network<_network_itf*>(network);
-				move->traveler_id(person->template vehicle<_vehicle_Itf*>()->template uuid<int>());
+				move->traveler_id(person->template uuid<int>());
 			
 				// Get the origin and destination locations
 				_activity_location_itf* orig;
@@ -348,7 +348,7 @@ namespace Activity_Components
 				_household_itf* household = person->_person_itf::template Household<_household_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
-				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
+				_scenario_itf* scenario = static_cast<_scenario_itf*>(_global_scenario);
 
 				
 				if (!this->Route_Is_Planned<bool>())
@@ -467,14 +467,14 @@ namespace Activity_Components
 
 				// Free this when able
 				// %%%RLW - need to figure out why first free is set to null
-				Free<ComponentType>((ComponentType*)this);
+				Free<ComponentType>(this);
 			}	
 
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)
 			{
 				_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
-				_activity_location_itf* orig = (_activity_location_itf*)origin;
-				_activity_location_itf* dest = (_activity_location_itf*)destination;
+				_activity_location_itf* orig = static_cast<_activity_location_itf*>(origin);
+				_activity_location_itf* dest = static_cast<_activity_location_itf*<(destination);
 				_activity_plan_itf* activity = move->template destination_activity_reference<_activity_plan_itf*>();
 
 				// General interfaces, to parent and global classes
@@ -496,7 +496,7 @@ namespace Activity_Components
 					// unless the activity is a return home activity, in which case, use the fixed departure time
 					if (activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 					{
-						_home_activity_itf* home_activity = (_home_activity_itf*)activity;
+						_home_activity_itf* home_activity = static_cast<_home_activity_itf*>(activity);
 						depart = home_activity->template Fixed_Departure<Simulation_Timestep_Increment>();
 					}
 						
@@ -548,7 +548,7 @@ namespace Activity_Components
 						// unless the activity is a return home activity, in which case, use the fixed departure time
 						if (activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 						{
-							_home_activity_itf* home_activity = (_home_activity_itf*)activity;
+							_home_activity_itf* home_activity = static_cast<_home_activity_itf*>(activity);
 							depart = home_activity->template Fixed_Departure<Simulation_Timestep_Increment>();
 						}
 						
@@ -730,8 +730,8 @@ namespace Activity_Components
 				//---------------------------------------------------------------------------------------------------------------------------
 
 				// get references to use in model
-				base_type* base_this = (base_type*)this;
-				this_itf* pthis = (this_itf*)this;
+				base_type* base_this = static_cast<base_type*>(this);
+				this_itf* pthis = static_cast<this_itf*>(this);
 				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				_properties_itf* properties = person->template Properties<_properties_itf*>();

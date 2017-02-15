@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 #include "Vehicle_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "../repository/RNG_Implementations.h"
@@ -30,7 +31,9 @@ namespace Vehicle_Components
 			m_data(bool,has_acc,NONE,NONE);
 			m_data(bool,has_connected_signal,NONE,NONE);
 			m_data(bool,has_full_automation,NONE,NONE);
+			m_data(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, db_ptr, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same), check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same));
 
+			//RLW%%%
             member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
             member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
             member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
@@ -38,6 +41,8 @@ namespace Vehicle_Components
 
 			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)))
 			{
+				this->_db_ptr = db_itr; // store db_ptr
+
 				this->ID(db_itr->getPrimaryKey());
 				this->capacity(db_itr->getVehicle_class()->getCapacity());
 				this->length((Basic_Units::Length_Variables::Meters)db_itr->getVehicle_class()->getLength());
@@ -125,11 +130,9 @@ namespace Vehicle_Components
 			m_data(float, distance_to_stop_bar, NONE, NONE);
 
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
-#ifndef EXCLUDE_DEMAND
+
 			m_prototype(Null_Prototype,typename MasterType::person_type, traveler, NONE, NONE);
-#else
-			m_prototype(Null_Prototype,typename MasterType::traveler_type, traveler, NONE, NONE);
-#endif
+
 			m_prototype(Routing_Components::Prototypes::Routing, typename MasterType::routing_type, router, NONE, NONE);
 
 			m_prototype(Vehicle_Components::Prototypes::Vehicle_Characteristics, typename MasterType::vehicle_characteristics_type, vehicle_characteristics, NONE, NONE);
@@ -158,16 +161,19 @@ namespace Vehicle_Components
 			typedef  Link<typename remove_pointer< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), _Link_Interface*> _Links_Container_Interface;
 
-			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Link_Interface::get_type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface;
-			typedef  Back_Insertion_Sequence< typename _Link_Interface::get_type_of(link_origin_vehicle_queue), _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
+			//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Link_Interface::get_type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface;
+			////RLW%%% typedef  Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>  _Vehicle_Interface;
+			//typedef  Back_Insertion_Sequence< typename _Link_Interface::get_type_of(link_origin_vehicle_queue), _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
+			////RLW%%% typedef  Back_Insertion_Sequence< typename MasterType::vehicle_type, _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
 
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef  Trajectory_Unit<typename remove_pointer< typename _Movement_Plan_Interface::get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename _Movement_Plan_Interface::get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
 
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			//RLW%%% typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
+			typedef  Turn_Movement_Components::Prototypes::Movement<typename MasterType::turn_movement_type>  _Movement_Interface;
+			//RLW%%% typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
 			typedef  Traveler_Components::Prototypes::Traveler<type_of(traveler)> _Traveler_Interface;
@@ -190,8 +196,26 @@ namespace Vehicle_Components
 
 			typedef Network_Event<typename MasterType::base_network_event_type> _Base_Event_Interface;
 
+			//bool is_autonomous()
+			//{
+			//	return this->_vehicle_characteristics->has_full_automation();
+			//}
+
+			bool available()
+			{
+				return this->_traveler == nullptr;
+			}
+
+			void Unassign_From_Person()
+			{
+				this->_traveler = nullptr;
+			}
+
 			template<typename TargetType> void load(requires(TargetType,check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
+				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Link_Interface::get_type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface;
+				typedef  Back_Insertion_Sequence< typename _Link_Interface::get_type_of(link_origin_vehicle_queue), _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
+
 				_simulation_status = Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE;
 				_Link_Interface* origin_link=movement_plan<_Movement_Plan_Interface*>()->template origin<_Link_Interface*>();
 				_entry_queue_length = (int)origin_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().size();
@@ -260,10 +284,10 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void move_to_origin_link()
 			{
-				_Movement_Plan_Interface* mp = (_Movement_Plan_Interface*)_movement_plan;
+				_Movement_Plan_Interface* mp = static_cast<_Movement_Plan_Interface*>(_movement_plan);
 				mp->template initialize_trajectory<NULLTYPE>();
 				_Link_Interface* link = mp->template origin<_Link_Interface*>();
-				move_to_link<_Link_Interface*>((_Link_Interface*)link);
+				move_to_link<_Link_Interface*>(static_cast<_Link_Interface*>(link));
 				_simulation_status = Types::Vehicle_Status_Keys::IN_NETWORK;
 
 				update_network_vht_compensation<TargetType>();
@@ -271,7 +295,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void move_to_next_link()
 			{
-				_Movement_Plan_Interface* mp = (_Movement_Plan_Interface*)_movement_plan;
+				_Movement_Plan_Interface* mp = static_cast<_Movement_Plan_Interface*>(_movement_plan);
 				_Link_Interface* link = mp->template next_link<_Link_Interface*>();
 
 				if (link == nullptr)
@@ -279,12 +303,12 @@ namespace Vehicle_Components
 					cout << "invalid next link in move_to_next_link of vehicle implementation" << endl;
 					assert(false);
 				}
-				move_to_link<_Link_Interface*>((_Link_Interface*)link);
+				move_to_link<_Link_Interface*>(static_cast<_Link_Interface*>(link));
 			}
 
 			template<typename TargetType> void move_to_link(TargetType link)
 			{
-
+				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Link_Interface::get_type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface;
 
 				_distance_to_stop_bar = ((_Link_Interface*)link)->template length<float>();
 
@@ -304,7 +328,10 @@ namespace Vehicle_Components
 
 				if (mp->template trajectory_size<int>() == 0)
 				{
-					THROW_EXCEPTION("Error, empty trajectory for vehicle " << _uuid);
+					static_cast<_Vehicle_Interface*>(this)->template unload<NULLTYPE>();
+					((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
+					cout << "WARNING, empty trajectory for vehicle " << _uuid;
+					return;
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
@@ -328,19 +355,22 @@ namespace Vehicle_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())
 				{
-					check_enroute_switching<TargetType>((_Link_Interface*)link);
+					check_enroute_switching<TargetType>(static_cast<_Link_Interface*>(link));
 				}
 
-				if(((_Link_Interface*)link)->template internal_id<int>() == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
+				if(static_cast<_Link_Interface*>(link)->template internal_id<int>() == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{
-					((_Vehicle_Interface*)this)->template unload<NULLTYPE>();
+					static_cast<_Vehicle_Interface*>(this)->template unload<NULLTYPE>();
 				}
-				((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
+				static_cast<_Link_Interface*>(link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
 			}
 
 			template<typename TargetType> void check_enroute_switching(_Link_Interface* link)
 			{
-				if (int(((_Link_Interface*)link)->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
+				//RLW%%% if (int(((_Link_Interface*)link)->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
+				typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+
+				if (int(link->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
 				{
 					return;
 				}
@@ -825,14 +855,14 @@ namespace Vehicle_Components
 
 				float best_route_time_to_destination = 0.0f;
 
-				//if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
-				//{
+				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
+				{
 					best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids,destination_ids,path_container,cumulative_cost_container);
-				//}
-				//else
-				//{
-				//	best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_link->template uuid<int>(),destination_link->template uuid<int>(),iteration(),path_container,cumulative_cost_container);
-				//}
+				}
+				else
+				{
+					best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids,iteration(),path_container,cumulative_cost_container);
+				}
 
 
 
@@ -1036,12 +1066,25 @@ namespace Vehicle_Components
 				//}
 			}
 
+			template<typename TargetType> void initialize(TargetType characteristics, int household_id)
+			{
+				vehicle_characteristics<TargetType>(characteristics);
+
+				initialize<NT>();
+
+				// create db_pointer
+				_vehicle_ptr = make_shared<polaris::io::Vehicle>();
+				_vehicle_ptr->setHhold(household_id);
+				_vehicle_ptr->setParking(0);
+				_vehicle_ptr->setSubtype(0);
+				_vehicle_ptr->setType(_vehicle_characteristics->db_ptr<shared_ptr<typename MasterType::vehicle_type_db_rec_type>>());
+			}
 			template<typename TargetType> void initialize()
 			{
 				//_is_integrated=false;
 
-				
 				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
+				_traveler = nullptr;
 
 				///
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
@@ -1118,6 +1161,9 @@ namespace Vehicle_Components
 						_write_trajectory = true;
 					}
 				}
+
+				// create DB writing pointer
+
 			}
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination)

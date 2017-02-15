@@ -65,6 +65,8 @@ namespace Person_Components
 			m_data(Types::TELECOMMUTE_FREQUENCY, Telecommute_Frequency, NONE, NONE);
 			
 			typedef Prototypes::Person<type_of(Parent_Person)> person_itf;
+			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+			typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename person_itf::get_type_of(vehicle)> vehicle_interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
@@ -172,12 +174,13 @@ namespace Person_Components
 				// interface to this
 				this_itf* pthis = (this_itf*)this;
 				zone_interface* selected_zone = nullptr;
-
+				Static_Properties_interface* properties = _Parent_Person->Static_Properties<Static_Properties_interface*>();
+				
 
 				//=========================================================
 				// first, make sure person is student, if not exit
 				//---------------------------------------------------------
-				SCHOOL_ENROLLMENT status = _Parent_Person->Static_Properties<Static_Properties_interface*>()->template School_Enrollment<SCHOOL_ENROLLMENT>();
+				SCHOOL_ENROLLMENT status = properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
 				if (status != SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC && status != SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 				{
 					this->school_location_id<int>(-1);
@@ -189,7 +192,7 @@ namespace Person_Components
 				// Find available zones within the specified target range of the given work travel time
 				//---------------------------------------------------------
 				zones_container_interface* zones = _Parent_Person->network_reference<network_reference_interface*>()->template zones_container<zones_container_interface*>();
-				typename zones_container_interface::iterator z_itr;
+				//typename zones_container_interface::iterator z_itr;
 				std::vector<zone_interface*> temp_zones;
 				std::vector<float> temp_zone_probabilities;
 				zone_interface* orig = _Parent_Person->template Home_Location<zone_interface*>();
@@ -197,32 +200,40 @@ namespace Person_Components
 				//=========================================================
 				// if origin zone has school locations, select, else search
 				//---------------------------------------------------------
-				if (orig->template school_locations<locations_container_interface*>()->size() > 0)
-				{
-					selected_zone = orig;
-				}
-				else
-				{
+				//if (orig->template school_locations<locations_container_interface*>()->size() > 0)
+				//{
+				//	selected_zone = orig;
+				//}
+				//else
+				//{
 					// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
 					float time_range_to_search = 15.0;
-					int school_locations = 0;
-					while (temp_zones.size() == 0)
-					{
-						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					if (properties->Age<int>() > 10) time_range_to_search += 10;
+					if (properties->Age<int>() > 18) time_range_to_search += 15;
+
+					std::vector<zone_interface*> zones_near;
+					_Parent_Person->network_reference<network_reference_interface*>()->template Get_Locations_Within_Range<zone_interface*, Time_Minutes, Vehicle_Components::Types::Vehicle_Type_Keys, zone_interface*>(zones_near, orig, 480.0, 0, time_range_to_search, SOV, true);
+
+					float school_locations = 0;
+					//while (temp_zones.size() == 0)
+					//{
+						//for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+						for (std::vector<zone_interface*>::iterator z_itr = zones_near.begin(); z_itr != zones_near.end(); ++z_itr)
 						{
-							zone_interface* zone = (zone_interface*)(z_itr->second);
-							Time_Minutes t = _Parent_Person->network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(orig, zone, Vehicle_Components::Types::SOV, 9);
-							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
+							//zone_interface* zone = (zone_interface*)(z_itr->second);
+							zone_interface* zone = *z_itr;
+							//Time_Minutes t = _Parent_Person->network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(orig, zone, Vehicle_Components::Types::SOV, 9);
+							if (/*t < time_range_to_search &&*/ zone->template school_locations<locations_container_interface*>()->size() > 0)
 							{
 								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();
 								temp_zones.push_back(zone);
 							}
 						}
 						// expand the search time radius if no available zones found
-						if (time_range_to_search >= 60) break;
-						time_range_to_search += time_range_to_search;
+						//if (time_range_to_search >= 60) break;
+						//time_range_to_search += time_range_to_search;
 
-					}
+					//}
 
 					if (temp_zones.size() == 0)
 					{
@@ -243,7 +254,6 @@ namespace Person_Components
 					// select zone
 					//---------------------------------------------------------
 					float r = Uniform_RNG.template Next_Rand<float>();
-					zone_interface* selected_zone = nullptr;
 					typename std::vector<zone_interface*>::iterator t_itr;
 					std::vector<float>::iterator p_itr;
 					for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
@@ -254,7 +264,8 @@ namespace Person_Components
 							break;
 						}
 					}
-				}
+
+				//}
 
 				//=========================================================
 				// Select location from within the zone
@@ -356,13 +367,21 @@ namespace Person_Components
 			// VOTT adjustment
 			template<typename TargetType> TargetType Value_of_Travel_Time_Adjustment()
 			{
-				vehicle_interface* veh = _Parent_Person->template vehicle<vehicle_interface*>();
-				if (veh->template is_autonomous<bool>())
+				vehicles_container_itf* vehicles = _Parent_Person->Household<household_itf*>()->Vehicles_Container<vehicles_container_itf*>();
+
+				for (vehicles_container_itf::iterator v_itr = vehicles->begin(); v_itr != vehicles->end(); ++v_itr)
 				{
-					TargetType adj = ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
-					return adj;
+					if ((*v_itr)->is_autonomous<bool>()) return ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
 				}
-				else return 1.0;
+				return 1.0;
+
+				//vehicle_interface* veh = _Parent_Person->template vehicle<vehicle_interface*>();
+				//if (veh->template is_autonomous<bool>())
+				//{
+				//	TargetType adj = ((_Scenario_Interface*)_global_scenario)->template cav_vott_adjustment<TargetType>();
+				//	return adj;
+				//}
+				//else return 1.0;
 			}
 		};
 		template<typename MasterType, typename InheritanceList> int* ADAPTS_Person_Properties_Implementation<MasterType,  InheritanceList>::Count_Array;

@@ -133,6 +133,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
+	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
@@ -146,8 +147,10 @@ struct MasterType
 	typedef Person_Components::Implementations::Activity_Timing_Chooser_Implementation<M> activity_timing_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
-	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	//typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	//typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
@@ -441,7 +444,7 @@ int main(int argc,char** argv)
 	cout << "reading external demand data..." <<endl;
 	demand->read_vehicle_type_data<NT>();
 	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	
+	_global_demand = demand;
 	
 
 	//==================================================================================================================================
@@ -517,6 +520,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
+
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize start time model
@@ -529,7 +533,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
 // %%%RLW
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
+	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
 	if (scenario->read_population_from_database<bool>())
 	{
 		popsyn->Read_From_Database<_Network_Interface*, _Scenario_Interface*>(network,scenario);

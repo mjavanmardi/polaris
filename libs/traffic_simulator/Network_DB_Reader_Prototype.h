@@ -13,7 +13,7 @@ namespace Network_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Network_DB_Reader
+		prototype struct Network_DB_Reader ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

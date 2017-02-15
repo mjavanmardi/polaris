@@ -52,6 +52,7 @@ struct MasterType
 	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
 #endif
 
 	//==============================================================================================
@@ -331,6 +332,7 @@ void run_with_input_from_db(const char* scenario_filename)
 	demand->template scenario_reference<_Scenario_Interface*>(scenario);
 	demand->template network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
+	demand->read_vehicle_type_data<NT>();
 	demand->template read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
@@ -404,7 +406,7 @@ void run_with_input_from_db(const char* scenario_filename)
 			{
 				typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-				TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+				TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 				tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 				tmc->Initialize<NT>();
 			}
@@ -471,7 +473,7 @@ void run_with_input_from_db(const char* scenario_filename)
 		{
 			cout << "Initializing network skims..." <<endl;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
-			_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+			_network_skim_itf* skimmer = static_cast<_network_skim_itf*>(Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>());
 			skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 			if (skimmer->read_input<bool>())
 			{

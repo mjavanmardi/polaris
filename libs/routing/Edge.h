@@ -20,7 +20,7 @@ namespace polaris
 
 
 
-	prototype struct Edge
+	prototype struct Edge ADD_DEBUG_INFO
 	{
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		typedef typename ComponentType::attribute_type attribute_type;

@@ -13,7 +13,7 @@ namespace Plan_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Plan
+		prototype struct Plan ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			accessor(movement_plan, NONE, NONE);

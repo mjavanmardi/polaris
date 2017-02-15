@@ -19,6 +19,8 @@ namespace PopSyn
 			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 			/// Reference to the file linker
 			m_prototype(PopSyn::Prototypes::Popsyn_File_Linker,typename MasterType::popsyn_file_linker_type, file_linker, NONE,NONE);
+
+			m_prototype(PopSyn::Prototypes::Population_Synthesizer, typename MasterType::population_synthesis_type, parent_reference, NONE, NONE);
 			
 			// List of synthesis regions to operate on, keyed on region id
 			typedef dense_hash_map<typename MasterType::synthesis_region_type::ID_type, Prototypes::Synthesis_Region<typename MasterType::synthesis_region_type>*> region_map_type;
@@ -63,6 +65,8 @@ namespace PopSyn
 			typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
 			typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 			typedef Household_Components::Prototypes::Household<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
+			typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicle_collection_itf;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicle_collection_itf)> vehicle_itf;
 			//typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
 			//typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 			typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
@@ -282,7 +286,7 @@ namespace PopSyn
 
 				out_t.commit();
 
-				((ComponentType*)this)->Load_Event<ComponentType>(&Popsyn_Event_Controller,END,END);	
+				static_cast<ComponentType*>(this)->Load_Event<ComponentType>(&Popsyn_Event_Controller,END,END);	
 			}
 
 			//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -956,13 +960,17 @@ namespace PopSyn
 				try
 				{
 					// Start database transaction
-					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
-					odb::transaction t(db->begin());
+					//unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
+					shared_ptr<odb::database> db = Get_Output_DB<NT>();
+					//odb::transaction t(db->begin());
 				
 
 					typename regions_itf::iterator r_itr;
 					typename zones_itf::iterator z_itr;
-					typename household_collection_itf::iterator p_itr;
+					typename household_collection_itf::iterator h_itr;
+
+					vehicle_itf* veh;
+
 					int counter = 0;
 
 					// Loop through all regions
@@ -974,12 +982,16 @@ namespace PopSyn
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_itf* zone = z_itr->second;
+
+							odb::transaction t(db->begin());
 							
 							// loop through each synthesized person
 							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
-							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+							for (h_itr = households->begin(); h_itr != households->end(); ++h_itr)
 							{
-								household_type* hh = (household_type*)*p_itr;
+								household_type* hh = (household_type*)*h_itr;
+
+								
 								
 								// create household record using the ACS properties
 								shared_ptr<MasterType::hh_db_rec_type> hh_rec(new MasterType::hh_db_rec_type());
@@ -1021,13 +1033,29 @@ namespace PopSyn
 									++perid;
 								}
 
-								++uuid;
-								++perid;
+								// CHANGE THIS TO OUTPUT VEHICLES TO DB
+								vehicle_collection_itf* vehicles = hh->Vehicles_Container<vehicle_collection_itf*>();
+								for (typename vehicle_collection_itf::iterator v_itr = vehicles->begin(); v_itr != vehicles->end(); ++v_itr)
+								{
+									veh = (vehicle_itf*)(*v_itr);
 
+									shared_ptr<MasterType::vehicle_db_rec_type> veh_rec(veh->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
+									veh_rec->setHhold(hh_rec->getHousehold());
+									//Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+									//Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
+
+									//push to database
+									db->persist(veh_rec);
+									counter++;
+								}
+
+								++uuid;
 							}
+
+							t.commit();
 						}
 					}
-					t.commit();
+					//RLW%%% t.commit(); 
 				}
 				catch (odb::sqlite::database_exception ex)
 				{
@@ -1035,6 +1063,14 @@ namespace PopSyn
 				}
 
 				cout << endl<<"Results output runtime (s): " << this->timer<Counter&>().Stop()/1000.0<<endl;
+			}
+			template<typename T> shared_ptr<odb::database> Get_Output_DB(requires(T, check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				return this->_scenario_reference->demand_db_ptr<shared_ptr<odb::database>>();
+			}
+			template<typename T> shared_ptr<odb::database> Get_Output_DB(requires(T, !check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
+			{
+				return this->_scenario_reference->popsyn_db_ptr<shared_ptr<odb::database>>();
 			}
 			template<typename T> string Get_Output_DB_Name(requires(T,check(typename get_type_of(network_reference), Network_Components::Concepts::Is_Transportation_Network)))
 			{

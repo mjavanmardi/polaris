@@ -255,7 +255,7 @@ namespace Basic_Units
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
-		prototype struct Length
+		prototype struct Length ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -554,7 +554,7 @@ namespace Basic_Units
 			}
 		};
 
-		prototype struct Time
+		prototype struct Time ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -757,7 +757,7 @@ namespace Basic_Units
 			}
 		};
 
-		prototype struct Speed : protected Time<ComponentType>, protected Length<ComponentType>
+		prototype struct Speed : public ComponentType, protected Time<ComponentType>, protected Length<ComponentType>
 		{
 			tag_as_prototype;
 			typedef Length<ComponentType> length_base;
@@ -810,7 +810,7 @@ namespace Basic_Units
 			//}
 		};
 
-		prototype struct Acceleration : protected Speed<ComponentType>
+		prototype struct Acceleration : public ComponentType, protected Speed<ComponentType>
 		{
 			tag_as_prototype;
 
@@ -860,7 +860,7 @@ namespace Basic_Units
 			//}
 		};
 		
-		prototype struct Currency
+		prototype struct Currency ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

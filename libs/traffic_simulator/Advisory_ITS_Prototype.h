@@ -13,7 +13,7 @@ namespace Advisory_ITS_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Advisory_ITS
+		prototype struct Advisory_ITS ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			

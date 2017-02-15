@@ -1125,6 +1125,8 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
 
 	///----------------------------------------------------------------------------------------------------
 	/// m_prototype_container � member creator, type-definition and basic accessors

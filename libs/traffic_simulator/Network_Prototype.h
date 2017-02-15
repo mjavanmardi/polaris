@@ -40,7 +40,7 @@ namespace Network_Components
 
 	namespace Prototypes
 	{
-		prototype struct Network
+		prototype struct Network ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -203,6 +203,15 @@ namespace Network_Components
 				assert_check(strip_modifiers(ReturnType), Basic_Units::Concepts::Is_Time_Value, "Return type must be a time value.");
 				//assert_check(ReturnType, Zone_Components::Concepts::Is_Zone_Prototype, "Origin/Destination must be specified as a zone_prototype.");
 				//assert_check(LocationType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype, " Or Origin/Destination must be specified as an activity_location_prototype.");
+			}
+
+			template<typename LocationType, typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<ReturnLocationType>& available_set, LocationType origin, TimeType start_time, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward = true,
+				requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
+			{
+				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
+				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
+
+				skim->Get_Locations_Within_Range<LocationType, TimeType, ModeType, ReturnLocationType>(available_set, origin, start_time, min_time, max_time, mode_indicator, search_forward);
 			}
 			
 			//------------------------------------------------------------------------------------------------------------------

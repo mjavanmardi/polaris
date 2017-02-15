@@ -34,7 +34,7 @@ namespace Person_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Person_Scheduler
+		prototype struct Person_Scheduler ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
