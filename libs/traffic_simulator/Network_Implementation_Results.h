@@ -457,7 +457,7 @@ namespace Network_Components
 			typedef typename MasterType::intersection_type _intersection_component_type;
 			typedef typename MasterType::link_type _link_component_type;
 			
-			if (((_Scenario_Interface*)_global_scenario)->template output_link_moe_for_assignment_interval<bool>())
+			if (((_Scenario_Interface*)_global_scenario)->template output_link_moe_for_simulation_interval<bool>())
 			{
 				try
 				{

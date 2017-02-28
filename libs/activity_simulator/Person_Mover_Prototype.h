@@ -58,13 +58,13 @@ namespace Prototypes
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
 			typedef Vehicle_Components::Prototypes::Vehicle< typename person_itf::get_type_of(vehicle)> vehicle_itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
-
+			typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> activity_itf;
 
 			movement_itf* movement = pthis->template Movement<movement_itf*>();
 			person_itf* person = pthis->template Parent_Person<person_itf*>();
 			vehicle_itf* vehicle = person->template vehicle<vehicle_itf*>();
 			scenario_itf* scenario = (scenario_itf*)_global_scenario;
-
+			activity_itf* act = movement->destination_activity_reference<activity_itf*>();
 				
 			// determine router aggregation properties - i.e. is routed called at departure or an aggregated time prior to departure
 			Simulation_Timestep_Increment routing_timestep = movement->template departed_time<Simulation_Timestep_Increment>()-1;

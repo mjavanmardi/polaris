@@ -140,6 +140,12 @@ namespace Person_Components
 					if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.template Current_Time<Simulation_Timestep_Increment>() &&
 						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
+						// not moving - reassign to walk mode
+						if (move->origin<_Activity_Location_Interface*>() == move->destination<_Activity_Location_Interface*>())
+						{
+							act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::WALK);
+						}
+
 						//===============================================================================
 						// IF IT IS AN SOV MOVEMENT - do vehicle selection
 						if (act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::SOV)
@@ -148,16 +154,16 @@ namespace Person_Components
 							if (vehicle == nullptr) vehicle = household->Get_Free_Vehicle<_Vehicle_Interface*>();	// if no current assigned vehicle, get a new one from the household vehicle list
 							if (vehicle != nullptr)
 							{
-								vehicle->Assign_To_Person(parent);								// if none available, throw error - should not get here
+								// if none available, throw error - should not get here
 								// make sure vehicle is not already being simulated, skip movement if it is
 								if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 								{
+									vehicle->Assign_To_Person(parent);
 									vehicle->template movement_plan<Movement_Plan*>(move);
 								}
 								else
 								{
 									act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
-									continue;
 								}
 							}
 							else

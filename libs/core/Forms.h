@@ -229,7 +229,7 @@ namespace polaris
 				template<typename _U>\
 				struct function_check<_U,true>\
 				{\
-					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().NAME<int>(0)), void>::type);\
+					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().template NAME<int>(0)), void>::type);\
 					template<typename _V> static large_type has_matching_named_member(...);\
 					\
 					template<typename _V,bool _P>\
@@ -278,7 +278,7 @@ namespace polaris
 				template<typename _U>\
 				struct function_check<_U,true>\
 				{\
-					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().NAME<int>()), int>::type);\
+					template<typename _V> static small_type has_matching_named_member(typename is_same<decltype(declval<_U>().template NAME<int>()), int>::type);\
 					template<typename _V> static large_type has_matching_named_member(...);\
 					\
 					template<typename _V,bool _P>\

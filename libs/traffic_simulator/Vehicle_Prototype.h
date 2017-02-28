@@ -219,7 +219,10 @@ namespace Vehicle_Components
 			}
 			void Unassign_From_Person()
 			{
-				this_component()->Unassign_From_Person();
+				typedef get_type_of(traveler) traveler_type;
+				this->traveler<traveler_type*>()->vehicle<ComponentType*>(nullptr);
+				this->traveler<traveler_type*>(nullptr);
+				//this_component()->Unassign_From_Person();
 			}
 
 			template<typename TargetType> void update_eta()

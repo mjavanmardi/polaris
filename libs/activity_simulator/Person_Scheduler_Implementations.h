@@ -72,8 +72,8 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			//typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 
 			typedef Back_Insertion_Sequence<type_of(Movement_Plans_Container)> Movement_Plans;
@@ -115,6 +115,9 @@ namespace Person_Components
 
 			template<typename TimeType,  typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, check(strip_modifiers(TimeType),Is_Time_Value)))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
 				typename Activity_Plans::iterator itr;
 
@@ -151,6 +154,9 @@ namespace Person_Components
 			}
 			template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType current_act,requires(ParamType, check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				// convert start time of current act to seconds
 				Activity_Plan* current = (Activity_Plan*)current_act;
 				Time_Seconds start_time = current->template Start_Time<Time_Seconds>();
@@ -166,6 +172,9 @@ namespace Person_Components
 
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType, check(strip_modifiers(ParamType),Is_Time_Value)))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plans* activity_plans = this->template Activity_Container<Activity_Plans*>();
 				typename Activity_Plans::iterator itr;
 
@@ -189,6 +198,9 @@ namespace Person_Components
 			}
 			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(ParamType, check(strip_modifiers(ParamType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				// convert start time of current act to seconds
 				Activity_Plan* current = (Activity_Plan*)current_act;
 				Time_Seconds start_time = current->template Start_Time<Time_Seconds>();
@@ -204,6 +216,9 @@ namespace Person_Components
 
 			template<typename ActivityItfType, typename ReturnType> ReturnType previous_location(ActivityItfType current_activity)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				Parent_Person_type* person = (Parent_Person_type*)_Parent_Person;
@@ -253,6 +268,9 @@ namespace Person_Components
 			}
 			template<typename ActivityItfType, typename ReturnType> ReturnType next_location(ActivityItfType current_activity)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 
@@ -307,6 +325,9 @@ namespace Person_Components
 			// Simplified timing conflict resolution - only modifying the new activity (except for split activities)
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				bool at_home_activity_modified = false;
 
 				Activity_Plan* act = (Activity_Plan*)current_activity;
@@ -532,6 +553,9 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Resolve_At_Home_Timing_Conflict(TargetType current_activity, TargetType previous_activity)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				Activity_Plan* prev_act = (Activity_Plan*)previous_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -571,6 +595,10 @@ namespace Person_Components
 			// Adding activities and movements to the planning schedules
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan, requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
+
 				// define interfaces
 				typename Movement_Plans::iterator move_itr;
 
@@ -678,6 +706,9 @@ namespace Person_Components
 			
 			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				//typedef Activity_Components::Prototypes::Activity_Plan<typename remove_pointer<typename type_of(Activity_Plans_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence<type_of(Activity_Plans_Container),Activity_Plan*> Activity_Plans;
 
@@ -697,9 +728,13 @@ namespace Person_Components
 			}		
 			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
 				Movement_Plan* move = act->template movement_plan<Movement_Plan*>();
+
+
 				
 				// if movement plan is not null check for refreence mismatch, then remove from schedule
 				if (move != nullptr)
@@ -746,6 +781,9 @@ namespace Person_Components
 
 			static bool comparer(typename MasterType::activity_type* act1, typename MasterType::activity_type* act2)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;
 				//typedef Back_Insertion_Sequence< type_of(Activity_Container),Activity_Plan*> Activity_Plans;
 
@@ -756,6 +794,9 @@ namespace Person_Components
 			
 			template<typename TargetType> TargetType Sort_Activity_Schedule()
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();
 				std::list<typename MasterType::activity_type*>* acts = (std::list<typename MasterType::activity_type*>*)activities;
 
@@ -773,6 +814,9 @@ namespace Person_Components
 			//-------------------------------------------------------------------------------------------------------
 			template<typename ActivityItfType> bool Identify_Conflicts(ActivityItfType current_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				Activity_Plan* current = (Activity_Plan*)current_activity;
 				Activity_Plan* previous = previous_activity_plan<Activity_Plan*,Activity_Plan*>(current);
 				Activity_Plan* next = next_activity_plan<Activity_Plan*,Activity_Plan*>(current);
@@ -793,6 +837,9 @@ namespace Person_Components
 
 			template<typename ActivityItfType> bool Define_Conflict(ActivityItfType conflicting_activity, ActivityItfType original_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
 			{
+				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
 				// no conflict if original_activity doesn't exist
 				if (original_activity == nullptr) return false;
 
