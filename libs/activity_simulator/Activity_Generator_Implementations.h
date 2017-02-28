@@ -37,192 +37,236 @@ namespace Person_Components
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
 
-			//%%%RLW
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
-			typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
+			////RLW%%% typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
+			////RLW%%% typedef Back_Insertion_Sequence<typename _Actvity_Container> Activity_Plans;
+			////RLW%%% typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
 
-			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type> Routine_Activity_Plan;
+			//typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type> Routine_Activity_Plan;
+			using Routine_Activity_Plan = Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type>;
+
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> At_Home_Activity_Plan;
 
-			template<typename TargetType> TargetType Parent_Person()
-			{
-				return _Parent_Planner->template Parent_Person<TargetType>();
-			}
-			template<typename TargetType> TargetType Scheduling_Faculty()
-			{
-				_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
-				return person->template Scheduling_Faculty<_Scheduler_Interface*>();
-			}
-			int Scheduled_Activity_Count()
-			{
-				_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
-				return person->template Scheduling_Faculty<_Scheduler_Interface*>()->template Activity_Count<int>();
-			}
+			template<typename TargetType> TargetType Parent_Person();
+			template<typename TargetType> TargetType Scheduling_Faculty();
+			int Scheduled_Activity_Count();
 
 			// ACTIVITY CREATION METHODS
-			template<typename TargetType> Routine_Activity_Plan* Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
-			{
-				Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				activity->template Activity_Plan_ID<int>(activity_count);
-	
-				// Activity planning time
-				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
-				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
-
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
-				activity_count++;
-				return activity;
-			}
-			template<typename TargetType> TargetType Create_Activity(TargetType act)
-			{
-				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->Copy<TargetType>(act);
-				activity->Activity_Plan_ID<int>(act->Activity_Plan_ID<int>() + 1000);
-
-				Revision &route = activity->Route_Planning_Time<Revision&>();
-				route._iteration = iteration() + 1;
-				route._sub_iteration = 0;
-
-				activity->template Schedule_Activity_Events<NT>();
-				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
-				return (TargetType)activity;
-			}
-			template<typename TargetType> Activity_Plan* Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
-			{
-				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				activity->template Activity_Plan_ID<int>(activity_count);
-
-
-				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
-				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
-
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
-				activity_count++;
-				return activity;
-			}
-			template<typename TargetType, typename LocationType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location)
-			{
-				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
-
-				activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
-
-				// set location and remove from planning stream
-				activity->template Location<LocationType>(location);
-				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
-				return activity;
-			}
-			template<typename TargetType, typename LocationType, typename ModeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode)
-			{
-				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-
-				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
-
-				activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
-				//activity->Set_Meta_Attributes<void>();
-				// schedule the activity events based on plan times.
-				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
-
-				// set location and remove from planning stream
-				activity->template Location<LocationType>(location);
-				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				// set location and remove from planning stream
-				activity->template Mode<ModeType>(mode);
-				activity->template Mode_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
-				return activity;
-			}
-			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
-			{
-				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-
-				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+1);
-
-				activity->template Initialize<ACTIVITY_TYPES, TimeType>(act_type, start_plan_time);
-				//activity->Set_Meta_Attributes<void>();
-				// schedule the activity events based on plan times.
-				//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
-
-				// set location and remove from planning stream
-				activity->template Location<LocationType>(location);
-				activity->template Location_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Location_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				// set location and remove from planning stream
-				activity->template Mode<ModeType>(mode);
-				activity->template Mode_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				// set location and remove from planning stream
-				activity->template Start_Time<TimeType>(start);
-				activity->template Start_Time_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				activity->template Duration<TimeType>(duration);
-				activity->template Duration_Planning_Time<Revision&>()._iteration = END+1;
-				activity->template Duration_Planning_Time<Revision&>()._sub_iteration = END+1;
-
-				activity->template Schedule_Activity_Events<NT>();
-				
-				this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);	
-				return activity;
-			}
-			template<typename TargetType> At_Home_Activity_Plan* Create_Home_Activity(int& activity_count)
-			{
-				At_Home_Activity_Plan* activity = (At_Home_Activity_Plan*)Allocate<typename Master_Type::at_home_activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				activity->template Activity_Plan_ID<int>(activity_count);
-
-				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
-				activity_count++;
-				return activity;
-			}
-			template<typename ReturnType, typename TimeType, typename ModeType> ReturnType Create_Home_Activity(TimeType departure_time, TimeType start, TimeType duration, ModeType mode)
-			{
-				At_Home_Activity_Plan* activity = (At_Home_Activity_Plan*)Allocate<typename Master_Type::at_home_activity_plan_type>();
-				activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
-				activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count()+100);
-
-				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY,departure_time,start,duration,mode);
-				activity->template Schedule_Activity_Events<NT>();
-
-				this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
-
-				return (ReturnType)activity;
-			}
+			template<typename TargetType> Routine_Activity_Plan* Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time);
+			template<typename TargetType> TargetType Create_Activity(TargetType act);
+			template<typename TargetType> Activity_Plan* Create_Activity(TargetType act_type, int& activity_count, int start_plan_time);
+			template<typename TargetType, typename LocationType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location);
+			template<typename TargetType, typename LocationType, typename ModeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode);
+			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration);
+			template<typename TargetType> At_Home_Activity_Plan* Create_Home_Activity(int& activity_count);
+			template<typename ReturnType, typename TimeType, typename ModeType> ReturnType Create_Home_Activity(TimeType departure_time, TimeType start, TimeType duration, ModeType mode);
 			
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType General_Activity_Generator_Implementation<MasterType, InheritanceList>::Parent_Person()
+		{
+			return _Parent_Planner->template Parent_Person<TargetType>();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType General_Activity_Generator_Implementation<MasterType, InheritanceList>::Scheduling_Faculty()
+		{
+			_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
+			return person->template Scheduling_Faculty<_Scheduler_Interface*>();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		int General_Activity_Generator_Implementation<MasterType, InheritanceList>::Scheduled_Activity_Count()
+		{
+			_Person_Interface* person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
+			return person->template Scheduling_Faculty<_Scheduler_Interface*>()->template Activity_Count<int>();
+		}
+
+		// ACTIVITY CREATION METHODS
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Routine_Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
+		{
+			Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			activity->template Activity_Plan_ID<int>(activity_count);
+
+			// Activity planning time
+			Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
+			activity_count++;
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->Copy<TargetType>(act);
+			activity->Activity_Plan_ID<int>(act->Activity_Plan_ID<int>() + 1000);
+
+			Revision &route = activity->Route_Planning_Time<Revision&>();
+			route._iteration = iteration() + 1;
+			route._sub_iteration = 0;
+
+			activity->template Schedule_Activity_Events<NT>();
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			return (TargetType)activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			activity->template Activity_Plan_ID<int>(activity_count);
+
+			Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			activity_count++;
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType, typename LocationType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act_type, int start_plan_time, LocationType location)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count() + 1);
+
+			activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
+
+			// set location and remove from planning stream
+			activity->template Location<LocationType>(location);
+			activity->template Location_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Location_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType, typename LocationType, typename ModeType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+
+			activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count() + 1);
+
+			activity->template Initialize<ACTIVITY_TYPES>(act_type, start_plan_time);
+			//activity->Set_Meta_Attributes<void>();
+			// schedule the activity events based on plan times.
+			//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+			// set location and remove from planning stream
+			activity->template Location<LocationType>(location);
+			activity->template Location_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Location_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			// set location and remove from planning stream
+			activity->template Mode<ModeType>(mode);
+			activity->template Mode_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType, typename LocationType, typename ModeType, typename TimeType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+
+			activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count() + 1);
+
+			activity->template Initialize<ACTIVITY_TYPES, TimeType>(act_type, start_plan_time);
+			//activity->Set_Meta_Attributes<void>();
+			// schedule the activity events based on plan times.
+			//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+			// set location and remove from planning stream
+			activity->template Location<LocationType>(location);
+			activity->template Location_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Location_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			// set location and remove from planning stream
+			activity->template Mode<ModeType>(mode);
+			activity->template Mode_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			// set location and remove from planning stream
+			activity->template Start_Time<TimeType>(start);
+			activity->template Start_Time_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Duration<TimeType>(duration);
+			activity->template Duration_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Duration_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::At_Home_Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Home_Activity(int& activity_count)
+		{
+			At_Home_Activity_Plan* activity = static_cast<At_Home_Activity_Plan*>(Allocate<typename Master_Type::at_home_activity_plan_type>());
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			activity->template Activity_Plan_ID<int>(activity_count);
+
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY, 0, 0, END, Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);
+			activity_count++;
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename ReturnType, typename TimeType, typename ModeType>
+		ReturnType General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Home_Activity(TimeType departure_time, TimeType start, TimeType duration, ModeType mode)
+		{
+			At_Home_Activity_Plan* activity = static_cast<At_Home_Activity_Plan*>(Allocate<typename Master_Type::at_home_activity_plan_type>());
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+			activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count() + 100);
+
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(ACTIVITY_TYPES::AT_HOME_ACTIVITY, departure_time, start, duration, mode);
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);
+
+			return (ReturnType)activity;
+		}
 
 
 		//======================================================================
@@ -235,20 +279,31 @@ namespace Person_Components
 			typedef Prototypes::Activity_Generator<base_type> base_itf;
 			typedef Prototypes::Person<typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person)))
-			{	
-			}
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Activity_Simulator::Person_Concepts::Is_Person)))
-			{	
-				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
-				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
-				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
-			}
-
-			template<typename TargetType> void Activity_Generation()
-			{
-			}
+			template<typename TargetType> void Initialize(requires(TargetType, check(typename ComponentType::Parent_Type, Activity_Simulator::Person_Concepts::Is_Person)));
+			template<typename TargetType> void Initialize(requires(TargetType, check(typename ComponentType::Parent_Type, !Activity_Simulator::Person_Concepts::Is_Person)));
+			template<typename TargetType> void Activity_Generation();
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void ADAPTS_Activity_Generator_Implementation<MasterType, InheritanceList>::Initialize(requires(TargetType, check(typename ComponentType::Parent_Type, Activity_Simulator::Person_Concepts::Is_Person)))
+		{
+		}
+		
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void ADAPTS_Activity_Generator_Implementation<MasterType, InheritanceList>::Initialize(requires(TargetType, check(typename ComponentType::Parent_Type, !Activity_Simulator::Person_Concepts::Is_Person)))
+		{
+			assert_sub_check(typename ComponentType::Parent_Type, Activity_Simulator::Person_Concepts::Is_Person, Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
+			assert_sub_check(typename ComponentType::Parent_Type, Activity_Simulator::Person_Concepts::Is_Person, Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
+			assert_sub_check(typename ComponentType::Parent_Type, Activity_Simulator::Person_Concepts::Is_Person, Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void ADAPTS_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Generation()
+		{
+		}
 
 
 		//======================================================================
@@ -307,9 +362,10 @@ namespace Person_Components
 
 			typedef typename base_type::_Scheduler_Interface _Scheduler_Interface;
 
-			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
-			typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
+			//RLW%%%
+			//typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
+			//typedef Back_Insertion_Sequence<_Actvity_Container> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename _Scheduler_Interface::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
@@ -318,146 +374,162 @@ namespace Person_Components
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type> Activity_Plan;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> At_Home_Activity_Plan;
 
-			template<typename TargetType> void Initialize()
-			{	
-			}
-
-			template<typename TargetType> void Activity_Generation()
-			{
-				// updates for counters
-				this->Generator_Count_Array[__thread_id]++;
-				if (this->Generator_Count_Array[__thread_id] % 10000 == 0)  
-				{
-					//LOCK(this->_update_lock);
-					this->Generator_Count+=10000;
-					cout << '\r' << "Activity Generation: " << this->Generator_Count << "                                 ";
-					//UNLOCK(this->_update_lock);
-				}
-				
-				person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
-				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
-				_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<_static_properties_itf*>();
-				_properties_itf* properties = _Parent_Person->template Properties<_properties_itf*>();
-				
-				// person type used in activity generation calculations
-				int person_index = this->Person_Type_index<NT>();
-				
-				// get references to the plan containers
-				Activity_Plans* activities = scheduler->template Activity_Container<Activity_Plans*>();
-				Movement_Plans* movements = scheduler->template Movement_Plans_Container<Movement_Plans*>();	
-
-				// external knowledge references
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Scenario_Interface* scenario = _Parent_Person->template scenario_reference<_Scenario_Interface*>();
-
-				int act_count = 1;
-
-				//=========================================================================================================================
-				// Get random start plan time inthe first 3 minutes for generation
-				int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*180.0f) + iteration();
-				
-
-				//=========================================================================================================================
-				// Initialize person with at-home activity
-				At_Home_Activity_Plan* home_act = this->template Create_Home_Activity<NT>(act_count);
-				//%%%RLW scheduler->template Update_Current_Activity(home_act);
-				scheduler->Update_Current_Activity(home_act);
-				//-------------------------------------------------------------------------------------------------------------------------
-
-
-				//=========================================================================================================================
-				// Generate work activity
-				//--------------------------------
-				// determine if working from home on this day
-				ACTIVITY_TYPES work_type = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;
-				float p_work_from_home = 0.0;
-				if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_DAILY) p_work_from_home = 1.0;
-				else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY) p_work_from_home = 1.5/7.0;
-				else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_MONTHLY) p_work_from_home = 1.5/30.0;
-				else p_work_from_home = 0.0;
-
-				EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();
-				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
-				{
-					float num_work = work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type,act_count, start_plan_time);
-
-					float num_pwork = part_time_work_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY;
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type,act_count, start_plan_time);
-				}
-				//-------------------------------------------------------------------------------------------------------------------------
-
-
-				//=========================================================================================================================
-				// Generate school activity
-				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
-				{
-					float num_school = school_activity_freq[person_index];
-					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school ) this->template Create_Routine_Activity<ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
-				}
-				//-------------------------------------------------------------------------------------------------------------------------
-
-				// separate routine and regular activity planning i.e. make sure all routine planning is done first
-				start_plan_time += 20;
-
-				float activity_overgeneration_factor = 1.3;
-
-				//=========================================================================================================================
-				// Get frequency of each activity type
-				float num_eat_out = eat_out_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_errand = errands_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_healthcare = healthcare_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_leisure = leisure_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_maj_shop = major_shopping_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_other = other_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_other_shop = other_shopping_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_pb = personal_business_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_civic = religious_or_civic_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_service = service_vehicle_activity_freq[person_index] * activity_overgeneration_factor;
-				float num_social = social_activity_freq[person_index] * activity_overgeneration_factor;
-
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out ) this->template Create_Activity<ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand ) this->template Create_Activity<ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare ) this->template Create_Activity<ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure ) this->template Create_Activity<ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop ) this->template Create_Activity<ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop ) this->template Create_Activity<ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb ) this->template Create_Activity<ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic ) this->template Create_Activity<ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service ) this->template Create_Activity<ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social ) this->template Create_Activity<ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
-
-			}
-
-			template<typename TargetType> int Person_Type_index()
-			{
-				person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
-				_static_properties_itf* per = _Parent_Person->template Static_Properties<_static_properties_itf*>();
-
-				int age = per->template Age<int>();
-				Time_Hours hours = per->template Work_Hours<Time_Hours>();
-				bool student = per->template Is_Student<bool>();
-				bool employed = per->template Is_Employed<bool>();
-
-				int index = -1;
-				if (employed && hours >= 30) index = 3;		// full time
-				else if (employed) index = 4;				// part time
-				else if (student && age > 18) index = 7;	// adult student
-				else if (age >= 65) index = 6;				// senior
-				else if (age < 65 && age > 18) index = 5;	// adult non-worker
-				else if (age >= 16 && age <= 18) index = 0;	// driving age school child
-				else if (age < 16 && age >= 5) index = 1;	// school child
-				else if (age < 5) index = 2;				// pre- school age child
-				else index = 5;
-
-				return index;
-			}
+			template<typename TargetType> void Initialize();
+			template<typename TargetType> void Activity_Generation();
+			template<typename TargetType> int Person_Type_index();
 
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::Initialize()
+		{
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Generation()
+		{
+			typedef typename _Scheduler_Interface::get_type_of(Activity_Container) _Actvity_Container;
+			typedef Back_Insertion_Sequence<typename _Actvity_Container> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Basic_Activity_Plan;
+
+
+			// updates for counters
+			this->Generator_Count_Array[__thread_id]++;
+			if (this->Generator_Count_Array[__thread_id] % 10000 == 0)
+			{
+				//LOCK(this->_update_lock);
+				this->Generator_Count += 10000;
+				cout << '\r' << "Activity Generation: " << this->Generator_Count << "                                 ";
+				//UNLOCK(this->_update_lock);
+			}
+
+			person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
+			scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+			_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<_static_properties_itf*>();
+			_properties_itf* properties = _Parent_Person->template Properties<_properties_itf*>();
+
+			// person type used in activity generation calculations
+			int person_index = this->Person_Type_index<NT>();
+
+			// get references to the plan containers
+			Activity_Plans* activities = scheduler->template Activity_Container<Activity_Plans*>();
+			Movement_Plans* movements = scheduler->template Movement_Plans_Container<Movement_Plans*>();
+
+			// external knowledge references
+			_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+			_Scenario_Interface* scenario = _Parent_Person->template scenario_reference<_Scenario_Interface*>();
+
+			int act_count = 1;
+
+			//=========================================================================================================================
+			// Get random start plan time inthe first 3 minutes for generation
+			int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*180.0f) + iteration();
+
+
+			//=========================================================================================================================
+			// Initialize person with at-home activity
+			At_Home_Activity_Plan* home_act = this->template Create_Home_Activity<NT>(act_count);
+			scheduler->Update_Current_Activity(home_act);
+			//-------------------------------------------------------------------------------------------------------------------------
+
+
+			//=========================================================================================================================
+			// Generate work activity
+			//--------------------------------
+			// determine if working from home on this day
+			ACTIVITY_TYPES work_type = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;
+			float p_work_from_home = 0.0;
+			if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_DAILY) p_work_from_home = 1.0;
+			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY) p_work_from_home = 1.5 / 7.0;
+			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_MONTHLY) p_work_from_home = 1.5 / 30.0;
+			else p_work_from_home = 0.0;
+
+			EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();
+			if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
+			{
+				float num_work = work_activity_freq[person_index];
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type, act_count, start_plan_time);
+
+				float num_pwork = part_time_work_activity_freq[person_index];
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY;
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type, act_count, start_plan_time);
+			}
+			//-------------------------------------------------------------------------------------------------------------------------
+
+
+			//=========================================================================================================================
+			// Generate school activity
+			Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
+			if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+			{
+				float num_school = school_activity_freq[person_index];
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school) this->template Create_Routine_Activity<ACTIVITY_TYPES>(SCHOOL_ACTIVITY, act_count, start_plan_time);
+			}
+			//-------------------------------------------------------------------------------------------------------------------------
+
+			// separate routine and regular activity planning i.e. make sure all routine planning is done first
+			start_plan_time += 20;
+
+			float activity_overgeneration_factor = 1.3;
+
+			//=========================================================================================================================
+			// Get frequency of each activity type
+			float num_eat_out = eat_out_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_errand = errands_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_healthcare = healthcare_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_leisure = leisure_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_maj_shop = major_shopping_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_other = other_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_other_shop = other_shopping_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_pb = personal_business_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_civic = religious_or_civic_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_service = service_vehicle_activity_freq[person_index] * activity_overgeneration_factor;
+			float num_social = social_activity_freq[person_index] * activity_overgeneration_factor;
+
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out) this->template Create_Activity<ACTIVITY_TYPES>(EAT_OUT_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand) this->template Create_Activity<ACTIVITY_TYPES>(ERRANDS_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare) this->template Create_Activity<ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure) this->template Create_Activity<ACTIVITY_TYPES>(LEISURE_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop) this->template Create_Activity<ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY, act_count, start_plan_time);
+			//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop) this->template Create_Activity<ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb) this->template Create_Activity<ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic) this->template Create_Activity<ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service) this->template Create_Activity<ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY, act_count, start_plan_time);
+			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social) this->template Create_Activity<ACTIVITY_TYPES>(SOCIAL_ACTIVITY, act_count, start_plan_time);
+
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		int Simple_Activity_Generator_Implementation<MasterType, InheritanceList>::Person_Type_index()
+		{
+			person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
+			_static_properties_itf* per = _Parent_Person->template Static_Properties<_static_properties_itf*>();
+
+			int age = per->template Age<int>();
+			Time_Hours hours = per->template Work_Hours<Time_Hours>();
+			bool student = per->template Is_Student<bool>();
+			bool employed = per->template Is_Employed<bool>();
+
+			int index = -1;
+			if (employed && hours >= 30) index = 3;		// full time
+			else if (employed) index = 4;				// part time
+			else if (student && age > 18) index = 7;	// adult student
+			else if (age >= 65) index = 6;				// senior
+			else if (age < 65 && age > 18) index = 5;	// adult non-worker
+			else if (age >= 16 && age <= 18) index = 0;	// driving age school child
+			else if (age < 16 && age >= 5) index = 1;	// school child
+			else if (age < 5) index = 2;				// pre- school age child
+			else index = 5;
+
+			return index;
+		}
+
+
 		//============================================
 		#pragma region Static member initialization 
 		//																																							student-driver, school child, pre-school, full-time, part-time, non-worker, senior, adult-student

@@ -96,23 +96,35 @@ typedef Basic_Units::Implementations::Speed_Implementation<NT> Basic_Speed;
 template<typename Base_Time_Type>
 struct _Simulation_Timer
 {
-	template<typename TargetType> TargetType Current_Time()
-	{
-		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Base_Time_Type,TargetType>((typename Base_Time_Type::ValueType)iteration());
-	}
-	template<typename InputType, typename ReturnType> ReturnType Future_Time(InputType Additional_Time_Increment)
-	{
-		Simulation_Timestep_Increment current_time;
-		current_time = (Simulation_Timestep_Increment)iteration();
-		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Additional_Time_Increment);
-		ReturnType return_value = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment, ReturnType>(Round<int,Basic_Units::Time_Value_Type>(current_time) + Round<int,Basic_Units::Time_Value_Type>(additional_time));
-		return (ReturnType)Round<int,Basic_Units::Time_Value_Type>(return_value);
-	}
-	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time)
-	{
-		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Time);
-	}
+	template<typename TargetType> TargetType Current_Time();
+	template<typename InputType, typename ReturnType> ReturnType Future_Time(InputType Additional_Time_Increment);
+	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time);
 };
+
+template<typename Base_Time_Type>
+template<typename TargetType>
+TargetType _Simulation_Timer<Base_Time_Type>::Current_Time()
+{
+	return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Base_Time_Type, TargetType>((typename Base_Time_Type::ValueType)iteration());
+}
+
+template<typename Base_Time_Type>
+template<typename InputType, typename ReturnType>
+ReturnType _Simulation_Timer<Base_Time_Type>::Future_Time(InputType Additional_Time_Increment)
+{
+	Simulation_Timestep_Increment current_time;
+	current_time = (Simulation_Timestep_Increment)iteration();
+	Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Additional_Time_Increment);
+	ReturnType return_value = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment, ReturnType>(Round<int, Basic_Units::Time_Value_Type>(current_time) + Round<int, Basic_Units::Time_Value_Type>(additional_time));
+	return (ReturnType)Round<int, Basic_Units::Time_Value_Type>(return_value);
+}
+
+template<typename Base_Time_Type>
+template<typename InputType>
+Simulation_Timestep_Increment _Simulation_Timer<Base_Time_Type>::Convert_Time_To_Simulation_Timestep(InputType Time)
+{
+	return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Time);
+}
 
 static _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
 

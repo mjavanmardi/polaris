@@ -640,7 +640,21 @@ namespace polaris
               }\
 
 
-	/////----------------------------------------------------------------------------------------------------
+#define more_basic_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+       public:\
+              template<typename TargetType>\
+              void NAME(TargetType set_value)\
+              {\
+                    this_component()->NAME(set_value);\
+              }\
+              template<typename TargetType>\
+              TargetType NAME()\
+              {\
+                    return this_component()->NAME();\
+              }\
+
+
+/////----------------------------------------------------------------------------------------------------
 	///// tag_based_accessor - implements the standard get / set accessors
 	/////		includes a tag-based check on whether the implementation has corresponding accessors - This is the only one which works currently
 	/////----------------------------------------------------------------------------------------------------

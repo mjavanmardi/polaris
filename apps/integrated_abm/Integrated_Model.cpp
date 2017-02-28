@@ -382,7 +382,7 @@ int main(int argc,char** argv)
 			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
 			//%%%RLW
-			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			tmc->Initialize<NT>();
 		}
@@ -522,7 +522,6 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
-
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize start time model
@@ -538,7 +537,6 @@ int main(int argc,char** argv)
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-// %%%RLW
 	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
 	if (scenario->read_population_from_database<bool>())
 	{

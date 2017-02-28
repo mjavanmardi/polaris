@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	// Start population synthesis
 	//---------------------------------------------------------------------------------------------------------------------------------- 
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
+	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
 	popsyn->Initialize<_Scenario_Interface*>(scenario);
 
 	START();

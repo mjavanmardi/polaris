@@ -447,9 +447,9 @@ namespace Movement_Plan_Components
 				return (TargetType)(trajectory->size());
 			}
 
-			template<typename TargetType> void arrive_to_destination()
+			void arrive_to_destination()
 			{
-				this_component()->template arrive_to_destination<TargetType>();
+				this_component()->arrive_to_destination();
 			}
 
 			template<typename TargetType> void transfer_to_next_link(int delayed_time)

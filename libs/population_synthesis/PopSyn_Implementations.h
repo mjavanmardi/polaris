@@ -65,8 +65,8 @@ namespace PopSyn
 			typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(person_sample_data_itf)> person_unit_itf;
 			typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
 			typedef Household_Components::Prototypes::Household<typename get_component_type(typename zone_type::type_of(Synthetic_Households_Container))> household_itf;
-			typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicle_collection_itf;
-			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicle_collection_itf)> vehicle_itf;
+			//RLW%%% typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicle_collection_itf;
+			//RLW%%% typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicle_collection_itf)> vehicle_itf;
 			//typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
 			//typedef Person_Components::Prototypes::Person_Properties<typename get_component_type(typename zone_type::type_of(Synthetic_Persons_Container))> person_itf;
 			typedef Random_Access_Sequence<person_collection_type> person_collection_itf;
@@ -946,6 +946,9 @@ namespace PopSyn
 			// 5.) Write output to database (at Iteration 2) - the routine differs if writing for a full abm or for stand-alone popsyn with no network
 			template<typename TargetType> void Output_Popsyn_To_DB_Event()
 			{
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicle_collection_itf;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicle_collection_itf)> vehicle_itf;
+
 				//=============================================================================================
 				// Loop through each region/zone and write synthesized agents to database
 				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
@@ -962,7 +965,7 @@ namespace PopSyn
 					// Start database transaction
 					//unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(Get_Output_DB_Name<NT>()));
 					shared_ptr<odb::database> db = Get_Output_DB<NT>();
-					//odb::transaction t(db->begin());
+					odb::transaction t(db->begin());
 				
 
 					typename regions_itf::iterator r_itr;
@@ -983,8 +986,6 @@ namespace PopSyn
 						{
 							zone_itf* zone = z_itr->second;
 
-							odb::transaction t(db->begin());
-							
 							// loop through each synthesized person
 							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
 							for (h_itr = households->begin(); h_itr != households->end(); ++h_itr)
@@ -1051,11 +1052,9 @@ namespace PopSyn
 
 								++uuid;
 							}
-
-							t.commit();
 						}
 					}
-					//RLW%%% t.commit(); 
+					t.commit(); 
 				}
 				catch (odb::sqlite::database_exception ex)
 				{

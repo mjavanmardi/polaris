@@ -231,7 +231,7 @@ namespace Person_Components
 				Revision& location = act->template Location_Planning_Time<Revision&>();
 				Revision& start = act->template Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Route_Planning_Time<Revision&>();
-				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Get_Type_String<NT>() << "\t"<<zone->template uuid<int>()<<"\t";
+				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Get_Type_String() << "\t"<<zone->template uuid<int>()<<"\t";
 				s << "Plan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)
@@ -691,7 +691,7 @@ namespace Person_Components
 					act_rec.setMode("BIKE");
 				else
 					act_rec.setMode ("TRANSIT");
-				act_rec.setType (act->template Get_Type_String<NT>());
+				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	

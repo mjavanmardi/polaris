@@ -280,9 +280,9 @@ namespace polaris
 		typedef typename ComponentType::size_type size_type;
 		typedef T value_type;
 
-		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+		iterator begin(){return (iterator)(static_cast<ComponentType*>(this))->begin();}
 
-		iterator end(){return (iterator)((ComponentType*)this)->end();}
+		iterator end(){return (iterator)(static_cast<ComponentType*>(this))->end();}
 
 		reverse_iterator rbegin(){return (reverse_iterator)((ComponentType*)this)->rbegin();}
 

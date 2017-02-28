@@ -76,8 +76,9 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			//RLW%%%
+			//typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
@@ -780,8 +781,9 @@ namespace Person_Components
 
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container),int> _Zone_Ids_Interface;
 
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			//RLW%%%
+			//typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
@@ -1050,7 +1052,7 @@ namespace Person_Components
 
 				_Activity_Location_Interface* prev_loc, *next_loc;
 				bool restrict_choice_set = true;
-				if (this->_Current_Activity->template Start_Is_Planned<bool>())
+				if (this->_Current_Activity->Start_Is_Planned())
 				{
 					start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 
@@ -1063,7 +1065,7 @@ namespace Person_Components
 						prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if (prev_act->template Location_Is_Planned<bool>())
+					else if (prev_act->Location_Is_Planned())
 					{
 						prev_loc = prev_act->template Location<_Activity_Location_Interface*>();
 						min_start = prev_act->template End_Time<Time_Minutes>();
@@ -1079,7 +1081,7 @@ namespace Person_Components
 						next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if(next_act->template Location_Is_Planned<bool>())
+					else if(next_act->Location_Is_Planned())
 					{
 						next_loc = next_act->template Location<_Activity_Location_Interface*>();
 						max_end = next_act->template Start_Time<Time_Minutes>();
@@ -1113,7 +1115,7 @@ namespace Person_Components
 				//----------------------------------------------------------------------
 				// Get the mode of the activity, if not yet planned, assume 9AM
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
-				if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
@@ -1259,7 +1261,7 @@ namespace Person_Components
 				Time_Minutes start_time = 9.0 * 60.0;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->template Start_Is_Planned<NT>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
+					if (_Current_Activity->Start_Is_Planned()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 				//----------------------------------------------------------------------
@@ -1267,7 +1269,7 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				}
 
 
@@ -1361,7 +1363,7 @@ namespace Person_Components
 				Time_Minutes start_time = 540.0;
 				if (_Current_Activity != nullptr)
 				{
-					if (_Current_Activity->template Start_Is_Planned<bool>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
+					if (_Current_Activity->Start_Is_Planned()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 

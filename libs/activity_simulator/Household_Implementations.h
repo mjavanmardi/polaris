@@ -105,15 +105,6 @@ namespace Household_Components
 				}
 				return nullptr;
 			}
-			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
-			{
-				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
-				{
-					if ((*v_itr)->available()) return *v_itr;
-				}
-				return nullptr;
-			}
-
 		};
 
 	}

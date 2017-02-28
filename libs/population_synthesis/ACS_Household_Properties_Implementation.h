@@ -34,6 +34,7 @@ namespace Household_Components
 			//=================================================================
 			// Container which holds linked persons in ACS File for this household info unit
 			m_container(std::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Persons_Container, NONE, NONE);
+			//m_container(std::vector<Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>*>, Vehicles_Container, NONE, NONE); //RLW%%% - added
 
 			template <typename T> T Number_of_Adults()
 			{

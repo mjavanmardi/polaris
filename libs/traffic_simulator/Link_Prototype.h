@@ -170,157 +170,256 @@ namespace Link_Components
 			// ITS-enabled link
 			accessor(advisory_radio_events, NONE, NONE);
 			
-			template<typename TargetType> void Push_ITS(TargetType its)
-			{
-				this_component()->template Accept_ITS<TargetType>(its);
-			}
+			template<typename TargetType> void Push_ITS(TargetType its);
 
 			//visualized link
 			accessor(displayed_line, NONE, NONE);
 
-			template<typename TargetType> void push_vehicle_from_origin(TargetType vehicle)
-			{
-				accept_vehicle_from_origin<TargetType>(vehicle);
-			}
-			
-			template<typename TargetType> void push_vehicle_from_network(TargetType vehicle)
-			{
-				accept_vehicle_from_network<TargetType>(vehicle);
-			}
-			
-			template<typename TargetType> void accept_vehicle_from_origin(TargetType vehicle)
-			{
-				this_component()->template accept_vehicle_from_origin<TargetType>(vehicle);
-			}
-			
-			template<typename TargetType> void accept_vehicle_from_network(TargetType vehicle)
-			{
-				this_component()->template accept_vehicle_from_network<TargetType>(vehicle);
-			}
-			
-			template<typename TargetType> void link_supply_update()
-			{
-				this_component()->template link_supply_update<TargetType>();
-			}
-			
-			template<typename TargetType> void link_moving()
-			{
-				this_component()->template link_moving<TargetType>();
-			}
-
-			template<typename TargetType> void origin_link_loading()
-			{
-				this_component()->template origin_link_loading<TargetType>();
-			}
-
-			template<typename TargetType> void network_state_update()
-			{
-				this_component()->template network_state_update<TargetType>();
-			}
-
-			template<typename TargetType> void Initialize()
-			{
-				this_component()->template Initialize<TargetType>();
-			}
-
-			template<typename TargetType> void reset_routable_link()
-			{
-				this_component()->template reset_routable_link<TargetType>();
-			}
-
-			template<typename TargetType> void construct_routable_from_regular(TargetType regular_link)
-			{
-				this_component()->template construct_routable_from_regular<TargetType>(regular_link);
-			}
-
-			template<typename TargetType> void construct_realtime_routable_from_regular(TargetType regular_link)
-			{
-				this_component()->template construct_realtime_routable_from_regular<TargetType>(regular_link);
-			}
-
-			template<typename TargetType> void initialize_features(TargetType param)
-			{
-				this_component()->template initialize_features<TargetType>(param);
-			}
-
-			template<typename TargetType> void calculate_moe_for_simulation_interval()
-			{
-				this_component()->template calculate_moe_for_simulation_interval<TargetType>();
-			}
-
-			template<typename TargetType> void calculate_moe_for_assignment_interval()
-			{
-				this_component()->template calculate_moe_for_assignment_interval<TargetType>();
-			}
-
-			template<typename TargetType> void update_vmt_vht()
-			{
-				this_component()->template update_vmt_vht<TargetType>();
-			}
-
-			template<typename TargetType> void visualize_moe()
-			{
-				this_component()->template visualize_moe<TargetType>();
-			}
-
-			template<typename TargetType> void configure_displayed_line()
-			{
-				this_component()->template configure_displayed_line<TargetType>();
-			}
-			
-			template<typename TargetType> void handle_events()
-			{
-				this_component()->template handle_events<TargetType>();
-			}
-
-			template<typename TargetType> void get_events_from_vms(TargetType events_set)
-			{
-				this_component()->template get_events_from_vms<TargetType>(events_set);
-			}
-			template<typename TargetType> void get_events_from_har(TargetType events_set)
-			{
-				this_component()->template get_events_from_har<TargetType>(events_set);
-			}
-
-			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
-			{
-				this_component()->template get_link_moe<TargetType>(start_time, end_time, volume, speed, density);
-			}
-			template<typename TargetType> void get_prevailing_link_moe(int& volume, float& speed, float& density)
-			{
-				this_component()->template get_prevailing_link_moe<TargetType>(volume, speed, density);
-			}
+			template<typename TargetType> void push_vehicle_from_origin(TargetType vehicle);
+			template<typename TargetType> void push_vehicle_from_network(TargetType vehicle);
+			template<typename TargetType> void accept_vehicle_from_origin(TargetType vehicle);
+			template<typename TargetType> void accept_vehicle_from_network(TargetType vehicle);
+			template<typename TargetType> void link_supply_update();
+			template<typename TargetType> void link_moving();
+			template<typename TargetType> void origin_link_loading();
+			template<typename TargetType> void network_state_update();
+			template<typename TargetType> void Initialize();
+			template<typename TargetType> void reset_routable_link();
+			template<typename TargetType> void construct_routable_from_regular(TargetType regular_link);
+			template<typename TargetType> void construct_realtime_routable_from_regular(TargetType regular_link);
+			template<typename TargetType> void initialize_features(TargetType param);
+			template<typename TargetType> void calculate_moe_for_simulation_interval();
+			template<typename TargetType> void calculate_moe_for_assignment_interval();
+			template<typename TargetType> void update_vmt_vht();
+			template<typename TargetType> void visualize_moe();
+			template<typename TargetType> void configure_displayed_line();
+			template<typename TargetType> void handle_events();
+			template<typename TargetType> void get_events_from_vms(TargetType events_set);
+			template<typename TargetType> void get_events_from_har(TargetType events_set);
+			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density);
+			template<typename TargetType> void get_prevailing_link_moe(int& volume, float& speed, float& density);
 
 			/*
 			 * return true if normal day link moe is available in which case volume, speed, and density are filled up with corresponding data;
 			 * return false if normal day link moe is unavailable.
 			 */
-			template<typename TargetType> bool get_normal_day_link_moe(int& volume, float& speed, float& density)
-			{
-				return this_component()->template get_normal_day_link_moe<TargetType>(volume, speed, density);
-			}
-			template<typename TargetType> void open_shoulder()
-			{
-				this_component()->template open_shoulder<TargetType>();
-			}
-			template<typename TargetType> void close_shoulder()
-			{
-				this_component()->template close_shoulder<TargetType>();
-			}
-			template<typename TargetType> void change_speed_limit(float speed_limit)
-			{
-				this_component()->template change_speed_limit<TargetType>(speed_limit);
-			}
-			template<typename TargetType> float free_flow_speed_estimate()
-			{
-				return this_component()->template free_flow_speed_estimate<TargetType>();
-			}
-
-			template<typename TargetType> float speed_limit_estimate()
-			{
-				return this_component()->template speed_limit_estimate<TargetType>();
-			}
+			template<typename TargetType> bool get_normal_day_link_moe(int& volume, float& speed, float& density);
+			template<typename TargetType> void open_shoulder();
+			template<typename TargetType> void close_shoulder();
+			template<typename TargetType> void change_speed_limit(float speed_limit);
+			template<typename TargetType> float free_flow_speed_estimate();
+			template<typename TargetType> float speed_limit_estimate();
 		};
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::Push_ITS(TargetType its)
+		{
+			this_component()->template Accept_ITS<TargetType>(its);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::push_vehicle_from_origin(TargetType vehicle)
+		{
+			accept_vehicle_from_origin<TargetType>(vehicle);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::push_vehicle_from_network(TargetType vehicle)
+		{
+			accept_vehicle_from_network<TargetType>(vehicle);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::accept_vehicle_from_origin(TargetType vehicle)
+		{
+			this_component()->template accept_vehicle_from_origin<TargetType>(vehicle);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::accept_vehicle_from_network(TargetType vehicle)
+		{
+			this_component()->template accept_vehicle_from_network<TargetType>(vehicle);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::link_supply_update()
+		{
+			this_component()->template link_supply_update<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::link_moving()
+		{
+			this_component()->template link_moving<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::origin_link_loading()
+		{
+			this_component()->template origin_link_loading<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::network_state_update()
+		{
+			this_component()->template network_state_update<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::Initialize()
+		{
+			this_component()->template Initialize<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::reset_routable_link()
+		{
+			this_component()->template reset_routable_link<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::construct_routable_from_regular(TargetType regular_link)
+		{
+			this_component()->template construct_routable_from_regular<TargetType>(regular_link);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::construct_realtime_routable_from_regular(TargetType regular_link)
+		{
+			this_component()->template construct_realtime_routable_from_regular<TargetType>(regular_link);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::initialize_features(TargetType param)
+		{
+			this_component()->template initialize_features<TargetType>(param);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::calculate_moe_for_simulation_interval()
+		{
+			this_component()->template calculate_moe_for_simulation_interval<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::calculate_moe_for_assignment_interval()
+		{
+			this_component()->template calculate_moe_for_assignment_interval<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::update_vmt_vht()
+		{
+			this_component()->template update_vmt_vht<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::visualize_moe()
+		{
+			this_component()->template visualize_moe<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::configure_displayed_line()
+		{
+			this_component()->template configure_displayed_line<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::handle_events()
+		{
+			this_component()->template handle_events<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::get_events_from_vms(TargetType events_set)
+		{
+			this_component()->template get_events_from_vms<TargetType>(events_set);
+		}
+		
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::get_events_from_har(TargetType events_set)
+		{
+			this_component()->template get_events_from_har<TargetType>(events_set);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
+		{
+			this_component()->template get_link_moe<TargetType>(start_time, end_time, volume, speed, density);
+		}
+		
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::get_prevailing_link_moe(int& volume, float& speed, float& density)
+		{
+			this_component()->template get_prevailing_link_moe<TargetType>(volume, speed, density);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		bool Link<ComponentType>::get_normal_day_link_moe(int& volume, float& speed, float& density)
+		{
+			return this_component()->template get_normal_day_link_moe<TargetType>(volume, speed, density);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::open_shoulder()
+		{
+			this_component()->template open_shoulder<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::close_shoulder()
+		{
+			this_component()->template close_shoulder<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Link<ComponentType>::change_speed_limit(float speed_limit)
+		{
+			this_component()->template change_speed_limit<TargetType>(speed_limit);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		float Link<ComponentType>::free_flow_speed_estimate()
+		{
+			return this_component()->template free_flow_speed_estimate<TargetType>();
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		float Link<ComponentType>::speed_limit_estimate()
+		{
+			return this_component()->template speed_limit_estimate<TargetType>();
+		}
 	}
 }
 
