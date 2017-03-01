@@ -557,9 +557,11 @@ namespace Activity_Components
 			// Free movement through interface
 			_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 			move->Free_Movement();
+				this->movement_plan<_movement_plan_itf*>(nullptr);
 
 			// Free this when able
-			//RLW%%% - do we need to re=implement this? Free<ComponentType>(this);
+				// %%%RLW - need to figure out why first free is set to null
+				//Free<ComponentType>((ComponentType*)this);
 		}
 
 		template<typename MasterType, typename InheritanceList>

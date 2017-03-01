@@ -147,10 +147,10 @@ struct MasterType
 	typedef Person_Components::Implementations::Activity_Timing_Chooser_Implementation<M> activity_timing_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
-	//typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	//typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
-	typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;

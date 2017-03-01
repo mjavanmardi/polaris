@@ -640,7 +640,7 @@ namespace Person_Components
 					trip_rec.setDuration(act->template Duration<Time_Seconds>());
 					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
 					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
-					trip_rec.setHhold(hh->template uuid<int>());
+					trip_rec.setHhold(0);
 					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
 						trip_rec.setMode(0);

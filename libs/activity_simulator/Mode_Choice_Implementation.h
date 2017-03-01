@@ -994,10 +994,10 @@ namespace Person_Components
 		};
 		// INITIALIZE MODE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 0.3;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 1.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 + 1.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TRAN = 0.0 - 0.7;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 + 1.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TRAN = 0.0 - 1.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cbd_pa = -0.0725;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cost = -0.243;
@@ -1028,10 +1028,10 @@ namespace Person_Components
 
 
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_AUTO = 1.16;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 0.3;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 1.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TAXI = -2.44 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_WALK = 0.0142 + 1.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TRAN = 0.0 - 0.7;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_WALK = 0.0142 + 1.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TRAN = 0.0 - 1.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cbd_pa = -0.0969;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cost = -0.131;
@@ -1061,10 +1061,10 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_NM = 0.934579439252336;
 
 
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 0.3;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 1.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TAXI = -0.912 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 + 1.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TRAN = 0.0 - 0.7;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 + 1.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TRAN = 0.0 - 1.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cbd_pa = -0.0495;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cost = -0.301;
@@ -1179,7 +1179,7 @@ namespace Person_Components
 				_current_activity = (Activity_Plan*)activity;
 				
 				// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
-				if (_current_activity->template Start_Is_Planned<bool>())
+				if (_current_activity->Start_Is_Planned())
 				{
 					_previous_activity = _Parent_Person->template previous_activity_plan<Time_Seconds, Activity_Plan*>(_current_activity->template Start_Time<Time_Seconds>());
 					_previous_location = scheduler->template previous_location<Activity_Plan*, _Activity_Location_Interface*>(_current_activity);
@@ -1253,7 +1253,7 @@ namespace Person_Components
 				//---------------------------------------------------------
 				if (_current_activity->Location_Is_Planned())
 				{
-					if (_current_activity->template Start_Is_Planned<bool>()) _los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds, los_itf*>(_previous_location, _destination, _current_activity->template Start_Time<Time_Seconds>());
+					if (_current_activity->Start_Is_Planned()) _los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds, los_itf*>(_previous_location, _destination, _current_activity->template Start_Time<Time_Seconds>());
 					else _los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours, los_itf*>(_previous_location, _destination, 12.0);
 				}
 				else

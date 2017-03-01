@@ -288,7 +288,10 @@ namespace Vehicle_Components
 		template<typename ComponentType>
 		void Vehicle<ComponentType>::Unassign_From_Person()
 		{
-			this_component()->Unassign_From_Person();
+				typedef get_type_of(traveler) traveler_type;
+				this->traveler<traveler_type*>()->vehicle<ComponentType*>(nullptr);
+				this->traveler<traveler_type*>(nullptr);
+				//this_component()->Unassign_From_Person();
 		}
 
 		template<typename ComponentType>

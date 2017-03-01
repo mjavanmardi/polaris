@@ -220,7 +220,7 @@ implementation struct old_link_impl : public Polaris_Component<MasterType, INHER
 
 struct MasterType
 {
-    typedef other_agent_impl<MasterType> agent_type;
+	typedef other_agent_impl<MasterType> agent_type;
     typedef link_impl<MasterType> link_type;
 	typedef base_agent_impl<MasterType> base_agent_type;
 };
