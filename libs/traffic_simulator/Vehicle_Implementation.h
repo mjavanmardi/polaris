@@ -168,10 +168,6 @@ namespace Vehicle_Components
 			typedef  Link<typename remove_pointer< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), _Link_Interface*> _Links_Container_Interface;
 
-			//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename _Link_Interface::get_type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface;
-			////RLW%%% typedef  Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>  _Vehicle_Interface;
-			//typedef  Back_Insertion_Sequence< typename _Link_Interface::get_type_of(link_origin_vehicle_queue), _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
-			////RLW%%% typedef  Back_Insertion_Sequence< typename MasterType::vehicle_type, _Vehicle_Interface*> _Vehicle_Origin_Queue_Interface;
 
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
