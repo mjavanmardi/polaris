@@ -1,0 +1,5 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+add_executable(All_Tests ${cppfiles} ${hppfiles})
+target_link_libraries(All_Tests ${GTEST_LIBRARY} Core)
+set_target_properties(All_Tests PROPERTIES FOLDER tests)
