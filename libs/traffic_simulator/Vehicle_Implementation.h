@@ -33,7 +33,6 @@ namespace Vehicle_Components
 			m_data(bool,has_full_automation,NONE,NONE);
 			m_data(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, db_ptr, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same), check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, TargetType, is_same));
 
-			//RLW%%%
             member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
             member_component_and_feature_accessor(max_speed, Value, Basic_Units::Prototypes::Speed, Basic_Units::Implementations::Speed_Implementation<NT>);
             member_component_and_feature_accessor(max_accel, Value, Basic_Units::Prototypes::Acceleration, Basic_Units::Implementations::Acceleration_Implementation<NT>);
@@ -441,10 +440,9 @@ namespace Vehicle_Components
 		template<typename TargetType>
 		void Vehicle_Implementation<MasterType, InheritanceList>::check_enroute_switching(_Link_Interface* link)
 		{
-			//RLW%%% if (int(((_Link_Interface*)link)->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
 			typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
-			if (int(link->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
+			if (int(((_Link_Interface*)link)->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
 			{
 				return;
 			}

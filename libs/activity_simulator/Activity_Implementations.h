@@ -456,7 +456,6 @@ namespace Activity_Components
 			{
 				// Require parent escort for preschool children
 				// get a free adult available for escort
-				//%%%RLW
 				_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 				// If no adults free and not school trip - cancel act
@@ -498,7 +497,6 @@ namespace Activity_Components
 				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
 				{
 					// get a free adult available for escort
-					//%%%RLW
 					_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
 					// If no adults free, force trip to transit
@@ -558,10 +556,6 @@ namespace Activity_Components
 			_movement_plan_itf* move = this->movement_plan<_movement_plan_itf*>();
 			move->Free_Movement();
 				this->movement_plan<_movement_plan_itf*>(nullptr);
-
-			// Free this when able
-				// %%%RLW - need to figure out why first free is set to null
-				//Free<ComponentType>((ComponentType*)this);
 		}
 
 		template<typename MasterType, typename InheritanceList>

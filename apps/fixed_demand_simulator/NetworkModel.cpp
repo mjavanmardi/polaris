@@ -38,7 +38,6 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
 	typedef NULLTYPE visual_vehicle_type;
 
-	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 #else
@@ -49,7 +48,6 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
 
-	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 	typedef polaris::io::Vehicle vehicle_db_rec_type;

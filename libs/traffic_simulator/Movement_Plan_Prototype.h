@@ -69,7 +69,6 @@ namespace Movement_Plan_Components
 			{
 				if (this == nullptr) return;
 				this->clear_trajectory();
-				// %%%RLW
 				Free<Component_Type>(this_component());
 			}
 
@@ -326,7 +325,6 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
-					// %%%RLW - 
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 				trajectory.clear();
@@ -347,7 +345,6 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
-					// %%% RLW - 
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 

@@ -1253,7 +1253,6 @@ namespace Network_Skimming_Components
 				//==============================================
 				// READ TRANSIT HEADER
 				//----------------------------------------------
-				//RLW%%% - unused - int num_zones_transit;
 				std::vector<pair<int, int>> return_transit_zones_container;
 				if (read_transit<bool>())
 				{

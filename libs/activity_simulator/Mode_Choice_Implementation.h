@@ -679,7 +679,6 @@ namespace Person_Components
 			//}
 
 			// free memory allocated locally
-			// %%%RLW
 			for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);
 			Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 

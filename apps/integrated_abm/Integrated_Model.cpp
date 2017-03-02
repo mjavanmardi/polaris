@@ -381,7 +381,6 @@ int main(int argc,char** argv)
 		{
 			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-			//%%%RLW
 			TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			tmc->Initialize<NT>();
