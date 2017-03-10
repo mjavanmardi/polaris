@@ -189,7 +189,7 @@ namespace Household_Components
 				string type;
 				Vehicle_Components::Types::EPA_Vehicle_Class_Keys veh_class;
 				Vehicle_Components::Types::Powertrain_Type_Keys pt_type;
-				int veh_class_i, pt_type_i;
+				//int veh_class_i, pt_type_i;
 								
 				getline(data_file, line); //throw out header
 				while (getline(data_file, line))

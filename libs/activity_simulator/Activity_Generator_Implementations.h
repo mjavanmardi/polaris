@@ -63,6 +63,7 @@ namespace Person_Components
 			template<typename TargetType> Activity_Plan* Create_Activity(TargetType act_type, int& activity_count, int start_plan_time);
 			template<typename TargetType, typename LocationType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location);
 			template<typename TargetType, typename LocationType, typename ModeType> Activity_Plan* Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode);
+			template<typename TargetType, typename LocationType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, TimeType start, TimeType duration);
 			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> Activity_Plan* Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration);
 			template<typename TargetType> At_Home_Activity_Plan* Create_Home_Activity(int& activity_count);
 			template<typename ReturnType, typename TimeType, typename ModeType> ReturnType Create_Home_Activity(TimeType departure_time, TimeType start, TimeType duration, ModeType mode);
@@ -190,6 +191,45 @@ namespace Person_Components
 			activity->template Mode<ModeType>(mode);
 			activity->template Mode_Planning_Time<Revision&>()._iteration = END + 1;
 			activity->template Mode_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Schedule_Activity_Events<NT>();
+
+			this->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);
+			return activity;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType, typename LocationType, typename TimeType>
+		typename General_Activity_Generator_Implementation<MasterType, InheritanceList>::Activity_Plan* General_Activity_Generator_Implementation<MasterType, InheritanceList>::Create_Activity(TargetType act_type, TimeType start_plan_time, LocationType location, TimeType start, TimeType duration)
+		{
+			Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
+
+			activity->template Activity_Plan_ID<int>(Scheduled_Activity_Count() + 1);
+
+			activity->template Initialize<ACTIVITY_TYPES, TimeType>(act_type, start_plan_time);
+			//activity->Set_Meta_Attributes<void>();
+			// schedule the activity events based on plan times.
+			//activity->Set_Attribute_Planning_Times<TimeType>(start_plan_time);
+
+			// set location and remove from planning stream
+			activity->template Location<LocationType>(location);
+			activity->template Location_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Location_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			// set location and remove from planning stream
+			//activity->template Mode<ModeType>(mode);
+			activity->template Mode_Planning_Time<Revision&>()._iteration = start_plan_time;
+			activity->template Mode_Planning_Time<Revision&>()._sub_iteration = start_plan_time;
+
+			// set location and remove from planning stream
+			activity->template Start_Time<TimeType>(start);
+			activity->template Start_Time_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END + 1;
+
+			activity->template Duration<TimeType>(duration);
+			activity->template Duration_Planning_Time<Revision&>()._iteration = END + 1;
+			activity->template Duration_Planning_Time<Revision&>()._sub_iteration = END + 1;
 
 			activity->template Schedule_Activity_Events<NT>();
 

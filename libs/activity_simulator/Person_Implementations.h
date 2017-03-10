@@ -130,6 +130,10 @@ namespace Person_Components
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			static bool record_comparer(Activity_Record* act1, Activity_Record* act2);
 			template<typename TargetType> TargetType Sort_Activity_Records();
+
+			template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
+
+			void Leave_Vehicle();
 		};
 
 		template<typename MasterType, typename InheritanceList>
@@ -344,6 +348,20 @@ namespace Person_Components
 			Activity_Records* records = this->Activity_Record_Container<Activity_Records*>();
 			std::list<Activity_Record*>* recs = (std::list<Activity_Record*>*)records;
 			recs->sort(record_comparer);
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TimeType>
+		TimeType Person_Implementation<MasterType, InheritanceList>::Get_Estimated_Return_Home_Time()
+		{
+			return this->_Scheduling_Faculty->Get_Estimated_Return_Home_Time<TimeType>();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Person_Implementation<MasterType, InheritanceList>::Leave_Vehicle()
+		{
+			this->_vehicle->Unassign_From_Person();
+			this->_vehicle = nullptr;
 		}
 	}
 }

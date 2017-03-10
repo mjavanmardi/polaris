@@ -176,7 +176,6 @@ namespace Person_Components
 			_Movement_Faculty_Interface* movement_faculty = parent->template Moving_Faculty<_Movement_Faculty_Interface*>();
 
 
-
 			// Get reference to movement plans
 			Movement_Plans* movements = parent->template Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans*>();
 			typename Movement_Plans::iterator move_itr = movements->begin();
@@ -192,25 +191,30 @@ namespace Person_Components
 				if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.template Current_Time<Simulation_Timestep_Increment>() &&
 					move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 				{
-						// not moving - reassign to walk mode
-						if (move->origin<_Activity_Location_Interface*>() == move->destination<_Activity_Location_Interface*>())
-						{
-							act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::WALK);
-						}
+
+					// not moving - reassign to walk mode
+					if (move->origin<_Activity_Location_Interface*>() == move->destination<_Activity_Location_Interface*>())
+					{
+						act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::WALK);
+					}
 
 					//===============================================================================
 					// IF IT IS AN SOV MOVEMENT - do vehicle selection
 					if (act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::SOV)
 					{
-						_Vehicle_Interface* vehicle = parent->vehicle<_Vehicle_Interface*>();					// get current vehicle (s.b. nullptr if starting at home
-						if (vehicle == nullptr) vehicle = household->Get_Free_Vehicle<_Vehicle_Interface*>();	// if no current assigned vehicle, get a new one from the household vehicle list
+						// get current vehicle (s.b. nullptr if starting at home
+						_Vehicle_Interface* vehicle = parent->vehicle<_Vehicle_Interface*>();			
+
+						// if no current assigned vehicle, get a new one from the household vehicle list
+						if (vehicle == nullptr) vehicle = household->Get_Free_Vehicle<_Vehicle_Interface*>();	
+
+						// vehicle found....
 						if (vehicle != nullptr)
 						{
-								// if none available, throw error - should not get here
-																							// make sure vehicle is not already being simulated, skip movement if it is
+							// make sure vehicle is not already being simulated, skip movement if it is
 							if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 							{
-									vehicle->Assign_To_Person(parent);
+								vehicle->Assign_To_Person(parent);
 								vehicle->template movement_plan<Movement_Plan*>(move);
 							}
 							else
@@ -218,10 +222,28 @@ namespace Person_Components
 								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
 							}
 						}
+						// no vehicle found, can we wait for a short time until a vehicle is available?
 						else
 						{
-							int test = 1; //THROW_EXCEPTION("NO VEHICLES AVAILABLE");
-							act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV); // no vehicles available, make it an HOV
+							//act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
+
+							// get next vehicle availability time, make sure it is at least in the next movement checking period (so we can ensure that the simulation movements are completed)
+							int next_avail_veh_iter = std::max((float)household->Get_Next_Available_Vehicle_Time<Simulation_Timestep_Increment>(), (float)Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()+1));
+
+							// vehicle available soon, delay the movement departure time until the estimated availability - **** make sure the new departure time is not in the same movement planning horizon
+							if (next_avail_veh_iter + act->Expected_Travel_Time<Simulation_Timestep_Increment>() < act->Start_Time<Simulation_Timestep_Increment>() + act->Duration<Simulation_Timestep_Increment>()*0.5)
+							{
+								act->Start_Time<Simulation_Timestep_Increment>(next_avail_veh_iter + act->Expected_Travel_Time<Simulation_Timestep_Increment>());
+								move->departed_time(next_avail_veh_iter); //THROW_EXCEPTION("NO VEHICLES AVAILABLE");
+								typename Movement_Plans::iterator prev = move_itr++;
+								continue;
+							}
+							// no vehicles available, make it an HOV
+							else
+							{
+								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV); 
+
+							}		
 						}
 
 					}

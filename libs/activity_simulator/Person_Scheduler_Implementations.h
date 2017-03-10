@@ -147,27 +147,6 @@ namespace Person_Components
 			
 			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/));
 			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType, check(TargetType, is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/));
-			//template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
-			//{
-			//	Activity_Plan* act = (Activity_Plan*)activity_plan;
-
-			//	Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
-			//	
-			//	typename Activity_Plans::iterator itr = activities->begin();
-
-			//	for (; itr != activities->end(); ++itr)
-			//	{
-			//		if (*itr == act)
-			//		{
-			//			activities->erase(itr);
-			//			break;
-			//		}
-			//	}
-
-			//	act->Free_Activity<NT>();
-			//	
-			//	//THROW_EXCEPTION("Error: this activity plan not found in the Activity_Container.")
-			//}	
 
 			static bool comparer(typename MasterType::activity_type* act1, typename MasterType::activity_type* act2);
 			
@@ -184,6 +163,8 @@ namespace Person_Components
 			template<typename ActivityItfType> bool Identify_Conflicts(ActivityItfType current_activity, std::vector<Activity_Conflict<MT>>& conflict_list);
 
 			template<typename ActivityItfType> bool Define_Conflict(ActivityItfType conflicting_activity, ActivityItfType original_activity, std::vector<Activity_Conflict<MT>>& conflict_list);
+
+			template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
 		};
 
 		// member features
@@ -912,11 +893,9 @@ namespace Person_Components
 		//template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 		//{
 		//	Activity_Plan* act = (Activity_Plan*)activity_plan;
-
 		//	Activity_Plans* activities = this->Activity_Container<Activity_Plans*>();		
 		//	
 		//	typename Activity_Plans::iterator itr = activities->begin();
-
 		//	for (; itr != activities->end(); ++itr)
 		//	{
 		//		if (*itr == act)
@@ -925,7 +904,6 @@ namespace Person_Components
 		//			break;
 		//		}
 		//	}
-
 		//	act->Free_Activity<NT>();
 		//	
 		//	//THROW_EXCEPTION("Error: this activity plan not found in the Activity_Container.")
@@ -1038,6 +1016,61 @@ namespace Person_Components
 
 			// push to conflict list
 			conflict_list.push_back(conflict);
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TimeType>
+		TimeType General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Get_Estimated_Return_Home_Time()
+		{
+			typedef Vehicle_Components::Types::Vehicle_Type_Keys MODE;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Person_Components::Prototypes::Person_Mover<typename type_of(Parent_Person)::get_type_of(Moving_Faculty)> Moving_Faculty_Interface;
+
+			_Network_Interface* network = _Parent_Person->network_reference<_Network_Interface*>();
+
+			// get the next activity if the person is moving or else current activity if they are stationary
+			Activity_Plan* current = nullptr;
+			if (this->_Parent_Person->Is_Moving()) current = this->_Parent_Person->Moving_Faculty<Moving_Faculty_Interface*>()->Movement<Movement_Plan*>()->destination_activity_reference<Activity_Plan*>();
+			else current = this->_Current_Activity;
+
+			// if the current act is a home-based act, return the current activity start time
+			if (current->template Location<_Activity_Location_Interface*>() == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) return current->Start_Time<TimeType>();
+
+			// Define time window after current activity is completed		
+			Time_Seconds end_this = current->template Start_Time<Time_Seconds>() + current->template Duration<Time_Seconds>();
+			Time_Seconds ttime_this_to_home = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(current->template Location<_Activity_Location_Interface*>(), _Parent_Person->template Home_Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+
+			//=====================================================================
+			// Check Next act to see if it exists and if the person will go home before it starts
+			//---------------------------------------------------------------------
+			// if no next act return estimated return home time after current act
+			Activity_Plan* next_act = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(current);
+			if (next_act == nullptr) return end_this + ttime_this_to_home;
+			if (next_act->Location<_Activity_Location_Interface*>() == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) return end_this + ttime_this_to_home;
+			// expected travel time to next movement
+			Time_Seconds ttime_this_to_next = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(current->template Location<_Activity_Location_Interface*>(), next_act->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+			Time_Seconds ttime_home_to_next = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(_Parent_Person->template Home_Location<_Activity_Location_Interface*>(), next_act->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this + ttime_this_to_home);
+			Time_Seconds min_home_duration = max(900.f, min((float)ttime_this_to_home, (float)ttime_home_to_next));	
+			// Person can go home first, schedule an additional return home movement
+			if (next_act->template Start_Time<Time_Seconds>() - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration) return end_this + ttime_this_to_home;
+
+			//=====================================================================
+			// Check Next, Next act to see if it exists and if the person will go home before it starts
+			//---------------------------------------------------------------------
+			// if no next act return estimated return home time after current act
+			Activity_Plan* next_next_act = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(next_act);
+			if (next_next_act == nullptr) return next_act->End_Time<Time_Seconds>() + ttime_home_to_next;
+			if (next_next_act->Location<_Activity_Location_Interface*>() == _Parent_Person->template Home_Location<_Activity_Location_Interface*>()) return next_act->End_Time<Time_Seconds>() + ttime_home_to_next;
+			// expected travel time to next movement
+			Time_Seconds ttime_next_to_nextnext = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(next_act->template Location<_Activity_Location_Interface*>(), next_next_act->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+			Time_Seconds ttime_home_to_nextnext = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(_Parent_Person->template Home_Location<_Activity_Location_Interface*>(), next_next_act->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this + ttime_this_to_home);
+			min_home_duration = max(900.f, min((float)ttime_home_to_next, (float)ttime_home_to_nextnext));
+			// Person can go home first, schedule an additional return home movement
+			if (next_next_act->template Start_Time<Time_Seconds>() - next_act->End_Time<Time_Seconds>() > ttime_home_to_next + ttime_home_to_nextnext + min_home_duration) return next_act->End_Time<Time_Seconds>() + ttime_home_to_next;
+			else return END;
+
+
 		}
 
 	}

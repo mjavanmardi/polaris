@@ -466,7 +466,7 @@ namespace Activity_Components
 				else
 				{
 					_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
-					gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, this->Start_Time<Time_Seconds>(), 300);
+					gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, /*Vehicle_Components::Types::Vehicle_Type_Keys,*/ Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), /*Vehicle_Components::Types::Vehicle_Type_Keys::SOV,*/ this->Start_Time<Time_Seconds>(), 300);
 				}
 			}
 			// require escort for all modes except bus (i.e. kids can take schoolbus by themselves)
@@ -487,7 +487,7 @@ namespace Activity_Components
 					else
 					{
 						_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
-						gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, this->Start_Time<Time_Seconds>(), 300);
+						gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, /*Vehicle_Components::Types::Vehicle_Type_Keys,*/ Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), /*Vehicle_Components::Types::Vehicle_Type_Keys::SOV,*/ this->Start_Time<Time_Seconds>(), 300);
 					}
 				}
 			}
@@ -508,7 +508,7 @@ namespace Activity_Components
 					{
 						// if adult free, add new escort activity to the adult schedule
 						_generator_itf* gen = adult->template Planning_Faculty<_planning_itf*>()->template Activity_Generation_Faculty<_generator_itf*>();
-						gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, this->Start_Time<Time_Seconds>(), 300);
+						gen->template Create_Activity<Types::ACTIVITY_TYPES, _activity_location_itf*, /*Vehicle_Components::Types::Vehicle_Type_Keys,*/ Time_Seconds>(Types::PICK_UP_OR_DROP_OFF_ACTIVITY, iteration() + 2, this->Location<_activity_location_itf*>(), /*Vehicle_Components::Types::Vehicle_Type_Keys::SOV,*/ this->Start_Time<Time_Seconds>(), 300);
 					}
 				}
 			}

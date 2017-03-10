@@ -672,7 +672,7 @@ namespace Person_Components
 				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
 				//polaris::io::Activity* act_rec = new polaris::io::Activity();
 				polaris::io::Activity act_rec;
-
+				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
 				if (new_destination<0)
 					act_rec.setLocation_Id(dest->template uuid<int>());
 				else 

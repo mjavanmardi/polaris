@@ -104,6 +104,7 @@ namespace Prototypes
 		//--------------------------------------------------------
 		accessor(Parent_Person, NONE, NONE);
 		accessor(Movement, NONE, NONE);
+		typed_accessor(bool, Is_Moving);
 		accessor(Movement_Scheduled, NONE, NONE);
 		accessor(Artificial_Movement_Scheduled, NONE, NONE);
 		accessor(Artificial_Arrival_Time, NONE, NONE);
@@ -729,6 +730,7 @@ namespace Prototypes
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
+		this->Is_Moving(true);
 
 		/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
 		//location_itf* orig = movements->template origin<location_itf*>();
@@ -792,6 +794,7 @@ namespace Prototypes
 	{
 
 		// free up movement schedule
+		this->Is_Moving(false);
 		this->Movement_Scheduled<bool>(false);
 
 		// interfaces
@@ -815,6 +818,7 @@ namespace Prototypes
 		typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_container_itf)>  turn_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 		typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type> at_home_activity_itf;
+		typedef  Person_Components::Prototypes::template Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
 
 
 		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
@@ -837,9 +841,9 @@ namespace Prototypes
 		location_itf* destination = movements->template destination<location_itf*>();
 
 
-		//=====================================================================
-		// Update activity start time
-		// Handle late arrival
+		//=========================================================================================================================
+		// Update activity start time to handle late arrival
+		//-------------------------------------------------------------------------------------------------------------------------
 		Time_Seconds new_end = act->template End_Time<Time_Seconds>();
 		if (iteration() > act->template Start_Time<Simulation_Timestep_Increment>())
 		{
@@ -920,45 +924,22 @@ namespace Prototypes
 			}
 
 		}
-
 		act->template Start_Time<Simulation_Timestep_Increment>(iteration());
 		act->template End_Time<Time_Seconds>(new_end, false);
 
 
 
-		//=====================================================================
-		// Get the next scheduled activity if exists
-		Activity_Itf* next_act = scheduler->template next_activity_plan<Simulation_Timestep_Increment, Activity_Itf*>(iteration());
-
-		typedef  Person_Components::Prototypes::template Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
-
-		// error checking - a scheduled activity should not have a null movement	
-		if (next_act != nullptr)
-		{
-			if (next_act->template movement_plan<movement_itf*>() == nullptr)
-			{
-				cout << "ERROR: movement plan for scheduled activity should not be null." << endl;
-				cout << "ACT:";
-				act->Display_Activity();
-				cout << endl;
-				cout << "NEXT ACT:";
-				next_act->Display_Activity();
-				cout << "PRINT SCHEDULE:";
-				person->Display_Activities(cout);
-
-			}
-		}
-
-
 		// Define time window after current activity is completed
+		Activity_Itf* next_act = scheduler->template next_activity_plan<Simulation_Timestep_Increment, Activity_Itf*>(iteration());
 		Time_Seconds end_this = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
 		location_itf* orig = act->template Location<location_itf*>();
 		location_itf* home = person->template Home_Location<location_itf*>();
-
 		Time_Seconds ttime_this_to_home = network->template Get_TTime<location_itf*, MODE, Time_Seconds, Time_Seconds>(orig, home, MODE::SOV, end_this);
 
 
-		// don't add additional movement if already at home, just update the end time of the current at home activity
+		//=========================================================================================================================
+		// Don't add additional movement if already at home, just update the end time of the current at home activity
+		//-------------------------------------------------------------------------------------------------------------------------
 		if (act->template Location<location_itf*>() == person->template Home_Location<location_itf*>() && act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 		{
 			if (next_act != nullptr)
@@ -977,11 +958,12 @@ namespace Prototypes
 			// then remove from the scheduler activity and movement containers
 			scheduler->template Update_Current_Activity<Activity_Itf*>(act);
 			scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
-			return;
 		}
 
-		// If this is the last act of the day, then return home afterward
-		if (next_act == nullptr)
+		//=========================================================================================================================
+		// Else if this is the last act of the day, then return home afterward
+		//-------------------------------------------------------------------------------------------------------------------------
+		else if (next_act == nullptr)
 		{
 			// GENERATE A NEW AT HOME ACTIVITY
 			Time_Seconds min_home_duration = 86400 - (end_this + ttime_this_to_home);
@@ -997,68 +979,60 @@ namespace Prototypes
 			// then remove from the scheduler activity and movement containers
 			scheduler->template Update_Current_Activity<Activity_Itf*>(act);
 			scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
-			return;
-		}
-		movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
-
-
-		// expected travel times
-		location_itf* dest = next_act->template Location<location_itf*>();
-		Time_Seconds begin_next = next_act->template Start_Time<Time_Seconds>();
-		Time_Seconds ttime_this_to_next = network->template Get_TTime<location_itf*, MODE, Time_Seconds, Time_Seconds>(orig, dest, MODE::SOV, end_this);
-		Time_Seconds ttime_home_to_next = network->template Get_TTime<location_itf*, MODE, Time_Seconds, Time_Seconds>(home, dest, MODE::SOV, end_this + ttime_this_to_home);
-		Time_Seconds min_home_duration = min((float)ttime_this_to_home, (float)ttime_home_to_next);
-		min_home_duration = max((float)min_home_duration, 900.0f);
-
-		//=====================================================================
-		// Person can go home first, schedule an additional return home movement
-		if (begin_next - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
-		{
-			// GENERATE A NEW AT HOME ACTIVITY
-			Time_Seconds duration = (begin_next - ttime_home_to_next) - (end_this + ttime_this_to_home);
-
-			at_home_activity_itf* new_act = generator->template Create_Home_Activity<at_home_activity_itf*, Time_Seconds, Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this + ttime_this_to_home, duration, act->template Mode<MODE>());
-
-			//TODO: remove when done testing
-			if (end_this + ttime_this_to_home > END || duration > END)
-			{
-				cout << endl << "begin_next=" << begin_next << ", end_this=" << end_this << ", ttime_this_to_home=" << ttime_this_to_home << ", ttime_home_to_next=" << ttime_home_to_next << ", min_home_duration=" << min_home_duration << ", home=" << home << ", dest=" << dest << ", LOS_start=" << end_this + ttime_this_to_home << endl;
-				THROW_WARNING("Invalid start/duration for at home activity. Start=" << end_this + ttime_this_to_home << ", duration=" << duration << ", departure time=" << end_this << ", travel time=" << ttime_this_to_home);
-			}
-
 		}
 
-		//=====================================================================
-		// otherwise either wait at current activity or depart and spend extra time at next activity
+		//=========================================================================================================================
+		// Else, determine if can go home before next activity and add return home act if needed
+		//-------------------------------------------------------------------------------------------------------------------------
 		else
 		{
-			// first, make sure following activity departs from current activity
-			if (next_movement->template origin<location_itf*>() != destination)
+			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
+
+
+			// expected travel times
+			location_itf* dest = next_act->template Location<location_itf*>();
+			Time_Seconds begin_next = next_act->template Start_Time<Time_Seconds>();
+			Time_Seconds ttime_this_to_next = network->template Get_TTime<location_itf*, MODE, Time_Seconds, Time_Seconds>(orig, dest, MODE::SOV, end_this);
+			Time_Seconds ttime_home_to_next = network->template Get_TTime<location_itf*, MODE, Time_Seconds, Time_Seconds>(home, dest, MODE::SOV, end_this + ttime_this_to_home);
+			Time_Seconds min_home_duration = min((float)ttime_this_to_home, (float)ttime_home_to_next);
+			min_home_duration = max((float)min_home_duration, 900.0f);
+
+			//=====================================================================
+			// Person can go home first, schedule an additional return home movement
+			if (begin_next - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
 			{
-				next_act->template Update_Movement_Plan<location_itf*>(destination, next_movement->template destination<location_itf*>(), end_this);
+				// GENERATE A NEW AT HOME ACTIVITY
+				Time_Seconds duration = (begin_next - ttime_home_to_next) - (end_this + ttime_this_to_home);
+				at_home_activity_itf* new_act = generator->template Create_Home_Activity<at_home_activity_itf*, Time_Seconds, Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this + ttime_this_to_home, duration, act->template Mode<MODE>());
 			}
-			act->template End_Time<Time_Seconds>(next_movement->template departed_time<Time_Seconds>(), false);
+
+			//=====================================================================
+			// otherwise either wait at current activity or depart and spend extra time at next activity
+			else
+			{
+				// first, make sure following activity departs from current activity
+				if (next_movement->template origin<location_itf*>() != destination)
+				{
+					next_act->template Update_Movement_Plan<location_itf*>(destination, next_movement->template destination<location_itf*>(), end_this);
+				}
+				act->template End_Time<Time_Seconds>(next_movement->template departed_time<Time_Seconds>(), false);
+			}
+
+			// Finally, log the activity
+			((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act, true);
+
+
+			//=====================================================================
+			// updated the person scheduler to make this activity the current activity for future planning 
+			// then remove from the scheduler activity and movement containers
+			scheduler->template Update_Current_Activity<Activity_Itf*>(act);
+			scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
 		}
-
-		// Finally, log the activity
-		((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act, true);
-
-
-		//=====================================================================
-		// updated the person scheduler to make this activity the current activity for future planning 
-		// then remove from the scheduler activity and movement containers
-		scheduler->template Update_Current_Activity<Activity_Itf*>(act);
-		scheduler->template Remove_Activity_Plan<Activity_Itf*>(act);
 
 
 		//====================================================================
-		// Unassign vehicle after returning home
-		if (destination == household->Home_Location<location_itf*>() && vehicle != nullptr)
-		{
-			person->vehicle<Vehicle_Itf*>(nullptr);
-			vehicle->Unassign_From_Person();
-		}
-
+		// Give up ownership of the vehicle after arriving at home, so other agents can use
+		if (destination == household->Home_Location<location_itf*>() && vehicle != nullptr) person->Leave_Vehicle();
 	}
 
 	template<typename ComponentType>

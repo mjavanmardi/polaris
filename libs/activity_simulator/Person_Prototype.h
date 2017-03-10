@@ -176,21 +176,6 @@ namespace Prototypes
 		template<typename TargetType> void School_Location(TargetType location_index, requires(TargetType, check(strip_modifiers(TargetType), is_integral)));
 		template<typename TargetType> void School_Location(TargetType location_index, requires(TargetType, check(strip_modifiers(TargetType), !is_integral)));
 		
-		//local_check_template_method_name(has_Choose_Work_Location,Choose_Work_Location);
-		//template<typename TargetType> void Choose_Work_Location(/*requires(TargetType,check(ComponentType,has_Choose_Work_Location))*/)
-		//{
-		//	assert_check(ComponentType,has_Choose_Work_Location,"ComponentType does not have Choose_Work_Location feature.");
-
-		//	this_component()->template Choose_Work_Location<TargetType>();
-		//}
-
-		//local_check_template_method_name(has_Choose_School_Location,Choose_School_Location);
-		//template<typename TargetType> void Choose_School_Location(requires(TargetType,check(ComponentType,has_Choose_School_Location)))
-		//{
-		//	assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
-
-		//	this_component()->template Choose_School_Location<TargetType>();
-		//}
 
 		template<typename TargetType> string To_String();
 		template<typename TargetType> void Sort_Activity_Records();
@@ -208,6 +193,10 @@ namespace Prototypes
 		template<typename ParamType, typename ReturnType> ReturnType previous_activity_plan(ParamType current_time);
 		template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan);
 		template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan);
+
+		template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
+		bool Is_Moving();
+		void Leave_Vehicle();
 	};
 
 	// Event handling
@@ -259,65 +248,6 @@ namespace Prototypes
 		//%%%RLW
 		//this_component()->template Print_Preplanned_Activities_Event();
 	}
-
-	// //Initializers
-	//template<typename ComponentType>
-	//template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type, Execution_Object, is_same))>
-	//void Person<ComponentType>::Initialize(TargetType id)
-	//{
-	//	this->First_Iteration<Simulation_Timestep_Increment>(iteration() + 1);
-
-	//	int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
-
-	//	this_component()->template Initialize<TargetType>(id);
-
-	//	//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
-	//	((ComponentType*)this)->template Load_Event<ComponentType>(&Agent_Event_Controller, this->First_Iteration<Simulation_Timestep_Increment>(), starting_subiteration);
-	//}
-	//
-	//template<typename ComponentType>
-	//template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type, Data_Object, is_same))>
-	//void Person<ComponentType>::Initialize(TargetType id)
-	//{
-	//	this_component()->template Initialize<TargetType>(id);
-	//}
-
-	//template<typename ComponentType>
-	//template<typename TargetType, requires(TargetType, !check(ComponentType, Concepts::Has_Initialize) || (check_2(typename ComponentType::Object_Type, Execution_Object, is_same) && check_2(typename ComponentType::Object_Type, Data_Object, is_same)))>
-	//void Person<ComponentType>::Initialize(TargetType id)
-	//{
-	//	assert_check(ComponentType, Concepts::Has_Initialize, "This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-	//	assert_check_2(typename ComponentType::Object_Type, Execution_Object, is_same, "ComponentType must be an execution object, or ");
-	//	assert_check_2(typename ComponentType::Object_Type, Data_Object, is_same, "ComponentType must be an data object.");
-	//}
-
-	//template<typename ComponentType>
-	//template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(IdType, check(ComponentType, Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type, Execution_Object, is_same))>
-	//void Person<ComponentType>::Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
-	//{
-	//	this->First_Iteration<Simulation_Timestep_Increment>(iteration() + 1);
-	//	int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
-
-	//	this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);
-
-	//	((ComponentType*)this)->template Load_Event<ComponentType>(&Agent_Event_Controller, this->First_Iteration<Simulation_Timestep_Increment>(), starting_subiteration);
-	//}
-
-	//template<typename ComponentType>
-	//template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(IdType, check(ComponentType, Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type, Data_Object, is_same))>
-	//void Person<ComponentType>::Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
-	//{
-	//	this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);
-	//}
-
-	//template<typename ComponentType>
-	//template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(IdType, !check(ComponentType, Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type, Execution_Object, is_same) && !check_2(typename ComponentType::Object_Type, Data_Object, is_same)))>
-	//void Person<ComponentType>::Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
-	//{
-	//	assert_check(ComponentType, Concepts::Has_Initialize, "This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-	//	assert_check_2(typename ComponentType::Object_Type, Execution_Object, is_same, "ComponentType must be an execution object, or ");
-	//	assert_check_2(typename ComponentType::Object_Type, Data_Object, is_same, "ComponentType must be an data object.");
-	//}
 
 	template<typename ComponentType>
 	void Person<ComponentType>::Arrive_At_Destination()
@@ -710,6 +640,25 @@ namespace Prototypes
 	void Person<ComponentType>::Add_Activity_Plan(TargetType activity_plan)
 	{
 		this_component()->template Add_Activity_Plan<TargetType>(activity_plan);
+	}
+
+	template<typename ComponentType>
+	template<typename TimeType>
+	TimeType Person<ComponentType>::Get_Estimated_Return_Home_Time()
+	{
+		return this_component()->Get_Estimated_Return_Home_Time<TimeType>();
+	}
+
+	template<typename ComponentType>
+	bool Person<ComponentType>::Is_Moving()
+	{
+		typedef Person_Components::Prototypes::Person_Mover<typename get_type_of(Moving_Faculty)> mover_itf;
+		return this->Moving_Faculty<mover_itf*>()->Is_Moving();
+	}
+	template<typename ComponentType>
+	void Person<ComponentType>::Leave_Vehicle()
+	{
+		this_component()->Leave_Vehicle();
 	}
 }
 

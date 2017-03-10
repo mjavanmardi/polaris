@@ -738,19 +738,6 @@ namespace polaris
                            static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
                      }\
 
-#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-       public:\
-              template<typename TargetType>\
-              void NAME(TargetType set_value)\
-              {\
-                    this_component()->template NAME<TargetType>(set_value);\
-              }\
-              template<typename TargetType>\
-              TargetType NAME()\
-              {\
-                    return this_component()->template NAME<TargetType>();\
-              }\
-
 
 #define more_basic_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
        public:\

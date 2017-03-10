@@ -565,8 +565,8 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
-	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
+	Activity (int id_, int seq_num_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
+	: id (id_), seq_num(seq_num_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
 	{
 	}
 	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_)
@@ -576,6 +576,8 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
+	const int& getSeq_num() const { return seq_num; }
+	void setSeq_num(const int& seq_num_) { seq_num = seq_num_; }
 	const int& getLocation_Id () const {return location_id;}
 	void setLocation_Id (const int& location_id_) {location_id = location_id_;}
 	const double& getStart_Time () const {return start_time;}
@@ -599,6 +601,7 @@ private:
 	friend class odb::access;
 	#pragma db auto id
 	int id;
+	int seq_num;
 	int location_id;
 	double start_time;
 	double duration;
