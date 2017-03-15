@@ -186,9 +186,11 @@ namespace Scenario_Components
 			m_data(fstream, analyze_link_groups_file, NONE, NONE);
 			
 			m_data(shared_ptr<odb::database>, result_db_ptr, NONE, NONE);
+			m_data(shared_ptr<odb::database>, demand_db_ptr, NONE, NONE);
+			m_data(shared_ptr<odb::database>, popsyn_db_ptr, NONE, NONE);
 			m_data(string, output_result_database_name, NONE, NONE);
 
-			m_data(bool, DB_output_link_moe_for_assignment_interval, NONE, NONE);
+			//m_data(bool, DB_output_link_moe_for_assignment_interval, NONE, NONE);
 			m_data(bool, write_ttime_distribution_from_network_model, NONE, NONE);
 			m_data(fstream, ttime_distribution_file, NONE, NONE);
 			m_data(bool, output_link_moe_for_simulation_interval, NONE, NONE);

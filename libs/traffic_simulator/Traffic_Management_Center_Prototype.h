@@ -18,7 +18,7 @@ namespace Traffic_Management_Center_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Traffic_Management_Center
+		prototype struct Traffic_Management_Center ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

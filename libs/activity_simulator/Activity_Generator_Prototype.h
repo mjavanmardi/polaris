@@ -111,6 +111,10 @@ namespace Person_Components
 			{
 				this_component()->Create_Activity<TargetType,LocationType,ModeType>(act_type,start_plan_time,location,mode);
 			}
+			template<typename TargetType, typename LocationType, typename TimeType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location, TimeType start, TimeType duration)
+			{
+				this_component()->Create_Activity<TargetType, LocationType, TimeType>(act_type, start_plan_time, location, start, duration);
+			}
 			template<typename TargetType, typename LocationType, typename ModeType, typename TimeType> void Create_Activity(TargetType act_type, int start_plan_time, LocationType location, ModeType mode, TimeType start, TimeType duration)
 			{
 				this_component()->Create_Activity<TargetType,LocationType,ModeType,TimeType>(act_type,start_plan_time,location,mode,start,duration);

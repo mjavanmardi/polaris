@@ -76,8 +76,9 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			//RLW%%%
+			//typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
@@ -159,6 +160,8 @@ namespace Person_Components
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
+					float WORK_TTIME_CALIBRATION_FACTOR = -0.02;
+
 					Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE industry = static_properties->template Employment_Industry_Simple<Person_Components::Types::EMPLOYMENT_INDUSTRY_SIMPLE>();
 					float EMPUR = 0;
 
@@ -208,7 +211,10 @@ namespace Person_Components
 					//ttime_deflected = ttime_deflected *0.5;
 
 					// Old values - with time strata at (45A/60T/20W)
-					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res + _BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + _BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
+					u = _BArEnt_WORK * area_ent + _BArIns_WORK * area_ins + _BArOff_WORK * area_off + _BArRec_WORK * area_rec + _BArRet_WORK *area_ret + _BArRes_WORK * area_res +
+						_BEmUnrelated_WORK * EMPUR + _BEmGov_WORK * (zone->template employment_government<float>()) / 1000.0 * IndG + _BEmMan_WORK * (zone->template employment_manufacturing<float>()) / 1000.0 * IndM + _BEmRet_WORK * (zone->template employment_retail<float>()) / 1000.0 * IndR + _BEmSer_WORK * (zone->template employment_services<float>()) / 1000.0 * IndS + 
+						_BHOME_WORK * HOME + _BTTAUTO_WORK * (ttime_deflected) * ModAuto + _BTTTRAN_WORK * (ttime_deflected) * ModTran + _BTTOTHER_WORK * (ttime_deflected) * ModOth + ttime_deflected * WORK_TTIME_CALIBRATION_FACTOR + 
+						thetag * _THETAG_WORK + thetam * _THETAM_WORK + thetar * _THETAR_WORK + thetas * _THETAS_WORK + thetai * _THETAI_WORK + thetao * _THETAO_WORK + _THETA_UR_WORK * theta_ur;
 					if (zone->template employment_total<int>() < 1.0) u = -9999999;
 					if (ISNAN(u))
 					{
@@ -775,8 +781,9 @@ namespace Person_Components
 
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container),int> _Zone_Ids_Interface;
 
-			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
-			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			//RLW%%%
+			//typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activity_Plans;
+			//typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 			
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Movement_Plans_Container)> Movement_Plans;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
@@ -839,7 +846,6 @@ namespace Person_Components
 				else return_ptr = choice_model->template Choice_At<_Destination_Choice_Option_Interface*>(selected_index)->template destination<ReturnType>();
 
 				// free memory allocated locally
-				//%%%RLW
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
 				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
@@ -931,7 +937,6 @@ namespace Person_Components
 				}
 
 				// free memory allocated locally
-				// %%%RLW
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
 				Free<typename MasterType::mnl_model_type>((typename MasterType::mnl_model_type*)choice_model);
 
@@ -1045,7 +1050,7 @@ namespace Person_Components
 
 				_Activity_Location_Interface* prev_loc, *next_loc;
 				bool restrict_choice_set = true;
-				if (this->_Current_Activity->template Start_Is_Planned<bool>())
+				if (this->_Current_Activity->Start_Is_Planned())
 				{
 					start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 
@@ -1058,7 +1063,7 @@ namespace Person_Components
 						prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if (prev_act->template Location_Is_Planned<bool>())
+					else if (prev_act->Location_Is_Planned())
 					{
 						prev_loc = prev_act->template Location<_Activity_Location_Interface*>();
 						min_start = prev_act->template End_Time<Time_Minutes>();
@@ -1074,7 +1079,7 @@ namespace Person_Components
 						next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 						restrict_choice_set = false;
 					}
-					else if(next_act->template Location_Is_Planned<bool>())
+					else if(next_act->Location_Is_Planned())
 					{
 						next_loc = next_act->template Location<_Activity_Location_Interface*>();
 						max_end = next_act->template Start_Time<Time_Minutes>();
@@ -1108,7 +1113,7 @@ namespace Person_Components
 				//----------------------------------------------------------------------
 				// Get the mode of the activity, if not yet planned, assume 9AM
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
-				if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
@@ -1254,7 +1259,7 @@ namespace Person_Components
 				Time_Minutes start_time = 9.0 * 60.0;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->template Start_Is_Planned<NT>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
+					if (_Current_Activity->Start_Is_Planned()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 				//----------------------------------------------------------------------
@@ -1262,7 +1267,7 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
 				if (_Current_Activity!=nullptr)
 				{
-					if (_Current_Activity->template Mode_Is_Planned<NT>()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				}
 
 
@@ -1356,7 +1361,7 @@ namespace Person_Components
 				Time_Minutes start_time = 540.0;
 				if (_Current_Activity != nullptr)
 				{
-					if (_Current_Activity->template Start_Is_Planned<bool>()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
+					if (_Current_Activity->Start_Is_Planned()) start_time = _Current_Activity->template Start_Time<Time_Minutes>();
 				}
 
 

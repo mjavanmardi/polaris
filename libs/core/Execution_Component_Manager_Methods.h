@@ -251,14 +251,14 @@ namespace polaris
 		if (bInPlaceNew)
 		{
 			new (return_memory) DataType();
-			((DataType*)return_memory)->execution_block(free_block);
-			((DataType*)return_memory)->_uuid = uuid;
-		}
+            reinterpret_cast<DataType*>(return_memory)->execution_block(free_block);
+            reinterpret_cast<DataType*>(return_memory)->_uuid = uuid;
+        }
 
 		// add information about the uuid
 		if (uuid != -1) _object_repository[__thread_id][uuid] = return_memory;
 
-		return (DataType*)return_memory;
+        return reinterpret_cast<DataType*>(return_memory);
 	}
 	
 	///----------------------------------------------------------------------------------------------------
@@ -284,7 +284,6 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// Free - Free an Execution object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
-	//%%%RLW
 	template<typename DataType>
 	void Execution_Component_Manager<DataType>::Free( DataType* ptr )
 	{

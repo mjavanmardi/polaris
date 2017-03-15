@@ -9,7 +9,7 @@ namespace polaris
 
 
 
-	prototype struct Interactive_Graph
+	prototype struct Interactive_Graph ADD_DEBUG_INFO
 	{
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		
@@ -41,7 +41,7 @@ namespace polaris
 		}
 	};
 	//interface for adding edges to the graph
-	prototype struct Graph_Assembler_Connected_Edge
+	prototype struct Graph_Assembler_Connected_Edge ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 

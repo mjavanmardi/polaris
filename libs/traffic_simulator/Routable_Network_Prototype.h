@@ -6,7 +6,7 @@ namespace Routing_Components
 {
 	namespace Prototypes
 	{
-		prototype struct Routable_Network
+		prototype struct Routable_Network ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

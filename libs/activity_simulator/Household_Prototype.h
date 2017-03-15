@@ -134,6 +134,15 @@ namespace Prototypes
 			return nullptr;
 		}
 		
+		template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle(requires(VehicleItfType, check(VehicleItfType, is_pointer)))// && check_stripped_type(PersonItfType, Activity_Simulator::Person_Concepts::Is_Person)))
+		{
+			return this_component()->Get_Free_Vehicle<VehicleItfType>();
+		}
+
+		template<typename TimeType> TimeType Get_Next_Available_Vehicle_Time()
+		{
+			return this_component()->Get_Next_Available_Vehicle_Time<TimeType>();
+		}
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
@@ -188,7 +197,7 @@ namespace Prototypes
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
+			if (location_index < 0 || location_index >= (TargetType)locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
 			properties->template home_location_id<TargetType>(location_index);
 		}
 		template<typename TargetType> void Home_Location(TargetType location_index, requires(TargetType,check(strip_modifiers(TargetType), !is_integral)))

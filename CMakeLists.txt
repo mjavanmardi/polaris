@@ -16,7 +16,12 @@ option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
 option(Unittests "Include Unit Tests for Other Libraries" OFF)
 option(CapacityFlow "Include Traffic Flow Simulator Prototype" OFF)
-option(IntegratedModel "Build Integrated Activity Based Model" ON)
+option(IntegratedModel "Build Integrated Activity Based Model" OFF)
+option(HelloWorld "Build Hello World application" ON)
+option(FixedDemandSimulator "Build Fixed Demand Simulator application" OFF)
+option(CommandLineArguments "Incorporate command line arguments" OFF)
+option(RandyTest "Build RandyTest application" OFF)
+
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
@@ -28,14 +33,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BUILD_DIR}/bin)
 
 
 #Compiler flags for release mode applied to all projects
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
-
-# %%%RLW - begine
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
-
-if (COMMANDLINE_ARGS)
+if (CommandLineArguments)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOMMANDLINE_ARGS")
 endif()
 
@@ -49,12 +47,10 @@ elseif(MINGW)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wa,-mbig-obj -std=c++11")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj -std=c++11")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -pthread -D__forceinline=inline -m64 -std=c++14 -lrt")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -pthread -D__forceinline=inline -m64 -std=c++11 -lrt")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 endif()
-# %%%RLW - end
-
 
 #Set up dependencies
 
@@ -90,7 +86,7 @@ endif()
 	set(Boost_NO_SYSTEM_PATHS true)
 	#set (Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
 	set (Boost_USE_STATIC_LIBS ON)
-	if (COMMANDLINE_ARGS)
+        if (CommandLineArguments)
 		set (Boost_USE_MULTITHREADED ON)
 		find_package(Boost 1.60.0 REQUIRED COMPONENTS
 		  chrono
@@ -187,9 +183,6 @@ else()
 endif()
 #}
 
-
-
-
 #Allow Access to Project-level Directories
 include_directories(libs)
 include_directories(libs/io)
@@ -279,33 +272,34 @@ if (MSVC AND Antares)
 	#add_subdirectory (apps/integrated_abm)
 	#add_subdirectory (apps/test)
 else()
+	if (Posysn OR FixedDemandSimulator)
+		add_subdirectory (libs/traffic_simulator)
+	endif()
 	#Apply CMake over POLARIS application project structure
 	if (Popsyn)
 		set(Antares OFF)
 		add_subdirectory (apps/population_synthesizer)
-		add_subdirectory (libs/traffic_simulator)
+		#add_subdirectory (libs/traffic_simulator)
 	elseif(Statewide)
 		add_subdirectory (apps/ILSTDM) 
 		add_subdirectory (libs/statewide_model)
 		add_subdirectory (libs/spatial) 
 		#add_subdirectory (libs/routing) 
 		add_subdirectory (libs/traffic_simulator)
-	else()
-		#add_subdirectory (apps/assignment_analyzer) 
+    else()
+                #add_subdirectory (apps/assignment_analyzer)
 		#add_subdirectory (apps/batch_router) 
 		#add_subdirectory (apps/io_demo) 
 	#	add_subdirectory (apps/test) 
 	#	add_subdirectory (apps/integrated_abm)
-		add_subdirectory (apps/fixed_demand_simulator) 
-		add_subdirectory (apps/hello_world)
 	#	add_subdirectory (apps/randy_test)
 	#	add_subdirectory (apps/integrated_capacity_based_model)
 	#	add_subdirectory (apps/atomic_test)
 		#add_subdirectory (apps/dee-test)
 		#add_subdirectory (apps/network_validator)
 	#	add_subdirectory (apps/Output_Visualizer)
-		add_subdirectory (apps/population_synthesizer)
-		add_subdirectory (libs/traffic_simulator)
+		#add_subdirectory (apps/population_synthesizer)
+		#add_subdirectory (libs/traffic_simulator)
 		add_subdirectory (libs/spatial) 
 		#add_subdirectory (libs/routing) 
 	endif()
@@ -314,7 +308,21 @@ else()
 		add_subdirectory (apps/integrated_abm)
 	endif()
 
-	if (Coretests)
+        if(FixedDemandSimulator)
+            add_subdirectory (apps/fixed_demand_simulator)
+            #add_subdirectory (libs/traffic_simulator)
+            #add_subdirectory (libs/spatial)
+        endif()
+
+        if(HelloWorld)
+            add_subdirectory (apps/hello_world)
+        endif()
+
+        if(RandyTest)
+            add_subdirectory(apps/randy_test)
+        endif()
+
+        if (Coretests)
 		#Apply CMake over POLARIS tests project structure
 		add_subdirectory (tests/core_tests)
 	endif()

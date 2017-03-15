@@ -20,7 +20,7 @@ namespace Sensor_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Sensor
+		prototype struct Sensor ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			

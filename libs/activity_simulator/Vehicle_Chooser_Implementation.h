@@ -65,7 +65,7 @@ namespace Household_Components
 			typedef Household_Components::Prototypes::Household<typename type_of(Parent_Household)> household_itf;
 			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_static_properties_itf;
 		
-			typedef Network_Components::Prototypes::Network< typename household_itf::type_of(network_reference)> _Network_Interface;
+			typedef Network_Components::Prototypes::Network< typename household_itf::get_type_of(network_reference)> _Network_Interface;
 			
 			//typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
 			//typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;	
@@ -80,10 +80,11 @@ namespace Household_Components
 
 			typedef Random_Access_Sequence< typename household_itf::get_type_of(Vehicles_Container)> _Vehicles_Container_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(_Vehicles_Container_Interface)> _Vehicle_Interface;
+			typedef typename get_component_type(_Vehicles_Container_Interface) _Vehicle_type;
 			//typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename _Vehicle_Interface::get_type_of(vehicle_characteristics)> _Vehicle_Characteristics_Interface;
 
 			typedef Random_Access_Sequence< typename _Demand_Interface::get_type_of(vehicle_types_container)> _Vehicle_Types_Interface;
-			typedef typename get_component_type(_Vehicles_Container_Interface) _Vehicle_type;
+			
 			
 
 			// static container for vehicle distribution by type and powertrain for each census tract
@@ -92,8 +93,8 @@ namespace Household_Components
 			//static m_container(std::unordered_map<SynthesisZoneType, Veh_Type>, vehicle_distribution_container, NONE, NONE);
 			typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type> vehicle_characteristics_interface;
 			typedef pair<vehicle_characteristics_interface*, float> vehicle_probability_pair_type;
-			typedef pair<double, vector<vehicle_probability_pair_type>> vehicle_distribution_pair_type;
-			typedef std::unordered_map<double, vector<vehicle_probability_pair_type>> vehicle_distribution_container_type;
+			typedef pair<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_pair_type;
+			typedef std::unordered_map<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_container_type;
 			static m_container(vehicle_distribution_container_type, vehicle_distribution_container, NONE, NONE);
 
 
@@ -110,36 +111,38 @@ namespace Household_Components
 				this->_Parent_Household->network_reference<_Network_Interface*>();
 				household_static_properties_itf* household_properties = _Parent_Household->Static_Properties<household_static_properties_itf*>();
 
-				int lookup_id = census_zone->ID<int>();
+				long long lookup_id = census_zone->ID<long long>();
 
 				// create a vehicle for num vehicles in the household
 				for (int i = 0; i < household_properties->Number_of_vehicles<int>(); ++i)
 				{
-					// Allocate a new vehicle
-					_Vehicle_Interface* veh = (_Vehicle_Interface*)Allocate<_Vehicle_type>();					
-
 					float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();					
-					vehicle_distribution_container_type::iterator itr = _vehicle_distribution_container.find(26049011213);
+					vehicle_distribution_container_type::iterator itr = _vehicle_distribution_container.find(lookup_id);
 
 					// home census tract could not be found in vehicle type distribution file!
 					if (itr == _vehicle_distribution_container.end())
 					{
-						THROW_EXCEPTION("ERROR: home census tract could not be found in vehicle type distribution file!");
+						THROW_WARNING("WARNING: home census tract '"<< lookup_id<< "' could not be found in vehicle type distribution file!"<<endl);
+						itr = _vehicle_distribution_container.begin();
 					}
-					else
-					{												
-						//_Vehicle_Types_Interface veh_types = (*itr)->second;  //.push_back(vehicle_probability_pair_type(veh_char, prob));
-						double sumProb = 0;
-						for (auto x = (*itr).second.begin(); x != (*itr).second.end(); x++)						
+											
+					//_Vehicle_Types_Interface veh_types = (*itr)->second;  //.push_back(vehicle_probability_pair_type(veh_char, prob));
+					double sumProb = 0;
+					for (auto x = (*itr).second.begin(); x != (*itr).second.end(); x++)						
+					{
+						sumProb += x->second;
+						if (sumProb >= rand)
 						{
-							sumProb += x->second;
-							if (sumProb >= rand)
-							{
-								veh->vehicle_characteristics(x->first);
-								break;
-							}
-						}							
-					}
+							// Allocate a new vehicle
+							_Vehicle_Interface* veh = (_Vehicle_Interface*)Allocate<_Vehicle_type>();
+							veh->initialize(x->first, _Parent_Household->uuid<int>());
+							veh->is_integrated(true);
+							// Push to household vehicle container
+							vehicles->push_back(veh);
+							break;
+						}
+					}							
+					
 
 					/*
 					// 1. Draw a random set of vehicle properties from your input file for the current zone
@@ -156,8 +159,7 @@ namespace Household_Components
 						if (vc->fuel_type<Vehicle_Components::Types::Fuel_Type_Keys>() == fuel_type && vc->vehicle_class<Vehicle_Components::Types::EPA_Vehicle_Class_Keys>() == veh_class && vc->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == pt_type) veh->vehicle_characteristics(vc);
 					}
 					*/
-					// Push to household vehicle container
-					vehicles->push_back(veh);
+					
 					// Done.
 				}				
 			}
@@ -180,14 +182,14 @@ namespace Household_Components
 				if (!data_file.is_open()) cout << endl << "Could not open 'vehicle_distribution.txt' in the working directory.  Check to make sure the vehicle_distribution.txt file exists.";
 
 				string line;
-				double census_tract;
+				long long census_tract;
 				float prob ;
 				string veh_class_txt, pt_type_txt;
 				string strCensusTract;
 				string type;
 				Vehicle_Components::Types::EPA_Vehicle_Class_Keys veh_class;
 				Vehicle_Components::Types::Powertrain_Type_Keys pt_type;
-				int veh_class_i, pt_type_i;
+				//int veh_class_i, pt_type_i;
 								
 				getline(data_file, line); //throw out header
 				while (getline(data_file, line))
@@ -195,7 +197,7 @@ namespace Household_Components
 					std::stringstream   linestream(line);
 					//linestream >> strCensusTract;
 					std::getline(linestream, strCensusTract, '\t');
-					census_tract = stod(strCensusTract);
+					census_tract = stoll(strCensusTract);
 					std::getline(linestream, veh_class_txt, '\t');
 					std::getline(linestream, pt_type_txt, '\t');
 					linestream >> prob;
@@ -210,9 +212,9 @@ namespace Household_Components
 					if(pt_type_txt ==  "PHEV")				pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::PHEV;
 					else if (pt_type_txt == "HEV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::HEV;				
 					else if (pt_type_txt == "ICE")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
-					//else if (pt_type_txt == "LSEV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::;				
-					//else if (pt_type_txt == "EV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::;				
-					//else if (pt_type_txt == "H2")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::;				
+					else if (pt_type_txt == "LSEV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;				
+					else if (pt_type_txt == "EV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;				
+					else if (pt_type_txt == "H2")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::FCEV;				
 					else 									pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;	
 
 					// find your vehicle characteristics pointer given the above information...
@@ -224,10 +226,14 @@ namespace Household_Components
 						vehicle_characteristics_interface* veh = (vehicle_characteristics_interface*)(*t_itr);
 						if (veh->vehicle_class<Vehicle_Components::Types::EPA_Vehicle_Class_Keys>() == veh_class && veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == pt_type)
 						{
-							veh_char = (vehicle_characteristics_interface*)*t_itr;
+							if ((veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == Vehicle_Components::Types::CONVENTIONAL && veh->fuel_type<Vehicle_Components::Types::Fuel_Type_Keys>() == Vehicle_Components::Types::GASOLINE) || veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() != Vehicle_Components::Types::CONVENTIONAL)
+							{
+								veh_char = (vehicle_characteristics_interface*)*t_itr;
+								break;
+							}
 						}
 					}
-					if (veh_char == nullptr) THROW_EXCEPTION("ERROR: vehicle class and powertrain combination not found in the input demand database.");
+					if (veh_char == nullptr) THROW_EXCEPTION("ERROR: vehicle class '"<<veh_class<<"' and powertrain type '"<<pt_type<<"' combination not found in the input demand database.");
 
 
 					vehicle_distribution_container_type::iterator itr = _vehicle_distribution_container.find(census_tract);
@@ -245,57 +251,10 @@ namespace Household_Components
 					}
 				}								
 			}
-			
-			/*
-			template<typename ActivityRefType, typename ReturnType> pair<ReturnType, ReturnType> Get_Vehicle_Type(ActivityRefType activity_ref)
-			{
-				//// get interface to activity reference
-				//Activity_Components::Prototypes::Activity_Planner<strip_modifiers(ActivityRefType)::Component_Type>* act;
-				//act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(ActivityRefType)::Component_Type>*) activity_ref;
-
-				//// draw random from uniform distribution
-				//float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
-
-				//// use upper bound to draw the start time / duration pair with first cumulative probability greater than rand
-				//map_type::iterator itr = _start_time_duration_container[(int)(act->template Activity_Type<ACTIVITY_TYPES>())].upper_bound(rand);
-
-				//// make sure valid entry is found
-				//if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end())
-				//{
-				//	THROW_WARNING("WARNING: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() << "' and random value = " << rand << ", using last pair in list.");
-				//	itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end();
-				//	itr--;
-				//}
-				
-				pair<ReturnType, ReturnType> return_val;
-
-				//// add random draw from between 0-5 minutes as this is the aggregation level of the start_time data
-				//return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes, ReturnType>(itr->second.first - GLOBALS::Uniform_RNG.template Next_Rand<float>()*10.0f);
-
-				//// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
-				//return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes, ReturnType>(itr->second.second + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*5.0f);
-
-				//// make sure duration is greater than 5 minutes
-				//if (return_val.second < GLOBALS::Time_Converter.template Convert_Value<Time_Minutes, ReturnType>(5.0f)) return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes, ReturnType>(5.0f);
-
-				//// make sure start + duration is less than END
-				//if (return_val.first >= GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment, ReturnType>(END))
-				//{
-				//	return_val.first = return_val.first - GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment, ReturnType>(END);
-				//}
-				//if (return_val.second >= GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment, ReturnType>(END))
-				//{
-				//	return_val.second = GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment, ReturnType>(END);
-				//}
-
-				//cout << "START TIME:" << return_val.first << ",DUR:" << return_val.second << endl;
-				return return_val;
-			}
-			*/
 		};
 				
 		template<typename MasterType, typename InheritanceList> typename Vehicle_Chooser_Implementation <MasterType, InheritanceList>::type_of(is_initialized) Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_is_initialized = false;		
-		template<typename MasterType, typename InheritanceList> std::unordered_map<double, vector<pair<Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type>*,float>>> Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_vehicle_distribution_container;		
+		template<typename MasterType, typename InheritanceList> std::unordered_map<long long, vector<pair<Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type>*,float>>> Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_vehicle_distribution_container;		
 	}
 }
 

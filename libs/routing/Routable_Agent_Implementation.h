@@ -61,25 +61,22 @@ namespace polaris
 
 		float cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
 		{
-			// moe lookup
+			// moe lookup - switched from link-based (moe_ptr) to turn-based (turn_moe_ptr) - testing.....
 			int current_time = current->time_label();
-			float* moe_ptr = current->moe_ptr();
+			//float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
 
-			if(moe_ptr != nullptr)
+			if(turn_moe_ptr /*moe_ptr*/ != nullptr)
 			{
 				int sim_time = iteration();
 
-				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				//float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_cost + connection->_cost;
 
 				int t_diff = abs(current_time - iteration());
-
-				if (t_diff > 800)
-				{
-					int test = 1;
-				}
 
 				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
 
@@ -123,13 +120,13 @@ namespace polaris
 		{
 			// moe lookup
 			int current_time = current->time_label();
-			float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
 
-			if(moe_ptr != nullptr)
+			if(turn_moe_ptr != nullptr)
 			{
 				int sim_time = iteration();
 
-				float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time) + current->_time_cost;
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_time_cost + connection->_time_cost;

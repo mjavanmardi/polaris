@@ -16,7 +16,7 @@ namespace Ramp_Metering_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Ramp_Metering
+		prototype struct Ramp_Metering ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

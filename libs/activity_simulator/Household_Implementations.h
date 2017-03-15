@@ -45,11 +45,12 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			typedef Person_Components::Prototypes::Person<get_component_type(Persons_Container_type)> person_interface;
 			typedef Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container)> zones_container_interface;
-			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;
-			
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;			
 			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
+			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(Vehicles_Container_type)> vehicle_interface;
 			
 
 			//=======================================================================================================================================================================
@@ -94,7 +95,38 @@ namespace Household_Components
 			{
 				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
 			}
+			
+			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
+			{
+				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
+				{
+					if ((*v_itr)->available()) return static_cast<VehicleItfType>(*v_itr);
+				}
+				return nullptr;
+			}
 
+			// return the estimated iteration when a vehicle will next be available
+			template<typename TimeType> TimeType Get_Next_Available_Vehicle_Time()
+			{
+				Simulation_Timestep_Increment min_available_iter = END;
+
+				// search all household vehicesls
+				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
+				{		
+					vehicle_interface* veh = *v_itr;
+
+					// if it is currently available, then next iteration is now -> most likely should not be triggered when calling this function
+					if (veh->available()) return iteration();
+					
+					// get the estimated return home time for unavailable vehicle
+					person_interface* p = veh->traveler<person_interface*>();
+					Simulation_Timestep_Increment return_iter = p->Get_Estimated_Return_Home_Time<Simulation_Timestep_Increment>();
+
+					if (return_iter < min_available_iter) min_available_iter = return_iter;
+
+				}
+				return GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,TimeType>(min_available_iter);
+			}
 		};
 
 	}

@@ -15,7 +15,7 @@ namespace Distributions
 	
 	namespace Prototypes
 	{
-		prototype struct Distribution
+		prototype struct Distribution ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -98,7 +98,7 @@ namespace Distributions
 			}
 		};
 
-		prototype struct Bivariate_Distribution
+		prototype struct Bivariate_Distribution ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

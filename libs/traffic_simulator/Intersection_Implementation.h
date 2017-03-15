@@ -334,6 +334,9 @@ namespace Intersection_Components
 
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
+			//=================================================================================
+			/// ERROR HERE..........
+			//TODO: check this - causing an error......................
 			template<typename TargetType> void link_capacity_allocation()
 			{
 				// Computation is a disaggregated interpretation of HCM Equation 17-1
@@ -405,17 +408,20 @@ namespace Intersection_Components
 					
 					float movement_supply;
 
-					// if there are 2 or more lanes, only the right (or left) lane would be backed up, the left (or right) lanes would have full capacity
-					// in addition, turners will only utilize the rightmost or leftmost lane
-					// this means the turn movement can receive no more than one lane's worth of capacity
-					// this one lane's capacity should also be subject to the percentage of demand for that lane
-					// however, we don't have a good way of estimating the % of through movers in one of those lanes; it should be less than an even split because they will avoid queues
-					// until we can get an estimate for that just compute proportion to demand and cap the capacity
+					/// if there are 2 or more lanes, only the right (or left) lane would be backed up, the left (or right) lanes would have full capacity
+					//	in addition, turners will only utilize the rightmost or leftmost lane
+					/// this means the turn movement can receive no more than one lane's worth of capacity
+					//	this one lane's capacity should also be subject to the percentage of demand for that lane
+					/// however, we don't have a good way of estimating the % of through movers in one of those lanes; it should be less than an even split because they will avoid queues
+					//	until we can get an estimate for that just compute proportion to demand and cap the capacity
 
 					// Additionally, there should be some mechanism to let unused supply flow back to other incident links
 
 					if(!pocket_data->num_pockets_left && !pocket_data->num_pockets_right)
 					{
+						float movement_remain = 0.0;
+						float total_remain = 0.0;
+
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
@@ -427,13 +433,27 @@ namespace Intersection_Components
 
 							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
+							//TODO: evaluate this code 
+							/// THIS HAS BEEN UPDATED TO REPLACE THE FLOOR WHICH WAS ROUNDING DOWN AND CREATING JAMS FOR LOW DEMAND MOVEMENTS
+							//	i.e the interval capacity when simulation interval is 6s = 3 veh. if less then 33% of demand is allocated to a specific movement, the flow for that movement will always be 0 until the demand percentage increases to greter than 33%.
+							/// this causes a lot of problems for turn movements - JAA 1/24/17
+
+							float movement_cap = total_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
+							{
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
 							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) ));
+								movement_supply = floor(min( movement_supply, movement_cap));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap)));
 							}
 
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand));
@@ -451,6 +471,7 @@ namespace Intersection_Components
 
 						float shared_demand = total_demand - left_demand;
 						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_left);
+						float total_remain = 0.0;
 
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
@@ -469,13 +490,24 @@ namespace Intersection_Components
 								
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
+							// allocate remaining capacity randomly
+							float movement_cap = shared_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							float movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
+							{
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
+
 							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
+								movement_supply = floor(min( movement_supply, movement_cap ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap )));
 							}
 
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));
@@ -491,6 +523,7 @@ namespace Intersection_Components
 					{
 						float shared_demand = total_demand - right_demand;
 						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_right);
+						float total_remain = 0.0;
 
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
@@ -506,15 +539,26 @@ namespace Intersection_Components
 
 							// movement gets fraction of capacity proportional to fraction of demand
 							movement_supply = outbound_movement->template movement_supply<float>();
+
+							// allocate remaining capacity randomly
+							float movement_cap = shared_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							float movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
+							{
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
 							
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
+								movement_supply = floor(min( movement_supply, movement_cap ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap )));
 							}
 							
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));

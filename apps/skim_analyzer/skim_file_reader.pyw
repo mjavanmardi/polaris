@@ -11,7 +11,7 @@ import csv
 ######################################################################################
 # Place code to work with Skims in this funcxtion
 ######################################################################################	
-def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, origin_list, dest_list):
+def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, write_tab, origin_list, dest_list):
 
 	do_highway = GetHighwaySkims(highway_skim_file, skims)
 	
@@ -26,6 +26,9 @@ def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, orig
 	
 	if do_highway and write_csv: WriteHighwaySkimsV1_CSV(highway_skim_file, skims, origin_list, dest_list)
 	if do_transit and write_csv: WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list)
+	
+	if do_highway and write_tab: WriteHighwaySkimsV1_TEXT(highway_skim_file, skims, origin_list, dest_list)
+	#if do_transit and write_csv: WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list)
 
 ######################################################################################
 # Skim Functions - do not modify anything below this section
@@ -315,6 +318,32 @@ def WriteHighwaySkimsV1_CSV(highway_skim_file, skims, origin_list=None, dest_lis
 				outfile.write('\n')
 			outfile.write('\n')
 		outfile.write('\n')
+		
+def WriteHighwaySkimsV1_TEXT(highway_skim_file, skims, origin_list=None, dest_list=None):
+	with open(highway_skim_file + '.csv', 'w') as outfile:	
+	
+		# Update the origin and destination lists
+		if origin_list is None: origin_list = sorted(skims.zone_id_to_index_map.keys())
+		if dest_list is None: dest_list = sorted(skims.zone_id_to_index_map.keys())
+		
+		# Write intervals
+		outfile.write('O,D,')
+		for interval in sorted(skims.auto_skims.keys()):
+			outfile.write(str(interval) + ',')	
+		# Write skim matrix for each interval
+		outfile.write('\n')
+			
+			
+		for i in origin_list:
+			for j in dest_list:
+				i_id = skims.zone_id_to_index_map[i]
+				j_id = skims.zone_id_to_index_map[j]
+				outfile.write(str(i) + ',' + str(j) + ',')
+				for interval in sorted(skims.auto_skims.keys()):
+					 outfile.write(str(skims.auto_skims[interval][i_id,j_id]) + ',')
+				outfile.write('\n')
+
+
 
 def WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list=None, dest_list=None):
 	outfile = open(transit_skim_file + '.csv', 'wb')
@@ -628,6 +657,7 @@ parser = argparse.ArgumentParser(description='Process the skim data')
 parser.add_argument('-auto_skim_file', default='')
 parser.add_argument('-transit_skim_file', default='')
 parser.add_argument('-csv', action='store_const', const=1)
+parser.add_argument('-tab', action='store_const', const=1)
 parser.add_argument('-bin', action='store_const', const=1)
 parser.add_argument('-origin_list', type=int, nargs='*')
 parser.add_argument('-destination_list', type=int, nargs='*')
@@ -647,7 +677,9 @@ write_csv=False
 if args.csv==1: write_csv=True
 write_bin=False
 if args.bin==1: write_bin=True
-if write_csv==False: write_bin=True
+write_tab=False
+if args.tab==1: write_tab=True
+if write_csv==False and write_tab==False: write_bin=True
 
 if (args.read_from_csv):
 	write_bin = True
@@ -664,5 +696,5 @@ if (args.read_from_csv):
 		WriteTransitSkimsV1(args.transit_skim_file,skims)
 		WriteTransitSkimsV1_CSV(args.transit_skim_file,skims)
 else:
-	Main(skims, args.auto_skim_file, args.transit_skim_file, write_bin, write_csv, args.origin_list, args.destination_list)
+	Main(skims, args.auto_skim_file, args.transit_skim_file, write_bin, write_csv, write_tab, args.origin_list, args.destination_list)
 

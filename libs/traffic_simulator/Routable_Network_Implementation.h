@@ -30,14 +30,12 @@ namespace Routing_Components
 			{
 				if(_layer_element_tracker != _layer_size)
 				{
-					cout << "layer size not maintained! " << _layer_element_tracker << "," << _layer_size << endl;
-					exit(0);
+					THROW_EXCEPTION("layer size not maintained! " << _layer_element_tracker << "," << _layer_size);
 				}
 
 				if((layer_id - _layer_tracker) != _layer_step)
 				{
-					cout << "layer step not maintained! " << _layer_tracker << "," << layer_id << endl;
-					exit(0);
+					THROW_EXCEPTION("layer step not maintained! " << _layer_tracker << "," << layer_id);
 				}
 
 				_layer_element_tracker = 0;
@@ -132,7 +130,12 @@ namespace Routing_Components
 		{
 			t_data(float,cost);
 			t_data(float,time_cost);
+			t_data(float*, turn_moe_ptr);
+
+			static t_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
+
+		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
 	}
 
 
@@ -150,8 +153,10 @@ namespace Routing_Components
 			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
 
 			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
-
 			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+
+			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
+			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
 
 			static void initialize_moe_data()
 			{
@@ -170,9 +175,12 @@ namespace Routing_Components
 				//string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 				shared_ptr<database> db (open_sqlite_database_single<shared_ptr<database>>(name));
 				transaction t(db->begin());
+
+				//==============================================================================
+				// ADD LINK MOEs
+				//------------------------------------------------------------------------------
 				result<LinkMOE> moe_result=db->template query<LinkMOE>(query<LinkMOE>::true_expr);
 				
-
 				int link_id;
 				float travel_delay;
 				int start_time = -1;
@@ -193,7 +201,7 @@ namespace Routing_Components
 
 					start_time = db_itr->getStart_Time();
 					link_id = db_itr->getLink_Uid();
-					travel_delay = db_itr->getLink_Travel_Time()*60.0f;
+					travel_delay = db_itr->getLink_Travel_Time();
 
 					//if(travel_delay < 0.01f) cout << travel_delay << endl;
 
@@ -202,6 +210,44 @@ namespace Routing_Components
 					if(!time_advance)
 					{
 						_link_id_to_moe_data[link_id] = ptr;
+						time_advance = false;
+					}
+				}
+
+				//==============================================================================
+				// ADD TURN MOEs
+				//------------------------------------------------------------------------------
+				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+
+				int turn_id;
+				float turn_delay;
+				start_time = -1;
+				counter = -1;
+
+				time_advance = false;
+
+				for (typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
+				{
+					if (++counter % 100000 == 0) cout << counter << endl;
+
+					if (start_time == -1) start_time = db_itr->getStart_Time();
+
+					if (start_time != db_itr->getStart_Time())
+					{
+						time_advance = true;
+					}
+
+					start_time = db_itr->getStart_Time();
+					turn_id = db_itr->getTurn_Uid();
+					turn_delay = db_itr->getTurn_Penalty();
+
+					//if(travel_delay < 0.01f) cout << travel_delay << endl;
+
+					unsigned int ptr = _turn_moe_data.add_layer_element(turn_delay, start_time);
+
+					if (!time_advance)
+					{
+						_turn_id_to_moe_data[turn_id] = ptr;
 						time_advance = false;
 					}
 				}
@@ -230,6 +276,7 @@ namespace Routing_Components
 			{
 
 				Types::time_dependent_attributes<MT>::_moe_data = &_moe_data;
+				Types::time_dependent_to_time_dependent::_turn_moe_data = &_turn_moe_data;
 
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
@@ -310,6 +357,14 @@ namespace Routing_Components
 					for(auto movements_itr=outbound_turn_movements->begin();movements_itr!=outbound_turn_movements->end();movements_itr++)
 					{
 						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
+						if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
+						{
+							connection_attributes._turn_moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
+						}
+						else
+						{
+							connection_attributes._turn_moe_ptr = nullptr;
+						}
 
 						long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
 
@@ -660,5 +715,11 @@ namespace Routing_Components
 
 		template<typename MasterType, typename InheritanceList>
 		std::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		Layered_Data_Array<float> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		std::unordered_map<int, int> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_id_to_moe_data;
 	}
 }

@@ -3,7 +3,7 @@
 
 namespace polaris
 {
-	prototype struct Routable_Agent
+	prototype struct Routable_Agent ADD_DEBUG_INFO
 	{
 		//some of those functions are called in Evaluate_Neighbor
 
@@ -36,7 +36,7 @@ namespace polaris
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){ this_component()->update_label(current, neighbor, connection); }	
 	};
 
-	//prototype struct Tree_Agent
+    //prototype struct Tree_Agent ADD_DEBUG_INFO
 	//{
 	//	//typedef typename ComponentType::agent_state_type agent_state_type;
 	//	

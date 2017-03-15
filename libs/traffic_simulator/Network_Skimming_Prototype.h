@@ -533,7 +533,6 @@ namespace Network_Skimming_Components
 
 				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
-				//%%%RLW
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 

@@ -29,7 +29,7 @@ namespace Operation_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Operation
+		prototype struct Operation ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
