@@ -49,6 +49,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(intersections_container, NONE, NONE);
 			accessor(links_container, NONE, NONE);
+			accessor(links_map_container, NONE, NONE);
 			accessor(db_reader, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 			

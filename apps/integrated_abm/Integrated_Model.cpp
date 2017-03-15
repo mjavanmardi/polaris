@@ -33,6 +33,9 @@
 #include "Scenario_Implementation.h"
 #include "Application_Includes.h"
 
+#include <chrono>
+#include <ctime>
+
 
 struct MasterType
 {
@@ -69,6 +72,7 @@ struct MasterType
 	#else
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
+
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<M> vehicle_characteristics_type;
@@ -134,6 +138,10 @@ struct MasterType
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
+
+	//Mahmoud
+	typedef Platoon_Components::Implementations::Platoon_Implementation <M> platoon_type;
+	typedef Platoon_Components::Implementations::Platoon_Data_Implementation <M> platoon_data_type;
 	
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
@@ -244,7 +252,9 @@ struct MasterType
 
 int main(int argc,char** argv)
 {
-	#ifdef MEM_DEBUG
+	auto date_time_now = std::chrono::system_clock::now();	auto time_now = std::chrono::system_clock::to_time_t(date_time_now);cout << std::ctime(&time_now);
+
+#ifdef MEM_DEBUG
 		_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	#endif
 
@@ -480,16 +490,16 @@ int main(int argc,char** argv)
 		{
 			skimmer->read_transit<bool>(true);
 			skimmer->read_highway_cost<bool>(true);
-			if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary highway skim file '" << scenario->input_highway_skim_file_path_name<string>() << "' could not be opened. Highway skims are required, application terminating.");
+			if (!skimmer->highway_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary highway skim file '" << scenario->input_highway_skim_file_path_name<string>() << "' could not be opened. Highway skims are required, application terminating." << endl);
 			if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_transit_skim_file_path_name<string>().c_str()))
 			{
 				skimmer->read_transit<bool>(false);
-				cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
+				cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable." << endl;
 			}
 			if (!skimmer->highway_cost_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_cost_skim_file_path_name<string>().c_str())) 
 			{
 				skimmer->read_highway_cost<bool>(false);
-				cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
+				cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0." << endl;
 			}
 		}
 		else
@@ -501,9 +511,9 @@ int main(int argc,char** argv)
 		skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
 		if (skimmer->write_output<bool>())
 		{
-			if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened.");
-			if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
-			if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
+			if (!skimmer->highway_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_highway_skim_file_path_name<string>() << "' could not be opened." << endl);
+			if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened." << endl);
+			if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened." << endl);
 		}
 		skimmer->Initialize<_Network_Interface*>(network);
 		network->skimming_faculty<_network_skim_itf*>(skimmer);
@@ -512,7 +522,7 @@ int main(int argc,char** argv)
 	}
 	else
 	{
-		THROW_EXCEPTION("ERROR: No network skimming properties specified in the scenario file.  Please set either 'READ_SKIM_TABLES' or 'WRITE_SKIM_TABLES' to true in order to continue.");
+		THROW_EXCEPTION("ERROR: No network skimming properties specified in the scenario file.  Please set either 'READ_SKIM_TABLES' or 'WRITE_SKIM_TABLES' to true in order to continue." << endl);
 	}
 
 	//==================================================================================================================================
@@ -528,6 +538,12 @@ int main(int argc,char** argv)
 	
 	// Initialize Vehicle Choice Model
 	MasterType::vehicle_chooser_type::static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
+
+
+	// Initialize/Load Platoon Data
+	MasterType::platoon_type::static_initializer(scenario->platoon_information_file_name<string>(), demand);
+	
+	
 
 	//==================================================================================================================================
 	// POPSYN stuff
@@ -577,7 +593,8 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	try
 	{
-		cout <<"Starting simulation..."<<endl;
+		auto date_time_now = std::chrono::system_clock::now();	auto time_now = std::chrono::system_clock::to_time_t(date_time_now); cout << std::ctime(&time_now);
+
 		START();
 	}
 	catch (std::exception ex)

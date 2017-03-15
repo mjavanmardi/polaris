@@ -2,6 +2,7 @@
 #include "Routing_Prototype.h"
 #include "Routable_Link_Implementation.h"
 #include "Routable_Intersection_Implementation.h"
+#include "Platoon_Implementation.h"
 #ifndef EXCLUDE_DEMAND
 //#include "Person_Implementations.h"
 #endif
@@ -80,11 +81,11 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Network is undefined.");
 				}
-				else if(((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				else if (((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
 				{
 					THROW_EXCEPTION("_routable_networks is undefined.");
 				}
-				else if(thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				else if (thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
 				{
 					THROW_EXCEPTION("_routable_networks is not large enough.");
 				}
@@ -99,16 +100,15 @@ namespace Routing_Components
 
 				// get a routable network; routable_network know what thread you are
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
-				
+
 
 				// Get the current origin/destination information
-				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
-				unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
+				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();				
+				//unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
 				Activity_Location_Interface* origin_loc = _movement_plan->template origin<Activity_Location_Interface*>();
 				Activity_Location_Interface* destination_loc = _movement_plan->template destination<Activity_Location_Interface*>();
 				Link_Container_Interface* origin_links = origin_loc->template origin_links<Link_Container_Interface*>();
 				Link_Container_Interface* destination_links = destination_loc->template destination_links<Link_Container_Interface*>();
-
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
 				bool debug_route = false;
@@ -133,21 +133,42 @@ namespace Routing_Components
 				std::deque<global_edge_id> path_container;
 				//cost of traversing each of the edges
 				std::deque<float> cost_container;
-				
+
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				float best_route_time_to_destination = 0.0f;
 
 
-				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
-				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
+				bool platoon_member = false;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> Vehicle_Interface;
+				auto vehicle = this->_movement_plan->parent_vehicle<Vehicle_Interface*>();
+				if (vehicle != nullptr)
 				{
-					best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids,destination_ids,path_container,cost_container);
-				}
-				else
-				{
-					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container,debug_route);
+					auto trip_id = vehicle->trip_id<int>();
+					auto platoon_data_container = Platoon_Components::Implementations::Platoon_Implementation<MasterType, InheritanceList>::_platoon_data_container;
+					auto platoon_data_it = platoon_data_container.find(trip_id);
+
+					if (platoon_data_it != platoon_data_container.end())
+					{
+						platoon_member = true;
+						vehicle->platoon_data_vec (platoon_data_it->second);
+						vehicle->write_trajectory(true);
+						//cout << "found a trip! trip_id = " << trip_id << endl;
+						best_route_time_to_destination = Compute_Platoon_Route(routable_network, origin_ids, destination_ids, path_container, cost_container, vehicle);
+					}
 				}
 
+				if(!platoon_member)
+				{					
+					// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
+					if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
+					{
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, path_container, cost_container);
+					}
+					else
+					{
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids, destination_ids, _departure_time/*iteration()*/, path_container, cost_container, debug_route);
+					}
+				}
 
 				if(path_container.size())
 				{
@@ -185,6 +206,62 @@ namespace Routing_Components
 				}
 			}
 
+			float Compute_Platoon_Route(Routable_Network<typename MasterType::routable_network_type>* routable_network, std::vector<unsigned int> &origin_ids, std::vector<unsigned int> &destination_ids, std::deque<global_edge_id> &path_container, std::deque<float> &cost_container, Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> * vehicle)
+			{
+				typedef Link_Components::Prototypes::Link<typename MasterType::link_type>  link_itf;
+				bool debug_route = false;
+				float best_route_time_to_destination = 0;
+
+				auto platoon_data =  vehicle->template platoon_data_vec < typename std::deque< Platoon_Components::Prototypes::Platoon_Data<MasterType::platoon_data_type> *>>();
+				auto first_link = platoon_data[0]->link<link_itf* >();
+				auto last_link = platoon_data[platoon_data.size() - 1]->link<link_itf* >();
+				
+				//from origin to the beginning of platoon formation
+				std::deque<global_edge_id> path_container_0;	//list of edgeid, graph_id tuples; internal edge ids
+				std::deque<float> cost_container_0;			//cost of traversing each of the edges
+				std::vector<unsigned int> destination_ids0;
+				destination_ids0.push_back(first_link->template uuid<unsigned int>());
+				float best_route_time_to_destination_0 = routable_network->compute_time_dependent_network_path(origin_ids, destination_ids0, _departure_time, path_container_0, cost_container_0, debug_route);
+
+				//from end of platooning to the destination
+				std::deque<global_edge_id> path_container_1;	//list of edgeid, graph_id tuples; internal edge ids				
+				std::deque<float> cost_container_1;				//cost of traversing each of the edges
+				std::vector<unsigned int> origin_ids1;
+				origin_ids1.push_back(last_link->template uuid<unsigned int>());
+				float best_route_time_to_destination_1 = routable_network->compute_time_dependent_network_path(origin_ids1, destination_ids, _departure_time, path_container_1, cost_container_1, debug_route);
+
+				//convert vector of links to vector of edges to create path container!				
+				auto graph_id = path_container_0[0].graph_id;
+				for (auto platoon_data_it : platoon_data)
+				{
+					auto link =  platoon_data_it->link<link_itf* >();
+					// get edge id from link id
+					global_edge_id edge;
+					edge.edge_id = link->template uuid<unsigned int>();			
+					edge.graph_id = graph_id;
+					path_container.push_back(edge);
+					
+					//cost_container.push_back(platoon_data_it->);
+					cost_container.push_back(0.0);
+
+					best_route_time_to_destination +=  0.0 ;
+				}
+
+				//Merge 
+				auto link_it_a = path_container_0.rbegin();  link_it_a++;
+				for (; link_it_a != path_container_0.rend(); link_it_a++){path_container.push_front(*link_it_a);}
+
+				auto cost_it_a = cost_container_0.rbegin(); cost_it_a++;
+				for (; cost_it_a != cost_container_0.rend(); cost_it_a++){cost_container.push_front(*cost_it_a);}
+				
+				auto link_it_b = path_container_1.begin(); link_it_b++;
+				for (; link_it_b != path_container_1.end(); ++link_it_b)	{path_container.push_back(*link_it_b);}
+
+				auto cost_it_b = cost_container_1.begin(); cost_it_b++;
+				for (; cost_it_b != cost_container_1.end(); ++cost_it_b)	{cost_container.push_back(*cost_it_b);}
+
+				return  best_route_time_to_destination + best_route_time_to_destination_0 + best_route_time_to_destination_1;
+			}
 		};
 
 		template<typename MasterType,typename InheritanceList>

@@ -117,6 +117,7 @@ namespace Vehicle_Components
 			}
 		};
 
+
 		prototype struct Vehicle ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
@@ -146,6 +147,11 @@ namespace Vehicle_Components
 			accessor(suggested_action, NONE, NONE);
 
 			typed_accessor(bool,write_trajectory);
+
+			//Mahmoud -- platoon related
+			accessor(platoon_data_vec, NONE, NONE);
+			accessor(release_time, NONE, NONE); 
+			accessor(trip_id, NONE, NONE);
 
 			bool available()
 			{

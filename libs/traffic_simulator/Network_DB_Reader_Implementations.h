@@ -151,9 +151,12 @@ namespace Network_Components
 
 				typedef  Ramp_Metering_Components::Prototypes::Ramp_Metering< typename _Link_Interface::get_type_of(ramp_meter)> _Ramp_Metering_Interface;
 				_Links_Container_Interface* links_container_ptr=_network_reference->template links_container<_Links_Container_Interface*>();
-				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
+				typename type_of(network_reference)::type_of(links_container)& links_container_monitor = (typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_type;
+				typedef std::unordered_map<int, std::vector<typename MasterType::link_type*>> id_to_links_type;
+
+				typedef std::map<pair<int,int>, Link_Components::Prototypes::Link<typename MasterType::link_type >* > _Links_Map_Container_Interface;
+				auto links_map_container_ptr = _network_reference->template links_map_container<typename _Links_Map_Container_Interface* >();
 
 				Types::Link_ID_Dir link_id_dir;
 				
@@ -198,6 +201,10 @@ namespace Network_Components
 					
 					counter++;
 					if(counter%10000==0) cout << "\t" << counter << endl;
+					
+					int Node_A = db_itr->getNode_A()->getNode();
+					int Node_B = db_itr->getNode_B()->getNode();
+					
 					//cout << "\t" << counter << endl;
 					if(db_itr->getLanes_Ab()>0)
 					{
@@ -218,9 +225,12 @@ namespace Network_Components
 
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(0.0);
+						
+						//link->template upstream_intersection<_Intersection_Interface*>  ((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+						//link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[Node_A]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[Node_B]);
 
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 
 						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
 
@@ -420,6 +430,9 @@ namespace Network_Components
 						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
+						pair<int, int> p = pair<int, int>(Node_A, Node_B);
+						//links_map_container_ptr->insert(pair<pair<int, int>, _Link_Interface* >(p, link));
+						links_map_container_ptr->insert(pair<pair<int, int>, Link_Components::Prototypes::Link<typename MasterType::link_type  >* >(p, link));
 						
 						typename id_to_links_type::iterator links_itr;
 						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
@@ -451,11 +464,13 @@ namespace Network_Components
 
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(1);
-
-
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						
+
+						//link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+						//link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[Node_B]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[Node_A]);
+
 						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
 
 						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
@@ -654,6 +669,10 @@ namespace Network_Components
 
 						links_container_ptr->push_back(link);
 
+						pair<int, int> q = pair<int, int>(Node_B, Node_A);
+						links_map_container_ptr->insert(std::pair<pair<int, int>, _Link_Interface* >(q, link));
+
+
 						typename id_to_links_type::iterator links_itr;
 						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
 						links_itr = id_to_links_map.find(link_id_dir.id);
@@ -839,8 +858,6 @@ namespace Network_Components
 					typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
 					//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
 					link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-
-
 					turn_movements_container.push_back(turn_movement);
 				}
 

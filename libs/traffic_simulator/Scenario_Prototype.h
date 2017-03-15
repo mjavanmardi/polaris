@@ -152,6 +152,11 @@ namespace Scenario_Components
 			accessor(vehicle_distribution_file_name, NONE, NONE);	// file containing the vehicle type distribution by taz
 
 			//===============================================
+			// Platoon information data
+			//-----------------------------------------------
+			accessor(platoon_information_file_name, NONE, NONE);	// file containing the platoon information
+																	
+			//===============================================
 			// Popsyn parameters
 			//-----------------------------------------------
 			accessor(percent_to_synthesize, NONE, NONE);			// percent to synthesize 0-1.0, setting to 0 will run only fixed demand
@@ -422,6 +427,9 @@ namespace Scenario_Components
 				// Start time model parameters
 				if (cfgReader.getParameter("vehicle_distribution_file_name", this->template vehicle_distribution_file_name<string*>()) != PARAMETER_FOUND) this->template vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
 
+				//=======================================================================================================================================================
+				// Platoon Information				
+				if (cfgReader.getParameter("platoon_information_file_name", this->template platoon_information_file_name<string*>()) != PARAMETER_FOUND) this->template platoon_information_file_name<string>((string)"platoon_information.txt");
 
 				//=======================================================================================================================================================
 				// PopSyn parameters

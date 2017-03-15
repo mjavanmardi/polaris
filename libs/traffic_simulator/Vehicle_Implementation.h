@@ -2,6 +2,7 @@
 #include "Vehicle_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "../repository/RNG_Implementations.h"
+#include "Platoon_Implementation.h"
 
 namespace Vehicle_Components
 {
@@ -105,6 +106,8 @@ namespace Vehicle_Components
 		};
 
 
+
+
 		implementation struct Vehicle_Implementation:public Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>
 		{
 
@@ -151,6 +154,10 @@ namespace Vehicle_Components
 			m_data(int, last_enroute_switching_route_check_time, NONE, NONE);
 			m_data(int, entry_queue_length, NONE, NONE);
 
+			//Platoon			
+			m_container(std::deque< Platoon_Components::Prototypes::Platoon_Data < typename MasterType::platoon_data_type> *> , platoon_data_vec, NONE, NONE);
+			m_data(int, release_time, NONE, NONE);
+			m_data(int, trip_id, NONE, NONE);
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
@@ -613,8 +620,10 @@ namespace Vehicle_Components
 						typename MasterType::network_type::long_hash_key_type long_hash_key;
 						long_hash_key.inbound_link_id = inbound_link_id;
 						long_hash_key.outbound_link_id = outbound_link_id;
-						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						
+						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();							
 						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+
 						float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
 						current_travel_time += link_turn_travel_time;
 					}
@@ -1229,6 +1238,7 @@ namespace Vehicle_Components
 				((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + current_route_time_to_destination);
 			}
 		};
+
 	}
 
 }

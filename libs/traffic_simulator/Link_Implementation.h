@@ -194,6 +194,11 @@ namespace Link_Components
 			m_container(std::vector<typename MasterType::vehicle_type*>, current_vehicle_queue, NONE, NONE);
 
 		//==================================================================================================================
+		/// Waiting Vehicles Containers -- for Platooning Application
+		//------------------------------------------------------------------------------------------------------------------
+		m_container(std::vector<typename MasterType::vehicle_type*>, waiting_vehicle_queue, NONE, NONE);
+
+		//==================================================================================================================
 		/// Replicas Container
 		//------------------------------------------------------------------------------------------------------------------
 
@@ -536,10 +541,13 @@ namespace Link_Components
 
 			template<typename TargetType> void accept_vehicle_from_network(TargetType veh)
 			{
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 				int current_simulation_interval_index = ((_Network_Interface*)_network_reference)->template current_simulation_interval_index<int>();
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
 				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
+
+				vehicle->release_time(current_time);
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{
@@ -575,20 +583,40 @@ namespace Link_Components
 				}
 				else
 				{
-					///set up downstream preferred departure time
-					int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
+					///set up downstream preferred departure time					
 					int pdt = current_time + _link_fftt;
+
+					int wait_time = 0;
+					auto &platoon_data_vec = vehicle->platoon_data_vec < std::deque < Platoon_Components::Prototypes::Platoon_Data<MasterType::platoon_data_type> * >>();
+					if (!platoon_data_vec.empty())
+					{
+						auto first_platoon_data = platoon_data_vec.front();
+						auto first_link = first_platoon_data->template link< typename Link_Components::Prototypes::Link < typename MasterType::link_type > *>();
+						if (first_link->uuid<int>() == this->_uuid)
+						{
+							wait_time = first_platoon_data->node_wait_time<int>();
+							vehicle->release_time(wait_time + current_time);
+							platoon_data_vec.pop_front();
+						}
+					}
 
 					LOCK(_link_lock);
 					if (_current_vehicle_queue.size() >= 1)
 					{
 						_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
 						int last_vehicle_pdt = last_vehicle->template downstream_preferred_departure_time<int>();
-						pdt = max(float(last_vehicle_pdt), float(pdt));
+						pdt = max(float(last_vehicle_pdt), float(pdt ));
 					}
-					vehicle->template downstream_preferred_departure_time<int>(pdt);
-					_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
-
+					
+					vehicle->template downstream_preferred_departure_time<int>(pdt + wait_time);
+					if (wait_time > 0)
+					{
+						_waiting_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					}
+					else
+					{
+						_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					}
 					UNLOCK(_link_lock);
 				}
 			}
@@ -596,8 +624,29 @@ namespace Link_Components
 			template<typename TargetType> void link_moving()
 			{
 				typename std::vector<typename MasterType::vehicle_type*>::iterator vehicle_itr;
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 
-				for(vehicle_itr=_current_vehicle_queue.begin();vehicle_itr!=_current_vehicle_queue.end();vehicle_itr++)
+				//Loop through platooning vehicles that were on hold and if the time to departure on the link has come, depart them.
+				for (vehicle_itr = _waiting_vehicle_queue.begin(); vehicle_itr != _waiting_vehicle_queue.end(); vehicle_itr++)
+				{
+					if ((*vehicle_itr)->release_time<int>() <= current_time)
+					{
+						int pdt = current_time + _link_fftt;
+						if (!_current_vehicle_queue.empty())
+						{
+							_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
+							int last_vehicle_pdt = last_vehicle->template downstream_preferred_departure_time<int>();
+							pdt = max(float(last_vehicle_pdt), float(pdt));	
+						}
+						(*vehicle_itr)->template downstream_preferred_departure_time<int>(pdt);
+						((_Intersection_Interface*)_downstream_intersection)->template push_vehicle<NULLTYPE>((*vehicle_itr));
+					}
+				}
+				//remove the vehicels that have been let go
+				_waiting_vehicle_queue.erase(std::remove_if(_waiting_vehicle_queue.begin(), _waiting_vehicle_queue.end(), [=](MasterType::vehicle_type* x) {return x->release_time<int>() <= current_time; }), _waiting_vehicle_queue.end());
+
+
+				for(vehicle_itr=_current_vehicle_queue.begin(); vehicle_itr != _current_vehicle_queue.end();vehicle_itr++)
 				{
 					((_Intersection_Interface*)_downstream_intersection)->template push_vehicle<NULLTYPE>((*vehicle_itr));
 				}

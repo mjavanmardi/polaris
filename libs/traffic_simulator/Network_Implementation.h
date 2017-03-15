@@ -68,6 +68,8 @@ namespace Network_Components
 
 			m_container(std::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
 			//m_container(std::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
+			m_container(concat(std::map<pair<int,int>, Link_Components::Prototypes::Link<typename MasterType::link_type>* >), links_map_container, NONE, NONE);
+			
 
 			//TODO:ROUTING
 			//m_container(std::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);

@@ -35,14 +35,38 @@ implementation struct my_agent_impl : public Polaris_Component<MasterType, INHER
 	}
 	void write_stuff()
 	{
-		cout << "Hello world, I am "<<this->name<string>()<<" this is iteration " << iteration()<<", subiteration "<<sub_iteration() << endl;
+		cout << "Hello world, I am MY_AGENT this is iteration " << iteration()<<", subiteration "<<sub_iteration() << endl;
 	}
 
 	m_data(string, name, true, true);
 	m_data(int, my_subiteration, true, true);
-	
+	m_data(bool, is_active, true, true);
 
 };
+
+implementation struct bad_agent_impl : public Polaris_Component<MasterType, INHERIT(bad_agent_impl), Execution_Object>
+{
+	void initialize(int start_time)
+	{
+		this->template Load_Event<bad_agent_impl>(&Do_stuff, start_time, 0);
+	}
+	static void Do_stuff(bad_agent_impl* _this, Event_Response& response)
+	{
+		response.next._iteration = iteration() + 2;
+		response.next._sub_iteration = 0;
+		_this->write_stuff();
+	}
+	void write_stuff()
+	{
+		cout << "Hello world, I am a BAD agent this is iteration " << iteration() << ", subiteration " << sub_iteration() << endl;
+	}
+
+	m_data(string, name, true, true);
+	m_data(int, my_subiteration, true, true);
+	m_data(bool, is_active, true, true);
+
+};
+
 implementation struct other_agent_impl : public my_agent_impl<MasterType, INHERIT(other_agent_impl)>
 {
 	void initialize(int start_time)
@@ -59,7 +83,7 @@ implementation struct other_agent_impl : public my_agent_impl<MasterType, INHERI
 	{
 		if (this->_is_active) this->_is_active = false;
 		else this->_is_active = true;
-        cout << "Hello world, I am " << this->template name<string>() << " this is iteration " << iteration() << ", subiteration " << sub_iteration() << endl;
+        cout << "Hello world, I am OTHER this is iteration " << iteration() << ", subiteration " << sub_iteration() << endl;
 	}
 
 	m_data(bool, is_active, true, true);
@@ -80,6 +104,7 @@ implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(l
 	}
 	void Do_the_stuff()
 	{
+		cout << "My subiteration is: " << this->_the_agent->my_subiteration<int>() << endl;
         if (this->_the_agent->template is_active<bool>()) cout << "My agent is currently active..." << endl;
 		else cout << "My agent is sleeping..." << endl;
 	}
@@ -89,7 +114,7 @@ implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(l
 
 struct MasterType
 {
-	typedef other_agent_impl<MasterType> agent_type;
+	typedef bad_agent_impl<MasterType> agent_type;
 	typedef link_impl<MasterType> link_type;
 
 };

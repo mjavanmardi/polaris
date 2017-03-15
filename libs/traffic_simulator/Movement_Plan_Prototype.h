@@ -65,6 +65,11 @@ namespace Movement_Plan_Components
 			accessor(entry_time, NONE, NONE);
 			accessor(traveler_id, NONE,NONE);
 
+			//Mahmoud
+			accessor(parent_vehicle, NONE, NONE);
+			//accessor(parent_vehicle, NONE, NONE);
+			accessor(Involved_Persons_Container, NONE, NONE);
+
 			void Free_Movement()
 			{
 				if (this == nullptr) return;
@@ -139,8 +144,7 @@ namespace Movement_Plan_Components
 			{
 				return this_component()->template destination_location<TargetType>();
 			}
-			template<typename TargetType>
-			void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
+			template<typename TargetType> void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
 			{
 				this_component()->template origin<TargetType>(link);
 			}

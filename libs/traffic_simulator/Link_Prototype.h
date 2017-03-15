@@ -103,6 +103,8 @@ namespace Link_Components
 			accessor(link_destination_vehicle_queue, NONE, NONE);
 			accessor(current_vehicle_queue, NONE, NONE);	
 
+			accessor(waiting_vehicle_queue, NONE, NONE); // for platooning application
+
 			accessor(link_fftt, NONE, NONE);
 			accessor(link_bwtt, NONE, NONE);
 			accessor(link_fftt_cached_simulation_interval_size, NONE, NONE);

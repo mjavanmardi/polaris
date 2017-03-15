@@ -109,6 +109,9 @@ namespace Movement_Plan_Components
 			m_data(int, entry_time, NONE, NONE);
 			m_data(int, traveler_id, NONE, NONE);
 
+
+			m_prototype(Vehicle, typename MasterType::vehicle_type, parent_vehicle, NONE, NONE);
+			
 			template<typename TargetType>
 			TargetType absolute_departure_time()
 			{
