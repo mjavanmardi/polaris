@@ -5,13 +5,13 @@
 #include <iostream>
 #include <sstream>
 #include <boost/intrusive/list.hpp>
-#include <boost/container/deque.hpp>
+/*#include <boost/container/deque.hpp>
 #include <boost/container/list.hpp>
 #include <boost/container/set.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/container/map.hpp>
 #include <boost/unordered/unordered_map.hpp>
-#include <boost/unordered/unordered_set.hpp>
+#include <boost/unordered/unordered_set.hpp>*/
 #include <boost/intrusive/treap_set.hpp>
 #include <boost/intrusive/set.hpp>
 
@@ -25,19 +25,23 @@ using google::sparse_hash_map;
 using google::sparse_hash_set;
 
 #include <map>
-//#include <deque>
-//#include <list>
-//#include <set>
-//#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <deque>
+#include <list>
+#include <set>
+#include <vector>
 #include <type_traits>
-#include <direct.h>
-
+#ifdef _WIN32		
+  #include <direct.h>
+#endif
+#include <memory>
 #ifdef _MSC_VER
-#include <Windows.h>
+  #include <Windows.h>
 #else
 #include <pthread.h>
 #include <unistd.h>
-#define __forceinline inline
+//#define __forceinline inline
 #endif
 
 //---------------------------------------------------------
@@ -53,6 +57,6 @@ using google::sparse_hash_set;
 using namespace std;
 
 
-using namespace boost::container;
-using namespace boost::unordered;
+//using namespace boost::container;
+//using namespace boost::unordered;
 

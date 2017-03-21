@@ -113,9 +113,9 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 // argv[1] = database_filename: the filepath to the supply database containing the network information
 // argv[2] = historical_moe_database_name: the filepath to the database containing the historical network MOE data
 // argv[3] = trips_filename: filepath to a delimited data file containing the list of trips to be routed in the following format:
-// argv[4] = num_threads: defaults to 1 if not present, more than 1 runs multithreaded mode
 //	1			2							3															4										5
 //	Trip_ID		Mode ('Auto', 'Transit')	Origin Location (location id code from supply database)		Destination Location (same as origin)	Departure time
+// argv[4] = num_threads: defaults to 1 if not present, more than 1 runs multithreaded mode
 int main(int argc,char** argv)
 {
 
@@ -191,38 +191,17 @@ int main(int argc,char** argv)
 		cout <<"reading intersection control data..." << endl;
 		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
 	}
-	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//typedef Demand<MasterType::demand_type> _Demand_Interface;
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//cout << "reading demand data..." <<endl;
-	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
-
-	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 
 	if (scenario->ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
 
-	
-
-#ifdef ANTARES
-	network->set_network_bounds<NULLTYPE>();
-	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
-	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	MasterType::vehicle_type::Initialize_Layer();
-	network->initialize_antares_layers<NULLTYPE>();
-	MasterType::link_type::configure_link_moes_layer();
-#endif
 
 	if(scenario->use_network_events<bool>())
 	{
-		//define_component_interface(_Network_Event_Manager_Interface, typename MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
 		typedef Network_Event_Manager<MasterType::network_event_manager_type> _Network_Event_Manager_Interface;
 		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<typename MasterType::network_event_manager_type>();
 		network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
@@ -256,8 +235,6 @@ int main(int argc,char** argv)
 	}
 
 	cout << "initializing intersection agents..." <<endl;
-	//define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
-	//
 	
 	typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
@@ -272,7 +249,6 @@ int main(int argc,char** argv)
 	}
 
 	cout << "initializing ramp metering agents..." <<endl;
-	//define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Prototype, NULLTYPE);
 
 	typedef Ramp_Metering<remove_pointer<_Network_Interface::get_type_of(ramp_metering_container)::value_type>::type> _Ramp_Metering_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(ramp_metering_container),_Ramp_Metering_Interface*> _Ramp_Metering_Container_Interface;
@@ -318,7 +294,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// activity location map - link the location id to the actual object pointer
 	typedef Random_Access_Sequence< _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-	typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
+	typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
 	typedef Batch_Router_Components::Prototypes::Routed_Trip<typename MasterType::trip_type> _Trip_Interface;
 
 	_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();

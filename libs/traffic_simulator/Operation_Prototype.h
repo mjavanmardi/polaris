@@ -6,6 +6,8 @@
 #include "Network_Prototype.h"
 //#include "../File_IO/network_operation_data.h"
 #include "Intersection_Control_Prototype.h"
+#include "User_Space_Forward_Declaration.h"
+#include "Intersection_Prototype.h"
 extern void* _global_scenario;
 extern void* _global_network;
 
@@ -27,7 +29,7 @@ namespace Operation_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Operation
+		prototype struct Operation ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

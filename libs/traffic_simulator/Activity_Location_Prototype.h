@@ -18,7 +18,9 @@ namespace Activity_Location_Components
 			LU_MEDICAL,
 			LU_MIXED_USE,
 			LU_NONE,
+			LU_NON_RESIDENTIAL,
 			LU_RESIDENTIAL,
+			LU_RESIDENTIAL_MULTI,
 			LU_RECREATION,
 			LU_SPECIAL_GENERATOR,
 			TRANSIT_STOP
@@ -50,10 +52,10 @@ namespace Activity_Location_Components
 			template<typename TargetType> bool Has_Valid_Origin_Link()
 			{			
 				typedef Random_Access_Sequence<typename get_type_of(origin_links)> links_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 				
 				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_itf)> turn_itf;
 				
 				typename links_itf::iterator link_itr = this->origin_links<links_itf*>()->begin();
 				if (link_itr != this->origin_links<links_itf*>()->end()	)
@@ -103,7 +105,7 @@ namespace Activity_Location_Components
 			}
 			template<typename TargetType> bool is_residential_location()
 			{
-				if (this->land_use_type<Types::LAND_USE>() == Types::LAND_USE::LU_ALL || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL || this->land_use_type<Types::LAND_USE>() == Types::LU_MIXED_USE) return true;
+				if (this->land_use_type<Types::LAND_USE>() == Types::LAND_USE::LU_ALL || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL || this->land_use_type<Types::LAND_USE>() == Types::LU_MIXED_USE || this->land_use_type<Types::LAND_USE>() == Types::LU_RESIDENTIAL_MULTI) return true;
 				else return false;
 			}
 

@@ -13,7 +13,7 @@ namespace Location_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Location
+		prototype struct Location ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

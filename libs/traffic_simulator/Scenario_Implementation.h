@@ -19,6 +19,7 @@ namespace Scenario_Components
 			m_data(string, output_results_database_name, NONE, NONE);
 			m_data(string, output_demand_database_name, NONE, NONE);
 			m_data(string, output_popsyn_database_name, NONE, NONE);
+			m_data(string, input_popsyn_database_name, NONE, NONE);
 			m_data(string, historical_results_database_name, NONE, NONE);
 
 			m_data(int, simulation_interval_length, NONE, NONE);
@@ -48,6 +49,7 @@ namespace Scenario_Components
 
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
+			m_data(double, simulate_cacc,NONE,NONE);
 
 			m_data(double, cav_market_penetration, NONE, NONE);
 			m_data(double, cav_vott_adjustment, NONE, NONE);
@@ -98,6 +100,7 @@ namespace Scenario_Components
 
 			m_data(bool, calculate_realtime_moe, NONE, NONE);
 			
+			m_data(bool, read_population_from_database, NONE, NONE);
 			m_data(bool, read_demand_from_database, NONE, NONE);
 			m_data(bool, write_demand_to_database, NONE, NONE);
 			m_data(bool, write_activity_output, NONE, NONE);
@@ -122,6 +125,8 @@ namespace Scenario_Components
 			m_data(double, time_dependent_routing_weight_factor, NONE, NONE);
 
 			m_data(string, activity_start_time_model_file_name, NONE, NONE);
+
+			m_data(string, vehicle_distribution_file_name, NONE, NONE);
 
 			m_data(double, percent_to_synthesize, NONE, NONE);
 			m_data(double, ipf_tolerance, NONE, NONE);
@@ -182,9 +187,11 @@ namespace Scenario_Components
 			m_data(fstream, analyze_link_groups_file, NONE, NONE);
 			
 			m_data(shared_ptr<odb::database>, result_db_ptr, NONE, NONE);
+			m_data(shared_ptr<odb::database>, demand_db_ptr, NONE, NONE);
+			m_data(shared_ptr<odb::database>, popsyn_db_ptr, NONE, NONE);
 			m_data(string, output_result_database_name, NONE, NONE);
 
-			m_data(bool, DB_output_link_moe_for_assignment_interval, NONE, NONE);
+			//m_data(bool, DB_output_link_moe_for_assignment_interval, NONE, NONE);
 			m_data(bool, write_ttime_distribution_from_network_model, NONE, NONE);
 			m_data(fstream, ttime_distribution_file, NONE, NONE);
 			m_data(bool, output_link_moe_for_simulation_interval, NONE, NONE);

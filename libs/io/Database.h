@@ -68,7 +68,7 @@ namespace io
 
 inline void hadnle_sqlite_error(char **err_msg, int ret)
 {
-	fprintf (stderr, "Error: %s\n", err_msg);
+	fprintf (stderr, "Error: %s\n", *err_msg);
 	fprintf (stderr, "Error code: %d\n", ret);
 	sqlite3_free (err_msg);
 }
@@ -328,9 +328,16 @@ inline unique_ptr<odb::database> create_sqlite_database(const string& name, stri
 		{
 			if (odb::schema_catalog::exists(*db, schema))
 				odb::schema_catalog::create_schema (*db, schema);
+			else
+			{
+				odb::unknown_schema e(schema);
+				cout<<"\n*WARNING: "<<e.what()<<"\n";
+			}
+				
 		}
 		catch (odb::unknown_schema e)
 		{
+			cout << "Exception in create_sqlite_database while creating database: " << name << "\n Exception:" << e.what() << "\n";
 			throw e;
 		}
 		t.commit ();

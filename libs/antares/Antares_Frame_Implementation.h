@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Antares_Frame.h"
+#include <fstream>
 
 //---------------------------------------------------------
 //	Antares_Implementation - aui initialization

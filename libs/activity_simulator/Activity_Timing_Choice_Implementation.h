@@ -25,7 +25,7 @@ namespace Person_Components
 
 
 			// static start time and duration lookup container for each activity type
-			static m_container(concat(boost::unordered::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
+			static m_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
 			
 
 			//=======================================================================================================
@@ -70,8 +70,9 @@ namespace Person_Components
 				// make sure valid entry is found
 				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) 
 				{
-					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
-					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].begin();
+					THROW_WARNING("WARNING: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand <<", using last pair in list.");
+					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end();
+					itr--;
 				}
 				pair<ReturnType,ReturnType> return_val;
 
@@ -94,6 +95,7 @@ namespace Person_Components
 					return_val.second = GLOBALS::Time_Converter.template Convert_Value<Simulation_Timestep_Increment,ReturnType>(END);
 				}
 				
+				//cout << "START TIME:" << return_val.first << ",DUR:" << return_val.second << endl;
 				return return_val;
 			}
 			template<typename ReturnTimeType, typename ActivityType, typename InputTimeType> pair<ReturnTimeType,ReturnTimeType> Get_Start_Time_and_Duration(ActivityType activity_ref, InputTimeType range_start, InputTimeType range_end)
@@ -158,6 +160,7 @@ namespace Person_Components
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::SOCIAL_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PART_TIME_WORK_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::WORK_AT_HOME_ACTIVITY, map_type()));
 
 				// add items
 				ifstream data_file;
@@ -174,11 +177,17 @@ namespace Person_Components
 				{
 					_start_time_duration_container[act_type].insert(record_type(prob,data_type(start,dur)));
 				}
+
+				//copy primary work into work_at_home
+				for (map_type::iterator itr = _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
+				{
+					_start_time_duration_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
+				}
 			}
 		};
 
 		template<typename MasterType, typename InheritanceList> typename Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::type_of(is_initialized) Activity_Timing_Chooser_Implementation<MasterType,InheritanceList>::_is_initialized = false;
 		//static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
-		template<typename MasterType, typename InheritanceList> boost::unordered::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
+		template<typename MasterType, typename InheritanceList> std::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
 	}
 }

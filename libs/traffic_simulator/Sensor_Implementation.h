@@ -3,7 +3,7 @@
 #include "Link_Prototype.h"
 #include "Detector_Implementation.h"
 #ifndef FOR_LINUX_PORTING
-#include "../Repository/Basic_Unit_Implementations.h"
+#include "../repository/Basic_Unit_Implementations.h"
 #endif
 
 namespace Sensor_Components
@@ -29,12 +29,13 @@ namespace Sensor_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Link_Sensor),Data_Object>::Component_Type ComponentType;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
+// TODO: does not compile
 			template<typename TargetType> void Sensor_Conditional()
 			{
-				response.next._iteration = _iteration + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+                //response.next._iteration = iteration() + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+                //response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
 
-				response.result = true;
+                //response.result = true;
 			}
 			
 			declare_event(Sensor_Event)
@@ -53,7 +54,7 @@ namespace Sensor_Components
 			{
 				double sum=0.0;
 				unsigned int count=0;
-				for(boost::container::vector<Types::Sensor_MOE_Data>::iterator itr = _sensor_data.begin();itr!=_sensor_data.end();itr++)
+				for(std::vector<Types::Sensor_MOE_Data>::iterator itr = _sensor_data.begin();itr!=_sensor_data.end();itr++)
 				{
 					sum += itr->density;
 					count++;
@@ -92,7 +93,8 @@ namespace Sensor_Components
 			template<typename TargetType> static void Initialize_Type()
 			{
 			}
-			
+
+// TODO: does not compile
 			template<typename TargetType> void Initialize(polaris::io::Fixed_Sensor& instance)
 			{
 				using namespace polaris::io;
@@ -115,15 +117,15 @@ namespace Sensor_Components
 				link_id_dir.id = instance.getLink();
 				link_id_dir.dir = instance.getDir();
 
-				boost::unordered::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
+				std::unordered_map<long long,void*>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
 
 				if(db_map.count(link_id_dir.id_dir))
 				{
-					covered_link_interface* polaris_link = (covered_link_interface*)db_map[link_id_dir.id_dir];
+                    _covered_link = db_map[link_id_dir.id_dir];
 
-					_covered_link = polaris_link;
+                    //_covered_link = polaris_link;
 
-					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
+                    _covered_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
 
 					typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 					//TODO
@@ -131,7 +133,7 @@ namespace Sensor_Components
 				}
 			}
 			
-			template<typename TargetType> void Attach_Detector(boost::unordered::unordered_map<int, Detector1DU<double> >& detector_configuration)
+			template<typename TargetType> void Attach_Detector(std::unordered_map<int, Detector1DU<double> >& detector_configuration)
 			{
 				if(!_covered_link) return;
 
@@ -150,7 +152,7 @@ namespace Sensor_Components
 			
 			m_data(bool,outlier_detected, NONE, NONE);
 
-			m_data(boost::container::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
+			m_data(std::vector<Types::Sensor_MOE_Data>,sensor_data, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::link_type,covered_link, NONE, NONE);
 		};

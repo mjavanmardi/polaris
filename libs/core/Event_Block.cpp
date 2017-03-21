@@ -1,9 +1,9 @@
-#pragma once
 ///----------------------------------------------------------------------------------------------------
 /// Event_Block.cpp - Block of execution objects in a contiguous memory space
 ///----------------------------------------------------------------------------------------------------
 
 #include "Event_Block.h"
+#include "World.h"
 
 namespace polaris
 {

@@ -38,6 +38,8 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
 	typedef NULLTYPE visual_vehicle_type;
 
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 #else
 
 	typedef Network_Components::Implementations::Integrated_Network_Implementation<MasterType> network_type;
@@ -45,6 +47,10 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<MasterType> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
+
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
 #endif
 
 	//==============================================================================================
@@ -74,14 +80,9 @@ struct MasterType
 	
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	//TODO:ROUTING
-	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
 
-	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
-	//typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
-	
 	typedef Demand_Components::Implementations::Demand_Implementation<MasterType> demand_type;
 
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<MasterType> activity_location_type;
@@ -91,15 +92,6 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
 
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
 	typedef Operation_Components::Implementations::Operation_Implementation<MasterType> operation_type;
 	
@@ -225,12 +217,12 @@ struct MasterType
 
 
 ostream* stream_ptr;
-void run_with_input_from_db(char* scenario_filename);
+void run_with_input_from_db(const char* scenario_filename);
 //void run_with_input_from_files();
 
 int main(int argc, char* argv[])
 {
-	char* scenario_filename = "scenario.json";
+	std::string scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 
 	int num_threads = 1;
@@ -252,11 +244,11 @@ int main(int argc, char* argv[])
 	Average_Execution_Objects_Hint<MasterType::antares_layer_type>(10);
 #endif
 
-	run_with_input_from_db(scenario_filename);
+	run_with_input_from_db(scenario_filename.c_str());
 }
 
 
-void run_with_input_from_db(char* scenario_filename)
+void run_with_input_from_db(const char* scenario_filename)
 {
 
 	Network_Components::Types::Network_IO_Maps network_io_maps;
@@ -315,20 +307,21 @@ void run_with_input_from_db(char* scenario_filename)
 
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
-	
+
 
 
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	typedef Demand<MasterType::demand_type> _Demand_Interface;
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	demand->scenario_reference<_Scenario_Interface*>(scenario);
-	demand->network_reference<_Network_Interface*>(network);
+	demand->template scenario_reference<_Scenario_Interface*>(scenario);
+	demand->template network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
-	demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	demand->read_vehicle_type_data<NT>();
+	demand->template read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 
-	if (scenario->ramp_metering_flag<bool>() == true) {
+	if (scenario->template ramp_metering_flag<bool>() == true) {
 		cout <<"reading ramp metering data..." << endl;
 		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
@@ -397,7 +390,7 @@ void run_with_input_from_db(char* scenario_filename)
 			{
 				typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-				TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+				TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 				tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 				tmc->Initialize<NT>();
 			}
@@ -464,7 +457,7 @@ void run_with_input_from_db(char* scenario_filename)
 		{
 			cout << "Initializing network skims..." <<endl;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
-			_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+			_network_skim_itf* skimmer = static_cast<_network_skim_itf*>(Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>());
 			skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 			if (skimmer->read_input<bool>())
 			{
@@ -489,7 +482,8 @@ void run_with_input_from_db(char* scenario_filename)
 				if (!skimmer->transit_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_transit_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary transit skim file '" << scenario->output_transit_skim_file_path_name<string>() << "' could not be opened.");
 				if (!skimmer->highway_cost_output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_highway_cost_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary highway cost skim file '" << scenario->output_highway_cost_skim_file_path_name<string>() << "' could not be opened.");
 			}
-			skimmer->Initialize<_Network_Interface*>(network);
+			//NOTE: break out m_container into test and run check in isolation
+			skimmer->template Initialize<_Network_Interface*>(network);
 			network->skimming_faculty<_network_skim_itf*>(skimmer);
 		}
 
@@ -503,7 +497,9 @@ void run_with_input_from_db(char* scenario_filename)
 		START();
 
 		cout << "Finished!" << endl;
-		system("PAUSE");
+		//system("PAUSE");
+		cout << "Press RETURN key to continue..." << endl;
+                cin.ignore();
 	}
 }
 

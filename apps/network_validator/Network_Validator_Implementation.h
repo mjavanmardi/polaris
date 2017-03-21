@@ -33,15 +33,15 @@ namespace Network_Components
 			m_container(std::vector<Network_Validation_Unit<typename MasterType::network_validation_unit_type>*>,validation_units, NONE, NONE);
 
 			typedef Network_Validation_Unit<get_component_type(validation_units_type)> validation_unit_itf;
-			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;		
+			typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-			typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+			typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 			typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
+			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_itf)> turn_itf;
 			typedef Random_Access_Sequence<typename validation_unit_itf::get_type_of(origin_routing_results)> routing_results_itf;
 
 			template<typename TargetType> void Initialize(int num_checks)
@@ -148,13 +148,13 @@ namespace Network_Components
 			typedef Prototypes::Network_Validation_Unit<ComponentType> validation_unit_itf;
 			typedef Network_Components::Prototypes::Network<typename strip_modifiers(network_validator_type)::get_type_of(network_reference)> network_itf;		
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-			typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+			typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 			typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-			typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
+			typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_itf)> turn_itf;
 
 			template<typename LocationType> void Initialize(LocationType location, requires(LocationType,check(LocationType,is_pointer) && check(strip_modifiers(LocationType),Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
@@ -212,7 +212,7 @@ namespace Network_Components
 				}
 
 				// If able to successfully update movement plan, then schedule routing
-				if (Update_Movement_Plan(orig,dest))_router->Schedule_Route_Computation(iteration());
+				if (Update_Movement_Plan(orig,dest))_router->Schedule_Route_Computation(iteration()+1);
 			}
 
 			template<typename TargetType> void Update_Validator()

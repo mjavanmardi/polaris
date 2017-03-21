@@ -103,7 +103,7 @@ namespace Ramp_Metering_Components
 				//TODO
 //load_event(ComponentType, ComponentType::Ramp_Metering_Conditional,ComponentType::Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
 				
-				Load_Event<ComponentType>(&ComponentType::Ramp_Metering_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION);
+				this->template Load_Event<ComponentType>(&ComponentType::Ramp_Metering_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION);
 			}
 
 			static void Ramp_Metering_Conditional(ComponentType* _this,Event_Response& response)

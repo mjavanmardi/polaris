@@ -74,7 +74,7 @@ namespace Network_Event_Components
 
 				if(start < _end_time)
 				{
-					Load_Event<ComponentType>(&ComponentType::Incident_Conditional,start, 0);
+					this->template Load_Event<ComponentType>(&ComponentType::Incident_Conditional,start, 0);
 				}
 				else
 				{
@@ -82,7 +82,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			template<typename TargetType> void Initialize(int start_time, int end_time, boost::container::vector<typename MasterType::link_type*>& affected_links)
+			template<typename TargetType> void Initialize(int start_time, int end_time, std::vector<typename MasterType::link_type*>& affected_links)
 			{
 				_start_time = start_time;
 				_end_time = end_time;
@@ -115,8 +115,8 @@ namespace Network_Event_Components
 				_notes = instance.lock()->getNote();
 
 				const std::vector<int>& links=instance.lock()->getLinks();
-				// temporary containers used to fill affected zone boost::container::vector			
-				boost::unordered::unordered_set<Zone_Interface*> zone_set;
+				// temporary containers used to fill affected zone std::vector			
+				std::unordered_set<Zone_Interface*> zone_set;
 				if (links[0] == -1)
 				{
 					// affect all links
@@ -141,7 +141,7 @@ namespace Network_Event_Components
 				else
 				{
 
-					boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+					std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
 
 
 				
@@ -152,9 +152,9 @@ namespace Network_Event_Components
 
 						if(db_map.count(link))
 						{
-							boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
+							std::vector<typename MasterType::link_type*>& links=db_map[link];
 
-							typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
+							typename std::vector<typename MasterType::link_type*>::iterator vitr;
 
 							for(vitr=links.begin();vitr!=links.end();vitr++)
 							{
@@ -175,20 +175,20 @@ namespace Network_Event_Components
 					}
 				}
 			
-				// create the affected zones boost::container::list
-				for (typename boost::unordered::unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				// create the affected zones std::list
+				for (typename std::unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
 					Zone_Interface* zone = (Zone_Interface*)(*zitr);
 					this->_affected_zones.push_back(zone);
 					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
 				}
 
-				// create the unaffected locations boost::container::list
+				// create the unaffected locations std::list
 				Location_Container_Interface* all_locations = ((Network<typename MasterType::network_type>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
 				for (typename Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
 				{
 					bool add = true;
-					for (typename boost::container::vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
+					for (typename std::vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
 					{
 						if ((void*)*litr == (void*)*itr){add=false; break;}
 					}
@@ -228,7 +228,7 @@ namespace Network_Event_Components
 				{
 					typename Network_Event_Callback<ComponentType>::type callback=_callbacks_by_component_id[subscriber];
 
-					for(typename boost::container::vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
+					for(typename std::vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
 					{
 						(*callback)( (void*)(*itr), (Network_Event<ComponentType>*)this );
 					}
@@ -249,30 +249,30 @@ namespace Network_Event_Components
 				}
 			}
 
-			m_data(boost::container::vector<Link_Interface*>,affected_links, NONE, NONE);
-			m_data(boost::container::vector<Location_Interface*>,affected_locations, NONE, NONE);
-			m_data(boost::container::vector<Location_Interface*>,unaffected_locations, NONE, NONE);
-			m_data(boost::container::vector<Zone_Interface*>,affected_zones, NONE, NONE);
+			m_data(std::vector<Link_Interface*>,affected_links, NONE, NONE);
+			m_data(std::vector<Location_Interface*>,affected_locations, NONE, NONE);
+			m_data(std::vector<Location_Interface*>,unaffected_locations, NONE, NONE);
+			m_data(std::vector<Zone_Interface*>,affected_zones, NONE, NONE);
 
 			m_data(int,start_time, NONE, NONE);
 			m_data(int,end_time, NONE, NONE);
 			m_data(bool,active, NONE, NONE);
 			m_data(string,notes, NONE, NONE);
 
-			static m_data(boost::container::vector<string>,event_keys, NONE, NONE);
+			static m_data(std::vector<string>,event_keys, NONE, NONE);
 			static m_prototype(Null_Prototype,typename MasterType::network_event_manager_type,network_event_manager, NONE, NONE);
 			
-			static m_data(concat(boost::unordered::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
+			static m_data(concat(std::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>
-		boost::container::vector<string> Base_Network_Event<MasterType,InheritanceList>::_event_keys;
+		std::vector<string> Base_Network_Event<MasterType,InheritanceList>::_event_keys;
 		
 		template<typename MasterType,typename InheritanceList>
-		boost::unordered::unordered_map<size_t,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
+		std::unordered_map<size_t,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
 
 		template<typename MasterType,typename InheritanceList>
-		Network_Event_Manager<typename MasterType::network_event_manager_type>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
+		Null_Prototype<typename MasterType::network_event_manager_type>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
 
 		implementation struct Weather_Network_Event : public Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>
 		{
@@ -383,7 +383,7 @@ namespace Network_Event_Components
 
 				//_start_time = 28800 + rand()%(20*60);
 				//_start_time = 500;
-				Base_Network_Event::_end_time = Base_Network_Event::_end_time * ((_Scenario_Interface*)_global_scenario)->template accident_event_duration_reduction<float>();
+				this->_end_time = this->_end_time * ((_Scenario_Interface*)_global_scenario)->template accident_event_duration_reduction<float>();
 
 				const std::vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
@@ -436,7 +436,7 @@ namespace Network_Event_Components
 			//template<typename TargetType> void Start(){Base_Network_Event::template Start<NT>();}
 			template<typename TargetType> void Start(){((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Start<NT>();}
 
-			template<typename TargetType> void Initialize(int start_time, int end_time, boost::container::vector<typename MasterType::link_type*>& affected_links)
+			template<typename TargetType> void Initialize(int start_time, int end_time, std::vector<typename MasterType::link_type*>& affected_links)
 			{
 				((Base_Network_Event<MasterType,INHERIT(Congestion_Network_Event)>*)this)->template Initialize<MasterType>(start_time,end_time,affected_links);
 			}
@@ -593,19 +593,20 @@ namespace Network_Event_Components
 				}
 			}
 
+// TODO: does not compile
 			template<typename TargetType> void Get_Network_Events(int link_id,boost::container::vector< Network_Event<TargetType>* >& container/*,requires(TargetType,check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
-				boost::container::list<Network_Event<TargetType,NT>*>* events_of_type = (boost::container::list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_id]);
+                std::list<Network_Event<TargetType>*>* events_of_type = (std::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
 
-				for(typename boost::container::list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+                for(typename std::list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<TargetType,NT>* network_event=*itr;
+                    Network_Event<TargetType>* network_event=*itr;
 
 					if(network_event->template active<bool>())
 					{
-						boost::container::vector<Link_Interface*>* affected_links = network_event->template affected_links<vector<Link_Interface*>*>();
+						std::vector<Link_Interface*>* affected_links = network_event->template affected_links<vector<Link_Interface*>*>();
 
-						for(typename boost::container::vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
+						for(typename std::vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
 						{
 							if((*vitr)->template internal_id<int>() == link_id)
 							{
@@ -617,11 +618,11 @@ namespace Network_Event_Components
 				}
 			}
 
-			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
+			template<typename TargetType> void Get_Network_Events( std::vector< Network_Event<TargetType>* >& container, requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
-				boost::container::list<Network_Event<TargetType>*>* events_of_type = (boost::container::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
+				std::list<Network_Event<TargetType>*>* events_of_type = (std::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
 
-				for(typename boost::container::list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(typename std::list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
 					Network_Event<TargetType>* network_event=*itr;
 
@@ -632,13 +633,13 @@ namespace Network_Event_Components
 				}
 			}
 			
-			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
+			template<typename TargetType> void Get_Network_Events( std::vector< Network_Event<TargetType>* >& container, requires(TargetType,check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
-				for(typename boost::unordered::unordered_map< size_t, boost::container::list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
+				for(typename std::unordered_map< size_t, std::list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
-					boost::container::list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
+					std::list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
 
-					for(typename boost::container::list< Base_Network_Event_Interface* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+					for(typename std::list< Base_Network_Event_Interface* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 					{
 						Base_Network_Event_Interface* network_event=*itr;
 
@@ -650,7 +651,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			//template<typename TargetType> void Get_Network_Events(int link_id,boost::container::vector< Network_Event<TargetType,NT>* >& container,requires(TargetType,!(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))))
+			//template<typename TargetType> void Get_Network_Events(int link_id,std::vector< Network_Event<TargetType,NT>* >& container,requires(TargetType,!(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))))
 			//{
 			//	static_assert(false,"Non-TMC are only allowed to withdraw weather events!");
 			//}
@@ -660,11 +661,12 @@ namespace Network_Event_Components
 				_network_event_container[TargetType::component_id].push_back( (Base_Network_Event_Interface*) network_event );
 			}
 
+// TODO: does not compile
 			template<typename TargetType> void Remove_Network_Event(Network_Event<TargetType>* network_event)
 			{
-				boost::container::list<Network_Event<typename TargetType::ControlType,NT>*>* events_of_type = (list<Network_Event<typename TargetType::ControlType,NT>*>*) & (_network_event_container[TargetType::ControlType::component_id]);
+                std::list<Network_Event<typename TargetType::ControlType>*>* events_of_type = (std::list<Network_Event<typename TargetType::ControlType>*>*) & (_network_event_container[TargetType::ControlType::component_id]);
 
-				for(typename boost::container::list< Network_Event<typename TargetType::ControlType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+                for(typename std::list< Network_Event<typename TargetType::ControlType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
 					if( (*itr) == network_event )
 					{
@@ -673,7 +675,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			m_data( concat(boost::unordered::unordered_map< size_t, boost::container::list<Base_Network_Event_Interface*> >), network_event_container, NONE , NONE);
+			m_data( concat(std::unordered_map< size_t, std::list<Base_Network_Event_Interface*> >), network_event_container, NONE , NONE);
 		};
 	}
 

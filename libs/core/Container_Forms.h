@@ -280,9 +280,9 @@ namespace polaris
 		typedef typename ComponentType::size_type size_type;
 		typedef T value_type;
 
-		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+		iterator begin(){return (iterator)(static_cast<ComponentType*>(this))->begin();}
 
-		iterator end(){return (iterator)((ComponentType*)this)->end();}
+		iterator end(){return (iterator)(static_cast<ComponentType*>(this))->end();}
 
 		reverse_iterator rbegin(){return (reverse_iterator)((ComponentType*)this)->rbegin();}
 
@@ -515,7 +515,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename ComponentType,typename K = typename ComponentType::key_type> 
-	struct Simple_Associative_Container
+	struct Simple_Associative_Container ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
@@ -586,7 +586,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename ComponentType,typename K = typename ComponentType::key_type,typename T = typename ComponentType::value_type::second_type> 
-	struct Pair_Associative_Container
+	struct Pair_Associative_Container ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
@@ -663,8 +663,8 @@ namespace polaris
 
 	};
 
-	template<typename ComponentType,typename K = typename ComponentType::key_type, template<typename T> class value_prototype> 
-	struct Prototype_Pair_Associative_Container
+	template<typename ComponentType,typename K = typename ComponentType::key_type, template<typename T=NULLTYPE> class value_prototype=NULLTEMPLATE>
+	struct Prototype_Pair_Associative_Container ADD_DEBUG_INFO
 	{
 		static_assert(is_pointer<typename ComponentType::mapped_type>::value,"Container must hold pointer types");
 
@@ -1087,7 +1087,7 @@ namespace polaris
 
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_container – member creator, type-definition and basic accessors
+	/// m_container ï¿½ member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_container(CONTAINER_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -1103,7 +1103,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(*_##NAME);}\
+			{return (TargetType)dereference(_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
@@ -1125,9 +1125,11 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
 
 	///----------------------------------------------------------------------------------------------------
-	/// m_prototype_container – member creator, type-definition and basic accessors
+	/// m_prototype_container ï¿½ member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_prototype_container(CONTAINER_TYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -1144,7 +1146,7 @@ namespace polaris
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
-			{return (TargetType)(*_##NAME);}\
+			{return (TargetType)dereference(_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\

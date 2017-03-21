@@ -32,10 +32,10 @@ namespace Intersection_Components
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
@@ -45,14 +45,14 @@ namespace Intersection_Components
 			
 			
 			typedef Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
 
 
 			typedef Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer<typename  type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Outbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Outbound_Movement_Interface*> _Outbound_Movements_Container_Interface;
@@ -64,7 +64,7 @@ namespace Intersection_Components
 
 			typedef Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
-			typedef Intersection_Control_Components::Prototypes::Intersection_Control<typename type_of(intersection_control)> _Intersection_Control_Interface;
+			typedef Intersection_Control_Components::Prototypes::Intersection_Control<type_of(intersection_control)> _Intersection_Control_Interface;
 			typedef Intersection_Control_Components::Prototypes::Control_Plan< typename _Intersection_Control_Interface::get_type_of(current_control_plan)> _Control_Plan_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;

@@ -75,7 +75,7 @@ namespace Area_Variables
 	polaris_variable(Square_Feet, length_data_type, Length_tag, Area_tag, Feet_tag);
 	polaris_variable(Square_Miles, length_data_type, Length_tag, Area_tag, Miles_tag);
 	polaris_variable(Square_Centimeters, length_data_type, Length_tag, Area_tag, Centimeters_tag);
-	polaris_variable(Square_Meters, length_data_type, Length_tag, Area_tag,  Meters_tag);
+	polaris_variable(Square_Meters, length_data_type, Length_tag, Area_tag, Meters_tag);
 	polaris_variable(Square_Kilometers, length_data_type, Length_tag, Area_tag, Kilometers_tag);
 }
 
@@ -118,6 +118,26 @@ namespace Speed_Variables
 	polaris_variable(Kilometers_Per_Second,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Kilometers_tag);
 	polaris_variable(Kilometers_Per_Minute,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Kilometers_tag);
 	polaris_variable(Kilometers_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Kilometers_tag);
+}
+
+namespace Acceleration_Variables
+{
+	typedef double rate_data_type;
+	polaris_variable(Feet_Per_Second_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Feet_tag);
+	polaris_variable(Feet_Per_Minute_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Feet_tag);
+	polaris_variable(Feet_Per_Hour_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Feet_tag);
+
+	polaris_variable(Meters_Per_Second_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Meters_tag);
+	polaris_variable(Meters_Per_Minute_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Meters_tag);
+	polaris_variable(Meters_Per_Hour_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Meters_tag);
+
+	polaris_variable(Miles_Per_Second_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Miles_tag);
+	polaris_variable(Miles_Per_Minute_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Miles_tag);
+	polaris_variable(Miles_Per_Hour_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Miles_tag);
+
+	polaris_variable(Kilometers_Per_Second_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Kilometers_tag);
+	polaris_variable(Kilometers_Per_Minute_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Kilometers_tag);
+	polaris_variable(Kilometers_Per_Hour_Squared,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Kilometers_tag);
 }
 
 namespace Currency_Variables

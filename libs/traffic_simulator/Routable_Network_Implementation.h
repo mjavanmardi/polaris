@@ -1,6 +1,6 @@
 #pragma once
 #include "Network_Implementation.h"
-#include "Routing/Routing.h"
+#include "routing/Routing.h"
 
 namespace Routing_Components
 {
@@ -30,14 +30,12 @@ namespace Routing_Components
 			{
 				if(_layer_element_tracker != _layer_size)
 				{
-					cout << "layer size not maintained! " << _layer_element_tracker << "," << _layer_size << endl;
-					exit(0);
+					THROW_EXCEPTION("layer size not maintained! " << _layer_element_tracker << "," << _layer_size);
 				}
 
 				if((layer_id - _layer_tracker) != _layer_step)
 				{
-					cout << "layer step not maintained! " << _layer_tracker << "," << layer_id << endl;
-					exit(0);
+					THROW_EXCEPTION("layer step not maintained! " << _layer_tracker << "," << layer_id);
 				}
 
 				_layer_element_tracker = 0;
@@ -98,7 +96,7 @@ namespace Routing_Components
 		m_data(int,first_layer_id,NONE,NONE);
 		m_data(int,layer_step,NONE,NONE);
 
-		m_data(boost::container::vector<DataRecord>,layer_data,NONE,NONE);
+		m_data(std::vector<DataRecord>,layer_data,NONE,NONE);
 	};
 
 
@@ -141,10 +139,9 @@ namespace Routing_Components
 		{
 			t_data(float,cost);
 			t_data(float,time_cost);
-			t_data(float*,moe_ptr);
+			t_data(float*, turn_moe_ptr);
 
-			static t_data(Layered_Data_Array<float>*,turn_moe_data);
-
+			static t_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
 		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
 	}
@@ -164,8 +161,10 @@ namespace Routing_Components
 			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
 
 			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
+			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
 
-			static m_data(concat(boost::unordered::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
+			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
 
 			// addition of new layered data array to hold to historical connection (turn-movement) information
 			static m_data(Layered_Data_Array<float>,turn_moe_data,NONE,NONE);
@@ -188,9 +187,12 @@ namespace Routing_Components
 				//string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 				shared_ptr<database> db (open_sqlite_database_single<shared_ptr<database>>(name));
 				transaction t(db->begin());
+
+				//==============================================================================
+				// ADD LINK MOEs
+				//------------------------------------------------------------------------------
 				result<LinkMOE> moe_result=db->template query<LinkMOE>(query<LinkMOE>::true_expr);
 				
-
 				int link_id;
 				float travel_delay;
 				int start_time = -1;
@@ -215,9 +217,7 @@ namespace Routing_Components
 
 					start_time = db_itr->getStart_Time();
 					link_id = db_itr->getLink_Uid();
-					
-					//TODO: division by travel time ratio gives the free flow travel time only
-					travel_delay = db_itr->getLink_Travel_Time()*60.0f/db_itr->getLink_Travel_Time_Ratio();
+					travel_delay = db_itr->getLink_Travel_Time();
 
 					//if(travel_delay < 0.01f) cout << travel_delay << endl;
 
@@ -230,44 +230,42 @@ namespace Routing_Components
 					}
 				}
 
-				// Do the same as above for the turn movement database
-				try
-				{
-					result<TurnMOE> turn_moe_result=db->template query<TurnMOE>(query<TurnMOE>::true_expr);
-				
-					int turn_id;
-					float turn_delay;
-					start_time = -1;
-					counter = -1;
-					time_advance = false;
+				//==============================================================================
+				// ADD TURN MOEs
+				//------------------------------------------------------------------------------
+				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
 
-					for(typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin (); db_itr != turn_moe_result.end (); ++db_itr)
+				int turn_id;
+				float turn_delay;
+				start_time = -1;
+				counter = -1;
+
+				time_advance = false;
+
+				for (typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
+				{
+					if (++counter % 100000 == 0) cout << counter << endl;
+
+					if (start_time == -1) start_time = db_itr->getStart_Time();
+
+					if (start_time != db_itr->getStart_Time())
 					{
-						if(++counter%100000 == 0) cout << counter << endl;
-
-						if(start_time == -1) start_time= db_itr->getStart_Time();
-
-						if(start_time != db_itr->getStart_Time())
-						{
-							time_advance = true;
-						}
-
-						start_time = db_itr->getStart_Time();
-						turn_id = db_itr->getTurn_Uid();
-						turn_delay = db_itr->getTurn_Penalty()*60.0f;
-
-						unsigned int ptr = _turn_moe_data.add_layer_element(turn_delay,start_time);
-
-						if(!time_advance)
-						{
-							_turn_id_to_moe_data[turn_id] = ptr;
-							time_advance = false;
-						}
+						time_advance = true;
 					}
-				}
-				catch (odb::sqlite::database_exception ex)
-				{
-					cout << "ODB database exception when reading TurnMOE table: "<<ex.message()<<endl;
+
+					start_time = db_itr->getStart_Time();
+					turn_id = db_itr->getTurn_Uid();
+					turn_delay = db_itr->getTurn_Penalty();
+
+					//if(travel_delay < 0.01f) cout << travel_delay << endl;
+
+					unsigned int ptr = _turn_moe_data.add_layer_element(turn_delay, start_time);
+
+					if (!time_advance)
+					{
+						_turn_id_to_moe_data[turn_id] = ptr;
+						time_advance = false;
+					}
 				}
 
 			}
@@ -276,7 +274,7 @@ namespace Routing_Components
 			{
 				Routable_Network_Implementation* copy = Allocate<ComponentType>();
 
-				Graph_Pool<MT::graph_pool_type>* graph_copy = _routable_graph_pool->Create_Copy();
+				Graph_Pool<typename MT::graph_pool_type>* graph_copy = _routable_graph_pool->Create_Copy();
 
 				copy->_routable_graph_pool = graph_copy;
 				copy->_static_network_graph_id = _static_network_graph_id;
@@ -287,7 +285,7 @@ namespace Routing_Components
 
 			void initialize()
 			{
-				_routable_graph_pool = (Graph_Pool<MT::graph_pool_type>*) new MT::graph_pool_type();
+				_routable_graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
 			}
 
 			void construct_time_dependent_routable_network(Network<typename MasterType::network_type>* source_network)
@@ -302,25 +300,25 @@ namespace Routing_Components
 
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
-				typedef Link_Components::Prototypes::Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
-				typedef Random_Access_Sequence<Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
-				typedef Intersection<remove_pointer<Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
+				typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
-				typedef Movement<remove_pointer<Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
-				typedef Random_Access_Sequence<Link_Interface::get_type_of(outbound_turn_movements),Turn_Movement_Interface*> Turn_Movement_Container_Interface;
-
-
+				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(outbound_turn_movements),Turn_Movement_Interface*> Turn_Movement_Container_Interface;
 
 
-				//Graph_Pool<MT::graph_pool_type>* graph_pool = (Graph_Pool<MT::graph_pool_type>*) new MT::graph_pool_type();
+
+
+				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
 
 				//_routable_graph_pool = graph_pool;
 
-				Graph_Pool<MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
 
 				
 				
-				Graph_Assembler_Connected_Edge<MT::time_dependent_graph_type>* time_dependent_graph = graph_pool->Create_New_Graph<MT::time_dependent_graph_type>();
+				Graph_Assembler_Connected_Edge<typename MT::time_dependent_graph_type>* time_dependent_graph = graph_pool->template Create_New_Graph<typename MT::time_dependent_graph_type>();
 
 				_time_dependent_network_graph_id = time_dependent_graph->graph_id();
 
@@ -335,22 +333,22 @@ namespace Routing_Components
 
 				Network_Interface* network = source_network;
 
-				Link_Container_Interface* links = network->links_container<Link_Container_Interface*>();
+				Link_Container_Interface* links = network->template links_container<Link_Container_Interface*>();
 
-				for(Link_Container_Interface::iterator links_itr=links->begin();links_itr!=links->end();links_itr++)
+				for(auto links_itr=links->begin();links_itr!=links->end();links_itr++)
 				{
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 		
-					Intersection_Interface* downstream_intersection = current_link->downstream_intersection<Intersection_Interface*>();
+					Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
 					input_time_dependent_edge._x = downstream_intersection->template x_position<float>();
 					input_time_dependent_edge._y = downstream_intersection->template y_position<float>();
-					input_time_dependent_edge._edge_id = current_link->uuid<unsigned int>();
+					input_time_dependent_edge._edge_id = current_link->template uuid<unsigned int>();
 
 					input_time_dependent_edge._cost = current_link->template travel_time<float>();
 					input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
 					
-					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
+					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 					
 					if(_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -374,13 +372,21 @@ namespace Routing_Components
 					}
 					
 
-					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->outbound_turn_movements<Turn_Movement_Container_Interface*>();
+					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->template outbound_turn_movements<Turn_Movement_Container_Interface*>();
 
-					for(Turn_Movement_Container_Interface::iterator movements_itr=outbound_turn_movements->begin();movements_itr!=outbound_turn_movements->end();movements_itr++)
+					for(auto movements_itr=outbound_turn_movements->begin();movements_itr!=outbound_turn_movements->end();movements_itr++)
 					{
 						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
+						if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
+						{
+							connection_attributes._turn_moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
+						}
+						else
+						{
+							connection_attributes._turn_moe_ptr = nullptr;
+						}
 
-						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->template uuid<int>();
+						long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
 
 						time_dependent_to_time_dependent_connection_group->_neighbors.push_back(neighbor_id);
 
@@ -401,7 +407,7 @@ namespace Routing_Components
 
 					input_time_dependent_edge._connection_groups.push_back(time_dependent_to_time_dependent_connection_group);
 
-					time_dependent_graph->Add_Edge<Types::time_dependent_attributes<MT>>( &input_time_dependent_edge );
+					time_dependent_graph->template Add_Edge<Types::time_dependent_attributes<MT>>( &input_time_dependent_edge );
 
 					// Clean up connection group
 
@@ -413,7 +419,7 @@ namespace Routing_Components
 					input_time_dependent_edge._connection_groups.clear();
 				}
 
-				Interactive_Graph<MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->Compile_Graph<Types::time_dependent_attributes<MT>>();
+				Interactive_Graph<typename MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->template Compile_Graph<Types::time_dependent_attributes<MT>>();
 	
 				//graph_pool->Link_Graphs();
 			}
@@ -427,19 +433,19 @@ namespace Routing_Components
 			{
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
-				typedef Link_Components::Prototypes::Link<remove_pointer<Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
-				typedef Random_Access_Sequence<Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
-				typedef Intersection<remove_pointer<Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container),Link_Interface*> Link_Container_Interface;
+				typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
-				typedef Movement<remove_pointer<Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
-				typedef Random_Access_Sequence<Link_Interface::get_type_of(outbound_turn_movements),Turn_Movement_Interface*> Turn_Movement_Container_Interface;
-
-
-
-				Graph_Pool<MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(outbound_turn_movements),Turn_Movement_Interface*> Turn_Movement_Container_Interface;
 
 
-				Graph_Assembler_Connected_Edge<MT::static_graph_type>* static_graph = graph_pool->Create_New_Graph<MT::static_graph_type>();
+
+				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+
+
+				Graph_Assembler_Connected_Edge<typename MT::static_graph_type>* static_graph = graph_pool->template Create_New_Graph<typename MT::static_graph_type>();
 
 				_static_network_graph_id = static_graph->graph_id();
 				//contains link properties (link properties). Its is a class to be used during graph construction to do things like creating a copy, it also contains a queue of connection groups
@@ -455,22 +461,22 @@ namespace Routing_Components
 
 				Network_Interface* network = source_network;
 
-				Link_Container_Interface* links = network->links_container<Link_Container_Interface*>();
+				Link_Container_Interface* links = network->template links_container<Link_Container_Interface*>();
 
-				for(Link_Container_Interface::iterator links_itr=links->begin();links_itr!=links->end();links_itr++)
+				for(auto links_itr=links->begin();links_itr!=links->end();links_itr++)
 				{
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 		
-					Intersection_Interface* downstream_intersection = current_link->downstream_intersection<Intersection_Interface*>();
+					Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
 					input_static_edge._x = downstream_intersection->template x_position<float>();
 					input_static_edge._y = downstream_intersection->template y_position<float>();
-					input_static_edge._edge_id = current_link->uuid<unsigned int>();
+					input_static_edge._edge_id = current_link->template uuid<unsigned int>();
 
 					input_static_edge._cost = current_link->template travel_time<float>();
 					input_static_edge._time_cost = current_link->template travel_time<float>();
 					
-					Link_Components::Types::Link_Type_Keys link_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
+					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 					
 					if(link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
 					{
@@ -482,13 +488,13 @@ namespace Routing_Components
 					}
 					
 
-					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->outbound_turn_movements<Turn_Movement_Container_Interface*>();
+					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->template outbound_turn_movements<Turn_Movement_Container_Interface*>();
 
-					for(Turn_Movement_Container_Interface::iterator movements_itr=outbound_turn_movements->begin();movements_itr!=outbound_turn_movements->end();movements_itr++)
+					for(auto movements_itr=outbound_turn_movements->begin();movements_itr!=outbound_turn_movements->end();movements_itr++)
 					{
 						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
 
-						long long neighbor_id = current_movement->outbound_link<Link_Interface*>()->template uuid<int>();
+						long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
 
 						static_to_static_connection_group->_neighbors.push_back(neighbor_id);
 
@@ -501,7 +507,7 @@ namespace Routing_Components
 					//each edge can have multiple connection groups, like bus->walk or bus->walk. The use pattern is to put connections of the same type into separate group, each group will have a different types of elements
 					input_static_edge._connection_groups.push_back(static_to_static_connection_group);
 
-					static_graph->Add_Edge<Types::static_attributes<MT>>( &input_static_edge );
+					static_graph->template Add_Edge<Types::static_attributes<MT>>( &input_static_edge );
 
 					// Clean up connection group
 
@@ -513,7 +519,7 @@ namespace Routing_Components
 					input_static_edge._connection_groups.clear();
 				}
 				//reorganizes data that holds information for a graph structure
-				Interactive_Graph<MT::static_graph_type>* routable_network_graph = static_graph->Compile_Graph<Types::static_attributes<MT>>();
+				Interactive_Graph<typename MT::static_graph_type>* routable_network_graph = static_graph->template Compile_Graph<Types::static_attributes<MT>>();
 	
 				//graph_pool->Link_Graphs();
 			}
@@ -522,7 +528,7 @@ namespace Routing_Components
 			{
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
-				boost::container::deque< global_edge_id > path;
+				std::deque< global_edge_id > path;
 
 				global_edge_id start;
 
@@ -536,20 +542,20 @@ namespace Routing_Components
 
 				A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,0,path);
 
-				for(boost::container::deque< global_edge_id >::iterator itr = path.begin();itr!=path.end();itr++)
+				for(auto itr = path.begin();itr!=path.end();itr++)
 				{
 					cout << itr->edge_id /2 << endl;
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
 				// get start id list from link id list
 				std::vector<global_edge_id> starts;
-				for (std::vector<unsigned int>::iterator itr = origins.begin(); itr != origins.end(); ++itr)
+				for (auto itr = origins.begin(); itr != origins.end(); ++itr)
 				{
 					global_edge_id start;
 					start.edge_id = *itr;
@@ -559,7 +565,7 @@ namespace Routing_Components
 
 				// get edge id list from link id list
 				std::vector<global_edge_id> ends;
-				for (std::vector<unsigned int>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 				{
 					global_edge_id end;
 					end.edge_id = *itr;
@@ -578,14 +584,14 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container, bool debug_route=false)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 			
 				// get start id list from link id list
 				std::vector<global_edge_id> starts;
-				for (std::vector<unsigned int>::iterator itr = origins.begin(); itr != origins.end(); ++itr)
+				for (auto itr = origins.begin(); itr != origins.end(); ++itr)
 				{
 					global_edge_id start;
 					start.edge_id = *itr;
@@ -595,7 +601,7 @@ namespace Routing_Components
 
 				// get edge id list from link id list
 				std::vector<global_edge_id> ends;
-				for (std::vector<unsigned int>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 				{
 					global_edge_id end;
 					end.edge_id = *itr;
@@ -615,7 +621,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_static_network_tree(unsigned int origin, boost::container::vector<float>& cost_container)
+			float compute_static_network_tree(unsigned int origin, std::vector<float>& cost_container)
 			{
 				Routable_Agent<typename MT::tree_agent_type> proxy_agent;
 
@@ -642,7 +648,7 @@ namespace Routing_Components
 					edge_lookup.edge_id = edge_id;
 					edge_lookup.graph_id = _static_network_graph_id;
 
-					A_Star_Edge<typename MasterType::static_edge_type>* edge = (A_Star_Edge<typename MasterType::static_edge_type>*)_routable_graph_pool->Get_Edge<typename MasterType::static_graph_type>(edge_lookup);
+					A_Star_Edge<typename MasterType::static_edge_type>* edge = (A_Star_Edge<typename MasterType::static_edge_type>*)_routable_graph_pool->template Get_Edge<typename MasterType::static_graph_type>(edge_lookup);
 
 					edge->time_cost(edge_cost);
 					edge->cost(edge_cost);
@@ -690,7 +696,7 @@ namespace Routing_Components
 					edge_lookup.edge_id = edge_id;
 					edge_lookup.graph_id = _time_dependent_network_graph_id;
 
-					A_Star_Edge<typename MasterType::time_dependent_edge_type>* edge = (A_Star_Edge<typename MasterType::time_dependent_edge_type>*)_routable_graph_pool->Get_Edge<typename MasterType::time_dependent_graph_type>(edge_lookup);
+					A_Star_Edge<typename MasterType::time_dependent_edge_type>* edge = (A_Star_Edge<typename MasterType::time_dependent_edge_type>*)_routable_graph_pool->template Get_Edge<typename MasterType::time_dependent_graph_type>(edge_lookup);
 
 					if (edge == nullptr)
 					{
@@ -737,7 +743,13 @@ namespace Routing_Components
 		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_moe_data;
 
 		template<typename MasterType, typename InheritanceList>
-		boost::unordered::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
+		std::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_link_id_to_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		Layered_Data_Array<float> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_moe_data;
+
+		template<typename MasterType, typename InheritanceList>
+		std::unordered_map<int, int> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_id_to_moe_data;
 
 		template<typename MasterType, typename InheritanceList>
 		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_turn_moe_data;

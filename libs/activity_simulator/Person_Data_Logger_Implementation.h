@@ -13,12 +13,12 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>
 		{
-			boost::container::vector<int> num_acts;
-			boost::container::vector<int>* planned_acts;
-			boost::container::vector<int>* executed_acts;
-			boost::container::vector<int>* ttime_distribution;
-			boost::container::vector<string>* output_data;
-			boost::container::vector<string>* output_data_buffer;
+			typedef typename Polaris_Component<MasterType,INHERIT(Person_Data_Logger_Implementation),Execution_Object>::Component_Type ComponentType;
+			std::vector<int>* planned_acts;
+			std::vector<int>* executed_acts;
+			std::vector<int>* ttime_distribution;
+			std::vector<string>* output_data;
+			std::vector<string>* output_data_buffer;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
 
@@ -30,8 +30,8 @@ namespace Person_Components
 			int* num_acts_in_interval;
 
 
-			boost::container::vector<string>* buff;
-			boost::container::vector<string>* current;
+			std::vector<string>* buff;
+			std::vector<string>* current;
 
 
 			m_data(ofstream, log, NONE, NONE);
@@ -58,11 +58,11 @@ namespace Person_Components
 				this->_activity_time_lost = 0;
 
 				// initialize storage arrays
-				planned_acts = new boost::container::vector<int>[num_sim_threads()];
-				executed_acts = new boost::container::vector<int>[num_sim_threads()];
-				ttime_distribution = new boost::container::vector<int>[num_sim_threads()];
-				output_data = new boost::container::vector<string>[num_sim_threads()];
-				output_data_buffer = new boost::container::vector<string>[num_sim_threads()];
+				planned_acts = new std::vector<int>[num_sim_threads()];
+				executed_acts = new std::vector<int>[num_sim_threads()];
+				ttime_distribution = new std::vector<int>[num_sim_threads()];
+				output_data = new std::vector<string>[num_sim_threads()];
+				output_data_buffer = new std::vector<string>[num_sim_threads()];
 
 				//trip_records = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
 				//trip_records_buffer = new std::vector<shared_ptr<polaris::io::Trip>>[num_sim_threads()];
@@ -95,13 +95,13 @@ namespace Person_Components
 					}
 				}
 
-				this->Logging_Interval<Time_Minutes>(5);
-				this->Next_Logging_Time<Time_Minutes>(5);
-				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<Simulation_Timestep_Increment>();
+				this->template Logging_Interval<Time_Minutes>(5);
+				this->template Next_Logging_Time<Time_Minutes>(5);
+				Simulation_Timestep_Increment first_time = this->template Next_Logging_Time<Simulation_Timestep_Increment>();
 				
 
 				//load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
-				this->Load_Event<ComponentType>(&Logging_Event_Controller,first_time,Scenario_Components::Types::OUTPUT_WRITING_SUB_ITERATION);
+				this->template Load_Event<ComponentType>(&Logging_Event_Controller,first_time,Scenario_Components::Types::OUTPUT_WRITING_SUB_ITERATION);
 
 				// Initialize pointers to data buffers
 				buff = output_data_buffer;
@@ -137,15 +137,14 @@ namespace Person_Components
 				filename_acts << "executed_activities.csv";
 				this->_executed_acts_file.open(filename_acts.str());
 				if (!this->_executed_acts_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
-				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18"<<endl;
+				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,23"<<endl;
 
 				// Initialize data count containers
-				num_acts.resize(20,0);
 				for (int i=0; i<(int)num_sim_threads();++i)
 				{
 					ttime_distribution[i].resize(25,0); 
-					executed_acts[i].resize(20,0);
-					planned_acts[i].resize(20,0);
+					executed_acts[i].resize(Activity_Components::Types::ACTIVITY_TYPES::Last+1);
+					planned_acts[i].resize(Activity_Components::Types::ACTIVITY_TYPES::Last + 1);
 				}
 
 				// Initialize demand MOE file
@@ -180,7 +179,7 @@ namespace Person_Components
 				act_record_itf* act = (act_record_itf*)act_record;
 				person_planner_itf* planner = act->template Parent_Planner<person_planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();
-				household_itf* hh = person->template Household<household_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
 
 				location_itf* loc = act->template Location<location_itf*>();
 
@@ -207,6 +206,7 @@ namespace Person_Components
 
 				// exit if not writing output
 				if (!scenario->template write_activity_output<bool>()) return;
+				return;
 
 
 				stringstream PERSON_ID;
@@ -232,7 +232,7 @@ namespace Person_Components
 				Revision& location = act->template Location_Planning_Time<Revision&>();
 				Revision& start = act->template Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Route_Planning_Time<Revision&>();
-				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Get_Type_String<NT>() << "\t"<<zone->template uuid<int>()<<"\t";
+				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Get_Type_String() << "\t"<<zone->template uuid<int>()<<"\t";
 				s << "Plan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)
@@ -251,13 +251,11 @@ namespace Person_Components
 
 				s << "\t";
 				s <<move->template origin<location_itf*>()->template uuid<int>()<< "\t"<<move->template destination<location_itf*>()->template uuid<int>()<< "\t";
-				s <<move->template departed_time<Time_Days>()<< "\t"<<move->arrived_time<Time_Days>()<< "\t"<<act->template Start_Time<Time_Days>() << "\t"<<act->template End_Time<Time_Days>() << "\t"<< act->template Mode<int>();
+				s <<move->template departed_time<Time_Days>()<< "\t"<<move->template arrived_time<Time_Days>()<< "\t"<<act->template Start_Time<Time_Days>() << "\t"<<act->template End_Time<Time_Days>() << "\t"<< act->template Mode<int>();
 				buff[__thread_id].push_back(s.str());
 			}
 			template<typename TargetType> void Add_Summary_Record(TargetType act_record, bool is_executed)
 			{		
-				if (!is_executed) return;
-
 				stringstream s;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
@@ -277,35 +275,16 @@ namespace Person_Components
 					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
 					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 
-					Push_To_Demand_Database<TargetType>(act_record);
+					Push_To_Demand_Database<TargetType>(act_record, is_executed);
 
-					//movement_itf* move = act->template movement_plan<movement_itf*>();
-					//zone_itf* orig = move->template origin<location_itf*>()->template zone<zone_itf*>();
-					//zone_itf* dest = move->template destination<location_itf*>()->template zone<zone_itf*>();
-					//planner_itf* planner = act->template Parent_Planner<planner_itf*>();
-					//person_itf* person = planner->template Parent_Person<person_itf*>();
-					//zone_itf* home = person->template Home_Location<zone_itf*>();
-					//int O, D, H;
-					//O = orig->template uuid<int>();
-					//D = dest->template uuid<int>();
-					//H = home->template uuid<int>();
-					//if(is_external_internal_trip(O,D,H)) 
-					//{
-					//	//int new_origin = get_nearest_external_location<zone_itf*>(orig);
-					//	//Push_To_Demand_Database<TargetType>(act_record, new_origin);
-					//	Push_To_Demand_Database<TargetType>(act_record);
-					//}
-					//else if (is_internal_external_trip(O,D,H))
-					//{
-					//	//int new_destination = get_nearest_external_location<zone_itf*>(dest);
-					//	//Push_To_Demand_Database<TargetType>(act_record, -1, new_destination);
-					//	Push_To_Demand_Database<TargetType>(act_record);
-					//}
 				}
+
+				if (!is_executed) return;
+
 				//----------------------------------------------------------
 				//==========================================================
 
-
+				//std::cout << "Incrementing executed_acts: thread_id=" << __thread_id << " Activity index=" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << std::endl;
 				executed_acts[__thread_id][act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
 			
 				// update travel time distributions
@@ -358,7 +337,7 @@ namespace Person_Components
 				// swap buffer and current for output strings and trip records
 				if(sub_iteration() == 0)
 				{				
-					boost::container::vector<string>* tmp = pthis->buff;
+					std::vector<string>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
 
@@ -395,7 +374,7 @@ namespace Person_Components
 				{
 
 					// write out strings in the current buffer to log file and clear it
-					for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
+					for (std::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 					{
 						this->_log << '\n' << *itr;
 					}
@@ -460,11 +439,13 @@ namespace Person_Components
 					}
 
 
-					// database write for external trips
+					// database write for trips
 					typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 					if (scenario->template write_demand_to_database<bool>())
 					{
+						int count = 0;
+
 						try
 						{
 							odb::transaction t(this->_db_ptr->begin());
@@ -474,15 +455,31 @@ namespace Person_Components
 							{
 								polaris::io::Trip& t = itr->first;
 								polaris::io::Activity& a = itr->second;
-								unsigned long t_id = this->_db_ptr->persist(t);
+
+								unsigned long t_id;
+								// only write trip if the type is not -1 (i.e. for executed trips)
+								if (t.getType() != -1) t_id = this->_db_ptr->persist(t);
+
+								else t_id = 0;
 								a.setTrip (t_id);
 								this->_db_ptr->persist(a);
+								count++;
 							}
 							t.commit();
 						}
-						catch (odb::sqlite::database_exception ex)
+						catch (const odb::exception& e)
 						{
-							cout << ex.message()<<". DB error in person_data_logger_implementation, line 519."<<endl;
+							cout << e.what()<<". DB error in person_data_logger_implementation, line 493.  count="<<count<<endl;
+							pair<polaris::io::Trip,polaris::io::Activity> p = activity_records[i][count];
+							
+						}
+						catch (std::exception& e)
+						{
+							cout << e.what() << ". DB error in person_data_logger_implementation, line 499.  count=" << count << endl;
+						}
+						catch (...)
+						{
+							cout << "some other error in database writing" << endl;
 						}
 
 						// erase buffer
@@ -608,7 +605,7 @@ namespace Person_Components
 
 
 
-			template<typename TargetType> void Push_To_Demand_Database(TargetType act_record, int new_origin=-1, int new_destination=-1)
+			template<typename TargetType> void Push_To_Demand_Database(TargetType act_record, bool is_executed, int new_origin=-1, int new_destination=-1)
 			{
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
@@ -617,6 +614,8 @@ namespace Person_Components
 				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
 				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
 
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
@@ -624,37 +623,49 @@ namespace Person_Components
 				location_itf* dest = move->template destination<location_itf*>();
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
-				household_itf* hh = person->template Household<household_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
+
 
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
-				trip_rec.setConstraint(0);
-				trip_rec.setPerson(person->template uuid<int>());
-				trip_rec.setTrip(act->template Activity_Plan_ID<int>());
-				if (new_destination<0) trip_rec.setDestination(dest->template uuid<int>());
-				else trip_rec.setDestination(new_destination);
-				trip_rec.setDuration(act->template Duration<Time_Seconds>());
-				//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
-				trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
-				trip_rec.setHhold(hh->template uuid<int>());
-				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) trip_rec.setMode(0);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
-				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
-				else trip_rec.setMode(3);
-				if (new_origin <0) trip_rec.setOrigin(orig->template uuid<int>());
-				else trip_rec.setOrigin(new_origin);
-				trip_rec.setPartition(move->routed_travel_time<int>());
-				trip_rec.setPassengers(0);
-				trip_rec.setPurpose(0);
-				//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
-				trip_rec.setStart(move->template departed_time<Time_Seconds>());
-				trip_rec.setTour(0);
-				trip_rec.setPriority(0);
-				trip_rec.setVehicle(9);
-				trip_rec.setType(1);
+				if (is_executed)
+				{
+					trip_rec.setConstraint(0);
+					trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
+					trip_rec.setTrip(act->template Activity_Plan_ID<int>());
+					if (new_destination < 0) trip_rec.setDestination(dest->template uuid<int>());
+					else trip_rec.setDestination(new_destination);
+					trip_rec.setDuration(act->template Duration<Time_Seconds>());
+					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
+					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec.setHhold(0);
+					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+					{
+						trip_rec.setMode(0);
+						trip_rec.setVehicle(person->vehicle<vehicle_itf*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+					}
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
+					else trip_rec.setMode(3);
+					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
+					else trip_rec.setOrigin(new_origin);
+					trip_rec.setPartition(move->template routed_travel_time<int>());
+					trip_rec.setPassengers(0);
+					trip_rec.setPurpose(0);
+					//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
+					trip_rec.setStart(move->template departed_time<Time_Seconds>());
+					trip_rec.setTour(0);
+					trip_rec.setPriority(0);
+					//				trip_rec.setVehicle(9);
+					trip_rec.setType(1);
+				}
+				else
+				{
+					trip_rec.setType(-1); // use this to flag a null trip when writing to database
+				}
 					
 
 				//==============================================================================================
@@ -662,7 +673,7 @@ namespace Person_Components
 				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
 				//polaris::io::Activity* act_rec = new polaris::io::Activity();
 				polaris::io::Activity act_rec;
-
+				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
 				if (new_destination<0)
 					act_rec.setLocation_Id(dest->template uuid<int>());
 				else 
@@ -673,13 +684,19 @@ namespace Person_Components
 					act_rec.setMode ("AUTO");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
 					act_rec.setMode ("HOV");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)
+					act_rec.setMode("TAXI");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
 					act_rec.setMode ("WALK");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+					act_rec.setMode("BIKE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
+					act_rec.setMode("SCHOOLBUS");
 				else
 					act_rec.setMode ("TRANSIT");
-				act_rec.setType (act->template Get_Type_String<NT>());
+				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
-				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>()->getPerson());
+				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
 

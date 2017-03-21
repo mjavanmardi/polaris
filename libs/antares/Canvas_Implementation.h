@@ -86,7 +86,7 @@ public:
 		int height;
 		unsigned char* data;
 	};
-	m_data(boost::container::vector<Queued_Texture>,queued_textures, NONE, NONE);
+	m_data(std::vector<Queued_Texture>,queued_textures, NONE, NONE);
 
 	m_data(wxGLContext*,glcontext, NONE, NONE);
 
@@ -150,7 +150,7 @@ public:
 	m_prototype(Layer_Options,typename MasterType::layer_options_type,layer_options, NONE, NONE);
 	m_prototype(Attributes_Panel,typename MasterType::attributes_panel_type,attributes_panel, NONE, NONE);
 
-	boost::container::list<Antares_Layer_Interface*> _layers;
+	std::list<Antares_Layer_Interface*> _layers;
 	m_data(Antares_Layer_Interface*,selected_layer, NONE, NONE);
 
 	//member_data(ANTARES_MODE,interaction_mode,none,none);
@@ -388,7 +388,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Add_Textures()
 
 	//float border_color[3] = {0.0f,0.0f,0.0f};
 
-	for(boost::container::vector<Queued_Texture>::iterator itr = _queued_textures.begin();itr!=_queued_textures.end();itr++)
+	for(std::vector<Queued_Texture>::iterator itr = _queued_textures.begin();itr!=_queued_textures.end();itr++)
 	{
 		glBindTexture(GL_TEXTURE_2D, itr->tex_id);
 

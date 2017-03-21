@@ -54,7 +54,7 @@ namespace File_IO
 				}
 			}
 		}
-		bool Is_File_Type(char* extension)
+		bool Is_File_Type(const char* extension)
 		{
 			return (strcmp(_extension.c_str(),extension) == 0);
 		}
@@ -234,30 +234,6 @@ namespace File_IO
 			return true;
 		}
 		template<class T>
-		bool Get_Data(boost::container::vector<T> &data, boost::container::vector<int> columns)
-		{
-			T t;
-			for (boost::container::vector<int>::iterator itr = columns.begin(); itr != columns.end(); itr++)
-			{
-				if (Get_Data<T>(t,*itr)) data.push_back(t);
-				else {/*cout<<"ERROR: could not get data from column"; */return false;}
-			}
-			return true;
-
-		}
-		template<class T>
-		bool Get_Data(boost::container::vector<T> &data, std::vector<int> columns)
-		{
-			T t;
-			for (std::vector<int>::iterator itr = columns.begin(); itr != columns.end(); itr++)
-			{
-				if (Get_Data<T>(t,*itr)) data.push_back(t);
-				else {/*cout<<"ERROR: could not get data from column"; */return false;}
-			}
-			return true;
-
-		}
-		template<class T>
 		bool Get_Data(std::vector<T> &data, std::vector<int> columns)
 		{
 			T t;
@@ -278,12 +254,12 @@ namespace File_IO
 	protected:
 		ifstream _file;
 		string _filename;
-		boost::container::vector<double> _data;
-		boost::container::vector<string> _string_data;
-		boost::container::vector<string> _header;
+		std::vector<double> _data;
+		std::vector<string> _string_data;
+		std::vector<string> _header;
 		bool _open;
 		string _delims;
-		void tokenize(const string& str, boost::container::vector<string>& tokens, const string& delimiters = ",\t\r", const bool trimEmpty = false)
+		void tokenize(const string& str, std::vector<string>& tokens, const string& delimiters = ",\t\r", const bool trimEmpty = false)
 		{
 			string::size_type pos, lastPos = 0;
 			while(true)
@@ -293,16 +269,16 @@ namespace File_IO
 				{
 					pos = str.length();
 					if(pos != lastPos || !trimEmpty)
-					tokens.push_back(boost::container::vector<string>::value_type(str.data()+lastPos,
-							(boost::container::vector<string>::value_type::size_type)pos-lastPos ));
+					tokens.push_back(std::vector<string>::value_type(str.data()+lastPos,
+							(std::vector<string>::value_type::size_type)pos-lastPos ));
 
 					break;
 				}
 				else
 				{
 					if(pos != lastPos || !trimEmpty)
-					tokens.push_back(boost::container::vector<string>::value_type(str.data()+lastPos,
-							(boost::container::vector<string>::value_type::size_type)pos-lastPos ));
+					tokens.push_back(std::vector<string>::value_type(str.data()+lastPos,
+							(std::vector<string>::value_type::size_type)pos-lastPos ));
 				}
 
 				lastPos = pos + 1;

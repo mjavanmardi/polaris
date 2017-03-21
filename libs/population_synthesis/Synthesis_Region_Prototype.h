@@ -21,7 +21,7 @@ namespace PopSyn
 			{
 				this_component()->template Init<NT>();
 				this_component()->template Initialize<IndexType>(dimensions_hh, dimensions_per,0,0);
-				((ComponentType*)this)->Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);		
+				((ComponentType*)this)->template Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);
 			}
 
 			accessor(Temporary_Sample_Data, NONE, NONE);
@@ -47,20 +47,20 @@ namespace PopSyn
 
 			//==============================================================================================================
 			// These are the high level population synthesis algorithm at the region-level, which do the fitting and selection for each zone in the region
-			template<typename TargetType> void Synthesize_Population(/*requires(TargetType,check_stripped_type(ComponentType,Concepts::Is_IPF_Compatible) || check_stripped_type(ComponentType,Concepts::Is_IPU_Compatible))*/)
+			template<typename TargetType> void Synthesize_Population(requires(TargetType,check_stripped_type(ComponentType,Concepts::Is_IPF_Compatible) || check_stripped_type(ComponentType,Concepts::Is_IPU_Compatible)))
 			{
 				this_component()->Synthesize_Population<TargetType>();
 			}
 			
-			//template<typename TargetType> void Synthesize_Population(requires(TargetType,check(ComponentType,!Concepts::Is_IPF_Compatible) && check(ComponentType,!Concepts::Is_IPU_Compatible)))
-			//{
-			//	assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable...");
-			//	assert_check(ComponentType,Concepts::Is_IPU_Compatible,".. and, Not IPU Capable");
-			//	assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_MWAY,"doesn't have a joint distribution");
-			//	assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_Value_Type,"doesn't have a value_type");
-			//	assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_Marginals,"doesn't have marginals");
-			//	
-			//}
+			template<typename TargetType> void Synthesize_Population(requires(TargetType,check(ComponentType,!Concepts::Is_IPF_Compatible) && check(ComponentType,!Concepts::Is_IPU_Compatible)))
+			{
+				assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable...");
+				assert_check(ComponentType,Concepts::Is_IPU_Compatible,".. and, Not IPU Capable");
+				assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_MWAY,"doesn't have a joint distribution");
+				assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_Value_Type,"doesn't have a value_type");
+				assert_sub_check(ComponentType,Concepts::Is_IPF_Compatible,Has_Marginals,"doesn't have marginals");
+				
+			}
 			
 			
 		};

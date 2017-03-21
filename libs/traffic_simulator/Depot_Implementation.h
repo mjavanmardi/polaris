@@ -43,19 +43,27 @@ namespace Depot_Components
 			}
 			
 			
-			template<typename TargetType> void Accept_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
+			template<typename TargetType> void Accept_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
 			{
 				_current_events.clear();
 
 				// Filter out accident events
 
-				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
-				{
-					Network_Event<typename MasterType::base_network_event_type>* net_event = *itr;
+				//for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				//{
+				//	Network_Event<typename MasterType::base_network_event_type>* net_event = *itr;
 
-					if( net_event->template Is_Type<typename MasterType::accident_network_event_type>() )
+				//	if( net_event->template Is_Type<typename MasterType::accident_network_event_type>() )
+				//	{
+				//		_current_events.push_back( *itr );
+				//	}
+				//}
+				for (const auto& net_event : network_events)
+				{
+					//if (net_event->Is_Type<typename MasterType::accident_network_event_type>())
+					if (typeid(net_event) == typeid(MasterType::accident_network_event_type))
 					{
-						_current_events.push_back( *itr );
+						_current_events.push_back(net_event);
 					}
 				}
 			}
@@ -78,17 +86,17 @@ namespace Depot_Components
 
 			template<typename TargetType> void Initialize(polaris::io::Depot& instance)
 			{
-				Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
+				this->template Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 				
 				////TODO
-//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
+				//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
 				using namespace polaris::io;
 				
 				std::shared_ptr<LinkList> link_list = instance.getLinks();
 
 				const std::vector<int>& db_covered_links = (*link_list).getLinks();
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
 
 				for(std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -96,9 +104,9 @@ namespace Depot_Components
 
 					if(db_map.count(link))
 					{
-						boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
+						std::vector<typename MasterType::link_type*>& links=db_map[link];
 
-						typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
+						typename std::vector<typename MasterType::link_type*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -120,18 +128,18 @@ namespace Depot_Components
 				}
 
 				//TODO
-				//_depot_service = new polaris::Depot( instance );
+                //RLW%%% _depot_service = new polaris::Depot( instance );
 			}
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			m_data(Link_Interface*,resident_link, NONE, NONE);
-			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
+			m_data(std::vector<Link_Interface*>,covered_links, NONE, NONE);
 
-			m_data(boost::container::vector<typename MasterType::tow_truck_type>,tow_trucks, NONE, NONE);
+			m_data(std::vector<typename MasterType::tow_truck_type>,tow_trucks, NONE, NONE);
 			//m_data(polaris::Depot*,depot_service, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::traffic_management_center_type,traffic_management_center, NONE, NONE);
 
-			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
+			m_data(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
 		};
 	}
 }

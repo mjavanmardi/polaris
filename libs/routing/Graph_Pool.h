@@ -5,7 +5,7 @@ namespace polaris
 {
 	//the highest lavel object in the library hierarchy. It contains all of the graph types, and each thread has a Graph_Pool 
 	//see NetworkModel.cpp for usage example
-	prototype struct Graph_Pool
+	prototype struct Graph_Pool ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 		//ComponentType is an implementation
@@ -23,7 +23,7 @@ namespace polaris
 		//	return this_component()->Get_Connection<Connection_Type>(inbound_edge_id,outbound_edge_id);
 		//}
 
-		boost::container::vector<base_edge_type*>* Get_Edges(graph_id_type gid)
+		std::vector<base_edge_type*>* Get_Edges(p_graph_id_type gid)
 		{
 			return this_component()->Get_Edges(gid);
 		}

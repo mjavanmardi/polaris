@@ -11,16 +11,18 @@ namespace Concepts
 {
 	concept struct Is_Household
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
-		check_template_method_name(Has_Properties_Defined,Properties);
-		check_template_method_name(Has_Planner_Defined,Planning_Faculty);
+		check_accessor_name(Has_Initialize_Defined,Initialize);
+		check_accessor_name(Has_Properties_Defined,Properties);
+		check_accessor_name(Has_Planner_Defined,Planning_Faculty);
 		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
 	};
 
 	concept struct Has_Initialize
 	{
-		check_template_method_name(Has_Initialize_Defined,Initialize);
-		define_default_check(Has_Initialize_Defined);
+		//%%%RLW TODO: this check fails
+		static const bool value = true;
+		//check_accessor_name(Has_Initialize_Defined,Initialize);
+		//define_default_check(Has_Initialize_Defined);
 	};
 
 }
@@ -37,22 +39,35 @@ namespace Prototypes
 		tag_as_prototype;
 
 
-		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize)))
+		template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Has_Initialize))> 
+		void Initialize(TargetType id)
 		{
 			this_component()->template Initialize< TargetType>(id);	
 			//this->template Set_Home_Location<NT>();
 		}
-		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,!check(ComponentType,Concepts::Has_Initialize)))
+		template<typename TargetType, requires(TargetType, !check(ComponentType, Concepts::Has_Initialize))> 
+		void Initialize(TargetType id)
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,check(ComponentType,Concepts::Has_Initialize)))
+		template<typename IdType, typename NetworkRefType, typename ScenarioRefType,requires(ScenarioRefType,check(ComponentType,Concepts::Has_Initialize))>
+		void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 		{
+			this_component()->template Initialize< IdType, NetworkRefType, ScenarioRefType>(id, network_ref, scenario_ref);		
+		}
+		template<typename IdType, typename NetworkRefType, typename ScenarioRefType,requires(ScenarioRefType,!check(ComponentType,Concepts::Has_Initialize))>
+		void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		}
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, check(ComponentType, Concepts::Has_Initialize))> 
+		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)		{
 			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 			this->template Set_Home_Location<NT>();
 		}
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,!check(ComponentType,Concepts::Has_Initialize)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, !check(ComponentType, Concepts::Has_Initialize))> 
+		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
@@ -75,6 +90,7 @@ namespace Prototypes
 		accessor(internal_id, NONE, NONE);
 
 		accessor(Persons_Container, NONE, NONE);
+		accessor(Vehicles_Container, NONE, NONE);
 
 		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
 		{
@@ -82,7 +98,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
-			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
 
 			typename person_container_itf::iterator p_itr;
 			person_container_itf* persons = this->Persons_Container<person_container_itf*>();
@@ -95,13 +111,15 @@ namespace Prototypes
 			return nullptr;
 		}
 		
-		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
+		//%%%RLW - fix requires part
+		//template<typename PersonItfType, typename TimeType, requires(PersonItfType, check(PersonItfType, std::is_pointer) && check_stripped_type(PersonItfType, Activity_Simulator::Person_Concepts::Is_Person))> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time)
+		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Escort(TimeType start_time, TimeType end_time)
 		{
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
-			typedef Person_Components::Prototypes::Person<typename get_component_type(person_container_itf)>  person_itf;
+			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
 
 			typedef Person_Components::Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)>  person_properties_itf;
 
@@ -111,11 +129,20 @@ namespace Prototypes
 			for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 			{
 				person_itf* p = (person_itf*)(*p_itr);
-				if (p->Is_Free(start_time,end_time) && p->Static_Properties<person_properties_itf*>()->Age<int>()>=16) return (PersonItfType)p;
+				if (p->Is_Free(start_time,end_time) && p->template Static_Properties<person_properties_itf*>()->template Age<int>()>=16) return (PersonItfType)p;
 			}
 			return nullptr;
 		}
 		
+		template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle(requires(VehicleItfType, check(VehicleItfType, is_pointer)))// && check_stripped_type(PersonItfType, Activity_Simulator::Person_Concepts::Is_Person)))
+		{
+			return this_component()->Get_Free_Vehicle<VehicleItfType>();
+		}
+
+		template<typename TimeType> TimeType Get_Next_Available_Vehicle_Time()
+		{
+			return this_component()->Get_Next_Available_Vehicle_Time<TimeType>();
+		}
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		template<typename TargetType> TargetType Home_Location(requires(TargetType,check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,is_pointer)))
@@ -124,7 +151,7 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
@@ -138,7 +165,7 @@ namespace Prototypes
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 
 			
 			properties_itf* properties = this->Properties<properties_itf*>();
@@ -164,13 +191,13 @@ namespace Prototypes
 			typedef Household_Properties<typename get_type_of(Properties)> properties_itf;
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> activity_locations_container_itf;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_container_itf)>  activity_location_itf;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_container_itf)>  activity_location_itf;
 
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
+			if (location_index < 0 || location_index >= (TargetType)locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
 			properties->template home_location_id<TargetType>(location_index);
 		}
 		template<typename TargetType> void Home_Location(TargetType location_index, requires(TargetType,check(strip_modifiers(TargetType), !is_integral)))
@@ -185,10 +212,10 @@ namespace Prototypes
 			typedef Network_Components::Prototypes::Network< typename get_type_of(network_reference)> network_itf;
 
 			typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zone_container_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zone_container_itf)>  zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zone_container_itf)>  zone_itf;
 			
 			typedef Random_Access_Sequence< typename network_itf::get_type_of(activity_locations_container)> locations_container_interface;
-			typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_container_interface)>  location_interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 
 
 			properties_itf* props = this->Properties<properties_itf*>();

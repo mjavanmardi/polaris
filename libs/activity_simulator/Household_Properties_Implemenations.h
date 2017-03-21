@@ -1,11 +1,7 @@
 #pragma once
 
 #include "Household_Properties_Prototype.h"
-//#include "Person_Properties_Prototype.h"
-//#include "Person_Prototype.h"
-//#include "Movement_Plan_Prototype.h"
-//#include "Network_Skimming_Prototype.h"
-//#include "Activity_Prototype.h"
+#include "Population_Synthesis_Concepts.h"
 
 
 namespace Household_Components
@@ -30,7 +26,7 @@ namespace Household_Components
 			{
 				
 			}
-			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(typename TargetType, is_pointer)))
+			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(TargetType, is_pointer)))
 			{	
 				//===============================================================================================================
 				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS
@@ -44,10 +40,10 @@ namespace Household_Components
 				typedef Network_Components::Prototypes::Network<typename type_of(Parent_Household)::get_type_of(network_reference)> network_itf;
 				
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> activity_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(activity_locations_itf)>  activity_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(activity_locations_itf)>  activity_location_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> _Zone_Container_Interface;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zone_Container_Interface)>  _Zone_Interface;
 				
 			
 				zone_itf* zone = (zone_itf*)home_synthesis_zone;
@@ -57,68 +53,72 @@ namespace Household_Components
 				// initialize location indices
 				_home_location_id = -1;
 
-				
 				// Available locations
 				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
-				// assign person to a random activity location in the zone				
+				// if no activity locations exist in the current synthesis zone, distribute randomly throughout the region
 				if (loc_indices->size() == 0)
 				{
-					_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
-				}
-				else
-				{
-					int index = -1;
-					index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
-					_home_location_id = loc_indices->at(index);
+					_home_location_id = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
+					return;
 				}
 
+				// Do probabilistic selection of final location, weighted by required population size of TAZ of each location (trying to match required TAZ totals)
+				// get total population weight
+				float pop_weight = 0;
+				for (auto l = loc_indices->begin(); l != loc_indices->end(); ++l)
+				{
+					activity_location_itf* a = (activity_location_itf*)activity_locations->at(*l);
+					_Zone_Interface* z = a->zone<_Zone_Interface*>();
+					pop_weight += z->pop_households<float>();
+
+				}
+				// if none of the tazs for the current zones requires any population print error message and distribute randomly
+				if (pop_weight == 0)
+				{
+					cout << "Warning: none of the TAZs corresponding to synthesis zone " << zone->ID<int>() << " require any population. Check zone and popsyn input values." << endl;
+					_home_location_id = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
+					return;
+				}
+				float p_cum = 0;
+				float r = GLOBALS::Uniform_RNG.template Next_Rand<float>();
+				for (auto l = loc_indices->begin(); l != loc_indices->end(); ++l)
+				{
+					activity_location_itf* a = (activity_location_itf*)activity_locations->at(*l);
+					_Zone_Interface* z = a->zone<_Zone_Interface*>();
+					p_cum += z->pop_households<float>() / pop_weight;
+
+					if (r < p_cum)
+					{
+						_home_location_id = *l;
+						return;
+					}
+
+				}
+
+				// if nothing else, assign randomly
+				_home_location_id = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
+				return;
+
+
+				//// assign person to a random activity location in the zone				
+				//if (loc_indices->size() == 0)
+				//{
+				//	_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
+				//}
+				//else
+				//{
+				//	int index = -1;
+				//	index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
+				//	_home_location_id = loc_indices->at(index);
+				//}
+
 				// get the polaris zone of the synthesized person and increment its population counter;
-				_Zone_Interface* pzone = _Parent_Household->template Home_Location<_Zone_Interface*>();
-				pzone->template pop_households<int&>()++;
+				//_Zone_Interface* pzone = _Parent_Household->template Home_Location<_Zone_Interface*>();
+				//pzone->template pop_households<int&>()++;
 
 			}	
 		};
-
-
-		//implementation struct ACS_Household_Static_Properties_Implementation : public Polaris_Component< MasterType,INHERIT(ACS_Household_Static_Properties_Implementation), Data_Object>
-		//{
-		//	// Tag as Implementation
-		//	typedef typename Polaris_Component<MasterType,INHERIT(ACS_Household_Static_Properties_Implementation),Data_Object>::Component_Type ComponentType;
-
-		//	//=================================================================
-		//	// Basic Person Characteristics Used in Popsyn algorithms
-		//	m_data(double,ID, NONE, NONE);
-		//	m_data(double,Weight, NONE, NONE);
-		//	m_data(uint,Index, NONE, NONE);				 //index into the joint-distribution matrix of the region (convert using region.get_index())
-
-		//	//=================================================================
-		//	// Census specific household data, used in ABM routines
-		//	m_data(Types::HHTYPE, Household_type, NONE, NONE);
-		//	m_data(int, Household_size, NONE, NONE);
-		//	m_data(int, Number_of_workers, NONE, NONE);
-		//	m_data(int, Number_of_vehicles, NONE, NONE);		
-		//	member_component_and_feature_accessor(Income, Value, Basic_Units::Prototypes::Currency, Basic_Units::Implementations::Currency_Implementation<NT>);
-
-		//	//=================================================================
-		//	// Container which holds linked persons in ACS File for this household info unit
-		//	m_container(boost::container::vector<typename MasterType::person_static_properties_type*>, Persons_Container, NONE, NONE);
-
-		//	// Characteristics setter
-		//	template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
-		//	{
-		//		// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
-		//		typedef Prototypes::Household_Properties<ComponentType> this_itf;
-		//		this_itf* pthis = (this_itf*)this;
-		//				
-		//		pthis->Household_type<Types::HHTYPE>((Types::HHTYPE)(int)(*data)[3]);
-		//		pthis->Household_size<int>((*data)[4]);
-		//		pthis->Number_of_vehicles<int>((*data)[8]);
-		//		pthis->Number_of_workers<int>((*data)[25]);
-		//		pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[14]);
-
-		//	}
-		//};
 
 	}
 }

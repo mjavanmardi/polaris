@@ -60,7 +60,7 @@ namespace Trip_Components
 					typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
 					typedef  Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links), _Link_Interface*> _Links_Container_Interface;
 					typedef  Random_Access_Sequence< typename get_type_of(routed_trips_container)> _Trips_Container_Interface;
-					typedef  Routed_Trip< typename get_component_type(_Trips_Container_Interface)> _Trip_Interface;
+					typedef  Routed_Trip< get_component_type(_Trips_Container_Interface)> _Trip_Interface;
 
 					
 					_Network_Interface* network=network_reference<_Network_Interface*>();
@@ -141,11 +141,11 @@ namespace Trip_Components
 			void write_analysis_results()
 			{
 				typedef  Random_Access_Sequence< typename get_type_of(routed_trips_container)> _Trips_Container_Interface;
-				typedef  Routed_Trip< typename get_component_type(_Trips_Container_Interface)> _Trip_Interface;
+				typedef  Routed_Trip< get_component_type(_Trips_Container_Interface)> _Trip_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename _Trip_Interface::get_type_of(origin)>  _Activity_Location_Interface;
 				typedef Random_Access_Sequence<typename _Trip_Interface::get_type_of(result_trajectory)> _Trajectory_Container_Interface;
-				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 				
 
 				string filename(((_Scenario_Interface*)_global_scenario)->template historical_results_database_name<string&>());
@@ -326,7 +326,7 @@ namespace Trip_Components
 				typedef Routing_Components::Prototypes::Routing< get_type_of(router) > _Routing_Interface;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Routing_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 				typedef Random_Access_Sequence<typename _Movement_Plan_Interface::get_type_of(trajectory_container)> _Trajectory_Container_Interface;
-				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 				typedef Random_Access_Sequence<typename get_type_of(result_trajectory)> _Result_Trajectory_Container_Interface;
 				
 				this->results_processed(true);
@@ -369,7 +369,7 @@ namespace Trip_Components
 			string Print_Trajectory_Times()
 			{
 				typedef Random_Access_Sequence<get_type_of(result_trajectory)> _Trajectory_Container_Interface;
-				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 				typedef Link_Components::Prototypes::Link<typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
 
 				stringstream result("");
@@ -387,7 +387,7 @@ namespace Trip_Components
 			string Print_Trajectory_Links()
 			{
 				typedef Random_Access_Sequence<get_type_of(result_trajectory)> _Trajectory_Container_Interface;
-				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<get_component_type(_Trajectory_Container_Interface)> _Trajectory_Unit_Interface;
 				typedef Link_Components::Prototypes::Link<typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
 
 				stringstream result("");

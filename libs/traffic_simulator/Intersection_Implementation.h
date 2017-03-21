@@ -2,6 +2,7 @@
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
 #include "Scenario_Prototype.h"
+#include "Link_Implementation.h"
 
 namespace Intersection_Components
 {
@@ -24,11 +25,11 @@ namespace Intersection_Components
 			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link_reference, NONE, NONE);
 			
 			// container of inbound movements
-			m_container(boost::container::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::movement_type*>, inbound_movements, NONE, NONE);
 
-			typedef  Link_Components::Prototypes::Link<typename type_of(outbound_link_reference)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(outbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(inbound_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence<typename type_of(inbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<type_of(inbound_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -325,14 +326,17 @@ namespace Intersection_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Inbound_Outbound_Movements_Implementation),Data_Object>::ComponentType ComponentType;
 
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link_reference, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::movement_type*>, outbound_movements, NONE, NONE);
 
-			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link_reference)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(inbound_link_reference)> _Link_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence<typename type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
+			//=================================================================================
+			/// ERROR HERE..........
+			//TODO: check this - causing an error......................
 			template<typename TargetType> void link_capacity_allocation()
 			{
 				// Computation is a disaggregated interpretation of HCM Equation 17-1
@@ -343,7 +347,7 @@ namespace Intersection_Components
 				
 				// skip non-arterial/local links
 
-				Link_Components::Types::Link_Type_Keys link_type = link->link_type<Link_Components::Types::Link_Type_Keys>();
+				Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 				// skip non-arterial/local links
 				if(link_type == Link_Components::Types::Link_Type_Keys::FREEWAY || 
@@ -354,7 +358,7 @@ namespace Intersection_Components
 					return;
 				}
 				
-				Link_Components::Implementations::Pocket_Data* pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+				Link_Components::Implementations::Pocket_Data* pocket_data = link->template pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
 				if(!pocket_data->num_pockets_left || !pocket_data->num_pockets_right)
 				{
@@ -362,9 +366,9 @@ namespace Intersection_Components
 
 					const float interval_capacity = (1800.0f/(60.0f*60.0f))*interval;
 
-					//boost::container::deque<_Movement_Interface*> through_movements;
-					//boost::container::deque<_Movement_Interface*> right_movements;
-					//boost::container::deque<_Movement_Interface*> left_movements;
+					//std::deque<_Movement_Interface*> through_movements;
+					//std::deque<_Movement_Interface*> right_movements;
+					//std::deque<_Movement_Interface*> left_movements;
 					
 					_Movement_Interface* outbound_movement;
 					typename _Movements_Container_Interface::iterator outbound_itr;
@@ -382,17 +386,17 @@ namespace Intersection_Components
 						
 						total_demand += outbound_movement->template movement_demand<float>();
 
-						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+						Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-						if(type == U_TURN || type == LEFT_TURN)
+						if(type == Turn_Movement_Components::Types::U_TURN || type == Turn_Movement_Components::Types::LEFT_TURN)
 						{
 							left_demand += outbound_movement->template movement_demand<float>();
 						}
-						else if(type == RIGHT_TURN)
+						else if(type == Turn_Movement_Components::Types::RIGHT_TURN)
 						{
 							right_demand += outbound_movement->template movement_demand<float>();
 						}
-						else if(type == THROUGH_TURN)
+						else if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 						{
 							through_demand += outbound_movement->template movement_demand<float>();
 						}
@@ -404,17 +408,20 @@ namespace Intersection_Components
 					
 					float movement_supply;
 
-					// if there are 2 or more lanes, only the right (or left) lane would be backed up, the left (or right) lanes would have full capacity
-					// in addition, turners will only utilize the rightmost or leftmost lane
-					// this means the turn movement can receive no more than one lane's worth of capacity
-					// this one lane's capacity should also be subject to the percentage of demand for that lane
-					// however, we don't have a good way of estimating the % of through movers in one of those lanes; it should be less than an even split because they will avoid queues
-					// until we can get an estimate for that just compute proportion to demand and cap the capacity
+					/// if there are 2 or more lanes, only the right (or left) lane would be backed up, the left (or right) lanes would have full capacity
+					//	in addition, turners will only utilize the rightmost or leftmost lane
+					/// this means the turn movement can receive no more than one lane's worth of capacity
+					//	this one lane's capacity should also be subject to the percentage of demand for that lane
+					/// however, we don't have a good way of estimating the % of through movers in one of those lanes; it should be less than an even split because they will avoid queues
+					//	until we can get an estimate for that just compute proportion to demand and cap the capacity
 
 					// Additionally, there should be some mechanism to let unused supply flow back to other incident links
 
 					if(!pocket_data->num_pockets_left && !pocket_data->num_pockets_right)
 					{
+						float movement_remain = 0.0;
+						float total_remain = 0.0;
+
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
@@ -424,15 +431,29 @@ namespace Intersection_Components
 
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == THROUGH_TURN)
+							//TODO: evaluate this code 
+							/// THIS HAS BEEN UPDATED TO REPLACE THE FLOOR WHICH WAS ROUNDING DOWN AND CREATING JAMS FOR LOW DEMAND MOVEMENTS
+							//	i.e the interval capacity when simulation interval is 6s = 3 veh. if less then 33% of demand is allocated to a specific movement, the flow for that movement will always be 0 until the demand percentage increases to greter than 33%.
+							/// this causes a lot of problems for turn movements - JAA 1/24/17
+
+							float movement_cap = total_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
 							{
-								movement_supply = floor(min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) ));
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
+							{
+								movement_supply = floor(min( movement_supply, movement_cap));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap)));
 							}
 
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( total_capacity * ( outbound_movement->template movement_demand<float>() / total_demand));
@@ -450,14 +471,15 @@ namespace Intersection_Components
 
 						float shared_demand = total_demand - left_demand;
 						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_left);
+						float total_remain = 0.0;
 
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == U_TURN || type == LEFT_TURN)
+							if(type == Turn_Movement_Components::Types::U_TURN || type == Turn_Movement_Components::Types::LEFT_TURN)
 							{
 								// skip these, they get full supply
 								continue;
@@ -468,13 +490,24 @@ namespace Intersection_Components
 								
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
 
-							if(type == THROUGH_TURN)
+							// allocate remaining capacity randomly
+							float movement_cap = shared_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							float movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
+
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
+							{
+								movement_supply = floor(min( movement_supply, movement_cap ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap )));
 							}
 
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));
@@ -490,14 +523,15 @@ namespace Intersection_Components
 					{
 						float shared_demand = total_demand - right_demand;
 						float shared_capacity = total_capacity - interval_capacity*((float)pocket_data->num_pockets_right);
+						float total_remain = 0.0;
 
 						for(outbound_itr=_outbound_movements.begin();outbound_itr!=_outbound_movements.end();outbound_itr++)
 						{
 							outbound_movement=(_Movement_Interface*)(*outbound_itr);
 
-							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+							Turn_Movement_Components::Types::Turn_Movement_Type_Keys type = outbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
 
-							if(type == RIGHT_TURN)
+							if(type == Turn_Movement_Components::Types::RIGHT_TURN)
 							{
 								// skip these, they get full supply
 								continue;
@@ -505,15 +539,26 @@ namespace Intersection_Components
 
 							// movement gets fraction of capacity proportional to fraction of demand
 							movement_supply = outbound_movement->template movement_supply<float>();
+
+							// allocate remaining capacity randomly
+							float movement_cap = shared_capacity * (outbound_movement->template movement_demand<float>() / total_demand);
+							float movement_remain = movement_cap - floor(movement_cap);
+							if (GLOBALS::Uniform_RNG.Next_Rand<float>() < movement_remain + total_remain)
+							{
+								total_remain -= movement_cap;
+								movement_cap += 1.0;
+							}
+							else total_remain += movement_remain;
+
 							
 							// if movement demand is 0, then the supply will be 0, which makes the demand computation meaningless, but ultimately gives the same result
-							if(type == THROUGH_TURN)
+							if(type == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
-								movement_supply = floor(min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) ));
+								movement_supply = floor(min( movement_supply, movement_cap ));
 							}
 							else
 							{
-								movement_supply = floor(min(interval_capacity,min( movement_supply, shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand ) )));
+								movement_supply = floor(min(interval_capacity,min( movement_supply, movement_cap )));
 							}
 							
 							//((_Movement_Interface::Component_Type*)outbound_movement)->pocket_movement_supply = ceil( shared_capacity * ( outbound_movement->template movement_demand<float>() / shared_demand));
@@ -543,10 +588,10 @@ namespace Intersection_Components
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
+			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
@@ -556,14 +601,14 @@ namespace Intersection_Components
 			
 			
 			typedef Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer<typename  type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
 
 
 			typedef Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer<typename  type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
-			typedef Random_Access_Sequence<typename type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
+			typedef Random_Access_Sequence<type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
 			typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Outbound_Movement_Interface;
 			typedef Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Outbound_Movement_Interface*> _Outbound_Movements_Container_Interface;
@@ -575,7 +620,7 @@ namespace Intersection_Components
 
 			typedef Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
-			typedef Intersection_Control_Components::Prototypes::Intersection_Control<typename type_of(intersection_control)> _Intersection_Control_Interface;
+			typedef Intersection_Control_Components::Prototypes::Intersection_Control<type_of(intersection_control)> _Intersection_Control_Interface;
 			typedef Intersection_Control_Components::Prototypes::Control_Plan< typename _Intersection_Control_Interface::get_type_of(current_control_plan)> _Control_Plan_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -802,9 +847,9 @@ namespace Intersection_Components
 				{
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
 					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
-					Load_Event<ComponentType>(&ComponentType::Newells_Conditional,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION);
+					this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION);
 					////TODO
-//load_event(ComponentType,,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
+					//load_event(ComponentType,,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
 				}
 			}
 			

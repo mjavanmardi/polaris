@@ -19,7 +19,7 @@ namespace Routing_Components
 
 	namespace Prototypes
 	{
-		prototype struct Routing
+		prototype struct Routing ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -109,7 +109,7 @@ namespace Routing_Components
 //				assert_sub_check(strip_modifiers(TargetType),Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 //			}
 //#endif*/
-//			template<typename TargetType> float one_to_one_link_based_least_time_path_a_star(TargetType routable_net, boost::container::vector<float>& reversed_arrival_time_container)
+//			template<typename TargetType> float one_to_one_link_based_least_time_path_a_star(TargetType routable_net, std::vector<float>& reversed_arrival_time_container)
 //			{
 //
 //				typedef  Network_Components::Prototypes::Network< typename get_type_of(routable_network)> _Routable_Network_Interface;
@@ -168,7 +168,7 @@ namespace Routing_Components
 //				_Routable_Link_Interface* current_link=origin_link_ptr;
 //
 //
-//				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< boost::container::vector<_Routable_Link_Interface*>& >();
+//				std::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< std::vector<_Routable_Link_Interface*>& >();
 //				if(current_link->template reset_list_status<bool>()==0)
 //				{
 //					reset_links_container.push_back(current_link);
@@ -344,7 +344,7 @@ namespace Routing_Components
 //				new_cost = next_cost;
 //				_Routable_Link_Interface* current_link=origin_link_ptr;
 //
-//				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< boost::container::vector<_Routable_Link_Interface*>& >();
+//				std::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< std::vector<_Routable_Link_Interface*>& >();
 //				if(current_link->template reset_list_status<bool>()==0)
 //				{
 //					reset_links_container.push_back(current_link);
@@ -499,7 +499,7 @@ namespace Routing_Components
 //				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 //				
 //				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-//				boost::container::vector<float> reversed_arrival_time_container;
+//				std::vector<float> reversed_arrival_time_container;
 //				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
 //
 //				if (routed_travel_time >= 0.0)
@@ -613,7 +613,7 @@ namespace Routing_Components
 //				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 //				
 //				_Routable_Network_Interface* routable_network_ptr=((_Regular_Network_Interface*)_global_network)->template get_routable_network_from_snapshots<_Routable_Network_Interface*>(_this_ptr->template departure_time<int>());
-//				boost::container::vector<float> reversed_arrival_time_container;
+//				std::vector<float> reversed_arrival_time_container;
 //				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
 //				
 //				if (routed_travel_time >= 0.0)

@@ -10,6 +10,10 @@ namespace PopSyn
 	{
 		implementation struct Popsyn_File_Linker_Implementation : public Polaris_Component< MasterType,INHERIT(Popsyn_File_Linker_Implementation), Data_Object>
 		{
+			typedef Polaris_Component< MasterType,INHERIT(Popsyn_File_Linker_Implementation), Data_Object> BaseType;
+			using typename BaseType::Component_Type;
+			typedef Component_Type ComponentType;
+
 			// Variables to store the links between the SF and PUMS files at the household level
 			m_container(std::vector<std::vector<High_Low>>,ranges,NONE,NONE);
 			m_container(std::vector<int>,pums_file_link,NONE,NONE);

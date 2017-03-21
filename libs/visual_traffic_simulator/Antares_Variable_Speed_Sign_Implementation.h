@@ -24,7 +24,7 @@ namespace Variable_Message_Sign_Components
 		implementation struct Antares_Variable_Speed_Sign : public Advisory_ITS_Components::Implementations::Antares_Advisory_ITS<MasterType,INHERIT(Antares_Variable_Speed_Sign),Variable_Speed_Sign>
 		{
 
-			static void on_double_click(const boost::container::list<void*>& selected,boost::container::vector<pair<string,string>>& attributes,boost::container::vector<boost::container::vector<string>>& dropdowns)
+			static void on_double_click(const std::list<void*>& selected,std::vector<pair<string,string>>& attributes,std::vector<std::vector<string>>& dropdowns)
 			{
 				ComponentType* its_component=(ComponentType*)selected.back();
 
@@ -64,7 +64,7 @@ namespace Variable_Message_Sign_Components
 				attributes.push_back(atts);
 			}
 
-			template<typename TargetType> void Display_Attributes(boost::container::vector<pair<string,string>>& bucket)
+			template<typename TargetType> void Display_Attributes(std::vector<pair<string,string>>& bucket)
 			{
 				pair<string,string> key_value_pair;
 				
@@ -81,7 +81,7 @@ namespace Variable_Message_Sign_Components
 				bucket.push_back(key_value_pair);
 			}
 
-			static bool on_submit(const boost::container::list<void*>& selected,const boost::container::vector<string>& attribute_choices,const boost::container::vector<string>& dropdown_choices)
+			static bool on_submit(const std::list<void*>& selected,const std::vector<string>& attribute_choices,const std::vector<string>& dropdown_choices)
 			{
 				ComponentType* its_component=(ComponentType*)selected.back();
 

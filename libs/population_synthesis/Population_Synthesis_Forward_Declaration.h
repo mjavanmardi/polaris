@@ -1,5 +1,5 @@
 #pragma once
-#include "../Core/Forms.h"
+#include "../core/Forms.h"
 
 namespace PopSyn {
 	namespace Prototypes

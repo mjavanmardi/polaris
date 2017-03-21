@@ -49,7 +49,7 @@ namespace polaris
 	template<typename Component_Manager_Type>
 	static Component_Manager_Type* Add_Component_Manager(Component_Manager_Type* val, size_t component_id)
 	{
-		if(__all_components==nullptr) __all_components=new boost::unordered::unordered_map<size_t, Component_Manager_Base*>();
+		if(__all_components==nullptr) __all_components=new std::unordered_map<size_t, Component_Manager_Base*>();
 		Component_Manager_Type::managed_type::component_id = component_id;
 		(*__all_components)[component_id] = (Component_Manager_Base*)val;
 		return val;
@@ -63,6 +63,9 @@ namespace polaris
 	class Polaris_Component : public ObjectType
 	{
 	public:
+		using ObjectType::_uuid;
+		using ObjectType::_component_id;
+
 		Polaris_Component(int uuid = -1):ObjectType(component_id,uuid){}
 
 		const int uuid(){ return _uuid; }

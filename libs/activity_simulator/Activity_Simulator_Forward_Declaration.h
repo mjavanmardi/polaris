@@ -1,5 +1,5 @@
 #pragma once
-#include "../Core/Forms.h"
+#include "../core/Forms.h"
 namespace Activity_Location_Components {
 	namespace Prototypes
 	{
@@ -164,6 +164,7 @@ namespace Person_Components {
 		template<typename ComponentType> struct Destination_Choice_Option;
 		template<typename ComponentType> struct Mode_Chooser;
 		template<typename ComponentType> struct Mode_Choice_Option;
+		template<typename ComponentType> struct Telecommute_Chooser;
 		template<typename ComponentType> struct Person_Planner;
 		template<typename ComponentType> struct Person_Properties;
 		template<typename ComponentType> struct Person_Perception;
@@ -179,6 +180,7 @@ namespace Household_Components {
 	{
 		template<typename ComponentType> struct Household;
 		template<typename ComponentType> struct Household_Properties;
+		prototype struct Vehicle_Chooser;
 	}
 };
 
@@ -192,6 +194,52 @@ namespace Activity_Components {
 	namespace Prototypes
 	{
 		template<typename ComponentType> struct Activity_Planner;
+	}
+
+	namespace Types
+	{
+		enum FLEXIBILITY_VALUES
+		{
+			LOW_FLEXIBILITY,
+			MODERATE_FLEXIBILITY,
+			HIGH_FLEXIBILITY
+		};
+		enum PLAN_HORIZON_VALUES
+		{
+			ROUTINE,
+			PREPLANNED_OVER_7_DAYS,
+			PREPLANNED_2_TO_7_DAYS,
+			PREPLANNED_PREVIOUS_DAY,
+			PREPLANNED_SAME_DAY,
+			IMPULSIVE
+		};
+		enum ACTIVITY_TYPES
+		{
+			DELETED = -1,
+			EMPTY = -2,
+			WORK_AT_HOME_ACTIVITY = 0,
+			AT_HOME_ACTIVITY,
+			PRIMARY_WORK_ACTIVITY,
+			OTHER_WORK_ACTIVITY,
+			SCHOOL_ACTIVITY,
+			MAJOR_SHOPPING_ACTIVITY,
+			OTHER_SHOPPING_ACTIVITY,
+			SERVICE_VEHICLE_ACTIVITY,
+			HEALTHCARE_ACTIVITY,
+			PERSONAL_BUSINESS_ACTIVITY,
+			ERRANDS_ACTIVITY,
+			PICK_UP_OR_DROP_OFF_ACTIVITY,
+			EAT_OUT_ACTIVITY,
+			RELIGIOUS_OR_CIVIC_ACTIVITY,
+			LEISURE_ACTIVITY,
+			RECREATION_ACTIVITY,
+			SOCIAL_ACTIVITY,
+			CHANGE_TRANSPORTATION_ACTIVITY,
+			OTHER_ACTIVITY,
+			PART_TIME_WORK_ACTIVITY = 22,
+			First= WORK_AT_HOME_ACTIVITY,
+			Last= PART_TIME_WORK_ACTIVITY
+		};
 	}
 };
 namespace Network_Skimming_Components {

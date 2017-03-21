@@ -29,10 +29,10 @@ namespace Traffic_Management_Center_Components
 		{
 		public:
 			typedef std::vector<AdjNode> AdjListRow;
-			typedef boost::unordered::unordered_map<int, AdjListRow> AdjList;
+			typedef std::unordered_map<int, AdjListRow> AdjList;
 			typedef AdjList::const_iterator AdjListIt;
 			typedef AdjListRow::const_iterator AdjListRowIt;
-			typedef boost::container::set<int> NodeContainer;
+			typedef std::set<int> NodeContainer;
 
 			Digraph() {this->v = 0; this->e = 0;}
 			/// Returns number of vertices in the graph. The vertices counting is not cleanly implemented, so the result is not to be trusted
@@ -46,7 +46,7 @@ namespace Traffic_Management_Center_Components
 				adj_node.dir_link_uid = dir_link_uid;
 				adj_node.downstream_node = w;
 				adj[v].push_back(adj_node);
-				adj[w]; // create empty adjacency boost::container::list to keep the Adj consistent
+				adj[w]; // create empty adjacency std::list to keep the Adj consistent
 				e++;
 				all_nodes.insert(v);
 				all_nodes.insert(w);
@@ -92,7 +92,7 @@ namespace Traffic_Management_Center_Components
 			{
 				v = 0;
 				e = 0;
-				// maps a node to a boost::container::vector of 2-tuples. Each tuple corresponds to an adjacent node
+				// maps a node to a std::vector of 2-tuples. Each tuple corresponds to an adjacent node
 				// first element of the tuple contains the node id and the second constrains link cost
 				adj.clear();
 				all_nodes.clear();
@@ -101,7 +101,7 @@ namespace Traffic_Management_Center_Components
 		private:
 			int v;
 			int e;
-			// maps a node to a boost::container::vector of 2-tuples. Each tuple corresponds to an adjacent node
+			// maps a node to a std::vector of 2-tuples. Each tuple corresponds to an adjacent node
 			// first element of the tuple contains the node id and the second constrains link cost
 			AdjList adj;
 			NodeContainer all_nodes;
@@ -111,9 +111,9 @@ namespace Traffic_Management_Center_Components
 		class WeakCC
 		{
 		private:
-			boost::unordered::unordered_map<int, bool> marked;
-			boost::unordered::unordered_map<int, int> component_id;
-			boost::unordered::unordered_map<int, boost::container::vector<int>> link_component;
+			std::unordered_map<int, bool> marked;
+			std::unordered_map<int, int> component_id;
+			std::unordered_map<int, std::vector<int>> link_component;
 			int count;
 			Digraph* g_reverse;
 			void dfs(const Digraph& g, int v)
@@ -141,7 +141,7 @@ namespace Traffic_Management_Center_Components
 			}
 			bool const Marked(const int& v)
 			{
-				boost::unordered::unordered_map<int, bool>::iterator res = marked.find(v);
+				std::unordered_map<int, bool>::iterator res = marked.find(v);
 				if (res == marked.end())
 				{
 					return false;
@@ -186,7 +186,7 @@ namespace Traffic_Management_Center_Components
 				return component_id.at(v);
 			}
 			/// This is the result of the algorithm, a map: component_id -> component_links
-			const boost::unordered::unordered_map<int, boost::container::vector<int> >& LinkComponents() const
+			const std::unordered_map<int, std::vector<int> >& LinkComponents() const
 			{
 				return link_component;
 			}
@@ -232,322 +232,351 @@ namespace Traffic_Management_Center_Components
 			//			  name of the prototype class		variable name					underlying type
 			m_prototype(Network_Event_Components::Prototypes::Network_Event_Manager, typename MasterType::network_event_manager_type, network_event_manager, NONE, NONE);
 
-			m_data(boost::container::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
-			m_data(boost::container::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);
-			m_data(boost::container::vector<Advisory_Radio_Interface*>,advisory_radios, NONE, NONE);
+			m_data(std::vector<Variable_Word_Sign_Interface*>,variable_word_signs, NONE, NONE);
+			m_data(std::vector<Variable_Speed_Sign_Interface*>,variable_speed_signs, NONE, NONE);
+			m_data(std::vector<Advisory_Radio_Interface*>,advisory_radios, NONE, NONE);
 			
-			m_data(boost::container::vector<Depot_Interface*>,depots, NONE, NONE);
-			m_data(boost::container::vector<Link_Control_Interface*>,link_controls, NONE, NONE);
+			m_data(std::vector<Depot_Interface*>,depots, NONE, NONE);
+			m_data(std::vector<Link_Control_Interface*>,link_controls, NONE, NONE);
 
-			m_data(boost::container::vector<Sensor_Interface*>,traffic_sensors, NONE, NONE);
+			m_data(std::vector<Sensor_Interface*>,traffic_sensors, NONE, NONE);
 
-			m_data(boost::container::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
+			m_data(std::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
 
 			//                                          name of the function
-			static void TMC_Conditional(ComponentType* _this,Event_Response& response)
-			{
-				response.next._iteration = iteration() + 5*60;
-				response.next._sub_iteration = 1;
+			static void TMC_Conditional(ComponentType* _this, Event_Response& response);
 
-				//this variable specifies whether the the Event function will be called
-				//response.result = true;
-				
-				_this->TMC_Event();
-			}
+			void TMC_Event();
 
-			void TMC_Event()
-			{
-				Load_New_Events<NT>();
+			void Analyze_Sensors();
 
-				Analyze_Sensors();
+			template<typename TargetType> void Load_New_Events();
 
-				DecideOnEventsToBeDisplayed<NT>();
-			}
+			template<typename TargetType> void DecideOnEventsToBeDisplayed();
 
-			void Analyze_Sensors()
-			{
-				Types::Digraph my_digraph;
-
-				for(typename boost::container::vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin();itr!=_traffic_sensors.end();itr++)
-				{
-					Sensor_Interface* sensor = *itr;
-
-					if( sensor->template Check_Outlier<NT>() )
-					{
-						Link_Interface* covered_link = sensor->template covered_link<Link_Interface*>();
-
-						Intersection<typename MasterType::intersection_type>* intersection;
-						
-						intersection = covered_link->template upstream_intersection<Intersection<typename MasterType::intersection_type>*>();
-
-						int v = intersection->template uuid<int>();
-
-						intersection = covered_link->template downstream_intersection<Intersection<typename MasterType::intersection_type>*>();
-
-						int w = intersection->template uuid<int>();
-
-						int id = covered_link->template dbid<int>();
-
-						my_digraph.addEdge(v,w,id);
-					}
-				}
-
-				Types::WeakCC my_weakcc;
-
-				my_weakcc.Run(my_digraph);
-
-				const boost::unordered::unordered_map<int, boost::container::vector<int> >& link_components = my_weakcc.LinkComponents();
-				boost::container::vector<typename MasterType::link_type*> affected_links;
-				
-				//cout << "Done analyzing, number of congestion events: " << link_components.size() << endl;
-
-				//for(boost::unordered::unordered_map<int, std::vector<int> >::const_iterator map_itr=link_components.begin();map_itr!=link_components.end();map_itr++)
-				//{
-				//	Congestion_Network_Event_Interface* new_event = (Congestion_Network_Event_Interface*)Allocate<Congestion_Network_Event_Interface::ComponentType>();
-
-				//	_tracked_events.push_back((Base_Network_Event_Interface*)new_event);
-
-				//	
-
-				//	boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
-
-				//	for(typename boost::container::vector<int>::const_iterator itr=map_itr->second.begin();itr!=map_itr->second.end();itr++)
-				//	{
-				//		int link = *itr;
-
-				//		if(db_map.count(link))
-				//		{
-				//			boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
-
-				//			typename boost::container::vector<typename type_of(MasterType::link)*>::iterator vitr;
-
-				//			for(vitr=links.begin();vitr!=links.end();vitr++)
-				//			{
-				//				Link_Interface* link = (Link_Interface*)(*vitr);
-				//				affected_links.push_back( *vitr );
-				//				//Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
-
-				//				//// push locations from link to affected locations container
-				//				//for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
-				//				//{
-				//				//	Location_Interface* loc = (*litr);
-				//				//	this->_affected_locations.push_back(loc);
-				//				//	zone_set.insert(loc->template zone<Zone_Interface*>());
-				//				//}
-
-				//			}
-				//		}
-				//	}
-
-				//	new_event->template Initialize<MasterType>(iteration(), iteration() + 5*60, affected_links);
-
-				//	new_event->template Start<NT>();
-
-				//	affected_links.clear();
-				//}
-			}
-
-			template<typename TargetType> void Load_New_Events()
-			{
-				boost::container::vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
-
-				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
-				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-
-				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
-				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-
-				for(typename boost::container::vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
-				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-
-				for(typename boost::container::vector<Depot_Interface*>::iterator itr=_depots.begin();itr!=_depots.end();itr++)
-				{
-					(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-			}
-
-			template<typename TargetType> void DecideOnEventsToBeDisplayed()
-			{
-				boost::container::vector<Base_Network_Event_Interface*> current_events;
-
-				_network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>((boost::container::vector<Weather_Network_Event_Interface*>&)current_events);
-				for(typename boost::container::vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
-				{
-					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
-					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-
-				current_events.clear();
-
-				_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
-				for(typename boost::container::vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
-				{
-					//boost::container::vector<Base_Network_Event_Interface*> events_to_display;
-					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-				}
-			}
-
-			template<typename TargetType> void Initialize()
-			{
-				this_component()->template Read_Database<TargetType>();
-
-				Load_Event<ComponentType>(&ComponentType::TMC_Conditional, 0, 1);
-			}
+			template<typename TargetType> void Initialize();
 
 			/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector
-			void Train_Detectors(unique_ptr<odb::database>& db, boost::unordered::unordered_map<int, Detector1DU<double> >& out_link_detectors)
-			{
-				using namespace odb;
-				using namespace polaris::io;
+			void Train_Detectors(unique_ptr<odb::database>& db, std::unordered_map<int, Detector1DU<double> >& out_link_detectors);
 
-				int id;
-				Detector1DU<double> detector;
-				boost::container::vector<double> training_data;
-
-				result<LinkMOE> rmoe(db->template query<LinkMOE>(query<LinkMOE>::true_expr));
-
-				
-				for (auto it = (rmoe.begin()); it!= rmoe.end(); ++it  )
-				{
-					id = it->getLink_Uid();
-					auto it_ld = out_link_detectors.find(id);
-
-
-					if (it_ld == out_link_detectors.end())
-					{
-						detector.Clear();
-						detector.Update(it->getLink_Density());
-						out_link_detectors[id] = detector;
-					}
-					else
-					{
-						it_ld->second.Update(it->getLink_Density());
-					}
-				}
-			}
-
-			template<typename TargetType> void Read_Database()
-			{
-				using namespace odb;
-				using namespace polaris::io;
-				
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
-
-				unique_ptr<database> db (open_sqlite_database (db_name));
-				
-				session s;
-
-				transaction t(db->begin());
-
-				cout << "Reading Components" << endl;
-
-				
-				cout << "\tVSS" << endl;
-
-				result<VSS> vss_component_result=db->template query<VSS>(query<VSS>::true_expr);
-				
-				Variable_Speed_Sign_Interface::template Initialize_Type<NT>();
-
-				for(typename result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
-				{
-					Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<typename Variable_Speed_Sign_Interface::Component_Type>();
-					its_component->template Initialize< VSS& >( *db_itr );
-					_variable_speed_signs.push_back(its_component);				
-				}
-				
-
-				cout << "\tVWS" << endl;
-
-				result<VMS> vws_component_result=db->template query<VMS>(query<VMS>::true_expr);
-
-				Variable_Word_Sign_Interface::template Initialize_Type<NT>();
-
-				for(typename result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
-				{
-					Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<typename Variable_Word_Sign_Interface::Component_Type>();
-					its_component->template Initialize< VMS& >( *db_itr );
-					_variable_word_signs.push_back(its_component);				
-				}
-
-
-				cout << "\tHAR" << endl;
-
-				result<HAR> har_component_result=db->template query<HAR>(query<HAR>::true_expr);
-
-				Advisory_Radio_Interface::template Initialize_Type<NT>();
-
-				for(typename result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
-				{
-					Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<typename Advisory_Radio_Interface::Component_Type>();
-					its_component->Initialize< HAR& >( *db_itr );
-					_advisory_radios.push_back(its_component);				
-				}
-
-
-				cout << "\tDepot" << endl;
-
-				result<polaris::io::Depot> depot_component_result=db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
-
-				Depot_Interface::template Initialize_Type<NT>();
-
-				for(typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
-				{
-					Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
-					its_component->template Initialize< polaris::io::Depot& >( *db_itr );
-					_depots.push_back(its_component);				
-				}
-
-
-				cout << "\tLink Control" << endl;
-
-				result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
-
-				Link_Control_Interface::template Initialize_Type<NT>();
-
-				for(typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
-				{
-					Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
-					its_component->template Initialize< OpenShoulder& >( *db_itr );
-					_link_controls.push_back(its_component);				
-				}
-
-				//cout << "\tDetectors" << endl;
-
-				//boost::unordered::unordered_map<int, Detector1DU<double> > link_detectors;
-
-				//Train_Detectors(db, link_detectors);
-
-				//cout << "\tSensor" << endl;
-
-				//result<Fixed_Sensor> sensor_component_result=db->template query<Fixed_Sensor>(query<Fixed_Sensor>::true_expr);
-
-				//Sensor_Interface::template Initialize_Type<NT>();
-
-				//for(typename result<Fixed_Sensor>::iterator db_itr = sensor_component_result.begin (); db_itr != sensor_component_result.end (); ++db_itr)
-				//{
-				//	Sensor_Interface* its_component = (Sensor_Interface*)Allocate<typename Sensor_Interface::Component_Type>();
-				//	
-				//	its_component->template Initialize< Fixed_Sensor& >( *db_itr );
-
-				//	its_component->template Attach_Detector< boost::unordered::unordered_map<int, Detector1DU<double> >& >( link_detectors );
-
-				//	_traffic_sensors.push_back(its_component);				
-				//}
-
-				//cout << "Done Reading" << endl;
-			}
+			template<typename TargetType> void Read_Database();
 
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		void Simple_TMC<MasterType, InheritanceList>::TMC_Conditional(ComponentType* _this, Event_Response& response)
+		{
+			response.next._iteration = iteration() + 5 * 60;
+			response.next._sub_iteration = 1;
+
+			//this variable specifies whether the the Event function will be called
+			//response.result = true;
+
+			_this->TMC_Event();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Simple_TMC<MasterType, InheritanceList>::TMC_Event()
+		{
+			Load_New_Events<NT>();
+
+			Analyze_Sensors();
+
+			DecideOnEventsToBeDisplayed<NT>();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Simple_TMC<MasterType, InheritanceList>::Analyze_Sensors()
+		{
+			Types::Digraph my_digraph;
+
+			for (typename std::vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin(); itr != _traffic_sensors.end(); itr++)
+			{
+				Sensor_Interface* sensor = *itr;
+
+				if (sensor->template Check_Outlier<NT>())
+				{
+					Link_Interface* covered_link = sensor->template covered_link<Link_Interface*>();
+
+					Intersection<typename MasterType::intersection_type>* intersection;
+
+					intersection = covered_link->template upstream_intersection<Intersection<typename MasterType::intersection_type>*>();
+
+					int v = intersection->template uuid<int>();
+
+					intersection = covered_link->template downstream_intersection<Intersection<typename MasterType::intersection_type>*>();
+
+					int w = intersection->template uuid<int>();
+
+					int id = covered_link->template dbid<int>();
+
+					my_digraph.addEdge(v, w, id);
+				}
+			}
+
+			Types::WeakCC my_weakcc;
+
+			my_weakcc.Run(my_digraph);
+
+			const std::unordered_map<int, std::vector<int> >& link_components = my_weakcc.LinkComponents();
+			std::vector<typename MasterType::link_type*> affected_links;
+
+			//cout << "Done analyzing, number of congestion events: " << link_components.size() << endl;
+
+			//for(std::unordered_map<int, std::vector<int> >::const_iterator map_itr=link_components.begin();map_itr!=link_components.end();map_itr++)
+			//{
+			//	Congestion_Network_Event_Interface* new_event = (Congestion_Network_Event_Interface*)Allocate<Congestion_Network_Event_Interface::ComponentType>();
+
+			//	_tracked_events.push_back((Base_Network_Event_Interface*)new_event);
+
+			//	
+
+			//	std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+
+			//	for(typename std::vector<int>::const_iterator itr=map_itr->second.begin();itr!=map_itr->second.end();itr++)
+			//	{
+			//		int link = *itr;
+
+			//		if(db_map.count(link))
+			//		{
+			//			std::vector<typename MasterType::link_type*>& links=db_map[link];
+
+			//			typename std::vector<typename type_of(MasterType::link)*>::iterator vitr;
+
+			//			for(vitr=links.begin();vitr!=links.end();vitr++)
+			//			{
+			//				Link_Interface* link = (Link_Interface*)(*vitr);
+			//				affected_links.push_back( *vitr );
+			//				//Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
+
+			//				//// push locations from link to affected locations container
+			//				//for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+			//				//{
+			//				//	Location_Interface* loc = (*litr);
+			//				//	this->_affected_locations.push_back(loc);
+			//				//	zone_set.insert(loc->template zone<Zone_Interface*>());
+			//				//}
+
+			//			}
+			//		}
+			//	}
+
+			//	new_event->template Initialize<MasterType>(iteration(), iteration() + 5*60, affected_links);
+
+			//	new_event->template Start<NT>();
+
+			//	affected_links.clear();
+			//}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_TMC<MasterType, InheritanceList>::Load_New_Events()
+		{
+			std::vector<Base_Network_Event_Interface*> current_events;
+			_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
+
+			for (typename std::vector<Advisory_Radio_Interface*>::iterator itr = _advisory_radios.begin(); itr != _advisory_radios.end(); itr++)
+			{
+				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+
+			for (typename std::vector<Variable_Word_Sign_Interface*>::iterator itr = _variable_word_signs.begin(); itr != _variable_word_signs.end(); itr++)
+			{
+				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+
+			for (typename std::vector<Variable_Speed_Sign_Interface*>::iterator itr = _variable_speed_signs.begin(); itr != _variable_speed_signs.end(); itr++)
+			{
+				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+
+			for (typename std::vector<Depot_Interface*>::iterator itr = _depots.begin(); itr != _depots.end(); itr++)
+			{
+				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_TMC<MasterType, InheritanceList>::DecideOnEventsToBeDisplayed()
+		{
+			std::vector<Base_Network_Event_Interface*> current_events;
+
+			_network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>((std::vector<Weather_Network_Event_Interface*>&)current_events);
+			for (typename std::vector<Advisory_Radio_Interface*>::iterator itr = _advisory_radios.begin(); itr != _advisory_radios.end(); itr++)
+			{
+				//std::vector<Base_Network_Event_Interface*> events_to_display;
+				//some calculations here
+				(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+
+			current_events.clear();
+
+			_network_event_manager->template Get_Network_Events<typename MasterType::base_network_event_type>(current_events);
+			for (typename std::vector<Variable_Word_Sign_Interface*>::iterator itr = _variable_word_signs.begin(); itr != _variable_word_signs.end(); itr++)
+			{
+				//std::vector<Base_Network_Event_Interface*> events_to_display;
+				//some calculations here
+				(*itr)->template Push_Displayed_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_TMC<MasterType, InheritanceList>::Initialize()
+		{
+			this_component()->template Read_Database<TargetType>();
+
+			this->template Load_Event<ComponentType>(&ComponentType::TMC_Conditional, 0, 1);
+		}
+
+		/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector
+		template<typename MasterType, typename InheritanceList>
+		void Simple_TMC<MasterType, InheritanceList>::Train_Detectors(unique_ptr<odb::database>& db, std::unordered_map<int, Detector1DU<double> >& out_link_detectors)
+		{
+			using namespace odb;
+			using namespace polaris::io;
+
+			int id;
+			Detector1DU<double> detector;
+			std::vector<double> training_data;
+
+			result<LinkMOE> rmoe(db->template query<LinkMOE>(query<LinkMOE>::true_expr));
+
+
+			for (auto it = (rmoe.begin()); it != rmoe.end(); ++it)
+			{
+				id = it->getLink_Uid();
+				auto it_ld = out_link_detectors.find(id);
+
+
+				if (it_ld == out_link_detectors.end())
+				{
+					detector.Clear();
+					detector.Update(it->getLink_Density());
+					out_link_detectors[id] = detector;
+				}
+				else
+				{
+					it_ld->second.Update(it->getLink_Density());
+				}
+			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Simple_TMC<MasterType, InheritanceList>::Read_Database()
+		{
+			using namespace odb;
+			using namespace polaris::io;
+
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+
+			unique_ptr<database> db(open_sqlite_database(db_name));
+
+			session s;
+
+			transaction t(db->begin());
+
+			cout << "Reading Components" << endl;
+
+
+			cout << "\tVSS" << endl;
+
+			result<VSS> vss_component_result = db->template query<VSS>(query<VSS>::true_expr);
+
+			Variable_Speed_Sign_Interface::template Initialize_Type<NT>();
+
+			for (typename result<VSS>::iterator db_itr = vss_component_result.begin(); db_itr != vss_component_result.end(); ++db_itr)
+			{
+				Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<typename Variable_Speed_Sign_Interface::Component_Type>();
+				its_component->template Initialize< VSS& >(*db_itr);
+				_variable_speed_signs.push_back(its_component);
+			}
+
+
+			cout << "\tVWS" << endl;
+
+			result<VMS> vws_component_result = db->template query<VMS>(query<VMS>::true_expr);
+
+			Variable_Word_Sign_Interface::template Initialize_Type<NT>();
+
+			for (typename result<VMS>::iterator db_itr = vws_component_result.begin(); db_itr != vws_component_result.end(); ++db_itr)
+			{
+				Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<typename Variable_Word_Sign_Interface::Component_Type>();
+				its_component->template Initialize< VMS& >(*db_itr);
+				_variable_word_signs.push_back(its_component);
+			}
+
+
+			cout << "\tHAR" << endl;
+
+			result<HAR> har_component_result = db->template query<HAR>(query<HAR>::true_expr);
+
+			Advisory_Radio_Interface::template Initialize_Type<NT>();
+
+			for (typename result<HAR>::iterator db_itr = har_component_result.begin(); db_itr != har_component_result.end(); ++db_itr)
+			{
+				Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<typename Advisory_Radio_Interface::Component_Type>();
+				its_component->Initialize< HAR& >(*db_itr);
+				_advisory_radios.push_back(its_component);
+			}
+
+
+			cout << "\tDepot" << endl;
+
+			result<polaris::io::Depot> depot_component_result = db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
+
+			Depot_Interface::template Initialize_Type<NT>();
+
+			for (typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin(); db_itr != depot_component_result.end(); ++db_itr)
+			{
+				Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
+				its_component->template Initialize< polaris::io::Depot& >(*db_itr);
+				_depots.push_back(its_component);
+			}
+
+
+			cout << "\tLink Control" << endl;
+
+			result<OpenShoulder> link_control_component_result = db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
+
+			Link_Control_Interface::template Initialize_Type<NT>();
+
+			for (typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin(); db_itr != link_control_component_result.end(); ++db_itr)
+			{
+				Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
+				its_component->template Initialize< OpenShoulder& >(*db_itr);
+				_link_controls.push_back(its_component);
+			}
+
+			//cout << "\tDetectors" << endl;
+
+			//std::unordered_map<int, Detector1DU<double> > link_detectors;
+
+			//Train_Detectors(db, link_detectors);
+
+			//cout << "\tSensor" << endl;
+
+			//result<Fixed_Sensor> sensor_component_result=db->template query<Fixed_Sensor>(query<Fixed_Sensor>::true_expr);
+
+			//Sensor_Interface::template Initialize_Type<NT>();
+
+			//for(typename result<Fixed_Sensor>::iterator db_itr = sensor_component_result.begin (); db_itr != sensor_component_result.end (); ++db_itr)
+			//{
+			//	Sensor_Interface* its_component = (Sensor_Interface*)Allocate<typename Sensor_Interface::Component_Type>();
+			//	
+			//	its_component->template Initialize< Fixed_Sensor& >( *db_itr );
+
+			//	its_component->template Attach_Detector< std::unordered_map<int, Detector1DU<double> >& >( link_detectors );
+
+			//	_traffic_sensors.push_back(its_component);				
+			//}
+
+			//cout << "Done Reading" << endl;
+		}
 	}
 }
 

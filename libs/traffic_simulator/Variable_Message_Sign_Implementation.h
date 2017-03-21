@@ -36,12 +36,12 @@ namespace Variable_Message_Sign_Components
 
 				//shared_ptr<LinkList> link_list = instance.getLinks();
 
-				//const boost::container::vector<int>& links = (*link_list).getLinks();
+				//const std::vector<int>& links = (*link_list).getLinks();
 
 				std::vector<int> links;
 				links.push_back(instance.getLink());
 
-				//Simple_Advisory_ITS::template Initialize<const boost::container::vector<int>&>(links);
+				//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
 				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Speed_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
 			}
 		};
@@ -55,7 +55,7 @@ namespace Variable_Message_Sign_Components
 				std::vector<int> links;
 				links.push_back(instance.getLink());
 
-				//Simple_Advisory_ITS::template Initialize<const boost::container::vector<int>&>(links);
+				//Simple_Advisory_ITS::template Initialize<const std::vector<int>&>(links);
 				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,INHERIT(Variable_Word_Sign)>*)this)->template Initialize<const std::vector<int>&>(links);
 			}
 		};

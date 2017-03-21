@@ -37,7 +37,7 @@ namespace Intersection_Control_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Phase_Movement
+		prototype struct Phase_Movement ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -45,7 +45,7 @@ namespace Intersection_Control_Components
 			accessor(movement_priority_type, NONE, NONE);
 		};
 
-		prototype struct Phase
+		prototype struct Phase ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -81,7 +81,7 @@ namespace Intersection_Control_Components
 			accessor(turn_movements_in_the_phase_array, NONE, NONE);
 		};
 
-		prototype struct Approach
+		prototype struct Approach ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			
@@ -91,7 +91,7 @@ namespace Intersection_Control_Components
 			accessor(green_cycle_ratio, NONE, NONE);
 		};
 
-		prototype struct Control_Plan
+		prototype struct Control_Plan ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -127,7 +127,7 @@ namespace Intersection_Control_Components
 		using namespace Intersection_Control_Components::Types;
 		using namespace Turn_Movement_Components::Types;
 		
-		prototype struct Intersection_Control
+		prototype struct Intersection_Control ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -651,9 +651,9 @@ namespace Intersection_Control_Components
 				}
 
 				float lost_time = 0.0f;
-				boost::container::vector<_Link_Interface*> critical_link_array; 
-				boost::container::vector<int> critical_link_queue_length_array;
-				boost::container::vector<int> critical_link_discharge_time_array;
+				std::vector<_Link_Interface*> critical_link_array; 
+				std::vector<int> critical_link_queue_length_array;
+				std::vector<int> critical_link_discharge_time_array;
 
 				critical_link_array.resize(num_phases);
 				critical_link_queue_length_array.resize(num_phases);

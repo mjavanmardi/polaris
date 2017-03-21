@@ -11,7 +11,7 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Implementations
 	{
-		implementation struct Choice_Option_Base : public Polaris_Component<MT,INHERIT(Choice_Option_Base),Data_Object>
+		define_implementation struct Choice_Option_Base : public Polaris_Component<MT,INHERIT(Choice_Option_Base),Data_Object>
 		{
 			virtual double Calculate_Utility() = 0;
 			virtual void Print_Utility() = 0;
@@ -20,7 +20,7 @@ namespace Choice_Model_Components
 			m_data(double, choice_probability, NONE, NONE);
 		};
 
-		implementation struct Nested_Choice_Option_Base : public Choice_Option_Base<MT,INHERIT(Nested_Choice_Option_Base)>
+		define_implementation struct Nested_Choice_Option_Base : public Choice_Option_Base<MT,INHERIT(Nested_Choice_Option_Base)>
 		{
 			typedef true_type Nested_Logit_Model_tag;
 			m_prototype_container(std::vector<Prototypes::Choice_Option<Nested_Choice_Option_Base<NT>>*>,Nested_Choice_Option_Base<NT>,sub_choice_options, NONE, NONE);
@@ -44,7 +44,7 @@ namespace Choice_Model_Components
 			m_container(std::vector<double>,choice_probabilities, NONE, NONE);
 		};
 
-		implementation struct Nested_Logit_Model_Implementation : public Polaris_Component<MT,INHERIT(Nested_Logit_Model_Implementation),Data_Object>
+		implementation struct NL_Model_Implementation : public Polaris_Component<MT,INHERIT(NL_Model_Implementation),Data_Object>
 		{
 			typedef true_type Nested_Logit_Model_tag;
 			typedef true_type Probabilistic_Choice_tag;

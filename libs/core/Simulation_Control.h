@@ -12,16 +12,16 @@ namespace polaris
 	/// Global Accessors
 	///----------------------------------------------------------------------------------------------------
 
-	inline unsigned int num_iterations();
-	inline unsigned int num_sim_threads();
-	inline unsigned int num_threads();
-	inline unsigned int num_antares_threads();
-	inline unsigned int execution_segments_per_thread();
-	inline unsigned int execution_objects_per_block();
-	inline unsigned int max_execution_objects_per_block();
-	inline unsigned int max_free_blocks();
-	inline unsigned int num_free_blocks_buffer();
-	inline long long preallocation_bytes();
+	static unsigned int num_iterations();
+	static unsigned int num_sim_threads();
+	static unsigned int num_threads();
+	static unsigned int num_antares_threads();
+	static unsigned int execution_segments_per_thread();
+	static unsigned int execution_objects_per_block();
+	static unsigned int max_execution_objects_per_block();
+	static unsigned int max_free_blocks();
+	static unsigned int num_free_blocks_buffer();
+	static long long preallocation_bytes();
 
 	typedef Basic_Units::Time_Variables::Time_Seconds Simulation_Timestep_Increment;
 
@@ -71,12 +71,12 @@ namespace polaris
 		virtual void Terminate() = 0;
 		virtual Component_Manager_Types Component_Manager_Type(){ return NULL_MANAGER; }
 
-		boost::unordered::unordered_map<int,pair<int,void(NULLTYPE::*)(void)>> function_map;
-		boost::unordered_map<int,void*>* _object_repository;
+		std::unordered_map<int,pair<int,void(NULLTYPE::*)(void)>> function_map;
+		std::unordered_map<int,void*>* _object_repository;
 	};
 
 	extern int __component_counter;
-	extern boost::unordered::unordered_map<size_t,Component_Manager_Base*>* __all_components;
+	extern std::unordered_map<size_t,Component_Manager_Base*>* __all_components;
 
 	///----------------------------------------------------------------------------------------------------
 	/// INITIALIZE_SIMULATION macro which must be called to initialize the simulation
@@ -85,7 +85,7 @@ namespace polaris
 	#define INITIALIZE_SIMULATION(CONFIGURATION_OBJECT)\
 		_world = new World();\
 		_world->Initialize(CONFIGURATION_OBJECT);\
-		for(boost::unordered::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++){ (itr->second)->Initialize(); }
+		for(std::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++){ (itr->second)->Initialize(); }
 
 	///----------------------------------------------------------------------------------------------------
 	/// TERMINATE_SIMULATION macro which must be called to clean up the simulation
@@ -94,7 +94,7 @@ namespace polaris
 	#define TERMINATE_SIMULATION()\
 		_world->Terminate();\
 		delete _world;\
-		for(boost::unordered::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++) (itr->second)->Terminate();
+		for(std::unordered_map<size_t,Component_Manager_Base*>::iterator itr=__all_components->begin();itr!=__all_components->end();itr++) (itr->second)->Terminate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// START macro which must be called to begin the simulation
@@ -136,9 +136,9 @@ namespace polaris
 	/// Global Simulation State Accessors
 	///----------------------------------------------------------------------------------------------------
 
-	inline int iteration();
-	inline int sub_iteration();
-	inline const Revision& revision();
+	static int iteration();
+	static int sub_iteration();
+	static const Revision& revision();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Global event step tracking variables

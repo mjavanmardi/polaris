@@ -17,7 +17,7 @@ namespace Advisory_ITS_Components
 			{
 				using namespace polaris::io;
 
-				boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+				std::unordered_map<int,std::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<std::unordered_map<int,std::vector<typename MasterType::link_type*>>&>();
 
 				for(typename std::vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -25,9 +25,9 @@ namespace Advisory_ITS_Components
 
 					if(db_map.count(link))
 					{
-						boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
+						std::vector<typename MasterType::link_type*>& links=db_map[link];
 
-						typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
+						typename std::vector<typename MasterType::link_type*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -43,30 +43,30 @@ namespace Advisory_ITS_Components
 			{
 			}
 
-			template<typename TargetType> void Accept_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
+			template<typename TargetType> void Accept_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
 			{
 				_current_events.clear();
 
-				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
 				{
 					_current_events.push_back( *itr );
 				}
 			}
 
-			template<typename TargetType> void Accept_Displayed_Network_Events(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
+			template<typename TargetType> void Accept_Displayed_Network_Events(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>& network_events)
 			{
 				_displayed_events.clear();
-				for (typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
+				for (typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
 				{
 					_displayed_events.push_back( *itr );
 				}
 			}
 			
-			template<typename TargetType> void Get_Displayed_Messages(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
+			template<typename TargetType> void Get_Displayed_Messages(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
 				const int target_component_id = (int)TargetType::component_id;
 
-				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
+				for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
 					if( (*itr)->_component_id == target_component_id )
 					{
@@ -75,31 +75,31 @@ namespace Advisory_ITS_Components
 				}
 			}
 			
-			template<typename TargetType> void Get_Displayed_Messages(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(TargetType,check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
+			template<typename TargetType> void Get_Displayed_Messages(std::vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(TargetType,check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
-				for(typename boost::container::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
+				for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
 					bucket.push_back( *itr );
 				}
 			}
 
-			//template<typename TargetType> void Get_Displayed_Messages(boost::container::vector<Network_Event<TargetType>*>& bucket,requires(TargetType,!check(strip_modifiers(TargetType),Is_Polaris_Component)))
+			//template<typename TargetType> void Get_Displayed_Messages(std::vector<Network_Event<TargetType>*>& bucket,requires(TargetType,!check(strip_modifiers(TargetType),Is_Polaris_Component)))
 			//{
 			//	static_assert(false,"TargetType is not a Polaris Component!");
 			//}
 
-			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
-			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, displayed_events, NONE, NONE);
+			m_data(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, current_events, NONE, NONE);
+			m_data(std::vector<Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type>*>, displayed_events, NONE, NONE);
 			
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
-			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
+			m_data(std::vector<Link_Interface*>,covered_links, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::traffic_management_center_type,traffic_management_center, NONE, NONE);
 
-			//static m_data(boost::container::vector<string>, component_keys, NONE, NONE);
+			//static m_data(std::vector<string>, component_keys, NONE, NONE);
 		};
 
 		//template<typename MasterType,typename InheritanceList>
-		//boost::container::vector<string> Simple_Advisory_ITS<MasterType,InheritanceList>::_component_keys;
+		//std::vector<string> Simple_Advisory_ITS<MasterType,InheritanceList>::_component_keys;
 	}
 }

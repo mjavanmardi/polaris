@@ -96,11 +96,11 @@ namespace Network_Skimming_Components
 			//=============================================
 			// Interface typedefs
 			//---------------------------------------------
-			typedef Prototypes::LOS<typename remove_pointer< typename get_type_of(skim_table)::value_type>::type> los_value_itf;
-			typedef Multidimensional_Random_Access_Array< typename get_type_of(skim_table),los_value_itf*> skim_table_itf;
+			typedef Prototypes::LOS<typename remove_pointer< typename type_of(skim_table)::value_type>::type> los_value_itf;
+			typedef Multidimensional_Random_Access_Array< type_of(skim_table),los_value_itf*> skim_table_itf;
 
-			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
-			typedef Prototypes::Network_Skimming<typename type_of(skim_reference)> skimmer_itf;
+			typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
+			typedef Prototypes::Network_Skimming<type_of(skim_reference)> skimmer_itf;
 			typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::mapped_type>::type> zone_itf;
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
 
@@ -127,8 +127,8 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			template<typename TargetType> void Initialize()
 			{
-				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
-				network_itf* network = this->network_reference<  network_itf*>();
+				typedef typename matrix<typename MasterType::los_value_type*>::size_type size_t;
+				network_itf* network = this->template network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
 				// This is not needed as we use the copy function in the initializer below which automatically resizes the array
@@ -145,14 +145,14 @@ namespace Network_Skimming_Components
 			{
 				this->template Initialize<NT>();
 
-				typedef matrix<typename MasterType::los_value_type*>::size_type size_t;
-				network_itf* network = this->network_reference<  network_itf*>();
+				typedef typename matrix<typename MasterType::los_value_type*>::size_type size_t;
+				network_itf* network = this->template network_reference<  network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
 				this->_skim_table.Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), initial_data);
 
 				// initialize the travel time sorters with the initial data
-				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
+				for (auto o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
 				{
 					zone_itf* orig_zone = (zone_itf*)o_itr->second;
 					int o_index = orig_zone->template internal_id<int>();
@@ -160,15 +160,15 @@ namespace Network_Skimming_Components
 					this->_auto_travel_time_sorter[o_index].clear();
 					this->_transit_travel_time_sorter[o_index].clear();
 
-					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
+					for (auto d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
 					{
 						zone_itf* dest_zone = (zone_itf*)d_itr->second;
 						int d_index = dest_zone->template internal_id<int>();
 						int d_id = dest_zone->template uuid<int>();
 
-						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
-						float auto_ttime = los->auto_ttime<Time_Minutes>();
-						float transit_ttime = los->transit_ttime<Time_Minutes>();
+						los_itf* los = this->template Get_LOS<int,los_itf*>(o_index,d_index);
+						float auto_ttime = los->template auto_ttime<Time_Minutes>();
+						float transit_ttime = los->template transit_ttime<Time_Minutes>();
 
 						this->_auto_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(auto_ttime,(unsigned short)d_id/*d_index*/));
 						this->_transit_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(transit_ttime,(unsigned short)d_id/*d_index*/));
@@ -181,17 +181,17 @@ namespace Network_Skimming_Components
 			{
 				// get the network and network element references
 				typedef Prototypes::LOS<typename remove_pointer< typename type_of(skim_table)::value_type>::type> los_value_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(skim_table),los_value_itf*> skim_table_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(skim_table),los_value_itf*> skim_table_itf;
 
-				typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
-				typedef Prototypes::Network_Skimming<typename type_of(skim_reference)> skimmer_itf;
+				typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
+				typedef Prototypes::Network_Skimming<type_of(skim_reference)> skimmer_itf;
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(zone_origins_count),int> zone_location_count_itf;
 				
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container)> locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(locations_itf)> location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_itf)> location_itf;
 				
 				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 				
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
@@ -199,14 +199,14 @@ namespace Network_Skimming_Components
 				network_itf* network = this->network_reference<  network_itf*>();
 				skimmer_itf* skim = this->skim_reference<  skimmer_itf*>();
 				locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
-				zones_itf* zones_container = network->zones_container<zones_itf*>();
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 				
 				// origin to zone / destination to zone mappings
 				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> origin_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> origin_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(origin_locations_itf)> origin_location_itf;
 				
 				typedef Random_Access_Sequence<typename skimmer_itf::get_type_of(origin_locations)> destination_locations_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(origin_locations_itf)> destination_location_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(origin_locations_itf)> destination_location_itf;
 				
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();
 				destination_locations_itf* destination_locations = skim->template destination_locations<destination_locations_itf*>();		
@@ -217,7 +217,7 @@ namespace Network_Skimming_Components
 
 				// get reference to the routers used to create path-trees from each origin
 				typedef Pair_Associative_Container<typename skimmer_itf::get_type_of(path_trees_container)> path_trees_itf;
-				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(path_trees_itf)> path_tree_itf;
+				typedef Routing_Components::Prototypes::Routing<get_mapped_component_type(path_trees_itf)> path_tree_itf;
 				
 				path_trees_itf* trees_container = skim->template path_trees_container<path_trees_itf*>();
 				typename path_trees_itf::iterator tree_itr = trees_container->begin();	
@@ -237,8 +237,8 @@ namespace Network_Skimming_Components
 					{
 						for (int j=0; j<(int)dims.second; ++j)
 						{
-							los_old[pair<size_t,size_t>(i,j)] = ((los_value_itf*)((*los)[pair<size_t,size_t>(i,j)]))->auto_ttime<Stored_Time_Type>();
-							((los_value_itf*)((*los)[pair<size_t,size_t>(i,j)]))->auto_ttime<Stored_Time_Type>(0.0);
+							los_old[pair<size_t,size_t>(i,j)] = ((los_value_itf*)((*los)[pair<size_t,size_t>(i,j)]))->template auto_ttime<Stored_Time_Type>();
+							((los_value_itf*)((*los)[pair<size_t,size_t>(i,j)]))->template auto_ttime<Stored_Time_Type>(0.0);
 						}
 					}
 				//}
@@ -261,13 +261,13 @@ namespace Network_Skimming_Components
 
 					// get the origin activity location from the stored index in the route-tree map item
 					origin_location_itf* orig_loc = origin_locations->at(orig_index);
-					int orig_zone_index = orig_loc->zone<zone_itf*>()->template internal_id<int>();
+					int orig_zone_index = orig_loc->template zone<zone_itf*>()->template internal_id<int>();
 
 					// search each link for required links from destination_map and update LOS table with the results
 					for (dest_itr = destination_locations->begin(); dest_itr !=destination_locations->end(); ++dest_itr)
 					{
 						destination_location_itf* dest_node = *dest_itr;
-						int dest_zone_index = dest_node->zone<zone_itf*>()->template internal_id<int>();
+						int dest_zone_index = dest_node->template zone<zone_itf*>()->template internal_id<int>();
 
 						long dest_link_index = (*(dest_node->template destination_links<links_itf*>()->begin()))->template internal_id<long>();
 						long dest_link_id = (*(dest_node->template destination_links<links_itf*>()->begin()))->template uuid<long>();
@@ -275,8 +275,8 @@ namespace Network_Skimming_Components
 						link_itf* dest_link = network->template links_container<links_itf&>()[dest_link_index];
 						
 						// calculate weight based on number of routed od pairs as not all o/d zones will have the full number of origin/destination locations
-						zone_origin_count_itr = skim->template zone_origins_count<zone_location_count_itf&>().find(orig_loc->zone<zone_itf*>()->template internal_id<int>());
-						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->zone<zone_itf*>()->template internal_id<int>());
+						zone_origin_count_itr = skim->template zone_origins_count<zone_location_count_itf&>().find(orig_loc->template zone<zone_itf*>()->template internal_id<int>());
+						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_node->template zone<zone_itf*>()->template internal_id<int>());
 						float weight = 1.0 / ((float)zone_origin_count_itr->second * (float)zone_destination_count_itr->second);
 
 						// ignore location pairs where no valid route was found travel time over 10 days
@@ -304,16 +304,16 @@ namespace Network_Skimming_Components
 							sum_of_weight += time_old;
 							float dev = time_old > 0.0 ? (time-time_old)/time_old : 0.0;
 							if (dev > max_dev) max_dev = dev;
-							float tmp = ((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>();
+							float tmp = ((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>();
 							tmp += (0.75 * time+ 0.25 * time_old)*weight;
-							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
+							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
 						}
 						// otherwise, just add current weighted value
 						else
 						{
-							float tmp = ((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>();
+							float tmp = ((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>();
 							tmp += time*weight;
-							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
+							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
 						}
 					}
 				}
@@ -341,7 +341,7 @@ namespace Network_Skimming_Components
 
 
 				// update the travel time sorters with the initial data
-				for (zones_itf::iterator o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
+				for (auto o_itr=zones_container->begin(); o_itr!=zones_container->end(); ++o_itr)
 				{
 					zone_itf* orig_zone = (zone_itf*)(o_itr->second);
 					int o_index = orig_zone->template internal_id<int>();
@@ -349,19 +349,19 @@ namespace Network_Skimming_Components
 					this->_auto_travel_time_sorter[o_index].clear();
 					this->_transit_travel_time_sorter[o_index].clear();
 
-					for (zones_itf::iterator d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
+					for (auto d_itr=zones_container->begin(); d_itr!=zones_container->end(); ++d_itr)
 					{
 						zone_itf* dest_zone = (zone_itf*)(d_itr->second);
 						int d_index = dest_zone->template internal_id<int>();
 
 						los_itf* los = this->Get_LOS<int,los_itf*>(o_index,d_index);
-						float auto_ttime = los->auto_ttime<Time_Minutes>();
-						float transit_ttime = los->transit_ttime<Time_Minutes>();
+						float auto_ttime = los->template auto_ttime<Time_Minutes>();
+						float transit_ttime = los->template transit_ttime<Time_Minutes>();
 
 						/*this->_auto_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(auto_ttime,dest_zone));
 						this->_transit_travel_time_sorter[o_index].push_back(pair<float,zone_itf*>(transit_ttime,dest_zone));*/
-						this->_auto_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(auto_ttime,dest_zone->uuid<unsigned short>()));
-						this->_transit_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(transit_ttime,dest_zone->uuid<unsigned short>()));
+						this->_auto_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(auto_ttime,dest_zone->template uuid<unsigned short>()));
+						this->_transit_travel_time_sorter[o_index].push_back(pair<float,unsigned short>(transit_ttime,dest_zone->template uuid<unsigned short>()));
 					}
 
 					sort(this->_auto_travel_time_sorter[o_index].begin(), this->_auto_travel_time_sorter[o_index].end(), Pair_Comparer<float,unsigned short>);
@@ -373,13 +373,13 @@ namespace Network_Skimming_Components
 			template<typename TargetType> void Write_LOS()
 			{
 				typedef Prototypes::LOS<typename remove_pointer< typename type_of(skim_table)::value_type>::type> los_value_itf;
-				typedef Multidimensional_Random_Access_Array< typename type_of(skim_table),los_value_itf*> skim_table_itf;
+				typedef Multidimensional_Random_Access_Array< type_of(skim_table),los_value_itf*> skim_table_itf;
 
-				typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
+				typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
 				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type> zone_itf;
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
 
-				typedef Prototypes::Network_Skimming<typename type_of(skim_reference)> skimmer_itf;
+				typedef Prototypes::Network_Skimming<type_of(skim_reference)> skimmer_itf;
 					
 				skimmer_itf* skim = this->skim_reference<skimmer_itf*>();
 				network_itf* network = this->network_reference<network_itf*>();
@@ -394,7 +394,7 @@ namespace Network_Skimming_Components
 				for (int i=0; i < num_pairs; ++i)
 				{
 					typename MasterType::los_value_type* los_value = (los->get_data_pointer())[i];
-					values[i] = los_value->auto_ttime<Stored_Time_Type>();
+					values[i] = los_value->template auto_ttime<Stored_Time_Type>();
 				}
 
 
@@ -445,7 +445,7 @@ namespace Network_Skimming_Components
 					{
 						//zone_itf* dest_zone = (zone_itf*)d_itr->second;
 						unsigned short dest_id = d_itr->second;
-						zones_itf::iterator z_itr;
+						typename zones_itf::iterator z_itr;
 						if ((z_itr = zones_container->find(dest_id))==zones_container->end()){THROW_EXCEPTION("Error, destination zone id '"<<dest_id<<"' in travel time sorter not found in zones_container.")}
 						zone_itf* dest_zone = (zone_itf*)(z_itr->second);
 
@@ -468,7 +468,7 @@ namespace Network_Skimming_Components
 					{
 						/*zone_itf* dest_zone = (zone_itf*)d_itr->second;*/
 						unsigned short dest_id = d_itr->second;
-						zones_itf::iterator z_itr;
+						typename zones_itf::iterator z_itr;
 						if ((z_itr = zones_container->find(dest_id))==zones_container->end()){THROW_EXCEPTION("Error, destination zone id '"<<dest_id<<"' in travel time sorter not found in zones_container.")}
 						zone_itf* dest_zone = (zone_itf*)(z_itr->second);
 
@@ -611,8 +611,8 @@ namespace Network_Skimming_Components
 			m_container(concat(dense_hash_map<long,Routing_Components::Prototypes::Routing<typename MasterType::skim_routing_type>*>), path_trees_container, NONE, NONE);
 			
 			// link-to-zone mapping for use in skimming
-			m_container(boost::container::vector<Activity_Location<typename MasterType::activity_location_type>*>,origin_locations, NONE, NONE);
-			m_container(boost::container::vector<Activity_Location<typename MasterType::activity_location_type>*>,destination_locations, NONE, NONE);
+			m_container(std::vector<Activity_Location<typename MasterType::activity_location_type>*>,origin_locations, NONE, NONE);
+			m_container(std::vector<Activity_Location<typename MasterType::activity_location_type>*>,destination_locations, NONE, NONE);
 			m_container(concat(dense_hash_map<long,int>),zone_origins_count, NONE, NONE);
 			m_container(concat(dense_hash_map<long,int>),zone_destinations_count, NONE, NONE);
 
@@ -630,15 +630,15 @@ namespace Network_Skimming_Components
 			m_data(File_IO::Binary_File_Reader, transit_input_file, NONE, NONE);
 			m_data(File_IO::File_Writer, skim_fit_results_file, NONE, NONE);
 
-			m_container(boost::container::vector<Prototypes::Skim_Table<Skim_Table_Implementation<MasterType>>*>, skims_by_time_container, NONE, NONE);
-			m_container(boost::container::list<int>, available_modes_container, NONE, NONE);
+			m_container(std::vector<Prototypes::Skim_Table<Skim_Table_Implementation<MasterType>>*>, skims_by_time_container, NONE, NONE);
+			m_container(std::list<int>, available_modes_container, NONE, NONE);
 
 
 			// set the network and skimmer references
-			typedef Network_Components::Prototypes::Network<typename type_of(network_reference)> network_itf;
+			typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
 			
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
@@ -648,11 +648,11 @@ namespace Network_Skimming_Components
 
 			//typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename type_of(origin_locations)::value_type>::type> origin_location_itf;
 			//typedef  Random_Access_Sequence<typename type_of(origin_locations),origin_location_itf*> origin_locations_itf;
-			typedef Prototype_Random_Access_Sequence<typename type_of(origin_locations),Activity_Location_Components::Prototypes::Activity_Location> origin_locations_itf;
+			typedef Prototype_Random_Access_Sequence<type_of(origin_locations),Activity_Location_Components::Prototypes::Activity_Location> origin_locations_itf;
 			typedef strip_modifiers(typename origin_locations_itf::value_type) origin_location_itf;
 
 			//typedef Prototypes::Skim_Table<typename remove_pointer<typename type_of(skims_by_time_container)::value_type>::type> skim_table_itf;
-			typedef Prototype_Random_Access_Sequence<typename type_of(skims_by_time_container),Prototypes::Skim_Table> skim_tables_itf;
+			typedef Prototype_Random_Access_Sequence<type_of(skims_by_time_container),Prototypes::Skim_Table> skim_tables_itf;
 			typedef strip_modifiers(typename skim_tables_itf::value_type) skim_table_itf;
 
 			typedef Prototypes::LOS<typename remove_pointer<typename skim_table_itf::get_type_of(skim_table)::value_type>::type> los_value_itf;
@@ -708,8 +708,7 @@ namespace Network_Skimming_Components
 				}
 				else
 				{
-					this->_update_interval_endpoints.push_back(0);
-					std::vector<int>* intervals = scenario->skim_interval_endpoint_minutes<std::vector<int>*>();
+					std::vector<int>* intervals = scenario->template skim_interval_endpoint_minutes<std::vector<int>*>();
 					for (std::vector<int>::iterator itr = intervals->begin(); itr != intervals->end(); ++itr)
 					{
 						this->_update_interval_endpoints.push_back(*itr);
@@ -721,7 +720,7 @@ namespace Network_Skimming_Components
 				}
 
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
-				pthis->template nodes_per_zone<long>(2);
+				pthis->template nodes_per_zone<long>(1);
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
@@ -745,7 +744,7 @@ namespace Network_Skimming_Components
 
 				// tree builder interface
 				typedef Pair_Associative_Container< type_of(path_trees_container)> tree_builder_list_itf;
-				typedef Routing_Components::Prototypes::Routing<typename get_mapped_component_type(tree_builder_list_itf)> tree_builder_itf;
+				typedef Routing_Components::Prototypes::Routing<get_mapped_component_type(tree_builder_list_itf)> tree_builder_itf;
 				tree_builder_list_itf* tree_list = this->path_trees_container<tree_builder_list_itf*>();
 
 				origin_locations_itf* origin_locations = skim->template origin_locations<origin_locations_itf*>();	
@@ -762,7 +761,7 @@ namespace Network_Skimming_Components
 
 					// Allocate a tree_builder for each origin node		
 					tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename tree_builder_itf::Component_Type>();
-					tree_builder->parent_skimmer<skimmer_itf*>(skim);
+					tree_builder->template parent_skimmer<skimmer_itf*>(skim);
 
 					// Set the current routable origin for the tree builder
 					tree_builder->template origin_link<link_itf*>((link_itf*)*(orig_node->template origin_links<links_itf*>()->begin()));
@@ -773,7 +772,7 @@ namespace Network_Skimming_Components
 					tree_builder->template start_time<Simulation_Timestep_Increment>(0);//this->start_time<Simulation_Timestep_Increment>());
 					tree_builder->template end_time<Simulation_Timestep_Increment>(END);//this->end_time<Simulation_Timestep_Increment>());
 			
-					// Add the tree_builder to the boost::container::list for future processing
+					// Add the tree_builder to the std::list for future processing
 					tree_builder->Schedule_Route_Computation(iteration());
 
 					pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig_index,tree_builder);
@@ -814,11 +813,17 @@ namespace Network_Skimming_Components
 				// Read transit input data if required
 				if (skim->template read_transit<bool>())
 				{	
-					transit_infile.template Read_Array<float>(transit_ttime, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_wait_time, num_zones*num_zones);
-					transit_infile.template Read_Array<float>(transit_fare, num_zones*num_zones);
+					this->template Read_Binary_Data<float*>(transit_ttime, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_walk_access_time, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(auto_distance, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_wait_time, transit_infile, num_zones);
+					this->template Read_Binary_Data<float*>(transit_fare, transit_infile, num_zones);
+
+					//transit_infile.template Read_Array<float>(transit_ttime, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_walk_access_time, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(auto_distance /*transit_sov_access_time*/, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_wait_time, num_zones*num_zones);
+					//transit_infile.template Read_Array<float>(transit_fare, num_zones*num_zones);
 
 				}
 				// otherwise initialize to unavailable
@@ -854,13 +859,13 @@ namespace Network_Skimming_Components
 				for (int i =0; i < num_zones*num_zones; ++i)
 				{
 					typename MasterType::los_invariant_value_type* temp_los = Allocate<typename MasterType::los_invariant_value_type>();
-					((los_invariant_value_itf*)temp_los)->auto_tolls<Stored_Currency_Type>(auto_tolls[i]);
-					((los_invariant_value_itf*)temp_los)->auto_parking_cost<Stored_Currency_Type>(auto_parking_cost[i]);
-					((los_invariant_value_itf*)temp_los)->transit_ttime<Stored_Time_Type>(transit_ttime[i]);
-					((los_invariant_value_itf*)temp_los)->transit_walk_access_time<Stored_Time_Type>(transit_walk_access_time[i]);
-					((los_invariant_value_itf*)temp_los)->auto_distance /*transit_sov_access_time<Stored_Time_Type>*/<Miles>(auto_distance/*transit_sov_access_time*/[i]);
-					((los_invariant_value_itf*)temp_los)->transit_wait_time<Stored_Time_Type>(transit_wait_time[i]);
-					((los_invariant_value_itf*)temp_los)->transit_fare<Stored_Currency_Type>(transit_fare[i]);
+					((los_invariant_value_itf*)temp_los)->template auto_tolls<Stored_Currency_Type>(auto_tolls[i]);
+					((los_invariant_value_itf*)temp_los)->template auto_parking_cost<Stored_Currency_Type>(auto_parking_cost[i]);
+					((los_invariant_value_itf*)temp_los)->template transit_ttime<Stored_Time_Type>(transit_ttime[i]);
+					((los_invariant_value_itf*)temp_los)->template transit_walk_access_time<Stored_Time_Type>(transit_walk_access_time[i]);
+					((los_invariant_value_itf*)temp_los)->template auto_distance /*transit_sov_access_time<Stored_Time_Type>*/<Miles>(auto_distance/*transit_sov_access_time*/[i]);
+					((los_invariant_value_itf*)temp_los)->template transit_wait_time<Stored_Time_Type>(transit_wait_time[i]);
+					((los_invariant_value_itf*)temp_los)->template transit_fare<Stored_Currency_Type>(transit_fare[i]);
 					temp_invariant_los_array[i] = temp_los;
 				}
 
@@ -910,9 +915,9 @@ namespace Network_Skimming_Components
 								THROW_WARNING("Warning, invalid travel auto travel time value="<<a_ttime<<" found when reading skim file, travel time reset to default value=180.0.");
 								a_ttime = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Stored_Time_Type>(180.0);
 							}
-							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(a_ttime);
+							((los_value_itf*)temp_los)->template auto_ttime<Stored_Time_Type>(a_ttime);
 							// store the other time invariant los characteristics for the current los record
-							((los_value_itf*)temp_los)->LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
+							((los_value_itf*)temp_los)->template LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}
 						skim_table->template Initialize<typename MasterType::los_value_type**>(temp_los_array);
@@ -938,8 +943,8 @@ namespace Network_Skimming_Components
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
 							typename MasterType::los_value_type* temp_los = Allocate<typename MasterType::los_value_type>();
-							((los_value_itf*)temp_los)->auto_ttime<Stored_Time_Type>(0.0f);
-							((los_value_itf*)temp_los)->LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
+							((los_value_itf*)temp_los)->template auto_ttime<Stored_Time_Type>(0.0f);
+							((los_value_itf*)temp_los)->template LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}
 						//-------------------------------------------------
@@ -965,14 +970,14 @@ namespace Network_Skimming_Components
 
 				//===========================================================================
 				// make sure intra-zonal information is initialized
-				for (zones_itf::iterator zone_itr = zones_container->begin(); zone_itr != zones_container->end(); ++zone_itr)
+				for (auto zone_itr = zones_container->begin(); zone_itr != zones_container->end(); ++zone_itr)
 				{
 					zone_itf* zone = (zone_itf*)(zone_itr->second);
-					los_value_itf* los = skim->Get_LOS<zone_itf*,los_value_itf*>(zone, zone);
+					los_value_itf* los = skim->template Get_LOS<zone_itf*,los_value_itf*>(zone, zone);
 
 					if (los->template auto_distance<Miles>() > 1000)
 					{
-						Miles new_distance = sqrt(zone->area<Square_Miles>())/2.0*1.2;
+						Miles new_distance = sqrt(zone->template area<Square_Miles>())/2.0*1.2;
 						los->template auto_distance<Miles>(new_distance);
 					}
 				}
@@ -994,7 +999,7 @@ namespace Network_Skimming_Components
 			{
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
-				typedef zones_itf::iterator zone_iterator;
+				typedef typename zones_itf::iterator zone_iterator;
 				skimmer_itf* skim = (skimmer_itf*)this;
 
 				float Nz_inv = 1.0 / (zones_container->size() - 1.0);
@@ -1013,9 +1018,10 @@ namespace Network_Skimming_Components
 					float C_ind=0;
 					float C_oth=0;
 
-					float auto_ttime_avg=0, auto_ttime_avg_comp=0, auto_ttime_offpeak_avg=0, auto_ttime_offpeak_avg_comp=0, tran_ttime_avg=0;
-					int count=0, count_comp=0;
-					float attract_count = 0, attract_count_comp=0;
+					float auto_ttime_avg = 0, auto_ttime_avg_comp = 0, auto_ttime_offpeak_avg = 0, auto_ttime_offpeak_avg_comp = 0, distance_avg = 0;
+					float tran_ttime_avg = 0, tran_ovtt_avg = 0, tran_wait_avg = 0, tran_fare_avg = 0;
+					int count=0, count_transit=0;
+					float attract_count = 0, attract_count_transit=0;
 								
 					// loop through all destination zones
 					for (zone_iterator d_zone_itr = zones_container->begin(); d_zone_itr != zones_container->end(); ++d_zone_itr)
@@ -1027,9 +1033,14 @@ namespace Network_Skimming_Components
 						if (zone == dzone) continue;
 
 						// get TTime by automobile and transit through skim interface, in minutes
-						Time_Minutes ttime_auto_peak = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
-						Time_Minutes ttime_auto_offpeak = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
-						Time_Minutes ttime_transit = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
+						Time_Minutes ttime_auto_peak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
+						Time_Minutes ttime_auto_offpeak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
+						Time_Minutes ttime_transit = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
+						los_value_itf* los_value = skim->Get_LOS<zone_itf*, Time_Minutes, los_value_itf*>(zone, dzone, 9.0);
+						Time_Minutes ovtt_transit = los_value->transit_walk_access_time<Time_Minutes>();
+						Time_Minutes wait_transit = los_value->transit_wait_time<Time_Minutes>();
+						Dollars fare_transit = los_value->transit_fare<Dollars>();
+						Miles distance = los_value->auto_distance<Miles>();
 
 						// update the accessibilty factors: (1/Nz-1) * (sum(Emp * exp(alpha*ttime)))
 						C_gov += Nz_inv * dzone->template employment_government<float>() * exp(alpha*ttime_auto_peak);
@@ -1042,19 +1053,21 @@ namespace Network_Skimming_Components
 						float attract = dzone->template employment_total<float>() + dzone->template pop_persons<float>();
 
 						// update the average travel time from 'zone' for transit and auto if transit is available
-						if (ttime_transit < 1440 && ttime_auto_peak < 1440)
+						if (ttime_transit < 1440 && ttime_transit > 0) // exponential decay in weighting of transit wait, ovtt, fare with transit travel time
 						{			
-							auto_ttime_avg_comp += (ttime_auto_peak * attract);
-							auto_ttime_offpeak_avg_comp += (ttime_auto_offpeak * attract);
-							tran_ttime_avg += (ttime_transit * attract);
-							count_comp++;
-							attract_count_comp += attract;
+							tran_ttime_avg += attract * exp(alpha * ttime_transit);
+							tran_fare_avg += attract * exp(alpha * ttime_transit) * fare_transit;
+							tran_ovtt_avg += attract * exp(alpha * ttime_transit) * ovtt_transit;
+							tran_wait_avg += attract * exp(alpha * ttime_transit) * wait_transit;
+							count_transit++;
+							attract_count_transit += attract;
 						}
 						// updata average auto travel times if auto is available
-						if (ttime_auto_peak < 1440)
+						if (ttime_auto_peak < 1440 && ttime_auto_peak > 0)
 						{
-							auto_ttime_avg += (ttime_auto_peak * attract);
-							auto_ttime_offpeak_avg += (ttime_auto_offpeak * attract);
+							auto_ttime_avg += attract * exp(alpha * ttime_auto_peak);
+							auto_ttime_offpeak_avg += attract * exp(alpha * ttime_auto_offpeak);
+							distance_avg += attract * exp(alpha * ttime_auto_peak) * distance;
 							count++;
 							attract_count += attract;
 						}
@@ -1068,17 +1081,37 @@ namespace Network_Skimming_Components
 					zone->accessibility_employment_retail(C_ret);
 					zone->accessibility_employment_services(C_ser);
 
-					//cout << C_gov <<" , " << C_ind <<" , " << C_man <<" , " << C_oth <<" , " << C_ret <<" , " << C_ser<<endl;
-
 					// update the average travel times to all other zones for 'zone' by mode - weighted by attractiveness of zone (i.e. how well served are the attractive zones)
-					zone->avg_ttime_auto_offpeak<Time_Minutes>(auto_ttime_offpeak_avg/attract_count);
-					zone->avg_ttime_auto_peak<Time_Minutes>(auto_ttime_avg/attract_count);
-					if (count_comp > 10) zone->avg_ttime_transit<Time_Minutes>(tran_ttime_avg/attract_count_comp);
-					else zone->avg_ttime_transit<Time_Minutes>(9999);
-					if (count_comp > 10) zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>((0.5*auto_ttime_avg_comp + 0.5*auto_ttime_offpeak_avg_comp)/attract_count_comp);
-					else zone->avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>(9999);
+					zone->template avg_ttime_auto_offpeak<Time_Minutes>(1.0 / alpha * log(auto_ttime_offpeak_avg/attract_count));
+					zone->template avg_ttime_auto_peak<Time_Minutes>(1.0 / alpha * log(auto_ttime_avg / attract_count));
+					zone->template avg_distance<Miles>(distance_avg / auto_ttime_avg);
+					if (count_transit > 2)
+					{
+						zone->template avg_ttime_transit<Time_Minutes>(1.0 / alpha * log(tran_ttime_avg / attract_count_transit));
+						zone->template avg_ovtt_transit<Time_Minutes>(tran_ovtt_avg / tran_ttime_avg);
+						zone->template avg_fare_transit<Dollars>(tran_fare_avg / tran_ttime_avg);
+						zone->template avg_wait_transit<Time_Minutes>(tran_wait_avg / tran_ttime_avg);
+					}
+					else
+					{
+						zone->template avg_ttime_transit<Time_Minutes>(9999);
+						zone->template avg_ovtt_transit<Time_Minutes>(9999);
+						zone->template avg_fare_transit<Time_Minutes>(9999);
+						zone->template avg_wait_transit<Time_Minutes>(9999);
+					}
+					//if (count_comp > 10) zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>((0.5*auto_ttime_avg_comp + 0.5*auto_ttime_offpeak_avg_comp)/attract_count_comp);
+					//else zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>(9999);
+
+					//cout << zone->uuid<int>() << ","
+					//	<< zone->template avg_ttime_auto_peak<Time_Minutes>() << ","
+					//	<< zone->template avg_distance<Miles>() << ","
+					//	<< zone->template avg_ttime_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_ovtt_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_wait_transit<Time_Minutes>() << ","
+					//	<< zone->template avg_fare_transit<Dollars>() << endl;
 
 				}
+				
 			}
 
 			void Write_Binary_Header()
@@ -1094,11 +1127,11 @@ namespace Network_Skimming_Components
 				outfile.template Write_Array<char>(&begin_zones[0],4);
 				int zones = (int)zones_container->size();
 				outfile.template Write_Value<int>(zones);
-				for (zones_itf::iterator itr = zones_container->begin(); itr != zones_container->end(); ++itr)
+				for (auto itr = zones_container->begin(); itr != zones_container->end(); ++itr)
 				{
 					zone_itf* zone = (zone_itf*)(itr->second);
-					outfile.template Write_Value<int>(zone->uuid<int&>());
-					outfile.template Write_Value<int>(zone->internal_id<int&>());
+					outfile.template Write_Value<int>(zone->template uuid<int&>());
+					outfile.template Write_Value<int>(zone->template internal_id<int&>());
 				}
 				char end_zones[] = "EZON";
 				outfile.template Write_Array<char>(&end_zones[0],4);
@@ -1136,16 +1169,14 @@ namespace Network_Skimming_Components
 				else
 				{
 					this->_highway_input_file.Version('0');
+					this->_transit_input_file.Version('0');
 					Read_Binary_Headers_Unversioned(num_modes,num_zones,return_intervals,perform_checks);
 				}
 			}
 	
 			void Read_Binary_Headers_Unversioned(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr,bool perform_checks=true)
 			{
-				//network_itf* network = this->template network_reference<network_itf*>();
-				//skimmer_itf* skim = (skimmer_itf*)this;
-				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
-	
+
 				int update_increment;//, num_zones_transit, num_zones_hcost;
 
 				// read for time-varying highway skims
@@ -1157,30 +1188,24 @@ namespace Network_Skimming_Components
 				_highway_input_file.template Read_Value<int>(num_zones);
 				_highway_input_file.template Read_Value<int>(update_increment);
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, nullptr, nullptr, update_increment);
-				//Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
-				//if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
-				//int skimmer_num_zones = zones_container->size();
-				//if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
-
-
-				//File_IO::Binary_File_Reader& transit_infile = skim->template transit_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_transit<bool>())
-				//{		
-				//	transit_infile.template Read_Value<int>(num_zones_transit);
-				//	if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
-				//File_IO::Binary_File_Reader& highway_cost_infile = skim->template highway_cost_input_file<File_IO::Binary_File_Reader&>();
-				//if (skim->template read_highway_cost<bool>())
-				//{		
-				//	highway_cost_infile.template Read_Value<int>(num_zones_hcost);
-				//	if (num_zones_hcost != num_zones) THROW_EXCEPTION("ERROR: Input highway cost skim file number of zones does not match the number of zones in the highway skim file. Cost="<<num_zones_transit<<" and Highway="<<num_zones);
-				//}
+				//if (perform_checks) Do_Header_Validation_Checks(num_modes, nullptr, nullptr, nullptr, update_increment);
+				network_itf* network = this->template network_reference<network_itf*>();
+				skimmer_itf* skim = (skimmer_itf*)this;
+				zones_itf* zones_container = network->template zones_container<zones_itf*>();
+				int skimmer_num_zones = zones_container->size();
+				if (num_zones != skimmer_num_zones) THROW_EXCEPTION("ERROR: Input skim file number of zones does not match the number of zones specified in the input database.");
+				Simulation_Timestep_Increment skimmer_update_increment = skim->template update_increment<Simulation_Timestep_Increment>();
+				if (update_increment != skimmer_update_increment) THROW_EXCEPTION("ERROR: Input skim file update increment does not match the update increment specified in Skim_Implementation.");
 			}
 
 			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
-				int num_intervals;//, num_zones_transit, num_zones_hcost;
+				//=======================================
+				// READ HIGHWAY HEADER
+				//---------------------------------------
+				int num_intervals;
+				//, num_zones_hcost;
+
 				update_interval_endpoints_type intervals;
 				std::vector<pair<int,int>> return_zones_container;
 
@@ -1223,7 +1248,46 @@ namespace Network_Skimming_Components
 				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");
 
-				if (perform_checks) Do_Header_Validation_Checks(num_modes, num_zones, &intervals, &return_zones_container);
+
+
+				//==============================================
+				// READ TRANSIT HEADER
+				//----------------------------------------------
+				std::vector<pair<int, int>> return_transit_zones_container;
+				if (read_transit<bool>())
+				{
+					// get versioning info
+					char version[9]; version[8] = '\0';
+					_transit_input_file.template Read_Array<char>(version, 8);
+					// call associated read function
+					if (strcmp(version, "SKIM:V01") != 0)
+					{
+						THROW_EXCEPTION("ERROR: Transit skim binary does not seem to be in V01 format. Use skim_analyzer.pyw to verify.");
+					}
+					else this->_transit_input_file.Version('1');
+
+					_transit_input_file.template Read_Array<char>(tag, 4);
+					if (strcmp(tag, "BZON") == 0)
+					{
+						_transit_input_file.template Read_Value<int>(num_zones);
+						for (int i = 0; i<num_zones; i++)
+						{
+							int id, index;
+							_transit_input_file.template Read_Value<int>(id);
+							_transit_input_file.template Read_Value<int>(index);
+							return_transit_zones_container.push_back(pair<int, int>(id, index));
+						}
+						_transit_input_file.template Read_Array<char>(tag, 4);
+						if (strcmp(tag, "EZON") != 0) THROW_EXCEPTION("ERROR: End zone information tag 'EZON' missing from binary file, possible versioning issue.");
+					}
+					else THROW_EXCEPTION("ERROR: Start zone information tag 'BZON' missing from binary trasnit skim file, possible versioning issue.");
+				}
+
+
+				//==============================================
+				// VALIDATION
+				//----------------------------------------------
+				if (perform_checks) Do_Header_Validation_Checks(num_modes, &intervals, &return_zones_container, &return_transit_zones_container);
 
 				// return the read in interval values if requested
 				if (return_intervals != nullptr)
@@ -1233,8 +1297,9 @@ namespace Network_Skimming_Components
 				}
 			}
 
-			void Do_Header_Validation_Checks(int num_modes, int num_zones, update_interval_endpoints_type* intervals, std::vector<pair<int,int>>* return_zones_container, int increment=0)
+			void Do_Header_Validation_Checks(int num_modes, update_interval_endpoints_type* intervals, std::vector<pair<int,int>>* return_zones_container, std::vector<pair<int, int>>* return_transit_zones_container, int increment=0)
 			{
+				int num_zones = return_zones_container->size();
 				network_itf* network = this->template network_reference<network_itf*>();
 				skimmer_itf* skim = (skimmer_itf*)this;
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
@@ -1266,7 +1331,7 @@ namespace Network_Skimming_Components
 						int id = (*itr).first;
 						int index = (*itr).second;
 
-						zones_itf::iterator zitr;
+						typename zones_itf::iterator zitr;
 						if ((zitr = zones_container->find(id)) == zones_container->end()) THROW_EXCEPTION("ERROR: Zone id from skim file not found in network zones container.");
 						if (zitr->second->template internal_id<int>() != index) THROW_EXCEPTION("ERROR: Zone id in skim file has different index than same zone id in network zones container.");
 					}
@@ -1275,8 +1340,7 @@ namespace Network_Skimming_Components
 				// header validation checks for transit and cost skims - make sure number of zones specified correctly
 				if (read_transit<bool>())
 				{		
-					int num_zones_transit;
-					_transit_input_file.template Read_Value<int>(num_zones_transit);
+					int num_zones_transit = return_transit_zones_container->size();
 					if (num_zones_transit != num_zones) THROW_EXCEPTION("ERROR: Input transit skim file number of zones does not match the number of zones in the highway skim file. Transit="<<num_zones_transit<<" and Highway="<<num_zones);
 				}
 				if (read_highway_cost<bool>())

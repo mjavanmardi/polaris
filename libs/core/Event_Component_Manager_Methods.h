@@ -26,7 +26,7 @@ namespace polaris
 				//_active_blocks.erase( _active_blocks.iterator_to(*block) );
 					
 				// linear search when deque is used as fundamental container
-				for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+				for(std::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 				{
 					if((*active_itr) == block)
 					{
@@ -52,13 +52,14 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Event_Component_Manager<DataType>::Allocate(int uuid)
+	DataType* Event_Component_Manager<DataType>::Allocate(int uuid, bool bInPlaceNew)
 	{
 		// Check whether thread has memory of this type available
 		if( _blocks_with_free_cells[__thread_id].empty() )
 		{
 			// Activation occurs once
-			if( !AtomicCompareExchange(&_activated,1,0) ) _world->simulation_engine()->Activate_Type( this );
+			//if( !AtomicCompareExchange(&_activated,1,0) ) _world->simulation_engine()->Activate_Type( this );
+			if (!Activate()) _world->simulation_engine()->Activate_Type(this);
 
 			// Block size is chosen as the nearest page size (or power of 2 if less than page size) which can accommodate the desired objects per block
 
@@ -153,7 +154,7 @@ namespace polaris
 							// Do the slow (but most conceptually simple) thing and remove it from the de-activation queue
 							// This condition almost never gets hit in practice, so it is ok to spend some time here
 
-							for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
+							for(std::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin();itr!=_queued_deactivated_blocks.end();itr++)
 							{
 								if((*itr) == free_block)
 								{
@@ -185,12 +186,14 @@ namespace polaris
 		// allocate an object from the block itself
 		Byte* return_memory = (Byte*)free_block->Allocate<DataType>();
 
-		new (return_memory) DataType();
+		if (bInPlaceNew)
+		{
+			new (return_memory) DataType();
+			((DataType*)return_memory)->_uuid = uuid;
+		}
 
 		// add information about the uuid
 		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
-
-		((DataType*)return_memory)->_uuid = uuid;
 
 		return (DataType*)return_memory;
 	}
@@ -199,11 +202,11 @@ namespace polaris
 	/// Allocate_Array
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	DataType* Event_Component_Manager<DataType>::Allocate_Array( unsigned int num )
-	{
-		static_assert("Array allocation not supported for execution components");
-	}
+//	template<typename DataType>
+//	DataType* Event_Component_Manager<DataType>::Allocate_Array( unsigned int num )
+//	{
+//		static_assert(false,"Array allocation not supported for execution components");
+//	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Lazy_Free - Deschedule the execution object, execution engine will deallocate when convenient
@@ -229,11 +232,11 @@ namespace polaris
 	/// Free_Array
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename DataType>
-	void Event_Component_Manager<DataType>::Free_Array( DataType* ptr )
-	{
-		static_assert("Array deallocation not supported for execution components");
-	}
+	//template<typename DataType>
+	//void Event_Component_Manager<DataType>::Free_Array( DataType* ptr )
+	//{
+	//	static_assert("Array deallocation not supported for execution components");
+	//}
 
 	///----------------------------------------------------------------------------------------------------
 	/// Clean_Up_Thread_Memory - return thread memory to the global allocator
@@ -253,7 +256,7 @@ namespace polaris
 		{
 			// This iteration is safe because only this thread can grow this list
 
-			for(boost::container::deque<Event_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
+			for(std::deque<Event_Block*>::iterator itr = _blocks_with_free_cells[__thread_id].begin(); itr!=_blocks_with_free_cells[__thread_id].end();)
 			{
 				// This check is safe because only this thread can make these blocks non-empty or (by extension) activated
 				// Skip blocks which are "activated", they must be in the deactivation queue (or at least they should be), and must be removed from the intrusive list in the update step
@@ -299,7 +302,7 @@ namespace polaris
 
 		// loop over the execution blocks which are active this event step
 		//boost::intrusive::list<Event_Block>::iterator itr = _active_blocks.begin();
-		boost::container::deque<Event_Block*>::iterator itr = _active_blocks.begin();
+		std::deque<Event_Block*>::iterator itr = _active_blocks.begin();
 
 		while(true)
 		{
@@ -423,14 +426,14 @@ namespace polaris
 		{
 			// remove queued deactivated blocks, they are locked against _tex, so you are ok here
 
-			for(boost::container::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
+			for(std::deque<Event_Block*>::iterator itr = _queued_deactivated_blocks.begin(); itr != _queued_deactivated_blocks.end(); itr++)
 			{
 				if((*itr)->activated())
 				{
 					//_active_blocks.erase( _active_blocks.iterator_to( *(*itr) ) );
 
 					// linear search when deque is used as fundamental container
-					for(boost::container::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
+					for(std::deque<Event_Block*>::iterator active_itr = _active_blocks.begin();active_itr!=_active_blocks.end();active_itr++)
 					{
 						if((*active_itr) == (*itr))
 						{

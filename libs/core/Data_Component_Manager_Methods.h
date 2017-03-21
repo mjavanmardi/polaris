@@ -12,7 +12,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Data_Component_Manager<DataType>::Allocate(int uuid)
+	DataType* Data_Component_Manager<DataType>::Allocate(int uuid, bool bInPlaceNew)
 	{
 		DataType* return_memory = new DataType();
 		

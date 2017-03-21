@@ -9,7 +9,7 @@ namespace polaris
 
 
 
-	prototype struct Interactive_Graph
+	prototype struct Interactive_Graph ADD_DEBUG_INFO
 	{
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		
@@ -18,18 +18,18 @@ namespace polaris
 			return this_component()->Create_Copy();
 		}
 		
-		boost::container::vector<base_edge_type*>* Get_Edges()
+		std::vector<base_edge_type*>* Get_Edges()
 		{
 			return this_component()->Get_Edges();
 		}
 
 		template<typename Edge_Type>
-		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)
+		Edge<Edge_Type>* Get_Edge(p_edge_id_type edge_id)
 		{
 			return this_component()->Get_Edge<Edge_Type>(edge_id);
 		}
 		
-		base_edge_type* Get_Edge(edge_id_type edge_id)
+		base_edge_type* Get_Edge(p_edge_id_type edge_id)
 		{
 			return this_component()->Get_Edge(edge_id);
 		}
@@ -41,14 +41,14 @@ namespace polaris
 		}
 	};
 	//interface for adding edges to the graph
-	prototype struct Graph_Assembler_Connected_Edge
+	prototype struct Graph_Assembler_Connected_Edge ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
 		typedef typename ComponentType::output_graph_type output_graph_type;
 
-		graph_id_type graph_id(){ return this_component()->graph_id(); }
-		void graph_id(graph_id_type value){ this_component()->graph_id(value); }
+		p_graph_id_type graph_id(){ return this_component()->graph_id(); }
+		void graph_id(p_graph_id_type value){ this_component()->graph_id(value); }
 	
 		void* graph_pool_reference(){ return this_component()->graph_pool_reference(); }
 		void graph_pool_reference(void* value){ this_component()->graph_pool_reference(value); }

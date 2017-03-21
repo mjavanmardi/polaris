@@ -3,6 +3,7 @@
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
 #include "Activity_Location_Prototype.h"
+#include "Link_Implementation.h"
 
 namespace Network_Components
 {
@@ -39,9 +40,14 @@ namespace Network_Components
 				using namespace polaris::io;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				_scenario_reference = _network_reference->scenario_reference<_Scenario_Interface*>();
+
+                cout << "Open database: "<<_scenario_reference->template database_name<string&>()<<"...";
+
 				string name(_scenario_reference->template database_name<string&>());
 				unique_ptr<database> db (open_sqlite_database (name));
 				transaction t(db->begin());
+
+				cout << "done."<<endl;
 
 				read_intersection_data<TargetType>(db, net_io_maps);
 				read_link_data<TargetType>(db, net_io_maps);
@@ -147,7 +153,7 @@ namespace Network_Components
 				_Links_Container_Interface* links_container_ptr=_network_reference->template links_container<_Links_Container_Interface*>();
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>> id_to_links_type;
+				typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_type;
 
 				Types::Link_ID_Dir link_id_dir;
 				
@@ -424,7 +430,7 @@ namespace Network_Components
 						}
 						else
 						{
-							boost::container::vector<typename MasterType::link_type*> links_arr;
+							std::vector<typename MasterType::link_type*> links_arr;
 							links_arr.push_back((typename MasterType::link_type*)link);
 							id_to_links_map[link_id_dir.id] = links_arr;
 						}
@@ -657,7 +663,7 @@ namespace Network_Components
 						}
 						else
 						{
-							boost::container::vector<typename MasterType::link_type*> links_arr;
+							std::vector<typename MasterType::link_type*> links_arr;
 							links_arr.push_back((typename MasterType::link_type*)link);
 							id_to_links_map[link_id_dir.id] = links_arr;
 						}
@@ -939,6 +945,7 @@ namespace Network_Components
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename type_of(network_reference)::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
+				//%%%RLW - check into this again
 				//typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename type_of(network_reference)::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
 				//typedef  Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container), _Zone_Interface*> _Zones_Container_Interface;
 
@@ -985,16 +992,16 @@ namespace Network_Components
 						zone->template race_percent_white<float>(db_itr->getPercent_white());
 						zone->template race_percent_black<float>(db_itr->getPercent_black());
 						zone->template average_household_income<Dollars>(db_itr->getHH_inc_avg());
-						zone->template area<Square_Feet>(db_itr->getArea());
-						zone->template entertainment_area<Square_Feet>(db_itr->getEntertainment_area());
-						zone->template industrial_area<Square_Feet>(db_itr->getIndustrial_area());
-						zone->template institutional_area<Square_Feet>(db_itr->getInstitutional_area());
-						zone->template mixed_use_area<Square_Feet>(db_itr->getMixed_use_area());
-						zone->template office_area<Square_Feet>(db_itr->getOffice_area());
-						zone->template other_area<Square_Feet>(db_itr->getOther_area());
-						zone->template residential_area<Square_Feet>(db_itr->getResidential_area());
-						zone->template retail_area<Square_Feet>(db_itr->getRetail_area());
-						zone->template school_area<Square_Feet>(db_itr->getSchool_area());
+						zone->template area<Square_Meters>(db_itr->getArea());
+						zone->template entertainment_area<Square_Meters>(db_itr->getEntertainment_area());
+						zone->template industrial_area<Square_Meters>(db_itr->getIndustrial_area());
+						zone->template institutional_area<Square_Meters>(db_itr->getInstitutional_area());
+						zone->template mixed_use_area<Square_Meters>(db_itr->getMixed_use_area());
+						zone->template office_area<Square_Meters>(db_itr->getOffice_area());
+						zone->template other_area<Square_Meters>(db_itr->getOther_area());
+						zone->template residential_area<Square_Meters>(db_itr->getResidential_area());
+						zone->template retail_area<Square_Meters>(db_itr->getRetail_area());
+						zone->template school_area<Square_Meters>(db_itr->getSchool_area());
 						zone->template pop_households<int>(db_itr->getPop_households());
 						zone->template pop_persons<int>(db_itr->getPop_persons());
 						zone->template pop_group_quarters<int>(db_itr->getPop_group_quarters());
@@ -1032,7 +1039,7 @@ namespace Network_Components
 				Types::Link_ID_Dir link_id_dir;
 				Types::Link_ID_Dir opp_link_id_dir;
 
-				boost::unordered::unordered_map<int,int> uuid_to_index;
+				std::unordered_map<int,int> uuid_to_index;
 
 				cout << "Reading Activity Locations..." << endl;
 
@@ -1116,7 +1123,7 @@ namespace Network_Components
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 
 						// add the opposite direction link if exists
-						if (!this->_scenario_reference->use_link_based_routing<bool>())
+						if (!this->_scenario_reference->template use_link_based_routing<bool>())
 						{
 							opp_link_id_dir.id = link_id_dir.id;
 							opp_link_id_dir.dir = abs(link_id_dir.dir - 1);
@@ -1200,6 +1207,18 @@ namespace Network_Components
 						{
 							code=Activity_Location_Components::Types::LU_RESIDENTIAL;
 						}
+						else if (strcmp(land_use, "NON_RESIDENTIAL") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_NON_RESIDENTIAL;
+						}
+						else if (strcmp(land_use, "RESIDENTIAL-SINGLE") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_RESIDENTIAL;
+						}
+						else if (strcmp(land_use, "RESIDENTIAL-MULTI") == 0)
+						{
+							code = Activity_Location_Components::Types::LU_RESIDENTIAL_MULTI;
+						}
 						else if (strcmp(land_use,"SPECIAL_GEN")==0)
 						{
 							code=Activity_Location_Components::Types::LU_SPECIAL_GENERATOR;
@@ -1214,11 +1233,11 @@ namespace Network_Components
 						}
 						activity_location->land_use_type(code);
 
-						// add to the zone boost::container::list
+						// add to the zone std::list
 						zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 
-						// add to zone land use type subboost::container::lists
+						// add to zone land use type substd::lists
 						if (code == Activity_Location_Components::Types::LU_ALL)
 						{
 							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
@@ -1253,6 +1272,11 @@ namespace Network_Components
 							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						}
+						if (code == Activity_Location_Components::Types::LU_RESIDENTIAL_MULTI)
+						{
+							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
 						if (code == Activity_Location_Components::Types::LU_EDUCATION)
 						{
 							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
@@ -1263,7 +1287,7 @@ namespace Network_Components
 						activity_locations_container.push_back(activity_location);
 
 						// store the id to index lookup info
-						loc_id_to_idx_container.insert(pair<int,int>(activity_location->uuid<int>(),activity_location->internal_id<int>()));
+						loc_id_to_idx_container.insert(pair<int,int>(activity_location->template uuid<int>(),activity_location->template internal_id<int>()));
 						++counter;
 					}
 					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
@@ -1305,7 +1329,7 @@ namespace Network_Components
 					{
 						link = (Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
-						pocket_data = link->pocket_data<Link_Components::Implementations::Pocket_Data*>();
+						pocket_data = link->template pocket_data<Link_Components::Implementations::Pocket_Data*>();
 
 						lanes = db_itr->getLanes();
 

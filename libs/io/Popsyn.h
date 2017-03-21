@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Shared.h"
 
 namespace polaris

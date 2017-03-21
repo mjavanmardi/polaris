@@ -4,6 +4,9 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include "Execution_Block_Methods.h"
+#if (_MSC_VER >= 1900 || !_MSC_VER )
+  #include <atomic>
+#endif
 
 namespace polaris
 {
@@ -14,6 +17,12 @@ namespace polaris
 	class Execution_Component_Manager_Base : public Component_Manager_Base
 	{
 	public:
+		Execution_Component_Manager_Base() : _activated(false) 
+		{
+#if (_MSC_VER >= 1900 || !_MSC_VER )
+			_activated_set.clear(); 
+#endif
+		}
 		virtual void Initialize();
 		virtual Component_Manager_Types Component_Manager_Type(){ return EXECUTION_MANAGER; }
 		virtual void Terminate();
@@ -31,6 +40,12 @@ namespace polaris
 		
 		
 		inline void Update_Schedule(const Revision& update_revision);
+
+#if (_MSC_VER >= 1900 || !_MSC_VER ) // %%%RLW - need to check this for Visual Studio 12 & 13
+		inline bool Activate() { do {} while (std::atomic_flag_test_and_set(&_activated_set)); bool was_activated = _activated; if (!_activated) _activated = true; std::atomic_flag_clear(&_activated_set); return was_activated; }
+#elif (_MSC_VER)
+		inline bool Activate() { return AtomicCompareExchange(&_activated,1,0); }
+#endif
 
 
 		//----------------------------------------------------------------------------------------------------
@@ -52,7 +67,12 @@ namespace polaris
 		unsigned int _objects_per_block_hint;
 		unsigned int _ideal_cell_size;
 		
+#if (_MSC_VER >= 1900 || !_MSC_VER )
+		std::atomic_bool _activated;
+		std::atomic_flag _activated_set;
+#else
 		_atomic_counter _activated;
+#endif
 
 		const char* _name;
 	};
@@ -87,14 +107,14 @@ namespace polaris
 		{
 			Execution_Component_Manager_Base::Initialize();
 
-			_blocks_with_free_cells = new boost::container::deque<Execution_Block*>[num_sim_threads() + 1];
+			_blocks_with_free_cells = new std::deque<Execution_Block*>[num_sim_threads() + 1];
 			_num_empty_blocks = new _atomic_counter[num_sim_threads() + 1]();
 
 			 // build objects which are rounded to the nearest cache line size for fastest possible striding
 			_ideal_cell_size = (sizeof(DataType) / __cache_line_size + 1) * __cache_line_size;
 		}
 
-		DataType* Allocate( int uuid = -1 );
+		DataType* Allocate( int uuid = -1, bool bInPlaceNew = true );
 		DataType* Allocate_Array( unsigned int num );
 
 		inline void Clean_Up_Thread_Memory( );
@@ -106,11 +126,11 @@ namespace polaris
 		virtual void Step( Revision& out_next_revision );
 
 		//boost::intrusive::list<Execution_Block> _active_blocks;
-		boost::container::deque<Execution_Block*> _active_blocks;
+		std::deque<Execution_Block*> _active_blocks;
 
 		boost::intrusive::list<Execution_Block> _queued_activated_blocks;
-		boost::container::deque<Execution_Block*> _queued_deactivated_blocks;
-		boost::container::deque<Execution_Block*>* _blocks_with_free_cells;
+		std::deque<Execution_Block*> _queued_deactivated_blocks;
+		std::deque<Execution_Block*>* _blocks_with_free_cells;
 
 		_atomic_counter* _num_empty_blocks;
 	};

@@ -26,7 +26,7 @@ namespace Intersection_Components
 	namespace Prototypes
 	{
 
-		prototype struct Outbound_Inbound_Movements
+		prototype struct Outbound_Inbound_Movements ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -59,7 +59,7 @@ namespace Intersection_Components
 			}
 		};
 
-		prototype struct Inbound_Outbound_Movements
+		prototype struct Inbound_Outbound_Movements ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -96,7 +96,7 @@ namespace Intersection_Components
 			}
 		};
 
-		prototype struct Intersection
+		prototype struct Intersection ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

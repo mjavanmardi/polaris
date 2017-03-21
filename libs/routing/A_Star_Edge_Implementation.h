@@ -8,7 +8,7 @@ namespace polaris
 	template<typename MasterType>
 	struct Base_Edge_A_Star : public set_base_hook< optimize_size<false> >
 	{
-		typedef typename MasterType Master_Type;
+		typedef MasterType Master_Type;
 
 		Base_Edge_A_Star():_x(0.0f),_y(0.0f),_cost_from_origin(FLT_MAX / 2.0f),_time_label(0.0f),
 					 _estimated_cost_origin_destination(FLT_MAX / 2.0f),_marked_for_reset(0.0f),_in_closed_set(false),_in_open_set(false),
@@ -48,7 +48,7 @@ namespace polaris
 
 		t_data(void*, came_from);
 		
-		t_data(edge_id_type, edge_id);
+		t_data(p_edge_id_type, edge_id);
 
 		
 		Anonymous_Connection_Group<MasterType,Base_Edge_A_Star>* _begin_connection_groups;

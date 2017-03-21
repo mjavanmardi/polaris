@@ -20,7 +20,7 @@ namespace polaris
 		
 		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, Base_Edge_A_Star<MasterType>** final_destination)
 		{
-			for (std::vector<Base_Edge_A_Star<MasterType>*>::iterator itr = destinations.begin(); itr != destinations.end(); ++itr)
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 			{
 				*final_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
 				if(current->_edge_id == (*final_destination)->_edge_id) return true;	
@@ -58,16 +58,15 @@ namespace polaris
 				return current->_cost + connection->_cost;
 			}
 		}
-		
-		template<>
+
 		float cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
 		{
-			// moe lookup
+			// moe lookup - switched from link-based (moe_ptr) to turn-based (turn_moe_ptr) - testing.....
 			int current_time = current->time_label();
-			float* moe_ptr = current->moe_ptr();
-			float* turn_moe_ptr = connection->moe_ptr();
+			//float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
 
-			if(moe_ptr != nullptr && turn_moe_ptr != nullptr)
+			if(turn_moe_ptr /*moe_ptr*/ != nullptr)
 			{
 				int sim_time = iteration();
 
@@ -75,9 +74,8 @@ namespace polaris
 				float ttime_accumulation = 0;
 				float ttime_step = current->moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t_turn = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time);
-				float t_link = current->moe_data()->get_closest_element(moe_ptr,current_time);
-				float t = t_link + t_turn;
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
@@ -135,16 +133,14 @@ namespace polaris
 		{
 			return current->_time_cost + connection->_time_cost;
 		}
-		
-		template<>
+
 		float time_cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
 		{
 			// moe lookup
 			int current_time = current->time_label();
-			float* moe_ptr = current->moe_ptr();
-			float* turn_moe_ptr = connection->moe_ptr();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
 
-			if(moe_ptr != nullptr && turn_moe_ptr != nullptr)
+			if(turn_moe_ptr != nullptr)
 			{
 				int sim_time = iteration();
 
@@ -152,9 +148,7 @@ namespace polaris
 				float ttime_accumulation = 0;
 				float ttime_step = current->moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t_turn = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time);
-				float t_link = current->moe_data()->get_closest_element(moe_ptr,current_time);
-				float t = t_link + t_turn;
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time) + current->_time_cost;
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;

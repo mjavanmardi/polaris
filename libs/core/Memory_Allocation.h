@@ -4,7 +4,7 @@
 ///----------------------------------------------------------------------------------------------------
 #include "m_array.h"
 #include "Generic.h"
-#include "windows\gperftools\tcmalloc.h"
+//#include "windows\gperftools\tcmalloc.h"
 
 
 //#define ENABLE_MEMORY_LOGGING
@@ -28,14 +28,14 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Allocate(int uuid = -1)
+	DataType* Allocate(int uuid = -1, bool bInPlaceNew = true)
 	{
 #ifdef ENABLE_MEMORY_LOGGING
 		int i=(int)DataType::component_id;
 		int j=thread_id();
 		_type_counter(i,j)+=sizeof(DataType);
 #endif
-		return (DataType*)((DataType::component_manager)->Allocate(uuid));
+		return (DataType*)((DataType::component_manager)->Allocate(uuid, bInPlaceNew));
 	}
 
 	template<typename DataType>
@@ -79,8 +79,8 @@ namespace polaris
 	}
 }
 
-__forceinline extern void* operator new ( size_t size );
-__forceinline extern void* operator new[] ( size_t size );
+extern void* operator new ( size_t size );
+extern void* operator new[] ( size_t size );
 
-__forceinline extern void operator delete ( void* ptr );
-__forceinline extern void operator delete[] ( void* ptr );
+extern void operator delete ( void* ptr );
+extern void operator delete[] ( void* ptr );

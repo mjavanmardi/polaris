@@ -101,7 +101,7 @@ void Simulation_Engine::Collect_Core_Diagnostics()
 
 	//unsigned long long memory_allocated = 0;
 
-	//for(boost::container::vector<Component_Manager_Base*>::iterator itr=__all_components.begin();itr!=__all_components.end();itr++)
+	//for(std::vector<Component_Manager_Base*>::iterator itr=__all_components.begin();itr!=__all_components.end();itr++)
 	//{
 	//	if((*itr)->Component_Manager_Type() == EXECUTION_MANAGER)
 	//	{
@@ -123,7 +123,6 @@ void Simulation_Engine::Collect_Core_Diagnostics()
 void Simulation_Engine::Update()
 {
 	// activate new types
-
 	while( _queued_active_types.size() )
 	{
 		Execution_Component_Manager_Base* ptr = &_queued_active_types.front();

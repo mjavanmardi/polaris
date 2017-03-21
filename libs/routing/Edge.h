@@ -8,7 +8,7 @@ namespace polaris
 	template<typename Base_Edge_Type>
 	struct Routing_Data
 	{
-		boost::container::deque< Base_Edge_Type* >* modified_edges;
+		std::deque< Base_Edge_Type* >* modified_edges;
 		boost::intrusive::multiset< Base_Edge_Type >* open_set;
 		Base_Edge_Type* start_edge;
 		Base_Edge_Type* end_edge;
@@ -20,7 +20,7 @@ namespace polaris
 
 
 
-	prototype struct Edge
+	prototype struct Edge ADD_DEBUG_INFO
 	{
 		typedef typename ComponentType::base_edge_type base_edge_type;
 		typedef typename ComponentType::attribute_type attribute_type;
@@ -28,8 +28,8 @@ namespace polaris
 
 		attribute_type* attributes(){ return this_component()->attributes(); }
 
-		edge_id_type edge_id(){ return this_component()->edge_id(); }
-		void edge_id(edge_id_type value){ this_component()->edge_id(value); }
+		p_edge_id_type edge_id(){ return this_component()->edge_id(); }
+		void edge_id(p_edge_id_type value){ this_component()->edge_id(value); }
 		
 		//unsigned int edge_size(){ return this_component()->edge_size(); }
 		//void edge_size(unsigned int value){ this_component()->edge_size(value); }

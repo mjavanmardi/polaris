@@ -33,7 +33,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		
 		while(current_iteration <= end_iteration)
 		{
-			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
+			const std::vector<int>* geometry_by_thread = _storage[current_iteration];
 
 			for(int i=0;i<num_antares_threads();i++)
 			{
@@ -148,7 +148,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		
 		while(current_iteration <= end_iteration)
 		{
-			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
+			const std::vector<int>* geometry_by_thread = _storage[current_iteration];
 
 			for(int i=0;i<num_antares_threads();i++)
 			{
@@ -260,7 +260,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		bool found=false;
 		
-		boost::container::vector<Point_3D<MasterType>> polygon;
+		std::vector<Point_3D<MasterType>> polygon;
 
 		int current_iteration=start_iteration;
 		
@@ -268,7 +268,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		{
 			if(found) break;
 
-			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
+			const std::vector<int>* geometry_by_thread = _storage[current_iteration];
 
 			for(unsigned int i=0;i<num_antares_threads();i++)
 			{
@@ -325,7 +325,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 								geometry_itr += sizeof(Point_3D<MasterType>);
 							}
 
-							if(In_Polygon((boost::container::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
+							if(In_Polygon((std::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
 							{
 								best_element = (unsigned char*)geometry_head;
 								found = true;
@@ -358,7 +358,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 
-						if(In_Polygon((boost::container::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
+						if(In_Polygon((std::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
 						{
 							best_element = (unsigned char*)geometry_head;
 							found = true;
@@ -388,7 +388,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		bool found=false;
 		
-		boost::container::vector<Point_3D<MasterType>> polygon;
+		std::vector<Point_3D<MasterType>> polygon;
 
 		int current_iteration=start_iteration;
 		
@@ -396,7 +396,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		{
 			if(found) break;
 
-			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
+			const std::vector<int>* geometry_by_thread = _storage[current_iteration];
 
 			for(unsigned int i=0;i<num_antares_threads();i++)
 			{
@@ -454,7 +454,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 						}
 					}
 
-					if(In_Polygon((boost::container::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
+					if(In_Polygon((std::vector<Point_3D<NULLTYPE>>&)polygon,point._x,point._y))
 					{
 						best_element = (unsigned char*)geometry_head;
 						found = true;
@@ -473,7 +473,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 	{
 		if(mode==ALT_DOWN)
 		{
-			for(boost::container::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
+			for(std::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
 			{
 				if((*itr) == *((void**)best_element))
 				{
@@ -482,7 +482,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 			}
 
 			_deselected_elements.clear();
-			for(boost::container::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++){ _deselected_elements.push_back( *itr ); }
+			for(std::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++){ _deselected_elements.push_back( *itr ); }
 
 			_added_elements.clear();
 			_added_elements.push_back(*((void**)best_element));
@@ -492,7 +492,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 			if(_selection_callback != nullptr)
 			{
-				boost::container::vector<pair<string,string>> bucket;
+				std::vector<pair<string,string>> bucket;
 
 				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
 				
@@ -504,7 +504,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 			_deselected_elements.clear();
 			_added_elements.clear();
 
-			for(boost::container::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
+			for(std::list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
 			{
 				if((*itr) == *((void**)best_element))
 				{
@@ -522,7 +522,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 			if(_selection_callback != nullptr)
 			{
-				boost::container::vector<pair<string,string>> bucket;
+				std::vector<pair<string,string>> bucket;
 
 				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
 

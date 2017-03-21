@@ -20,6 +20,9 @@ namespace Zone_Components
 	{
 		implementation struct Zone_Implementation:public Polaris_Component<MasterType,INHERIT(Zone_Implementation),Execution_Object>
 		{
+			typedef Polaris_Component<MasterType,INHERIT(Zone_Implementation),Execution_Object> Base_t;
+			typedef typename Base_t::ComponentType ComponentType;
+
 			typedef Zone<typename MasterType::zone_type> _this_interface;
 
 			int* production_counter;
@@ -83,7 +86,11 @@ namespace Zone_Components
 			member_component_and_feature_accessor(school_area,Value,Basic_Units::Prototypes::Area,Basic_Units::Implementations::Area_Implementation<NT>);
 
 			member_component_and_feature_accessor(avg_ttime_transit,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
-			member_component_and_feature_accessor(avg_ttime_auto_to_transit_accessible_zones,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_ovtt_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_fare_transit, Value, Basic_Units::Prototypes::Currency, Basic_Units::Implementations::Currency_Implementation<NT>);
+			member_component_and_feature_accessor(avg_wait_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_distance, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			//member_component_and_feature_accessor(avg_ttime_auto_to_transit_accessible_zones,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ttime_auto_peak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ttime_auto_offpeak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 
@@ -139,18 +146,23 @@ namespace Zone_Components
 			tag_getter_as_available(production_count);	
 			tag_getter_as_available(attraction_count);
 
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, origin_activity_locations, NONE, NONE);
+			template<typename AreaType, typename ReturnType> ReturnType population_density(requires(ReturnType, check(ReturnType, is_arithmetic)))
+			{
+				return (ReturnType)this->_pop_persons / (ReturnType)this->area<AreaType>();
+			}
 
-			m_container(boost::container::vector<typename MasterType::link_type*>, destination_activity_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, origin_activity_locations, NONE, NONE);
 
-			m_container(boost::container::vector<float>, origin_activity_location_choice_cdfs, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, destination_activity_locations, NONE, NONE);
 
-			m_container(boost::container::vector<float>, destination_activity_location_choice_cdfs, NONE, NONE);
+			m_container(std::vector<float>, origin_activity_location_choice_cdfs, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, home_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, work_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, discretionary_locations, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::activity_location_type*>, school_locations, NONE, NONE);
+			m_container(std::vector<float>, destination_activity_location_choice_cdfs, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::activity_location_type*>, home_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, work_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, discretionary_locations, NONE, NONE);
+			m_container(std::vector<typename MasterType::activity_location_type*>, school_locations, NONE, NONE);
 
 		};
 	}

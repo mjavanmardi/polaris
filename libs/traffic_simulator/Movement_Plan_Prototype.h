@@ -1,10 +1,10 @@
 #pragma once
 #include "User_Space_Includes.h"
-#include "activity_simulator\Activity_Prototype.h"
+#include "activity_simulator/Activity_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Prototype.h"
 #include "Zone_Prototype.h"
-#include "routing\Routing.h"
+#include "routing/Routing.h"
 
 namespace Movement_Plan_Components
 {
@@ -78,11 +78,11 @@ namespace Movement_Plan_Components
 				
 				typedef Network_Components::Prototypes::Network< typename get_type_of(network)> _network_itf;
 				typedef Random_Access_Sequence< typename _network_itf::get_type_of(activity_locations_container)> _activity_locations_container_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_activity_locations_container_itf)>  _activity_location_itf;	
+				typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_activity_locations_container_itf)>  _activity_location_itf;
 				typedef Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links)> _links_container_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(_links_container_itf)>  _link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(_links_container_itf)>  _link_itf;
 				typedef Random_Access_Sequence< typename _link_itf::get_type_of(outbound_turn_movements)> _turns_container_itf;
-				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(_turns_container_itf)>  _turn_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(_turns_container_itf)>  _turn_itf;
 
 				// continue if a valid movement is specified
 				if (orig != nullptr && dest != nullptr) 
@@ -100,7 +100,7 @@ namespace Movement_Plan_Components
 						{
 							_link_itf* o_link =this->template origin<_link_itf*>();
 							_link_itf* d_link =this->template destination<_link_itf*>();
-							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->dbid<int>() << ", dir="<<o_link->direction<int>()<<" : dest_link="<< d_link->dbid<int>()<<", dir="<<o_link->direction<int>());
+							THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->template dbid<int>() << ", dir="<<o_link->template direction<int>()<<" : dest_link="<< d_link->template dbid<int>()<<", dir="<<o_link->template direction<int>());
 							return false;
 						}
 					}
@@ -119,10 +119,10 @@ namespace Movement_Plan_Components
 				}
 				return true;
 			}
-			
 
 			// overloaded origin and destination, depending on targetType
-			template<typename TargetType> void origin(TargetType activity_location, requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+			template<typename TargetType>
+			void origin(TargetType activity_location,requires(TargetType,check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				this_component()->template origin_location<TargetType>(activity_location);
 			}
@@ -138,7 +138,8 @@ namespace Movement_Plan_Components
 			{
 				return this_component()->template destination_location<TargetType>();
 			}
-			template<typename TargetType> void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
+			template<typename TargetType>
+			void origin(TargetType link, requires(TargetType,check(strip_modifiers(TargetType),Link_Components::Concepts::Is_Basic_Link)))
 			{
 				this_component()->template origin<TargetType>(link);
 			}
@@ -196,7 +197,7 @@ namespace Movement_Plan_Components
 				assert_check(ComponentType,Initialize_exists, "No Initialize method defined in component.");
 			}
 #endif
-			void set_trajectory(boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& arrival_time_container)
+			void set_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
 				//TODO: check that this has been correctly translated!
 
@@ -216,14 +217,14 @@ namespace Movement_Plan_Components
 				//trajectory.clear();
 				clear_trajectory();
 
-				typename boost::container::deque<global_edge_id>::iterator itr;
-				typename boost::container::deque<float>::iterator arrival_time_itr;
+				typename std::deque<global_edge_id>::iterator itr;
+				typename std::deque<float>::iterator arrival_time_itr;
 
 				for(itr = path_container.begin(), arrival_time_itr = arrival_time_container.begin(); itr != path_container.end(); itr++,arrival_time_itr++)
 				{
 					Trajectory_Unit_Interface* vehicle_trajectory_data=(Trajectory_Unit_Interface*)Allocate<typename Trajectory_Unit_Interface::Component_Type>();
 
-					Link_Interface* link = net->get_link_ptr< typename Trajectory_Unit_Interface::get_type_of(link) >( itr->edge_id );
+					Link_Interface* link = net->template get_link_ptr< typename Trajectory_Unit_Interface::get_type_of(link) >( itr->edge_id );
 					
 
 					vehicle_trajectory_data->template Initialize<Link_Interface*>( link );
@@ -253,7 +254,7 @@ namespace Movement_Plan_Components
 
 
 				//typename TargetType::reverse_iterator itr;
-				//typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
+				//typename std::vector<float>::reverse_iterator arrival_time_itr;
 				//for(itr = path_container.rbegin(), arrival_time_itr = reversed_arrival_time_container.rbegin(); itr != path_container.rend(); itr++,arrival_time_itr++)
 				//{
 				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
@@ -268,7 +269,7 @@ namespace Movement_Plan_Components
 
 			}
 
-			void update_trajectory(boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& arrival_time_container)
+			void update_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
@@ -285,14 +286,14 @@ namespace Movement_Plan_Components
 				// add the time entering the current link to the relative estimated arrival time for the new trajectory_unit links
 				int stored_ttime = trajectory[current_trajectory_position<int&>()]->template enter_time<int>() - (int)this->departed_time<Time_Seconds>();
 
-				typename boost::container::deque<global_edge_id>::iterator path_itr;
-				typename boost::container::deque<float>::iterator arrival_time_itr;
+				typename std::deque<global_edge_id>::iterator path_itr;
+				typename std::deque<float>::iterator arrival_time_itr;
 				
 				Network_Interface* net = network<Network_Interface*>();
 
 				for(path_itr = path_container.begin() + 1, arrival_time_itr = arrival_time_container.begin() + 1; path_itr != path_container.end(); path_itr++,arrival_time_itr++)
 				{
-					_Link_Interface* link = net->get_link_ptr< typename _Trajectory_Unit_Interface::get_type_of(link) >( path_itr->edge_id );
+					_Link_Interface* link = net->template get_link_ptr< typename _Trajectory_Unit_Interface::get_type_of(link) >( path_itr->edge_id );
 
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
 					vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr/* - 1*/) + stored_ttime);
@@ -302,7 +303,7 @@ namespace Movement_Plan_Components
 
 
 				//typename TargetType::reverse_iterator itr;
-				//typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
+				//typename std::vector<float>::reverse_iterator arrival_time_itr;
 				//for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
 				//{
 				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
@@ -317,14 +318,14 @@ namespace Movement_Plan_Components
 			void clear_trajectory()
 			{
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
-				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+				typedef  Trajectory_Unit<get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
 
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
 
 				// Free the allocated memory in the trajectory, if exists
-				for (Trajectory_Container_Interface::iterator itr = trajectory.begin(); itr != trajectory.end(); ++itr)
+				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
-					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 				trajectory.clear();
 
@@ -335,16 +336,16 @@ namespace Movement_Plan_Components
 			{
 				// get interface to trajectory
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
-				typedef  Trajectory_Unit<typename get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
+				typedef  Trajectory_Unit<get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
 				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
 
 				// validate offset
 				if (offset >= trajectory.size()) THROW_EXCEPTION("Error, invalid begining offset for clearing the trajectory, must be less than the container size.");
 
 				// Free the allocated memory in the trajectory, if exists
-				for (Trajectory_Container_Interface::iterator itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
+				for (auto itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
-					Free<typename get_component_type(Trajectory_Container_Interface)>(*itr);
+					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 
 				//erase 
@@ -443,9 +444,9 @@ namespace Movement_Plan_Components
 				return (TargetType)(trajectory->size());
 			}
 
-			template<typename TargetType> void arrive_to_destination()
+			void arrive_to_destination()
 			{
-				this_component()->template arrive_to_destination<TargetType>();
+				this_component()->arrive_to_destination();
 			}
 
 			template<typename TargetType> void transfer_to_next_link(int delayed_time)

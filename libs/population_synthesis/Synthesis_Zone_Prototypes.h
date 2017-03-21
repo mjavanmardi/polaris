@@ -56,9 +56,9 @@ namespace PopSyn
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable");
 				assert_check(ComponentType,Concepts::Is_IPU_Compatible," And not Combinatorial-optimization compatible.");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
 			template<typename AnalysisUnitType> void Integerize_Joint_Distribution(requires(AnalysisUnitType,check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible)))
@@ -69,29 +69,33 @@ namespace PopSyn
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Compatible,"Not IPF Capable");
 				assert_check(ComponentType,Concepts::Is_IPU_Compatible," And not Combinatorial-optimization compatible.");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
-				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_JMWAY,"doesn't have a joint distribution");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Value_Type,"doesn't have a value_type");
+//				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
 
 
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, IPU, etc. methods
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType,Concepts::Is_IPF_Compatible) || check(ComponentType,Concepts::Is_IPU_Compatible)) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)))
+			template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Is_Probabilistic_Selection) && (check(ComponentType, Concepts::Is_IPF_Compatible) || check(ComponentType, Concepts::Is_IPU_Compatible))/* && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)*/)>
+			void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr)
 			{
 				this_component()->Select_Synthetic_Population_Units<TargetType>(Region_Sample_Ptr);
 			}
-			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType,Concepts::Is_IPF_Compatible) && !check(ComponentType,Concepts::Is_IPU_Compatible)) || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))))
+
+			template<typename TargetType, requires(TargetType, !(check(ComponentType, Concepts::Is_Probabilistic_Selection) || (!check(ComponentType, Concepts::Is_IPF_Compatible) && !check(ComponentType, Concepts::Is_IPU_Compatible))/* || !check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))*/))>
+			void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr)
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				/*assert_check(TargetType, is_pointer,"Is not a pointer");*/
-				assert_check(strip_modifiers(TargetType), polaris::Container_Concepts::Is_Associative, "Container is not associative.");
+				//assert_check(strip_modifiers(TargetType), polaris::Container_Concepts::Is_Associative, "Container is not associative.");
 			}
 			
 			//===================================================================================================================================
 			// This method creates the actual agent object - if the popsyn is linked to a simulation, otherwise it returns nothing (use this for popsyns which only output the results)
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype)))
+			template<typename TargetType, requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype))>
+			void Create_Household(TargetType static_properties)
 			{
 				//=============================================================================================
 				#pragma region Define interfaces
@@ -99,13 +103,13 @@ namespace PopSyn
 				typedef Network_Components::Prototypes::Network<typename ComponentType::Master_Type::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
-				typedef  Household_Components::Prototypes::Household<typename get_component_type(households_itf)>  household_itf;
+				typedef  Household_Components::Prototypes::Household<get_component_type(households_itf)>  household_itf;
 				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> persons_itf;
-				typedef  Person_Components::Prototypes::Person<typename get_component_type(persons_itf)>  person_itf;
+				typedef  Person_Components::Prototypes::Person<get_component_type(persons_itf)>  person_itf;
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Household_Components::Prototypes::Household_Properties <typename get_mapped_component_type(sample_itf)>  pop_unit_itf;		
+				typedef  Household_Components::Prototypes::Household_Properties <get_mapped_component_type(sample_itf)>  pop_unit_itf;
 				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef  Person_Components::Prototypes::Person_Properties <typename get_component_type(person_sample_itf)>  person_unit_itf;
+				typedef  Person_Components::Prototypes::Person_Properties <get_component_type(person_sample_itf)>  person_unit_itf;
 				#pragma endregion
 
 				// Get the zones synthetic household container
@@ -115,7 +119,7 @@ namespace PopSyn
 				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
 
 				// create new household using sample unit
-				household_itf* hh=(household_itf*)Allocate<typename get_component_type(households_itf)>();
+				household_itf* hh=(household_itf*)Allocate<get_component_type(households_itf)>();
 				hh->template Static_Properties<pop_unit_itf*>(pop_unit);
 
 				// get the static persons associated with the static household
@@ -128,47 +132,51 @@ namespace PopSyn
 					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
 					person->template Static_Properties<person_unit_itf*>((person_unit_itf*)(*person_unit_itr));
 					hh->template Persons_Container<persons_itf&>().push_back(person);
-					person->template Household<household_itf*>(hh);
+					person->person_itf::template Household<household_itf*>(hh);
 				}
 				household_container->push_back(hh);
 			}
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			
+			template<typename TargetType, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype)), requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype))> 
+			void Create_Household(TargetType static_properties)
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
-				typedef  Household_Components::Prototypes::Household_Properties<typename get_component_type( typename get_type_of(Synthetic_Households_Container))>  household_itf;
+				typedef  Household_Components::Prototypes::Household_Properties<get_component_type(get_type_of(Synthetic_Households_Container))>  household_itf;
 				
-				typedef  Random_Access_Sequence<get_type_of(Synthetic_Persons_Container)> persons_itf;
-				typedef  Person_Components::Prototypes::Person_Properties<typename get_component_type(typename get_type_of(Synthetic_Persons_Container))>  person_itf;
+				typedef  Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> persons_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<typename get_component_type(persons_itf)>  person_itf;
 
 				// interface to the ACS sample data classes
 				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
-				typedef  Household_Components::Prototypes::Household_Properties <typename get_mapped_component_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <get_mapped_component_type(get_type_of(Sample_Data))>  pop_unit_itf;
 				
 				
 				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
-				typedef  Person_Components::Prototypes::Person_Properties<typename get_component_type(typename pop_unit_itf::get_type_of(Persons_Container))>  person_unit_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<get_component_type(pop_unit_itf::get_type_of(Persons_Container))>  person_unit_itf;
 				
 
 				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<households_itf*>();
-				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
+				//persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 
-				// create new household using sample unit
-				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
-				person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
+				//// create new household using sample unit
+				//pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
+				//person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
 
-				// create new person agent from each person unit properties class in the hh unit properties class
-				typename person_sample_itf::iterator person_unit_itr = person_units->begin();
-				for (;person_unit_itr != person_units->end(); ++person_unit_itr)
-				{
-					person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
-					person_container->push_back((person_itf*)person);
-				}
+				//// create new person agent from each person unit properties class in the hh unit properties class
+				//typename person_sample_itf::iterator person_unit_itr = person_units->begin();
+				//for (;person_unit_itr != person_units->end(); ++person_unit_itr)
+				//{
+				//	person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
+				//	person_container->push_back((person_itf*)person);
+				//}
 
 				household_container->push_back((household_itf*)static_properties);
 			}
-			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			
+			template<typename TargetType, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype)), requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype))> 
+			void Create_Household(TargetType static_properties)
 			{
 				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");
 				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");
@@ -201,9 +209,9 @@ namespace PopSyn
 			accessor(Synthetic_Households_Container, NONE, NONE);	// This is the container holding the flyweighted synthesized data (i.e. multiple pointers to single object) created during the synthesis routine
 			accessor(Synthetic_Persons_Container, NONE, NONE);		// same as above for the synthetic persons
 			accessor(Sample_Data, NONE, NONE);						// This is the container holding the base sample data used in the synthesis routine
-			accessor(scenario_reference, NONE, NONE);				
+			basic_accessor(scenario_reference, NONE, NONE);				
 			accessor(network_reference, NONE, NONE);
-			accessor(parent_reference, NONE, NONE);					// Reference to the parent region which contains the zone (or the parent popsyn when prototype used for regions)
+			basic_accessor(parent_reference, NONE, NONE);					// Reference to the parent region which contains the zone (or the parent popsyn when prototype used for regions)
 			accessor(file_linker_reference, NONE, NONE);		
 			
 			//===================================================================================================================================

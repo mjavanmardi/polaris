@@ -425,5 +425,5 @@ struct Antares_Layer_Configuration
 	string x_label;
 	string y_label;
 
-	boost::container::vector<string> textures;
+	std::vector<string> textures;
 };

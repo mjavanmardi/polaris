@@ -25,6 +25,23 @@ namespace Network_Skimming_Components
 		template<typename ComponentType> struct Skim_Table;
 		template<typename ComponentType> struct Location_To_Zone_Map_Item;
 
+
+		prototype struct LOS ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+
+			accessor(auto_ttime, NONE, NONE);
+			accessor(auto_tolls, NONE, NONE);
+			accessor(auto_parking_cost, NONE, NONE);
+			accessor(auto_distance /*transit_sov_access_time*/, NONE, NONE);
+
+			accessor(transit_ttime, NONE, NONE);
+			accessor(transit_walk_access_time, NONE, NONE);
+			accessor(transit_wait_time, NONE, NONE);
+			accessor(transit_fare, NONE, NONE);
+			accessor(LOS_time_invariant, NONE, NONE);
+		};
+
 		prototype struct Network_Skimming ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
@@ -146,7 +163,7 @@ namespace Network_Skimming_Components
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				network_itf* network = this->network_reference<network_itf*>();
 
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::mapped_type>::type> zone_itf;
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),int,zone_itf*> zones_itf;
 
@@ -154,10 +171,10 @@ namespace Network_Skimming_Components
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			
 				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
-				typedef Link_Components::Prototypes::Link<typename get_component_type(links_itf)> link_itf;
+				typedef Link_Components::Prototypes::Link<get_component_type(links_itf)> link_itf;
 				
 				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
-				typedef Turn_Movement_Components::Prototypes::Movement<typename get_component_type(turns_itf)> turn_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<get_component_type(turns_itf)> turn_itf;
 
 				/*typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename get_type_of(origin_locations)::value_type>::type> origin_location_itf;
 				typedef Random_Access_Sequence<typename get_type_of(origin_locations),origin_location_itf*> origin_locations_itf;*/
@@ -193,7 +210,7 @@ namespace Network_Skimming_Components
 					int num_locations = (int)available_locations.size();
 					zone_origins_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
 					
-					// Add all locations to boost::container::list if less than the number required
+					// Add all locations to std::list if less than the number required
 					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
@@ -212,7 +229,7 @@ namespace Network_Skimming_Components
 						int num_successful = 0;
 
 						// make nodes_per_zone attempts to pick origin locations
-						boost::container::vector<origin_location_itf*> available_locations_temp;
+						std::vector<origin_location_itf*> available_locations_temp;
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((origin_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
@@ -222,7 +239,7 @@ namespace Network_Skimming_Components
 							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							origin_location_itf* loc = (origin_location_itf*)available_locations_temp[rand_loc_index];
 
-							// If the location does not have valid links or is already in the boost::container::list, skip
+							// If the location does not have valid links or is already in the std::list, skip
 							if (loc->template Is_Routable_Location<bool>())
 							{
 								origin_locations->push_back(loc);
@@ -239,7 +256,7 @@ namespace Network_Skimming_Components
 						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	origin_location_itf* loc = (origin_location_itf*)available_locations[rand_loc_index];
 
-						//	// If the location does not have valid links or is already in the boost::container::list, skip
+						//	// If the location does not have valid links or is already in the std::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
 						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
@@ -274,7 +291,7 @@ namespace Network_Skimming_Components
 					int num_locations = (int)available_locations.size();
 					zone_destinations_count.insert(pair<long,int>(dest_zone->template internal_id<long>(),0));
 					
-					// Add all locations to boost::container::list if less than the number required
+					// Add all locations to std::list if less than the number required
 					if (num_locations <= this->template nodes_per_zone<int>())
 					{
 						for (int i=0; i<num_locations; i++)
@@ -295,7 +312,7 @@ namespace Network_Skimming_Components
 						int num_successful = 0;
 
 						// make nodes_per_zone attempts to pick origin locations
-						boost::container::vector<destination_location_itf*> available_locations_temp;
+						std::vector<destination_location_itf*> available_locations_temp;
 						for (int i=0; i<num_locations; i++) available_locations_temp.push_back((destination_location_itf*)available_locations[i]);
 
 						// continue trying to add locations randomly while less than the required number have been added, until all locations have been tried
@@ -305,7 +322,7 @@ namespace Network_Skimming_Components
 							int rand_loc_index = (int)(max<double>(0,(GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001)) * (double)available_locations_temp.size());
 							destination_location_itf* loc = (destination_location_itf*)available_locations_temp[rand_loc_index];
 
-							// If the location does not have valid links or is already in the boost::container::list, skip
+							// If the location does not have valid links or is already in the std::list, skip
 							if (loc->template Is_Routable_Location<bool>())
 							{
 								destination_locations->push_back(loc);
@@ -323,7 +340,7 @@ namespace Network_Skimming_Components
 						//	int rand_loc_index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<double>() - 0.0001) * (double)num_locations);
 						//	destination_location_itf* loc = (destination_location_itf*)available_locations[rand_loc_index];
 
-						//	// If the location does not have valid links or is already in the boost::container::list, skip
+						//	// If the location does not have valid links or is already in the std::list, skip
 						//	if (!loc->template Is_Routable_Location<bool>())
 						//	{
 						//		cout << "Location not routable: " << loc->template uuid<int>() <<", land use type: " << loc->land_use_type<Activity_Location_Components::Types::LAND_USE>()<<endl;
@@ -352,14 +369,18 @@ namespace Network_Skimming_Components
 				this_component()->template Load_Event<ComponentType>(Skim_Table_Update_Conditional,0,Types::SUB_ITERATIONS::INITIALIZE);
 
 			}
-			template<typename NetworkType> void Initialize(NetworkType network_pointer, requires(NetworkType,check(NetworkType, is_pointer) && check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+
+			template<typename NetworkType, requires(NetworkType, check(NetworkType, is_pointer) && check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network_Prototype))>
+			void Initialize(NetworkType network_pointer)
 			{
 				// set the network references
 				this->template network_reference<NetworkType>(network_pointer);
 				
 				this->template Initialize<NT>();
-			}			
-			template<typename NetworkType> void Initialize(NetworkType network_reference, requires(NetworkType,!check(NetworkType, is_pointer) || !check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype)))
+			}
+
+			template<typename NetworkType, requires(NetworkType, !check(NetworkType, is_pointer) || !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network_Prototype))>
+			void Initialize(NetworkType network_reference)
 			{
 				assert_check(NetworkType, is_pointer,"TargetType is not a pointer" );
 				assert_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
@@ -367,7 +388,8 @@ namespace Network_Skimming_Components
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_turns, "TargetType does not have turns accessor");
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_locations, "TargetType does not have locations accessor");
 				assert_sub_check(strip_modifiers(NetworkType), Network_Components::Concepts::Is_Transportation_Network_Prototype, has_zones, "TargetType does not have zones accessor");
-			}			
+			}
+
 			template<typename TargetType> bool Update_Skim_Tables()
 			{
 				//// Update each modal_skim
@@ -419,7 +441,7 @@ namespace Network_Skimming_Components
 				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,_los_itf*>(Origin, Destination, Start_Time);
 
 				//Check for bad travel time
-				if (los_value->auto_ttime<Time_Seconds>() > END || los_value->auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->auto_ttime<Time_Seconds>()))
+				if (los_value->template auto_ttime<Time_Seconds>() > END || los_value->template auto_ttime<Time_Seconds>() <0 || ISNAN(los_value->template auto_ttime<Time_Seconds>()))
 				{
 					int O = this->template Get_Zone_ID<LocationType>(Origin);
 					int D = this->template Get_Zone_ID<LocationType>(Destination);
@@ -445,11 +467,11 @@ namespace Network_Skimming_Components
 			// This returns the full level of service information for the O/D pair at a specific time
 			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType  Get_LOS(LocationType Origin, LocationType Destination, TimeType Start_Time, requires(ReturnType,check(strip_modifiers(ReturnType), Concepts::Is_LOS_Prototype)))
 			{
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
 				
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -473,7 +495,7 @@ namespace Network_Skimming_Components
 				// Transferred code here from former mode_skim_prototype
 				//-------------------------------------------------------------------
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<typename get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
+				typedef Prototypes::Skim_Table<get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
 
 				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 				_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
@@ -482,8 +504,8 @@ namespace Network_Skimming_Components
 
 				// get only the HH:MM:SS portion of requested time if Time > 1 day
 				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(Start_Time))/24);
-				typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
-				typename TimeType remain = Start_Time - rounded;
+				TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+				TimeType remain = Start_Time - rounded;
 				
 				// go to skim table for requested time period
 				for (; itr != skims->end(); ++itr)
@@ -500,7 +522,7 @@ namespace Network_Skimming_Components
 				// if the code gets here, then the requested time does not fall within any skim_table time period
 				cout << endl << "Get LOS failure: " <<"origin: " << Origin_Zone_ID <<", destination: " << Destination_Zone_ID<<", time: "  << Start_Time<<", remain time="<<remain<<", rounded="<<rounded<<endl;
 				assert(false);
-				return false;
+				return nullptr;
 			}
 			
 			//---------------------------------------------
@@ -509,10 +531,10 @@ namespace Network_Skimming_Components
 			{
 				available_set.clear();
 
-				// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+				// create the references to network items and create the std::lists of origins/destination to route from/to
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-				typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 
 				network_itf* network = this->template network_reference<network_itf*>();
 				zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -532,7 +554,7 @@ namespace Network_Skimming_Components
 				// Transferred code here from former mode_skim_prototype
 				//-------------------------------------------------------------------
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<typename get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
+				typedef Prototypes::Skim_Table<get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
 
 				//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 				_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
@@ -541,8 +563,8 @@ namespace Network_Skimming_Components
 
 				// get only the HH:MM:SS portion of requested time if Time > 1 day
 				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(start_time))/24);
-				typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
-				typename TimeType remain = start_time - rounded;
+				TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+				TimeType remain = start_time - rounded;
 				
 				// go to skim table for requested time period
 				for (; itr != skims->end(); ++itr)
@@ -561,10 +583,10 @@ namespace Network_Skimming_Components
 			//{
 			//	available_set.clear();
 
-			//	// create the references to network items and create the boost::container::lists of origins/destination to route from/to
+			//	// create the references to network items and create the std::lists of origins/destination to route from/to
 			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
 			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			//	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(zones_itf)> zone_itf;
+			//	typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
 
 			//	network_itf* network = this->template network_reference<network_itf*>();
 			//	zones_itf* zones = network->template zones_container<zones_itf*>();
@@ -584,7 +606,7 @@ namespace Network_Skimming_Components
 			//	// Transferred code here from former mode_skim_prototype
 			//	//-------------------------------------------------------------------
 			//	typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-			//	typedef Prototypes::Skim_Table<typename get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
+			//	typedef Prototypes::Skim_Table<get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
 
 			//	//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
 			//	_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
@@ -614,7 +636,7 @@ namespace Network_Skimming_Components
 			template<typename TargetType> bool Update_LOS()
 			{
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<typename get_component_type(_skim_container_itf)> _skim_itf;
+				typedef Prototypes::Skim_Table<get_component_type(_skim_container_itf)> _skim_itf;
 
 				_skim_container_itf* skim = this->template skims_by_time_container<_skim_container_itf*>();
 				
@@ -637,7 +659,7 @@ namespace Network_Skimming_Components
 			template<typename TargetType> void Write_LOS()
 			{
 				typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-				typedef Prototypes::Skim_Table<typename get_component_type(_skim_container_itf)> _skim_itf;
+				typedef Prototypes::Skim_Table<get_component_type(_skim_container_itf)> _skim_itf;
 
 				_skim_container_itf* skim = this->skims_by_time_container<_skim_container_itf*>();
 
@@ -650,52 +672,54 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
-			template<typename TargetType> static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
-			{
-//				File_IO::Binary_File_Reader infile;
-				infile.Open(infilename);
-				
-				ofstream outfile;
-				outfile.open(outfilename);
 
-				//===========================================================================
-				// Read Header
-				int num_modes, num_zones, update_increment;
-				infile.template Read_Value<int>(num_modes);
-				infile.template Read_Value<int>(num_zones);
-				infile.template Read_Value<int>(update_increment);
-				
-				//===========================================================================
-				// create the skim_table time periods, for basic create only a single time period skim_table
-				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
-				{		
-					float* data = new float[num_zones*num_zones];
-
-
-
-					infile.template Read_Array<float>(data, num_zones*num_zones);
-
-
-					boost::container::vector<float> temp(data,data+num_zones*num_zones);
-
-					
-					outfile << "Skim table for time period starting at: " << start<<endl;
-
-					for (int i=0; i< num_zones; i++)
-					{
-						for (int j=0; j< num_zones; j++)
-						{
-							outfile << data[i*(num_zones)+j] << ",";
-						}
-						outfile << endl;
-					}
-					cout <<endl<< "finished period "<<start<<endl;
-					outfile << endl;
-				}
-
-				infile.Close();
-				outfile.close();
-			}
+// TODO: this does not compile
+//			template<typename TargetType> static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
+//			{
+////				File_IO::Binary_File_Reader infile;
+//				infile.Open(infilename);
+//
+//				ofstream outfile;
+//				outfile.open(outfilename);
+//
+//				//===========================================================================
+//				// Read Header
+//				int num_modes, num_zones, update_increment;
+//				infile.template Read_Value<int>(num_modes);
+//				infile.template Read_Value<int>(num_zones);
+//				infile.template Read_Value<int>(update_increment);
+//
+//				//===========================================================================
+//				// create the skim_table time periods, for basic create only a single time period skim_table
+//				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
+//				{
+//					float* data = new float[num_zones*num_zones];
+//
+//
+//
+//					infile.template Read_Array<float>(data, num_zones*num_zones);
+//
+//
+//					boost::container::vector<float> temp(data,data+num_zones*num_zones);
+//
+//
+//					outfile << "Skim table for time period starting at: " << start<<endl;
+//
+//					for (int i=0; i< num_zones; i++)
+//					{
+//						for (int j=0; j< num_zones; j++)
+//						{
+//							outfile << data[i*(num_zones)+j] << ",";
+//						}
+//						outfile << endl;
+//					}
+//					cout <<endl<< "finished period "<<start<<endl;
+//					outfile << endl;
+//				}
+//
+//				infile.Close();
+//				outfile.close();
+//			}
 
 			template<typename TargetType> void Read_Binary_Headers(int& num_modes, int& num_zones, TargetType intervals, bool perform_checks)
 			{
@@ -705,6 +729,8 @@ namespace Network_Skimming_Components
 			{
 				this_component()->template Read_Binary_Data<TargetType>(data_ptr, file, num_zones);
 			}
+
+			typedef typename ComponentType::Master_Type MasterType;
 
 			template<typename TargetType> int Get_Zone_ID(TargetType area_type_interface_ptr, requires(TargetType,check(TargetType, is_pointer) && check(strip_modifiers(TargetType), Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
@@ -860,21 +886,6 @@ namespace Network_Skimming_Components
 
 		};
 
-		prototype struct LOS ADD_DEBUG_INFO
-		{
-			tag_as_prototype;
-
-			accessor(auto_ttime, NONE, NONE);
-			accessor(auto_tolls, NONE, NONE);
-			accessor(auto_parking_cost, NONE, NONE);
-			accessor(auto_distance /*transit_sov_access_time*/, NONE, NONE);
-
-			accessor(transit_ttime, NONE, NONE);
-			accessor(transit_walk_access_time, NONE, NONE);		
-			accessor(transit_wait_time, NONE, NONE);
-			accessor(transit_fare, NONE, NONE);
-			accessor(LOS_time_invariant, NONE, NONE);
-		};
 
 	}
 }

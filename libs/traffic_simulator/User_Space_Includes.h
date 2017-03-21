@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "../Repository/Repository.h"
+#include "../repository/Repository.h"
 #include "User_Space_Forward_Declaration.h"
 #include "Traffic_Simulator_Concepts.h"
 #include "Traffic_Simulator_Types.h"
@@ -16,8 +16,8 @@
 //#include <unordered_map>
 //#include <unordered_set>
 #ifndef _MSC_VER
-#include <tr1/boost::unordered::unordered_map>
-#include <tr1/boost::unordered::unordered_set>
+#include <unordered_map>
+#include <unordered_set>
 using namespace __gnu_cxx;
 #endif
 
@@ -113,11 +113,13 @@ public:
 	void Start()
 	{
 		_l=0;
-		start_timer(_start);
+		//TODO: I don't see where this is defined
+		//start_timer(_start);
 	}
 	double Stop()
 	{
-		end_timer(_start,_l);
+		//TODO: I don't see where this is defined
+		//end_timer(_start,_l);
 		cout << endl << "approx clock time (ns) = "<< _l<<endl;
 		return (double)(_l);
 	}
@@ -129,7 +131,8 @@ public:
 
 
 #ifndef _MSC_VER
-#define FLT_MAX	3.402823466e+38F	/* max value */
+//#define FLT_MAX	3.402823466e+38F	/* max value */
+#include <cfloat>
 #endif
 
 #define INFINITY_FLOAT 9999999
@@ -194,7 +197,7 @@ int convert_hhmm_to_seconds(string hhmm)
 	return time_in_seconds;
 };
 
-void string_split(boost::container::vector<std::string>& results, const std::string &source, const int fields)
+void string_split(std::vector<std::string>& results, const std::string &source, const int fields)
 {
 	results.clear();
 	results.resize(fields);
@@ -223,7 +226,7 @@ void string_split(boost::container::vector<std::string>& results, const std::str
 	}
 };
 
-void string_split(boost::container::vector<std::string>& results, const std::string &source)
+void string_split(std::vector<std::string>& results, const std::string &source)
 {
 	results.clear();
 
@@ -308,7 +311,7 @@ string convert_seconds_to_hhmm(int time_in_seconds)
 	return hhmm;
 };
 
-void calculate_mean_standard_deviation(const boost::container::vector<float>& data_array, float& mean, float& standard_deviation)
+void calculate_mean_standard_deviation(const std::vector<float>& data_array, float& mean, float& standard_deviation)
 {
 	int array_size = int(data_array.size());
 	if (array_size>1)
@@ -342,7 +345,7 @@ void calculate_mean_standard_deviation(const boost::container::vector<float>& da
 	}
 };
 
-void calculate_mean(const boost::container::vector<float>& data_array, float& mean)
+void calculate_mean(const std::vector<float>& data_array, float& mean)
 {
 	int array_size = int(data_array.size());
 	if (array_size>1)

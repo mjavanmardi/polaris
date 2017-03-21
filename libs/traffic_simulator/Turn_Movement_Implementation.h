@@ -1,6 +1,6 @@
 #pragma once
 #include "Turn_Movement_Prototype.h"
-#include "../Repository/RNG_Implementations.h"
+#include "../repository/RNG_Implementations.h"
 
 namespace Turn_Movement_Components
 {
@@ -44,63 +44,61 @@ namespace Turn_Movement_Components
 
 			m_data(float, minimum_merge_rate, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
+			m_data(float, forward_link_turn_travel_time, NONE, NONE);
+			m_data(float, realtime_forward_link_turn_travel_time, NONE, NONE);
 			//TODO:ROUTING
-			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
-			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
-
+			//m_container(std::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
+			//m_container(std::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
 
 			//==================================================================================================================
-			/// forward_link_turn_travel_time
+			// forward_link_turn_travel_time
 			//------------------------------------------------------------------------------------------------------------------
-            
-			
+			//template<typename TargetType>
+			//TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
+			//
+			//template<typename TargetType>
+			//void forward_link_turn_travel_time(TargetType set_value,void* = nullptr)
+			//{
+			//	_forward_link_turn_travel_time = (float)set_value;
+			//	//TODO:ROUTING_OPERATION
+			//	// update replicas
+			//	//typename _Replicas_Container_Interface::iterator replica_itr;
+			//	//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
+			//	//{
+			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
+			//	//	replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+			//	//}
+			//}
+			//tag_setter_as_available(forward_link_turn_travel_time);
+			//
+			//float _forward_link_turn_travel_time;
+			//
+			//template<typename TargetType>
+			//TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
+			//template<typename TargetType>
+			//void realtime_forward_link_turn_travel_time(TargetType set_value)
+			//{
+			//	_realtime_forward_link_turn_travel_time = (float)set_value;
+			//	//TODO:ROUTING_OPERATION
+			//	// update replicas
+			//	//typename _Replicas_Container_Interface::iterator replica_itr;
+			//	//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+			//	//{
+			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
+			//	//	replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
+			//	//}
+			//}
+			//tag_setter_as_available(realtime_forward_link_turn_travel_time);
+			//float _realtime_forward_link_turn_travel_time;
+
 			//TODO:ROUTING
 			//typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
-            //typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
-			
-			template<typename TargetType>
-			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
-			
-			template<typename TargetType>
-			void forward_link_turn_travel_time(TargetType set_value)
-			{
-				_forward_link_turn_travel_time = (float)set_value;
-				//TODO:ROUTING_OPERATION
-				// update replicas
-				//typename _Replicas_Container_Interface::iterator replica_itr;
-				//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				//{
-				//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-				//	replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
-				//}
-			}
-			tag_setter_as_available(forward_link_turn_travel_time);
+			//typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
 
-			float _forward_link_turn_travel_time;
-
-			template<typename TargetType>
-			TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
-			template<typename TargetType>
-			void realtime_forward_link_turn_travel_time(TargetType set_value)
-			{
-				_realtime_forward_link_turn_travel_time = (float)set_value;
-				//TODO:ROUTING_OPERATION
-				// update replicas
-				//typename _Replicas_Container_Interface::iterator replica_itr;
-				//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				//{
-				//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-				//	replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
-				//}
-			}
-			tag_setter_as_available(realtime_forward_link_turn_travel_time);
-
-			float _realtime_forward_link_turn_travel_time;
-
-			m_container(boost::container::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
+			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
-			m_container(boost::container::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
+			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
 
@@ -119,10 +117,10 @@ namespace Turn_Movement_Components
 			struct Movement_MOE_Data realtime_movement_moe_data;
 
 			
-			typedef  Link_Components::Prototypes::Link<typename type_of(inbound_link)> _Link_Interface;
+			typedef  Link_Components::Prototypes::Link<type_of(inbound_link)> _Link_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename  type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
-			typedef  Back_Insertion_Sequence<typename type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+			typedef  Back_Insertion_Sequence<type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Turn_Movement_Components::Prototypes::Movement<typename MasterType::movement_type> _Turn_Movement_Interface;
@@ -210,11 +208,11 @@ namespace Turn_Movement_Components
 					_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
 					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
 
-					_Intersection_Interface* itx = lnk->downstream_intersection<_Intersection_Interface*>();
+					_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
 
 
 
-					if(itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
+					if(itx->template intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::Intersection_Type_Keys::NO_CONTROL)
 					{
 						_movement_flow = (float) min((double)_movement_demand,(double)_movement_supply);
 					}
@@ -308,7 +306,7 @@ namespace Turn_Movement_Components
 					//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
 
 					// reset vehicle intersection delays for the link to zero, once it starts moving again
-					for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+					for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 					{
 						_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
 						vehicle->template movement_plan<_Movement_Plan_Interface*>()->template set_current_link_intersection_delay<int>(0);
@@ -337,7 +335,7 @@ namespace Turn_Movement_Components
 
 								// update vehicles currently being delayed by the signal
 								
-								for (vehicles_container_type::iterator itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
+								for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 								{
 									_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
 									vehicle->template movement_plan<_Movement_Plan_Interface*>()->template update_current_link_intersection_delay<int>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
@@ -539,7 +537,7 @@ namespace Turn_Movement_Components
 
 			template<typename TargetType> void calculate_moe_for_simulation_interval_from_outbound_link()
 			{
-				realtime_movement_moe_data.turn_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				realtime_movement_moe_data.turn_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f;
 				realtime_movement_moe_data.movement_flow_rate = (float)_movement_transferred;			
 				((_link_component_type*)_outbound_link)->realtime_link_moe_data.link_in_volume += (float)_movement_transferred;
 
@@ -547,6 +545,8 @@ namespace Turn_Movement_Components
 				
 				
 				((_link_component_type*)_outbound_link)->link_moe_data.link_in_volume += (float)_movement_transferred;
+
+				realtime_movement_moe_data.outbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_outbound_link)->_link_fftt / 60.0f;
 			}
 
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link()
@@ -568,6 +568,9 @@ namespace Turn_Movement_Components
 				typedef typename MasterType::link_type _link_component_type;
 				((_link_component_type*)_inbound_link)->realtime_link_moe_data.link_out_volume += (float)_movement_transferred;
 				((_link_component_type*)_inbound_link)->link_moe_data.link_out_volume += (float)_movement_transferred;
+
+				realtime_movement_moe_data.inbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_inbound_link)->_link_fftt / 60.0f;
+				
 			}
 
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_inbound_link()

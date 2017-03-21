@@ -6,12 +6,15 @@ namespace polaris
 	template<typename MasterType, typename InheritanceList = NULLTYPELIST, typename Base_Graph_Type = NT>
 	struct Graph_Pool_Implementation : public Polaris_Component<MasterType, typename Append<InheritanceList,Graph_Pool_Implementation<MasterType,NTL,Base_Graph_Type>>::Result>
 	{
+		typedef Polaris_Component<MasterType, typename Append<InheritanceList,Graph_Pool_Implementation<MasterType,NTL,Base_Graph_Type>>::Result> Base_t;
+		typedef typename Base_t::ComponentType ComponentType;
+
 		Graph_Pool_Implementation():_num_graphs(0){}
 
 		typedef Base_Graph_Type base_graph_type;
 		typedef typename base_graph_type::base_edge_type base_edge_type;
 
-		boost::container::vector<base_edge_type*>* Get_Edges(graph_id_type gid)
+		std::vector<base_edge_type*>* Get_Edges(p_graph_id_type gid)
 		{
 			if( gid/*.graph_id*/ < _graphs.size() && gid/*.graph_id*/ >= 0 )
 			{
@@ -64,7 +67,7 @@ namespace polaris
 		//liks all of the graphs in the pool
 		void Link_Graphs()
 		{
-			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			for(auto itr = _graphs.begin(); itr != _graphs.end(); itr++)
 			{
 				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
 
@@ -96,7 +99,7 @@ namespace polaris
 
 			copy->_num_graphs = _num_graphs;
 
-			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			for(auto itr = _graphs.begin(); itr != _graphs.end(); itr++)
 			{
 				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
 
@@ -113,8 +116,8 @@ namespace polaris
 		}
 
 
-		boost::container::vector<void*> _graphs;
+		std::vector<void*> _graphs;
 
-		graph_id_type _num_graphs;
+		p_graph_id_type _num_graphs;
 	};
 }

@@ -19,12 +19,15 @@ struct MasterType
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
-	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
+	typedef polaris::io::Synthetic_Household hh_db_rec_type;
+	typedef polaris::io::Synthetic_Person person_db_rec_type;
+	typedef RNG_Components::Implementations::MT_Probability<MasterType> rng_type;
 	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;
 	typedef NULLTYPE network_type;
 };
 void help();
+void generate_scenario();
 
 
 int main(int argc, char* argv[])
@@ -33,14 +36,21 @@ int main(int argc, char* argv[])
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
 
-
 	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 
-	if (strcmp(scenario_filename, "-h") == 0)
+	if (strcmp(scenario_filename, "-c") == 0)
+	{
+		generate_scenario();
+		char help;
+		cout << "Default scenario file 'scenario_popsyn.json' created in working directory.  Press any key.";
+		cin >> help;
+		return 0;
+	}
+	else if (strcmp(scenario_filename, "-h") == 0)
 	{
 		help();
 		char help;
@@ -76,7 +86,7 @@ int main(int argc, char* argv[])
 	// Start population synthesis
 	//---------------------------------------------------------------------------------------------------------------------------------- 
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
+	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
 	popsyn->Initialize<_Scenario_Interface*>(scenario);
 
 	START();
@@ -108,9 +118,10 @@ void help()
 	outfile << "# Specify the region id, the sample id, and the weight from the Person Pums file"<< endl;
 	outfile << "PERSON	0	1	4"<< endl;
 	outfile << endl;
-	outfile << "# Specify all columns (0-indexed) to retain from the pums files for later processing"<< endl;
-	outfile << "HHDATA	2	3	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31"<< endl;
-	outfile << "PERSONDATA	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29"<< endl;
+	outfile << "# Specify all columns (0-indexed) for the following variables: hhtype, hhsize, nveh, nworkers, income"<< endl;
+	outfile << "HHDATA	10	9	43	84	57"<< endl;
+	outfile << "# Specify all columns (0-indexed) for the following variables: age, COW, educ, empl_industry, emp_status, gender, income, work arrival time, work mode, work travel time, work_veh_occ, marital_status, race, school_enroll, school_level, work hours" << endl;
+	outfile << "PERSONDATA	8	12	67	93	88	69	111	94	36	34	35	38	122	65	66	73"<< endl;
 	outfile << endl;
 	outfile << "# Specify the variable id (starting from 0) and column number in the pums files wher the variable is located"<< endl;
 	outfile << "HHVAR	0	7"<< endl;
@@ -166,6 +177,25 @@ void help()
 	outfile << "PERSONMARGVAR	1	6	7	8	30"<< endl;
 	outfile << "PERSONMARGVAR	1	7	8	99	31"<< endl;
 	outfile.close();
+}
+
+void generate_scenario()
+{
+	ofstream outfile;
+	outfile.open("scenario_popsyn.json");
+	outfile<<"{"<<endl;
+	outfile<<"\t"<<"\"output_dir_name\" : \"[Specify directory name]\","<<endl;
+	outfile<<"\t"<<"\"database_name\" : \"[database]\","<<endl;
+	outfile<<"\t"<<"\"percent_to_synthesize\" : 1.0,"<<endl;
+	outfile<<"\t"<<"\"demand_reduction_factor\" : 1.0,"<<endl;
+	outfile<<"\t"<<"\"ipf_tolerance\" : 0.01,"<<endl;
+	outfile<<"\t"<<"\"marginal_tolerance\" : 5,"<<endl;
+	outfile<<"\t"<<"\"maximum_iterations\" : 100,"<<endl;
+	outfile<<"\t"<<"\"write_marginal_output\" : false,"<<endl;
+	outfile<<"\t"<<"\"write_full_output\" : false,"<<endl;
+	outfile<<"\t"<<"\"popsyn_control_file\" : \"[linker file path: use -h for help]\","<<endl;
+	outfile<<"\t"<<"\"write_demand_to_database\" : true"<<endl;
+	outfile<<"}"<<endl;
 }
 
 

@@ -1,4 +1,3 @@
-#pragma once
 ///----------------------------------------------------------------------------------------------------
 /// Execution_Component_Manager.cpp - Base and type-specific managers for all objects of that type
 ///----------------------------------------------------------------------------------------------------
@@ -15,7 +14,7 @@ namespace polaris
 	{
 		_activated = false;
 
-		_object_repository = new boost::unordered_map<int,void*>[num_sim_threads() + 1];
+		_object_repository = new std::unordered_map<int,void*>[num_sim_threads() + 1];
 
 		_tex_next_revision = __revision_omega;
 		_tex_next_next_revision = __revision_omega;

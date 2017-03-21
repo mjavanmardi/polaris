@@ -14,112 +14,12 @@ class Performance;
 class Problem;
 class Skim;
 class Transims_Event;
-class link_travel;
-class Path;
 class Link_Probability;
 class LinkMOE;
+class RealtimeLinkMOE;
 class TurnMOE;
+class RealtimeTurnMOE;
 
-
-#pragma db value
-class link_travel
-{
-public:
-	// Default Constructor
-	link_travel () {}        
-	link_travel (int link_, bool dir_, int entering_time_, int travel_time_, int delayed_time_)
-	: link (link_), dir (dir_), entering_time (entering_time_), travel_time (travel_time_), delayed_time (delayed_time_)
-	{
-	}
-	//Accessors
-	const int& getLink () const {return link;}
-	void setLink (const int& link_) {link = link_;}
-	const bool& getDir () const {return dir;}
-	void setDir (const bool& dir_) {dir = dir_;}
-	const int& getEntering_Time () const {return entering_time;}
-	void setEntering_Time (const int& entering_time_) {entering_time = entering_time_;}
-	const int& getTravel_Time () const {return travel_time;}
-	void setTravel_Time (const int& travel_time_) {travel_time = travel_time_;}
-	const int& getDelayed_Time () const {return delayed_time;}
-	void setDelayed_Time (const int& delayed_time_) {delayed_time = delayed_time_;}
-	//Data Fields
-private:
-	friend class odb::access;
-	int link;
-	bool dir;
-	int entering_time;
-	int travel_time;
-	int delayed_time;
-};
-
-
-#pragma db object
-class Path
-{
-public:
-	// Default Constructor
-	Path () {}        
-	Path (int id_, int vehicle_, int origin_zone_, int destination_zone_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int arrival_time_, int travel_time_, std::vector<link_travel > links_)
-	: id (id_), vehicle (vehicle_), origin_zone (origin_zone_), destination_zone (destination_zone_), origin_activity_location (origin_activity_location_), destination_activity_location (destination_activity_location_), origin_link (origin_link_), destination_link (destination_link_), num_links (num_links_), departure_time (departure_time_), arrival_time (arrival_time_), travel_time (travel_time_), links (links_)
-	{
-	}
-	//Accessors
-	const int& getId () const {return id;}
-	void setId (const int& id_) {id = id_;}
-	const int& getVehicle () const {return vehicle;}
-	void setVehicle (const int& vehicle_) {vehicle = vehicle_;}
-	const int& getOrigin_Zone () const {return origin_zone;}
-	void setOrigin_Zone (const int& origin_zone_) {origin_zone = origin_zone_;}
-	const int& getDestination_Zone () const {return destination_zone;}
-	void setDestination_Zone (const int& destination_zone_) {destination_zone = destination_zone_;}
-	const int& getOrigin_Activity_Location () const {return origin_activity_location;}
-	void setOrigin_Activity_Location (const int& origin_activity_location_) {origin_activity_location = origin_activity_location_;}
-	const int& getDestination_Activity_Location () const {return destination_activity_location;}
-	void setDestination_Activity_Location (const int& destination_activity_location_) {destination_activity_location = destination_activity_location_;}
-	const int& getOrigin_Link () const {return origin_link;}
-	void setOrigin_Link (const int& origin_link_) {origin_link = origin_link_;}
-	const int& getDestination_Link () const {return destination_link;}
-	void setDestination_Link (const int& destination_link_) {destination_link = destination_link_;}
-	const int& getNum_Links () const {return num_links;}
-	void setNum_Links (const int& num_links_) {num_links = num_links_;}
-	const int& getDeparture_Time () const {return departure_time;}
-	void setDeparture_Time (const int& departure_time_) {departure_time = departure_time_;}
-	const int& getArrival_Time () const {return arrival_time;}
-	void setArrival_Time (const int& arrival_time_) {arrival_time = arrival_time_;}
-	const int& getTravel_Time () const {return travel_time;}
-	void setTravel_Time (const int& travel_time_) {travel_time = travel_time_;}
-	const std::vector<link_travel >& getLinks () const {return links;}
-	void setLinks (const std::vector<link_travel >& links_) {links = links_;}
-	void setLink (const link_travel  links_) {links.push_back(links_);}
-	//Data Fields
-private:
-	friend class odb::access;
-	#pragma db auto id
-	int id;
-	#pragma db not_null
-	int vehicle;
-	#pragma db not_null
-	int origin_zone;
-	#pragma db not_null
-	int destination_zone;
-	#pragma db not_null
-	int origin_activity_location;
-	#pragma db not_null
-	int destination_activity_location;
-	#pragma db not_null
-	int origin_link;
-	#pragma db not_null
-	int destination_link;
-	#pragma db not_null
-	int num_links;
-	#pragma db not_null
-	int departure_time;
-	#pragma db not_null
-	int arrival_time;
-	#pragma db not_null
-	int travel_time;
-	std::vector<link_travel > links;
-};
 
 #pragma db object //table("LINK_DELAY")
 class Link_Delay
@@ -497,74 +397,67 @@ private:
 	float link_travel_time_ratio;
 	float num_vehicles_in_link;
 };
-
+#pragma db object
+class RealtimeLinkMOE : public LinkMOE
+{};
 #pragma db object
 class TurnMOE
 {
 public:
 	// Default Constructor
-	TurnMOE () {}        
-	TurnMOE (int id_, int start_time_, int turn_uid_,
-			int node_uid_,
-			int link_inbound_uid_,
-			int link_outbound_uid_,
-			float turn_penalty_,
-			float turn_penalty_sd_,
-			float inbound_link_turn_time_,
-			float outbound_link_turn_time_,
-			float movement_flow_rate_)
-		: id(id_), start_time(start_time_), turn_uid(turn_uid_),
-			node_uid(node_uid_),
-			link_inbound_uid(link_inbound_uid_),
-			link_outbound_uid(link_outbound_uid_),
-			turn_penalty(turn_penalty_),
-			turn_penalty_sd(turn_penalty_sd_),
-			inbound_link_turn_time(inbound_link_turn_time_),
-			outbound_link_turn_time(outbound_link_turn_time_),
-			movement_flow_rate(movement_flow_rate_)
+	TurnMOE() {}
+	TurnMOE(int id_, int turn_uid_, int start_time_, int end_time_, int inbound_link_uid_, int outbound_link_uid_, int node_uid_, float turn_penalty_, float turn_penalty_sd_, float inbound_turn_travel_time_, float outbound_turn_travel_time_, float turn_flow_rate_)
+		: id(id_), turn_uid(turn_uid_),start_time(start_time_), end_time(end_time_), inbound_link_uid(inbound_link_uid_), outbound_link_uid(outbound_link_uid_), node_uid(node_uid_), turn_penalty(turn_penalty_), turn_penalty_sd(turn_penalty_sd_), inbound_turn_travel_time(inbound_turn_travel_time_), outbound_turn_travel_time(outbound_turn_travel_time_), turn_flow_rate(turn_flow_rate)
 	{
 	}
 	//Accessors
-	const int& getId () const {return id;}
-	void setId (const int& id_) {id = id_;}
-	const int& getTurn_Uid () const {return turn_uid;}
-	void setTurn_Uid (const int& turn_uid_) {turn_uid = turn_uid_;}
-	const int& getNode_Uid () const {return node_uid;}
-	void setNode_Uid (const int& node_uid_) {node_uid = node_uid_;}
-	const int& getLink_Inbound_Uid () const {return link_inbound_uid;}
-	void setLink_Inbound_Uid (const int& link_inbound_uid_) {link_inbound_uid = link_inbound_uid_;}
-	const int& getLink_Outbound_Uid () const {return link_outbound_uid;}
-	void setLink_Outbound_Uid (const int& link_outbound_uid_) {link_outbound_uid = link_outbound_uid_;}
-	const int& getStart_Time () const {return start_time;}
-	void setStart_Time (const int& start_time_) {start_time = start_time_;}
-	const float& getTurn_Penalty () const {return turn_penalty;}
-	void setTurn_Penalty (const float& turn_penalty_) {turn_penalty = turn_penalty_;}
-	const float& getTurn_Penalty_SD () const {return turn_penalty_sd;}
-	void setTurn_Penalty_SD (const float& turn_penalty_sd_) {turn_penalty_sd = turn_penalty_sd_;}
-	const float& getInbound_Link_Turn_Time () const {return inbound_link_turn_time;}
-	void setInbound_Link_Turn_Time (const float& inbound_link_turn_time_) {inbound_link_turn_time = inbound_link_turn_time_;}
-	const float& getOutbound_Link_Turn_Time () const {return outbound_link_turn_time;}
-	void setOutbound_Link_Turn_Time (const float& outbound_link_turn_time_) {outbound_link_turn_time = outbound_link_turn_time_;}
-	const float& getMovement_Flow_Rate () const {return movement_flow_rate;}
-	void setMovement_Flow_Rate (const float& movement_flow_rate_) {movement_flow_rate = movement_flow_rate_;}
-	
+	const int& getId() const { return id; }
+	void setId(const int& id_) { id = id_; }
+	const int& getTurn_Uid() const { return turn_uid; }
+	void setTurn_Uid(const int& turn_uid_) { turn_uid = turn_uid_; }
+	const int& getStart_Time() const { return start_time; }
+	void setStart_Time(const int& start_time_) { start_time = start_time_; }
+	const int& getEnd_Time() const { return end_time; }
+	void setEnd_Time(const int& end_time_) { end_time = end_time_; }
+	const int& getInbound_Link_Uid() const { return inbound_link_uid; }
+	void setInbound_Link_Uid(const int& inbound_link_uid_) { inbound_link_uid = inbound_link_uid_; }
+	const int& getOutbound_Link_Uid() const { return outbound_link_uid; }
+	void setOutbound_Link_Uid(const int& outbound_link_uid_) { outbound_link_uid = outbound_link_uid_; }
+	const int& getNode_Uid() const { return node_uid; }
+	void setNode_Uid(const int& node_uid_) { node_uid = node_uid_; }
+	const float& getTurn_Penalty() const { return turn_penalty; }
+	void setTurn_Penalty(const float& turn_penalty_) { turn_penalty = turn_penalty_; }
+	const float& getTurn_Penalty_SD() const { return turn_penalty_sd; }
+	void setTurn_Penalty_SD(const float& turn_penalty_sd_) { turn_penalty_sd = turn_penalty_sd_; }
+
+	const float& getInbound_Turn_Travel_Time() const { return inbound_turn_travel_time; }
+	void setInbound_Turn_Travel_Time(const float& inbound_turn_travel_time_) { inbound_turn_travel_time = inbound_turn_travel_time_; }
+	const float& getOutbound_Turn_Travel_Time() const { return outbound_turn_travel_time; }
+	void setOutbound_Turn_Travel_Time(const float& outbound_turn_travel_time_) {outbound_turn_travel_time = outbound_turn_travel_time_; }
+	const float& getTurn_Flow_Rate() const { return turn_flow_rate; }
+	void setTurn_Flow_Rate(const float& turn_flow_rate_) { turn_flow_rate = turn_flow_rate_; }
+
 	//Data Fields
 private:
 	friend class odb::access;
 #pragma db auto id
 	int id;
 #pragma db not_null
-	int start_time;
 	int turn_uid;
+	int start_time;
+	int end_time;
+	int inbound_link_uid;
+	int outbound_link_uid;
 	int node_uid;
-	int link_inbound_uid;
-	int link_outbound_uid;
 	float turn_penalty;
 	float turn_penalty_sd;
-	float inbound_link_turn_time;
-	float outbound_link_turn_time;
-	float movement_flow_rate;
+	float inbound_turn_travel_time;
+	float outbound_turn_travel_time;
+	float turn_flow_rate;
 };
+#pragma db object
+class RealtimeTurnMOE : public TurnMOE
+{};
 }//end of io namespace
 }//end of polaris namespace
 #endif // IOResult

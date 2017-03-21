@@ -21,7 +21,7 @@
 
 //=========================================
 // Miscellaneous warning and error message printing options
-#undef ENABLE_WARNINGS
+//#undef ENABLE_WARNINGS
 //#define ENABLE_DEBUG_MESSAGES
 //#define SHOW_WARNINGS
 
@@ -71,6 +71,7 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<M> vehicle_characteristics_type;
 	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
 	#endif
 
@@ -132,6 +133,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
+	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
@@ -145,10 +147,14 @@ struct MasterType
 	typedef Person_Components::Implementations::Activity_Timing_Chooser_Implementation<M> activity_timing_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
-	typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
+	typedef Choice_Model_Components::Implementations::NL_Model_Implementation<MT> nl_model_type;
 	typedef Hazard_Model_Components::Implementations::Additive_Weibull_Baseline_Hazard_Implementation<MT> hazard_model_type;
 	
 	#ifdef ANTARES
@@ -165,6 +171,10 @@ struct MasterType
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> solver_settings_type;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
+	typedef polaris::io::Household hh_db_rec_type; // these represent the type of database record to write - use Household/Person for writing to Demand or Synthetic_Household/Person for writing to Popsyn only
+	typedef polaris::io::Person person_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
+	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -243,7 +253,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
-	char* scenario_filename = "scenario.json";
+	string scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 	int threads = 1;
 	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);
@@ -269,6 +279,29 @@ int main(int argc,char** argv)
 	}
 
 
+	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
+	_global_scenario = scenario;
+
+	
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+
+
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -276,20 +309,12 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
+	cout << "allocating data structures..." << endl;
+
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
 	string output_dir_name = "";
-
-	GLOBALS::Normal_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Initialize();
-
-	cout << "allocating data structures..." <<endl;	
-
-
-	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
-	_global_scenario = scenario;
 
 	typedef Network<typename MasterType::network_type> _Network_Interface;
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
@@ -298,7 +323,7 @@ int main(int argc,char** argv)
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 
 	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
@@ -356,7 +381,7 @@ int main(int argc,char** argv)
 		{
 			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			tmc->Initialize<NT>();
 		}
@@ -370,13 +395,9 @@ int main(int argc,char** argv)
 	typedef Link<remove_pointer<_Network_Interface::get_type_of(links_container)::value_type>::type> _Link_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(links_container),_Link_Interface*> _Links_Container_Interface;
 
-	_Links_Container_Interface::iterator links_itr;
-
-	for(links_itr=network->links_container<_Links_Container_Interface&>().begin();
-		links_itr!=network->links_container<_Links_Container_Interface&>().end();
-		links_itr++)
+	for (const auto& link : network->links_container<_Links_Container_Interface&>())
 	{
-		((_Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
+		link->Initialize<NULLTYPE>();
 	}
 
 	cout << "initializing intersection agents..." <<endl;
@@ -386,13 +407,9 @@ int main(int argc,char** argv)
 	typedef Intersection<remove_pointer<_Network_Interface::get_type_of(intersections_container)::value_type>::type> _Intersection_Interface;
 	typedef Random_Access_Sequence<_Network_Interface::get_type_of(intersections_container),_Intersection_Interface*> _Intersections_Container_Interface;
 
-	_Intersections_Container_Interface::iterator intersections_itr;
-
-	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
-		intersections_itr++)
+	for (const auto& intersection : network->intersections_container<typename MasterType::network_type::intersections_container_type&>())
 	{
-		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+		intersection->Initialize<NULLTYPE>();
 	}
 
 	cout << "initializing ramp metering agents..." <<endl;
@@ -403,11 +420,9 @@ int main(int argc,char** argv)
 
 	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
 
-	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
-		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
-		ramp_metering_itr++)
+	for (const auto& ramp : network->ramp_metering_container<_Ramp_Metering_Container_Interface&>())
 	{
-		((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
+		ramp->Initialize<NULLTYPE>();
 	}
 
 	if (scenario->use_network_events<bool>())
@@ -417,34 +432,20 @@ int main(int argc,char** argv)
 	#pragma endregion
 	
 
-	//==================================================================================================================================
-	// Initialize global randon number generators - if seed set to zero or left blank use system time
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	int seed = scenario->iseed<int>();
-	if (seed != 0)
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
-	}
-	else
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
-	}
+
 
 
 	//==================================================================================================================================
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
-	if (scenario->read_demand_from_database<bool>())
-	{
-		typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
-		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-		demand->scenario_reference<_Scenario_Interface*>(scenario);
-		demand->network_reference<_Network_Interface*>(network);
-		cout << "reading external demand data..." <<endl;
-		demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	}
+	typedef Demand_Components::Prototypes::Demand<MasterType::demand_type> _Demand_Interface;
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	demand->scenario_reference<_Scenario_Interface*>(scenario);
+	demand->network_reference<_Network_Interface*>(network);
+	cout << "reading external demand data..." <<endl;
+	demand->read_vehicle_type_data<NT>();
+	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	_global_demand = demand;
 	
 
 	//==================================================================================================================================
@@ -452,7 +453,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	#ifdef ANTARES
 	typedef polaris::Pair_Associative_Container<typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-	typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
+	typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
 
@@ -524,15 +525,26 @@ int main(int argc,char** argv)
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
+
 	// Initialize person properties with average activity frequency and duration
 	MasterType::person_properties_type::Static_Initializer();
+	
+	// Initialize Vehicle Choice Model
+	MasterType::vehicle_chooser_type::static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
 
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
-	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
+	if (scenario->read_population_from_database<bool>())
+	{
+		popsyn->Read_From_Database<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	}
+	else
+	{
+		popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 

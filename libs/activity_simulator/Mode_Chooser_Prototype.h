@@ -16,6 +16,19 @@ namespace Prototypes
 		accessor(Parent_Planner, NONE, NONE);
 		accessor(choice_set_size, NONE, NONE);
 		accessor(choice_model, NONE, NONE);	
+		accessor(previous_activity, NONE, NONE);
+		accessor(current_activity, NONE, NONE);
+		accessor(next_activity, NONE, NONE);
+		accessor(previous_location, NONE, NONE);
+		accessor(destination, NONE, NONE);
+		accessor(next_location, NONE, NONE);
+		accessor(los, NONE, NONE);
+
+		accessor(auto_available, NONE, NONE);
+		accessor(to_work_school, NONE, NONE);
+		accessor(from_work_school, NONE, NONE);
+		accessor(to_CBD, NONE, NONE);
+		accessor(home_based, NONE, NONE);
 
 		template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity, requires(ActivityItfType,
 			check(ActivityItfType, is_pointer) &&
@@ -33,28 +46,18 @@ namespace Prototypes
 	};
 
 
-	prototype struct Mode_Choice_Option ADD_DEBUG_INFO
+	prototype struct Mode_Choice_Option : public Choice_Model_Components::Prototypes::Choice_Option<ComponentType>
 	{
 		tag_as_prototype;
 
 		// accessor to parent class
 		accessor(Parent_Planner, NONE, NONE);
-		accessor(previous_activity, NONE, NONE);
-		accessor(current_activity, NONE, NONE);
-		accessor(next_activity, NONE, NONE);
-		accessor(previous_location, NONE, NONE);
-		accessor(destination, NONE, NONE);
-		accessor(next_location, NONE, NONE);
+		accessor(Mode_Chooser, NONE, NONE);
 		accessor(mode_type, NONE, NONE);
-		accessor(auto_available, NONE, NONE);
 
-		template<typename TargetType> TargetType Calculate_Utility()
+		void copy(Mode_Choice_Option<ComponentType>* obj)
 		{
-			return this_component()->template Calculate_Utility<TargetType>();
-		}
-		template<typename TargetType> TargetType Print_Utility()
-		{
-			return this_component()->template Print_Utility<TargetType>();
+			this_component()->copy((ComponentType*)obj);
 		}
 	};
 	

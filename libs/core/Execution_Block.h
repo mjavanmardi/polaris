@@ -13,6 +13,7 @@ namespace polaris
 	public:
 		Execution_Block(unsigned int cell_size,unsigned int num_cells):_cell_size(cell_size),_num_cells(num_cells){}
 
+		template<typename DataType>
 		void Initialize(void* component_manager_ptr);
 
 		//----------------------------------------------------------------------------------------------------
@@ -20,13 +21,13 @@ namespace polaris
 		//----------------------------------------------------------------------------------------------------
 
 		template<typename DataType>
-		inline DataType* Allocate();
+		DataType* Allocate();
 		
 		template<typename DataType>
-		inline void Free(DataType* ptr);
+		void Free(DataType* ptr);
 		
 		template<typename DataType>
-		inline void Lazy_Free(DataType* ptr);
+		void Lazy_Free(DataType* ptr);
 
 		bool Empty(){ return _num_allocated == 0; }
 

@@ -30,14 +30,14 @@ namespace Intersection_Components
 	//	implementation struct Routable_Inbound_Outbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Inbound_Outbound_Movements_Implementation),Data_Object>
 	//	{
 	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, inbound_link_reference, NONE, NONE);
-	//		m_container(boost::container::vector<typename MasterType::routable_movement_type*>, outbound_movements, NONE, NONE);
+	//		m_container(std::vector<typename MasterType::routable_movement_type*>, outbound_movements, NONE, NONE);
 	//	};
 
 	//	
 	//	implementation struct Routable_Outbound_Inbound_Movements_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Outbound_Inbound_Movements_Implementation),Data_Object>
 	//	{
 	//		m_prototype(Null_Prototype,typename MasterType::routable_link_type>, outbound_link_reference, NONE, NONE);
-	//		m_container(boost::container::vector<typename MasterType::routable_movement_type*>, inbound_movements, NONE, NONE);
+	//		m_container(std::vector<typename MasterType::routable_movement_type*>, inbound_movements, NONE, NONE);
 	//	};
 
 	//	implementation struct Routable_Intersection_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Intersection_Implementation),Data_Object>
@@ -49,9 +49,9 @@ namespace Intersection_Components
 	//		m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 	//		typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_container_element_type;
-	//		m_container(boost::container::vector<outbound_inbound_movements_container_element_type*>, outbound_inbound_movements, NONE, NONE);
+	//		m_container(std::vector<outbound_inbound_movements_container_element_type*>, outbound_inbound_movements, NONE, NONE);
 	//		typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_container_element_type;
-	//		m_container(boost::container::vector<inbound_outbound_movements_container_element_type*>, inbound_outbound_movements, NONE, NONE);
+	//		m_container(std::vector<inbound_outbound_movements_container_element_type*>, inbound_outbound_movements, NONE, NONE);
 
 	//		//template<typename TargetType> void construct_routable_from_regular(typename TargetType::ParamType regular_intersection, typename TargetType::Param2Type linksMap)
 	//		template<typename RegularIntersectionParamType,typename LinksMapParamType> void construct_routable_from_regular(RegularIntersectionParamType regular_intersection, LinksMapParamType linksMap)
