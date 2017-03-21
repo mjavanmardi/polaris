@@ -50,7 +50,8 @@ namespace Vehicle_Components
 			NONMOTORIZED,
 			BICYCLE,
 			WALK,
-			TAXI
+			TAXI,
+			SCHOOLBUS
 		};
 
 		enum Route_Choice_Use_Class_Keys

@@ -461,7 +461,7 @@ namespace Activity_Components
 				// If no adults free and not school trip - cancel act
 				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 				// if no adult but is school activity, force trip to transit
-				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
 				// otherwise, assign escort duty to adult
 				else
 				{
@@ -473,7 +473,7 @@ namespace Activity_Components
 			else if (properties->template Age<int>()<10 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 			{
 				// Attempt parent escort for all modes but transit - if fails force to transit
-				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::BUS)
+				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::SCHOOLBUS)
 				{
 					// get a free adult available for escort
 					//%%%RLW
@@ -482,7 +482,7 @@ namespace Activity_Components
 					// If no adults free and not school trip - cancel act
 					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 					// if no adult but is school activity, force trip to transit
-					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
 					// otherwise, assign escort duty to adult
 					else
 					{

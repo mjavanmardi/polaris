@@ -993,10 +993,10 @@ namespace Person_Components
 		};
 		// INITIALIZE MODE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 + 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TRAN = 0.0 - 1.5;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 2.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.8;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 - 0.2;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TRAN = 0.0 - 0.7;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cbd_pa = -0.0725;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cost = -0.243;
@@ -1026,11 +1026,11 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_NEST_NM = 0.952380952380952;
 
 
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_AUTO = 1.16;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TAXI = -2.44 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_WALK = 0.0142 + 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TRAN = 0.0 - 1.5;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_AUTO = 1.16 + 0.5;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 2.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TAXI = -2.44 - 0.8;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_WALK = 0.0142 - 0.2;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TRAN = 0.0 - 0.7;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cbd_pa = -0.0969;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cost = -0.131;
@@ -1060,10 +1060,10 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_NM = 0.934579439252336;
 
 
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TAXI = -0.912 - 0.3;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 + 1.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TRAN = 0.0 - 1.5;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 2.0;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TAXI = -0.912 - 0.8;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 - 0.2;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TRAN = 0.0 - 0.7;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_BIKE = 0.0 - 3.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cbd_pa = -0.0495;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cost = -0.301;
@@ -1364,8 +1364,8 @@ namespace Person_Components
 
 
 				//TURN ON TO VALIDATE UTILITY CALCULATION AND RESULTS
-				//if (__thread_id == 0) Print_Calculation_Results(choice_model, selected_mode);
-				//Print_Selection(selected_mode);
+			/*	if (__thread_id == 0) Print_Calculation_Results(choice_model, selected_mode);
+				if (__thread_id == 0) Print_Selection(selected_mode);*/
 
 /*				//============================================================================================
 				//Account for touring - if previous act is not at an anchor location and not using auto, then auto not available
@@ -1417,56 +1417,76 @@ namespace Person_Components
 				float p_bike = 0.0;
 				float p_walk = 0.0;
 				float p_bus = 0.0;
+				float p_school = 0.0;
 
-				if (dist > 2.0)
+				// going to school activity
+				if (this->_to_work_school || this->_from_work_school)
 				{
-					if (person_properties->Age<int>() < 5)
+					if (dist < 0.5) p_walk = 1.0;
+					else if (dist < 1.0)
 					{
-						p_hov = 1.0;
-						p_walk = 0.0;
-						p_bike = 0.0;
-						p_bus = 0.0;
+						p_walk = 0.5;
+						p_bike = 0.1;
+						p_school = 0.4;
 					}
-					else if (person_properties->Age<int>() < 11)
-					{
-						p_hov = 0.82;
-						p_walk = 0.0;
-						p_bike = 0.01;
-						p_bus = p_hov - p_walk - p_bike;
-					}
-					else
-					{
-						p_hov = 0.72;
-						p_walk = 0.004;
-						p_bike = 0.034;
-						p_bus = p_hov - p_walk - p_bike;
-					}
-
+					else p_school = 1.0;
 				}
 				else
 				{
-					if (person_properties->Age<int>() < 5)
+					if (dist < 0.5)
 					{
-						p_hov = 0.88;
-						p_walk = 0.01;
-						p_bike = 0.07;
-						p_bus = p_hov - p_walk - p_bike;
+						p_walk = 1.0;
 					}
-					else if (person_properties->Age<int>() < 11)
+					else if (dist > 2.0)
 					{
-						p_hov = 0.61;
-						p_walk = 0.02;
-						p_bike = 0.22;
-						p_bus = p_hov - p_walk - p_bike;
+						if (person_properties->Age<int>() < 5)
+						{
+							p_hov = 1.0;
+							p_walk = 0.0;
+							p_bike = 0.0;
+							p_bus = 0.0;
+						}
+						else if (person_properties->Age<int>() < 11)
+						{
+							p_hov = 0.82;
+							p_walk = 0.1;
+							p_bike = 0.01;
+							p_bus = 1.0 - p_hov - p_walk - p_bike;
+						}
+						else
+						{
+							p_hov = 0.72;
+							p_walk = 0.004;
+							p_bike = 0.034;
+							p_bus = 1.0 - p_hov - p_walk - p_bike;
+						}
+
 					}
 					else
 					{
-						p_hov = 0.52;
-						p_walk = 0.04;
-						p_bike = 0.36;
-						p_bus = p_hov - p_walk - p_bike;
-					}
+						if (person_properties->Age<int>() < 5)
+						{
+							p_hov = 0.90;
+							p_walk = 0.02;
+							p_bike = 0.08;
+							p_bus = 1.0 - p_hov - p_walk - p_bike;
+						}
+						else if (person_properties->Age<int>() < 11)
+						{
+							p_hov = 0.71;
+							p_walk = 0.13;
+							p_bike = 0.16;
+							p_bus = 1.0 - p_hov - p_walk - p_bike;
+						}
+						else
+						{
+							p_hov = 0.52;
+							p_walk = 0.14;
+							p_bike = 0.26;
+							p_bus = 1.0 - p_hov - p_walk - p_bike;
+						}
 
+					}
 				}
 
 				Vehicle_Components::Types::Vehicle_Type_Keys selected_mode;
@@ -1475,7 +1495,8 @@ namespace Person_Components
 				if (r < p_hov) selected_mode = Vehicle_Components::Types::HOV;
 				else if(r < p_hov + p_walk) selected_mode = Vehicle_Components::Types::WALK;
 				else if(r < p_hov + p_walk + p_bike) selected_mode = Vehicle_Components::Types::BICYCLE;
-				else selected_mode = Vehicle_Components::Types::BUS;
+				else if (r < p_hov + p_walk + p_bike + p_bus) selected_mode = Vehicle_Components::Types::BUS;
+				else selected_mode = Vehicle_Components::Types::SCHOOLBUS;
 
 				if (_delete_los)
 				{
@@ -1568,7 +1589,7 @@ namespace Person_Components
 			void Print_Selection(Vehicle_Components::Types::Vehicle_Type_Keys selected_mode)
 			{
 				LOCK(this->_update_lock);
-				MESSAGE("MODE_CHOICE," << selected_mode << ",ACTTYPE," << _current_activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>());
+				MESSAGE("MODE_CHOICE," << selected_mode << ",ACTTYPE," << _current_activity->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()<<endl<<endl);
 				UNLOCK(this->_update_lock);
 			}
 
@@ -1627,7 +1648,7 @@ namespace Person_Components
 				double ONE = 1.0;
 
 				// print input values: hhid,mode,h_inc,m_inc,peak,auto_tt,auto_cost,taxi_cost,popdens,travivtt,tranovtt,tranwait,trancost,walkttr,gen,vehperlic,age65,incbd,notalone,ageu18,
-				cout <<"DATA:,"<<household->uuid<int>() << "," << selected_mode << "," << h_inc << "," <<m_inc << "," <<PEAK << "," << "," << AUTO_TT << "," << AUTO_COST << "," <<TAXI_COST << "," <<POP_DENS << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr << "," << GENDER << "," << VEHPERLIC << "," << AGE65 << "," << IN_CBD << "," << NOTALONE << "," << AGEU18<<",";
+				cout <<"DATA:,"<<household->uuid<int>() << ","<<orig_zone->uuid<int>()<<"-"<<dest_zone->uuid<int>()<<"," << selected_mode << "," << h_inc << "," <<m_inc << "," <<PEAK << "," << "," << AUTO_TT << "," << AUTO_COST << "," <<TAXI_COST << "," <<POP_DENS << "," << TRAN_IVTTr << "," << TRAN_OVTT << "," << TRAN_WAIT << "," << TRAN_COST << "," << WALK_TTr << "," << GENDER << "," << VEHPERLIC << "," << AGE65 << "," << IN_CBD << "," << NOTALONE << "," << AGEU18<<endl;
 				// print available modes
 				choice_options_itf* choices = choice_model->choice_options<choice_options_itf*>();
 				choice_options_itf::iterator itr = choices->begin();
@@ -1644,6 +1665,7 @@ namespace Person_Components
 						_Mode_Choice_Option_Interface* subchoice = (_Mode_Choice_Option_Interface*)(*sitr);
 						cout << subchoice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>() << ",";
 					}
+					cout << endl;
 				}
 				cout << ":Utility/Probability:,";
 				// print utility/probability for each mode

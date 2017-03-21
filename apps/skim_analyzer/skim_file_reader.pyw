@@ -15,7 +15,7 @@ def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, writ
 
 	do_highway = GetHighwaySkims(highway_skim_file, skims)
 	
-	skims.print_header_info()
+	#skims.print_header_info()
 	
 	do_transit = GetTransitSkims(transit_skim_file, do_highway, skims)
 	
@@ -28,7 +28,7 @@ def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, writ
 	if do_transit and write_csv: WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list)
 	
 	if do_highway and write_tab: WriteHighwaySkimsV1_TEXT(highway_skim_file, skims, origin_list, dest_list)
-	#if do_transit and write_csv: WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list, dest_list)
+	#if do_transit and write_tab: WriteTransitSkimsV1_TEXT(ransit_skim_file, skims, origin_list, dest_list)
 
 ######################################################################################
 # Skim Functions - do not modify anything below this section
@@ -137,6 +137,8 @@ def GetTransitSkims(transit_skim_file, validate_against_highway, skims, zone_lis
 		
 	tsize = tzones*tzones
 	skims.num_tzones=tzones
+	
+	print "Reading information for " + str(tzones) + " zones. Version 1=" + str(version1) + "...."
 
 	if version1: Check_Tag(infile, "BMAT",True)
 	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
@@ -167,6 +169,8 @@ def GetTransitSkims(transit_skim_file, validate_against_highway, skims, zone_lis
 	if data.size < tsize: print "Error: transit_fare matrix not read properly"
 	else: skims.transit_fare = data.reshape(tzones,tzones)
 	if version1: Check_Tag(infile, "EMAT",True)
+	
+	print "Done."
 	return True
 	
 def ReduceTransitSkims(skim, zone_list):
@@ -343,7 +347,48 @@ def WriteHighwaySkimsV1_TEXT(highway_skim_file, skims, origin_list=None, dest_li
 					 outfile.write(str(skims.auto_skims[interval][i_id,j_id]) + ',')
 				outfile.write('\n')
 
+def ConvertTransitToV1(transit_skim_file, skims,zone_id_to_index):
+	if transit_skim_file == '':
+		return False
+		
+	# get the zone map
+	with open(zone_id_to_index, 'r') as infile:
+		cr = csv.reader(infile,delimiter =',')
+		for row in cr:
+			skims.zone_id_to_index_map[int(row[0])] = int(row[1])
+			skims.zone_index_to_id_map[int(row[1])] = int(row[0])
+	
+	infile = open(transit_skim_file, 'rb')
+		
+	tzones = struct.unpack("i",infile.read(4))[0]
+	
+	tsize = tzones*tzones
+	skims.num_tzones=tzones
+	
+	print "Reading information for " + str(tzones) + " zones...."
 
+	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
+	if data.size < tsize: print "Error: transit ttime matrix not read properly"
+	else: skims.transit_ttime = data.reshape(tzones,tzones)
+
+	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
+	if data.size < tsize: print "Error: transit walk time matrix not read properly"
+	else: skims.transit_walk_access_time = data.reshape(tzones,tzones)
+	
+	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
+	if data.size < tsize: print "Error: auto distance matrix not read properly"
+	else: skims.auto_distance = data.reshape(tzones,tzones)
+	
+	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
+	if data.size < tsize: print "Error: transit_wait_time matrix not read properly"
+	else: skims.transit_wait_time = data.reshape(tzones,tzones)
+	
+	data = numpy.matrix(numpy.fromfile(infile, dtype='f',count = tsize))
+	if data.size < tsize: print "Error: transit_fare matrix not read properly"
+	else: skims.transit_fare = data.reshape(tzones,tzones)
+	
+	print "Done."
+	return True
 
 def WriteTransitSkimsV1_CSV(transit_skim_file, skims, origin_list=None, dest_list=None):
 	outfile = open(transit_skim_file + '.csv', 'wb')
@@ -616,6 +661,14 @@ class Skim_Results:
 		for interval in sorted(self.auto_skims.keys()):
 			print interval
 		print "\r\n"
+	def print_OD_info(self, o_idx, d_idx, do_auto, do_transit):			
+		if o_idx < len(self.zone_id_to_index_map) and d_idx < len(self.zone_id_to_index_map):
+			s = "AutoTime, TransitTime, walk_time, wait_time, fare, dist= "
+			if do_auto: s += str(self.auto_skims[self.intervals[0]][o_idx,d_idx])
+			else: s += "NA"
+			if do_transit: s += ", " + str(self.transit_ttime[o_idx,d_idx]) + ", " + str(self.transit_walk_access_time[o_idx,d_idx]) + ", " + str(self.transit_wait_time[o_idx,d_idx]) + ", " + str(self.transit_fare[o_idx,d_idx]) + ", " + str(self.auto_distance[o_idx,d_idx])
+			else: s += ", NA, NA, NA, NA, NA"
+			return s
 	def print_skims(self):
 		for interval in sorted(self.auto_skims.keys()):
 			print 'Skim end=' + str(interval)
@@ -662,6 +715,8 @@ parser.add_argument('-bin', action='store_const', const=1)
 parser.add_argument('-origin_list', type=int, nargs='*')
 parser.add_argument('-destination_list', type=int, nargs='*')
 parser.add_argument('-read_from_csv', action='store_true')
+parser.add_argument('-convert_to_v1', action='store_true')
+parser.add_argument('-interactive', action='store_true')
 parser.add_argument('-i1_transit_ttime_file', default = '')
 parser.add_argument('-i2_transit_walk_files', nargs='*')
 parser.add_argument('-i3_transit_wait_files', nargs='*')
@@ -695,6 +750,48 @@ if (args.read_from_csv):
 		ReadTransitSkims_CSV(args.i1_transit_ttime_file,args.i2_transit_walk_files,args.i3_transit_wait_files,args.i4_transit_fare_file,args.i5_auto_distance_file, args.zone_id_to_index_file,skims)
 		WriteTransitSkimsV1(args.transit_skim_file,skims)
 		WriteTransitSkimsV1_CSV(args.transit_skim_file,skims)
+		
+elif (args.convert_to_v1):
+	write_bin = True
+	write_csv = True
+	if args.zone_id_to_index_file == '': raise NameError("Error: missing zone_id_to_index file")
+	if args.auto_skim_file != '': raise NameError("Error: v0 to v1 converter not implemented for auto skims")
+	if args.transit_skim_file != '':
+		do_transit = ConvertTransitToV1(args.transit_skim_file,skims, args.zone_id_to_index_file)
+		if do_transit: WriteTransitSkimsV1(args.transit_skim_file+"_v1", skims)	
+		if do_transit: WriteTransitSkimsV1_CSV(args.transit_skim_file+"_v1", skims)
+		
+elif (args.interactive):
+
+	Main(skims, args.auto_skim_file, args.transit_skim_file, False, False, False, None, None)
+	
+	do_auto = args.auto_skim_file != ''
+	do_transit = args.transit_skim_file != ''
+	
+	s = ''
+	while (s != 'q'):
+		s = raw_input('Enter an O,D pair (or q to exit): ')
+		OD_s = s.split(',')
+		if len(OD_s) != 2:
+			print "Error: enter an OD pair seperated by a comma"
+			continue
+		try:
+			O = int(OD_s[0])
+			D = int(OD_s[1])
+		except ValueError:
+			print "Error: enter a valid OD pair seperated by a comma"
+			continue
+		if O not in skims.zone_id_to_index_map:
+			print "Origin ID '" + O + "' not found."
+			continue
+		if D not in skims.zone_id_to_index_map:
+			print "Destination ID '" + D + "' not found."
+			continue
+		O_idx = skims.zone_id_to_index_map[int(O)]
+		D_idx = skims.zone_id_to_index_map[int(D)]
+		if O_idx is None: raise NameError("Error: Origin zone id '" + O + "' not found.")
+		if D_idx is None: raise NameError("Error: Destination zone id '" + D + "' not found.")
+		print skims.print_OD_info(O_idx, D_idx, do_auto, do_transit)
 else:
 	Main(skims, args.auto_skim_file, args.transit_skim_file, write_bin, write_csv, write_tab, args.origin_list, args.destination_list)
 

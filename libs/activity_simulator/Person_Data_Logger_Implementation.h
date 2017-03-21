@@ -206,6 +206,7 @@ namespace Person_Components
 
 				// exit if not writing output
 				if (!scenario->template write_activity_output<bool>()) return;
+				return;
 
 
 				stringstream PERSON_ID;
@@ -689,6 +690,8 @@ namespace Person_Components
 					act_rec.setMode ("WALK");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 					act_rec.setMode("BIKE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
+					act_rec.setMode("SCHOOLBUS");
 				else
 					act_rec.setMode ("TRANSIT");
 				act_rec.setType (act->Get_Type_String());
