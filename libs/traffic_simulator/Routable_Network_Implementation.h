@@ -163,12 +163,9 @@ namespace Routing_Components
 			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
 			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
 
-			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
-			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
-
 			// addition of new layered data array to hold to historical connection (turn-movement) information
-			static m_data(Layered_Data_Array<float>,turn_moe_data,NONE,NONE);
-			static m_data(concat(boost::unordered::unordered_map<int,int>),turn_id_to_moe_data,NONE,NONE);
+			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
+			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);			
 
 			static void initialize_moe_data()
 			{
@@ -392,15 +389,6 @@ namespace Routing_Components
 
 						connection_attributes._cost = 0.0f;
 						connection_attributes._time_cost = 0.0f;
-
-						if(_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
-						{
-							connection_attributes._moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
-						}
-						else
-						{
-							connection_attributes._moe_ptr = nullptr;
-						}
 
 						time_dependent_to_time_dependent_connection_group->_neighbor_attributes.push_back(connection_attributes);
 					}
@@ -750,11 +738,5 @@ namespace Routing_Components
 
 		template<typename MasterType, typename InheritanceList>
 		std::unordered_map<int, int> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_id_to_moe_data;
-
-		template<typename MasterType, typename InheritanceList>
-		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_turn_moe_data;
-
-		template<typename MasterType, typename InheritanceList>
-		boost::unordered::unordered_map<int,int> Routable_Network_Implementation<MasterType,InheritanceList>::_turn_id_to_moe_data;
 	}
 }

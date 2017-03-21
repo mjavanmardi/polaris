@@ -75,16 +75,15 @@ namespace polaris
 				float ttime_step = current->moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
-
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
-					t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+					t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
 					ttime_step = current->moe_data()->layer_step<float>();	
 					while (t-ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
-						t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+						t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
 								
 					}
 				}
@@ -152,12 +151,12 @@ namespace polaris
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
-					t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
-					ttime_step = current->moe_data()->layer_step<float>();	
+					t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+					ttime_step = current->moe_data()->layer_step<float>();
 					while (t-ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
-						t = t_link + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
+						t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time+ttime_accumulation);
 								
 					}
 				}
