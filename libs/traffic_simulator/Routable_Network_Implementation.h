@@ -121,10 +121,20 @@ namespace Routing_Components
 			t_data(float*,moe_ptr);
 
 			static t_data(Layered_Data_Array<float>*,moe_data);
+			static t_data(float, ttime_weight_shape);
+			static t_data(float, ttime_weight_scale);
+			static t_data(float, ttime_weight_factor);
 		};
 		
 		template<typename MasterType>
 		Layered_Data_Array<float>* time_dependent_attributes<MasterType>::_moe_data;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_shape;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_scale;
+		template<typename MasterType>
+		float time_dependent_attributes<MasterType>::_ttime_weight_factor;
+
 
 		struct time_dependent_to_time_dependent
 		{
@@ -274,8 +284,13 @@ namespace Routing_Components
 
 			void construct_time_dependent_routable_network(Network<typename MasterType::network_type>* source_network)
 			{
+				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
 				Types::time_dependent_attributes<MT>::_moe_data = &_moe_data;
+				Types::time_dependent_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_shape<float>();
+				Types::time_dependent_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_scale<float>();
+				Types::time_dependent_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_factor<float>();
+
 				Types::time_dependent_to_time_dependent::_turn_moe_data = &_turn_moe_data;
 
 				typedef Network<typename MasterType::network_type> Network_Interface;

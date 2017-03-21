@@ -394,6 +394,7 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	s.clear(); s.str("");
 	s<<"\t\"historical_results_database_name\" : \""<<historical_db_name<<"\",";
 	fw.Write_Line(s);
+	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
 	fw.Write_Line("\t\"time_dependent_routing\" : true\n}");
 	fw.Close();
 }

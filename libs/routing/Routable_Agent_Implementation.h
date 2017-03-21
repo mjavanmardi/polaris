@@ -70,15 +70,35 @@ namespace polaris
 			{
 				int sim_time = iteration();
 
-				//float t = current->moe_data()->get_closest_element(moe_ptr,current_time);
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = current->moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				if (t > ttime_step)
+				{
+					ttime_accumulation += ttime_step;
+					t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+					ttime_step = current->moe_data()->layer_step<float>();
+					while (t - ttime_accumulation > ttime_step)
+					{
+						ttime_accumulation += ttime_step;
+						t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+
+					}
+				}
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+
+				
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_cost + connection->_cost;
 
 				int t_diff = abs(current_time - iteration());
 
-				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 
@@ -126,18 +146,35 @@ namespace polaris
 			{
 				int sim_time = iteration();
 
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr,current_time) + current->_time_cost;
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = current->moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				if (t > ttime_step)
+				{
+					ttime_accumulation += ttime_step;
+					t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+					ttime_step = current->moe_data()->layer_step<float>();
+					while (t - ttime_accumulation > ttime_step)
+					{
+						ttime_accumulation += ttime_step;
+						t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+
+					}
+				}
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+
+
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = current->_time_cost + connection->_time_cost;
+
 				int t_diff = abs(current_time - iteration());
 
-				if (t_diff > 800)
-				{
-					int test = 1;
-				}
-
-				float w = 1 - 1/(1+exp(-1.0*((float)t_diff/200.0) + 5.0));
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 

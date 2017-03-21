@@ -300,6 +300,7 @@ namespace Trip_Components
 				movement_plan->template destination<_Activity_Location_Interface*>(dest);
 				movement_plan->template departed_time<Time_Seconds>(departed_time);
 				movement_plan->template initialize_trajectory<NULLTYPE>();
+				movement_plan->template traveler_id(Trip_Id);
 
 				router->template network<_Network_Interface*>(network);
 				router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
