@@ -268,6 +268,13 @@ namespace Scenario_Components
 			accessor(use_tile_imagery,NONE,NONE);
 			accessor(tile_imagery_alpha_level,NONE,NONE);
 
+			//Parameter files
+			accessor(mode_choice_option_param_file, NONE, NONE);
+			accessor(detroit_mode_choice_option_param_file, NONE, NONE);
+			accessor(adapts_destination_choice_option_param_file, NONE, NONE);
+			accessor(telecommute_choice_implementation_param_file, NONE, NONE);
+
+
 			template<typename TargetType> void read_scenario_data(const char* filename)
 			{
 				CfgReader cfgReader;
@@ -635,7 +642,11 @@ namespace Scenario_Components
 					buildings_geometry_file<string&>()="";
 				}
 				else use_buildings(true);
-				
+
+				if (cfgReader.getParameter("mode_choice_option_param_file",					mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)				 mode_choice_option_param_file<string>(filename);
+				if (cfgReader.getParameter("detroit_mode_choice_option_param_file",			detroit_mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)		 detroit_mode_choice_option_param_file<string>(filename);
+				if (cfgReader.getParameter("adapts_destination_choice_option_param_file",	adapts_destination_choice_option_param_file<string*>()) != PARAMETER_FOUND)	 adapts_destination_choice_option_param_file<string>(filename);
+				if (cfgReader.getParameter("telecommute_choice_param_file",					telecommute_choice_param_file<string*>()) != PARAMETER_FOUND)				 telecommute_choice_param_file<string>(filename);
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1352,6 +1363,17 @@ namespace Scenario_Components
 			{
 				return assignment_interval_length<int>();
 			}
+
+			int getParameter(const char *parameterName, int *paramValue);
+			int getParameter(const char *parameterName, double *paramValue);
+			int getParameter(const char *parameterName, std::string *paramValue);
+			int getParameter(const char *parameterName, bool *paramValue);
+			int getParameter(const char *parameterName, IntArray *parameter);
+			int getParameter(const char *parameterName, DoubleArray *parameter);
+			int getParameter(const char *parameterName, StringArray *parameter);
+			int getParameter(const char *parameterName, BoolArray *parameter);
+			int getParameter(const char *parameterName, unsigned long *paramValue);
+
 		};
 	}
 }

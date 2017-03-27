@@ -2,11 +2,41 @@
 
 #include "Mode_Chooser_Prototype.h"
 #include "Person_Prototype.h"
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/error/en.h>
+#include <fstream>
 
 namespace Person_Components
 {
 	namespace Implementations
 	{
+		double GetOption_Double(rapidjson::Document& document, const std::string& section, const std::string& key, double default_value)
+		{
+			assert(document.HasMember(section.c_str()));
+			assert(document[section.c_str()].HasMember(key.c_str()));
+			assert(document[section.c_str()][key.c_str()].IsDouble());
+			if (!document.HasMember(section.c_str()))
+			{
+				cout << "Can't locate section \'" << section << "\' in option file" << endl;
+				return default_value;
+			}
+
+			if (!document[section.c_str()].HasMember(key.c_str()))
+			{
+				cout << "Can't locate key \'" << key << "\' in option file" << endl;
+				return default_value;
+			}
+
+			if (!document[section.c_str()][key.c_str()].IsDouble())
+			{
+				cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
+				return default_value;
+			}
+
+			return document[section.c_str()][key.c_str()].GetDouble();
+		}
+
 		//==================================================================================
 		/// Mode Choice Planning classes
 		//----------------------------------------------------------------------------------
@@ -22,47 +52,47 @@ namespace Person_Components
 
 			// PARAMETER DECLARATIONS
 			#pragma region static parameters
-			static m_data(float, BHW_IVTT, NONE, NONE);
-			static m_data(float, BHW_CBD_IVTT, NONE, NONE);
-			static m_data(float, BHO_IVTT, NONE, NONE);
-			static m_data(float, BHO_CBD_IVTT, NONE, NONE);
-			static m_data(float, BNH_IVTT, NONE, NONE);
-			static m_data(float, BNH_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BHW_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BHO_IVTT, NONE, NONE);
+			m_static_data(float, BHO_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BNH_IVTT, NONE, NONE);
+			m_static_data(float, BNH_CBD_IVTT, NONE, NONE);
+			m_static_data(float, BHW_IVTT, NONE, NONE);
 
-			static m_data(float, BHW_WAIT, NONE, NONE);
-			static m_data(float, BHW_CBD_WAIT, NONE, NONE);
-			static m_data(float, BHO_WAIT, NONE, NONE);
-			static m_data(float, BHO_CBD_WAIT, NONE, NONE);
-			static m_data(float, BNH_WAIT, NONE, NONE);
-			static m_data(float, BNH_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BHW_WAIT, NONE, NONE);
+			m_static_data(float, BHW_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BHO_WAIT, NONE, NONE);
+			m_static_data(float, BHO_CBD_WAIT, NONE, NONE);
+			m_static_data(float, BNH_WAIT, NONE, NONE);
+			m_static_data(float, BNH_CBD_WAIT, NONE, NONE);
 			
-			static m_data(float, BHW_TRANSFER, NONE, NONE);
-			static m_data(float, BHW_CBD_TRANSFER, NONE, NONE);
-			static m_data(float, BHO_TRANSFER, NONE, NONE);
-			static m_data(float, BHO_CBD_TRANSFER, NONE, NONE);
-			static m_data(float, BNH_TRANSFER, NONE, NONE);
-			static m_data(float, BNH_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BHW_TRANSFER, NONE, NONE);
+			m_static_data(float, BHW_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BHO_TRANSFER, NONE, NONE);
+			m_static_data(float, BHO_CBD_TRANSFER, NONE, NONE);
+			m_static_data(float, BNH_TRANSFER, NONE, NONE);
+			m_static_data(float, BNH_CBD_TRANSFER, NONE, NONE);
 			
-			static m_data(float, BHW_WALK, NONE, NONE);
-			static m_data(float, BHW_CBD_WALK, NONE, NONE);
-			static m_data(float, BHO_WALK, NONE, NONE);
-			static m_data(float, BHO_CBD_WALK, NONE, NONE);
-			static m_data(float, BNH_WALK, NONE, NONE);
-			static m_data(float, BNH_CBD_WALK, NONE, NONE);
+			m_static_data(float, BHW_WALK, NONE, NONE);
+			m_static_data(float, BHW_CBD_WALK, NONE, NONE);
+			m_static_data(float, BHO_WALK, NONE, NONE);
+			m_static_data(float, BHO_CBD_WALK, NONE, NONE);
+			m_static_data(float, BNH_WALK, NONE, NONE);
+			m_static_data(float, BNH_CBD_WALK, NONE, NONE);
 			
-			static m_data(float, BHW_COST, NONE, NONE);
-			static m_data(float, BHW_CBD_COST, NONE, NONE);
-			static m_data(float, BHO_COST, NONE, NONE);
-			static m_data(float, BHO_CBD_COST, NONE, NONE);
-			static m_data(float, BNH_COST, NONE, NONE);
-			static m_data(float, BNH_CBD_COST, NONE, NONE);
+			m_static_data(float, BHW_COST, NONE, NONE);
+			m_static_data(float, BHW_CBD_COST, NONE, NONE);
+			m_static_data(float, BHO_COST, NONE, NONE);
+			m_static_data(float, BHO_CBD_COST, NONE, NONE);
+			m_static_data(float, BNH_COST, NONE, NONE);
+			m_static_data(float, BNH_CBD_COST, NONE, NONE);
 			
-			static m_data(float, BHW_BIAS, NONE, NONE);
-			static m_data(float, BHW_CBD_BIAS, NONE, NONE);
-			static m_data(float, BHO_BIAS, NONE, NONE);
-			static m_data(float, BHO_CBD_BIAS, NONE, NONE);
-			static m_data(float, BNH_BIAS, NONE, NONE);
-			static m_data(float, BNH_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BHW_BIAS, NONE, NONE);
+			m_static_data(float, BHW_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BHO_BIAS, NONE, NONE);
+			m_static_data(float, BHO_CBD_BIAS, NONE, NONE);
+			m_static_data(float, BNH_BIAS, NONE, NONE);
+			m_static_data(float, BNH_CBD_BIAS, NONE, NONE);
 			#pragma endregion
 
 			//====================================================================================================================================
@@ -96,6 +126,8 @@ namespace Person_Components
 			
 			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
 			//------------------------------------------------------------------------------------------------------------------------------------
+			
+			static bool static_initialize();
 
 			// Feature called from prototype and by Choice_Model
 			virtual double Calculate_Utility();
@@ -164,6 +196,67 @@ namespace Person_Components
 			float Calculate_Utility_Value(float ivtt_dif, float wait_dif, float transfer_dif, float walk_time_dif, float cost_dif);
 
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize()
+		{
+			std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
+			std::ifstream ifs(option_file);
+			if (!ifs.good())
+			{
+				cout << "ERROR: unbale to open option file \'" << option_file << "\'" << endl;
+				return false;
+			}
+
+			rapidjson::IStreamWrapper isw(ifs);
+			rapidjson::Document document;
+			if (document.ParseStream(isw).HasParseError())
+			{
+				cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
+				cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
+				return false;
+			}
+			assert(document.IsObject());
+
+			BHW_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_IVTT"		, BHW_CBD_IVTT	<float>()));
+			BHO_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_IVTT"			, BHO_IVTT		<float>()));
+			BHO_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_IVTT"		, BHO_CBD_IVTT	<float>()));
+			BNH_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_IVTT"			, BNH_IVTT		<float>()));
+			BNH_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_IVTT"		, BNH_CBD_IVTT	<float>()));
+			BHW_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_IVTT"			, BHW_IVTT		<float>()));
+			BHW_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_WAIT"			, BHW_WAIT		<float>()));
+			BHW_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_WAIT"		, BHW_CBD_WAIT	<float>()));
+			BHO_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_WAIT"			, BHO_WAIT		<float>()));
+			BHO_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_WAIT"		, BHO_CBD_WAIT	<float>()));
+			BNH_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_WAIT"			, BNH_WAIT		<float>()));
+			BNH_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_WAIT"		, BNH_CBD_WAIT	<float>()));
+			BHW_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_TRANSFER"		, BHW_TRANSFER	<float>()));
+			BHW_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_TRANSFER"	, BHW_CBD_TRANSFER<float>()));
+			BHO_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_TRANSFER"		, BHO_TRANSFER	<float>()));
+			BHO_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_TRANSFER"	, BHO_CBD_TRANSFER<float>()));
+			BNH_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_TRANSFER"		, BNH_TRANSFER	<float>()));
+			BNH_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_TRANSFER"	, BNH_CBD_TRANSFER<float>()));
+			BHW_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_WALK"			, BHW_WALK		<float>()));
+			BHW_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_WALK"		, BHW_CBD_WALK	<float>()));
+			BHO_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_WALK"			, BHO_WALK		<float>()));
+			BHO_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_WALK"		, BHO_CBD_WALK	<float>()));
+			BNH_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_WALK"			, BNH_WALK		<float>()));
+			BNH_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_WALK"		, BNH_CBD_WALK	<float>()));
+			BHW_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_COST"			, BHW_COST		<float>()));
+			BHW_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_COST"		, BHW_CBD_COST	<float>()));
+			BHO_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_COST"			, BHO_COST		<float>()));
+			BHO_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_COST"		, BHO_CBD_COST	<float>()));
+			BNH_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_COST"			, BNH_COST		<float>()));
+			BNH_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_COST"		, BNH_CBD_COST	<float>()));
+			BHW_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_BIAS"			, BHW_BIAS		<float>()));
+			BHW_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_BIAS"		, BHW_CBD_BIAS	<float>()));
+			BHO_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_BIAS"			, BHO_BIAS		<float>()));
+			BHO_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_BIAS"		, BHO_CBD_BIAS	<float>()));
+			BNH_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_BIAS"			, BNH_BIAS		<float>()));
+			BNH_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_BIAS"		, BNH_CBD_BIAS	<float>()));
+
+			return true;
+		}
 
 		template<typename MasterType, typename InheritanceList>
 		double Mode_Choice_Option<MasterType, InheritanceList>::Calculate_Utility()
@@ -782,6 +875,129 @@ namespace Person_Components
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType, INHERIT(Detroit_Mode_Choice_Option), Data_Object>::Component_Type ComponentType;
 
+			static bool static_initialize()
+			{
+				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template detroit_mode_choice_option_param_file<string>();
+				std::ifstream ifs(option_file);
+				if ( !ifs.good() )
+				{
+					cout << "ERROR: unbale to open option file \'" << option_file << "\'" << endl;
+					return false;
+				}
+
+				rapidjson::IStreamWrapper isw(ifs);
+				rapidjson::Document document;
+				if (document.ParseStream(isw).HasParseError())
+				{
+					cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
+					cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
+					return false;
+				}
+				assert(document.IsObject());
+
+				HBW_ASC_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_AUTO"			, HBW_ASC_AUTO			<float>()));
+				HBO_ASC_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_AUTO"			, HBO_ASC_AUTO			<float>()));
+				NHB_ASC_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_AUTO"			, NHB_ASC_AUTO			<float>()));
+				HBW_ASC_PASS				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_PASS"			, HBW_ASC_PASS			<float>()));
+				HBO_ASC_PASS	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_PASS"			, HBO_ASC_PASS			<float>()));
+				NHB_ASC_PASS      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_PASS"			, NHB_ASC_PASS			<float>()));
+				HBW_ASC_TAXI				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_TAXI"			, HBW_ASC_TAXI			<float>()));
+				HBO_ASC_TAXI	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_TAXI"			, HBO_ASC_TAXI			<float>()));
+				NHB_ASC_TAXI      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_TAXI"			, NHB_ASC_TAXI			<float>()));
+				HBW_ASC_WALK	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_WALK"			, HBW_ASC_WALK			<float>()));
+				HBO_ASC_WALK	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_WALK"			, HBO_ASC_WALK			<float>()));
+				NHB_ASC_WALK      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_WALK"			, NHB_ASC_WALK			<float>()));
+				HBW_ASC_TRAN				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_TRAN"			, HBW_ASC_TRAN			<float>()));
+				HBO_ASC_TRAN	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_TRAN"			, HBO_ASC_TRAN			<float>()));
+				NHB_ASC_TRAN      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_TRAN"			, NHB_ASC_TRAN			<float>()));
+				HBW_ASC_BIKE	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_BIKE"			, HBW_ASC_BIKE			<float>()));
+				HBO_ASC_BIKE	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_BIKE"			, HBO_ASC_BIKE			<float>()));
+				NHB_ASC_BIKE      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_BIKE"			, NHB_ASC_BIKE			<float>()));
+				HBW_B_cbd_pa				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cbd_pa"			, HBW_B_cbd_pa			<float>()));
+				HBO_B_cbd_pa	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cbd_pa"			, HBO_B_cbd_pa			<float>()));
+				NHB_B_cbd_pa      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cbd_pa"			, NHB_B_cbd_pa			<float>()));
+				HBW_B_cost	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost"			, HBW_B_cost			<float>()));
+				HBO_B_cost	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost"			, HBO_B_cost			<float>()));
+				NHB_B_cost        			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost"			, NHB_B_cost			<float>()));
+				HBW_B_cost_hinc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost_hinc"		, HBW_B_cost_hinc		<float>()));
+				HBO_B_cost_hinc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost_hinc"		, HBO_B_cost_hinc		<float>()));
+				NHB_B_cost_hinc   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost_hinc"		, NHB_B_cost_hinc		<float>()));
+				HBW_B_cost_minc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost_minc"		, HBW_B_cost_minc		<float>()));
+				HBO_B_cost_minc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost_minc"		, HBO_B_cost_minc		<float>()));
+				NHB_B_cost_minc   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost_minc"		, NHB_B_cost_minc		<float>()));
+				HBW_B_dens_bike				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_dens_bike"		, HBW_B_dens_bike		<float>()));
+				HBO_B_dens_bike				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_dens_bike"		, HBO_B_dens_bike		<float>()));
+				NHB_B_dens_bike   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_dens_bike"		, NHB_B_dens_bike		<float>()));
+				HBW_B_dens_walk				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_dens_walk"		, HBW_B_dens_walk		<float>()));
+				HBO_B_dens_walk				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_dens_walk"		, HBO_B_dens_walk		<float>()));
+				NHB_B_dens_walk   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_dens_walk"		, NHB_B_dens_walk		<float>()));
+				HBW_B_male_taxi				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_male_taxi"		, HBW_B_male_taxi		<float>()));
+				HBO_B_male_taxi				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_male_taxi"		, HBO_B_male_taxi		<float>()));
+				NHB_B_male_taxi   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_male_taxi"		, NHB_B_male_taxi		<float>()));
+				HBW_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_notalone_pass"	, HBW_B_notalone_pass	<float>()));
+				HBO_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_notalone_pass"	, HBO_B_notalone_pass	<float>()));
+				NHB_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_notalone_pass"	, NHB_B_notalone_pass	<float>()));
+				HBW_B_over65_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_over65_pass"	, HBW_B_over65_pass		<float>()));
+				HBO_B_over65_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_over65_pass"	, HBO_B_over65_pass		<float>()));
+				NHB_B_over65_pass 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_over65_pass"	, NHB_B_over65_pass 	<float>()));
+				HBW_B_over65_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_over65_tran"	, HBW_B_over65_tran		<float>()));
+				HBO_B_over65_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_over65_tran"	, HBO_B_over65_tran		<float>()));
+				NHB_B_over65_tran 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_over65_tran"	, NHB_B_over65_tran 	<float>()));
+				HBW_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ovttime_tran"	, HBW_B_ovttime_tran	<float>()));
+				HBO_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ovttime_tran"	, HBO_B_ovttime_tran	<float>()));
+				NHB_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ovttime_tran"	, NHB_B_ovttime_tran	<float>()));
+				HBW_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_peak_auto"		, HBW_B_peak_auto   	<float>()));
+				HBO_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_peak_auto"		, HBO_B_peak_auto   	<float>()));
+				NHB_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_peak_auto"		, NHB_B_peak_auto   	<float>()));
+				HBW_B_ttime_bike			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_bike"		, HBW_B_ttime_bike		<float>()));
+				HBO_B_ttime_bike			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_bike"		, HBO_B_ttime_bike		<float>()));
+				NHB_B_ttime_bike  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_bike"		, NHB_B_ttime_bike  	<float>()));
+				HBW_B_ttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_tran"		, HBW_B_ttime_tran		<float>()));
+				HBO_B_ttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_tran"		, HBO_B_ttime_tran		<float>()));
+				NHB_B_ttime_tran  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_tran"		, NHB_B_ttime_tran  	<float>()));
+				HBW_B_ttime_walk			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_walk"		, HBW_B_ttime_walk		<float>()));
+				HBO_B_ttime_walk			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_walk"		, HBO_B_ttime_walk		<float>()));
+				NHB_B_ttime_walk  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_walk"		, NHB_B_ttime_walk  	<float>()));
+				HBW_B_u18_pass				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_u18_pass"		, HBW_B_u18_pass		<float>()));
+				HBO_B_u18_pass				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_u18_pass"		, HBO_B_u18_pass		<float>()));
+				NHB_B_u18_pass    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_u18_pass"		, NHB_B_u18_pass    	<float>()));
+				HBW_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_pass"	, HBW_B_vehavail_pass	<float>()));
+				HBO_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_pass"	, HBO_B_vehavail_pass	<float>()));
+				NHB_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_pass"	, NHB_B_vehavail_pass	<float>()));
+				HBW_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_taxi"	, HBW_B_vehavail_taxi	<float>()));
+				HBO_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_taxi"	, HBO_B_vehavail_taxi	<float>()));
+				NHB_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_taxi"	, NHB_B_vehavail_taxi	<float>()));
+				HBW_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_tran"	, HBW_B_vehavail_tran	<float>()));
+				HBO_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_tran"	, HBO_B_vehavail_tran	<float>()));
+				NHB_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_tran"	, NHB_B_vehavail_tran	<float>()));
+				HBW_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_waittime_tran"	, HBW_B_waittime_tran	<float>()));
+				HBO_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_waittime_tran"	, HBO_B_waittime_tran	<float>()));
+				NHB_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_waittime_tran"	, NHB_B_waittime_tran	<float>()));
+				HBW_ASC_N_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_N_AUTO"		, HBW_ASC_N_AUTO		<float>()));
+				HBO_ASC_N_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_N_AUTO"		, HBO_ASC_N_AUTO		<float>()));
+				NHB_ASC_N_AUTO    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_N_AUTO"		, NHB_ASC_N_AUTO    	<float>()));
+				HBW_ASC_N_NM	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_N_NM"			, HBW_ASC_N_NM			<float>()));
+				HBO_ASC_N_NM	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_N_NM"			, HBO_ASC_N_NM			<float>()));
+				NHB_ASC_N_NM      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_N_NM"			, NHB_ASC_N_NM      	<float>()));
+				HBW_B_vehavail_nm			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_nm"	, HBW_B_vehavail_nm		<float>()));
+				HBO_B_vehavail_nm			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_nm"	, HBO_B_vehavail_nm		<float>()));
+				NHB_B_vehavail_nm 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_nm"	, NHB_B_vehavail_nm 	<float>()));
+				HBW_B_male_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_male_nm"		, HBW_B_male_nm			<float>()));
+				HBO_B_male_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_male_nm"		, HBO_B_male_nm			<float>()));
+				NHB_B_male_nm     			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_male_nm"		, NHB_B_male_nm     	<float>()));
+				HBW_B_cbd_nm				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cbd_nm"			, HBW_B_cbd_nm			<float>()));
+				HBO_B_cbd_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cbd_nm"			, HBO_B_cbd_nm			<float>()));
+				NHB_B_cbd_nm      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cbd_nm"			, NHB_B_cbd_nm      	<float>()));
+				HBW_NEST_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_NEST_AUTO"		, HBW_NEST_AUTO			<float>()));
+				HBO_NEST_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_NEST_AUTO"		, HBO_NEST_AUTO			<float>()));
+				NHB_NEST_AUTO     			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_NEST_AUTO"		, NHB_NEST_AUTO     	<float>()));
+				HBW_NEST_NM	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_NEST_NM"			, HBW_NEST_NM	    	<float>()));
+				HBO_NEST_NM	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_NEST_NM"			, HBO_NEST_NM	    	<float>()));
+				NHB_NEST_NM       			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_NEST_NM"			, NHB_NEST_NM       	<float>()));
+
+				return true;
+			}
+
 			void copy(ComponentType* obj)
 			{
 				this->_Parent_Planner = obj->_Parent_Planner;
@@ -804,39 +1020,39 @@ namespace Person_Components
 
 			// PARAMETER DECLARATIONS
 			#pragma region static parameters
-			static m_data(float, HBW_ASC_AUTO, NONE, NONE);	static m_data(float, HBO_ASC_AUTO, NONE, NONE);	static m_data(float, NHB_ASC_AUTO, NONE, NONE);
-			static m_data(float, HBW_ASC_PASS, NONE, NONE);	static m_data(float, HBO_ASC_PASS, NONE, NONE);	static m_data(float, NHB_ASC_PASS, NONE, NONE);
-			static m_data(float, HBW_ASC_TAXI, NONE, NONE);	static m_data(float, HBO_ASC_TAXI, NONE, NONE);	static m_data(float, NHB_ASC_TAXI, NONE, NONE);
-			static m_data(float, HBW_ASC_WALK, NONE, NONE);	static m_data(float, HBO_ASC_WALK, NONE, NONE);	static m_data(float, NHB_ASC_WALK, NONE, NONE);
-			static m_data(float, HBW_ASC_TRAN, NONE, NONE);	static m_data(float, HBO_ASC_TRAN, NONE, NONE);	static m_data(float, NHB_ASC_TRAN, NONE, NONE);
-			static m_data(float, HBW_ASC_BIKE, NONE, NONE);	static m_data(float, HBO_ASC_BIKE, NONE, NONE);	static m_data(float, NHB_ASC_BIKE, NONE, NONE);
-			static m_data(float, HBW_B_cbd_pa, NONE, NONE);	static m_data(float, HBO_B_cbd_pa, NONE, NONE);	static m_data(float, NHB_B_cbd_pa, NONE, NONE);
-			static m_data(float, HBW_B_cost, NONE, NONE);	static m_data(float, HBO_B_cost, NONE, NONE);	static m_data(float, NHB_B_cost, NONE, NONE);
-			static m_data(float, HBW_B_cost_hinc, NONE, NONE);	static m_data(float, HBO_B_cost_hinc, NONE, NONE);	static m_data(float, NHB_B_cost_hinc, NONE, NONE);
-			static m_data(float, HBW_B_cost_minc, NONE, NONE);	static m_data(float, HBO_B_cost_minc, NONE, NONE);	static m_data(float, NHB_B_cost_minc, NONE, NONE);
-			static m_data(float, HBW_B_dens_bike, NONE, NONE);	static m_data(float, HBO_B_dens_bike, NONE, NONE);	static m_data(float, NHB_B_dens_bike, NONE, NONE);
-			static m_data(float, HBW_B_dens_walk, NONE, NONE);	static m_data(float, HBO_B_dens_walk, NONE, NONE);	static m_data(float, NHB_B_dens_walk, NONE, NONE);
-			static m_data(float, HBW_B_male_taxi, NONE, NONE);	static m_data(float, HBO_B_male_taxi, NONE, NONE);	static m_data(float, NHB_B_male_taxi, NONE, NONE);
-			static m_data(float, HBW_B_notalone_pass, NONE, NONE);	static m_data(float, HBO_B_notalone_pass, NONE, NONE);	static m_data(float, NHB_B_notalone_pass, NONE, NONE);
-			static m_data(float, HBW_B_over65_pass, NONE, NONE);	static m_data(float, HBO_B_over65_pass, NONE, NONE);	static m_data(float, NHB_B_over65_pass, NONE, NONE);
-			static m_data(float, HBW_B_over65_tran, NONE, NONE);	static m_data(float, HBO_B_over65_tran, NONE, NONE);	static m_data(float, NHB_B_over65_tran, NONE, NONE);
-			static m_data(float, HBW_B_ovttime_tran, NONE, NONE);	static m_data(float, HBO_B_ovttime_tran, NONE, NONE);	static m_data(float, NHB_B_ovttime_tran, NONE, NONE);
-			static m_data(float, HBW_B_peak_auto, NONE, NONE);	static m_data(float, HBO_B_peak_auto, NONE, NONE);	static m_data(float, NHB_B_peak_auto, NONE, NONE);
-			static m_data(float, HBW_B_ttime_bike, NONE, NONE);	static m_data(float, HBO_B_ttime_bike, NONE, NONE);	static m_data(float, NHB_B_ttime_bike, NONE, NONE);
-			static m_data(float, HBW_B_ttime_tran, NONE, NONE);	static m_data(float, HBO_B_ttime_tran, NONE, NONE);	static m_data(float, NHB_B_ttime_tran, NONE, NONE);
-			static m_data(float, HBW_B_ttime_walk, NONE, NONE);	static m_data(float, HBO_B_ttime_walk, NONE, NONE);	static m_data(float, NHB_B_ttime_walk, NONE, NONE);
-			static m_data(float, HBW_B_u18_pass, NONE, NONE);	static m_data(float, HBO_B_u18_pass, NONE, NONE);	static m_data(float, NHB_B_u18_pass, NONE, NONE);
-			static m_data(float, HBW_B_vehavail_pass, NONE, NONE);	static m_data(float, HBO_B_vehavail_pass, NONE, NONE);	static m_data(float, NHB_B_vehavail_pass, NONE, NONE);
-			static m_data(float, HBW_B_vehavail_taxi, NONE, NONE);	static m_data(float, HBO_B_vehavail_taxi, NONE, NONE);	static m_data(float, NHB_B_vehavail_taxi, NONE, NONE);
-			static m_data(float, HBW_B_vehavail_tran, NONE, NONE);	static m_data(float, HBO_B_vehavail_tran, NONE, NONE);	static m_data(float, NHB_B_vehavail_tran, NONE, NONE);
-			static m_data(float, HBW_B_waittime_tran, NONE, NONE);	static m_data(float, HBO_B_waittime_tran, NONE, NONE);	static m_data(float, NHB_B_waittime_tran, NONE, NONE);
-			static m_data(float, HBW_ASC_N_AUTO, NONE, NONE);	static m_data(float, HBO_ASC_N_AUTO, NONE, NONE);	static m_data(float, NHB_ASC_N_AUTO, NONE, NONE);
-			static m_data(float, HBW_ASC_N_NM, NONE, NONE);	static m_data(float, HBO_ASC_N_NM, NONE, NONE);	static m_data(float, NHB_ASC_N_NM, NONE, NONE);
-			static m_data(float, HBW_B_vehavail_nm, NONE, NONE);	static m_data(float, HBO_B_vehavail_nm, NONE, NONE);	static m_data(float, NHB_B_vehavail_nm, NONE, NONE);
-			static m_data(float, HBW_B_male_nm, NONE, NONE);	static m_data(float, HBO_B_male_nm, NONE, NONE);	static m_data(float, NHB_B_male_nm, NONE, NONE);
-			static m_data(float, HBW_B_cbd_nm, NONE, NONE);	static m_data(float, HBO_B_cbd_nm, NONE, NONE);	static m_data(float, NHB_B_cbd_nm, NONE, NONE);
-			static m_data(float, HBW_NEST_AUTO, NONE, NONE);	static m_data(float, HBO_NEST_AUTO, NONE, NONE);	static m_data(float, NHB_NEST_AUTO, NONE, NONE);
-			static m_data(float, HBW_NEST_NM, NONE, NONE);	static m_data(float, HBO_NEST_NM, NONE, NONE);	static m_data(float, NHB_NEST_NM, NONE, NONE);
+			m_static_data(float, HBW_ASC_AUTO, NONE, NONE);	m_static_data(float, HBO_ASC_AUTO, NONE, NONE);	m_static_data(float, NHB_ASC_AUTO, NONE, NONE);
+			m_static_data(float, HBW_ASC_PASS, NONE, NONE);	m_static_data(float, HBO_ASC_PASS, NONE, NONE);	m_static_data(float, NHB_ASC_PASS, NONE, NONE);
+			m_static_data(float, HBW_ASC_TAXI, NONE, NONE);	m_static_data(float, HBO_ASC_TAXI, NONE, NONE);	m_static_data(float, NHB_ASC_TAXI, NONE, NONE);
+			m_static_data(float, HBW_ASC_WALK, NONE, NONE);	m_static_data(float, HBO_ASC_WALK, NONE, NONE);	m_static_data(float, NHB_ASC_WALK, NONE, NONE);
+			m_static_data(float, HBW_ASC_TRAN, NONE, NONE);	m_static_data(float, HBO_ASC_TRAN, NONE, NONE);	m_static_data(float, NHB_ASC_TRAN, NONE, NONE);
+			m_static_data(float, HBW_ASC_BIKE, NONE, NONE);	m_static_data(float, HBO_ASC_BIKE, NONE, NONE);	m_static_data(float, NHB_ASC_BIKE, NONE, NONE);
+			m_static_data(float, HBW_B_cbd_pa, NONE, NONE);	m_static_data(float, HBO_B_cbd_pa, NONE, NONE);	m_static_data(float, NHB_B_cbd_pa, NONE, NONE);
+			m_static_data(float, HBW_B_cost, NONE, NONE);	m_static_data(float, HBO_B_cost, NONE, NONE);	m_static_data(float, NHB_B_cost, NONE, NONE);
+			m_static_data(float, HBW_B_cost_hinc, NONE, NONE);	m_static_data(float, HBO_B_cost_hinc, NONE, NONE);	m_static_data(float, NHB_B_cost_hinc, NONE, NONE);
+			m_static_data(float, HBW_B_cost_minc, NONE, NONE);	m_static_data(float, HBO_B_cost_minc, NONE, NONE);	m_static_data(float, NHB_B_cost_minc, NONE, NONE);
+			m_static_data(float, HBW_B_dens_bike, NONE, NONE);	m_static_data(float, HBO_B_dens_bike, NONE, NONE);	m_static_data(float, NHB_B_dens_bike, NONE, NONE);
+			m_static_data(float, HBW_B_dens_walk, NONE, NONE);	m_static_data(float, HBO_B_dens_walk, NONE, NONE);	m_static_data(float, NHB_B_dens_walk, NONE, NONE);
+			m_static_data(float, HBW_B_male_taxi, NONE, NONE);	m_static_data(float, HBO_B_male_taxi, NONE, NONE);	m_static_data(float, NHB_B_male_taxi, NONE, NONE);
+			m_static_data(float, HBW_B_notalone_pass, NONE, NONE);	m_static_data(float, HBO_B_notalone_pass, NONE, NONE);	m_static_data(float, NHB_B_notalone_pass, NONE, NONE);
+			m_static_data(float, HBW_B_over65_pass, NONE, NONE);	m_static_data(float, HBO_B_over65_pass, NONE, NONE);	m_static_data(float, NHB_B_over65_pass, NONE, NONE);
+			m_static_data(float, HBW_B_over65_tran, NONE, NONE);	m_static_data(float, HBO_B_over65_tran, NONE, NONE);	m_static_data(float, NHB_B_over65_tran, NONE, NONE);
+			m_static_data(float, HBW_B_ovttime_tran, NONE, NONE);	m_static_data(float, HBO_B_ovttime_tran, NONE, NONE);	m_static_data(float, NHB_B_ovttime_tran, NONE, NONE);
+			m_static_data(float, HBW_B_peak_auto, NONE, NONE);	m_static_data(float, HBO_B_peak_auto, NONE, NONE);	m_static_data(float, NHB_B_peak_auto, NONE, NONE);
+			m_static_data(float, HBW_B_ttime_bike, NONE, NONE);	m_static_data(float, HBO_B_ttime_bike, NONE, NONE);	m_static_data(float, NHB_B_ttime_bike, NONE, NONE);
+			m_static_data(float, HBW_B_ttime_tran, NONE, NONE);	m_static_data(float, HBO_B_ttime_tran, NONE, NONE);	m_static_data(float, NHB_B_ttime_tran, NONE, NONE);
+			m_static_data(float, HBW_B_ttime_walk, NONE, NONE);	m_static_data(float, HBO_B_ttime_walk, NONE, NONE);	m_static_data(float, NHB_B_ttime_walk, NONE, NONE);
+			m_static_data(float, HBW_B_u18_pass, NONE, NONE);	m_static_data(float, HBO_B_u18_pass, NONE, NONE);	m_static_data(float, NHB_B_u18_pass, NONE, NONE);
+			m_static_data(float, HBW_B_vehavail_pass, NONE, NONE);	m_static_data(float, HBO_B_vehavail_pass, NONE, NONE);	m_static_data(float, NHB_B_vehavail_pass, NONE, NONE);
+			m_static_data(float, HBW_B_vehavail_taxi, NONE, NONE);	m_static_data(float, HBO_B_vehavail_taxi, NONE, NONE);	m_static_data(float, NHB_B_vehavail_taxi, NONE, NONE);
+			m_static_data(float, HBW_B_vehavail_tran, NONE, NONE);	m_static_data(float, HBO_B_vehavail_tran, NONE, NONE);	m_static_data(float, NHB_B_vehavail_tran, NONE, NONE);
+			m_static_data(float, HBW_B_waittime_tran, NONE, NONE);	m_static_data(float, HBO_B_waittime_tran, NONE, NONE);	m_static_data(float, NHB_B_waittime_tran, NONE, NONE);
+			m_static_data(float, HBW_ASC_N_AUTO, NONE, NONE);	m_static_data(float, HBO_ASC_N_AUTO, NONE, NONE);	m_static_data(float, NHB_ASC_N_AUTO, NONE, NONE);
+			m_static_data(float, HBW_ASC_N_NM, NONE, NONE);	m_static_data(float, HBO_ASC_N_NM, NONE, NONE);	m_static_data(float, NHB_ASC_N_NM, NONE, NONE);
+			m_static_data(float, HBW_B_vehavail_nm, NONE, NONE);	m_static_data(float, HBO_B_vehavail_nm, NONE, NONE);	m_static_data(float, NHB_B_vehavail_nm, NONE, NONE);
+			m_static_data(float, HBW_B_male_nm, NONE, NONE);	m_static_data(float, HBO_B_male_nm, NONE, NONE);	m_static_data(float, NHB_B_male_nm, NONE, NONE);
+			m_static_data(float, HBW_B_cbd_nm, NONE, NONE);	m_static_data(float, HBO_B_cbd_nm, NONE, NONE);	m_static_data(float, NHB_B_cbd_nm, NONE, NONE);
+			m_static_data(float, HBW_NEST_AUTO, NONE, NONE);	m_static_data(float, HBO_NEST_AUTO, NONE, NONE);	m_static_data(float, NHB_NEST_AUTO, NONE, NONE);
+			m_static_data(float, HBW_NEST_NM, NONE, NONE);	m_static_data(float, HBO_NEST_NM, NONE, NONE);	m_static_data(float, NHB_NEST_NM, NONE, NONE);
 			#pragma endregion
 
 			//====================================================================================================================================
@@ -993,6 +1209,7 @@ namespace Person_Components
 		};
 		// INITIALIZE MODE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_AUTO = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 2.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.8;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 - 0.2;
@@ -1022,10 +1239,11 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_N_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_N_NM = -0.217;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_vehavail_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_vehavail_nm = -0.327;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_male_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_male_nm = -0.0847;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cbd_nm = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_NEST_AUTO = 0.492610837438424;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_NEST_NM = 0.952380952380952;
 
-
+	
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_AUTO = 1.16 + 0.5;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 2.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TAXI = -2.44 - 0.8;
@@ -1056,10 +1274,12 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_N_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_N_NM = -0.095;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_vehavail_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_vehavail_nm = -0.249;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_male_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_male_nm = 0.0596;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cbd_nm = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_AUTO = 0.671140939597315;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_NM = 0.934579439252336;
 
 
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_AUTO = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 2.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TAXI = -0.912 - 0.8;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 - 0.2;
@@ -1073,13 +1293,16 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_dens_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_dens_walk = -0.203;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_male_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_male_taxi = -0.385;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_notalone_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_notalone_pass = 0.0244;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_over65_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_over65_tran = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_over65_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_over65_pass = -0.0561;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ovttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ovttime_tran = -0.369;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_peak_auto) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_peak_auto = 0.267;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_bike = -0.186;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_tran = -0.00367;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_walk = -0.00351;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_u18_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_u18_pass = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_pass = -0.849;
+		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_tran = 0.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_taxi = -0.973;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_waittime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_waittime_tran = -0.317;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_N_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_N_AUTO = 0.182;

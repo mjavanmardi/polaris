@@ -283,7 +283,6 @@ int main(int argc,char** argv)
 	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
-	
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
@@ -324,6 +323,18 @@ int main(int argc,char** argv)
 
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
+
+	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Mode_Choice_Option parameters." << endl;
+		return 1;
+	}
+
+	if (!Person_Components::Implementations::Detroit_Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Detroit_Mode_Choice_Option parameters." << endl;
+		return 1;
+	}
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 

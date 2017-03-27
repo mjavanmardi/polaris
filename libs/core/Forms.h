@@ -847,6 +847,49 @@ namespace polaris
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 			tag_getter_as_available(NAME);\
 			tag_setter_as_available(NAME);
+
+	///----------------------------------------------------------------------------------------------------
+	/// m_data � member creator, type-definition and basic accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define m_static_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+			static DATA_TYPE _##NAME;\
+		public:\
+			typedef DATA_TYPE NAME##_type;\
+			typedef NAME##_type NAME##_accessible_type;\
+			template<typename TargetType>\
+			static TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			static TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(&_##NAME);}\
+			template<typename TargetType>\
+			static TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(dereference(_##NAME));}\
+			template<typename TargetType>\
+			static TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			static TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			static void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(value);}\
+			template<typename TargetType>\
+			static void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(DATA_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(*value);}\
+			template<typename TargetType>\
+			static void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((DATA_TYPE)(&value));}\
+			template<typename TargetType>\
+			static void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(concat(DATA_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(value);}\
+			template<typename TargetType>\
+			static void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
+
 	///----------------------------------------------------------------------------------------------------
 	/// t_* - implements get / set and member placement which explicitly access stated value
 	///		includes a tagless check on whether the implementation has corresponding accessors
