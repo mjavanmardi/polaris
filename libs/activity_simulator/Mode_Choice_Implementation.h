@@ -11,32 +11,6 @@ namespace Person_Components
 {
 	namespace Implementations
 	{
-		double GetOption_Double(rapidjson::Document& document, const std::string& section, const std::string& key, double default_value)
-		{
-			assert(document.HasMember(section.c_str()));
-			assert(document[section.c_str()].HasMember(key.c_str()));
-			assert(document[section.c_str()][key.c_str()].IsDouble());
-			if (!document.HasMember(section.c_str()))
-			{
-				cout << "Can't locate section \'" << section << "\' in option file" << endl;
-				return default_value;
-			}
-
-			if (!document[section.c_str()].HasMember(key.c_str()))
-			{
-				cout << "Can't locate key \'" << key << "\' in option file" << endl;
-				return default_value;
-			}
-
-			if (!document[section.c_str()][key.c_str()].IsDouble())
-			{
-				cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
-				return default_value;
-			}
-
-			return document[section.c_str()][key.c_str()].GetDouble();
-		}
-
 		//==================================================================================
 		/// Mode Choice Planning classes
 		//----------------------------------------------------------------------------------
@@ -128,6 +102,7 @@ namespace Person_Components
 			//------------------------------------------------------------------------------------------------------------------------------------
 			
 			static bool static_initialize();
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value);
 
 			// Feature called from prototype and by Choice_Model
 			virtual double Calculate_Utility();
@@ -198,62 +173,61 @@ namespace Person_Components
 		};
 
 		template<typename MasterType, typename InheritanceList>
+		double Mode_Choice_Option<MasterType, InheritanceList>::GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+		{
+			return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Mode_Choice_Option", key, default_value);
+		}
+
+		template<typename MasterType, typename InheritanceList>
 		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize()
 		{
-			std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
-			std::ifstream ifs(option_file);
-			if (!ifs.good())
-			{
-				cout << "ERROR: unbale to open option file \'" << option_file << "\'" << endl;
-				return false;
-			}
-
-			rapidjson::IStreamWrapper isw(ifs);
 			rapidjson::Document document;
-			if (document.ParseStream(isw).HasParseError())
+			std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
+			if (option_file.length() < 1)
 			{
-				cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
-				cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
-				return false;
+				cout << "Warning: option file for Mode_Choice_Option was not specified" << endl;
+				return true;
 			}
-			assert(document.IsObject());
 
-			BHW_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_IVTT"		, BHW_CBD_IVTT	<float>()));
-			BHO_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_IVTT"			, BHO_IVTT		<float>()));
-			BHO_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_IVTT"		, BHO_CBD_IVTT	<float>()));
-			BNH_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_IVTT"			, BNH_IVTT		<float>()));
-			BNH_CBD_IVTT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_IVTT"		, BNH_CBD_IVTT	<float>()));
-			BHW_IVTT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_IVTT"			, BHW_IVTT		<float>()));
-			BHW_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_WAIT"			, BHW_WAIT		<float>()));
-			BHW_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_WAIT"		, BHW_CBD_WAIT	<float>()));
-			BHO_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_WAIT"			, BHO_WAIT		<float>()));
-			BHO_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_WAIT"		, BHO_CBD_WAIT	<float>()));
-			BNH_WAIT		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_WAIT"			, BNH_WAIT		<float>()));
-			BNH_CBD_WAIT	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_WAIT"		, BNH_CBD_WAIT	<float>()));
-			BHW_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_TRANSFER"		, BHW_TRANSFER	<float>()));
-			BHW_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_TRANSFER"	, BHW_CBD_TRANSFER<float>()));
-			BHO_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_TRANSFER"		, BHO_TRANSFER	<float>()));
-			BHO_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_TRANSFER"	, BHO_CBD_TRANSFER<float>()));
-			BNH_TRANSFER	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_TRANSFER"		, BNH_TRANSFER	<float>()));
-			BNH_CBD_TRANSFER<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_TRANSFER"	, BNH_CBD_TRANSFER<float>()));
-			BHW_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_WALK"			, BHW_WALK		<float>()));
-			BHW_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_WALK"		, BHW_CBD_WALK	<float>()));
-			BHO_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_WALK"			, BHO_WALK		<float>()));
-			BHO_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_WALK"		, BHO_CBD_WALK	<float>()));
-			BNH_WALK		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_WALK"			, BNH_WALK		<float>()));
-			BNH_CBD_WALK	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_WALK"		, BNH_CBD_WALK	<float>()));
-			BHW_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_COST"			, BHW_COST		<float>()));
-			BHW_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_COST"		, BHW_CBD_COST	<float>()));
-			BHO_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_COST"			, BHO_COST		<float>()));
-			BHO_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_COST"		, BHO_CBD_COST	<float>()));
-			BNH_COST		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_COST"			, BNH_COST		<float>()));
-			BNH_CBD_COST	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_COST"		, BNH_CBD_COST	<float>()));
-			BHW_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_BIAS"			, BHW_BIAS		<float>()));
-			BHW_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHW_CBD_BIAS"		, BHW_CBD_BIAS	<float>()));
-			BHO_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_BIAS"			, BHO_BIAS		<float>()));
-			BHO_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BHO_CBD_BIAS"		, BHO_CBD_BIAS	<float>()));
-			BNH_BIAS		<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_BIAS"			, BNH_BIAS		<float>()));
-			BNH_CBD_BIAS	<float>(GetOption_Double(document, "Mode_Choice_Option", "BNH_CBD_BIAS"		, BNH_CBD_BIAS	<float>()));
+			if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+				return false;
+			
+			BHW_CBD_IVTT	<float>(GetOption_Double(document, "BHW_CBD_IVTT"		, BHW_CBD_IVTT	<float>()));
+			BHO_IVTT		<float>(GetOption_Double(document, "BHO_IVTT"			, BHO_IVTT		<float>()));
+			BHO_CBD_IVTT	<float>(GetOption_Double(document, "BHO_CBD_IVTT"		, BHO_CBD_IVTT	<float>()));
+			BNH_IVTT		<float>(GetOption_Double(document, "BNH_IVTT"			, BNH_IVTT		<float>()));
+			BNH_CBD_IVTT	<float>(GetOption_Double(document, "BNH_CBD_IVTT"		, BNH_CBD_IVTT	<float>()));
+			BHW_IVTT		<float>(GetOption_Double(document, "BHW_IVTT"			, BHW_IVTT		<float>()));
+			BHW_WAIT		<float>(GetOption_Double(document, "BHW_WAIT"			, BHW_WAIT		<float>()));
+			BHW_CBD_WAIT	<float>(GetOption_Double(document, "BHW_CBD_WAIT"		, BHW_CBD_WAIT	<float>()));
+			BHO_WAIT		<float>(GetOption_Double(document, "BHO_WAIT"			, BHO_WAIT		<float>()));
+			BHO_CBD_WAIT	<float>(GetOption_Double(document, "BHO_CBD_WAIT"		, BHO_CBD_WAIT	<float>()));
+			BNH_WAIT		<float>(GetOption_Double(document, "BNH_WAIT"			, BNH_WAIT		<float>()));
+			BNH_CBD_WAIT	<float>(GetOption_Double(document, "BNH_CBD_WAIT"		, BNH_CBD_WAIT	<float>()));
+			BHW_TRANSFER	<float>(GetOption_Double(document, "BHW_TRANSFER"		, BHW_TRANSFER	<float>()));
+			BHW_CBD_TRANSFER<float>(GetOption_Double(document, "BHW_CBD_TRANSFER"	, BHW_CBD_TRANSFER<float>()));
+			BHO_TRANSFER	<float>(GetOption_Double(document, "BHO_TRANSFER"		, BHO_TRANSFER	<float>()));
+			BHO_CBD_TRANSFER<float>(GetOption_Double(document, "BHO_CBD_TRANSFER"	, BHO_CBD_TRANSFER<float>()));
+			BNH_TRANSFER	<float>(GetOption_Double(document, "BNH_TRANSFER"		, BNH_TRANSFER	<float>()));
+			BNH_CBD_TRANSFER<float>(GetOption_Double(document, "BNH_CBD_TRANSFER"	, BNH_CBD_TRANSFER<float>()));
+			BHW_WALK		<float>(GetOption_Double(document, "BHW_WALK"			, BHW_WALK		<float>()));
+			BHW_CBD_WALK	<float>(GetOption_Double(document, "BHW_CBD_WALK"		, BHW_CBD_WALK	<float>()));
+			BHO_WALK		<float>(GetOption_Double(document, "BHO_WALK"			, BHO_WALK		<float>()));
+			BHO_CBD_WALK	<float>(GetOption_Double(document, "BHO_CBD_WALK"		, BHO_CBD_WALK	<float>()));
+			BNH_WALK		<float>(GetOption_Double(document, "BNH_WALK"			, BNH_WALK		<float>()));
+			BNH_CBD_WALK	<float>(GetOption_Double(document, "BNH_CBD_WALK"		, BNH_CBD_WALK	<float>()));
+			BHW_COST		<float>(GetOption_Double(document, "BHW_COST"			, BHW_COST		<float>()));
+			BHW_CBD_COST	<float>(GetOption_Double(document, "BHW_CBD_COST"		, BHW_CBD_COST	<float>()));
+			BHO_COST		<float>(GetOption_Double(document, "BHO_COST"			, BHO_COST		<float>()));
+			BHO_CBD_COST	<float>(GetOption_Double(document, "BHO_CBD_COST"		, BHO_CBD_COST	<float>()));
+			BNH_COST		<float>(GetOption_Double(document, "BNH_COST"			, BNH_COST		<float>()));
+			BNH_CBD_COST	<float>(GetOption_Double(document, "BNH_CBD_COST"		, BNH_CBD_COST	<float>()));
+			BHW_BIAS		<float>(GetOption_Double(document, "BHW_BIAS"			, BHW_BIAS		<float>()));
+			BHW_CBD_BIAS	<float>(GetOption_Double(document, "BHW_CBD_BIAS"		, BHW_CBD_BIAS	<float>()));
+			BHO_BIAS		<float>(GetOption_Double(document, "BHO_BIAS"			, BHO_BIAS		<float>()));
+			BHO_CBD_BIAS	<float>(GetOption_Double(document, "BHO_CBD_BIAS"		, BHO_CBD_BIAS	<float>()));
+			BNH_BIAS		<float>(GetOption_Double(document, "BNH_BIAS"			, BNH_BIAS		<float>()));
+			BNH_CBD_BIAS	<float>(GetOption_Double(document, "BNH_CBD_BIAS"		, BNH_CBD_BIAS	<float>()));
 
 			return true;
 		}
@@ -875,125 +849,123 @@ namespace Person_Components
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType, INHERIT(Detroit_Mode_Choice_Option), Data_Object>::Component_Type ComponentType;
 
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+			{
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Detroit_Mode_Choice_Option", key, default_value);
+			}
+
 			static bool static_initialize()
 			{
-				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template detroit_mode_choice_option_param_file<string>();
-				std::ifstream ifs(option_file);
-				if ( !ifs.good() )
-				{
-					cout << "ERROR: unbale to open option file \'" << option_file << "\'" << endl;
-					return false;
-				}
-
-				rapidjson::IStreamWrapper isw(ifs);
 				rapidjson::Document document;
-				if (document.ParseStream(isw).HasParseError())
+				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template detroit_mode_choice_option_param_file<string>();
+				if (option_file.length() < 1)
 				{
-					cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
-					cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
-					return false;
+					cout << "Warning: option file for Detroit_Mode_Choice_Option was not specified" << endl;
+					return true;
 				}
-				assert(document.IsObject());
 
-				HBW_ASC_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_AUTO"			, HBW_ASC_AUTO			<float>()));
-				HBO_ASC_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_AUTO"			, HBO_ASC_AUTO			<float>()));
-				NHB_ASC_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_AUTO"			, NHB_ASC_AUTO			<float>()));
-				HBW_ASC_PASS				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_PASS"			, HBW_ASC_PASS			<float>()));
-				HBO_ASC_PASS	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_PASS"			, HBO_ASC_PASS			<float>()));
-				NHB_ASC_PASS      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_PASS"			, NHB_ASC_PASS			<float>()));
-				HBW_ASC_TAXI				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_TAXI"			, HBW_ASC_TAXI			<float>()));
-				HBO_ASC_TAXI	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_TAXI"			, HBO_ASC_TAXI			<float>()));
-				NHB_ASC_TAXI      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_TAXI"			, NHB_ASC_TAXI			<float>()));
-				HBW_ASC_WALK	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_WALK"			, HBW_ASC_WALK			<float>()));
-				HBO_ASC_WALK	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_WALK"			, HBO_ASC_WALK			<float>()));
-				NHB_ASC_WALK      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_WALK"			, NHB_ASC_WALK			<float>()));
-				HBW_ASC_TRAN				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_TRAN"			, HBW_ASC_TRAN			<float>()));
-				HBO_ASC_TRAN	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_TRAN"			, HBO_ASC_TRAN			<float>()));
-				NHB_ASC_TRAN      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_TRAN"			, NHB_ASC_TRAN			<float>()));
-				HBW_ASC_BIKE	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_BIKE"			, HBW_ASC_BIKE			<float>()));
-				HBO_ASC_BIKE	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_BIKE"			, HBO_ASC_BIKE			<float>()));
-				NHB_ASC_BIKE      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_BIKE"			, NHB_ASC_BIKE			<float>()));
-				HBW_B_cbd_pa				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cbd_pa"			, HBW_B_cbd_pa			<float>()));
-				HBO_B_cbd_pa	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cbd_pa"			, HBO_B_cbd_pa			<float>()));
-				NHB_B_cbd_pa      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cbd_pa"			, NHB_B_cbd_pa			<float>()));
-				HBW_B_cost	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost"			, HBW_B_cost			<float>()));
-				HBO_B_cost	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost"			, HBO_B_cost			<float>()));
-				NHB_B_cost        			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost"			, NHB_B_cost			<float>()));
-				HBW_B_cost_hinc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost_hinc"		, HBW_B_cost_hinc		<float>()));
-				HBO_B_cost_hinc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost_hinc"		, HBO_B_cost_hinc		<float>()));
-				NHB_B_cost_hinc   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost_hinc"		, NHB_B_cost_hinc		<float>()));
-				HBW_B_cost_minc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cost_minc"		, HBW_B_cost_minc		<float>()));
-				HBO_B_cost_minc				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cost_minc"		, HBO_B_cost_minc		<float>()));
-				NHB_B_cost_minc   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cost_minc"		, NHB_B_cost_minc		<float>()));
-				HBW_B_dens_bike				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_dens_bike"		, HBW_B_dens_bike		<float>()));
-				HBO_B_dens_bike				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_dens_bike"		, HBO_B_dens_bike		<float>()));
-				NHB_B_dens_bike   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_dens_bike"		, NHB_B_dens_bike		<float>()));
-				HBW_B_dens_walk				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_dens_walk"		, HBW_B_dens_walk		<float>()));
-				HBO_B_dens_walk				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_dens_walk"		, HBO_B_dens_walk		<float>()));
-				NHB_B_dens_walk   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_dens_walk"		, NHB_B_dens_walk		<float>()));
-				HBW_B_male_taxi				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_male_taxi"		, HBW_B_male_taxi		<float>()));
-				HBO_B_male_taxi				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_male_taxi"		, HBO_B_male_taxi		<float>()));
-				NHB_B_male_taxi   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_male_taxi"		, NHB_B_male_taxi		<float>()));
-				HBW_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_notalone_pass"	, HBW_B_notalone_pass	<float>()));
-				HBO_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_notalone_pass"	, HBO_B_notalone_pass	<float>()));
-				NHB_B_notalone_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_notalone_pass"	, NHB_B_notalone_pass	<float>()));
-				HBW_B_over65_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_over65_pass"	, HBW_B_over65_pass		<float>()));
-				HBO_B_over65_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_over65_pass"	, HBO_B_over65_pass		<float>()));
-				NHB_B_over65_pass 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_over65_pass"	, NHB_B_over65_pass 	<float>()));
-				HBW_B_over65_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_over65_tran"	, HBW_B_over65_tran		<float>()));
-				HBO_B_over65_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_over65_tran"	, HBO_B_over65_tran		<float>()));
-				NHB_B_over65_tran 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_over65_tran"	, NHB_B_over65_tran 	<float>()));
-				HBW_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ovttime_tran"	, HBW_B_ovttime_tran	<float>()));
-				HBO_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ovttime_tran"	, HBO_B_ovttime_tran	<float>()));
-				NHB_B_ovttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ovttime_tran"	, NHB_B_ovttime_tran	<float>()));
-				HBW_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_peak_auto"		, HBW_B_peak_auto   	<float>()));
-				HBO_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_peak_auto"		, HBO_B_peak_auto   	<float>()));
-				NHB_B_peak_auto   			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_peak_auto"		, NHB_B_peak_auto   	<float>()));
-				HBW_B_ttime_bike			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_bike"		, HBW_B_ttime_bike		<float>()));
-				HBO_B_ttime_bike			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_bike"		, HBO_B_ttime_bike		<float>()));
-				NHB_B_ttime_bike  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_bike"		, NHB_B_ttime_bike  	<float>()));
-				HBW_B_ttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_tran"		, HBW_B_ttime_tran		<float>()));
-				HBO_B_ttime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_tran"		, HBO_B_ttime_tran		<float>()));
-				NHB_B_ttime_tran  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_tran"		, NHB_B_ttime_tran  	<float>()));
-				HBW_B_ttime_walk			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_ttime_walk"		, HBW_B_ttime_walk		<float>()));
-				HBO_B_ttime_walk			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_ttime_walk"		, HBO_B_ttime_walk		<float>()));
-				NHB_B_ttime_walk  			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_ttime_walk"		, NHB_B_ttime_walk  	<float>()));
-				HBW_B_u18_pass				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_u18_pass"		, HBW_B_u18_pass		<float>()));
-				HBO_B_u18_pass				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_u18_pass"		, HBO_B_u18_pass		<float>()));
-				NHB_B_u18_pass    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_u18_pass"		, NHB_B_u18_pass    	<float>()));
-				HBW_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_pass"	, HBW_B_vehavail_pass	<float>()));
-				HBO_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_pass"	, HBO_B_vehavail_pass	<float>()));
-				NHB_B_vehavail_pass			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_pass"	, NHB_B_vehavail_pass	<float>()));
-				HBW_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_taxi"	, HBW_B_vehavail_taxi	<float>()));
-				HBO_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_taxi"	, HBO_B_vehavail_taxi	<float>()));
-				NHB_B_vehavail_taxi			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_taxi"	, NHB_B_vehavail_taxi	<float>()));
-				HBW_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_tran"	, HBW_B_vehavail_tran	<float>()));
-				HBO_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_tran"	, HBO_B_vehavail_tran	<float>()));
-				NHB_B_vehavail_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_tran"	, NHB_B_vehavail_tran	<float>()));
-				HBW_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_waittime_tran"	, HBW_B_waittime_tran	<float>()));
-				HBO_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_waittime_tran"	, HBO_B_waittime_tran	<float>()));
-				NHB_B_waittime_tran			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_waittime_tran"	, NHB_B_waittime_tran	<float>()));
-				HBW_ASC_N_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_N_AUTO"		, HBW_ASC_N_AUTO		<float>()));
-				HBO_ASC_N_AUTO				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_N_AUTO"		, HBO_ASC_N_AUTO		<float>()));
-				NHB_ASC_N_AUTO    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_N_AUTO"		, NHB_ASC_N_AUTO    	<float>()));
-				HBW_ASC_N_NM	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_ASC_N_NM"			, HBW_ASC_N_NM			<float>()));
-				HBO_ASC_N_NM	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_ASC_N_NM"			, HBO_ASC_N_NM			<float>()));
-				NHB_ASC_N_NM      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_ASC_N_NM"			, NHB_ASC_N_NM      	<float>()));
-				HBW_B_vehavail_nm			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_vehavail_nm"	, HBW_B_vehavail_nm		<float>()));
-				HBO_B_vehavail_nm			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_vehavail_nm"	, HBO_B_vehavail_nm		<float>()));
-				NHB_B_vehavail_nm 			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_vehavail_nm"	, NHB_B_vehavail_nm 	<float>()));
-				HBW_B_male_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_male_nm"		, HBW_B_male_nm			<float>()));
-				HBO_B_male_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_male_nm"		, HBO_B_male_nm			<float>()));
-				NHB_B_male_nm     			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_male_nm"		, NHB_B_male_nm     	<float>()));
-				HBW_B_cbd_nm				<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_B_cbd_nm"			, HBW_B_cbd_nm			<float>()));
-				HBO_B_cbd_nm	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_B_cbd_nm"			, HBO_B_cbd_nm			<float>()));
-				NHB_B_cbd_nm      			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_B_cbd_nm"			, NHB_B_cbd_nm      	<float>()));
-				HBW_NEST_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_NEST_AUTO"		, HBW_NEST_AUTO			<float>()));
-				HBO_NEST_AUTO	    		<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_NEST_AUTO"		, HBO_NEST_AUTO			<float>()));
-				NHB_NEST_AUTO     			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_NEST_AUTO"		, NHB_NEST_AUTO     	<float>()));
-				HBW_NEST_NM	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBW_NEST_NM"			, HBW_NEST_NM	    	<float>()));
-				HBO_NEST_NM	    			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "HBO_NEST_NM"			, HBO_NEST_NM	    	<float>()));
-				NHB_NEST_NM       			<float>(GetOption_Double(document, "Detroit_Mode_Choice_Option", "NHB_NEST_NM"			, NHB_NEST_NM       	<float>()));
+				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+					return false;
+
+				HBW_ASC_AUTO	    		<float>(GetOption_Double(document, "HBW_ASC_AUTO"		, HBW_ASC_AUTO			<float>()));
+				HBO_ASC_AUTO				<float>(GetOption_Double(document, "HBO_ASC_AUTO"		, HBO_ASC_AUTO			<float>()));
+				NHB_ASC_AUTO				<float>(GetOption_Double(document, "NHB_ASC_AUTO"		, NHB_ASC_AUTO			<float>()));
+				HBW_ASC_PASS				<float>(GetOption_Double(document, "HBW_ASC_PASS"		, HBW_ASC_PASS			<float>()));
+				HBO_ASC_PASS	    		<float>(GetOption_Double(document, "HBO_ASC_PASS"		, HBO_ASC_PASS			<float>()));
+				NHB_ASC_PASS      			<float>(GetOption_Double(document, "NHB_ASC_PASS"		, NHB_ASC_PASS			<float>()));
+				HBW_ASC_TAXI				<float>(GetOption_Double(document, "HBW_ASC_TAXI"		, HBW_ASC_TAXI			<float>()));
+				HBO_ASC_TAXI	    		<float>(GetOption_Double(document, "HBO_ASC_TAXI"		, HBO_ASC_TAXI			<float>()));
+				NHB_ASC_TAXI      			<float>(GetOption_Double(document, "NHB_ASC_TAXI"		, NHB_ASC_TAXI			<float>()));
+				HBW_ASC_WALK	    		<float>(GetOption_Double(document, "HBW_ASC_WALK"		, HBW_ASC_WALK			<float>()));
+				HBO_ASC_WALK	    		<float>(GetOption_Double(document, "HBO_ASC_WALK"		, HBO_ASC_WALK			<float>()));
+				NHB_ASC_WALK      			<float>(GetOption_Double(document, "NHB_ASC_WALK"		, NHB_ASC_WALK			<float>()));
+				HBW_ASC_TRAN				<float>(GetOption_Double(document, "HBW_ASC_TRAN"		, HBW_ASC_TRAN			<float>()));
+				HBO_ASC_TRAN	    		<float>(GetOption_Double(document, "HBO_ASC_TRAN"		, HBO_ASC_TRAN			<float>()));
+				NHB_ASC_TRAN      			<float>(GetOption_Double(document, "NHB_ASC_TRAN"		, NHB_ASC_TRAN			<float>()));
+				HBW_ASC_BIKE	    		<float>(GetOption_Double(document, "HBW_ASC_BIKE"		, HBW_ASC_BIKE			<float>()));
+				HBO_ASC_BIKE	    		<float>(GetOption_Double(document, "HBO_ASC_BIKE"		, HBO_ASC_BIKE			<float>()));
+				NHB_ASC_BIKE      			<float>(GetOption_Double(document, "NHB_ASC_BIKE"		, NHB_ASC_BIKE			<float>()));
+				HBW_B_cbd_pa				<float>(GetOption_Double(document, "HBW_B_cbd_pa"		, HBW_B_cbd_pa			<float>()));
+				HBO_B_cbd_pa	    		<float>(GetOption_Double(document, "HBO_B_cbd_pa"		, HBO_B_cbd_pa			<float>()));
+				NHB_B_cbd_pa      			<float>(GetOption_Double(document, "NHB_B_cbd_pa"		, NHB_B_cbd_pa			<float>()));
+				HBW_B_cost	    			<float>(GetOption_Double(document, "HBW_B_cost"			, HBW_B_cost			<float>()));
+				HBO_B_cost	    			<float>(GetOption_Double(document, "HBO_B_cost"			, HBO_B_cost			<float>()));
+				NHB_B_cost        			<float>(GetOption_Double(document, "NHB_B_cost"			, NHB_B_cost			<float>()));
+				HBW_B_cost_hinc				<float>(GetOption_Double(document, "HBW_B_cost_hinc"	, HBW_B_cost_hinc		<float>()));
+				HBO_B_cost_hinc				<float>(GetOption_Double(document, "HBO_B_cost_hinc"	, HBO_B_cost_hinc		<float>()));
+				NHB_B_cost_hinc   			<float>(GetOption_Double(document, "NHB_B_cost_hinc"	, NHB_B_cost_hinc		<float>()));
+				HBW_B_cost_minc				<float>(GetOption_Double(document, "HBW_B_cost_minc"	, HBW_B_cost_minc		<float>()));
+				HBO_B_cost_minc				<float>(GetOption_Double(document, "HBO_B_cost_minc"	, HBO_B_cost_minc		<float>()));
+				NHB_B_cost_minc   			<float>(GetOption_Double(document, "NHB_B_cost_minc"	, NHB_B_cost_minc		<float>()));
+				HBW_B_dens_bike				<float>(GetOption_Double(document, "HBW_B_dens_bike"	, HBW_B_dens_bike		<float>()));
+				HBO_B_dens_bike				<float>(GetOption_Double(document, "HBO_B_dens_bike"	, HBO_B_dens_bike		<float>()));
+				NHB_B_dens_bike   			<float>(GetOption_Double(document, "NHB_B_dens_bike"	, NHB_B_dens_bike		<float>()));
+				HBW_B_dens_walk				<float>(GetOption_Double(document, "HBW_B_dens_walk"	, HBW_B_dens_walk		<float>()));
+				HBO_B_dens_walk				<float>(GetOption_Double(document, "HBO_B_dens_walk"	, HBO_B_dens_walk		<float>()));
+				NHB_B_dens_walk   			<float>(GetOption_Double(document, "NHB_B_dens_walk"	, NHB_B_dens_walk		<float>()));
+				HBW_B_male_taxi				<float>(GetOption_Double(document, "HBW_B_male_taxi"	, HBW_B_male_taxi		<float>()));
+				HBO_B_male_taxi				<float>(GetOption_Double(document, "HBO_B_male_taxi"	, HBO_B_male_taxi		<float>()));
+				NHB_B_male_taxi   			<float>(GetOption_Double(document, "NHB_B_male_taxi"	, NHB_B_male_taxi		<float>()));
+				HBW_B_notalone_pass			<float>(GetOption_Double(document, "HBW_B_notalone_pass", HBW_B_notalone_pass	<float>()));
+				HBO_B_notalone_pass			<float>(GetOption_Double(document, "HBO_B_notalone_pass", HBO_B_notalone_pass	<float>()));
+				NHB_B_notalone_pass			<float>(GetOption_Double(document, "NHB_B_notalone_pass", NHB_B_notalone_pass	<float>()));
+				HBW_B_over65_pass			<float>(GetOption_Double(document, "HBW_B_over65_pass"	, HBW_B_over65_pass		<float>()));
+				HBO_B_over65_pass			<float>(GetOption_Double(document, "HBO_B_over65_pass"	, HBO_B_over65_pass		<float>()));
+				NHB_B_over65_pass 			<float>(GetOption_Double(document, "NHB_B_over65_pass"	, NHB_B_over65_pass 	<float>()));
+				HBW_B_over65_tran			<float>(GetOption_Double(document, "HBW_B_over65_tran"	, HBW_B_over65_tran		<float>()));
+				HBO_B_over65_tran			<float>(GetOption_Double(document, "HBO_B_over65_tran"	, HBO_B_over65_tran		<float>()));
+				NHB_B_over65_tran 			<float>(GetOption_Double(document, "NHB_B_over65_tran"	, NHB_B_over65_tran 	<float>()));
+				HBW_B_ovttime_tran			<float>(GetOption_Double(document, "HBW_B_ovttime_tran"	, HBW_B_ovttime_tran	<float>()));
+				HBO_B_ovttime_tran			<float>(GetOption_Double(document, "HBO_B_ovttime_tran"	, HBO_B_ovttime_tran	<float>()));
+				NHB_B_ovttime_tran			<float>(GetOption_Double(document, "NHB_B_ovttime_tran"	, NHB_B_ovttime_tran	<float>()));
+				HBW_B_peak_auto   			<float>(GetOption_Double(document, "HBW_B_peak_auto"	, HBW_B_peak_auto   	<float>()));
+				HBO_B_peak_auto   			<float>(GetOption_Double(document, "HBO_B_peak_auto"	, HBO_B_peak_auto   	<float>()));
+				NHB_B_peak_auto   			<float>(GetOption_Double(document, "NHB_B_peak_auto"	, NHB_B_peak_auto   	<float>()));
+				HBW_B_ttime_bike			<float>(GetOption_Double(document, "HBW_B_ttime_bike"	, HBW_B_ttime_bike		<float>()));
+				HBO_B_ttime_bike			<float>(GetOption_Double(document, "HBO_B_ttime_bike"	, HBO_B_ttime_bike		<float>()));
+				NHB_B_ttime_bike  			<float>(GetOption_Double(document, "NHB_B_ttime_bike"	, NHB_B_ttime_bike  	<float>()));
+				HBW_B_ttime_tran			<float>(GetOption_Double(document, "HBW_B_ttime_tran"	, HBW_B_ttime_tran		<float>()));
+				HBO_B_ttime_tran			<float>(GetOption_Double(document, "HBO_B_ttime_tran"	, HBO_B_ttime_tran		<float>()));
+				NHB_B_ttime_tran  			<float>(GetOption_Double(document, "NHB_B_ttime_tran"	, NHB_B_ttime_tran  	<float>()));
+				HBW_B_ttime_walk			<float>(GetOption_Double(document, "HBW_B_ttime_walk"	, HBW_B_ttime_walk		<float>()));
+				HBO_B_ttime_walk			<float>(GetOption_Double(document, "HBO_B_ttime_walk"	, HBO_B_ttime_walk		<float>()));
+				NHB_B_ttime_walk  			<float>(GetOption_Double(document, "NHB_B_ttime_walk"	, NHB_B_ttime_walk  	<float>()));
+				HBW_B_u18_pass				<float>(GetOption_Double(document, "HBW_B_u18_pass"		, HBW_B_u18_pass		<float>()));
+				HBO_B_u18_pass				<float>(GetOption_Double(document, "HBO_B_u18_pass"		, HBO_B_u18_pass		<float>()));
+				NHB_B_u18_pass    			<float>(GetOption_Double(document, "NHB_B_u18_pass"		, NHB_B_u18_pass    	<float>()));
+				HBW_B_vehavail_pass			<float>(GetOption_Double(document, "HBW_B_vehavail_pass", HBW_B_vehavail_pass	<float>()));
+				HBO_B_vehavail_pass			<float>(GetOption_Double(document, "HBO_B_vehavail_pass", HBO_B_vehavail_pass	<float>()));
+				NHB_B_vehavail_pass			<float>(GetOption_Double(document, "NHB_B_vehavail_pass", NHB_B_vehavail_pass	<float>()));
+				HBW_B_vehavail_taxi			<float>(GetOption_Double(document, "HBW_B_vehavail_taxi", HBW_B_vehavail_taxi	<float>()));
+				HBO_B_vehavail_taxi			<float>(GetOption_Double(document, "HBO_B_vehavail_taxi", HBO_B_vehavail_taxi	<float>()));
+				NHB_B_vehavail_taxi			<float>(GetOption_Double(document, "NHB_B_vehavail_taxi", NHB_B_vehavail_taxi	<float>()));
+				HBW_B_vehavail_tran			<float>(GetOption_Double(document, "HBW_B_vehavail_tran", HBW_B_vehavail_tran	<float>()));
+				HBO_B_vehavail_tran			<float>(GetOption_Double(document, "HBO_B_vehavail_tran", HBO_B_vehavail_tran	<float>()));
+				NHB_B_vehavail_tran			<float>(GetOption_Double(document, "NHB_B_vehavail_tran", NHB_B_vehavail_tran	<float>()));
+				HBW_B_waittime_tran			<float>(GetOption_Double(document, "HBW_B_waittime_tran", HBW_B_waittime_tran	<float>()));
+				HBO_B_waittime_tran			<float>(GetOption_Double(document, "HBO_B_waittime_tran", HBO_B_waittime_tran	<float>()));
+				NHB_B_waittime_tran			<float>(GetOption_Double(document, "NHB_B_waittime_tran", NHB_B_waittime_tran	<float>()));
+				HBW_ASC_N_AUTO				<float>(GetOption_Double(document, "HBW_ASC_N_AUTO"		, HBW_ASC_N_AUTO		<float>()));
+				HBO_ASC_N_AUTO				<float>(GetOption_Double(document, "HBO_ASC_N_AUTO"		, HBO_ASC_N_AUTO		<float>()));
+				NHB_ASC_N_AUTO    			<float>(GetOption_Double(document, "NHB_ASC_N_AUTO"		, NHB_ASC_N_AUTO    	<float>()));
+				HBW_ASC_N_NM	    		<float>(GetOption_Double(document, "HBW_ASC_N_NM"		, HBW_ASC_N_NM			<float>()));
+				HBO_ASC_N_NM	    		<float>(GetOption_Double(document, "HBO_ASC_N_NM"		, HBO_ASC_N_NM			<float>()));
+				NHB_ASC_N_NM      			<float>(GetOption_Double(document, "NHB_ASC_N_NM"		, NHB_ASC_N_NM      	<float>()));
+				HBW_B_vehavail_nm			<float>(GetOption_Double(document, "HBW_B_vehavail_nm"	, HBW_B_vehavail_nm		<float>()));
+				HBO_B_vehavail_nm			<float>(GetOption_Double(document, "HBO_B_vehavail_nm"	, HBO_B_vehavail_nm		<float>()));
+				NHB_B_vehavail_nm 			<float>(GetOption_Double(document, "NHB_B_vehavail_nm"	, NHB_B_vehavail_nm 	<float>()));
+				HBW_B_male_nm	    		<float>(GetOption_Double(document, "HBW_B_male_nm"		, HBW_B_male_nm			<float>()));
+				HBO_B_male_nm	    		<float>(GetOption_Double(document, "HBO_B_male_nm"		, HBO_B_male_nm			<float>()));
+				NHB_B_male_nm     			<float>(GetOption_Double(document, "NHB_B_male_nm"		, NHB_B_male_nm     	<float>()));
+				HBW_B_cbd_nm				<float>(GetOption_Double(document, "HBW_B_cbd_nm"		, HBW_B_cbd_nm			<float>()));
+				HBO_B_cbd_nm	    		<float>(GetOption_Double(document, "HBO_B_cbd_nm"		, HBO_B_cbd_nm			<float>()));
+				NHB_B_cbd_nm      			<float>(GetOption_Double(document, "NHB_B_cbd_nm"		, NHB_B_cbd_nm      	<float>()));
+				HBW_NEST_AUTO	    		<float>(GetOption_Double(document, "HBW_NEST_AUTO"		, HBW_NEST_AUTO			<float>()));
+				HBO_NEST_AUTO	    		<float>(GetOption_Double(document, "HBO_NEST_AUTO"		, HBO_NEST_AUTO			<float>()));
+				NHB_NEST_AUTO     			<float>(GetOption_Double(document, "NHB_NEST_AUTO"		, NHB_NEST_AUTO     	<float>()));
+				HBW_NEST_NM	    			<float>(GetOption_Double(document, "HBW_NEST_NM"		, HBW_NEST_NM	    	<float>()));
+				HBO_NEST_NM	    			<float>(GetOption_Double(document, "HBO_NEST_NM"		, HBO_NEST_NM	    	<float>()));
+				NHB_NEST_NM       			<float>(GetOption_Double(document, "NHB_NEST_NM"		, NHB_NEST_NM       	<float>()));
 
 				return true;
 			}

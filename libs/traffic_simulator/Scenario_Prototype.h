@@ -6,6 +6,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/error/en.h>
+
 //TODO: put back in?
 //#include "../File_IO/network_scenario_data.h"
 
@@ -643,10 +647,10 @@ namespace Scenario_Components
 				}
 				else use_buildings(true);
 
-				if (cfgReader.getParameter("mode_choice_option_param_file",					mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)				 mode_choice_option_param_file<string>(filename);
-				if (cfgReader.getParameter("detroit_mode_choice_option_param_file",			detroit_mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)		 detroit_mode_choice_option_param_file<string>(filename);
-				if (cfgReader.getParameter("adapts_destination_choice_option_param_file",	adapts_destination_choice_option_param_file<string*>()) != PARAMETER_FOUND)	 adapts_destination_choice_option_param_file<string>(filename);
-				if (cfgReader.getParameter("telecommute_choice_param_file",					telecommute_choice_param_file<string*>()) != PARAMETER_FOUND)				 telecommute_choice_param_file<string>(filename);
+				if (cfgReader.getParameter("mode_choice_option_param_file",					mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)				 mode_choice_option_param_file<string>("");
+				if (cfgReader.getParameter("detroit_mode_choice_option_param_file",			detroit_mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)		 detroit_mode_choice_option_param_file<string>("");
+				if (cfgReader.getParameter("adapts_destination_choice_option_param_file",	adapts_destination_choice_option_param_file<string*>()) != PARAMETER_FOUND)	 adapts_destination_choice_option_param_file<string>("");
+				if (cfgReader.getParameter("telecommute_choice_param_file",					telecommute_choice_param_file<string*>()) != PARAMETER_FOUND)				 telecommute_choice_param_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1373,6 +1377,65 @@ namespace Scenario_Components
 			int getParameter(const char *parameterName, StringArray *parameter);
 			int getParameter(const char *parameterName, BoolArray *parameter);
 			int getParameter(const char *parameterName, unsigned long *paramValue);
+
+			bool parse_option_file(rapidjson::Document& document, std::string option_file)
+			{
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file was not specified" << endl;
+					return true;
+				}
+
+				std::ifstream ifs(option_file);
+				if (!ifs.good())
+				{
+					cout << "ERROR: unbale to open option file \'" << option_file << "\'" << endl;
+					return false;
+				}
+
+				rapidjson::IStreamWrapper isw(ifs);
+				if (document.ParseStream(isw).HasParseError())
+				{
+					cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
+					cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
+					return false;
+				}
+
+				if (!document.IsObject())
+				{
+					cout << "ERROR: \'" << option_file << "\' is not a valid option file" << endl;
+					return false;
+				}
+
+				return true;
+			}
+
+			double get_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, double default_value)
+			{
+				//assert(document.HasMember(section.c_str()));
+				//assert(document[section.c_str()].HasMember(key.c_str()));
+				//assert(document[section.c_str()][key.c_str()].IsDouble());
+				if (!document.HasMember(section.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" <<section << "\'" << endl;
+					return default_value;
+				}
+
+				if (!document[section.c_str()].HasMember(key.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
+					return default_value;
+				}
+
+				if (!document[section.c_str()][key.c_str()].IsDouble())
+				{
+					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
+					return default_value;
+				}
+
+				return document[section.c_str()][key.c_str()].GetDouble();
+			}
+
 
 		};
 	}
