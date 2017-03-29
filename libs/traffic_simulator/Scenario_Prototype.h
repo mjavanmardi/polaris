@@ -1398,6 +1398,7 @@ namespace Scenario_Components
 				{
 					cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
 					cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
+
 					return false;
 				}
 

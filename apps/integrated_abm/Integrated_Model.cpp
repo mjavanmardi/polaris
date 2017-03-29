@@ -336,6 +336,13 @@ int main(int argc,char** argv)
 		return 1;
 	}
 
+	if (!Person_Components::Implementations::ADAPTS_Destination_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize ADAPTS_Destination_Choice_Option parameters." << endl;
+		return 1;
+	}
+	
+
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
 	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
