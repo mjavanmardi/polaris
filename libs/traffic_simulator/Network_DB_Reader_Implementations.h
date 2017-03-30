@@ -122,6 +122,46 @@ namespace Network_Components
 					}
 					intersections_container_ptr->push_back(intersection);
 				}
+
+
+
+
+
+
+				result<Transit_Node> tr_node_result = db->template query<Transit_Node>(query<Transit_Node>::true_expr);
+
+				for (typename result<Transit_Node>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
+				{
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+
+					intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
+
+					intersection->template uuid<int>(db_itr->getNode());
+					intersection->template internal_id<int>(counter);
+					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
+					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
+					//intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
+
+					net_io_maps.intersection_id_to_ptr[db_itr->getNode()] = intersection;
+
+					/*if (_scenario_reference->template intersection_control_flag<int>() == 0)
+					{
+						intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
+
+						_Intersection_Control_Interface* intersection_control = (_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+						intersection_control->template intersection<_Intersection_Interface*>(intersection);
+
+						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+						control_plan->template control_plan_index<int>(0.0);
+						control_plan->template control_type<int>(Intersection_Components::Types::NO_CONTROL);
+						control_plan->template starting_time<int>(0.0);
+						control_plan->template ending_time<int>(24 * 60 * 60);
+						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+					}*/
+					intersections_container_ptr->push_back(intersection);
+				}
 			}
 
 			template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
