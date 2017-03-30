@@ -106,6 +106,10 @@ namespace Intersection_Components
 			accessor(x_position, NONE, NONE);
 			accessor(y_position, NONE, NONE);
 			accessor(z_position, NONE, NONE);
+			accessor(agency, NONE, NONE);
+			accessor(code, NONE, NONE);
+			accessor(name, NONE, NONE);
+			accessor(description, NONE, NONE);
 			accessor(inbound_links, NONE, NONE);
 			accessor(outbound_links, NONE, NONE);
 			accessor(intersection_type, NONE, NONE);
