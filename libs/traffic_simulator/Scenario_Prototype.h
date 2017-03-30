@@ -650,7 +650,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("mode_choice_option_param_file",					mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)				 mode_choice_option_param_file<string>("");
 				if (cfgReader.getParameter("detroit_mode_choice_option_param_file",			detroit_mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)		 detroit_mode_choice_option_param_file<string>("");
 				if (cfgReader.getParameter("adapts_destination_choice_option_param_file",	adapts_destination_choice_option_param_file<string*>()) != PARAMETER_FOUND)	 adapts_destination_choice_option_param_file<string>("");
-				if (cfgReader.getParameter("telecommute_choice_param_file",					telecommute_choice_param_file<string*>()) != PARAMETER_FOUND)				 telecommute_choice_param_file<string>("");
+				if (cfgReader.getParameter("telecommute_choice_implementation_param_file",  telecommute_choice_implementation_param_file<string*>()) != PARAMETER_FOUND) telecommute_choice_implementation_param_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

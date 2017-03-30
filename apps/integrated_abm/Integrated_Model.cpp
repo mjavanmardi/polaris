@@ -342,6 +342,11 @@ int main(int argc,char** argv)
 		return 1;
 	}
 	
+	if (!Person_Components::Implementations::Telecommute_Choice_Implementation<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Telecommute_Choice_Implementation parameters." << endl;
+		return 1;
+	}
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 

@@ -328,7 +328,7 @@ namespace Scenario_Components
 			m_data(string, mode_choice_option_param_file, NONE, NONE);
 			m_data(string, detroit_mode_choice_option_param_file, NONE, NONE);
 			m_data(string, adapts_destination_choice_option_param_file, NONE, NONE);
-			m_data(string, telecommute_choice_param_file, NONE, NONE);
+			m_data(string, telecommute_choice_implementation_param_file, NONE, NONE);
 		};
 	}
 
