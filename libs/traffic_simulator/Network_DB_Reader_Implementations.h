@@ -123,10 +123,7 @@ namespace Network_Components
 					intersections_container_ptr->push_back(intersection);
 				}
 
-
-
-
-
+				cout << "Reading Transit Nodes" << endl;
 
 				result<Transit_Node> tr_node_result = db->template query<Transit_Node>(query<Transit_Node>::true_expr);
 
@@ -141,6 +138,10 @@ namespace Network_Components
 					intersection->template internal_id<int>(counter);
 					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
+					intersection->template agency<std::string>(db_itr->getAgency());
+					intersection->template code<std::string>(db_itr->getCode());
+					intersection->template name<std::string>(db_itr->getName());
+					intersection->template description<std::string>(db_itr->getDescription());
 					//intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 
 					net_io_maps.intersection_id_to_ptr[db_itr->getNode()] = intersection;
