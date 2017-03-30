@@ -14,6 +14,7 @@ namespace io
 class MetaData;
 class Tags;
 class Node;
+class Transit_Node;
 class Zone;
 //class ZoneLandUse;
 class Shape;
@@ -146,6 +147,7 @@ public:
 	std::string key;
 	std::string value;
 };
+
 #pragma db object //table("NODE")
 class Node
 {
@@ -184,6 +186,57 @@ private:
 	int part;
 	#pragma db index member(node)
 
+};
+
+#pragma db object //table("NODE")
+class Transit_Node
+{
+public:
+	// Default Constructor
+	Transit_Node() {}
+	//Constructor
+	Transit_Node(int node_, double x_, double y_, double z_, int subarea_, int part_, std::string agency_, std::string code_, std::string name_, std::string description_)
+		: node(node_), x(x_), y(y_), z(z_), subarea(subarea_), part(part_), agency(agency_), code(code_), name(name_), description(description_)
+	{
+	}
+	//Accessors
+	const int& getNode() const { return node; }
+	void setNode(const int& node_) { node = node_; }
+	const double& getX() const { return x; }
+	void setX(const double& x_) { x = x_; }
+	const double& getY() const { return y; }
+	void setY(const double& y_) { y = y_; }
+	const double& getZ() const { return z; }
+	void setZ(const double& z_) { z = z_; }
+	const int& getSubarea() const { return subarea; }
+	void setSubarea(const int& subarea_) { subarea = subarea_; }
+	const int& getPart() const { return part; }
+	void setPart(const int& part_) { part = part_; }
+	const std::string& getAgency() const { return agency; }
+	void setAgency(const std::string& agency_) { agency = agency_; }
+	const std::string& getCode() const { return code; }
+	void setCode(const std::string& code_) { code = code_; }
+	const std::string& getName() const { return code; }
+	void setName(const std::string& code_) { code = code_; }
+	const std::string& getDescription() const { return description; }
+	void setDescription(const std::string& description_) { description = description_; }
+	const int& getPrimaryKey() const { return node; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int node;
+	double x;
+	double y;
+	double z;
+	int subarea;
+	int part;
+	std::string agency;
+	std::string code;
+	std::string name;
+	std::string description;
+	#pragma db index member(node)
 };
 
 #pragma db object
