@@ -19,6 +19,8 @@ class Zone;
 //class ZoneLandUse;
 class Shape;
 class Link;
+class Transit_Link;
+class Walk_Link;
 class Pocket;
 class Lane_Use;
 class Connect;
@@ -117,9 +119,10 @@ public:
 	std::map<int,shared_ptr<Signal> > Signals;
 	std::map<int,shared_ptr<Stop> > Stops;
 	std::map<int,shared_ptr<Veh_Type> > Veh_Types;
-	std::map<int,shared_ptr<Area_Type> > Area_Types;
+	std::map<int,area_type_ptr > Area_Types;
 	std::map<std::string,shared_ptr<Link_Type> > Link_Types;
 };
+
 #pragma db object
 class MetaData
 {
@@ -188,7 +191,7 @@ private:
 
 };
 
-#pragma db object //table("NODE")
+#pragma db object //table("Transit_Node")
 class Transit_Node
 {
 public:
@@ -591,6 +594,128 @@ private:
 	int right_ab;
 	int left_ba;
 	int right_ba;
+};
+
+#pragma db object //table("LINK")
+class Transit_Link
+{
+public:
+	// Default Constructor
+	Transit_Link() {}
+	//Constructor
+	Transit_Link(int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, std::string TripsByDepTime_, std::string IndexAlongTripOfStopA_, std::string ArrivalSecondsAtA_, std::string DepartureSecondsFromA_, std::string ArrivalSecondsAtB_, std::string DepartureSecondsFromB_)
+	: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_), TripsByDepTime(TripsByDepTime_), IndexAlongTripOfStopA(IndexAlongTripOfStopA_), ArrivalSecondsAtA(ArrivalSecondsAtA_), DepartureSecondsFromA(DepartureSecondsFromA_), ArrivalSecondsAtB(ArrivalSecondsAtB_), DepartureSecondsFromB(DepartureSecondsFromB_)
+	{
+	}
+	//Accessors
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const std::string& getName() const { return name; }
+	void setName(const std::string& name_) { name = name_; }
+	const node_ptr& getNode_A() const { return node_a; }
+	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
+	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
+	const node_ptr& getNode_B() const { return node_b; }
+	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
+	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }
+	const double& getLength() const { return length; }
+	void setLength(const double& length_) { length = length_; }
+	const shared_ptr<Link_Type>& getType() const { return type; }
+	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
+	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
+	const shared_ptr<Area_Type>& getArea_Type() const { return area_type; }
+	void setArea_Type(const shared_ptr<Area_Type>& area_type_) { area_type = area_type_; }
+	void setArea_Type(const int& area_type_, InputContainer& container) { area_type = container.Area_Types[area_type_]; }
+	const std::string& getUse() const { return use; }
+	void setUse(const std::string& use_) { use = use_; }
+	const double& getGrade() const { return grade; }
+	void setGrade(const double& grade_) { grade = grade_; }
+	const int& getPrimaryKey() const { return link; }
+	const std::string& getTripsByDepTime() const { return TripsByDepTime; }
+	void setTripsByDepTime(const std::string& TripsByDepTime_) { TripsByDepTime = TripsByDepTime_; }
+	const std::string& getIndexAlongTripOfStopA() const { return IndexAlongTripOfStopA; }
+	void setIndexAlongTripOfStopA(const std::string& IndexAlongTripOfStopA_) { IndexAlongTripOfStopA = IndexAlongTripOfStopA_; }
+	const std::string& getArrivalSecondsAtA() const { return ArrivalSecondsAtA; }
+	void setArrivalSecondsAtA(const std::string& ArrivalSecondsAtA_) { ArrivalSecondsAtA = ArrivalSecondsAtA_; }
+	const std::string& getDepartureSecondsFromA() const { return DepartureSecondsFromA; }
+	void setDepartureSecondsFromA(const std::string& DepartureSecondsFromA_) { DepartureSecondsFromA = DepartureSecondsFromA_; }
+	const std::string& getArrivalSecondsAtB() const { return ArrivalSecondsAtB; }
+	void setArrivalSecondsAtB(const std::string& ArrivalSecondsAtB_) { ArrivalSecondsAtB = ArrivalSecondsAtB_; }
+	const std::string& getDepartureSecondsFromB() const { return DepartureSecondsFromB; }
+	void setDepartureSecondsFromB(const std::string& DepartureSecondsFromB_) { DepartureSecondsFromB = DepartureSecondsFromB_; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int link;
+#pragma db null
+	std::string name;
+	node_ptr node_a;
+	node_ptr node_b;
+	double length;
+	shared_ptr<Link_Type> type;
+	shared_ptr<Area_Type> area_type;
+	std::string use;
+	double grade;
+	std::string TripsByDepTime;
+	std::string IndexAlongTripOfStopA;
+	std::string ArrivalSecondsAtA;
+	std::string DepartureSecondsFromA;
+	std::string ArrivalSecondsAtB;
+	std::string DepartureSecondsFromB;
+};
+
+#pragma db object //table("LINK")
+class Walk_Link
+{
+public:
+	// Default Constructor
+	Walk_Link() {}
+	//Constructor
+	Walk_Link(int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_)
+		: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_)
+	{
+	}
+	//Accessors
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const std::string& getName() const { return name; }
+	void setName(const std::string& name_) { name = name_; }
+	const node_ptr& getNode_A() const { return node_a; }
+	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
+	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
+	const node_ptr& getNode_B() const { return node_b; }
+	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
+	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }
+	const double& getLength() const { return length; }
+	void setLength(const double& length_) { length = length_; }
+	const shared_ptr<Link_Type>& getType() const { return type; }
+	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
+	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
+	const shared_ptr<Area_Type>& getArea_Type() const { return area_type; }
+	void setArea_Type(const shared_ptr<Area_Type>& area_type_) { area_type = area_type_; }
+	void setArea_Type(const int& area_type_, InputContainer& container) { area_type = container.Area_Types[area_type_]; }
+	const std::string& getUse() const { return use; }
+	void setUse(const std::string& use_) { use = use_; }
+	const double& getGrade() const { return grade; }
+	void setGrade(const double& grade_) { grade = grade_; }
+	const int& getPrimaryKey() const { return link; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int link;
+#pragma db null
+	std::string name;
+	node_ptr node_a;
+	node_ptr node_b;
+	double length;
+	shared_ptr<Link_Type> type;
+	shared_ptr<Area_Type> area_type;
+	std::string use;
+	double grade;
 };
 
 #pragma db object //table("POCKET")
