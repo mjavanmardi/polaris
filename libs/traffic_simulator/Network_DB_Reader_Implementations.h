@@ -125,9 +125,9 @@ namespace Network_Components
 
 				cout << "Reading Transit Nodes" << endl;
 
-				result<Transit_Node> tr_node_result = db->template query<Transit_Node>(query<Transit_Node>::true_expr);
+				result<TransitNode> tr_node_result = db->template query<TransitNode>(query<TransitNode>::true_expr);
 
-				for (typename result<Transit_Node>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
+				for (typename result<TransitNode>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
 				{
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
