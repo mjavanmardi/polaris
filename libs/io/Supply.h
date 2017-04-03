@@ -605,7 +605,7 @@ private:
 	int right_ba;
 };
 
-#pragma db object //table("TRANSIT_LINK")
+#pragma db object //table("TransitLink")
 class TransitLink
 {
 public:
@@ -675,7 +675,7 @@ private:
 	std::string DepartureSecondsFromB;
 };
 
-#pragma db object //table("WALK_LINK")
+#pragma db object //table("WalkLink")
 class WalkLink
 {
 public:
@@ -727,7 +727,7 @@ private:
 	double grade;
 };
 
-#pragma db object //table("LINK")
+#pragma db object //table("Route")
 class Route
 {
 public:
@@ -769,7 +769,7 @@ private:
 	int type;
 };
 
-#pragma db object //table("LINK")
+#pragma db object //table("Pattern")
 class Pattern
 {
 public:
@@ -806,7 +806,7 @@ private:
 	std::string stop_seq_string;
 };
 
-#pragma db object //table("LINK")
+#pragma db object //table("TransitVehTrip")
 class TransitVehTrip
 {
 public:
