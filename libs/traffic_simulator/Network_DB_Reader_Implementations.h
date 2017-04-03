@@ -123,10 +123,10 @@ namespace Network_Components
 					intersections_container_ptr->push_back(intersection);
 				}
 
+				result<TransitNode> tr_node_result = db->template query<TransitNode>(query<TransitNode>::true_expr); 
+				
 				cout << "Reading Transit Nodes" << endl;
-
-				result<TransitNode> tr_node_result = db->template query<TransitNode>(query<TransitNode>::true_expr);
-
+				
 				for (typename result<TransitNode>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
 				{
 					counter++;
@@ -709,6 +709,56 @@ namespace Network_Components
 							id_to_links_map[link_id_dir.id] = links_arr;
 						}
 					}
+				}
+
+				result<polaris::io::WalkLink> walk_link_result = db->template query<polaris::io::WalkLink>(query<polaris::io::WalkLink>::true_expr);
+
+				cout << "Reading Walk Links" << endl;
+
+				for (typename result<polaris::io::WalkLink>::iterator db_itr = walk_link_result.begin(); db_itr != walk_link_result.end(); ++db_itr)
+				{
+					const string& facility_type = db_itr->getType()->getLink_Type();
+					bool do_this_link = true;
+
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+					if (1 > 0)
+					{
+						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+						link_id_dir.id = db_itr->getLink();
+						link_id_dir.dir = 0;
+
+						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+
+						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+
+						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+						link->template dbid<int>(db_itr->getLink());
+						link->template direction<int>(0.0);
+
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+
+						link->template internal_id<int>(++link_counter);
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+					}
+				}
+
+				result<polaris::io::TransitLink> transit_link_result = db->template query<polaris::io::TransitLink>(query<polaris::io::TransitLink>::true_expr);
+
+				cout << "Reading Transit Links" << endl;
+
+				for (typename result<polaris::io::TransitLink>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
+				{
+
 				}
 			}
 
