@@ -86,6 +86,8 @@ namespace Link_Components
 			m_data(int, num_lanes, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, length, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, grade, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, name, NONE, NONE);
 			
 			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
 

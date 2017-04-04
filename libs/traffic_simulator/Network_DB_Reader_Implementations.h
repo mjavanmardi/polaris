@@ -732,12 +732,12 @@ namespace Network_Components
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
 
 						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
-
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
-
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
 						link->template dbid<int>(db_itr->getLink());
+						link->template name<std::string>(db_itr->getName());
+						link->template grade<float>(db_itr->getGrade());
 						link->template direction<int>(0.0);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
@@ -749,6 +749,81 @@ namespace Network_Components
 
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
+
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+						links_container_ptr->push_back(link);
+
+						typename id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							std::vector<typename MasterType::link_type*> links_arr;
+							links_arr.push_back((typename MasterType::link_type*)link);
+							id_to_links_map[link_id_dir.id] = links_arr;
+						}
+					}
+
+					if (0 < 1)
+					{
+						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+						link_id_dir.id = db_itr->getLink();
+						link_id_dir.dir = 1;
+
+						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+						link->template dbid<int>(db_itr->getLink());
+						link->template name<std::string>(db_itr->getName());
+						link->template grade<float>(db_itr->getGrade());
+						link->template direction<int>(1);
+
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+
+						link->template internal_id<int>(++link_counter);
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
+
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+						links_container_ptr->push_back(link);
+
+						typename id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							std::vector<typename MasterType::link_type*> links_arr;
+							links_arr.push_back((typename MasterType::link_type*)link);
+							id_to_links_map[link_id_dir.id] = links_arr;
+						}
 					}
 				}
 
@@ -758,7 +833,114 @@ namespace Network_Components
 
 				for (typename result<polaris::io::TransitLink>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
 				{
+					const string& facility_type = db_itr->getType()->getLink_Type();
+					bool do_this_link = true;
 
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+					if (1 > 0)
+					{
+						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+						link_id_dir.id = db_itr->getLink();
+						link_id_dir.dir = 0;
+
+						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+						link->template dbid<int>(db_itr->getLink());
+						link->template name<std::string>(db_itr->getName());
+						link->template grade<float>(db_itr->getGrade());
+						link->template direction<int>(0.0);
+
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+
+						link->template internal_id<int>(++link_counter);
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
+
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+						links_container_ptr->push_back(link);
+
+						typename id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							std::vector<typename MasterType::link_type*> links_arr;
+							links_arr.push_back((typename MasterType::link_type*)link);
+							id_to_links_map[link_id_dir.id] = links_arr;
+						}
+					}
+
+					if (0 < 1)
+					{
+						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+						link_id_dir.id = db_itr->getLink();
+						link_id_dir.dir = 1;
+
+						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+						link->template dbid<int>(db_itr->getLink());
+						link->template name<std::string>(db_itr->getName());
+						link->template grade<float>(db_itr->getGrade());
+						link->template direction<int>(1);
+
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+
+						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+
+						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+
+						link->template internal_id<int>(++link_counter);
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
+
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+						links_container_ptr->push_back(link);
+
+						typename id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							std::vector<typename MasterType::link_type*> links_arr;
+							links_arr.push_back((typename MasterType::link_type*)link);
+							id_to_links_map[link_id_dir.id] = links_arr;
+						}
+					}
 				}
 			}
 
