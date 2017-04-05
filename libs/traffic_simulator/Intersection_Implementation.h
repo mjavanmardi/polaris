@@ -594,6 +594,10 @@ namespace Intersection_Components
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_walk_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_walk_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_transit_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_transit_links, NONE, NONE);
 			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
 			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
