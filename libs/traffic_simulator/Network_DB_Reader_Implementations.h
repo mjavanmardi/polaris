@@ -806,8 +806,8 @@ namespace Network_Components
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_walk_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_walk_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
 
@@ -870,8 +870,8 @@ namespace Network_Components
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
 
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_transit_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_transit_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
 
