@@ -80,6 +80,7 @@ struct MasterType
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> movement_type;
 
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> turn_movement_type;
+	//typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<M> transit_vehicle_trip_type;
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;

@@ -2,6 +2,7 @@
 #include "Network_DB_Reader_Prototype.h"
 #include "Intersection_Prototype.h"
 #include "Turn_Movement_Prototype.h"
+#include "Transit_Vehicle_Trip_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Implementation.h"
 

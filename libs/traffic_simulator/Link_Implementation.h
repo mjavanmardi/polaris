@@ -164,6 +164,13 @@ namespace Link_Components
 			m_data(float, lane_adjustment_due_to_accident, NONE, NONE);
 
 		//==================================================================================================================
+		/// Transit-Related Members
+		//------------------------------------------------------------------------------------------------------------------
+
+			//m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time, NONE, NONE);
+			//m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, index_along_trip_at_upstream_node, NONE, NONE);
+
+		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
 

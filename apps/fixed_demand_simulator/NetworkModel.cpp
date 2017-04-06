@@ -77,7 +77,8 @@ struct MasterType
 	
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<MasterType> turn_movement_type;
 
-	
+	typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<MasterType> transit_vehicle_trip_type;
+
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
