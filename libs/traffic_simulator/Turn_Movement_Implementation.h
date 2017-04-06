@@ -24,7 +24,7 @@ namespace Turn_Movement_Components
 			float outbound_link_turn_time;
 		};
 
-		implementation struct Movement_Implementation:public Polaris_Component<MasterType,INHERIT(Movement_Implementation),Data_Object>
+		implementation struct Movement_Implementation :public Polaris_Component<MasterType,INHERIT(Movement_Implementation),Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Movement_Implementation),Data_Object>::Component_Type ComponentType;
 			
