@@ -9,7 +9,7 @@ namespace Transit_Vehicle_Trip_Components
 {
 	namespace Types
 	{
-		enum Turn_Movement_Type_Keys
+		/*enum Turn_Movement_Type_Keys
 		{
 			LEFT_TURN = 0,
 			THROUGH_TURN,
@@ -21,7 +21,7 @@ namespace Transit_Vehicle_Trip_Components
 		{
 			PROHIBITED = 0,
 			ALLOWED,
-		};
+		};*/
 	}
 
 	namespace Concepts
