@@ -26,6 +26,8 @@ void* _global_vehicle_logger;
 #include "Plan_Implementation.h"
 #include "Movement_Plan_Implementation.h"
 #include "Turn_Movement_Implementation.h"
+#include "Transit_Route_Implementation.h"
+#include "Transit_Pattern_Implementation.h"
 #include "Transit_Vehicle_Trip_Implementation.h"
 
 #include "Link_Event_Handler_Implementation.h"

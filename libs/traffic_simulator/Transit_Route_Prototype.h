@@ -1,7 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
 
-namespace Transit_Vehicle_Trip_Components
+namespace Transit_Route_Components
 {
 	namespace Types
 	{
@@ -13,7 +13,7 @@ namespace Transit_Vehicle_Trip_Components
 
 	namespace Prototypes
 	{
-		prototype struct Transit_Vehicle_Trip ADD_DEBUG_INFO
+		prototype struct Transit_Route ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -26,11 +26,11 @@ namespace Transit_Vehicle_Trip_Components
 			accessor(pattern, NONE, NONE);
 			accessor(sequence_number, NONE, NONE);
 			accessor(arrival_seconds, NONE, NONE);
-			accessor(departure_seconds, NONE, NONE);		
+			accessor(departure_seconds, NONE, NONE);
 		};
 
 
 	}
 }
 
-using namespace Transit_Vehicle_Trip_Components::Prototypes;
+using namespace Transit_Route_Components::Prototypes;
