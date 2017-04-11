@@ -21,12 +21,9 @@ namespace Transit_Pattern_Components
 			accessor(uuid, NONE, NONE);
 			accessor(name, NONE, NONE);
 			accessor(agency, NONE, NONE);
-			accessor(direction, NONE, NONE);
 			accessor(route, NONE, NONE);
-			accessor(pattern, NONE, NONE);
-			accessor(sequence_number, NONE, NONE);
-			accessor(arrival_seconds, NONE, NONE);
-			accessor(departure_seconds, NONE, NONE);
+			accessor(pattern_stops, NONE, NONE);
+			accessor(pattern_links, NONE, NONE);
 		};
 
 
