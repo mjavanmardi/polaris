@@ -26,17 +26,15 @@ namespace Transit_Route_Components
 		implementation struct Transit_Route_Implementation :public Polaris_Component<MasterType, INHERIT(Transit_Route_Implementation), Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Route_Implementation), Data_Object>::Component_Type ComponentType;
-
+			
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, name, NONE, NONE);
 			m_data(std::string, agency, NONE, NONE);
-			m_data(int, direction, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, route, NONE, NONE);
-			m_data(int, pattern, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_container(std::vector<int>, sequence_number, NONE, NONE);
-			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
-			m_container(std::vector<int>, departure_seconds, NONE, NONE);
+			m_data(std::string, shortname, NONE, NONE);
+			m_data(std::string, longname, NONE, NONE);
+			m_data(std::string, description, NONE, NONE);
+			m_data(int, type, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
 
 			//m_prototype(Null_Prototype, typename MasterType::link_type, inbound_link, NONE, NONE);

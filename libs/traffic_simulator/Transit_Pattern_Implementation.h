@@ -31,17 +31,14 @@ namespace Transit_Pattern_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, name, NONE, NONE);
 			m_data(std::string, agency, NONE, NONE);
-			m_data(int, direction, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, route, NONE, NONE);
-			m_data(int, pattern, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_container(std::vector<int>, sequence_number, NONE, NONE);
-			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
-			m_container(std::vector<int>, departure_seconds, NONE, NONE);
+			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::route_type, route, NONE, NONE);
+			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stop, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, pattern_link, NONE, NONE);
+			
 
-
-			//m_prototype(Null_Prototype, typename MasterType::link_type, inbound_link, NONE, NONE);
-
-			//typedef  Link_Components::Prototypes::Link<type_of(inbound_link)> _Link_Interface;
+			typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<type_of(pattern_stop)> _Intersection_Interface; 
+			typedef Link_Components::Prototypes::Link<type_of(pattern_link)> _Link_Interface;
 			//typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename  type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
 			//typedef  Back_Insertion_Sequence<type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;

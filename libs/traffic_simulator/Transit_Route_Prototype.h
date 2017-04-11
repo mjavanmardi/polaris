@@ -21,12 +21,10 @@ namespace Transit_Route_Components
 			accessor(uuid, NONE, NONE);
 			accessor(name, NONE, NONE);
 			accessor(agency, NONE, NONE);
-			accessor(direction, NONE, NONE);
-			accessor(route, NONE, NONE);
-			accessor(pattern, NONE, NONE);
-			accessor(sequence_number, NONE, NONE);
-			accessor(arrival_seconds, NONE, NONE);
-			accessor(departure_seconds, NONE, NONE);
+			accessor(shortname, NONE, NONE);
+			accessor(longname, NONE, NONE);
+			accessor(description, NONE, NONE);
+			accessor(type, NONE, NONE);
 		};
 
 
