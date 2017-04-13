@@ -50,10 +50,10 @@ namespace Transit_Route_Components
 			//typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			//typedef typename MasterType::link_type _link_component_type;
 
-			Transit_Route_Implementation()
+			/*Transit_Route_Implementation()
 			{
 				UNLOCK(_mvmt_lock);
-			}
+			}*/
 
 		};
 	}

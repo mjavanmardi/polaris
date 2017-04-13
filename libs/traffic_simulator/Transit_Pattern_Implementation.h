@@ -31,7 +31,7 @@ namespace Transit_Pattern_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, name, NONE, NONE);
 			m_data(std::string, agency, NONE, NONE);
-			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::route_type, route, NONE, NONE);
+			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::transit_route_type, route, NONE, NONE);
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stop, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, pattern_link, NONE, NONE);
 			
@@ -49,10 +49,10 @@ namespace Transit_Pattern_Components
 			//typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			//typedef typename MasterType::link_type _link_component_type;
 
-			Transit_Pattern_Implementation()
+			/*Transit_Pattern_Implementation()
 			{
 				UNLOCK(_mvmt_lock);
-			}
+			}*/
 
 		};
 	}

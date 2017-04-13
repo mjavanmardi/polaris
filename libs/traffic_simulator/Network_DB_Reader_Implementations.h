@@ -53,6 +53,9 @@ namespace Network_Components
 				cout << "done."<<endl;
 
 				read_intersection_data<TargetType>(db, net_io_maps);
+				read_transit_route_data<TargetType>(db, net_io_maps);
+				read_transit_pattern_data<TargetType>(db, net_io_maps);
+				read_transit_vehicle_trip_data<TargetType>(db, net_io_maps);
 				read_link_data<TargetType>(db, net_io_maps);
 				read_turn_movement_data<TargetType>(db, net_io_maps);
 				read_zone_data<TargetType>(db, net_io_maps);
@@ -165,6 +168,150 @@ namespace Network_Components
 						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 					}*/
 					intersections_container_ptr->push_back(intersection);
+				}
+			}
+
+			template<typename TargetType> void read_transit_route_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				using namespace odb;
+				using namespace polaris::io;
+
+				typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_routes_container), _Transit_Route_Interface*> _Transit_Routes_Container_Interface;
+
+				_Transit_Routes_Container_Interface* transit_routes_container_ptr = _network_reference->template transit_routes_container<_Transit_Routes_Container_Interface*>();
+				typename type_of(network_reference)::type_of(transit_routes_container)& transit_routes_container_monitor = (typename type_of(network_reference)::type_of(transit_routes_container)&)(*transit_routes_container_ptr);
+
+				transit_routes_container_ptr->clear();
+
+				result<Route> route_result = db->template query<Route>(query<Route>::true_expr);
+
+				net_io_maps.transit_route_id_to_ptr.set_empty_key(-1);
+				net_io_maps.transit_route_id_to_ptr.set_deleted_key(-2);
+
+				_Transit_Route_Interface* transit_route;
+
+				int counter = -1;
+
+				cout << "Reading Transit Routes" << endl;
+
+				for (typename result<Route>::iterator db_itr = route_result.begin(); db_itr != route_result.end(); ++db_itr)
+				{
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+
+					transit_route = (_Transit_Route_Interface*)Allocate<typename _Transit_Route_Interface::Component_Type>();
+
+					transit_route->template uuid<int>(db_itr->getRoute());
+					transit_route->template internal_id<int>(counter);
+					transit_route->template name<std::string>(db_itr->getName());
+					transit_route->template agency<std::string>(db_itr->getAgency());
+					transit_route->template shortname<std::string>(db_itr->getShortname());
+					transit_route->template longname<std::string>(db_itr->getLongname());
+					transit_route->template description<std::string>(db_itr->getDescription());
+					transit_route->template type<int>(db_itr->getType());	
+
+					net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()] = transit_route;
+					transit_routes_container_ptr->push_back(transit_route);
+				}				
+			}
+
+			template<typename TargetType> void read_transit_pattern_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				using namespace odb;
+				using namespace polaris::io;
+
+				typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_routes_container), _Transit_Route_Interface*> _Transit_Routes_Container_Interface;
+
+				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+
+				_Transit_Patterns_Container_Interface* transit_patterns_container_ptr = _network_reference->template transit_patterns_container<_Transit_Patterns_Container_Interface*>();
+				typename type_of(network_reference)::type_of(transit_patterns_container)& transit_patterns_container_monitor = (typename type_of(network_reference)::type_of(transit_patterns_container)&)(*transit_patterns_container_ptr);
+
+
+				transit_patterns_container_ptr->clear();
+
+				result<Pattern> pattern_result = db->template query<Pattern>(query<Pattern>::true_expr);
+
+				net_io_maps.transit_pattern_id_to_ptr.set_empty_key(-1);
+				net_io_maps.transit_pattern_id_to_ptr.set_deleted_key(-2);
+
+				_Transit_Pattern_Interface* transit_pattern;
+
+				int counter = -1;
+
+				cout << "Reading Transit Patterns" << endl;
+
+				for (typename result<Pattern>::iterator db_itr = pattern_result.begin(); db_itr != pattern_result.end(); ++db_itr)
+				{
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+
+					transit_pattern = (_Transit_Pattern_Interface*)Allocate<typename _Transit_Pattern_Interface::Component_Type>();
+
+					transit_pattern->template uuid<int>(db_itr->getPattern());
+					transit_pattern->template internal_id<int>(counter);
+					transit_pattern->template name<std::string>(db_itr->getName());
+					transit_pattern->template agency<std::string>(db_itr->getAgency());
+					transit_pattern->template route<_Transit_Route_Interface*>((_Transit_Route_Interface*)net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()->getRoute()]);
+
+					net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()] = transit_pattern;
+					transit_patterns_container_ptr->push_back(transit_pattern);
+					//DO the stop sequence!
+				}
+			}
+
+			template<typename TargetType> void read_transit_vehicle_trip_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				using namespace odb;
+				using namespace polaris::io;
+
+				typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_routes_container), _Transit_Route_Interface*> _Transit_Routes_Container_Interface;
+
+				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+
+				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+
+				_Transit_Vehicle_Trips_Container_Interface* transit_vehicle_trips_container_ptr = _network_reference->template transit_vehicle_trips_container<_Transit_Vehicle_Trips_Container_Interface*>();
+				typename type_of(network_reference)::type_of(transit_vehicle_trips_container)& transit_vehicle_trips_container_monitor = (typename type_of(network_reference)::type_of(transit_vehicle_trips_container)&)(*transit_vehicle_trips_container_ptr);
+
+
+				transit_vehicle_trips_container_ptr->clear();
+
+				result<TransitVehTrip> transit_vehtrip_result = db->template query<TransitVehTrip>(query<TransitVehTrip>::true_expr);
+
+				net_io_maps.transit_vehicle_trip_id_to_ptr.set_empty_key(-1);
+				net_io_maps.transit_vehicle_trip_id_to_ptr.set_deleted_key(-2);
+
+				_Transit_Vehicle_Trip_Interface* transit_vehicle_trip;
+
+				int counter = -1;
+
+				cout << "Reading Transit Trips" << endl;
+
+				for (typename result<TransitVehTrip>::iterator db_itr = transit_vehtrip_result.begin(); db_itr != transit_vehtrip_result.end(); ++db_itr)
+				{
+					counter++;
+					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+
+					transit_vehicle_trip = (_Transit_Vehicle_Trip_Interface*)Allocate<typename _Transit_Vehicle_Trip_Interface::Component_Type>();
+
+					transit_vehicle_trip->template uuid<int>(db_itr->getTrip());
+					transit_vehicle_trip->template internal_id<int>(counter);
+					transit_vehicle_trip->template name<std::string>(db_itr->getName());
+					transit_vehicle_trip->template agency<std::string>(db_itr->getAgency());
+					transit_vehicle_trip->template direction<int>(db_itr->getDirection());
+					transit_vehicle_trip->template route<_Transit_Route_Interface*>((_Transit_Route_Interface*)net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()->getRoute()]);
+					transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>((_Transit_Pattern_Interface*)net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()->getPattern()]);
+
+					net_io_maps.transit_vehicle_trip_id_to_ptr[db_itr->getTrip()] = transit_vehicle_trip;
+					transit_vehicle_trips_container_ptr->push_back(transit_vehicle_trip);
+					//DO the stop sequence!
 				}
 			}
 

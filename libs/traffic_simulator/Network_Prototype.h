@@ -20,6 +20,9 @@ namespace Network_Components
 		struct Network_IO_Maps
 		{
 			dense_hash_map<int, void*> intersection_id_to_ptr;
+			dense_hash_map<int, void*> transit_route_id_to_ptr;
+			dense_hash_map<int, void*> transit_pattern_id_to_ptr;
+			dense_hash_map<int, void*> transit_vehicle_trip_id_to_ptr;
 			dense_hash_map<long long, void*> link_id_dir_to_ptr;
 		};
 
