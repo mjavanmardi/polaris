@@ -67,6 +67,12 @@ namespace Network_Components
 			m_container(std::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
 
 			m_container(std::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_route_type*>, transit_routes_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_pattern_type*>, transit_patterns_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, transit_vehicle_trips_container, NONE, NONE);
 			//m_container(std::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
 
 			//TODO:ROUTING
