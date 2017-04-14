@@ -119,6 +119,8 @@ class InputContainer
 {
 public:
 	std::map<int,node_ptr > Nodes;
+	//TRansit_Nodes
+
 	std::map<int,shared_ptr<Zone> > Zones;
 	std::map<int,shared_ptr<Link> > Links;
 	std::map<int,shared_ptr<Parking> > Parkings;
