@@ -62,11 +62,13 @@ class InputContainer;
 
 
 typedef shared_ptr<Node> node_ptr;
+typedef shared_ptr<TransitNode> transit_node_ptr;
 typedef shared_ptr<Link_Type> link_type_ptr;
 typedef shared_ptr<Area_Type> area_type_ptr;
 typedef shared_ptr<Route> route_ptr;
 typedef shared_ptr<Pattern> pattern_ptr;
 #pragma db value(node_ptr) type("INTEGER") not_null
+#pragma db value(transit_node_ptr) type("INTEGER") not_null
 #pragma db value(link_type_ptr) type("INTEGER") not_null
 #pragma db value(area_type_ptr) type("INTEGER") not_null
 #pragma db value(route_ptr) type("INTEGER") not_null
@@ -118,9 +120,8 @@ public:
 class InputContainer 
 {
 public:
-	std::map<int,node_ptr > Nodes;
-	//TRansit_Nodes
-
+	std::map<int, node_ptr > Nodes;
+	std::map<int, transit_node_ptr > TransitNodes;	
 	std::map<int,shared_ptr<Zone> > Zones;
 	std::map<int,shared_ptr<Link> > Links;
 	std::map<int,shared_ptr<Parking> > Parkings;
@@ -230,8 +231,8 @@ public:
 	void setAgency(const std::string& agency_) { agency = agency_; }
 	const std::string& getCode() const { return code; }
 	void setCode(const std::string& code_) { code = code_; }
-	const std::string& getName() const { return code; }
-	void setName(const std::string& code_) { code = code_; }
+	const std::string& getName() const { return name; }
+	void setName(const std::string& name_) { code = name_; }
 	const std::string& getDescription() const { return description; }
 	void setDescription(const std::string& description_) { description = description_; }
 	const int& getPrimaryKey() const { return node; }
@@ -614,8 +615,8 @@ public:
 	// Default Constructor
 	TransitLink() {}
 	//Constructor
-	TransitLink(int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, std::string TripsByDepTime_, std::string IndexAlongTripOfStopA_, std::string ArrivalSecondsAtA_, std::string DepartureSecondsFromA_, std::string ArrivalSecondsAtB_, std::string DepartureSecondsFromB_)
-	: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_), TripsByDepTime(TripsByDepTime_), IndexAlongTripOfStopA(IndexAlongTripOfStopA_), ArrivalSecondsAtA(ArrivalSecondsAtA_), DepartureSecondsFromA(DepartureSecondsFromA_), ArrivalSecondsAtB(ArrivalSecondsAtB_), DepartureSecondsFromB(DepartureSecondsFromB_)
+	TransitLink(int link_, std::string name_, transit_node_ptr node_a_, transit_node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, std::string TripsByDepTime_, std::string IndexAlongTripOfStopA_)
+	: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_), TripsByDepTime(TripsByDepTime_), IndexAlongTripOfStopA(IndexAlongTripOfStopA_)
 	{
 	}
 	//Accessors
@@ -623,12 +624,12 @@ public:
 	void setLink(const int& link_) { link = link_; }
 	const std::string& getName() const { return name; }
 	void setName(const std::string& name_) { name = name_; }
-	const node_ptr& getNode_A() const { return node_a; }
-	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
-	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
-	const node_ptr& getNode_B() const { return node_b; }
-	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }
+	const transit_node_ptr& getNode_A() const { return node_a; }
+	void setNode_A(const transit_node_ptr& node_a_) { node_a = node_a_; }
+	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.TransitNodes[node_a_]; }
+	const transit_node_ptr& getNode_B() const { return node_b; }
+	void setNode_B(const transit_node_ptr& node_b_) { node_b = node_b_; }
+	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.TransitNodes[node_b_]; }
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }
 	const shared_ptr<Link_Type>& getType() const { return type; }
@@ -645,15 +646,6 @@ public:
 	const std::string& getTripsByDepTime() const { return TripsByDepTime; }
 	void setTripsByDepTime(const std::string& TripsByDepTime_) { TripsByDepTime = TripsByDepTime_; }
 	const std::string& getIndexAlongTripOfStopA() const { return IndexAlongTripOfStopA; }
-	void setIndexAlongTripOfStopA(const std::string& IndexAlongTripOfStopA_) { IndexAlongTripOfStopA = IndexAlongTripOfStopA_; }
-	const std::string& getArrivalSecondsAtA() const { return ArrivalSecondsAtA; }
-	void setArrivalSecondsAtA(const std::string& ArrivalSecondsAtA_) { ArrivalSecondsAtA = ArrivalSecondsAtA_; }
-	const std::string& getDepartureSecondsFromA() const { return DepartureSecondsFromA; }
-	void setDepartureSecondsFromA(const std::string& DepartureSecondsFromA_) { DepartureSecondsFromA = DepartureSecondsFromA_; }
-	const std::string& getArrivalSecondsAtB() const { return ArrivalSecondsAtB; }
-	void setArrivalSecondsAtB(const std::string& ArrivalSecondsAtB_) { ArrivalSecondsAtB = ArrivalSecondsAtB_; }
-	const std::string& getDepartureSecondsFromB() const { return DepartureSecondsFromB; }
-	void setDepartureSecondsFromB(const std::string& DepartureSecondsFromB_) { DepartureSecondsFromB = DepartureSecondsFromB_; }
 
 	//Data Fields
 private:
@@ -662,8 +654,8 @@ private:
 	int link;
 #pragma db null
 	std::string name;
-	node_ptr node_a;
-	node_ptr node_b;
+	transit_node_ptr node_a;
+	transit_node_ptr node_b;
 	double length;
 	shared_ptr<Link_Type> type;
 	shared_ptr<Area_Type> area_type;
@@ -671,10 +663,6 @@ private:
 	double grade;
 	std::string TripsByDepTime;
 	std::string IndexAlongTripOfStopA;
-	std::string ArrivalSecondsAtA;
-	std::string DepartureSecondsFromA;
-	std::string ArrivalSecondsAtB;
-	std::string DepartureSecondsFromB;
 };
 
 #pragma db object //table("WalkLink")
@@ -684,7 +672,7 @@ public:
 	// Default Constructor
 	WalkLink() {}
 	//Constructor
-	WalkLink(int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_)
+	WalkLink(int link_, std::string name_, int node_a_, int node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_)
 		: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_)
 	{
 	}
@@ -693,12 +681,18 @@ public:
 	void setLink(const int& link_) { link = link_; }
 	const std::string& getName() const { return name; }
 	void setName(const std::string& name_) { name = name_; }
-	const node_ptr& getNode_A() const { return node_a; }
+
+	const int& getNode_A() const { return node_a; }
+	void setNode_A(const int& node_a_) { node_a = node_a_; }
+	const int& getNode_B() const { return node_b; }
+	void setNode_B(const int& node_b_) { node_b = node_b_; }
+
+	/*const node_ptr& getNode_A() const { return node_a; }
 	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
 	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
 	const node_ptr& getNode_B() const { return node_b; }
 	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }
+	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }*/
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }
 	const shared_ptr<Link_Type>& getType() const { return type; }
@@ -720,8 +714,8 @@ private:
 	int link;
 #pragma db null
 	std::string name;
-	node_ptr node_a;
-	node_ptr node_b;
+	int node_a;
+	int node_b;
 	double length;
 	shared_ptr<Link_Type> type;
 	shared_ptr<Area_Type> area_type;
@@ -778,17 +772,13 @@ public:
 	// Default Constructor
 	Pattern() {}
 	//Constructor
-	Pattern(int pattern_, std::string name_, std::string agency_, route_ptr route_, std::string stop_seq_string_)
-	: pattern(pattern_), name(name_), agency(agency_), route(route_), stop_seq_string(stop_seq_string_)
+	Pattern(int pattern_, route_ptr route_, std::string stop_seq_string_)
+	: pattern(pattern_), route(route_), stop_seq_string(stop_seq_string_)
 	{
 	}
 	//Accessors
 	const int& getPattern() const { return pattern; }
-	void setPattern(const int& pattern_) { pattern = pattern_; }
-	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { name = name_; }
-	const std::string& getAgency() const { return agency; }
-	void setAgency(const std::string& agency_) { agency = agency_; }
+	void setPattern(const int& pattern_) { pattern = pattern_; }	
 	const route_ptr& getRoute() const { return route; }
 	void setRoute(const route_ptr& route_) { route = route_; }
 	void setRoute(const int& route_, InputContainer& container) { route = container.Routes[route_]; }
@@ -802,8 +792,6 @@ private:
 #pragma db id
 	int pattern;
 #pragma db null
-	std::string name;
-	std::string agency;
 	route_ptr route;
 	std::string stop_seq_string;
 };
@@ -815,17 +803,13 @@ public:
 	// Default Constructor
 	TransitVehTrip() {}
 	//Constructor
-	TransitVehTrip(int trip_, std::string name_, std::string agency_, int direction_,	route_ptr route_, pattern_ptr pattern_,	std::string seq_string_, std::string arrivalseconds_string_, std::string departureseconds_string_)
-	: trip(trip_), name(name_), agency(agency_), direction(direction_), route(route_), pattern(pattern_), seq_string(seq_string_), arrivalseconds_string(arrivalseconds_string_), departureseconds_string(departureseconds_string_)
+	TransitVehTrip(int trip_, int direction_,	route_ptr route_, pattern_ptr pattern_,	std::string seq_string_, std::string arrivalseconds_string_, std::string departureseconds_string_)
+	: trip(trip_), direction(direction_), route(route_), pattern(pattern_), seq_string(seq_string_), arrivalseconds_string(arrivalseconds_string_), departureseconds_string(departureseconds_string_)
 	{
 	}
 	//Accessors
 	const int& getTrip() const { return trip; }
-	void setTrip(const int& trip_) { trip = trip_; }
-	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { name = name_; }
-	const std::string& getAgency() const { return agency; }
-	void setAgency(const std::string& agency_) { agency = agency_; }
+	void setTrip(const int& trip_) { trip = trip_; }	
 	const int& getDirection() const { return direction; }
 	void setDirection(const int& direction_) { direction = direction_; }
 	const route_ptr& getRoute() const { return route; }
@@ -848,8 +832,6 @@ private:
 #pragma db id
 	int trip;
 #pragma db null
-	std::string name;
-	std::string agency;
 	int	direction;
 	route_ptr route;
 	pattern_ptr pattern;

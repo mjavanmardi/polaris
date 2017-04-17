@@ -19,8 +19,6 @@ namespace Transit_Pattern_Components
 
 			accessor(internal_id, NONE, NONE);
 			accessor(uuid, NONE, NONE);
-			accessor(name, NONE, NONE);
-			accessor(agency, NONE, NONE);
 			accessor(route, NONE, NONE);
 			accessor(pattern_stops, NONE, NONE);
 			accessor(pattern_links, NONE, NONE);

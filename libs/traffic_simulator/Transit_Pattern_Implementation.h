@@ -29,8 +29,6 @@ namespace Transit_Pattern_Components
 
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(std::string, name, NONE, NONE);
-			m_data(std::string, agency, NONE, NONE);
 			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::transit_route_type, route, NONE, NONE);
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stop, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, pattern_link, NONE, NONE);
