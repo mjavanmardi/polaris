@@ -19,8 +19,6 @@ namespace Transit_Vehicle_Trip_Components
 
 			accessor(internal_id, NONE, NONE);
 			accessor(uuid, NONE, NONE);
-			accessor(name, NONE, NONE);
-			accessor(agency, NONE, NONE);
 			accessor(direction, NONE, NONE);
 			accessor(route, NONE, NONE);
 			accessor(pattern, NONE, NONE);
