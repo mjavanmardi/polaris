@@ -221,6 +221,9 @@ namespace Network_Components
 				using namespace odb;
 				using namespace polaris::io;
 
+				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
+				
 				typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_routes_container), _Transit_Route_Interface*> _Transit_Routes_Container_Interface;
 
@@ -255,6 +258,16 @@ namespace Network_Components
 					transit_pattern->template internal_id<int>(counter);
 					transit_pattern->template route<_Transit_Route_Interface*>((_Transit_Route_Interface*)net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()->getRoute()]);
 
+					const string& stop_seq_string = db_itr->getStop_seq_string();
+					std::istringstream ss(stop_seq_string);
+					std::string sub_string;
+
+					while (std::getline(ss, sub_string, ':'))
+					{					
+						_Intersection_Interface* pattern_stop = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(sub_string)];
+						transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().push_back(pattern_stop);
+					}
+
 					net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()] = transit_pattern;
 					transit_patterns_container_ptr->push_back(transit_pattern);
 					//DO the stop sequence!
@@ -265,6 +278,9 @@ namespace Network_Components
 			{
 				using namespace odb;
 				using namespace polaris::io;
+
+				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
 
 				typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_routes_container), _Transit_Route_Interface*> _Transit_Routes_Container_Interface;
@@ -302,12 +318,42 @@ namespace Network_Components
 					transit_vehicle_trip->template uuid<int>(db_itr->getTrip());
 					transit_vehicle_trip->template internal_id<int>(counter);
 					transit_vehicle_trip->template direction<int>(db_itr->getDirection());
-					transit_vehicle_trip->template route<_Transit_Route_Interface*>((_Transit_Route_Interface*)net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()->getRoute()]);
 					transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>((_Transit_Pattern_Interface*)net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()->getPattern()]);
 
+					const string& arrivalseconds_string = db_itr->getArrivalseconds_string();
+					std::stringstream ss(arrivalseconds_string);
+					std::string sub_string;
+					int myTime;
+					int mySeq;
+
+					while (std::getline(ss, sub_string, ':'))
+					{
+						myTime = stoi(sub_string);
+						transit_vehicle_trip->template arrival_seconds<std::vector<int>&>().push_back(myTime);
+					}
+
+					const string& departureseconds_string = db_itr->getDepartureseconds_string();
+					ss.clear();
+					ss.str(departureseconds_string);
+
+					while (std::getline(ss, sub_string, ':'))
+					{
+						myTime = stoi(sub_string);
+						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
+					}
+
+					const string& seq_string = db_itr->getSeq_string();
+					ss.clear();
+					ss.str(seq_string);
+
+					while (std::getline(ss, sub_string, ':'))
+					{
+						mySeq = stoi(sub_string);
+						transit_vehicle_trip->template sequence_number<std::vector<int>&>().push_back(mySeq);
+					}
+
 					net_io_maps.transit_vehicle_trip_id_to_ptr[db_itr->getTrip()] = transit_vehicle_trip;
-					transit_vehicle_trips_container_ptr->push_back(transit_vehicle_trip);
-					//DO the stop sequence!
+					transit_vehicle_trips_container_ptr->push_back(transit_vehicle_trip);					
 				}
 			}
 
@@ -341,6 +387,9 @@ namespace Network_Components
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_type;
+
+				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
 				Types::Link_ID_Dir link_id_dir;
 				
@@ -1025,6 +1074,27 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_transit_links<_Links_Container_Interface&>().push_back(link);
 						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_transit_links<_Links_Container_Interface&>().push_back(link);
 
+						const string& TripsByDepTime = db_itr->getTripsByDepTime();
+						std::istringstream ss(TripsByDepTime);
+						std::string sub_string;
+						int mySeq;
+
+						while (std::getline(ss, sub_string, ':'))
+						{
+							_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[stoi(sub_string)];
+							link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
+						}
+
+						const string& IndexAlongTripOfStopA = db_itr->getIndexAlongTripOfStopA();
+						ss.clear();
+						ss.str(IndexAlongTripOfStopA);
+
+						while (std::getline(ss, sub_string, ':'))
+						{
+							mySeq = stoi(sub_string);
+							link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
+						}
+						
 						links_container_ptr->push_back(link);
 
 						typename id_to_links_type::iterator links_itr;
