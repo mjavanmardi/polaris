@@ -642,10 +642,11 @@ public:
 	void setUse(const std::string& use_) { use = use_; }
 	const double& getGrade() const { return grade; }
 	void setGrade(const double& grade_) { grade = grade_; }
-	const int& getPrimaryKey() const { return link; }
 	const std::string& getTripsByDepTime() const { return TripsByDepTime; }
 	void setTripsByDepTime(const std::string& TripsByDepTime_) { TripsByDepTime = TripsByDepTime_; }
 	const std::string& getIndexAlongTripOfStopA() const { return IndexAlongTripOfStopA; }
+	void setIndexAlongTripOfStopA(const std::string& IndexAlongTripOfStopA_) { IndexAlongTripOfStopA = IndexAlongTripOfStopA_; }
+	const int& getPrimaryKey() const { return link; }
 
 	//Data Fields
 private:

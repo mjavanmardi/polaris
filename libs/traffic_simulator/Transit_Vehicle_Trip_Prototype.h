@@ -20,11 +20,10 @@ namespace Transit_Vehicle_Trip_Components
 			accessor(internal_id, NONE, NONE);
 			accessor(uuid, NONE, NONE);
 			accessor(direction, NONE, NONE);
-			accessor(route, NONE, NONE);
 			accessor(pattern, NONE, NONE);
 			accessor(sequence_number, NONE, NONE);
 			accessor(arrival_seconds, NONE, NONE);
-			accessor(departure_seconds, NONE, NONE);		
+			accessor(departure_seconds, NONE, NONE);
 		};
 
 

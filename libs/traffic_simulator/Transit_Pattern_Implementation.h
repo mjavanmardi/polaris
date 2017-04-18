@@ -1,5 +1,7 @@
 #pragma once
 #include "Transit_Pattern_Prototype.h"
+#include "Network_DB_Reader_Implementations.h"
+#include "Intersection_Implementation.h"
 #include "../repository/RNG_Implementations.h"
 
 namespace Transit_Pattern_Components
@@ -30,13 +32,12 @@ namespace Transit_Pattern_Components
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::transit_route_type, route, NONE, NONE);
-			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stop, NONE, NONE);
+			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stops, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, pattern_link, NONE, NONE);
 			
-
-			typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;
-			typedef Intersection_Components::Prototypes::Intersection<type_of(pattern_stop)> _Intersection_Interface; 
-			typedef Link_Components::Prototypes::Link<type_of(pattern_link)> _Link_Interface;
+			/*typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<type_of(pattern_stops)> _Intersection_Interface; 
+			typedef Link_Components::Prototypes::Link<type_of(pattern_link)> _Link_Interface;*/
 			//typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename  type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
 			//typedef  Back_Insertion_Sequence<type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
