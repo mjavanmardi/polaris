@@ -148,11 +148,11 @@ namespace Network_Components
 					intersection->template code<std::string>(db_itr->getCode());
 					intersection->template name<std::string>(db_itr->getName());
 					intersection->template description<std::string>(db_itr->getDescription());
-					//intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
+					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 
 					net_io_maps.intersection_id_to_ptr[db_itr->getNode()] = intersection;
 
-					/*if (_scenario_reference->template intersection_control_flag<int>() == 0)
+					if (_scenario_reference->template intersection_control_flag<int>() == 0)
 					{
 						intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
 
@@ -166,7 +166,7 @@ namespace Network_Components
 						control_plan->template ending_time<int>(24 * 60 * 60);
 						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
-					}*/
+					}
 					intersections_container_ptr->push_back(intersection);
 				}
 			}
@@ -265,7 +265,16 @@ namespace Network_Components
 					while (std::getline(ss, sub_string, ':'))
 					{					
 						_Intersection_Interface* pattern_stop = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(sub_string)];
-						transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().push_back(pattern_stop);
+						if (pattern_stop)
+						{
+							transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().push_back(pattern_stop);
+						}
+						else
+						{
+							cout << "The pattern " << transit_pattern->_uuid << " points to a non-existing stop: " << sub_string << endl;
+							system("pause");
+							exit(0);
+						}
 					}
 
 					net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()] = transit_pattern;
@@ -351,6 +360,80 @@ namespace Network_Components
 						mySeq = stoi(sub_string);
 						transit_vehicle_trip->template sequence_number<std::vector<int>&>().push_back(mySeq);
 					}
+
+					if (transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_sequence_number.size() ||
+						transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_departure_seconds.size() ||
+						transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_pattern->_pattern_stops.size()
+						)
+					{
+						cout << "Inconsistency between at least two of the following:" << endl;
+						cout << "Number of stops of the pattern; number of arrival times, departure times, or GTFS sequence numbers of the trip!" << endl;
+						cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
+						cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
+						cout << "Stop sequence size of the pattern: " << transit_vehicle_trip->_pattern->_pattern_stops.size() << endl;
+						cout << "Arrival times sequence size of the trip: " << transit_vehicle_trip->_arrival_seconds.size() << endl;
+						cout << "Departure times sequence size of the trip: " << transit_vehicle_trip->_departure_seconds.size() << endl;
+						cout << "GTFS sequence size of the trip: " << transit_vehicle_trip->_sequence_number.size() << endl;
+						system("pause");
+						exit(0);
+					}
+					
+					int my_itr = 0;
+					for (auto itr = transit_vehicle_trip->_arrival_seconds.begin(); itr != transit_vehicle_trip->_arrival_seconds.end(); ++itr)
+					{
+						if (transit_vehicle_trip->_arrival_seconds.at(my_itr) > transit_vehicle_trip->_departure_seconds.at(my_itr))
+						{
+							cout << "Departure before arrival error!" << endl;
+							cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
+							cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
+							cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
+							cout << "Internal sequence number (0 start): " << my_itr << endl;
+							cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
+							cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
+							cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr) << endl;
+							system("pause");
+							exit(0);
+						}
+
+						if (my_itr + 1 < transit_vehicle_trip->_arrival_seconds.size())
+						{
+							if (transit_vehicle_trip->_arrival_seconds.at(my_itr) >= transit_vehicle_trip->_arrival_seconds.at(my_itr+1))
+							{
+								cout << "Arrival sequence timing error!" << endl;
+								cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
+								cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
+								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
+								cout << "Internal sequence number (0 start): " << my_itr << endl;
+								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
+								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
+								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr+1) << endl;
+								cout << "Internal sequence number (0 start): " << my_itr+1 << endl;
+								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr+1)->_uuid << endl;
+								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr+1) << endl;
+								system("pause");
+								exit(0);
+							}
+
+							if (transit_vehicle_trip->_departure_seconds.at(my_itr) >= transit_vehicle_trip->_departure_seconds.at(my_itr+1))
+							{
+								cout << "Departure sequence timing error!" << endl;
+								cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
+								cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
+								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
+								cout << "Internal sequence number (0 start): " << my_itr << endl;
+								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
+								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr) << endl;
+								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr + 1) << endl;
+								cout << "Internal sequence number (0 start): " << my_itr + 1 << endl;
+								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr + 1)->_uuid << endl;
+								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr + 1) << endl;
+								system("pause");
+								exit(0);
+							}
+						}
+						++my_itr;
+					}
+
 
 					net_io_maps.transit_vehicle_trip_id_to_ptr[db_itr->getTrip()] = transit_vehicle_trip;
 					transit_vehicle_trips_container_ptr->push_back(transit_vehicle_trip);					
@@ -953,7 +1036,7 @@ namespace Network_Components
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
 						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_walk_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template outbound_walk_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_walk_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
 
@@ -1082,7 +1165,18 @@ namespace Network_Components
 						while (std::getline(ss, sub_string, ':'))
 						{
 							_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[stoi(sub_string)];
-							link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
+
+							if (link_trip)
+							{
+								link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
+							}
+							else
+							{
+								cout << "The link " << link->_dbid << " points to a non-existing trip: " << sub_string << endl;
+								system("pause");
+								exit(0);
+							}
+
 						}
 
 						const string& IndexAlongTripOfStopA = db_itr->getIndexAlongTripOfStopA();
@@ -1093,6 +1187,68 @@ namespace Network_Components
 						{
 							mySeq = stoi(sub_string);
 							link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
+						}
+
+						if ( link->_trips_by_dep_time.size() != link->_index_along_trip_at_upstream_node.size() )
+						{
+							cout << "Inconsistency between number of trips and trip indices on a link!" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Trip sequence size of the link: " << link->_trips_by_dep_time.size() << endl;
+							cout << "Trip sequence indices size of the trip: " << link->_index_along_trip_at_upstream_node.size() << endl;
+							system("pause");
+							exit(0);
+						}
+
+						int my_itr = 0;
+						for (auto itr = link->_trips_by_dep_time.begin(); itr != link->_trips_by_dep_time.end(); ++itr)
+						{
+							int temp_seq = link->_index_along_trip_at_upstream_node.at(my_itr);
+
+							int temp_stop1 = link->_upstream_intersection->_uuid;
+							int temp_stop2 = link->_trips_by_dep_time.at(my_itr)->_pattern->_pattern_stops.at(temp_seq)->_uuid;
+							int temp_trip = link->_trips_by_dep_time.at(my_itr)->_uuid;
+							int temp_pattern = link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid;
+
+							if (temp_stop1 != temp_stop2)
+							{
+								cout << "Link's upstream node does not match the stop ID of the trip!" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Trip's sequence by departure time (0 start) on link: " << my_itr << endl;
+								cout << "Trip ID: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
+								cout << "Pattern ID: " << link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid << endl;
+								cout << "Claimed sequence number of the upstream node along the trip: " << temp_seq << endl;
+								cout << "Link's upstream node ID: " << temp_stop1 << endl;
+								cout << "Node ID along the trip at " << temp_seq << " is: " << temp_stop2 << endl;
+								system("pause");
+								exit(0);
+							}	
+
+							if (my_itr + 1 < link->_trips_by_dep_time.size())
+							{
+								
+								int temp_seq1 = link->_index_along_trip_at_upstream_node.at(my_itr);
+								int temp_seq2 = link->_index_along_trip_at_upstream_node.at(my_itr + 1);
+
+								int temp_time1 = link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1);
+								int temp_time2 = link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2);
+								
+								if (link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1) > link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2))
+								{
+									cout << "Trips on the link are not ordered by departure time!" << endl;
+									cout << "Link ID: " << link->_dbid << endl;
+									cout << "Trip ID_1: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
+									cout << "Trip ID_2: " << link->_trips_by_dep_time.at(my_itr + 1)->_uuid << endl;
+									cout << "Trip 1's sequence by departure time (0 start) on link: " << my_itr << endl;
+									cout << "Trip 2's sequence by departure time (0 start) on link: " << my_itr + 1 << endl;
+									cout << "Sequence number of the upstream node along the trip 1: " << temp_seq1 << endl;
+									cout << "Sequence number of the upstream node along the trip 2: " << temp_seq2 << endl;
+									cout << "Departure time from the upstream node of trip 1: " << temp_time1 << endl;
+									cout << "Departure time from the upstream node of trip 2: " << temp_time2 << endl;
+									system("pause");
+									exit(0);
+								}	
+							}
+							++my_itr;
 						}
 						
 						links_container_ptr->push_back(link);
