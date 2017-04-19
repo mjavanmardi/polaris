@@ -244,6 +244,35 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
+bool InitializeParameters()
+{
+	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Mode_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::Detroit_Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Detroit_Mode_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::ADAPTS_Destination_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize ADAPTS_Destination_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::Telecommute_Choice_Implementation<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Telecommute_Choice_Implementation parameters." << endl;
+		return false;
+	}
+
+	return true;
+}
+
 int main(int argc,char** argv)
 {
 	#ifdef MEM_DEBUG
@@ -324,29 +353,8 @@ int main(int argc,char** argv)
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
-	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
-	{
-		cout << "ERROR: Unable to initialize Mode_Choice_Option parameters." << endl;
+	if (!InitializeParameters())
 		return 1;
-	}
-
-	if (!Person_Components::Implementations::Detroit_Mode_Choice_Option<MasterType>::static_initialize())
-	{
-		cout << "ERROR: Unable to initialize Detroit_Mode_Choice_Option parameters." << endl;
-		return 1;
-	}
-
-	if (!Person_Components::Implementations::ADAPTS_Destination_Choice_Option<MasterType>::static_initialize())
-	{
-		cout << "ERROR: Unable to initialize ADAPTS_Destination_Choice_Option parameters." << endl;
-		return 1;
-	}
-	
-	if (!Person_Components::Implementations::Telecommute_Choice_Implementation<MasterType>::static_initialize())
-	{
-		cout << "ERROR: Unable to initialize Telecommute_Choice_Implementation parameters." << endl;
-		return 1;
-	}
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
