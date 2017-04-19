@@ -15,7 +15,7 @@ namespace Household_Components
 		//==================================================================================
 		/// Person Agent classes
 		//----------------------------------------------------------------------------------
-		implementation struct Household_Implementation : public Polaris_Component<MasterType,INHERIT(Household_Implementation),Data_Object>
+		implementation struct Household_Implementation : public Polaris_Component<MasterType,INHERIT(Household_Implementation),Execution_Object>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Household_Implementation),Data_Object>::Component_Type ComponentType;
@@ -46,6 +46,7 @@ namespace Household_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Person_Components::Prototypes::Person<get_component_type(Persons_Container_type)> person_interface;
+			typedef Person_Components::Prototypes::Person_Properties<typename person_interface::get_type_of(Static_Properties)> person_properties_interface;
 			typedef Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container)> zones_container_interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;			
 			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
@@ -74,21 +75,26 @@ namespace Household_Components
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
 
+				// Initialize all of the persons in the person container
+				long perid = 0;
+				for (typename Persons_Container_type::iterator p_itr = _Persons_Container.begin(); p_itr != _Persons_Container.end(); ++p_itr, ++perid)
+				{
+					person_interface* person = static_cast<person_interface*>(*p_itr);
+					person->Initialize(perid, this->_home_synthesis_zone, this->_network_reference, this->_scenario_reference);
+				}
+
 				
 			}
 			template<typename IdType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
-				this->Initialize<IdType>(id);
 				this->network_reference<NetworkRefType>(network_ref);
 				this->scenario_reference<ScenarioRefType>(scenario_ref);
-
+				this->Initialize<IdType>(id);
 			}
 			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
-				this->Initialize<IdType,NetworkRefType,ScenarioRefType>(id,network_ref,scenario_ref);
 				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
-
-				this->_Vehicle_Chooser->Select_Vehicles<SynthesisZoneType>(home_zone);
+				this->Initialize<IdType,NetworkRefType,ScenarioRefType>(id,network_ref,scenario_ref);		
 			}
 
 			template<typename TargetType> void Set_Home_Location()
@@ -103,6 +109,25 @@ namespace Household_Components
 					if ((*v_itr)->available()) return static_cast<VehicleItfType>(*v_itr);
 				}
 				return nullptr;
+			}
+
+			template<typename PersonItfType> PersonItfType Get_Primary_Driver()
+			{
+				person_interface* primary = static_cast<person_interface*>(*(this->_Persons_Container.begin()));
+
+				for (Persons_Container_type::iterator p_itr = this->_Persons_Container.begin(); p_itr != this->_Persons_Container.end(); ++p_itr)
+				{
+					person_interface* p = static_cast<person_interface*>(*p_itr);
+					person_properties_interface* properties = p->Static_Properties<person_properties_interface*>();
+
+					// find the driver with the longest work travel time to make the primary driver (or if no driver has a longest work trip, find the oldest driver)
+					if (properties->Age<int>() >= 16 && properties->Journey_To_Work_Travel_Time<Time_Minutes>() >= primary->Static_Properties<person_properties_interface*>()->Journey_To_Work_Travel_Time<Time_Minutes>())
+					{
+						if (properties->Age<int>() > primary->Static_Properties<person_properties_interface*>()->Age<int>() && properties->Journey_To_Work_Travel_Time<Time_Minutes>() == primary->Static_Properties<person_properties_interface*>()->Journey_To_Work_Travel_Time<Time_Minutes>()) primary = p;
+						else if (properties->Journey_To_Work_Travel_Time<Time_Minutes>() >= primary->Static_Properties<person_properties_interface*>()->Journey_To_Work_Travel_Time<Time_Minutes>()) primary = p;
+					}
+				}
+				return static_cast<PersonItfType>(primary);
 			}
 
 			// return the estimated iteration when a vehicle will next be available

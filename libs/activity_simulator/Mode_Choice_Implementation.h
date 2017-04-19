@@ -7,6 +7,7 @@ namespace Person_Components
 {
 	namespace Implementations
 	{
+		#pragma region ******************** OLD CMAP-version MODE CHOICE CODE - DEPRECATED **************************
 		//==================================================================================
 		/// Mode Choice Planning classes
 		//----------------------------------------------------------------------------------
@@ -119,13 +120,13 @@ namespace Person_Components
 			//	_Zone_Interface* origin_zone = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
 			//	Activity_Plan* current_activity = _Mode_Chooser->current_activity<Activity_Plan*>();
 			//	Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-
-
+			//
+			//
 			//	// account for any VOT changes for this individual (i.e. from CAVS)
 			//	//person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 			//	//person_properties_itf* properties = _Parent_Person->template Properties<person_properties_itf*>();
 			//	float vot_change = properties->template Value_of_Travel_Time_Adjustment<float>();
-
+			//
 			//	//_Zone_Interface* origin_zone = _previous_location->template zone<_Zone_Interface*>();
 			//	float ivtt_dif = origin_zone->template avg_ttime_auto_to_transit_accessible_zones<Time_Minutes>() * vot_change - origin_zone->template avg_ttime_transit<Time_Minutes>();
 			//	float wait_dif = -5.0; // assumed wait time of 5 minutes for transit trips
@@ -133,7 +134,7 @@ namespace Person_Components
 			//	float walk_time_dif = -5.0; // assumed average walk time of 5 minutes for transit trips, given walk speed of 3 mph and max distance of 0.5 miles
 			//	float cost_dif = 0;
 			//	float utility = -1.0 * FLT_MAX;
-
+			//
 			//	// modify the values if no auto in the household (i.e. auto mode becomes like carpool with wait times, walk times, transfer time)
 			//	if (!_Mode_Chooser->auto_available<bool>())
 			//	{
@@ -141,14 +142,14 @@ namespace Person_Components
 			//		transfer_dif += 2.0;
 			//		walk_time_dif += 2.0;
 			//	}
-
+			//
 			//	// If the transit mode is  accessible from the current zone, calculate utility, otherwise utility is flt_max		
 			//	if (origin_zone->template avg_ttime_transit<Time_Days>() < 1.0)
 			//		//%%%RLW utility = this->template Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
 			//		utility = this->Calculate_Utility_Value(ivtt_dif, wait_dif, transfer_dif, walk_time_dif, cost_dif);
 			//	else
 			//		return utility;
-
+			//
 			//	if (utility > 100.0) THROW_WARNING("WARNING: utility > 200.0 will cause numeric overflow, possible misspecification in utility function for mode choice (ivtt,wait,transfer,walk,cost): "<<ivtt_dif<<","<<wait_dif<<","<<transfer_dif<<","<<walk_time_dif<<","<<cost_dif)
 			//	
 			//	//cout << "O/D=unknown:"<<_previous_location->zone<_Zone_Interface*>()->uuid<int>() <<"/xxx";
@@ -156,7 +157,7 @@ namespace Person_Components
 			//	//cout <<",Transit_wait:" << -1.0* wait_dif << ",transfer_time:"<<0;
 			//	//cout <<",Auto_cost:" << 0;
 			//	//cout <<",Transit_fare:" << 0 << ",utility:"<< utility << endl;
-
+			//
 			//	// Otherwise return the transit utility based on Zonal average characteristics
 			//	return utility;			
 			//}
@@ -773,10 +774,11 @@ namespace Person_Components
 			if (dist < max_walk_distance) return true;
 			else return false;
 		}
-
+#pragma endregion
 
 		//======= NEW NESTED LOGIT IMPLEMENTATION ===============================================
 
+		// DETROIT VERSION
 		implementation struct Detroit_Mode_Choice_Option : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType, INHERIT(Detroit_Mode_Choice_Option)>
 		{
 			// Tag as Implementation
@@ -796,6 +798,9 @@ namespace Person_Components
 				this->_to_CBD = obj->_to_CBD;
 
 			}
+
+			static void static_initializer()
+			{}
 
 			// data members
 			//m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
@@ -962,7 +967,7 @@ namespace Person_Components
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)		utility = _NHB_ASC_N_AUTO * ONE + _NHB_B_over65_pass * AGE65 + _NHB_B_cbd_pa * IN_CBD + _NHB_B_notalone_pass * NOTALONE + _NHB_ASC_PASS * ONE + _NHB_B_vehavail_pass * VEHPERLIC + _NHB_B_cost * PASS_COST + _NHB_B_cost_minc * PASS_COST_M + _NHB_B_cost_hinc * PASS_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)	utility = _NHB_ASC_TAXI * ONE + _NHB_ASC_N_AUTO * ONE + _NHB_B_cost * TAXI_COST + _NHB_B_vehavail_taxi * VEHPERLIC + _NHB_B_cost_minc * TAXI_COST_M + _NHB_B_male_taxi * GENDER + _NHB_B_cost_hinc * TAXI_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;
-						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_dens_walk * POP_DENS + _NHB_B_ttime_walk * WALK_TTr + _NHB_ASC_WALK * ONE + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
+						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_dens_walk * POP_DENS + _NHB_B_ttime_walk * WALK_TTr + ComponentType::_NHB_ASC_WALK * ONE + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
 						else THROW_EXCEPTION("UNKNOWN MODE TYPE.")
 					}
 					//TODO: implement heuristics for tour-based restrictions on travel mode - placeholder here just reapplies the NHB model
@@ -991,7 +996,7 @@ namespace Person_Components
 			}
 
 		};
-		// INITIALIZE MODE CHOICE MODEL STATIC PARAMETERS
+		
 		#pragma region Choice option parameters	
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 2.0;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.8;
@@ -1089,10 +1094,6 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cbd_nm = 0.0856;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_NEST_AUTO = 0.50251256281407;
 		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_NEST_NM = 0.99009900990099;
-
-
-
-
 		#pragma endregion
 
 		implementation struct Detroit_Mode_Chooser_Implementation : public Polaris_Component<MasterType, INHERIT(Detroit_Mode_Chooser_Implementation), Data_Object>
@@ -1673,6 +1674,35 @@ namespace Person_Components
 				cout << endl;
 
 				UNLOCK(this->_update_lock);
+			}
+		};
+
+		// CHICAGO VERSION
+		implementation struct Chicago_Mode_Choice_Option : public Detroit_Mode_Choice_Option<MasterType, INHERIT(Chicago_Mode_Choice_Option)>
+		{
+			typedef Detroit_Mode_Choice_Option<MasterType, INHERIT(Chicago_Mode_Choice_Option)> BaseType;
+
+			static void static_initializer()
+			{
+				BaseType::_HBW_ASC_WALK = -0.231;
+				BaseType::_HBW_ASC_TRAN = 0.0;
+				BaseType::_HBW_ASC_BIKE = 0;
+
+				BaseType::_HBO_ASC_WALK = 0.0142;
+				BaseType::_HBO_ASC_TRAN = 0.0;
+				BaseType::_HBO_ASC_BIKE = 0;
+
+				BaseType::_NHB_ASC_WALK = -0.134;
+				BaseType::_NHB_ASC_TRAN = 0.0;
+				BaseType::_NHB_ASC_BIKE = 0;
+
+				BaseType::_HBW_B_ttime_tran = -0.0277;
+				BaseType::_HBO_B_ttime_tran = 0;
+				BaseType::_NHB_B_ttime_tran = -0.00167;
+
+				BaseType::_HBW_B_waittime_tran = -0.06;
+				BaseType::_HBO_B_waittime_tran = -0.03;
+				BaseType::_NHB_B_waittime_tran = -0.15;
 			}
 		};
 	}

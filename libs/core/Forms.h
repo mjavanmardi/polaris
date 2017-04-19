@@ -60,6 +60,8 @@ namespace polaris
 	#define define_implementation template<typename MasterType,typename InheritanceList>
 	#define implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST>
 
+	#define define_static_member_variable(IMPL_NAME, VARIABLE_NAME) template<typename MasterType, typename InheritanceList> typename IMPL_NAME<MasterType, InheritanceList>::type_of(VARIABLE_NAME) IMPL_NAME<MasterType, InheritanceList>::_##VARIABLE_NAME
+	
 	///----------------------------------------------------------------------------------------------------
 	/// declare_event - header for a basic event feature
 	///----------------------------------------------------------------------------------------------------

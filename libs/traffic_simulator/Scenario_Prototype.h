@@ -52,16 +52,37 @@ namespace Scenario_Components
 
 			accessor(path_calculation_interval_length, NONE, NONE);
 
+			//=========================================================
+			// CAV PARAMETERS
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
 			accessor(simulate_cacc, NONE, NONE);
-			
 			accessor(cav_market_penetration, NONE, NONE);
 			accessor(cav_vott_adjustment, NONE, NONE);
+			accessor(automation_cost, NONE, NONE);
+			accessor(vehicle_techchoice_beta_past_crashes, NONE, NONE);
+			accessor(vehicle_techchoice_beta_smartphone, NONE, NONE);
+			accessor(vehicle_techchoice_beta_carshare, NONE, NONE);
+			accessor(vehicle_techchoice_beta_rideshare, NONE, NONE);
+			accessor(vehicle_techchoice_beta_drive_alone_work, NONE, NONE);
+			accessor(vehicle_techchoice_beta_drive_alone_other, NONE, NONE);
+			accessor(vehicle_techchoice_beta_ln_vmt, NONE, NONE);
+			accessor(vehicle_techchoice_beta_work_dist, NONE, NONE);
+			accessor(vehicle_techchoice_beta_gender, NONE, NONE);
+			accessor(vehicle_techchoice_beta_license, NONE, NONE);
+			accessor(vehicle_techchoice_beta_num_children, NONE, NONE);
+			accessor(vehicle_techchoice_beta_age, NONE, NONE);
+			accessor(vehicle_techchoice_beta_empl_density, NONE, NONE);
+			accessor(vehicle_techchoice_beta_hhincome, NONE, NONE);
+			accessor(vehicle_techchoice_calibration, NONE, NONE);
+			accessor(vehicle_techchoice_mu_1, NONE, NONE);
+			accessor(vehicle_techchoice_mu_2, NONE, NONE);
+			accessor(vehicle_techchoice_mu_3, NONE, NONE);
+			
 
 			accessor(current_day_index, NONE, NONE);
-			
+
 			/// If set to true, only the integrated vehicles are counted for the in-network output
 			accessor(count_integrated_in_network_vehicles_only, NONE, NONE);
 
@@ -146,6 +167,7 @@ namespace Scenario_Components
 			accessor(read_population_from_database, NONE, NONE);	// run model with pre-existing synthetic population *must reference <db>-Popsyn.sqlite database
 			accessor(activity_start_time_model_file_name,NONE,NONE);
 
+			accessor(flexible_work_percentage, NONE, NONE);
 			//===============================================
 			// Vehicle Choice parameters
 			//-----------------------------------------------
@@ -424,6 +446,25 @@ namespace Scenario_Components
 				// Vehicle Choice Model parameters
 				// Start time model parameters
 				if (cfgReader.getParameter("vehicle_distribution_file_name", this->template vehicle_distribution_file_name<string*>()) != PARAMETER_FOUND) this->template vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
+				if (cfgReader.getParameter("automation_cost", this->template automation_cost<double*>()) != PARAMETER_FOUND) this->template automation_cost<double>(FLT_MAX);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_past_crashes", this->template vehicle_techchoice_beta_past_crashes<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_past_crashes<double>(0.309);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_smartphone", this->template vehicle_techchoice_beta_smartphone<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_smartphone<double>(0.0);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_carshare", this->template vehicle_techchoice_beta_carshare<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_carshare<double>(-1.149);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_rideshare", this->template vehicle_techchoice_beta_rideshare<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_rideshare<double>(-1.4);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_drive_alone_work", this->template vehicle_techchoice_beta_drive_alone_work<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_drive_alone_work<double>(0.616);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_drive_alone_other", this->template vehicle_techchoice_beta_drive_alone_other<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_drive_alone_other<double>(0.833);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_ln_vmt", this->template vehicle_techchoice_beta_ln_vmt<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_ln_vmt<double>(0.329);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_work_dist", this->template vehicle_techchoice_beta_work_dist<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_work_dist<double>(0.087);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_gender", this->template vehicle_techchoice_beta_gender<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_gender<double>(0.442);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_license", this->template vehicle_techchoice_beta_license<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_license<double>(-1.159);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_num_children", this->template vehicle_techchoice_beta_num_children<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_num_children<double>(0.341);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_age", this->template vehicle_techchoice_beta_age<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_age<double>(-0.039);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_empl_density", this->template vehicle_techchoice_beta_empl_density<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_empl_density<double>(-0.000337);
+				if (cfgReader.getParameter("vehicle_techchoice_beta_hhincome", this->template vehicle_techchoice_beta_hhincome<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_hhincome<double>(0.00000729);
+				if (cfgReader.getParameter("vehicle_techchoice_calibration", this->template vehicle_techchoice_calibration<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_calibration<double>(-5.0);
+				if (cfgReader.getParameter("vehicle_techchoice_mu_1", this->template vehicle_techchoice_mu_1<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_1<double>(-7.401);
+				if (cfgReader.getParameter("vehicle_techchoice_mu_2", this->template vehicle_techchoice_mu_2<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_2<double>(-6.514);
+				if (cfgReader.getParameter("vehicle_techchoice_mu_3", this->template vehicle_techchoice_mu_3<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_3<double>(-5.503);
 
 
 				//=======================================================================================================================================================
@@ -523,8 +564,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
 				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
 				if (cfgReader.getParameter("simulate_cacc", simulate_cacc<bool*>()) != PARAMETER_FOUND)simulate_cacc<bool>(false);
-
-
+				
+				if (cfgReader.getParameter("flexible_work_percentage", flexible_work_percentage<double*>()) != PARAMETER_FOUND)flexible_work_percentage<double>(0.12);
 
 				//===============================================
 				// Vehicle trajectory tracking parameters

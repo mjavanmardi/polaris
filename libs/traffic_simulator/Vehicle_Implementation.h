@@ -62,7 +62,7 @@ namespace Vehicle_Components
 			this->has_full_automation(db_itr->getAutomation_type()->getFully_autonomous());
 
 			bool has_connectivity = false;
-			const char* connectivity_str = db_itr->getFuel_type()->getType().c_str();
+			const char* connectivity_str = db_itr->getConnectivity_type()->getType().c_str();
 			if (strcmp(connectivity_str, "Yes") == 0) has_connectivity = true;
 			this->has_connectivity(has_connectivity);
 
@@ -120,6 +120,7 @@ namespace Vehicle_Components
 			m_data(bool, is_integrated, NONE, NONE);
 
 			m_data(bool, is_autonomous, NONE, NONE);
+			m_data(float, willingness_to_pay, NONE, NONE);
 
 			m_data(shared_ptr<polaris::io::Vehicle>, vehicle_ptr, NONE, NONE);
 

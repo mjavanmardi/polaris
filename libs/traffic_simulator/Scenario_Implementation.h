@@ -47,12 +47,36 @@ namespace Scenario_Components
 
 			m_data(int, current_day_index, NONE, NONE);
 
+			//=================================================================================
+			// CAV SIMULATION VARIABLES
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
 			m_data(double, simulate_cacc,NONE,NONE);
+			m_data(double, automation_cost, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_past_crashes, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_smartphone, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_carshare, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_rideshare, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_drive_alone_work, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_drive_alone_other, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_ln_vmt, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_work_dist, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_gender, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_license, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_num_children, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_age, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_empl_density, NONE, NONE);
+			m_data(double, vehicle_techchoice_beta_hhincome, NONE, NONE);
+			m_data(double, vehicle_techchoice_calibration, NONE, NONE);
+			m_data(double, vehicle_techchoice_mu_1, NONE, NONE);
+			m_data(double, vehicle_techchoice_mu_2, NONE, NONE);
+			m_data(double, vehicle_techchoice_mu_3, NONE, NONE);
 
 			m_data(double, cav_market_penetration, NONE, NONE);
 			m_data(double, cav_vott_adjustment, NONE, NONE);
+
+			//=================================================================================
+			// FILENAMES
 
 			m_data(string, input_dir_name, NONE, NONE);
 			m_data(string, output_dir_name, NONE, NONE);
@@ -100,6 +124,8 @@ namespace Scenario_Components
 
 			m_data(bool, calculate_realtime_moe, NONE, NONE);
 			
+			m_data(double, flexible_work_percentage, NONE, NONE);
+
 			m_data(bool, read_population_from_database, NONE, NONE);
 			m_data(bool, read_demand_from_database, NONE, NONE);
 			m_data(bool, write_demand_to_database, NONE, NONE);

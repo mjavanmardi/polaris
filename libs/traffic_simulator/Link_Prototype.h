@@ -118,6 +118,7 @@ namespace Link_Components
 			accessor(link_origin_departed_vehicles, NONE, NONE);
 			accessor(link_origin_loaded_vehicles, NONE, NONE);
 			accessor(link_origin_loaded_capacity_leftover, NONE, NONE);
+			accessor(cacc_count, NONE, NONE);
 		
 			//cumulative - Mid-Trip
 			accessor(link_upstream_cumulative_arrived_vehicles, NONE, NONE);

@@ -317,7 +317,7 @@ namespace PopSyn
 						_this->Initialize_Agents_Event<NT>();
 						_this->Write_Files_Event<NT>();
 						_this->Write_Fit_Results<zone_type>();
-						response.next._iteration = 3;
+						response.next._iteration = 5;
 						response.next._sub_iteration = 0;
 						break;
 					default:
@@ -325,7 +325,7 @@ namespace PopSyn
 						response.next._sub_iteration = 0;
 					}
 				}
-				else if (iteration() == 3)
+				else if (iteration() == 5)
 				{
 					_this->Output_Popsyn_To_DB_Event<NT>();
 					response.next._iteration = END;
@@ -584,29 +584,28 @@ namespace PopSyn
 							// i.e. creates full agents when connected to an ABM and NetworkType is defined, otherwise does nothing.
 							Object_Initialization_Handler<household_itf*,zone_itf*,network_itf*,scenario_itf*>(uuid,hh,zone,network,scenario);
 
-							// Loop through each person in the household
-							person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
-							long perid=0;
-							for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
-							{		
-								// update synthesizing persons counter
-								if (counter % 10000 == 0) cout << '\r' << "Initializing Agents: " << counter;
+							//// Loop through each person in the household
+							//person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
+							//long perid=0;
+							//for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+							//{		
+							//	// update synthesizing persons counter
+							//	if (counter % 10000 == 0) cout << '\r' << "Initializing Agents: " << counter;
 
-								person_itf* person = (person_itf*)(*p_itr);
-								// Same as above, creates person agents when connected to an ABM through the NetworkType definition
-								Object_Initialization_Handler<person_itf*,zone_itf*,network_itf*,scenario_itf*>(perid,person,zone,network,scenario);
-								++perid;
-								++counter;
+							//	person_itf* person = (person_itf*)(*p_itr);
+							//	// Same as above, creates person agents when connected to an ABM through the NetworkType definition
+							//	Object_Initialization_Handler<person_itf*,zone_itf*,network_itf*,scenario_itf*>(perid,person,zone,network,scenario);
+							//	++perid;
+							//	++counter;
 
-#ifdef DEBUG_1
-								++r_itr;++z_itr;++h_itr;++p_itr;
-								regions->erase(r_itr,regions->end());
-								zones->erase(z_itr,zones->end());
-								households->erase(h_itr,households->end());
-								persons->erase(p_itr,persons->end());
-								return;
-#endif
-							}
+							//}
+							#ifdef DEBUG_1
+							++r_itr;++z_itr;++h_itr;++p_itr;
+							regions->erase(r_itr, regions->end());
+							zones->erase(z_itr, zones->end());
+							households->erase(h_itr, households->end());
+							return;
+							#endif
 
 
 							++uuid;
@@ -999,17 +998,7 @@ namespace PopSyn
 								//hh_rec->setHhold(hh->ID<double>());
 								Set_HH_Record_Location<shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
 								Fill_HH_Record<typename get_type_of(network_reference),shared_ptr<MasterType::hh_db_rec_type>,household_type*,zone_itf*>(hh_rec,hh,zone);
-								
-								//cout << "household: "<<hh_rec->getHousehold();
-								//cout << ", hhold: "<<hh_rec->getHhold();
-								//cout << ", location: "<<hh_rec->getLocation();
-								//cout << ", persons: "<<hh_rec->getPersons();
-								//cout << ", workers: "<<hh_rec->getWorkers();
-								//cout << ", vehicles: "<<hh_rec->getVehicles();
-								//cout << ", income: "<<hh_rec->getIncome();
-								//cout << ", type: "<<hh_rec->getType()<<endl;
-								
-
+							
 								//push to database
 								db->persist(hh_rec);
 
@@ -1042,6 +1031,8 @@ namespace PopSyn
 
 									shared_ptr<MasterType::vehicle_db_rec_type> veh_rec(veh->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
 									veh_rec->setHhold(hh_rec->getHousehold());
+									veh_rec->setSubtype(veh->is_autonomous<bool>());
+									veh_rec->setParking(veh->willingness_to_pay<float>());
 									//Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
 									//Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
 

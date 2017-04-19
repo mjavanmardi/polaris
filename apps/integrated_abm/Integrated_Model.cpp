@@ -148,7 +148,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
 	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Chicago_Mode_Choice_Option<M> mode_choice_option_type;
 	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
 	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
@@ -522,6 +522,10 @@ int main(int argc,char** argv)
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
+	MasterType::mode_choice_option_type::static_initializer();
+
+	// Initialize telecommute model parameters
+	MasterType::telecommute_chooser_type::static_initializer();
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	

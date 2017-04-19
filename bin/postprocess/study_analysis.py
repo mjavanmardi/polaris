@@ -36,7 +36,8 @@ outfile.write("time,loaded,departed,arrived,in_network,switched,VMT,VHT,avg_trav
 scenario_id = 1
 for scenario in s_doc['scenarios']:
 	# write results - make sure scenario was actually run first
-	scenario_name = study_id + "_" + str(scenario_id)
+	# scenario_name = study_id + "_" + str(scenario_id)
+	scenario_name = str(scenario["output_dir_name"])
 	
 	try:
 		with open(scenario_name + "\\summary.csv") as summary_file:	

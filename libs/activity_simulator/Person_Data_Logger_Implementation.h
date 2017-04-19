@@ -644,12 +644,13 @@ namespace Person_Components
 					trip_rec.setHhold(0);
 					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
-						trip_rec.setMode(0);
+						//trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 						trip_rec.setVehicle(person->vehicle<vehicle_itf*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 					}
-					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
-					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
-					else trip_rec.setMode(3);
+					trip_rec.setMode(act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>()); //TODO - changed so that trip record in demand database uses the same mode codes as the activity table so it is consistent throughout code
+					/*else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
+					else trip_rec.setMode(3);*/
 					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
 					else trip_rec.setOrigin(new_origin);
 					trip_rec.setPartition(move->template routed_travel_time<int>());

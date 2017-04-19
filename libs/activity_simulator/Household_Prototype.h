@@ -38,6 +38,8 @@ namespace Prototypes
 	{
 		tag_as_prototype;
 
+		// Event handling
+		static void Agent_Event_Controller(ComponentType* _this, Event_Response& response);
 
 		template<typename TargetType, requires(TargetType, check(ComponentType, Concepts::Has_Initialize))> 
 		void Initialize(TargetType id)
@@ -62,9 +64,16 @@ namespace Prototypes
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, check(ComponentType, Concepts::Has_Initialize))> 
-		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)		{
-			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
+		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)		
+		{
+			// call object initialization for all subcomponents
+			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);	
+
+			// select a home activity location from the synthesis zone
 			this->template Set_Home_Location<NT>();
+
+			// Load the vehicle selection event
+			((ComponentType*)this)->template Load_Event<ComponentType>(&Agent_Event_Controller, iteration() + 3, 0);
 		}
 		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType, requires(ScenarioRefType, !check(ComponentType, Concepts::Has_Initialize))> 
 		void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
@@ -84,6 +93,7 @@ namespace Prototypes
 		// External knowledge accessor
 		accessor(network_reference, NONE, NONE);
 		accessor(scenario_reference, NONE, NONE);
+		accessor(home_synthesis_zone, NONE, NONE);
 
 		// Basic property members
 		accessor(uuid, NONE, NONE);
@@ -91,6 +101,27 @@ namespace Prototypes
 
 		accessor(Persons_Container, NONE, NONE);
 		accessor(Vehicles_Container, NONE, NONE);
+
+		int Number_of_Children()
+		{
+			typedef Random_Access_Sequence< typename get_type_of(Persons_Container)> person_container_itf;
+			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
+			typedef Person_Components::Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> properties_itf;
+
+			typename person_container_itf::iterator p_itr;
+			person_container_itf* persons = this->Persons_Container<person_container_itf*>();
+
+			int children = 0;
+
+			for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+			{
+				person_itf* p = static_cast<person_itf*>(*p_itr);
+				properties_itf* props = p->Static_Properties<properties_itf*>();
+
+				if (props->Age<int>() < 18) children += 1;
+			}
+			return children;
+		}
 
 		template<typename PersonItfType, typename TimeType> PersonItfType Get_Free_Member(TimeType start_time, TimeType end_time, requires(PersonItfType,check(PersonItfType,is_pointer) && check_stripped_type(PersonItfType,Activity_Simulator::Person_Concepts::Is_Person)))
 		{
@@ -134,6 +165,8 @@ namespace Prototypes
 			return nullptr;
 		}
 		
+		template<typename PersonItfType> PersonItfType Get_Primary_Driver(){ return this_component()->Get_Primary_Driver<PersonItfType>(); }
+
 		template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle(requires(VehicleItfType, check(VehicleItfType, is_pointer)))// && check_stripped_type(PersonItfType, Activity_Simulator::Person_Concepts::Is_Person)))
 		{
 			return this_component()->Get_Free_Vehicle<VehicleItfType>();
@@ -231,6 +264,22 @@ namespace Prototypes
 		}
 
 	};
+
+	// Event handling - Currently only does vehicle selection
+	template<typename ComponentType>
+	void Household<ComponentType>::Agent_Event_Controller(ComponentType* _this, Event_Response& response)
+	{
+		typedef Household<ComponentType> _Household_Interface;
+		typedef Household_Components::Prototypes::Vehicle_Chooser<get_type_of(Vehicle_Chooser)> vehicle_chooser_interface;
+		typedef PopSyn::Prototypes::Synthesis_Zone<get_type_of(home_synthesis_zone)> zone_interface;
+
+		// Do choose vehicle routine - must occur after persons are intialized and all locations set
+		_Household_Interface* pthis = (_Household_Interface*)_this;
+		pthis->Vehicle_Chooser<vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
+
+		response.next._iteration = END;
+		response.next._sub_iteration = 0;
+	}
 
 }
 

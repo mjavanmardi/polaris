@@ -132,24 +132,27 @@ GROUP BY
 --############################################################
 -- GENERATE ACTIVITY TYPE BY MODAL DISTRIBUTION
 
-DROP TABLE IF EXISTS Mode_Distribution;
-CREATE TABLE IF NOT EXISTS Mode_Distribution As
+DROP TABLE IF EXISTS Mode_Distribution_ADULT;
+CREATE TABLE IF NOT EXISTS Mode_Distribution_ADULT As
 SELECT 
-	type,
-	sum(CASE WHEN mode= 'AUTO' THEN 1 END) as Auto,
-	sum(CASE WHEN mode= 'HOV' THEN 1 END) as HOV,
-	sum(CASE WHEN mode= 'TRANSIT' THEN 1 END) as Transit,
-	sum(CASE WHEN mode= 'WALK' THEN 1 END) as Walk,
-	sum(CASE WHEN mode= 'BIKE' THEN 1 END) as Bike,
-	sum(CASE WHEN mode= 'TAXI' THEN 1 END) as Taxi,
+	case when activity.type = 'WORK' or activity.type = 'SCHOOL' or activity.type = 'PART_WORK' then 'HBW'
+	when trip.origin = household.location then 'HBO'
+	else 'NHB' end as acttype,
+	sum(CASE WHEN activity.mode= 'AUTO' THEN 1 END) as Auto,
+	sum(CASE WHEN activity.mode= 'HOV' THEN 1 END) as HOV,
+	sum(CASE WHEN activity.mode= 'TRANSIT' THEN 1 END) as Transit,
+	sum(CASE WHEN activity.mode= 'WALK' THEN 1 END) as Walk,
+	sum(CASE WHEN activity.mode= 'BIKE' THEN 1 END) as Bike,
+	sum(CASE WHEN activity.mode= 'TAXI' THEN 1 END) as Taxi,
+	sum(CASE WHEN activity.mode= 'SCHOOLBUS' THEN 1 END) as Schoolbus,
 	sum(1) AS total
 FROM 
-	Activity
+	Activity, person, household, trip
 WHERE
-	Start_Time > 62
+	Start_Time > 62 and activity.trip = trip.trip_id and person.age >= 16 and activity.person = person.person and person.household=household.household
 GROUP BY 
-	type;
-	
+	acttype;
+
 
 --############################################################
 -- GENERATE ACTIVITY START TIME DISTRIBUTION
