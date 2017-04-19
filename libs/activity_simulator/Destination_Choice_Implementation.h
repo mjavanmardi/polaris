@@ -22,30 +22,30 @@ namespace Person_Components
 
 			// PARAMETER DECLARATIONS
 			#pragma region DESTINATION CHOICE MODEL PARAMETERS
-			static m_data(float, BTT_PICK, NONE, NONE);		static m_data(float, BTT_OTHER_WORK, NONE, NONE);			static m_data(float, BTT_SERVICE, NONE, NONE);			static m_data(float, BTT_MIN_SHOP, NONE, NONE);		static m_data(float, BTT_MAJ_SHOP, NONE, NONE);		static m_data(float, BTT_EAT_OUT, NONE, NONE);			static m_data(float, BTT_CIVIC, NONE, NONE);			static m_data(float, BTT_LEISURE, NONE, NONE);			static m_data(float, BTT_SOCIAL, NONE, NONE);			static m_data(float, BTT_OTHER, NONE, NONE);			static m_data(float, BTTAUTO_WORK, NONE, NONE); static m_data(float, BTTTRAN_WORK, NONE, NONE); static m_data(float, BTTOTHER_WORK, NONE, NONE);
-			static m_data(float, BINCD_PICK, NONE, NONE);		static m_data(float, BINCD_OTHER_WORK, NONE, NONE);		static m_data(float, BINCD_SERVICE, NONE, NONE);		static m_data(float, BINCD_MIN_SHOP, NONE, NONE);		static m_data(float, BINCD_MAJ_SHOP, NONE, NONE);		static m_data(float, BINCD_EAT_OUT, NONE, NONE);		static m_data(float, BINCD_CIVIC, NONE, NONE);			static m_data(float, BINCD_LEISURE, NONE, NONE);		static m_data(float, BINCD_SOCIAL, NONE, NONE);		static m_data(float, BINCD_OTHER, NONE, NONE);			static m_data(float, BINCD_WORK, NONE, NONE); static m_data(float, BHOME_WORK, NONE, NONE);
-			static m_data(float, BRACED_PICK, NONE, NONE);		static m_data(float, BRACED_OTHER_WORK, NONE, NONE);		static m_data(float, BRACED_SERVICE, NONE, NONE);		static m_data(float, BRACED_MIN_SHOP, NONE, NONE);		static m_data(float, BRACED_MAJ_SHOP, NONE, NONE);		static m_data(float, BRACED_EAT_OUT, NONE, NONE);		static m_data(float, BRACED_CIVIC, NONE, NONE);		static m_data(float, BRACED_LEISURE, NONE, NONE);		static m_data(float, BRACED_SOCIAL, NONE, NONE);		static m_data(float, BRACED_OTHER, NONE, NONE);		static m_data(float, BRACED_WORK, NONE, NONE);
-			static m_data(float, BArRes_PICK, NONE, NONE);		static m_data(float, BArRes_OTHER_WORK, NONE, NONE);		static m_data(float, BArRes_SERVICE, NONE, NONE);		static m_data(float, BArRes_MIN_SHOP, NONE, NONE);		static m_data(float, BArRes_MAJ_SHOP, NONE, NONE);		static m_data(float, BArRes_EAT_OUT, NONE, NONE);		static m_data(float, BArRes_CIVIC, NONE, NONE);		static m_data(float, BArRes_LEISURE, NONE, NONE);		static m_data(float, BArRes_SOCIAL, NONE, NONE);		static m_data(float, BArRes_OTHER, NONE, NONE);		static m_data(float, BArRes_WORK, NONE, NONE);
-			static m_data(float, BArRec_PICK, NONE, NONE);		static m_data(float, BArRec_OTHER_WORK, NONE, NONE);		static m_data(float, BArRec_SERVICE, NONE, NONE);		static m_data(float, BArRec_MIN_SHOP, NONE, NONE);		static m_data(float, BArRec_MAJ_SHOP, NONE, NONE);		static m_data(float, BArRec_EAT_OUT, NONE, NONE);		static m_data(float, BArRec_CIVIC, NONE, NONE);		static m_data(float, BArRec_LEISURE, NONE, NONE);		static m_data(float, BArRec_SOCIAL, NONE, NONE);		static m_data(float, BArRec_OTHER, NONE, NONE);		static m_data(float, BArRec_WORK, NONE, NONE);
-			static m_data(float, BArRet_PICK, NONE, NONE);		static m_data(float, BArRet_OTHER_WORK, NONE, NONE);		static m_data(float, BArRet_SERVICE, NONE, NONE);		static m_data(float, BArRet_MIN_SHOP, NONE, NONE);		static m_data(float, BArRet_MAJ_SHOP, NONE, NONE);		static m_data(float, BArRet_EAT_OUT, NONE, NONE);		static m_data(float, BArRet_CIVIC, NONE, NONE);		static m_data(float, BArRet_LEISURE, NONE, NONE);		static m_data(float, BArRet_SOCIAL, NONE, NONE);		static m_data(float, BArRet_OTHER, NONE, NONE);		static m_data(float, BArRet_WORK, NONE, NONE);
-			static m_data(float, BArEnt_PICK, NONE, NONE);		static m_data(float, BArEnt_OTHER_WORK, NONE, NONE);		static m_data(float, BArEnt_SERVICE, NONE, NONE);		static m_data(float, BArEnt_MIN_SHOP, NONE, NONE);		static m_data(float, BArEnt_MAJ_SHOP, NONE, NONE);		static m_data(float, BArEnt_EAT_OUT, NONE, NONE);		static m_data(float, BArEnt_CIVIC, NONE, NONE);		static m_data(float, BArEnt_LEISURE, NONE, NONE);		static m_data(float, BArEnt_SOCIAL, NONE, NONE);		static m_data(float, BArEnt_OTHER, NONE, NONE);		static m_data(float, BArEnt_WORK, NONE, NONE);
-			static m_data(float, BArIns_PICK, NONE, NONE);		static m_data(float, BArIns_OTHER_WORK, NONE, NONE);		static m_data(float, BArIns_SERVICE, NONE, NONE);		static m_data(float, BArIns_MIN_SHOP, NONE, NONE);		static m_data(float, BArIns_MAJ_SHOP, NONE, NONE);		static m_data(float, BArIns_EAT_OUT, NONE, NONE);		static m_data(float, BArIns_CIVIC, NONE, NONE);		static m_data(float, BArIns_LEISURE, NONE, NONE);		static m_data(float, BArIns_SOCIAL, NONE, NONE);		static m_data(float, BArIns_OTHER, NONE, NONE);		static m_data(float, BArIns_WORK, NONE, NONE);
-			static m_data(float, BArOff_PICK, NONE, NONE);		static m_data(float, BArOff_OTHER_WORK, NONE, NONE);		static m_data(float, BArOff_SERVICE, NONE, NONE);		static m_data(float, BArOff_MIN_SHOP, NONE, NONE);		static m_data(float, BArOff_MAJ_SHOP, NONE, NONE);		static m_data(float, BArOff_EAT_OUT, NONE, NONE);		static m_data(float, BArOff_CIVIC, NONE, NONE);		static m_data(float, BArOff_LEISURE, NONE, NONE);		static m_data(float, BArOff_SOCIAL, NONE, NONE);		static m_data(float, BArOff_OTHER, NONE, NONE);		static m_data(float, BArOff_WORK, NONE, NONE);
-			static m_data(float, BArMix_PICK, NONE, NONE);		static m_data(float, BArMix_OTHER_WORK, NONE, NONE);		static m_data(float, BArMix_SERVICE, NONE, NONE);		static m_data(float, BArMix_MIN_SHOP, NONE, NONE);		static m_data(float, BArMix_MAJ_SHOP, NONE, NONE);		static m_data(float, BArMix_EAT_OUT, NONE, NONE);		static m_data(float, BArMix_CIVIC, NONE, NONE);		static m_data(float, BArMix_LEISURE, NONE, NONE);		static m_data(float, BArMix_SOCIAL, NONE, NONE);		static m_data(float, BArMix_OTHER, NONE, NONE);		static m_data(float, BArMix_WORK, NONE, NONE);
-			static m_data(float, BArSch_PICK, NONE, NONE);		static m_data(float, BArSch_OTHER_WORK, NONE, NONE);		static m_data(float, BArSch_SERVICE, NONE, NONE);		static m_data(float, BArSch_MIN_SHOP, NONE, NONE);		static m_data(float, BArSch_MAJ_SHOP, NONE, NONE);		static m_data(float, BArSch_EAT_OUT, NONE, NONE);		static m_data(float, BArSch_CIVIC, NONE, NONE);		static m_data(float, BArSch_LEISURE, NONE, NONE);		static m_data(float, BArSch_SOCIAL, NONE, NONE);		static m_data(float, BArSch_OTHER, NONE, NONE);		static m_data(float, BArSch_WORK, NONE, NONE);
-			static m_data(float, BEmOth_PICK, NONE, NONE);		static m_data(float, BEmOth_OTHER_WORK, NONE, NONE);		static m_data(float, BEmOth_SERVICE, NONE, NONE);		static m_data(float, BEmOth_MIN_SHOP, NONE, NONE);		static m_data(float, BEmOth_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmOth_EAT_OUT, NONE, NONE);		static m_data(float, BEmOth_CIVIC, NONE, NONE);		static m_data(float, BEmOth_LEISURE, NONE, NONE);		static m_data(float, BEmOth_SOCIAL, NONE, NONE);		static m_data(float, BEmOth_OTHER, NONE, NONE);		static m_data(float, BEmOth_WORK, NONE, NONE);
-			static m_data(float, BEmInd_PICK, NONE, NONE);		static m_data(float, BEmInd_OTHER_WORK, NONE, NONE);		static m_data(float, BEmInd_SERVICE, NONE, NONE);		static m_data(float, BEmInd_MIN_SHOP, NONE, NONE);		static m_data(float, BEmInd_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmInd_EAT_OUT, NONE, NONE);		static m_data(float, BEmInd_CIVIC, NONE, NONE);		static m_data(float, BEmInd_LEISURE, NONE, NONE);		static m_data(float, BEmInd_SOCIAL, NONE, NONE);		static m_data(float, BEmInd_OTHER, NONE, NONE);		static m_data(float, BEmInd_WORK, NONE, NONE);
-			static m_data(float, BEmGov_PICK, NONE, NONE);		static m_data(float, BEmGov_OTHER_WORK, NONE, NONE);		static m_data(float, BEmGov_SERVICE, NONE, NONE);		static m_data(float, BEmGov_MIN_SHOP, NONE, NONE);		static m_data(float, BEmGov_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmGov_EAT_OUT, NONE, NONE);		static m_data(float, BEmGov_CIVIC, NONE, NONE);		static m_data(float, BEmGov_LEISURE, NONE, NONE);		static m_data(float, BEmGov_SOCIAL, NONE, NONE);		static m_data(float, BEmGov_OTHER, NONE, NONE);		static m_data(float, BEmGov_WORK, NONE, NONE);
-			static m_data(float, BEmSer_PICK, NONE, NONE);		static m_data(float, BEmSer_OTHER_WORK, NONE, NONE);		static m_data(float, BEmSer_SERVICE, NONE, NONE);		static m_data(float, BEmSer_MIN_SHOP, NONE, NONE);		static m_data(float, BEmSer_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmSer_EAT_OUT, NONE, NONE);		static m_data(float, BEmSer_CIVIC, NONE, NONE);		static m_data(float, BEmSer_LEISURE, NONE, NONE);		static m_data(float, BEmSer_SOCIAL, NONE, NONE);		static m_data(float, BEmSer_OTHER, NONE, NONE);		static m_data(float, BEmSer_WORK, NONE, NONE);
-			static m_data(float, BEmMan_PICK, NONE, NONE);		static m_data(float, BEmMan_OTHER_WORK, NONE, NONE);		static m_data(float, BEmMan_SERVICE, NONE, NONE);		static m_data(float, BEmMan_MIN_SHOP, NONE, NONE);		static m_data(float, BEmMan_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmMan_EAT_OUT, NONE, NONE);		static m_data(float, BEmMan_CIVIC, NONE, NONE);		static m_data(float, BEmMan_LEISURE, NONE, NONE);		static m_data(float, BEmMan_SOCIAL, NONE, NONE);		static m_data(float, BEmMan_OTHER, NONE, NONE);		static m_data(float, BEmMan_WORK, NONE, NONE);
-			static m_data(float, BEmRet_PICK, NONE, NONE);		static m_data(float, BEmRet_OTHER_WORK, NONE, NONE);		static m_data(float, BEmRet_SERVICE, NONE, NONE);		static m_data(float, BEmRet_MIN_SHOP, NONE, NONE);		static m_data(float, BEmRet_MAJ_SHOP, NONE, NONE);		static m_data(float, BEmRet_EAT_OUT, NONE, NONE);		static m_data(float, BEmRet_CIVIC, NONE, NONE);		static m_data(float, BEmRet_LEISURE, NONE, NONE);		static m_data(float, BEmRet_SOCIAL, NONE, NONE);		static m_data(float, BEmRet_OTHER, NONE, NONE);		static m_data(float, BEmRet_WORK, NONE, NONE);
-			static m_data(float, THETAG_PICK, NONE, NONE);		static m_data(float, THETAG_OTHER_WORK, NONE, NONE);		static m_data(float, THETAG_SERVICE, NONE, NONE);		static m_data(float, THETAG_MIN_SHOP, NONE, NONE);		static m_data(float, THETAG_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAG_EAT_OUT, NONE, NONE);		static m_data(float, THETAG_CIVIC, NONE, NONE);		static m_data(float, THETAG_LEISURE, NONE, NONE);		static m_data(float, THETAG_SOCIAL, NONE, NONE);		static m_data(float, THETAG_OTHER, NONE, NONE);		static m_data(float, THETAG_WORK, NONE, NONE);
-			static m_data(float, THETAM_PICK, NONE, NONE);		static m_data(float, THETAM_OTHER_WORK, NONE, NONE);		static m_data(float, THETAM_SERVICE, NONE, NONE);		static m_data(float, THETAM_MIN_SHOP, NONE, NONE);		static m_data(float, THETAM_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAM_EAT_OUT, NONE, NONE);		static m_data(float, THETAM_CIVIC, NONE, NONE);		static m_data(float, THETAM_LEISURE, NONE, NONE);		static m_data(float, THETAM_SOCIAL, NONE, NONE);		static m_data(float, THETAM_OTHER, NONE, NONE);		static m_data(float, THETAM_WORK, NONE, NONE);
-			static m_data(float, THETAR_PICK, NONE, NONE);		static m_data(float, THETAR_OTHER_WORK, NONE, NONE);		static m_data(float, THETAR_SERVICE, NONE, NONE);		static m_data(float, THETAR_MIN_SHOP, NONE, NONE);		static m_data(float, THETAR_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAR_EAT_OUT, NONE, NONE);		static m_data(float, THETAR_CIVIC, NONE, NONE);		static m_data(float, THETAR_LEISURE, NONE, NONE);		static m_data(float, THETAR_SOCIAL, NONE, NONE);		static m_data(float, THETAR_OTHER, NONE, NONE);		static m_data(float, THETAR_WORK, NONE, NONE);
-			static m_data(float, THETAS_PICK, NONE, NONE);		static m_data(float, THETAS_OTHER_WORK, NONE, NONE);		static m_data(float, THETAS_SERVICE, NONE, NONE);		static m_data(float, THETAS_MIN_SHOP, NONE, NONE);		static m_data(float, THETAS_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAS_EAT_OUT, NONE, NONE);		static m_data(float, THETAS_CIVIC, NONE, NONE);		static m_data(float, THETAS_LEISURE, NONE, NONE);		static m_data(float, THETAS_SOCIAL, NONE, NONE);		static m_data(float, THETAS_OTHER, NONE, NONE);		static m_data(float, THETAS_WORK, NONE, NONE);
-			static m_data(float, THETAI_PICK, NONE, NONE);		static m_data(float, THETAI_OTHER_WORK, NONE, NONE);		static m_data(float, THETAI_SERVICE, NONE, NONE);		static m_data(float, THETAI_MIN_SHOP, NONE, NONE);		static m_data(float, THETAI_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAI_EAT_OUT, NONE, NONE);		static m_data(float, THETAI_CIVIC, NONE, NONE);		static m_data(float, THETAI_LEISURE, NONE, NONE);		static m_data(float, THETAI_SOCIAL, NONE, NONE);		static m_data(float, THETAI_OTHER, NONE, NONE);		static m_data(float, THETAI_WORK, NONE, NONE);
-			static m_data(float, THETAO_PICK, NONE, NONE);		static m_data(float, THETAO_OTHER_WORK, NONE, NONE);		static m_data(float, THETAO_SERVICE, NONE, NONE);		static m_data(float, THETAO_MIN_SHOP, NONE, NONE);		static m_data(float, THETAO_MAJ_SHOP, NONE, NONE);		static m_data(float, THETAO_EAT_OUT, NONE, NONE);		static m_data(float, THETAO_CIVIC, NONE, NONE);		static m_data(float, THETAO_LEISURE, NONE, NONE);		static m_data(float, THETAO_SOCIAL, NONE, NONE);		static m_data(float, THETAO_OTHER, NONE, NONE);		static m_data(float, THETAO_WORK, NONE, NONE);	static m_data(float, BEmUnrelated_WORK, NONE, NONE); static m_data(float, THETA_UR_WORK, NONE, NONE);
-			static m_data(float, GAMMA_PICK, NONE, NONE);		static m_data(float, GAMMA_OTHER_WORK, NONE, NONE);		static m_data(float, GAMMA_SERVICE, NONE, NONE);		static m_data(float, GAMMA_MIN_SHOP, NONE, NONE);		static m_data(float, GAMMA_MAJ_SHOP, NONE, NONE);		static m_data(float, GAMMA_EAT_OUT, NONE, NONE);		static m_data(float, GAMMA_CIVIC, NONE, NONE);			static m_data(float, GAMMA_LEISURE, NONE, NONE);		static m_data(float, GAMMA_SOCIAL, NONE, NONE);		static m_data(float, GAMMA_OTHER, NONE, NONE);		
+			m_static_data(float, BTT_PICK, NONE, NONE);		m_static_data(float, BTT_OTHER_WORK, NONE, NONE);			m_static_data(float, BTT_SERVICE, NONE, NONE);			m_static_data(float, BTT_MIN_SHOP, NONE, NONE);		m_static_data(float, BTT_MAJ_SHOP, NONE, NONE);		m_static_data(float, BTT_EAT_OUT, NONE, NONE);			m_static_data(float, BTT_CIVIC, NONE, NONE);			m_static_data(float, BTT_LEISURE, NONE, NONE);			m_static_data(float, BTT_SOCIAL, NONE, NONE);			m_static_data(float, BTT_OTHER, NONE, NONE);			m_static_data(float, BTTAUTO_WORK, NONE, NONE); m_static_data(float, BTTTRAN_WORK, NONE, NONE); m_static_data(float, BTTOTHER_WORK, NONE, NONE);
+			m_static_data(float, BINCD_PICK, NONE, NONE);		m_static_data(float, BINCD_OTHER_WORK, NONE, NONE);		m_static_data(float, BINCD_SERVICE, NONE, NONE);		m_static_data(float, BINCD_MIN_SHOP, NONE, NONE);		m_static_data(float, BINCD_MAJ_SHOP, NONE, NONE);		m_static_data(float, BINCD_EAT_OUT, NONE, NONE);		m_static_data(float, BINCD_CIVIC, NONE, NONE);			m_static_data(float, BINCD_LEISURE, NONE, NONE);		m_static_data(float, BINCD_SOCIAL, NONE, NONE);		m_static_data(float, BINCD_OTHER, NONE, NONE);			m_static_data(float, BINCD_WORK, NONE, NONE); m_static_data(float, BHOME_WORK, NONE, NONE);
+			m_static_data(float, BRACED_PICK, NONE, NONE);		m_static_data(float, BRACED_OTHER_WORK, NONE, NONE);		m_static_data(float, BRACED_SERVICE, NONE, NONE);		m_static_data(float, BRACED_MIN_SHOP, NONE, NONE);		m_static_data(float, BRACED_MAJ_SHOP, NONE, NONE);		m_static_data(float, BRACED_EAT_OUT, NONE, NONE);		m_static_data(float, BRACED_CIVIC, NONE, NONE);		m_static_data(float, BRACED_LEISURE, NONE, NONE);		m_static_data(float, BRACED_SOCIAL, NONE, NONE);		m_static_data(float, BRACED_OTHER, NONE, NONE);		m_static_data(float, BRACED_WORK, NONE, NONE);
+			m_static_data(float, BArRes_PICK, NONE, NONE);		m_static_data(float, BArRes_OTHER_WORK, NONE, NONE);		m_static_data(float, BArRes_SERVICE, NONE, NONE);		m_static_data(float, BArRes_MIN_SHOP, NONE, NONE);		m_static_data(float, BArRes_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArRes_EAT_OUT, NONE, NONE);		m_static_data(float, BArRes_CIVIC, NONE, NONE);		m_static_data(float, BArRes_LEISURE, NONE, NONE);		m_static_data(float, BArRes_SOCIAL, NONE, NONE);		m_static_data(float, BArRes_OTHER, NONE, NONE);		m_static_data(float, BArRes_WORK, NONE, NONE);
+			m_static_data(float, BArRec_PICK, NONE, NONE);		m_static_data(float, BArRec_OTHER_WORK, NONE, NONE);		m_static_data(float, BArRec_SERVICE, NONE, NONE);		m_static_data(float, BArRec_MIN_SHOP, NONE, NONE);		m_static_data(float, BArRec_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArRec_EAT_OUT, NONE, NONE);		m_static_data(float, BArRec_CIVIC, NONE, NONE);		m_static_data(float, BArRec_LEISURE, NONE, NONE);		m_static_data(float, BArRec_SOCIAL, NONE, NONE);		m_static_data(float, BArRec_OTHER, NONE, NONE);		m_static_data(float, BArRec_WORK, NONE, NONE);
+			m_static_data(float, BArRet_PICK, NONE, NONE);		m_static_data(float, BArRet_OTHER_WORK, NONE, NONE);		m_static_data(float, BArRet_SERVICE, NONE, NONE);		m_static_data(float, BArRet_MIN_SHOP, NONE, NONE);		m_static_data(float, BArRet_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArRet_EAT_OUT, NONE, NONE);		m_static_data(float, BArRet_CIVIC, NONE, NONE);		m_static_data(float, BArRet_LEISURE, NONE, NONE);		m_static_data(float, BArRet_SOCIAL, NONE, NONE);		m_static_data(float, BArRet_OTHER, NONE, NONE);		m_static_data(float, BArRet_WORK, NONE, NONE);
+			m_static_data(float, BArEnt_PICK, NONE, NONE);		m_static_data(float, BArEnt_OTHER_WORK, NONE, NONE);		m_static_data(float, BArEnt_SERVICE, NONE, NONE);		m_static_data(float, BArEnt_MIN_SHOP, NONE, NONE);		m_static_data(float, BArEnt_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArEnt_EAT_OUT, NONE, NONE);		m_static_data(float, BArEnt_CIVIC, NONE, NONE);		m_static_data(float, BArEnt_LEISURE, NONE, NONE);		m_static_data(float, BArEnt_SOCIAL, NONE, NONE);		m_static_data(float, BArEnt_OTHER, NONE, NONE);		m_static_data(float, BArEnt_WORK, NONE, NONE);
+			m_static_data(float, BArIns_PICK, NONE, NONE);		m_static_data(float, BArIns_OTHER_WORK, NONE, NONE);		m_static_data(float, BArIns_SERVICE, NONE, NONE);		m_static_data(float, BArIns_MIN_SHOP, NONE, NONE);		m_static_data(float, BArIns_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArIns_EAT_OUT, NONE, NONE);		m_static_data(float, BArIns_CIVIC, NONE, NONE);		m_static_data(float, BArIns_LEISURE, NONE, NONE);		m_static_data(float, BArIns_SOCIAL, NONE, NONE);		m_static_data(float, BArIns_OTHER, NONE, NONE);		m_static_data(float, BArIns_WORK, NONE, NONE);
+			m_static_data(float, BArOff_PICK, NONE, NONE);		m_static_data(float, BArOff_OTHER_WORK, NONE, NONE);		m_static_data(float, BArOff_SERVICE, NONE, NONE);		m_static_data(float, BArOff_MIN_SHOP, NONE, NONE);		m_static_data(float, BArOff_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArOff_EAT_OUT, NONE, NONE);		m_static_data(float, BArOff_CIVIC, NONE, NONE);		m_static_data(float, BArOff_LEISURE, NONE, NONE);		m_static_data(float, BArOff_SOCIAL, NONE, NONE);		m_static_data(float, BArOff_OTHER, NONE, NONE);		m_static_data(float, BArOff_WORK, NONE, NONE);
+			m_static_data(float, BArMix_PICK, NONE, NONE);		m_static_data(float, BArMix_OTHER_WORK, NONE, NONE);		m_static_data(float, BArMix_SERVICE, NONE, NONE);		m_static_data(float, BArMix_MIN_SHOP, NONE, NONE);		m_static_data(float, BArMix_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArMix_EAT_OUT, NONE, NONE);		m_static_data(float, BArMix_CIVIC, NONE, NONE);		m_static_data(float, BArMix_LEISURE, NONE, NONE);		m_static_data(float, BArMix_SOCIAL, NONE, NONE);		m_static_data(float, BArMix_OTHER, NONE, NONE);		m_static_data(float, BArMix_WORK, NONE, NONE);
+			m_static_data(float, BArSch_PICK, NONE, NONE);		m_static_data(float, BArSch_OTHER_WORK, NONE, NONE);		m_static_data(float, BArSch_SERVICE, NONE, NONE);		m_static_data(float, BArSch_MIN_SHOP, NONE, NONE);		m_static_data(float, BArSch_MAJ_SHOP, NONE, NONE);		m_static_data(float, BArSch_EAT_OUT, NONE, NONE);		m_static_data(float, BArSch_CIVIC, NONE, NONE);		m_static_data(float, BArSch_LEISURE, NONE, NONE);		m_static_data(float, BArSch_SOCIAL, NONE, NONE);		m_static_data(float, BArSch_OTHER, NONE, NONE);		m_static_data(float, BArSch_WORK, NONE, NONE);
+			m_static_data(float, BEmOth_PICK, NONE, NONE);		m_static_data(float, BEmOth_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmOth_SERVICE, NONE, NONE);		m_static_data(float, BEmOth_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmOth_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmOth_EAT_OUT, NONE, NONE);		m_static_data(float, BEmOth_CIVIC, NONE, NONE);		m_static_data(float, BEmOth_LEISURE, NONE, NONE);		m_static_data(float, BEmOth_SOCIAL, NONE, NONE);		m_static_data(float, BEmOth_OTHER, NONE, NONE);		m_static_data(float, BEmOth_WORK, NONE, NONE);
+			m_static_data(float, BEmInd_PICK, NONE, NONE);		m_static_data(float, BEmInd_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmInd_SERVICE, NONE, NONE);		m_static_data(float, BEmInd_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmInd_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmInd_EAT_OUT, NONE, NONE);		m_static_data(float, BEmInd_CIVIC, NONE, NONE);		m_static_data(float, BEmInd_LEISURE, NONE, NONE);		m_static_data(float, BEmInd_SOCIAL, NONE, NONE);		m_static_data(float, BEmInd_OTHER, NONE, NONE);		m_static_data(float, BEmInd_WORK, NONE, NONE);
+			m_static_data(float, BEmGov_PICK, NONE, NONE);		m_static_data(float, BEmGov_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmGov_SERVICE, NONE, NONE);		m_static_data(float, BEmGov_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmGov_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmGov_EAT_OUT, NONE, NONE);		m_static_data(float, BEmGov_CIVIC, NONE, NONE);		m_static_data(float, BEmGov_LEISURE, NONE, NONE);		m_static_data(float, BEmGov_SOCIAL, NONE, NONE);		m_static_data(float, BEmGov_OTHER, NONE, NONE);		m_static_data(float, BEmGov_WORK, NONE, NONE);
+			m_static_data(float, BEmSer_PICK, NONE, NONE);		m_static_data(float, BEmSer_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmSer_SERVICE, NONE, NONE);		m_static_data(float, BEmSer_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmSer_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmSer_EAT_OUT, NONE, NONE);		m_static_data(float, BEmSer_CIVIC, NONE, NONE);		m_static_data(float, BEmSer_LEISURE, NONE, NONE);		m_static_data(float, BEmSer_SOCIAL, NONE, NONE);		m_static_data(float, BEmSer_OTHER, NONE, NONE);		m_static_data(float, BEmSer_WORK, NONE, NONE);
+			m_static_data(float, BEmMan_PICK, NONE, NONE);		m_static_data(float, BEmMan_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmMan_SERVICE, NONE, NONE);		m_static_data(float, BEmMan_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmMan_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmMan_EAT_OUT, NONE, NONE);		m_static_data(float, BEmMan_CIVIC, NONE, NONE);		m_static_data(float, BEmMan_LEISURE, NONE, NONE);		m_static_data(float, BEmMan_SOCIAL, NONE, NONE);		m_static_data(float, BEmMan_OTHER, NONE, NONE);		m_static_data(float, BEmMan_WORK, NONE, NONE);
+			m_static_data(float, BEmRet_PICK, NONE, NONE);		m_static_data(float, BEmRet_OTHER_WORK, NONE, NONE);		m_static_data(float, BEmRet_SERVICE, NONE, NONE);		m_static_data(float, BEmRet_MIN_SHOP, NONE, NONE);		m_static_data(float, BEmRet_MAJ_SHOP, NONE, NONE);		m_static_data(float, BEmRet_EAT_OUT, NONE, NONE);		m_static_data(float, BEmRet_CIVIC, NONE, NONE);		m_static_data(float, BEmRet_LEISURE, NONE, NONE);		m_static_data(float, BEmRet_SOCIAL, NONE, NONE);		m_static_data(float, BEmRet_OTHER, NONE, NONE);		m_static_data(float, BEmRet_WORK, NONE, NONE);
+			m_static_data(float, THETAG_PICK, NONE, NONE);		m_static_data(float, THETAG_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAG_SERVICE, NONE, NONE);		m_static_data(float, THETAG_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAG_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAG_EAT_OUT, NONE, NONE);		m_static_data(float, THETAG_CIVIC, NONE, NONE);		m_static_data(float, THETAG_LEISURE, NONE, NONE);		m_static_data(float, THETAG_SOCIAL, NONE, NONE);		m_static_data(float, THETAG_OTHER, NONE, NONE);		m_static_data(float, THETAG_WORK, NONE, NONE);
+			m_static_data(float, THETAM_PICK, NONE, NONE);		m_static_data(float, THETAM_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAM_SERVICE, NONE, NONE);		m_static_data(float, THETAM_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAM_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAM_EAT_OUT, NONE, NONE);		m_static_data(float, THETAM_CIVIC, NONE, NONE);		m_static_data(float, THETAM_LEISURE, NONE, NONE);		m_static_data(float, THETAM_SOCIAL, NONE, NONE);		m_static_data(float, THETAM_OTHER, NONE, NONE);		m_static_data(float, THETAM_WORK, NONE, NONE);
+			m_static_data(float, THETAR_PICK, NONE, NONE);		m_static_data(float, THETAR_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAR_SERVICE, NONE, NONE);		m_static_data(float, THETAR_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAR_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAR_EAT_OUT, NONE, NONE);		m_static_data(float, THETAR_CIVIC, NONE, NONE);		m_static_data(float, THETAR_LEISURE, NONE, NONE);		m_static_data(float, THETAR_SOCIAL, NONE, NONE);		m_static_data(float, THETAR_OTHER, NONE, NONE);		m_static_data(float, THETAR_WORK, NONE, NONE);
+			m_static_data(float, THETAS_PICK, NONE, NONE);		m_static_data(float, THETAS_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAS_SERVICE, NONE, NONE);		m_static_data(float, THETAS_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAS_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAS_EAT_OUT, NONE, NONE);		m_static_data(float, THETAS_CIVIC, NONE, NONE);		m_static_data(float, THETAS_LEISURE, NONE, NONE);		m_static_data(float, THETAS_SOCIAL, NONE, NONE);		m_static_data(float, THETAS_OTHER, NONE, NONE);		m_static_data(float, THETAS_WORK, NONE, NONE);
+			m_static_data(float, THETAI_PICK, NONE, NONE);		m_static_data(float, THETAI_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAI_SERVICE, NONE, NONE);		m_static_data(float, THETAI_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAI_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAI_EAT_OUT, NONE, NONE);		m_static_data(float, THETAI_CIVIC, NONE, NONE);		m_static_data(float, THETAI_LEISURE, NONE, NONE);		m_static_data(float, THETAI_SOCIAL, NONE, NONE);		m_static_data(float, THETAI_OTHER, NONE, NONE);		m_static_data(float, THETAI_WORK, NONE, NONE);
+			m_static_data(float, THETAO_PICK, NONE, NONE);		m_static_data(float, THETAO_OTHER_WORK, NONE, NONE);		m_static_data(float, THETAO_SERVICE, NONE, NONE);		m_static_data(float, THETAO_MIN_SHOP, NONE, NONE);		m_static_data(float, THETAO_MAJ_SHOP, NONE, NONE);		m_static_data(float, THETAO_EAT_OUT, NONE, NONE);		m_static_data(float, THETAO_CIVIC, NONE, NONE);		m_static_data(float, THETAO_LEISURE, NONE, NONE);		m_static_data(float, THETAO_SOCIAL, NONE, NONE);		m_static_data(float, THETAO_OTHER, NONE, NONE);		m_static_data(float, THETAO_WORK, NONE, NONE);	m_static_data(float, BEmUnrelated_WORK, NONE, NONE); m_static_data(float, THETA_UR_WORK, NONE, NONE);
+			m_static_data(float, GAMMA_PICK, NONE, NONE);		m_static_data(float, GAMMA_OTHER_WORK, NONE, NONE);		m_static_data(float, GAMMA_SERVICE, NONE, NONE);		m_static_data(float, GAMMA_MIN_SHOP, NONE, NONE);		m_static_data(float, GAMMA_MAJ_SHOP, NONE, NONE);		m_static_data(float, GAMMA_EAT_OUT, NONE, NONE);		m_static_data(float, GAMMA_CIVIC, NONE, NONE);			m_static_data(float, GAMMA_LEISURE, NONE, NONE);		m_static_data(float, GAMMA_SOCIAL, NONE, NONE);		m_static_data(float, GAMMA_OTHER, NONE, NONE);		
 			#pragma endregion
 
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location, typename MasterType::activity_location_type, previous, NONE, NONE );
@@ -84,6 +84,307 @@ namespace Person_Components
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<get_component_type(Movement_Plans)> Movement_Plan;
 
 			//------------------------------------------------------------------------------------------------------------------------------------
+
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+			{
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Destination_Choice_Option", key, default_value);
+			}
+
+			static bool static_initialize()
+			{
+				rapidjson::Document document;
+				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template adapts_destination_choice_option_param_file<string>();
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file for ADAPTS_Destination_Choice_Option was not specified" << endl;
+					return true;
+				}
+
+				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+					return false;
+
+				BTT_PICK		<float>(GetOption_Double(document, "BTT_PICK"   , BTT_PICK			<float>()));
+				BINCD_PICK		<float>(GetOption_Double(document, "BINCD_PICK" , BINCD_PICK		<float>()));
+				BRACED_PICK		<float>(GetOption_Double(document, "BRACED_PICK", BRACED_PICK		<float>()));
+				BArRes_PICK		<float>(GetOption_Double(document, "BArRes_PICK", BArRes_PICK		<float>()));
+				BArRec_PICK		<float>(GetOption_Double(document, "BArRec_PICK", BArRec_PICK		<float>()));
+				BArRet_PICK		<float>(GetOption_Double(document, "BArRet_PICK", BArRet_PICK		<float>()));
+				BArEnt_PICK		<float>(GetOption_Double(document, "BArEnt_PICK", BArEnt_PICK		<float>()));
+				BArIns_PICK		<float>(GetOption_Double(document, "BArIns_PICK", BArIns_PICK		<float>()));
+				BArOff_PICK		<float>(GetOption_Double(document, "BArOff_PICK", BArOff_PICK		<float>()));
+				BArMix_PICK		<float>(GetOption_Double(document, "BArMix_PICK", BArMix_PICK		<float>()));
+				BArSch_PICK		<float>(GetOption_Double(document, "BArSch_PICK", BArSch_PICK		<float>()));
+				BEmOth_PICK		<float>(GetOption_Double(document, "BEmOth_PICK", BEmOth_PICK		<float>()));
+				BEmInd_PICK		<float>(GetOption_Double(document, "BEmInd_PICK", BEmInd_PICK		<float>()));
+				BEmGov_PICK		<float>(GetOption_Double(document, "BEmGov_PICK", BEmGov_PICK		<float>()));
+				BEmSer_PICK		<float>(GetOption_Double(document, "BEmSer_PICK", BEmSer_PICK		<float>()));
+				BEmMan_PICK		<float>(GetOption_Double(document, "BEmMan_PICK", BEmMan_PICK		<float>()));
+				BEmRet_PICK		<float>(GetOption_Double(document, "BEmRet_PICK", BEmRet_PICK		<float>()));
+				THETAG_PICK		<float>(GetOption_Double(document, "THETAG_PICK", THETAG_PICK		<float>()));
+				THETAM_PICK		<float>(GetOption_Double(document, "THETAM_PICK", THETAM_PICK		<float>()));
+				THETAR_PICK		<float>(GetOption_Double(document, "THETAR_PICK", THETAR_PICK		<float>()));
+				THETAS_PICK		<float>(GetOption_Double(document, "THETAS_PICK", THETAS_PICK		<float>()));
+				THETAI_PICK		<float>(GetOption_Double(document, "THETAI_PICK", THETAI_PICK		<float>()));
+				THETAO_PICK		<float>(GetOption_Double(document, "THETAO_PICK", THETAO_PICK		<float>()));
+				GAMMA_PICK		<float>(GetOption_Double(document, "GAMMA_PICK" , GAMMA_PICK		<float>()));
+
+				BTT_OTHER_WORK		<float>(GetOption_Double(document, "BTT_OTHER_WORK"	  , BTT_OTHER_WORK		<float>()));
+				BINCD_OTHER_WORK	<float>(GetOption_Double(document, "BINCD_OTHER_WORK" , BINCD_OTHER_WORK	<float>()));
+				BRACED_OTHER_WORK	<float>(GetOption_Double(document, "BRACED_OTHER_WORK", BRACED_OTHER_WORK	<float>()));
+				BArRes_OTHER_WORK	<float>(GetOption_Double(document, "BArRes_OTHER_WORK", BArRes_OTHER_WORK	<float>()));
+				BArRec_OTHER_WORK	<float>(GetOption_Double(document, "BArRec_OTHER_WORK", BArRec_OTHER_WORK	<float>()));
+				BArRet_OTHER_WORK	<float>(GetOption_Double(document, "BArRet_OTHER_WORK", BArRet_OTHER_WORK	<float>()));
+				BArEnt_OTHER_WORK	<float>(GetOption_Double(document, "BArEnt_OTHER_WORK", BArEnt_OTHER_WORK	<float>()));
+				BArIns_OTHER_WORK	<float>(GetOption_Double(document, "BArIns_OTHER_WORK", BArIns_OTHER_WORK	<float>()));
+				BArOff_OTHER_WORK	<float>(GetOption_Double(document, "BArOff_OTHER_WORK", BArOff_OTHER_WORK	<float>()));
+				BArMix_OTHER_WORK	<float>(GetOption_Double(document, "BArMix_OTHER_WORK", BArMix_OTHER_WORK	<float>()));
+				BArSch_OTHER_WORK	<float>(GetOption_Double(document, "BArSch_OTHER_WORK", BArSch_OTHER_WORK	<float>()));
+				BEmOth_OTHER_WORK	<float>(GetOption_Double(document, "BEmOth_OTHER_WORK", BEmOth_OTHER_WORK	<float>()));
+				BEmInd_OTHER_WORK	<float>(GetOption_Double(document, "BEmInd_OTHER_WORK", BEmInd_OTHER_WORK	<float>()));
+				BEmGov_OTHER_WORK	<float>(GetOption_Double(document, "BEmGov_OTHER_WORK", BEmGov_OTHER_WORK	<float>()));
+				BEmSer_OTHER_WORK	<float>(GetOption_Double(document, "BEmSer_OTHER_WORK", BEmSer_OTHER_WORK	<float>()));
+				BEmMan_OTHER_WORK	<float>(GetOption_Double(document, "BEmMan_OTHER_WORK", BEmMan_OTHER_WORK	<float>()));
+				BEmRet_OTHER_WORK	<float>(GetOption_Double(document, "BEmRet_OTHER_WORK", BEmRet_OTHER_WORK	<float>()));
+				THETAG_OTHER_WORK	<float>(GetOption_Double(document, "THETAG_OTHER_WORK", THETAG_OTHER_WORK	<float>()));
+				THETAM_OTHER_WORK	<float>(GetOption_Double(document, "THETAM_OTHER_WORK", THETAM_OTHER_WORK	<float>()));
+				THETAR_OTHER_WORK	<float>(GetOption_Double(document, "THETAR_OTHER_WORK", THETAR_OTHER_WORK	<float>()));
+				THETAS_OTHER_WORK	<float>(GetOption_Double(document, "THETAS_OTHER_WORK", THETAS_OTHER_WORK	<float>()));
+				THETAI_OTHER_WORK	<float>(GetOption_Double(document, "THETAI_OTHER_WORK", THETAI_OTHER_WORK	<float>()));
+				THETAO_OTHER_WORK	<float>(GetOption_Double(document, "THETAO_OTHER_WORK", THETAO_OTHER_WORK	<float>()));
+				GAMMA_OTHER_WORK 	<float>(GetOption_Double(document, "GAMMA_OTHER_WORK",  GAMMA_OTHER_WORK 	<float>()));
+
+				BTT_SERVICE		<float>(GetOption_Double(document, "BTT_SERVICE"   , BTT_SERVICE	<float>()));
+				BINCD_SERVICE	<float>(GetOption_Double(document, "BINCD_SERVICE" , BINCD_SERVICE	<float>()));
+				BRACED_SERVICE	<float>(GetOption_Double(document, "BRACED_SERVICE", BRACED_SERVICE	<float>()));
+				BArRes_SERVICE	<float>(GetOption_Double(document, "BArRes_SERVICE", BArRes_SERVICE	<float>()));
+				BArRec_SERVICE	<float>(GetOption_Double(document, "BArRec_SERVICE", BArRec_SERVICE	<float>()));
+				BArRet_SERVICE	<float>(GetOption_Double(document, "BArRet_SERVICE", BArRet_SERVICE	<float>()));
+				BArEnt_SERVICE	<float>(GetOption_Double(document, "BArEnt_SERVICE", BArEnt_SERVICE	<float>()));
+				BArIns_SERVICE	<float>(GetOption_Double(document, "BArIns_SERVICE", BArIns_SERVICE	<float>()));
+				BArOff_SERVICE	<float>(GetOption_Double(document, "BArOff_SERVICE", BArOff_SERVICE	<float>()));
+				BArMix_SERVICE	<float>(GetOption_Double(document, "BArMix_SERVICE", BArMix_SERVICE	<float>()));
+				BArSch_SERVICE	<float>(GetOption_Double(document, "BArSch_SERVICE", BArSch_SERVICE	<float>()));
+				BEmOth_SERVICE	<float>(GetOption_Double(document, "BEmOth_SERVICE", BEmOth_SERVICE	<float>()));
+				BEmInd_SERVICE	<float>(GetOption_Double(document, "BEmInd_SERVICE", BEmInd_SERVICE	<float>()));
+				BEmGov_SERVICE	<float>(GetOption_Double(document, "BEmGov_SERVICE", BEmGov_SERVICE	<float>()));
+				BEmSer_SERVICE	<float>(GetOption_Double(document, "BEmSer_SERVICE", BEmSer_SERVICE	<float>()));
+				BEmMan_SERVICE	<float>(GetOption_Double(document, "BEmMan_SERVICE", BEmMan_SERVICE	<float>()));
+				BEmRet_SERVICE	<float>(GetOption_Double(document, "BEmRet_SERVICE", BEmRet_SERVICE	<float>()));
+				THETAG_SERVICE	<float>(GetOption_Double(document, "THETAG_SERVICE", THETAG_SERVICE	<float>()));
+				THETAM_SERVICE	<float>(GetOption_Double(document, "THETAM_SERVICE", THETAM_SERVICE	<float>()));
+				THETAR_SERVICE	<float>(GetOption_Double(document, "THETAR_SERVICE", THETAR_SERVICE	<float>()));
+				THETAS_SERVICE	<float>(GetOption_Double(document, "THETAS_SERVICE", THETAS_SERVICE	<float>()));
+				THETAI_SERVICE	<float>(GetOption_Double(document, "THETAI_SERVICE", THETAI_SERVICE	<float>()));
+				THETAO_SERVICE	<float>(GetOption_Double(document, "THETAO_SERVICE", THETAO_SERVICE	<float>()));
+				GAMMA_SERVICE 	<float>(GetOption_Double(document, "GAMMA_SERVICE" , GAMMA_SERVICE  <float>()));
+
+				BTT_MIN_SHOP	<float>(GetOption_Double(document, "BTT_MIN_SHOP"	, BTT_MIN_SHOP		<float>()));
+				BINCD_MIN_SHOP  <float>(GetOption_Double(document, "BINCD_MIN_SHOP" , BINCD_MIN_SHOP	<float>()));
+				BRACED_MIN_SHOP	<float>(GetOption_Double(document, "BRACED_MIN_SHOP", BRACED_MIN_SHOP	<float>()));
+				BArRes_MIN_SHOP	<float>(GetOption_Double(document, "BArRes_MIN_SHOP", BArRes_MIN_SHOP	<float>()));
+				BArRec_MIN_SHOP	<float>(GetOption_Double(document, "BArRec_MIN_SHOP", BArRec_MIN_SHOP	<float>()));
+				BArRet_MIN_SHOP	<float>(GetOption_Double(document, "BArRet_MIN_SHOP", BArRet_MIN_SHOP	<float>()));
+				BArEnt_MIN_SHOP	<float>(GetOption_Double(document, "BArEnt_MIN_SHOP", BArEnt_MIN_SHOP	<float>()));
+				BArIns_MIN_SHOP	<float>(GetOption_Double(document, "BArIns_MIN_SHOP", BArIns_MIN_SHOP	<float>()));
+				BArOff_MIN_SHOP	<float>(GetOption_Double(document, "BArOff_MIN_SHOP", BArOff_MIN_SHOP	<float>()));
+				BArMix_MIN_SHOP	<float>(GetOption_Double(document, "BArMix_MIN_SHOP", BArMix_MIN_SHOP	<float>()));
+				BArSch_MIN_SHOP	<float>(GetOption_Double(document, "BArSch_MIN_SHOP", BArSch_MIN_SHOP	<float>()));
+				BEmOth_MIN_SHOP	<float>(GetOption_Double(document, "BEmOth_MIN_SHOP", BEmOth_MIN_SHOP	<float>()));
+				BEmInd_MIN_SHOP	<float>(GetOption_Double(document, "BEmInd_MIN_SHOP", BEmInd_MIN_SHOP	<float>()));
+				BEmGov_MIN_SHOP	<float>(GetOption_Double(document, "BEmGov_MIN_SHOP", BEmGov_MIN_SHOP	<float>()));
+				BEmSer_MIN_SHOP	<float>(GetOption_Double(document, "BEmSer_MIN_SHOP", BEmSer_MIN_SHOP	<float>()));
+				BEmMan_MIN_SHOP	<float>(GetOption_Double(document, "BEmMan_MIN_SHOP", BEmMan_MIN_SHOP	<float>()));
+				BEmRet_MIN_SHOP	<float>(GetOption_Double(document, "BEmRet_MIN_SHOP", BEmRet_MIN_SHOP	<float>()));
+				THETAG_MIN_SHOP	<float>(GetOption_Double(document, "THETAG_MIN_SHOP", THETAG_MIN_SHOP	<float>()));
+				THETAM_MIN_SHOP	<float>(GetOption_Double(document, "THETAM_MIN_SHOP", THETAM_MIN_SHOP	<float>()));
+				THETAR_MIN_SHOP	<float>(GetOption_Double(document, "THETAR_MIN_SHOP", THETAR_MIN_SHOP	<float>()));
+				THETAS_MIN_SHOP	<float>(GetOption_Double(document, "THETAS_MIN_SHOP", THETAS_MIN_SHOP	<float>()));
+				THETAI_MIN_SHOP	<float>(GetOption_Double(document, "THETAI_MIN_SHOP", THETAI_MIN_SHOP	<float>()));
+				THETAO_MIN_SHOP	<float>(GetOption_Double(document, "THETAO_MIN_SHOP", THETAO_MIN_SHOP	<float>()));
+				GAMMA_MIN_SHOP 	<float>(GetOption_Double(document, "GAMMA_MIN_SHOP" , GAMMA_MIN_SHOP 	<float>()));
+
+				BTT_MAJ_SHOP   	<float>(GetOption_Double(document, "BTT_MAJ_SHOP"   , BTT_MAJ_SHOP   	<float>()));
+				BINCD_MAJ_SHOP 	<float>(GetOption_Double(document, "BINCD_MAJ_SHOP" , BINCD_MAJ_SHOP 	<float>()));
+				BRACED_MAJ_SHOP	<float>(GetOption_Double(document, "BRACED_MAJ_SHOP", BRACED_MAJ_SHOP	<float>()));
+				BArRes_MAJ_SHOP	<float>(GetOption_Double(document, "BArRes_MAJ_SHOP", BArRes_MAJ_SHOP	<float>()));
+				BArRec_MAJ_SHOP	<float>(GetOption_Double(document, "BArRec_MAJ_SHOP", BArRec_MAJ_SHOP	<float>()));
+				BArRet_MAJ_SHOP	<float>(GetOption_Double(document, "BArRet_MAJ_SHOP", BArRet_MAJ_SHOP	<float>()));
+				BArEnt_MAJ_SHOP	<float>(GetOption_Double(document, "BArEnt_MAJ_SHOP", BArEnt_MAJ_SHOP	<float>()));
+				BArIns_MAJ_SHOP	<float>(GetOption_Double(document, "BArIns_MAJ_SHOP", BArIns_MAJ_SHOP	<float>()));
+				BArOff_MAJ_SHOP	<float>(GetOption_Double(document, "BArOff_MAJ_SHOP", BArOff_MAJ_SHOP	<float>()));
+				BArMix_MAJ_SHOP	<float>(GetOption_Double(document, "BArMix_MAJ_SHOP", BArMix_MAJ_SHOP	<float>()));
+				BArSch_MAJ_SHOP	<float>(GetOption_Double(document, "BArSch_MAJ_SHOP", BArSch_MAJ_SHOP	<float>()));
+				BEmOth_MAJ_SHOP	<float>(GetOption_Double(document, "BEmOth_MAJ_SHOP", BEmOth_MAJ_SHOP	<float>()));
+				BEmInd_MAJ_SHOP	<float>(GetOption_Double(document, "BEmInd_MAJ_SHOP", BEmInd_MAJ_SHOP	<float>()));
+				BEmGov_MAJ_SHOP	<float>(GetOption_Double(document, "BEmGov_MAJ_SHOP", BEmGov_MAJ_SHOP	<float>()));
+				BEmSer_MAJ_SHOP	<float>(GetOption_Double(document, "BEmSer_MAJ_SHOP", BEmSer_MAJ_SHOP	<float>()));
+				BEmMan_MAJ_SHOP	<float>(GetOption_Double(document, "BEmMan_MAJ_SHOP", BEmMan_MAJ_SHOP	<float>()));
+				BEmRet_MAJ_SHOP	<float>(GetOption_Double(document, "BEmRet_MAJ_SHOP", BEmRet_MAJ_SHOP	<float>()));
+				THETAG_MAJ_SHOP	<float>(GetOption_Double(document, "THETAG_MAJ_SHOP", THETAG_MAJ_SHOP	<float>()));
+				THETAM_MAJ_SHOP	<float>(GetOption_Double(document, "THETAM_MAJ_SHOP", THETAM_MAJ_SHOP	<float>()));
+				THETAR_MAJ_SHOP	<float>(GetOption_Double(document, "THETAR_MAJ_SHOP", THETAR_MAJ_SHOP	<float>()));
+				THETAS_MAJ_SHOP	<float>(GetOption_Double(document, "THETAS_MAJ_SHOP", THETAS_MAJ_SHOP	<float>()));
+				THETAI_MAJ_SHOP	<float>(GetOption_Double(document, "THETAI_MAJ_SHOP", THETAI_MAJ_SHOP	<float>()));
+				THETAO_MAJ_SHOP	<float>(GetOption_Double(document, "THETAO_MAJ_SHOP", THETAO_MAJ_SHOP	<float>()));
+				GAMMA_MAJ_SHOP 	<float>(GetOption_Double(document, "GAMMA_MAJ_SHOP" , GAMMA_MAJ_SHOP 	<float>()));
+
+				BTT_EAT_OUT	  	<float>(GetOption_Double(document, "BTT_EAT_OUT"   , BTT_EAT_OUT	<float>()));
+				BINCD_EAT_OUT 	<float>(GetOption_Double(document, "BINCD_EAT_OUT" , BINCD_EAT_OUT	<float>()));
+				BRACED_EAT_OUT	<float>(GetOption_Double(document, "BRACED_EAT_OUT", BRACED_EAT_OUT	<float>()));
+				BArRes_EAT_OUT	<float>(GetOption_Double(document, "BArRes_EAT_OUT", BArRes_EAT_OUT	<float>()));
+				BArRec_EAT_OUT	<float>(GetOption_Double(document, "BArRec_EAT_OUT", BArRec_EAT_OUT	<float>()));
+				BArRet_EAT_OUT	<float>(GetOption_Double(document, "BArRet_EAT_OUT", BArRet_EAT_OUT	<float>()));
+				BArEnt_EAT_OUT	<float>(GetOption_Double(document, "BArEnt_EAT_OUT", BArEnt_EAT_OUT	<float>()));
+				BArIns_EAT_OUT	<float>(GetOption_Double(document, "BArIns_EAT_OUT", BArIns_EAT_OUT	<float>()));
+				BArOff_EAT_OUT	<float>(GetOption_Double(document, "BArOff_EAT_OUT", BArOff_EAT_OUT	<float>()));
+				BArMix_EAT_OUT	<float>(GetOption_Double(document, "BArMix_EAT_OUT", BArMix_EAT_OUT	<float>()));
+				BArSch_EAT_OUT	<float>(GetOption_Double(document, "BArSch_EAT_OUT", BArSch_EAT_OUT	<float>()));
+				BEmOth_EAT_OUT	<float>(GetOption_Double(document, "BEmOth_EAT_OUT", BEmOth_EAT_OUT	<float>()));
+				BEmInd_EAT_OUT	<float>(GetOption_Double(document, "BEmInd_EAT_OUT", BEmInd_EAT_OUT	<float>()));
+				BEmGov_EAT_OUT	<float>(GetOption_Double(document, "BEmGov_EAT_OUT", BEmGov_EAT_OUT	<float>()));
+				BEmSer_EAT_OUT	<float>(GetOption_Double(document, "BEmSer_EAT_OUT", BEmSer_EAT_OUT	<float>()));
+				BEmMan_EAT_OUT	<float>(GetOption_Double(document, "BEmMan_EAT_OUT", BEmMan_EAT_OUT	<float>()));
+				BEmRet_EAT_OUT	<float>(GetOption_Double(document, "BEmRet_EAT_OUT", BEmRet_EAT_OUT	<float>()));
+				THETAG_EAT_OUT	<float>(GetOption_Double(document, "THETAG_EAT_OUT", THETAG_EAT_OUT	<float>()));
+				THETAM_EAT_OUT	<float>(GetOption_Double(document, "THETAM_EAT_OUT", THETAM_EAT_OUT	<float>()));
+				THETAR_EAT_OUT	<float>(GetOption_Double(document, "THETAR_EAT_OUT", THETAR_EAT_OUT	<float>()));
+				THETAS_EAT_OUT	<float>(GetOption_Double(document, "THETAS_EAT_OUT", THETAS_EAT_OUT	<float>()));
+				THETAI_EAT_OUT	<float>(GetOption_Double(document, "THETAI_EAT_OUT", THETAI_EAT_OUT	<float>()));
+				THETAO_EAT_OUT	<float>(GetOption_Double(document, "THETAO_EAT_OUT", THETAO_EAT_OUT	<float>()));
+				GAMMA_EAT_OUT 	<float>(GetOption_Double(document, "GAMMA_EAT_OUT", GAMMA_EAT_OUT 	<float>()));
+
+				BTT_CIVIC   	<float>(GetOption_Double(document, "BTT_CIVIC"   , BTT_CIVIC   	<float>()));
+				BINCD_CIVIC 	<float>(GetOption_Double(document, "BINCD_CIVIC" , BINCD_CIVIC 	<float>()));
+				BRACED_CIVIC	<float>(GetOption_Double(document, "BRACED_CIVIC", BRACED_CIVIC	<float>()));
+				BArRes_CIVIC	<float>(GetOption_Double(document, "BArRes_CIVIC", BArRes_CIVIC	<float>()));
+				BArRec_CIVIC	<float>(GetOption_Double(document, "BArRec_CIVIC", BArRec_CIVIC	<float>()));
+				BArRet_CIVIC	<float>(GetOption_Double(document, "BArRet_CIVIC", BArRet_CIVIC	<float>()));
+				BArEnt_CIVIC	<float>(GetOption_Double(document, "BArEnt_CIVIC", BArEnt_CIVIC	<float>()));
+				BArIns_CIVIC	<float>(GetOption_Double(document, "BArIns_CIVIC", BArIns_CIVIC	<float>()));
+				BArOff_CIVIC	<float>(GetOption_Double(document, "BArOff_CIVIC", BArOff_CIVIC	<float>()));
+				BArMix_CIVIC	<float>(GetOption_Double(document, "BArMix_CIVIC", BArMix_CIVIC	<float>()));
+				BArSch_CIVIC	<float>(GetOption_Double(document, "BArSch_CIVIC", BArSch_CIVIC	<float>()));
+				BEmOth_CIVIC	<float>(GetOption_Double(document, "BEmOth_CIVIC", BEmOth_CIVIC	<float>()));
+				BEmInd_CIVIC	<float>(GetOption_Double(document, "BEmInd_CIVIC", BEmInd_CIVIC	<float>()));
+				BEmGov_CIVIC	<float>(GetOption_Double(document, "BEmGov_CIVIC", BEmGov_CIVIC	<float>()));
+				BEmSer_CIVIC	<float>(GetOption_Double(document, "BEmSer_CIVIC", BEmSer_CIVIC	<float>()));
+				BEmMan_CIVIC	<float>(GetOption_Double(document, "BEmMan_CIVIC", BEmMan_CIVIC	<float>()));
+				BEmRet_CIVIC	<float>(GetOption_Double(document, "BEmRet_CIVIC", BEmRet_CIVIC	<float>()));
+				THETAG_CIVIC	<float>(GetOption_Double(document, "THETAG_CIVIC", THETAG_CIVIC	<float>()));
+				THETAM_CIVIC	<float>(GetOption_Double(document, "THETAM_CIVIC", THETAM_CIVIC	<float>()));
+				THETAR_CIVIC	<float>(GetOption_Double(document, "THETAR_CIVIC", THETAR_CIVIC	<float>()));
+				THETAS_CIVIC	<float>(GetOption_Double(document, "THETAS_CIVIC", THETAS_CIVIC	<float>()));
+				THETAI_CIVIC	<float>(GetOption_Double(document, "THETAI_CIVIC", THETAI_CIVIC	<float>()));
+				THETAO_CIVIC	<float>(GetOption_Double(document, "THETAO_CIVIC", THETAO_CIVIC	<float>()));
+				GAMMA_CIVIC 	<float>(GetOption_Double(document, "GAMMA_CIVIC" , GAMMA_CIVIC 	<float>()));
+
+				BTT_LEISURE	  	<float>(GetOption_Double(document, "BTT_LEISURE"   , BTT_LEISURE  	<float>()));
+				BINCD_LEISURE 	<float>(GetOption_Double(document, "BINCD_LEISURE" , BINCD_LEISURE 	<float>()));
+				BRACED_LEISURE	<float>(GetOption_Double(document, "BRACED_LEISURE", BRACED_LEISURE	<float>()));
+				BArRes_LEISURE	<float>(GetOption_Double(document, "BArRes_LEISURE", BArRes_LEISURE	<float>()));
+				BArRec_LEISURE	<float>(GetOption_Double(document, "BArRec_LEISURE", BArRec_LEISURE	<float>()));
+				BArRet_LEISURE	<float>(GetOption_Double(document, "BArRet_LEISURE", BArRet_LEISURE	<float>()));
+				BArEnt_LEISURE	<float>(GetOption_Double(document, "BArEnt_LEISURE", BArEnt_LEISURE	<float>()));
+				BArIns_LEISURE	<float>(GetOption_Double(document, "BArIns_LEISURE", BArIns_LEISURE	<float>()));
+				BArOff_LEISURE	<float>(GetOption_Double(document, "BArOff_LEISURE", BArOff_LEISURE	<float>()));
+				BArMix_LEISURE	<float>(GetOption_Double(document, "BArMix_LEISURE", BArMix_LEISURE	<float>()));
+				BArSch_LEISURE	<float>(GetOption_Double(document, "BArSch_LEISURE", BArSch_LEISURE	<float>()));
+				BEmOth_LEISURE	<float>(GetOption_Double(document, "BEmOth_LEISURE", BEmOth_LEISURE	<float>()));
+				BEmInd_LEISURE	<float>(GetOption_Double(document, "BEmInd_LEISURE", BEmInd_LEISURE	<float>()));
+				BEmGov_LEISURE	<float>(GetOption_Double(document, "BEmGov_LEISURE", BEmGov_LEISURE	<float>()));
+				BEmSer_LEISURE	<float>(GetOption_Double(document, "BEmSer_LEISURE", BEmSer_LEISURE	<float>()));
+				BEmMan_LEISURE	<float>(GetOption_Double(document, "BEmMan_LEISURE", BEmMan_LEISURE	<float>()));
+				BEmRet_LEISURE	<float>(GetOption_Double(document, "BEmRet_LEISURE", BEmRet_LEISURE	<float>()));
+				THETAG_LEISURE	<float>(GetOption_Double(document, "THETAG_LEISURE", THETAG_LEISURE	<float>()));
+				THETAM_LEISURE	<float>(GetOption_Double(document, "THETAM_LEISURE", THETAM_LEISURE	<float>()));
+				THETAR_LEISURE	<float>(GetOption_Double(document, "THETAR_LEISURE", THETAR_LEISURE	<float>()));
+				THETAS_LEISURE	<float>(GetOption_Double(document, "THETAS_LEISURE", THETAS_LEISURE	<float>()));
+				THETAI_LEISURE	<float>(GetOption_Double(document, "THETAI_LEISURE", THETAI_LEISURE	<float>()));
+				THETAO_LEISURE	<float>(GetOption_Double(document, "THETAO_LEISURE", THETAO_LEISURE	<float>()));
+				GAMMA_LEISURE 	<float>(GetOption_Double(document, "GAMMA_LEISURE" , GAMMA_LEISURE 	<float>()));
+
+				BTT_SOCIAL   	<float>(GetOption_Double(document, "BTT_SOCIAL"   , BTT_SOCIAL   	<float>()));
+				BINCD_SOCIAL 	<float>(GetOption_Double(document, "BINCD_SOCIAL" , BINCD_SOCIAL 	<float>()));
+				BRACED_SOCIAL	<float>(GetOption_Double(document, "BRACED_SOCIAL", BRACED_SOCIAL	<float>()));
+				BArRes_SOCIAL	<float>(GetOption_Double(document, "BArRes_SOCIAL", BArRes_SOCIAL	<float>()));
+				BArRec_SOCIAL	<float>(GetOption_Double(document, "BArRec_SOCIAL", BArRec_SOCIAL	<float>()));
+				BArRet_SOCIAL	<float>(GetOption_Double(document, "BArRet_SOCIAL", BArRet_SOCIAL	<float>()));
+				BArEnt_SOCIAL	<float>(GetOption_Double(document, "BArEnt_SOCIAL", BArEnt_SOCIAL	<float>()));
+				BArIns_SOCIAL	<float>(GetOption_Double(document, "BArIns_SOCIAL", BArIns_SOCIAL	<float>()));
+				BArOff_SOCIAL	<float>(GetOption_Double(document, "BArOff_SOCIAL", BArOff_SOCIAL	<float>()));
+				BArMix_SOCIAL	<float>(GetOption_Double(document, "BArMix_SOCIAL", BArMix_SOCIAL	<float>()));
+				BArSch_SOCIAL	<float>(GetOption_Double(document, "BArSch_SOCIAL", BArSch_SOCIAL	<float>()));
+				BEmOth_SOCIAL	<float>(GetOption_Double(document, "BEmOth_SOCIAL", BEmOth_SOCIAL	<float>()));
+				BEmInd_SOCIAL	<float>(GetOption_Double(document, "BEmInd_SOCIAL", BEmInd_SOCIAL	<float>()));
+				BEmGov_SOCIAL	<float>(GetOption_Double(document, "BEmGov_SOCIAL", BEmGov_SOCIAL	<float>()));
+				BEmSer_SOCIAL	<float>(GetOption_Double(document, "BEmSer_SOCIAL", BEmSer_SOCIAL	<float>()));
+				BEmMan_SOCIAL	<float>(GetOption_Double(document, "BEmMan_SOCIAL", BEmMan_SOCIAL	<float>()));
+				BEmRet_SOCIAL	<float>(GetOption_Double(document, "BEmRet_SOCIAL", BEmRet_SOCIAL	<float>()));
+				THETAG_SOCIAL	<float>(GetOption_Double(document, "THETAG_SOCIAL", THETAG_SOCIAL	<float>()));
+				THETAM_SOCIAL	<float>(GetOption_Double(document, "THETAM_SOCIAL", THETAM_SOCIAL	<float>()));
+				THETAR_SOCIAL	<float>(GetOption_Double(document, "THETAR_SOCIAL", THETAR_SOCIAL	<float>()));
+				THETAS_SOCIAL	<float>(GetOption_Double(document, "THETAS_SOCIAL", THETAS_SOCIAL	<float>()));
+				THETAI_SOCIAL	<float>(GetOption_Double(document, "THETAI_SOCIAL", THETAI_SOCIAL	<float>()));
+				THETAO_SOCIAL	<float>(GetOption_Double(document, "THETAO_SOCIAL", THETAO_SOCIAL	<float>()));
+				GAMMA_SOCIAL 	<float>(GetOption_Double(document, "GAMMA_SOCIAL" , GAMMA_SOCIAL 	<float>()));
+
+				BTT_OTHER   	<float>(GetOption_Double(document, "BTT_OTHER"  , BTT_OTHER   	<float>()));
+				BINCD_OTHER 	<float>(GetOption_Double(document, "BINCD_OTHER", BINCD_OTHER 	<float>()));
+				BRACED_OTHER	<float>(GetOption_Double(document, "BRACED_OTHER", BRACED_OTHER	<float>()));
+				BArRes_OTHER	<float>(GetOption_Double(document, "BArRes_OTHER", BArRes_OTHER	<float>()));
+				BArRec_OTHER	<float>(GetOption_Double(document, "BArRec_OTHER", BArRec_OTHER	<float>()));
+				BArRet_OTHER	<float>(GetOption_Double(document, "BArRet_OTHER", BArRet_OTHER	<float>()));
+				BArEnt_OTHER	<float>(GetOption_Double(document, "BArEnt_OTHER", BArEnt_OTHER	<float>()));
+				BArIns_OTHER	<float>(GetOption_Double(document, "BArIns_OTHER", BArIns_OTHER	<float>()));
+				BArOff_OTHER	<float>(GetOption_Double(document, "BArOff_OTHER", BArOff_OTHER	<float>()));
+				BArMix_OTHER	<float>(GetOption_Double(document, "BArMix_OTHER", BArMix_OTHER	<float>()));
+				BArSch_OTHER	<float>(GetOption_Double(document, "BArSch_OTHER", BArSch_OTHER	<float>()));
+				BEmOth_OTHER	<float>(GetOption_Double(document, "BEmOth_OTHER", BEmOth_OTHER	<float>()));
+				BEmInd_OTHER	<float>(GetOption_Double(document, "BEmInd_OTHER", BEmInd_OTHER	<float>()));
+				BEmGov_OTHER	<float>(GetOption_Double(document, "BEmGov_OTHER", BEmGov_OTHER	<float>()));
+				BEmSer_OTHER	<float>(GetOption_Double(document, "BEmSer_OTHER", BEmSer_OTHER	<float>()));
+				BEmMan_OTHER	<float>(GetOption_Double(document, "BEmMan_OTHER", BEmMan_OTHER	<float>()));
+				BEmRet_OTHER	<float>(GetOption_Double(document, "BEmRet_OTHER", BEmRet_OTHER	<float>()));
+				THETAG_OTHER	<float>(GetOption_Double(document, "THETAG_OTHER", THETAG_OTHER	<float>()));
+				THETAM_OTHER	<float>(GetOption_Double(document, "THETAM_OTHER", THETAM_OTHER	<float>()));
+				THETAR_OTHER	<float>(GetOption_Double(document, "THETAR_OTHER", THETAR_OTHER	<float>()));
+				THETAS_OTHER	<float>(GetOption_Double(document, "THETAS_OTHER", THETAS_OTHER	<float>()));
+				THETAI_OTHER	<float>(GetOption_Double(document, "THETAI_OTHER", THETAI_OTHER	<float>()));
+				THETAO_OTHER	<float>(GetOption_Double(document, "THETAO_OTHER", THETAO_OTHER	<float>()));
+				GAMMA_OTHER 	<float>(GetOption_Double(document, "GAMMA_OTHER" , GAMMA_OTHER 	<float>()));
+
+				BTTAUTO_WORK	<float>(GetOption_Double(document, "BTTAUTO_WORK", BTTAUTO_WORK	<float>()));
+				BINCD_WORK 		<float>(GetOption_Double(document, "BINCD_WORK"	 , BINCD_WORK 	<float>()));
+				BRACED_WORK 	<float>(GetOption_Double(document, "BRACED_WORK" , BRACED_WORK 	<float>()));
+				BArRes_WORK 	<float>(GetOption_Double(document, "BArRes_WORK" , BArRes_WORK 	<float>()));
+				BArRec_WORK 	<float>(GetOption_Double(document, "BArRec_WORK" , BArRec_WORK 	<float>()));
+				BArRet_WORK 	<float>(GetOption_Double(document, "BArRet_WORK" , BArRet_WORK 	<float>()));
+				BArEnt_WORK 	<float>(GetOption_Double(document, "BArEnt_WORK" , BArEnt_WORK 	<float>()));
+				BArIns_WORK 	<float>(GetOption_Double(document, "BArIns_WORK" , BArIns_WORK 	<float>()));
+				BArOff_WORK 	<float>(GetOption_Double(document, "BArOff_WORK" , BArOff_WORK 	<float>()));
+				BArMix_WORK 	<float>(GetOption_Double(document, "BArMix_WORK" , BArMix_WORK 	<float>()));
+				BArSch_WORK 	<float>(GetOption_Double(document, "BArSch_WORK" , BArSch_WORK 	<float>()));
+				BEmOth_WORK 	<float>(GetOption_Double(document, "BEmOth_WORK" , BEmOth_WORK 	<float>()));
+				BEmInd_WORK 	<float>(GetOption_Double(document, "BEmInd_WORK" , BEmInd_WORK 	<float>()));
+				BEmGov_WORK 	<float>(GetOption_Double(document, "BEmGov_WORK" , BEmGov_WORK 	<float>()));
+				BEmSer_WORK 	<float>(GetOption_Double(document, "BEmSer_WORK" , BEmSer_WORK 	<float>()));
+				BEmMan_WORK 	<float>(GetOption_Double(document, "BEmMan_WORK" , BEmMan_WORK 	<float>()));
+				BEmRet_WORK 	<float>(GetOption_Double(document, "BEmRet_WORK" , BEmRet_WORK 	<float>()));
+				THETAG_WORK 	<float>(GetOption_Double(document, "THETAG_WORK" , THETAG_WORK 	<float>()));
+				THETAM_WORK 	<float>(GetOption_Double(document, "THETAM_WORK" , THETAM_WORK 	<float>()));
+				THETAR_WORK 	<float>(GetOption_Double(document, "THETAR_WORK" , THETAR_WORK 	<float>()));
+				THETAS_WORK 	<float>(GetOption_Double(document, "THETAS_WORK" , THETAS_WORK 	<float>()));
+				THETAI_WORK 	<float>(GetOption_Double(document, "THETAI_WORK" , THETAI_WORK 	<float>()));
+				THETAO_WORK 	<float>(GetOption_Double(document, "THETAO_WORK" , THETAO_WORK 	<float>()));
+
+				BTTTRAN_WORK     	<float>(GetOption_Double(document, "BTTTRAN_WORK", BTTTRAN_WORK     		<float>()));
+				BTTOTHER_WORK    	<float>(GetOption_Double(document, "BTTOTHER_WORK", BTTOTHER_WORK    		<float>()));
+				BHOME_WORK       	<float>(GetOption_Double(document, "BHOME_WORK", BHOME_WORK       			<float>()));
+				BEmUnrelated_WORK	<float>(GetOption_Double(document, "BEmUnrelated_WORK", BEmUnrelated_WORK	<float>()));
+				THETA_UR_WORK    	<float>(GetOption_Double(document, "THETA_UR_WORK", THETA_UR_WORK    		<float>()));
+
+				return true;
+			}
 
 			template<typename TargetType> void Initialize()
 			{	

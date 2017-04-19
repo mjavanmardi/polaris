@@ -71,6 +71,8 @@ endif()
 		MESSAGE(INFO " DEPS_BINARY_DIR=${DEPS_BINARY_DIR}")
 	endif()
 
+	include_directories(${DEPS_DIR}/rapidjson-1.1.0/include)
+
 	#Variable to indicate where boost lives
 	#Variable to indicate where boost lives
 	set(BOOST_ROOT ${DEPS_DIR}/boost_1_60_0)

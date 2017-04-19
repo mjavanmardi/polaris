@@ -19,6 +19,57 @@ namespace Person_Components
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+			{
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Implementation", key, default_value);
+			}
+
+			static bool static_initialize()
+			{
+				rapidjson::Document document;
+				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file for Telecommute_Choice_Implementation was not specified" << endl;
+					return true;
+				}
+
+				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+					return false;
+
+				Z_CONST					<float>(GetOption_Double(document, "Z_CONST"			, Z_CONST				<float>()));
+				Z_VEH_AVAIL				<float>(GetOption_Double(document, "Z_VEH_AVAIL"		, Z_VEH_AVAIL			<float>()));
+				Z_HU_DENSITY			<float>(GetOption_Double(document, "Z_HU_DENSITY"		, Z_HU_DENSITY			<float>()));
+				Z_OCC_INC				<float>(GetOption_Double(document, "Z_OCC_INC"			, Z_OCC_INC				<float>()));
+				Z_OCC_FINANCE			<float>(GetOption_Double(document, "Z_OCC_FINANCE"		, Z_OCC_FINANCE			<float>()));
+				Z_OCC_EDUCATION 		<float>(GetOption_Double(document, "Z_OCC_EDUCATION"	, Z_OCC_EDUCATION 		<float>()));
+				Z_DEGREE_ASSOC 			<float>(GetOption_Double(document, "Z_DEGREE_ASSOC"		, Z_DEGREE_ASSOC 		<float>()));
+
+				O_CONST					<float>(GetOption_Double(document, "O_CONST"			, O_CONST				<float>()));
+				O_HINC 					<float>(GetOption_Double(document, "O_HINC"				, O_HINC 				<float>()));
+				O_MALE 					<float>(GetOption_Double(document, "O_MALE"				, O_MALE 				<float>()));
+				O_EMPFULL 				<float>(GetOption_Double(document, "O_EMPFULL"			, O_EMPFULL 			<float>()));
+				O_DEGREE_GRAD			<float>(GetOption_Double(document, "O_DEGREE_GRAD"		, O_DEGREE_GRAD			<float>()));
+				O_TTIME 				<float>(GetOption_Double(document, "O_TTIME"			, O_TTIME 				<float>()));
+				O_WORKDUR 				<float>(GetOption_Double(document, "O_WORKDUR"			, O_WORKDUR 			<float>()));
+				O_NVEH 					<float>(GetOption_Double(document, "O_NVEH"				, O_NVEH 				<float>()));
+				O_OCC_REALESTATE		<float>(GetOption_Double(document, "O_OCC_REALESTATE"	, O_OCC_REALESTATE		<float>()));
+				O_OCC_COMMUNICATION 	<float>(GetOption_Double(document, "O_OCC_COMMUNICATION", O_OCC_COMMUNICATION	<float>()));
+				O_OCC_PROFESSIONAL 		<float>(GetOption_Double(document, "O_OCC_PROFESSIONAL"	, O_OCC_PROFESSIONAL 	<float>()));
+				O_OCC_HEALTH 			<float>(GetOption_Double(document, "O_OCC_HEALTH"		, O_OCC_HEALTH 			<float>()));
+
+				T_EMPPART				<float>(GetOption_Double(document, "T_EMPPART"			, T_EMPPART				<float>()));
+				T_DEGREE 				<float>(GetOption_Double(document, "T_DEGREE"			, T_DEGREE 				<float>()));
+				T_STUDENTPART 			<float>(GetOption_Double(document, "T_STUDENTPART"		, T_STUDENTPART 		<float>()));
+				T_POPDENSITY 			<float>(GetOption_Double(document, "T_POPDENSITY"		, T_POPDENSITY 			<float>()));
+				T_C1					<float>(GetOption_Double(document, "T_C1"				, T_C1					<float>()));
+				T_C2 					<float>(GetOption_Double(document, "T_C2"				, T_C2 					<float>()));
+				T_C3 					<float>(GetOption_Double(document, "T_C3"				, T_C3 					<float>()));
+				T_RHO					<float>(GetOption_Double(document, "T_RHO"				, T_RHO					<float>()));
+
+				
+				return true;
+			}
 			//==============================================================================================================================
 			// PARAMETER DECLARATIONS
 			//--------------------------------------------------
@@ -30,6 +81,13 @@ namespace Person_Components
 			static m_data(float, Z_OCC_FINANCE, NONE, NONE);
 			static m_data(float, Z_OCC_EDUCATION, NONE, NONE);
 			static m_data(float, Z_DEGREE_ASSOC, NONE, NONE);		// has associates or technical school degree*/
+			m_static_data(float, Z_CONST, NONE, NONE);
+			m_static_data(float, Z_VEH_AVAIL, NONE, NONE);
+			m_static_data(float, Z_HU_DENSITY, NONE, NONE);
+			m_static_data(float, Z_OCC_INC, NONE, NONE);
+			m_static_data(float, Z_OCC_FINANCE, NONE, NONE);
+			m_static_data(float, Z_OCC_EDUCATION, NONE, NONE);
+			m_static_data(float, Z_DEGREE_ASSOC, NONE, NONE);		// has associates or technical school degree
 
 			static m_data(float, Z_CONSTANT, NONE, NONE);
 			static m_data(float, Z_MALE, NONE, NONE);
@@ -58,6 +116,18 @@ namespace Person_Components
 			static m_data(float, O_OCC_COMMUNICATION, NONE, NONE);	// communication industry
 			static m_data(float, O_OCC_PROFESSIONAL, NONE, NONE);	// professional, scientific, technical services
 			static m_data(float, O_OCC_HEALTH, NONE, NONE);			//health care or social assistance*/
+			m_static_data(float, O_CONST, NONE, NONE);
+			m_static_data(float, O_HINC, NONE, NONE);				// inc > 100k
+			m_static_data(float, O_MALE, NONE, NONE);
+			m_static_data(float, O_EMPFULL, NONE, NONE);
+			m_static_data(float, O_DEGREE_GRAD, NONE, NONE);
+			m_static_data(float, O_TTIME, NONE, NONE);
+			m_static_data(float, O_WORKDUR, NONE, NONE);
+			m_static_data(float, O_NVEH, NONE, NONE);
+			m_static_data(float, O_OCC_REALESTATE, NONE, NONE);		// real estate, rental, leasing service
+			m_static_data(float, O_OCC_COMMUNICATION, NONE, NONE);	// communication industry
+			m_static_data(float, O_OCC_PROFESSIONAL, NONE, NONE);	// professional, scientific, technical services
+			m_static_data(float, O_OCC_HEALTH, NONE, NONE);			//health care or social assistance
 
 			static m_data(float, O_CONSTANT, NONE, NONE);
 			static m_data(float, O_INCOME_MED, NONE, NONE);
@@ -89,6 +159,14 @@ namespace Person_Components
 			static m_data(float, T_C2, NONE, NONE);
 			static m_data(float, T_C3, NONE, NONE);
 			static m_data(float, T_RHO, NONE, NONE);
+			m_static_data(float, T_EMPPART, NONE, NONE);			// 1=part-time worker, 0=other
+			m_static_data(float, T_DEGREE, NONE, NONE);				// has bachelor or grad degree
+			m_static_data(float, T_STUDENTPART, NONE, NONE);		// 1=parttime student, 0=other
+			m_static_data(float, T_POPDENSITY, NONE, NONE);			
+			m_static_data(float, T_C1, NONE, NONE);
+			m_static_data(float, T_C2, NONE, NONE);
+			m_static_data(float, T_C3, NONE, NONE);
+			m_static_data(float, T_RHO, NONE, NONE);
 
 			static void static_initializer()
 			{
