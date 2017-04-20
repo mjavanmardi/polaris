@@ -103,6 +103,7 @@ namespace Person_Components
 			//------------------------------------------------------------------------------------------------------------------------------------
 			
 			static bool static_initialize();
+			static void base_static_initializer();
 			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value);
 
 			// Feature called from prototype and by Choice_Model
@@ -182,6 +183,10 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList>
 		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize()
 		{
+			// set the base values
+			base_static_initializer();
+
+			// now see if there are config file changes
 			rapidjson::Document document;
 			std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
 			if (option_file.length() < 1)
@@ -400,51 +405,99 @@ namespace Person_Components
 			return utility;
 		}
 
+		template<typename MasterType, typename InheritanceList>
+		void Mode_Choice_Option<MasterType, InheritanceList>::base_static_initializer()
+		{
+			_BHW_IVTT = 0.0186;
+			_BHW_CBD_IVTT = 0.0159;
+			_BHO_IVTT = 0.0114;
+			_BHO_CBD_IVTT = 0.0159;
+			_BNH_IVTT = 0.0114;
+			_BNH_CBD_IVTT = 0.0159;
+
+			_BHW_WAIT = 0.0811;
+			_BHW_CBD_WAIT = 0.0173;
+			_BHO_WAIT = 0.061;
+			_BHO_CBD_WAIT = 0.0173;
+			_BNH_WAIT = 0.061;
+			_BNH_CBD_WAIT = 0.0173;
+
+			_BHW_TRANSFER = 0.0399;
+			_BHW_CBD_TRANSFER = 0.029;
+			_BHO_TRANSFER = 0.0589;
+			_BHO_CBD_TRANSFER = 0.029;
+			_BNH_TRANSFER = 0.0589;
+			_BNH_CBD_TRANSFER = 0.029;
+
+			_BHW_WALK = 0.0584;
+			_BHW_CBD_WALK = 0.0486;
+			_BHO_WALK = 0.0663;
+			_BHO_CBD_WALK = 0.0486;
+			_BNH_WALK = 0.0663;
+			_BNH_CBD_WALK = 0.0486;
+
+			_BHW_COST = 0.00119;
+			_BHW_CBD_COST = 0.00141;
+			_BHO_COST = 0.00546;
+			_BHO_CBD_COST = 0.00141;
+			_BNH_COST = 0.00546;
+			_BNH_CBD_COST = 0.00141;
+
+			_BHW_BIAS = -2;
+			_BHW_CBD_BIAS = -1;
+			_BHO_BIAS = -1.9;
+			_BHO_CBD_BIAS = -1;
+			_BNH_BIAS = -2;
+			_BNH_CBD_BIAS = -1;
+		}
 
 		// INITIALIZE MODE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_IVTT = 0.0186;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_IVTT = 0.0159;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_IVTT = 0.0114;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_IVTT = 0.0159;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_IVTT = 0.0114;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_IVTT = 0.0159;
+		//define_static_member_variable(Telecommute_Choice_Implementation, Z_CONSTANT);
 
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_WAIT = 0.0811;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_WAIT = 0.0173;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_WAIT = 0.061;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_WAIT = 0.0173;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_WAIT = 0.061;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_WAIT = 0.0173;
+		define_static_member_variable(Mode_Choice_Option, BHW_IVTT		);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_IVTT	);
+		define_static_member_variable(Mode_Choice_Option, BHO_IVTT		);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_IVTT	);
+		define_static_member_variable(Mode_Choice_Option, BNH_IVTT		);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_IVTT	);
 
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_TRANSFER = 0.0399;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_TRANSFER = 0.029;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_TRANSFER = 0.0589;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_TRANSFER = 0.029;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_TRANSFER = 0.0589;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_TRANSFER = 0.029;
+		define_static_member_variable(Mode_Choice_Option, BHW_WAIT		);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_WAIT	);
+		define_static_member_variable(Mode_Choice_Option, BHO_WAIT		);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_WAIT	);
+		define_static_member_variable(Mode_Choice_Option, BNH_WAIT		);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_WAIT	);
 
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_WALK = 0.0584;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_WALK = 0.0486;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_WALK = 0.0663;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_WALK = 0.0486;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_WALK = 0.0663;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_WALK = 0.0486;
+		define_static_member_variable(Mode_Choice_Option, BHW_TRANSFER	);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_TRANSFER);
+		define_static_member_variable(Mode_Choice_Option, BHO_TRANSFER	);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_TRANSFER);
+		define_static_member_variable(Mode_Choice_Option, BNH_TRANSFER	);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_TRANSFER);
 
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_COST = 0.00119;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_COST = 0.00141;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_COST = 0.00546;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_COST = 0.00141;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_COST = 0.00546;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_COST = 0.00141;
+		define_static_member_variable(Mode_Choice_Option, BHW_WALK		);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_WALK	);
+		define_static_member_variable(Mode_Choice_Option, BHO_WALK		);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_WALK	);
+		define_static_member_variable(Mode_Choice_Option, BNH_WALK		);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_WALK	);
 
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_BIAS = -2;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_BIAS = -1;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_BIAS = -1.9;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_BIAS = -1;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_BIAS = -2;
-		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_BIAS = -1;
+		define_static_member_variable(Mode_Choice_Option, BHW_COST		);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_COST	);
+		define_static_member_variable(Mode_Choice_Option, BHO_COST		);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_COST	);
+		define_static_member_variable(Mode_Choice_Option, BNH_COST		);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_COST	);
+
+		define_static_member_variable(Mode_Choice_Option, BHW_BIAS	);
+		define_static_member_variable(Mode_Choice_Option, BHW_CBD_BIAS);
+		define_static_member_variable(Mode_Choice_Option, BHO_BIAS	);
+		define_static_member_variable(Mode_Choice_Option, BHO_CBD_BIAS);
+		define_static_member_variable(Mode_Choice_Option, BNH_BIAS	);
+		define_static_member_variable(Mode_Choice_Option, BNH_CBD_BIAS);
 		#pragma endregion
+
 
 		implementation struct Mode_Chooser_Implementation : public Polaris_Component<MasterType, INHERIT(Mode_Chooser_Implementation), Data_Object>
 		{
@@ -858,6 +911,10 @@ namespace Person_Components
 
 			static bool static_initialize()
 			{
+				// set the base values
+				base_static_initializer();
+
+				// now see if there are config file changes
 				rapidjson::Document document;
 				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template detroit_mode_choice_option_param_file<string>();
 				if (option_file.length() < 1)
@@ -972,6 +1029,111 @@ namespace Person_Components
 				return true;
 			}
 
+			static void base_static_initializer()
+			{
+				_HBW_ASC_AUTO = 0.0;
+				_HBW_ASC_PASS = -0.802 - 2.0;
+				_HBW_ASC_TAXI = -0.999 - 0.8;
+				_HBW_ASC_WALK = -0.231 - 0.2;
+				_HBW_ASC_TRAN = 0.0 - 0.7;
+				_HBW_ASC_BIKE = 0.0 - 3.5;
+				_HBW_B_cbd_pa = -0.0725;
+				_HBW_B_cost = -0.243;
+				_HBW_B_cost_hinc = 0.0742;
+				_HBW_B_cost_minc = 0.0807;
+				_HBW_B_dens_bike = 0.0377;
+				_HBW_B_dens_walk = -0.414;
+				_HBW_B_male_taxi = -0.358;
+				_HBW_B_notalone_pass = 0.306;
+				_HBW_B_over65_pass = -0.0217;
+				_HBW_B_over65_tran = 0.0;
+				_HBW_B_ovttime_tran = -0.0431;
+				_HBW_B_peak_auto = 0.648;
+				_HBW_B_ttime_bike = -0.0813;
+				_HBW_B_ttime_tran = -0.0577;
+				_HBW_B_ttime_walk = 0.0;
+				_HBW_B_u18_pass = 0.206;
+				_HBW_B_vehavail_pass = -0.89;
+				_HBW_B_vehavail_taxi = -0.904;
+				_HBW_B_vehavail_tran = -0.397;
+				_HBW_B_waittime_tran = -0.116;
+				_HBW_ASC_N_AUTO = 0.166;
+				_HBW_ASC_N_NM = -0.217;
+				_HBW_B_vehavail_nm = -0.327;
+				_HBW_B_male_nm = -0.0847;
+				_HBW_B_cbd_nm = 0.0;
+				_HBW_NEST_AUTO = 0.492610837438424;
+				_HBW_NEST_NM = 0.952380952380952;
+
+				_HBO_ASC_AUTO = 1.16 + 0.5;
+				_HBO_ASC_PASS = -0.91 - 2.0;
+				_HBO_ASC_TAXI = -2.44 - 0.8;
+				_HBO_ASC_WALK = 0.0142 - 0.2;
+				_HBO_ASC_TRAN = 0.0 - 0.7;
+				_HBO_ASC_BIKE = 0.0 - 3.5;
+				_HBO_B_cbd_pa = -0.0969;
+				_HBO_B_cost = -0.131;
+				_HBO_B_cost_hinc = 0.107;
+				_HBO_B_cost_minc = 0.0477;
+				_HBO_B_dens_bike = -0.167;
+				_HBO_B_dens_walk = 0.123;
+				_HBO_B_male_taxi = -0.252;
+				_HBO_B_notalone_pass = 1.01;
+				_HBO_B_over65_pass = 0.368;
+				_HBO_B_over65_tran = -0.103;
+				_HBO_B_ovttime_tran = -0.0894;
+				_HBO_B_peak_auto = 0.288;
+				_HBO_B_ttime_bike = -0.0626;
+				_HBO_B_ttime_tran = 0;
+				_HBO_B_ttime_walk = -0.00433;
+				_HBO_B_u18_pass = 0.297;
+				_HBO_B_vehavail_pass = -0.249;
+				_HBO_B_vehavail_taxi = -0.835;
+				_HBO_B_vehavail_tran = -0.487;
+				_HBO_B_waittime_tran = -0.0434;
+				_HBO_ASC_N_AUTO = 0.145;
+				_HBO_ASC_N_NM = -0.095;
+				_HBO_B_vehavail_nm = -0.249;
+				_HBO_B_male_nm = 0.0596;
+				_HBO_B_cbd_nm = 0.0;
+				_HBO_NEST_AUTO = 0.671140939597315;
+				_HBO_NEST_NM = 0.934579439252336;
+
+				_NHB_ASC_AUTO = 0.0;
+				_NHB_ASC_PASS = -0.789 - 2.0;
+				_NHB_ASC_TAXI = -0.912 - 0.8;
+				_NHB_ASC_WALK = -0.134 - 0.2;
+				_NHB_ASC_TRAN = 0.0 - 0.7;
+				_NHB_ASC_BIKE = 0.0 - 3.5;
+				_NHB_B_cbd_pa = -0.0495;
+				_NHB_B_cost = -0.301;
+				_NHB_B_cost_hinc = -0.0233;
+				_NHB_B_cost_minc = -0.00447;
+				_NHB_B_dens_bike = 0.0;
+				_NHB_B_dens_walk = -0.203;
+				_NHB_B_male_taxi = -0.385;
+				_NHB_B_notalone_pass = 0.0244;
+				_NHB_B_over65_tran = 0.0;
+				_NHB_B_over65_pass = -0.0561;
+				_NHB_B_ovttime_tran = -0.369;
+				_NHB_B_peak_auto = 0.267;
+				_NHB_B_ttime_bike = -0.186;
+				_NHB_B_ttime_tran = -0.00367;
+				_NHB_B_ttime_walk = -0.00351;
+				_NHB_B_u18_pass = 0.0;
+				_NHB_B_vehavail_pass = -0.849;
+				_NHB_B_vehavail_tran = 0.0;
+				_NHB_B_vehavail_taxi = -0.973;
+				_NHB_B_waittime_tran = -0.317;
+				_NHB_ASC_N_AUTO = 0.182;
+				_NHB_ASC_N_NM = -0.139;
+				_NHB_B_vehavail_nm = -0.212;
+				_NHB_B_male_nm = -0.121;
+				_NHB_B_cbd_nm = 0.0856;
+				_NHB_NEST_AUTO = 0.50251256281407;
+				_NHB_NEST_NM = 0.99009900990099;
+			}
+
 			void copy(ComponentType* obj)
 			{
 				this->_Parent_Planner = obj->_Parent_Planner;
@@ -986,9 +1148,6 @@ namespace Person_Components
 				this->_to_CBD = obj->_to_CBD;
 
 			}
-
-			static void static_initializer()
-			{}
 
 			// data members
 			//m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
@@ -1186,109 +1345,107 @@ namespace Person_Components
 		};
 		
 		#pragma region Choice option parameters	
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_AUTO = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_PASS = -0.802 - 2.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TAXI = -0.999 - 0.8;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_WALK = -0.231 - 0.2;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_TRAN = 0.0 - 0.7;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_BIKE = 0.0 - 3.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cbd_pa = -0.0725;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cost = -0.243;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cost_hinc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cost_hinc = 0.0742;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cost_minc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cost_minc = 0.0807;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_dens_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_dens_bike = 0.0377;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_dens_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_dens_walk = -0.414;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_male_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_male_taxi = -0.358;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_notalone_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_notalone_pass = 0.306;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_over65_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_over65_pass = -0.0217;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_over65_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_over65_tran = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_ovttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_ovttime_tran = -0.0431;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_peak_auto) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_peak_auto = 0.648;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_ttime_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_ttime_bike = -0.0813;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_ttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_ttime_tran = -0.0577;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_ttime_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_ttime_walk = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_u18_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_u18_pass = 0.206;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_vehavail_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_vehavail_pass = -0.89;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_vehavail_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_vehavail_taxi = -0.904;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_vehavail_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_vehavail_tran = -0.397;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_waittime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_waittime_tran = -0.116;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_N_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_N_AUTO = 0.166;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_ASC_N_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_ASC_N_NM = -0.217;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_vehavail_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_vehavail_nm = -0.327;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_male_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_male_nm = -0.0847;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_B_cbd_nm = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_NEST_AUTO = 0.492610837438424;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBW_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBW_NEST_NM = 0.952380952380952;
-
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_AUTO);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_PASS);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_TAXI);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_WALK);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_TRAN);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_BIKE);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cbd_pa);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost_hinc);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost_minc);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_dens_bike);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_dens_walk);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_male_taxi);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_notalone_pass);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_over65_pass);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_over65_tran);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ovttime_tran);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_peak_auto);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_bike);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_tran);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_walk);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_u18_pass);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_pass);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_taxi);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_tran);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_waittime_tran );
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_N_AUTO);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_N_NM);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_nm);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_male_nm);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cbd_nm);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_NEST_AUTO);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_NEST_NM);
 	
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_AUTO = 1.16 + 0.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_PASS = -0.91 - 2.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TAXI = -2.44 - 0.8;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_WALK = 0.0142 - 0.2;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_TRAN = 0.0 - 0.7;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_BIKE = 0.0 - 3.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cbd_pa = -0.0969;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cost = -0.131;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cost_hinc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cost_hinc = 0.107;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cost_minc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cost_minc = 0.0477;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_dens_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_dens_bike = -0.167;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_dens_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_dens_walk = 0.123;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_male_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_male_taxi = -0.252;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_notalone_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_notalone_pass = 1.01;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_over65_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_over65_pass = 0.368;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_over65_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_over65_tran = -0.103;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_ovttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_ovttime_tran = -0.0894;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_peak_auto) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_peak_auto = 0.288;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_ttime_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_ttime_bike = -0.0626;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_ttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_ttime_tran = 0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_ttime_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_ttime_walk = -0.00433;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_u18_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_u18_pass = 0.297;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_vehavail_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_vehavail_pass = -0.249;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_vehavail_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_vehavail_taxi = -0.835;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_vehavail_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_vehavail_tran = -0.487;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_waittime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_waittime_tran = -0.0434;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_N_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_N_AUTO = 0.145;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_ASC_N_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_ASC_N_NM = -0.095;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_vehavail_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_vehavail_nm = -0.249;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_male_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_male_nm = 0.0596;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_B_cbd_nm = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_AUTO = 0.671140939597315;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(HBO_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_HBO_NEST_NM = 0.934579439252336;
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_AUTO			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_PASS			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_TAXI			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_WALK			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_TRAN			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_BIKE			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cbd_pa			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost_hinc		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost_minc		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_dens_bike		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_dens_walk		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_male_taxi		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_notalone_pass	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_over65_pass		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_over65_tran		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ovttime_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_peak_auto		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_bike		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_tran		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_walk		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_u18_pass		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_pass	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_taxi	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_waittime_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_N_AUTO		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_N_NM			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_nm		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_male_nm			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cbd_nm			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_NEST_AUTO			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_NEST_NM			);
 
-
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_AUTO = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_PASS) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_PASS = -0.789 - 2.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TAXI) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TAXI = -0.912 - 0.8;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_WALK) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_WALK = -0.134 - 0.2;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_TRAN) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_TRAN = 0.0 - 0.7;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_BIKE) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_BIKE = 0.0 - 3.5;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cbd_pa) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cbd_pa = -0.0495;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cost) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cost = -0.301;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cost_hinc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cost_hinc = -0.0233;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cost_minc) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cost_minc = -0.00447;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_dens_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_dens_bike = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_dens_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_dens_walk = -0.203;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_male_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_male_taxi = -0.385;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_notalone_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_notalone_pass = 0.0244;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_over65_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_over65_tran = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_over65_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_over65_pass = -0.0561;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ovttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ovttime_tran = -0.369;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_peak_auto) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_peak_auto = 0.267;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_bike) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_bike = -0.186;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_tran = -0.00367;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_ttime_walk) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_ttime_walk = -0.00351;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_u18_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_u18_pass = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_pass) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_pass = -0.849;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_tran = 0.0;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_taxi) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_taxi = -0.973;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_waittime_tran) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_waittime_tran = -0.317;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_N_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_N_AUTO = 0.182;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_ASC_N_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_ASC_N_NM = -0.139;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_vehavail_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_vehavail_nm = -0.212;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_male_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_male_nm = -0.121;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_B_cbd_nm) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_B_cbd_nm = 0.0856;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_NEST_AUTO) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_NEST_AUTO = 0.50251256281407;
-		template<typename MasterType, typename InheritanceList> typename Detroit_Mode_Choice_Option<MasterType, InheritanceList>::type_of(NHB_NEST_NM) Detroit_Mode_Choice_Option<MasterType, InheritanceList>::_NHB_NEST_NM = 0.99009900990099;
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_AUTO			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_PASS			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_TAXI			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_WALK			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_TRAN			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_BIKE			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cbd_pa			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost_hinc		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost_minc		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_dens_bike		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_dens_walk		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_male_taxi		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_notalone_pass	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_over65_tran		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_over65_pass		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ovttime_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_peak_auto		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_bike		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_tran		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_walk		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_u18_pass		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_pass	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_taxi	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_waittime_tran	);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_N_AUTO		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_N_NM			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_nm		);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_male_nm			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cbd_nm			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_NEST_AUTO			);
+		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_NEST_NM			);
 		#pragma endregion
 
 		implementation struct Detroit_Mode_Chooser_Implementation : public Polaris_Component<MasterType, INHERIT(Detroit_Mode_Chooser_Implementation), Data_Object>

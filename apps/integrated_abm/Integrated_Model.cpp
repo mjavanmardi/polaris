@@ -244,7 +244,7 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
-bool InitializeParameters()
+bool InitializeModeChoiceParameters()
 {
 	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
 	{
@@ -352,9 +352,6 @@ int main(int argc,char** argv)
 
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
-
-	if (!InitializeParameters())
-		return 1;
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
@@ -556,7 +553,10 @@ int main(int argc,char** argv)
 	MasterType::mode_choice_option_type::static_initializer();
 
 	// Initialize telecommute model parameters
-	MasterType::telecommute_chooser_type::static_initializer();
+	if (!InitializeModeChoiceParameters())
+		return 1;
+
+//RLW%%%	MasterType::telecommute_chooser_type::static_initializer();
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	

@@ -507,7 +507,7 @@ namespace Link_Components
 			if (((_Scenario_Interface*)_global_scenario)->template simulate_cacc<double>() && _num_vehicles_on_link/*_link_origin_vehicle_queue.size()*/ > 0)
 			{
 				float n_veh = 0.0;
-				_Vehicle_Interface* vehicle;
+				// - not used - _Vehicle_Interface* vehicle;
 
 				//==========================================================================================================
 				 // I THINK THIS IS WRONG - ONLY MEASURES VEHICLES IN ENTRY QUEUE, AND THE FOR LOOP ADDS A LOT OF PROCESSING TIME - JAA 3/28/17
