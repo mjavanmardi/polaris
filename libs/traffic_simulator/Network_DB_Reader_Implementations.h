@@ -1246,6 +1246,7 @@ namespace Network_Components
 									cout << "Departure time from the upstream node of trip 2: " << temp_time2 << endl;
 									system("pause");
 									exit(0);
+									//
 								}	
 							}
 							++my_itr;
