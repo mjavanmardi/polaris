@@ -19,78 +19,105 @@ namespace Person_Components
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+			{
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Implementation", key, default_value);
+			}
+
+			static bool static_initialize()
+			{
+				// set the base values
+				base_static_initializer();
+
+				// now see if there are config file changes
+				rapidjson::Document document;
+				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file for Telecommute_Choice_Implementation was not specified" << endl;
+					return true;
+				}
+
+				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+					return false;
+
+				Z_CONSTANT					<float>(GetOption_Double(document, "Z_CONSTANT"					, Z_CONSTANT				 <float>()));
+				Z_MALE						<float>(GetOption_Double(document, "Z_MALE"						, Z_MALE					 <float>()));
+				Z_INCOME_LOW				<float>(GetOption_Double(document, "Z_INCOME_LOW"				, Z_INCOME_LOW				 <float>()));
+				Z_EDUC_NO_COLLEGE			<float>(GetOption_Double(document, "Z_EDUC_NO_COLLEGE"			, Z_EDUC_NO_COLLEGE			 <float>()));
+				Z_WORK_TRIP_DIST			<float>(GetOption_Double(document, "Z_WORK_TRIP_DIST"			, Z_WORK_TRIP_DIST			 <float>()));
+				Z_NWORKERS					<float>(GetOption_Double(document, "Z_NWORKERS"					, Z_NWORKERS				 <float>()));
+				Z_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "Z_FLEX_WORK_INDICATOR"		, Z_FLEX_WORK_INDICATOR		 <float>()));
+				Z_OCC_TRANS_UTILITY			<float>(GetOption_Double(document, "Z_OCC_TRANS_UTILITY"		, Z_OCC_TRANS_UTILITY		 <float>()));
+				Z_OCC_MANAGEMENT			<float>(GetOption_Double(document, "Z_OCC_MANAGEMENT"			, Z_OCC_MANAGEMENT			 <float>()));
+				Z_OCC_SERVICE				<float>(GetOption_Double(document, "Z_OCC_SERVICE"				, Z_OCC_SERVICE				 <float>()));
+				Z_EMP_DENSITY_OVER_20000	<float>(GetOption_Double(document, "Z_EMP_DENSITY_OVER_20000"	, Z_EMP_DENSITY_OVER_20000	 <float>()));
+				Z_POP_DENSITY				<float>(GetOption_Double(document, "Z_POP_DENSITY"				, Z_POP_DENSITY				 <float>()));
+
+				O_CONSTANT					<float>(GetOption_Double(document, "O_CONSTANT"					, O_CONSTANT				 <float>()));
+				O_INCOME_MED				<float>(GetOption_Double(document, "O_INCOME_MED"				, O_INCOME_MED				 <float>()));
+				O_AGE_35_55					<float>(GetOption_Double(document, "O_AGE_35_55"				, O_AGE_35_55				 <float>()));
+				O_EDUC_GRAD_DEGREE			<float>(GetOption_Double(document, "O_EDUC_GRAD_DEGREE"			, O_EDUC_GRAD_DEGREE		 <float>()));
+				O_WORK_TRIP_TTIME			<float>(GetOption_Double(document, "O_WORK_TRIP_TTIME"			, O_WORK_TRIP_TTIME			 <float>()));
+				O_NVEHICLE					<float>(GetOption_Double(document, "O_NVEHICLE"					, O_NVEHICLE				 <float>()));
+				O_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "O_FLEX_WORK_INDICATOR"		, O_FLEX_WORK_INDICATOR		 <float>()));
+				O_OCC_GOVERNMENT			<float>(GetOption_Double(document, "O_OCC_GOVERNMENT"			, O_OCC_GOVERNMENT			 <float>()));
+				O_OCC_COMMUNICATION			<float>(GetOption_Double(document, "O_OCC_COMMUNICATION"		, O_OCC_COMMUNICATION		 <float>()));
+				O_OCC_MANUFACTURING			<float>(GetOption_Double(document, "O_OCC_MANUFACTURING"		, O_OCC_MANUFACTURING		 <float>()));
+				O_EMP_DENSITY_UNDER_3000	<float>(GetOption_Double(document, "O_EMP_DENSITY_UNDER_3000"	, O_EMP_DENSITY_UNDER_3000	 <float>()));
+
+				T_WORK_DURATION				<float>(GetOption_Double(document, "T_WORK_DURATION"			, T_WORK_DURATION			 <float>()));
+				T_VEH_AVAILABLE				<float>(GetOption_Double(document, "T_VEH_AVAILABLE"			, T_VEH_AVAILABLE			 <float>()));
+				T_HH_VEH_OVER_2_INDICATOR	<float>(GetOption_Double(document, "T_HH_VEH_OVER_2_INDICATOR"	, T_HH_VEH_OVER_2_INDICATOR	 <float>()));
+				T_C1						<float>(GetOption_Double(document, "T_C1"						, T_C1						 <float>()));
+				T_C2						<float>(GetOption_Double(document, "T_C2"						, T_C2						 <float>()));
+				T_C3						<float>(GetOption_Double(document, "T_C3"						, T_C3						 <float>()));
+				T_RHO						<float>(GetOption_Double(document, "T_RHO"						, T_RHO						 <float>()));
+				
+				return true;
+			}
 			//==============================================================================================================================
 			// PARAMETER DECLARATIONS
 			//--------------------------------------------------
 			// Zero-inflation paramaters
-			/*static m_data(float, Z_CONST, NONE, NONE);
-			static m_data(float, Z_VEH_AVAIL, NONE, NONE);
-			static m_data(float, Z_HU_DENSITY, NONE, NONE);
-			static m_data(float, Z_OCC_INC, NONE, NONE);
-			static m_data(float, Z_OCC_FINANCE, NONE, NONE);
-			static m_data(float, Z_OCC_EDUCATION, NONE, NONE);
-			static m_data(float, Z_DEGREE_ASSOC, NONE, NONE);		// has associates or technical school degree*/
-
-			static m_data(float, Z_CONSTANT, NONE, NONE);
-			static m_data(float, Z_MALE, NONE, NONE);
-			static m_data(float, Z_INCOME_LOW, NONE, NONE);
-			static m_data(float, Z_EDUC_NO_COLLEGE, NONE, NONE);
-			static m_data(float, Z_WORK_TRIP_DIST, NONE, NONE);
-			static m_data(float, Z_NWORKERS, NONE, NONE);
-			static m_data(float, Z_FLEX_WORK_INDICATOR, NONE, NONE);
-			static m_data(float, Z_OCC_TRANS_UTILITY, NONE, NONE);
-			static m_data(float, Z_OCC_MANAGEMENT, NONE, NONE);
-			static m_data(float, Z_OCC_SERVICE, NONE, NONE);
-			static m_data(float, Z_EMP_DENSITY_OVER_20000, NONE, NONE);
-			static m_data(float, Z_POP_DENSITY, NONE, NONE);
+			m_static_data(float, Z_CONSTANT, NONE, NONE);
+			m_static_data(float, Z_MALE, NONE, NONE);
+			m_static_data(float, Z_INCOME_LOW, NONE, NONE);
+			m_static_data(float, Z_EDUC_NO_COLLEGE, NONE, NONE);
+			m_static_data(float, Z_WORK_TRIP_DIST, NONE, NONE);
+			m_static_data(float, Z_NWORKERS, NONE, NONE);
+			m_static_data(float, Z_FLEX_WORK_INDICATOR, NONE, NONE);
+			m_static_data(float, Z_OCC_TRANS_UTILITY, NONE, NONE);
+			m_static_data(float, Z_OCC_MANAGEMENT, NONE, NONE);
+			m_static_data(float, Z_OCC_SERVICE, NONE, NONE);
+			m_static_data(float, Z_EMP_DENSITY_OVER_20000, NONE, NONE);
+			m_static_data(float, Z_POP_DENSITY, NONE, NONE);
 
 
 			// Ordered probit model
-			/*static m_data(float, O_CONST, NONE, NONE);
-			static m_data(float, O_HINC, NONE, NONE);				// inc > 100k
-			static m_data(float, O_MALE, NONE, NONE);
-			static m_data(float, O_EMPFULL, NONE, NONE);
-			static m_data(float, O_DEGREE_GRAD, NONE, NONE);
-			static m_data(float, O_TTIME, NONE, NONE);
-			static m_data(float, O_WORKDUR, NONE, NONE);
-			static m_data(float, O_NVEH, NONE, NONE);
-			static m_data(float, O_OCC_REALESTATE, NONE, NONE);		// real estate, rental, leasing service
-			static m_data(float, O_OCC_COMMUNICATION, NONE, NONE);	// communication industry
-			static m_data(float, O_OCC_PROFESSIONAL, NONE, NONE);	// professional, scientific, technical services
-			static m_data(float, O_OCC_HEALTH, NONE, NONE);			//health care or social assistance*/
-
-			static m_data(float, O_CONSTANT, NONE, NONE);
-			static m_data(float, O_INCOME_MED, NONE, NONE);
-			static m_data(float, O_AGE_35_55, NONE, NONE);
-			static m_data(float, O_EDUC_GRAD_DEGREE, NONE, NONE);
-			static m_data(float, O_WORK_TRIP_TTIME, NONE, NONE);
-			static m_data(float, O_NVEHICLE, NONE, NONE);
-			static m_data(float, O_FLEX_WORK_INDICATOR, NONE, NONE);
-			static m_data(float, O_OCC_GOVERNMENT, NONE, NONE);
-			static m_data(float, O_OCC_COMMUNICATION, NONE, NONE);
-			static m_data(float, O_OCC_MANUFACTURING, NONE, NONE);
-			static m_data(float, O_EMP_DENSITY_UNDER_3000, NONE, NONE);
+			m_static_data(float, O_CONSTANT, NONE, NONE);
+			m_static_data(float, O_INCOME_MED, NONE, NONE);
+			m_static_data(float, O_AGE_35_55, NONE, NONE);
+			m_static_data(float, O_EDUC_GRAD_DEGREE, NONE, NONE);
+			m_static_data(float, O_WORK_TRIP_TTIME, NONE, NONE);
+			m_static_data(float, O_NVEHICLE, NONE, NONE);
+			m_static_data(float, O_FLEX_WORK_INDICATOR, NONE, NONE);
+			m_static_data(float, O_OCC_GOVERNMENT, NONE, NONE);
+			m_static_data(float, O_OCC_COMMUNICATION, NONE, NONE);
+			m_static_data(float, O_OCC_MANUFACTURING, NONE, NONE);
+			m_static_data(float, O_EMP_DENSITY_UNDER_3000, NONE, NONE);
 
 
 			// threshold variables
-			/*static m_data(float, T_EMPPART, NONE, NONE);			// 1=part-time worker, 0=other
-			static m_data(float, T_DEGREE, NONE, NONE);				// has bachelor or grad degree
-			static m_data(float, T_STUDENTPART, NONE, NONE);		// 1=parttime student, 0=other
-			static m_data(float, T_POPDENSITY, NONE, NONE);			
-			static m_data(float, T_C1, NONE, NONE);
-			static m_data(float, T_C2, NONE, NONE);
-			static m_data(float, T_C3, NONE, NONE);
-			static m_data(float, T_RHO, NONE, NONE);*/
+			m_static_data(float, T_WORK_DURATION, NONE, NONE);				// Average work duration in hours
+			m_static_data(float, T_VEH_AVAILABLE, NONE, NONE);				// vehicle is available for work
+			m_static_data(float, T_HH_VEH_OVER_2_INDICATOR, NONE, NONE);	// HH has more than 2 vehicles
+			m_static_data(float, T_C1, NONE, NONE);
+			m_static_data(float, T_C2, NONE, NONE);
+			m_static_data(float, T_C3, NONE, NONE);
+			m_static_data(float, T_RHO, NONE, NONE);
 
-			static m_data(float, T_WORK_DURATION, NONE, NONE);				// Average work duration in hours
-			static m_data(float, T_VEH_AVAILABLE, NONE, NONE);				// vehicle is available for work
-			static m_data(float, T_HH_VEH_OVER_2_INDICATOR, NONE, NONE);	// HH has more than 2 vehicles
-			static m_data(float, T_C1, NONE, NONE);
-			static m_data(float, T_C2, NONE, NONE);
-			static m_data(float, T_C3, NONE, NONE);
-			static m_data(float, T_RHO, NONE, NONE);
-
-			static void static_initializer()
+			static void base_static_initializer()
 			{
 				_Z_CONSTANT = -0.98;
 				_Z_MALE = 0.26;
@@ -124,8 +151,6 @@ namespace Person_Components
 				_T_C2 = -0.47;
 				_T_C3 = 0.43;
 				_T_RHO = 0.28;
-
-
 			}
 			
 			//===========================================================================================================================================

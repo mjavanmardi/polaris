@@ -247,6 +247,35 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
+bool InitializeModeChoiceParameters()
+{
+	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Mode_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::Detroit_Mode_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Detroit_Mode_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::ADAPTS_Destination_Choice_Option<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize ADAPTS_Destination_Choice_Option parameters." << endl;
+		return false;
+	}
+
+	if (!Person_Components::Implementations::Telecommute_Choice_Implementation<MasterType>::static_initialize())
+	{
+		cout << "ERROR: Unable to initialize Telecommute_Choice_Implementation parameters." << endl;
+		return false;
+	}
+
+	return true;
+}
+
 int main(int argc,char** argv)
 {
 	#ifdef MEM_DEBUG
@@ -286,7 +315,6 @@ int main(int argc,char** argv)
 	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
-	
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
@@ -528,7 +556,10 @@ int main(int argc,char** argv)
 	MasterType::mode_choice_option_type::static_initializer();
 
 	// Initialize telecommute model parameters
-	MasterType::telecommute_chooser_type::static_initializer();
+	if (!InitializeModeChoiceParameters())
+		return 1;
+
+//RLW%%%	MasterType::telecommute_chooser_type::static_initializer();
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
