@@ -1444,6 +1444,109 @@ namespace Network_Components
 					turn_movements_container.push_back(turn_movement);
 				}
 
+				typename _Intersections_Container_Interface::iterator intersections_itr;
+
+				cout << "Adding multi-modal connections" << endl;
+
+				for (intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
+				{
+					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
+					//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
+
+					cout << "Intersection:" << intersection->_uuid << endl;
+
+					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
+					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
+
+
+					_Links_Container_Interface& inbound_walk_links = intersection->template inbound_walk_links<_Links_Container_Interface&>();
+					_Links_Container_Interface& outbound_walk_links = intersection->template outbound_walk_links<_Links_Container_Interface&>();
+
+
+					_Links_Container_Interface& inbound_transit_links = intersection->template inbound_transit_links<_Links_Container_Interface&>();
+					_Links_Container_Interface& outbound_transit_links = intersection->template outbound_transit_links<_Links_Container_Interface&>();
+
+					typename _Links_Container_Interface::iterator in_links_itr;
+					typename _Links_Container_Interface::iterator out_links_itr;
+
+					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+					{
+						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
+
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+					}
+
+					for (in_links_itr = inbound_walk_links.begin(); in_links_itr != inbound_walk_links.end(); in_links_itr++)
+					{
+						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
+
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+					}
+
+					for (in_links_itr = inbound_transit_links.begin(); in_links_itr != inbound_transit_links.end(); in_links_itr++)
+					{
+						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
+
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+						}
+
+					}
+				}
+
+
+
 				cout << "Configuring Connections" << endl;
 
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
@@ -1465,7 +1568,7 @@ namespace Network_Components
 
 
 				// configure outbound_inbound_movements
-				typename _Intersections_Container_Interface::iterator intersections_itr;
+//				typename _Intersections_Container_Interface::iterator intersections_itr;
 
 				cout << "Configuring Outbound Inbound Movements" << endl;
 
