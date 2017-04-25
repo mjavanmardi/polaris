@@ -296,10 +296,9 @@ namespace Scenario_Components
 			accessor(tile_imagery_alpha_level,NONE,NONE);
 
 			//Parameter files
-			accessor(mode_choice_option_param_file, NONE, NONE);
-			accessor(detroit_mode_choice_option_param_file, NONE, NONE);
-			accessor(adapts_destination_choice_option_param_file, NONE, NONE);
-			accessor(telecommute_choice_implementation_param_file, NONE, NONE);
+			accessor(mode_choice_option_file, NONE, NONE);
+			accessor(person_destination_choice_option_file, NONE, NONE);
+			accessor(telecommute_choice_option_file, NONE, NONE);
 
 
 			template<typename TargetType> void read_scenario_data(const char* filename)
@@ -690,10 +689,9 @@ namespace Scenario_Components
 				}
 				else use_buildings(true);
 
-				if (cfgReader.getParameter("mode_choice_option_param_file",					mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)				 mode_choice_option_param_file<string>("");
-				if (cfgReader.getParameter("detroit_mode_choice_option_param_file",			detroit_mode_choice_option_param_file<string*>()) != PARAMETER_FOUND)		 detroit_mode_choice_option_param_file<string>("");
-				if (cfgReader.getParameter("adapts_destination_choice_option_param_file",	adapts_destination_choice_option_param_file<string*>()) != PARAMETER_FOUND)	 adapts_destination_choice_option_param_file<string>("");
-				if (cfgReader.getParameter("telecommute_choice_implementation_param_file",  telecommute_choice_implementation_param_file<string*>()) != PARAMETER_FOUND) telecommute_choice_implementation_param_file<string>("");
+				if (cfgReader.getParameter("mode_choice_option_file",						mode_choice_option_file<string*>()) != PARAMETER_FOUND)					mode_choice_option_file<string>("");
+				if (cfgReader.getParameter("person_destination_choice_option_file",			person_destination_choice_option_file<string*>()) != PARAMETER_FOUND)	person_destination_choice_option_file<string>("");
+				if (cfgReader.getParameter("telecommute_choice_option_file",				telecommute_choice_option_file<string*>()) != PARAMETER_FOUND)			telecommute_choice_option_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

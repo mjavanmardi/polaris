@@ -247,31 +247,28 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
-bool InitializeModeChoiceParameters()
+bool InitializeModeChoiceParameters(MasterType::scenario_type* scenario)
 {
-	if (!Person_Components::Implementations::Mode_Choice_Option<MasterType>::static_initialize())
+	if (!MasterType::mode_choice_option_type::static_initialize(scenario->template mode_choice_option_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize Mode_Choice_Option parameters." << endl;
+		cout << "ERROR: Unable to initialize MasterType::mode_choice_option_type parameters." << endl;
 		return false;
 	}
+	MasterType::mode_choice_option_type::print_parameters();
 
-	if (!Person_Components::Implementations::Detroit_Mode_Choice_Option<MasterType>::static_initialize())
+	if (!MasterType::person_destination_choice_option_type::static_initialize(scenario->template person_destination_choice_option_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize Detroit_Mode_Choice_Option parameters." << endl;
+		cout << "ERROR: Unable to initialize MasterType::person_destination_choice_option_type parameters." << endl;
 		return false;
 	}
+	MasterType::person_destination_choice_option_type::print_parameters();
 
-	if (!Person_Components::Implementations::ADAPTS_Destination_Choice_Option<MasterType>::static_initialize())
+	if (!MasterType::telecommute_chooser_type::static_initialize(scenario->template telecommute_choice_option_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize ADAPTS_Destination_Choice_Option parameters." << endl;
+		cout << "ERROR: Unable to initialize MasterType::telecommute_chooser_type parameters." << endl;
 		return false;
 	}
-
-	if (!Person_Components::Implementations::Telecommute_Choice_Implementation<MasterType>::static_initialize())
-	{
-		cout << "ERROR: Unable to initialize Telecommute_Choice_Implementation parameters." << endl;
-		return false;
-	}
+	MasterType::telecommute_chooser_type::print_parameters();
 
 	return true;
 }
@@ -553,13 +550,10 @@ int main(int argc,char** argv)
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
-	MasterType::mode_choice_option_type::static_initializer();
 
 	// Initialize telecommute model parameters
-	if (!InitializeModeChoiceParameters())
+	if (!InitializeModeChoiceParameters(scenario))
 		return 1;
-
-//RLW%%%	MasterType::telecommute_chooser_type::static_initializer();
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
