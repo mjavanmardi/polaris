@@ -24,14 +24,14 @@ namespace Person_Components
 				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Implementation", key, default_value);
 			}
 
-			static bool static_initialize()
+			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
 				base_static_initializer();
 
 				// now see if there are config file changes
 				rapidjson::Document document;
-				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
+				//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file for Telecommute_Choice_Implementation was not specified" << endl;
@@ -76,6 +76,44 @@ namespace Person_Components
 				
 				return true;
 			}
+
+			static void print_parameters()
+			{
+				cout << "Telecommute_Choice_Implementation parameters" << endl;
+				cout << "\tZ_CONSTANT = " << Z_CONSTANT<float>() << endl;
+				cout << "\tZ_MALE = " << Z_MALE<float>() << endl;
+				cout << "\tZ_INCOME_LOW = " << Z_INCOME_LOW<float>() << endl;
+				cout << "\tZ_EDUC_NO_COLLEGE = " << Z_EDUC_NO_COLLEGE<float>() << endl;
+				cout << "\tZ_WORK_TRIP_DIST = " << Z_WORK_TRIP_DIST<float>() << endl;
+				cout << "\tZ_NWORKERS = " << Z_NWORKERS<float>() << endl;
+				cout << "\tZ_FLEX_WORK_INDICATOR = " << Z_FLEX_WORK_INDICATOR<float>() << endl;
+				cout << "\tZ_OCC_TRANS_UTILITY = " << Z_OCC_TRANS_UTILITY<float>() << endl;
+				cout << "\tZ_OCC_MANAGEMENT = " << Z_OCC_MANAGEMENT<float>() << endl;
+				cout << "\tZ_OCC_SERVICE = " << Z_OCC_SERVICE<float>() << endl;
+				cout << "\tZ_EMP_DENSITY_OVER_20000 = " << Z_EMP_DENSITY_OVER_20000<float>() << endl;
+				cout << "\tZ_POP_DENSITY = " << Z_POP_DENSITY<float>() << endl;
+
+				cout << "\tO_CONSTANT = " << O_CONSTANT<float>() << endl;
+				cout << "\tO_INCOME_MED = " << O_INCOME_MED<float>() << endl;
+				cout << "\tO_AGE_35_55 = " << O_AGE_35_55<float>() << endl;
+				cout << "\tO_EDUC_GRAD_DEGREE = " << O_EDUC_GRAD_DEGREE<float>() << endl;
+				cout << "\tO_WORK_TRIP_TTIME = " << O_WORK_TRIP_TTIME<float>() << endl;
+				cout << "\tO_NVEHICLE = " << O_NVEHICLE<float>() << endl;
+				cout << "\tO_FLEX_WORK_INDICATOR = " << O_FLEX_WORK_INDICATOR<float>() << endl;
+				cout << "\tO_OCC_GOVERNMENT = " << O_OCC_GOVERNMENT<float>() << endl;
+				cout << "\tO_OCC_COMMUNICATION = " << O_OCC_COMMUNICATION<float>() << endl;
+				cout << "\tO_OCC_MANUFACTURING = " << O_OCC_MANUFACTURING<float>() << endl;
+				cout << "\tO_EMP_DENSITY_UNDER_3000 = " << O_EMP_DENSITY_UNDER_3000<float>() << endl;
+
+				cout << "\tT_WORK_DURATION = " << T_WORK_DURATION<float>() << endl;
+				cout << "\tT_VEH_AVAILABLE = " << T_VEH_AVAILABLE<float>() << endl;
+				cout << "\tT_HH_VEH_OVER_2_INDICATOR = " << T_HH_VEH_OVER_2_INDICATOR<float>() << endl;
+				cout << "\tT_C1 = " << T_C1<float>() << endl;
+				cout << "\tT_C2 = " << T_C2<float>() << endl;
+				cout << "\tT_C3 = " << T_C3<float>() << endl;
+				cout << "\tT_RHO = " << T_RHO<float>() << endl;
+			}
+
 			//==============================================================================================================================
 			// PARAMETER DECLARATIONS
 			//--------------------------------------------------

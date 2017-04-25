@@ -102,7 +102,8 @@ namespace Person_Components
 			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
 			//------------------------------------------------------------------------------------------------------------------------------------
 			
-			static bool static_initialize();
+			static bool static_initialize(const string& option_file);
+			static void print_parameters();
 			static void base_static_initializer();
 			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value);
 
@@ -181,14 +182,14 @@ namespace Person_Components
 		}
 
 		template<typename MasterType, typename InheritanceList>
-		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize()
+		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize(const string& option_file)
 		{
 			// set the base values
 			base_static_initializer();
 
 			// now see if there are config file changes
 			rapidjson::Document document;
-			std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
+			//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
 			if (option_file.length() < 1)
 			{
 				cout << "Warning: option file for Mode_Choice_Option was not specified" << endl;
@@ -236,6 +237,49 @@ namespace Person_Components
 			BNH_CBD_BIAS	<float>(GetOption_Double(document, "BNH_CBD_BIAS"		, BNH_CBD_BIAS	<float>()));
 
 			return true;
+		}
+
+
+		template<typename MasterType, typename InheritanceList>
+		void Mode_Choice_Option<MasterType, InheritanceList>::print_parameters()
+		{
+			cout << "Mode_Choice_Option parameters" << endl;
+			cout << "\tBHW_CBD_IVTT = "		<< BHW_CBD_IVTT	<float>() << endl;
+			cout << "\tBHO_IVTT = "			<< BHO_IVTT		<float>() << endl;
+			cout << "\tBHO_CBD_IVTT = "		<< BHO_CBD_IVTT	<float>() << endl;
+			cout << "\tBNH_IVTT = "			<< BNH_IVTT		<float>() << endl;
+			cout << "\tBNH_CBD_IVTT = "		<< BNH_CBD_IVTT	<float>() << endl;
+			cout << "\tBHW_IVTT = "			<< BHW_IVTT		<float>() << endl;
+			cout << "\tBHW_WAIT = "			<< BHW_WAIT		<float>() << endl;
+			cout << "\tBHW_CBD_WAIT = "		<< BHW_CBD_WAIT	<float>() << endl;
+			cout << "\tBHO_WAIT = "			<< BHO_WAIT		<float>() << endl;
+			cout << "\tBHO_CBD_WAIT = "		<< BHO_CBD_WAIT	<float>() << endl;
+			cout << "\tBNH_WAIT = "			<< BNH_WAIT		<float>() << endl;
+			cout << "\tBNH_CBD_WAIT = "		<< BNH_CBD_WAIT	<float>() << endl;
+			cout << "\tBHW_TRANSFER = "		<< BHW_TRANSFER	<float>() << endl;
+			cout << "\tBHW_CBD_TRANSFER = "	<< BHW_CBD_TRANSFER<float>() << endl;
+			cout << "\tBHO_TRANSFER = "		<< BHO_TRANSFER	<float>() << endl;
+			cout << "\tBHO_CBD_TRANSFER = "	<< BHO_CBD_TRANSFER<float>() << endl;
+			cout << "\tBNH_TRANSFER = "		<< BNH_TRANSFER	<float>() << endl;
+			cout << "\tBNH_CBD_TRANSFER = "	<< BNH_CBD_TRANSFER<float>() << endl;
+			cout << "\tBHW_WALK = "			<< BHW_WALK		<float>() << endl;
+			cout << "\tBHW_CBD_WALK = "		<< BHW_CBD_WALK	<float>() << endl;
+			cout << "\tBHO_WALK = "			<< BHO_WALK		<float>() << endl;
+			cout << "\tBHO_CBD_WALK = "		<< BHO_CBD_WALK	<float>() << endl;
+			cout << "\tBNH_WALK = "			<< BNH_WALK		<float>() << endl;
+			cout << "\tBNH_CBD_WALK = "		<< BNH_CBD_WALK	<float>() << endl;
+			cout << "\tBHW_COST = "			<< BHW_COST		<float>() << endl;
+			cout << "\tBHW_CBD_COST = "		<< BHW_CBD_COST	<float>() << endl;
+			cout << "\tBHO_COST = "			<< BHO_COST		<float>() << endl;
+			cout << "\tBHO_CBD_COST = "		<< BHO_CBD_COST	<float>() << endl;
+			cout << "\tBNH_COST = "			<< BNH_COST		<float>() << endl;
+			cout << "\tBNH_CBD_COST = "		<< BNH_CBD_COST	<float>() << endl;
+			cout << "\tBHW_BIAS = "			<< BHW_BIAS		<float>() << endl;
+			cout << "\tBHW_CBD_BIAS = "		<< BHW_CBD_BIAS	<float>() << endl;
+			cout << "\tBHO_BIAS = "			<< BHO_BIAS		<float>() << endl;
+			cout << "\tBHO_CBD_BIAS = "		<< BHO_CBD_BIAS	<float>() << endl;
+			cout << "\tBNH_BIAS = "			<< BNH_BIAS		<float>() << endl;
+			cout << "\tBNH_CBD_BIAS = "		<< BNH_CBD_BIAS	<float>() << endl;
 		}
 
 		template<typename MasterType, typename InheritanceList>
@@ -408,12 +452,12 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList>
 		void Mode_Choice_Option<MasterType, InheritanceList>::base_static_initializer()
 		{
-			_BHW_IVTT = 0.0186;
 			_BHW_CBD_IVTT = 0.0159;
 			_BHO_IVTT = 0.0114;
 			_BHO_CBD_IVTT = 0.0159;
 			_BNH_IVTT = 0.0114;
 			_BNH_CBD_IVTT = 0.0159;
+			_BHW_IVTT = 0.0186;
 
 			_BHW_WAIT = 0.0811;
 			_BHW_CBD_WAIT = 0.0173;
@@ -909,14 +953,13 @@ namespace Person_Components
 				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Detroit_Mode_Choice_Option", key, default_value);
 			}
 
-			static bool static_initialize()
+			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
 				base_static_initializer();
 
 				// now see if there are config file changes
 				rapidjson::Document document;
-				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template detroit_mode_choice_option_param_file<string>();
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file for Detroit_Mode_Choice_Option was not specified" << endl;
@@ -1133,6 +1176,111 @@ namespace Person_Components
 				_NHB_NEST_AUTO = 0.50251256281407;
 				_NHB_NEST_NM = 0.99009900990099;
 			}
+
+			static void print_parameters()
+			{
+				cout << "Detroit_Mode_Choice_Option parameters" << endl;
+				cout << "\tHBW_ASC_AUTO = " << HBW_ASC_AUTO<float>() << endl;
+				cout << "\tHBO_ASC_AUTO = " << HBO_ASC_AUTO<float>() << endl;
+				cout << "\tNHB_ASC_AUTO = " << NHB_ASC_AUTO<float>() << endl;
+				cout << "\tHBW_ASC_PASS = " << HBW_ASC_PASS<float>() << endl;
+				cout << "\tHBO_ASC_PASS = " << HBO_ASC_PASS<float>() << endl;
+				cout << "\tNHB_ASC_PASS = " << NHB_ASC_PASS<float>() << endl;
+				cout << "\tHBW_ASC_TAXI = " << HBW_ASC_TAXI<float>() << endl;
+				cout << "\tHBO_ASC_TAXI = " << HBO_ASC_TAXI<float>() << endl;
+				cout << "\tNHB_ASC_TAXI = " << NHB_ASC_TAXI<float>() << endl;
+				cout << "\tHBW_ASC_WALK = " << HBW_ASC_WALK<float>() << endl;
+				cout << "\tHBO_ASC_WALK = " << HBO_ASC_WALK<float>() << endl;
+				cout << "\tNHB_ASC_WALK = " << NHB_ASC_WALK<float>() << endl;
+				cout << "\tHBW_ASC_TRAN = " << HBW_ASC_TRAN<float>() << endl;
+				cout << "\tHBO_ASC_TRAN = " << HBO_ASC_TRAN<float>() << endl;
+				cout << "\tNHB_ASC_TRAN = " << NHB_ASC_TRAN<float>() << endl;
+				cout << "\tHBW_ASC_BIKE = " << HBW_ASC_BIKE<float>() << endl;
+				cout << "\tHBO_ASC_BIKE = " << HBO_ASC_BIKE<float>() << endl;
+				cout << "\tNHB_ASC_BIKE = " << NHB_ASC_BIKE<float>() << endl;
+				cout << "\tHBW_B_cbd_pa = " << HBW_B_cbd_pa<float>() << endl;
+				cout << "\tHBO_B_cbd_pa = " << HBO_B_cbd_pa<float>() << endl;
+				cout << "\tNHB_B_cbd_pa = " << NHB_B_cbd_pa<float>() << endl;
+				cout << "\tHBW_B_cost = " << HBW_B_cost<float>() << endl;
+				cout << "\tHBO_B_cost = " << HBO_B_cost<float>() << endl;
+				cout << "\tNHB_B_cost = " << NHB_B_cost<float>() << endl;
+				cout << "\tHBW_B_cost_hinc = " << HBW_B_cost_hinc<float>() << endl;
+				cout << "\tHBO_B_cost_hinc = " << HBO_B_cost_hinc<float>() << endl;
+				cout << "\tNHB_B_cost_hinc = " << NHB_B_cost_hinc<float>() << endl;
+				cout << "\tHBW_B_cost_minc = " << HBW_B_cost_minc<float>() << endl;
+				cout << "\tHBO_B_cost_minc = " << HBO_B_cost_minc<float>() << endl;
+				cout << "\tNHB_B_cost_minc = " << NHB_B_cost_minc<float>() << endl;
+				cout << "\tHBW_B_dens_bike = " << HBW_B_dens_bike<float>() << endl;
+				cout << "\tHBO_B_dens_bike = " << HBO_B_dens_bike<float>() << endl;
+				cout << "\tNHB_B_dens_bike = " << NHB_B_dens_bike<float>() << endl;
+				cout << "\tHBW_B_dens_walk = " << HBW_B_dens_walk<float>() << endl;
+				cout << "\tHBO_B_dens_walk = " << HBO_B_dens_walk<float>() << endl;
+				cout << "\tNHB_B_dens_walk = " << NHB_B_dens_walk<float>() << endl;
+				cout << "\tHBW_B_male_taxi = " << HBW_B_male_taxi<float>() << endl;
+				cout << "\tHBO_B_male_taxi = " << HBO_B_male_taxi<float>() << endl;
+				cout << "\tNHB_B_male_taxi = " << NHB_B_male_taxi<float>() << endl;
+				cout << "\tHBW_B_notalone_pass = " << HBW_B_notalone_pass<float>() << endl;
+				cout << "\tHBO_B_notalone_pass = " << HBO_B_notalone_pass<float>() << endl;
+				cout << "\tNHB_B_notalone_pass = " << NHB_B_notalone_pass<float>() << endl;
+				cout << "\tHBW_B_over65_pass = " << HBW_B_over65_pass<float>() << endl;
+				cout << "\tHBO_B_over65_pass = " << HBO_B_over65_pass<float>() << endl;
+				cout << "\tNHB_B_over65_pass = " << NHB_B_over65_pass<float>() << endl;
+				cout << "\tHBW_B_over65_tran = " << HBW_B_over65_tran<float>() << endl;
+				cout << "\tHBO_B_over65_tran = " << HBO_B_over65_tran<float>() << endl;
+				cout << "\tNHB_B_over65_tran = " << NHB_B_over65_tran<float>() << endl;
+				cout << "\tHBW_B_ovttime_tran = " << HBW_B_ovttime_tran<float>() << endl;
+				cout << "\tHBO_B_ovttime_tran = " << HBO_B_ovttime_tran<float>() << endl;
+				cout << "\tNHB_B_ovttime_tran = " << NHB_B_ovttime_tran<float>() << endl;
+				cout << "\tHBW_B_peak_auto = " << HBW_B_peak_auto<float>() << endl;
+				cout << "\tHBO_B_peak_auto = " << HBO_B_peak_auto<float>() << endl;
+				cout << "\tNHB_B_peak_auto = " << NHB_B_peak_auto<float>() << endl;
+				cout << "\tHBW_B_ttime_bike = " << HBW_B_ttime_bike<float>() << endl;
+				cout << "\tHBO_B_ttime_bike = " << HBO_B_ttime_bike<float>() << endl;
+				cout << "\tNHB_B_ttime_bike = " << NHB_B_ttime_bike<float>() << endl;
+				cout << "\tHBW_B_ttime_tran = " << HBW_B_ttime_tran<float>() << endl;
+				cout << "\tHBO_B_ttime_tran = " << HBO_B_ttime_tran<float>() << endl;
+				cout << "\tNHB_B_ttime_tran = " << NHB_B_ttime_tran<float>() << endl;
+				cout << "\tHBW_B_ttime_walk = " << HBW_B_ttime_walk<float>() << endl;
+				cout << "\tHBO_B_ttime_walk = " << HBO_B_ttime_walk<float>() << endl;
+				cout << "\tNHB_B_ttime_walk = " << NHB_B_ttime_walk<float>() << endl;
+				cout << "\tHBW_B_u18_pass = " << HBW_B_u18_pass<float>() << endl;
+				cout << "\tHBO_B_u18_pass = " << HBO_B_u18_pass<float>() << endl;
+				cout << "\tNHB_B_u18_pass = " << NHB_B_u18_pass<float>() << endl;
+				cout << "\tHBW_B_vehavail_pass = " << HBW_B_vehavail_pass<float>() << endl;
+				cout << "\tHBO_B_vehavail_pass = " << HBO_B_vehavail_pass<float>() << endl;
+				cout << "\tNHB_B_vehavail_pass = " << NHB_B_vehavail_pass<float>() << endl;
+				cout << "\tHBW_B_vehavail_taxi = " << HBW_B_vehavail_taxi<float>() << endl;
+				cout << "\tHBO_B_vehavail_taxi = " << HBO_B_vehavail_taxi<float>() << endl;
+				cout << "\tNHB_B_vehavail_taxi = " << NHB_B_vehavail_taxi<float>() << endl;
+				cout << "\tHBW_B_vehavail_tran = " << HBW_B_vehavail_tran<float>() << endl;
+				cout << "\tHBO_B_vehavail_tran = " << HBO_B_vehavail_tran<float>() << endl;
+				cout << "\tNHB_B_vehavail_tran = " << NHB_B_vehavail_tran<float>() << endl;
+				cout << "\tHBW_B_waittime_tran = " << HBW_B_waittime_tran<float>() << endl;
+				cout << "\tHBO_B_waittime_tran = " << HBO_B_waittime_tran<float>() << endl;
+				cout << "\tNHB_B_waittime_tran = " << NHB_B_waittime_tran<float>() << endl;
+				cout << "\tHBW_ASC_N_AUTO = " << HBW_ASC_N_AUTO<float>() << endl;
+				cout << "\tHBO_ASC_N_AUTO = " << HBO_ASC_N_AUTO<float>() << endl;
+				cout << "\tNHB_ASC_N_AUTO = " << NHB_ASC_N_AUTO<float>() << endl;
+				cout << "\tHBW_ASC_N_NM = " << HBW_ASC_N_NM<float>() << endl;
+				cout << "\tHBO_ASC_N_NM = " << HBO_ASC_N_NM<float>() << endl;
+				cout << "\tNHB_ASC_N_NM = " << NHB_ASC_N_NM<float>() << endl;
+				cout << "\tHBW_B_vehavail_nm = " << HBW_B_vehavail_nm<float>() << endl;
+				cout << "\tHBO_B_vehavail_nm = " << HBO_B_vehavail_nm<float>() << endl;
+				cout << "\tNHB_B_vehavail_nm = " << NHB_B_vehavail_nm<float>() << endl;
+				cout << "\tHBW_B_male_nm = " << HBW_B_male_nm<float>() << endl;
+				cout << "\tHBO_B_male_nm = " << HBO_B_male_nm<float>() << endl;
+				cout << "\tNHB_B_male_nm = " << NHB_B_male_nm<float>() << endl;
+				cout << "\tHBW_B_cbd_nm = " << HBW_B_cbd_nm<float>() << endl;
+				cout << "\tHBO_B_cbd_nm = " << HBO_B_cbd_nm<float>() << endl;
+				cout << "\tNHB_B_cbd_nm = " << NHB_B_cbd_nm<float>() << endl;
+				cout << "\tHBW_NEST_AUTO = " << HBW_NEST_AUTO<float>() << endl;
+				cout << "\tHBO_NEST_AUTO = " << HBO_NEST_AUTO<float>() << endl;
+				cout << "\tNHB_NEST_AUTO = " << NHB_NEST_AUTO<float>() << endl;
+				cout << "\tHBW_NEST_NM = " << HBW_NEST_NM<float>() << endl;
+				cout << "\tHBO_NEST_NM = " << HBO_NEST_NM<float>() << endl;
+				cout << "\tNHB_NEST_NM = " << NHB_NEST_NM<float>() << endl;
+			}
+
 
 			void copy(ComponentType* obj)
 			{

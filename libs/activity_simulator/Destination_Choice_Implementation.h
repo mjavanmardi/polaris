@@ -90,14 +90,14 @@ namespace Person_Components
 				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Destination_Choice_Option", key, default_value);
 			}
 
-			static bool static_initialize()
+			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
 				base_static_initializer();
 
 				// now see if there are config file changes
 				rapidjson::Document document;
-				std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template adapts_destination_choice_option_param_file<string>();
+				//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template adapts_destination_choice_option_param_file<string>();
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file for ADAPTS_Destination_Choice_Option was not specified" << endl;
@@ -388,6 +388,290 @@ namespace Person_Components
 				THETA_UR_WORK    	<float>(GetOption_Double(document, "THETA_UR_WORK", THETA_UR_WORK    		<float>()));
 
 				return true;
+			}
+
+			static void print_parameters()
+			{
+				cout << "ADAPTS_Destination_Choice_Option parameters" << endl;
+				cout << "\tBTT_PICK = " << BTT_PICK			<float>() << endl;
+				cout << "\tBINCD_PICK = " << BINCD_PICK		<float>() << endl;
+				cout << "\tBRACED_PICK = " << BRACED_PICK		<float>() << endl;
+				cout << "\tBArRes_PICK = " << BArRes_PICK		<float>() << endl;
+				cout << "\tBArRec_PICK = " << BArRec_PICK		<float>() << endl;
+				cout << "\tBArRet_PICK = " << BArRet_PICK		<float>() << endl;
+				cout << "\tBArEnt_PICK = " << BArEnt_PICK		<float>() << endl;
+				cout << "\tBArIns_PICK = " << BArIns_PICK		<float>() << endl;
+				cout << "\tBArOff_PICK = " << BArOff_PICK		<float>() << endl;
+				cout << "\tBArMix_PICK = " << BArMix_PICK		<float>() << endl;
+				cout << "\tBArSch_PICK = " << BArSch_PICK		<float>() << endl;
+				cout << "\tBEmOth_PICK = " << BEmOth_PICK		<float>() << endl;
+				cout << "\tBEmInd_PICK = " << BEmInd_PICK		<float>() << endl;
+				cout << "\tBEmGov_PICK = " << BEmGov_PICK		<float>() << endl;
+				cout << "\tBEmSer_PICK = " << BEmSer_PICK		<float>() << endl;
+				cout << "\tBEmMan_PICK = " << BEmMan_PICK		<float>() << endl;
+				cout << "\tBEmRet_PICK = " << BEmRet_PICK		<float>() << endl;
+				cout << "\tTHETAG_PICK = " << THETAG_PICK		<float>() << endl;
+				cout << "\tTHETAM_PICK = " << THETAM_PICK		<float>() << endl;
+				cout << "\tTHETAR_PICK = " << THETAR_PICK		<float>() << endl;
+				cout << "\tTHETAS_PICK = " << THETAS_PICK		<float>() << endl;
+				cout << "\tTHETAI_PICK = " << THETAI_PICK		<float>() << endl;
+				cout << "\tTHETAO_PICK = " << THETAO_PICK		<float>() << endl;
+				cout << "\tGAMMA_PICK = " << GAMMA_PICK		<float>() << endl;
+
+				cout << "\tBTT_OTHER_WORK = " << BTT_OTHER_WORK		<float>() << endl;
+				cout << "\tBINCD_OTHER_WORK = " << BINCD_OTHER_WORK	<float>() << endl;
+				cout << "\tBRACED_OTHER_WORK = " << BRACED_OTHER_WORK	<float>() << endl;
+				cout << "\tBArRes_OTHER_WORK = " << BArRes_OTHER_WORK	<float>() << endl;
+				cout << "\tBArRec_OTHER_WORK = " << BArRec_OTHER_WORK	<float>() << endl;
+				cout << "\tBArRet_OTHER_WORK = " << BArRet_OTHER_WORK	<float>() << endl;
+				cout << "\tBArEnt_OTHER_WORK = " << BArEnt_OTHER_WORK	<float>() << endl;
+				cout << "\tBArIns_OTHER_WORK = " << BArIns_OTHER_WORK	<float>() << endl;
+				cout << "\tBArOff_OTHER_WORK = " << BArOff_OTHER_WORK	<float>() << endl;
+				cout << "\tBArMix_OTHER_WORK = " << BArMix_OTHER_WORK	<float>() << endl;
+				cout << "\tBArSch_OTHER_WORK = " << BArSch_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmOth_OTHER_WORK = " << BEmOth_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmInd_OTHER_WORK = " << BEmInd_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmGov_OTHER_WORK = " << BEmGov_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmSer_OTHER_WORK = " << BEmSer_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmMan_OTHER_WORK = " << BEmMan_OTHER_WORK	<float>() << endl;
+				cout << "\tBEmRet_OTHER_WORK = " << BEmRet_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAG_OTHER_WORK = " << THETAG_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAM_OTHER_WORK = " << THETAM_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAR_OTHER_WORK = " << THETAR_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAS_OTHER_WORK = " << THETAS_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAI_OTHER_WORK = " << THETAI_OTHER_WORK	<float>() << endl;
+				cout << "\tTHETAO_OTHER_WORK = " << THETAO_OTHER_WORK	<float>() << endl;
+				cout << "\tGAMMA_OTHER_WORK = " << GAMMA_OTHER_WORK 	<float>() << endl;
+
+				cout << "\tBTT_SERVICE = " << BTT_SERVICE	<float>() << endl;
+				cout << "\tBINCD_SERVICE = " << BINCD_SERVICE	<float>() << endl;
+				cout << "\tBRACED_SERVICE = " << BRACED_SERVICE	<float>() << endl;
+				cout << "\tBArRes_SERVICE = " << BArRes_SERVICE	<float>() << endl;
+				cout << "\tBArRec_SERVICE = " << BArRec_SERVICE	<float>() << endl;
+				cout << "\tBArRet_SERVICE = " << BArRet_SERVICE	<float>() << endl;
+				cout << "\tBArEnt_SERVICE = " << BArEnt_SERVICE	<float>() << endl;
+				cout << "\tBArIns_SERVICE = " << BArIns_SERVICE	<float>() << endl;
+				cout << "\tBArOff_SERVICE = " << BArOff_SERVICE	<float>() << endl;
+				cout << "\tBArMix_SERVICE = " << BArMix_SERVICE	<float>() << endl;
+				cout << "\tBArSch_SERVICE = " << BArSch_SERVICE	<float>() << endl;
+				cout << "\tBEmOth_SERVICE = " << BEmOth_SERVICE	<float>() << endl;
+				cout << "\tBEmInd_SERVICE = " << BEmInd_SERVICE	<float>() << endl;
+				cout << "\tBEmGov_SERVICE = " << BEmGov_SERVICE	<float>() << endl;
+				cout << "\tBEmSer_SERVICE = " << BEmSer_SERVICE	<float>() << endl;
+				cout << "\tBEmMan_SERVICE = " << BEmMan_SERVICE	<float>() << endl;
+				cout << "\tBEmRet_SERVICE = " << BEmRet_SERVICE	<float>() << endl;
+				cout << "\tTHETAG_SERVICE = " << THETAG_SERVICE	<float>() << endl;
+				cout << "\tTHETAM_SERVICE = " << THETAM_SERVICE	<float>() << endl;
+				cout << "\tTHETAR_SERVICE = " << THETAR_SERVICE	<float>() << endl;
+				cout << "\tTHETAS_SERVICE = " << THETAS_SERVICE	<float>() << endl;
+				cout << "\tTHETAI_SERVICE = " << THETAI_SERVICE	<float>() << endl;
+				cout << "\tTHETAO_SERVICE = " << THETAO_SERVICE	<float>() << endl;
+				cout << "\tGAMMA_SERVICE = " << GAMMA_SERVICE  <float>() << endl;
+
+				cout << "\tBTT_MIN_SHOP = " << BTT_MIN_SHOP		<float>() << endl;
+				cout << "\tBINCD_MIN_SHOP = " << BINCD_MIN_SHOP	<float>() << endl;
+				cout << "\tBRACED_MIN_SHOP = " << BRACED_MIN_SHOP	<float>() << endl;
+				cout << "\tBArRes_MIN_SHOP = " << BArRes_MIN_SHOP	<float>() << endl;
+				cout << "\tBArRec_MIN_SHOP = " << BArRec_MIN_SHOP	<float>() << endl;
+				cout << "\tBArRet_MIN_SHOP = " << BArRet_MIN_SHOP	<float>() << endl;
+				cout << "\tBArEnt_MIN_SHOP = " << BArEnt_MIN_SHOP	<float>() << endl;
+				cout << "\tBArIns_MIN_SHOP = " << BArIns_MIN_SHOP	<float>() << endl;
+				cout << "\tBArOff_MIN_SHOP = " << BArOff_MIN_SHOP	<float>() << endl;
+				cout << "\tBArMix_MIN_SHOP = " << BArMix_MIN_SHOP	<float>() << endl;
+				cout << "\tBArSch_MIN_SHOP = " << BArSch_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmOth_MIN_SHOP = " << BEmOth_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmInd_MIN_SHOP = " << BEmInd_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmGov_MIN_SHOP = " << BEmGov_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmSer_MIN_SHOP = " << BEmSer_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmMan_MIN_SHOP = " << BEmMan_MIN_SHOP	<float>() << endl;
+				cout << "\tBEmRet_MIN_SHOP = " << BEmRet_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAG_MIN_SHOP = " << THETAG_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAM_MIN_SHOP = " << THETAM_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAR_MIN_SHOP = " << THETAR_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAS_MIN_SHOP = " << THETAS_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAI_MIN_SHOP = " << THETAI_MIN_SHOP	<float>() << endl;
+				cout << "\tTHETAO_MIN_SHOP = " << THETAO_MIN_SHOP	<float>() << endl;
+				cout << "\tGAMMA_MIN_SHOP = " << GAMMA_MIN_SHOP 	<float>() << endl;
+
+				cout << "\tBTT_MAJ_SHOP = " << BTT_MAJ_SHOP   	<float>() << endl;
+				cout << "\tBINCD_MAJ_SHOP = " << BINCD_MAJ_SHOP 	<float>() << endl;
+				cout << "\tBRACED_MAJ_SHOP = " << BRACED_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArRes_MAJ_SHOP = " << BArRes_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArRec_MAJ_SHOP = " << BArRec_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArRet_MAJ_SHOP = " << BArRet_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArEnt_MAJ_SHOP = " << BArEnt_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArIns_MAJ_SHOP = " << BArIns_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArOff_MAJ_SHOP = " << BArOff_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArMix_MAJ_SHOP = " << BArMix_MAJ_SHOP	<float>() << endl;
+				cout << "\tBArSch_MAJ_SHOP = " << BArSch_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmOth_MAJ_SHOP = " << BEmOth_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmInd_MAJ_SHOP = " << BEmInd_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmGov_MAJ_SHOP = " << BEmGov_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmSer_MAJ_SHOP = " << BEmSer_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmMan_MAJ_SHOP = " << BEmMan_MAJ_SHOP	<float>() << endl;
+				cout << "\tBEmRet_MAJ_SHOP = " << BEmRet_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAG_MAJ_SHOP = " << THETAG_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAM_MAJ_SHOP = " << THETAM_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAR_MAJ_SHOP = " << THETAR_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAS_MAJ_SHOP = " << THETAS_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAI_MAJ_SHOP = " << THETAI_MAJ_SHOP	<float>() << endl;
+				cout << "\tTHETAO_MAJ_SHOP = " << THETAO_MAJ_SHOP	<float>() << endl;
+				cout << "\tGAMMA_MAJ_SHOP = " << GAMMA_MAJ_SHOP 	<float>() << endl;
+
+				cout << "\tBTT_EAT_OUT = " << BTT_EAT_OUT	<float>() << endl;
+				cout << "\tBINCD_EAT_OUT = " << BINCD_EAT_OUT	<float>() << endl;
+				cout << "\tBRACED_EAT_OUT = " << BRACED_EAT_OUT	<float>() << endl;
+				cout << "\tBArRes_EAT_OUT = " << BArRes_EAT_OUT	<float>() << endl;
+				cout << "\tBArRec_EAT_OUT = " << BArRec_EAT_OUT	<float>() << endl;
+				cout << "\tBArRet_EAT_OUT = " << BArRet_EAT_OUT	<float>() << endl;
+				cout << "\tBArEnt_EAT_OUT = " << BArEnt_EAT_OUT	<float>() << endl;
+				cout << "\tBArIns_EAT_OUT = " << BArIns_EAT_OUT	<float>() << endl;
+				cout << "\tBArOff_EAT_OUT = " << BArOff_EAT_OUT	<float>() << endl;
+				cout << "\tBArMix_EAT_OUT = " << BArMix_EAT_OUT	<float>() << endl;
+				cout << "\tBArSch_EAT_OUT = " << BArSch_EAT_OUT	<float>() << endl;
+				cout << "\tBEmOth_EAT_OUT = " << BEmOth_EAT_OUT	<float>() << endl;
+				cout << "\tBEmInd_EAT_OUT = " << BEmInd_EAT_OUT	<float>() << endl;
+				cout << "\tBEmGov_EAT_OUT = " << BEmGov_EAT_OUT	<float>() << endl;
+				cout << "\tBEmSer_EAT_OUT = " << BEmSer_EAT_OUT	<float>() << endl;
+				cout << "\tBEmMan_EAT_OUT = " << BEmMan_EAT_OUT	<float>() << endl;
+				cout << "\tBEmRet_EAT_OUT = " << BEmRet_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAG_EAT_OUT = " << THETAG_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAM_EAT_OUT = " << THETAM_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAR_EAT_OUT = " << THETAR_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAS_EAT_OUT = " << THETAS_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAI_EAT_OUT = " << THETAI_EAT_OUT	<float>() << endl;
+				cout << "\tTHETAO_EAT_OUT = " << THETAO_EAT_OUT	<float>() << endl;
+				cout << "\tGAMMA_EAT_OUT = " << GAMMA_EAT_OUT 	<float>() << endl;
+
+				cout << "\tBTT_CIVIC = " << BTT_CIVIC   	<float>() << endl;
+				cout << "\tBINCD_CIVIC = " << BINCD_CIVIC 	<float>() << endl;
+				cout << "\tBRACED_CIVIC = " << BRACED_CIVIC	<float>() << endl;
+				cout << "\tBArRes_CIVIC = " << BArRes_CIVIC	<float>() << endl;
+				cout << "\tBArRec_CIVIC = " << BArRec_CIVIC	<float>() << endl;
+				cout << "\tBArRet_CIVIC = " << BArRet_CIVIC	<float>() << endl;
+				cout << "\tBArEnt_CIVIC = " << BArEnt_CIVIC	<float>() << endl;
+				cout << "\tBArIns_CIVIC = " << BArIns_CIVIC	<float>() << endl;
+				cout << "\tBArOff_CIVIC = " << BArOff_CIVIC	<float>() << endl;
+				cout << "\tBArMix_CIVIC = " << BArMix_CIVIC	<float>() << endl;
+				cout << "\tBArSch_CIVIC = " << BArSch_CIVIC	<float>() << endl;
+				cout << "\tBEmOth_CIVIC = " << BEmOth_CIVIC	<float>() << endl;
+				cout << "\tBEmInd_CIVIC = " << BEmInd_CIVIC	<float>() << endl;
+				cout << "\tBEmGov_CIVIC = " << BEmGov_CIVIC	<float>() << endl;
+				cout << "\tBEmSer_CIVIC = " << BEmSer_CIVIC	<float>() << endl;
+				cout << "\tBEmMan_CIVIC = " << BEmMan_CIVIC	<float>() << endl;
+				cout << "\tBEmRet_CIVIC = " << BEmRet_CIVIC	<float>() << endl;
+				cout << "\tTHETAG_CIVIC = " << THETAG_CIVIC	<float>() << endl;
+				cout << "\tTHETAM_CIVIC = " << THETAM_CIVIC	<float>() << endl;
+				cout << "\tTHETAR_CIVIC = " << THETAR_CIVIC	<float>() << endl;
+				cout << "\tTHETAS_CIVIC = " << THETAS_CIVIC	<float>() << endl;
+				cout << "\tTHETAI_CIVIC = " << THETAI_CIVIC	<float>() << endl;
+				cout << "\tTHETAO_CIVIC = " << THETAO_CIVIC	<float>() << endl;
+				cout << "\tGAMMA_CIVIC = " << GAMMA_CIVIC 	<float>() << endl;
+
+				cout << "\tBTT_LEISURE = " << BTT_LEISURE  	<float>() << endl;
+				cout << "\tBINCD_LEISURE = " << BINCD_LEISURE 	<float>() << endl;
+				cout << "\tBRACED_LEISURE = " << BRACED_LEISURE	<float>() << endl;
+				cout << "\tBArRes_LEISURE = " << BArRes_LEISURE	<float>() << endl;
+				cout << "\tBArRec_LEISURE = " << BArRec_LEISURE	<float>() << endl;
+				cout << "\tBArRet_LEISURE = " << BArRet_LEISURE	<float>() << endl;
+				cout << "\tBArEnt_LEISURE = " << BArEnt_LEISURE	<float>() << endl;
+				cout << "\tBArIns_LEISURE = " << BArIns_LEISURE	<float>() << endl;
+				cout << "\tBArOff_LEISURE = " << BArOff_LEISURE	<float>() << endl;
+				cout << "\tBArMix_LEISURE = " << BArMix_LEISURE	<float>() << endl;
+				cout << "\tBArSch_LEISURE = " << BArSch_LEISURE	<float>() << endl;
+				cout << "\tBEmOth_LEISURE = " << BEmOth_LEISURE	<float>() << endl;
+				cout << "\tBEmInd_LEISURE = " << BEmInd_LEISURE	<float>() << endl;
+				cout << "\tBEmGov_LEISURE = " << BEmGov_LEISURE	<float>() << endl;
+				cout << "\tBEmSer_LEISURE = " << BEmSer_LEISURE	<float>() << endl;
+				cout << "\tBEmMan_LEISURE = " << BEmMan_LEISURE	<float>() << endl;
+				cout << "\tBEmRet_LEISURE = " << BEmRet_LEISURE	<float>() << endl;
+				cout << "\tTHETAG_LEISURE = " << THETAG_LEISURE	<float>() << endl;
+				cout << "\tTHETAM_LEISURE = " << THETAM_LEISURE	<float>() << endl;
+				cout << "\tTHETAR_LEISURE = " << THETAR_LEISURE	<float>() << endl;
+				cout << "\tTHETAS_LEISURE = " << THETAS_LEISURE	<float>() << endl;
+				cout << "\tTHETAI_LEISURE = " << THETAI_LEISURE	<float>() << endl;
+				cout << "\tTHETAO_LEISURE = " << THETAO_LEISURE	<float>() << endl;
+				cout << "\tGAMMA_LEISURE = " << GAMMA_LEISURE 	<float>() << endl;
+
+				cout << "\tBTT_SOCIAL = " << BTT_SOCIAL   	<float>() << endl;
+				cout << "\tBINCD_SOCIAL = " << BINCD_SOCIAL 	<float>() << endl;
+				cout << "\tBRACED_SOCIAL = " << BRACED_SOCIAL	<float>() << endl;
+				cout << "\tBArRes_SOCIAL = " << BArRes_SOCIAL	<float>() << endl;
+				cout << "\tBArRec_SOCIAL = " << BArRec_SOCIAL	<float>() << endl;
+				cout << "\tBArRet_SOCIAL = " << BArRet_SOCIAL	<float>() << endl;
+				cout << "\tBArEnt_SOCIAL = " << BArEnt_SOCIAL	<float>() << endl;
+				cout << "\tBArIns_SOCIAL = " << BArIns_SOCIAL	<float>() << endl;
+				cout << "\tBArOff_SOCIAL = " << BArOff_SOCIAL	<float>() << endl;
+				cout << "\tBArMix_SOCIAL = " << BArMix_SOCIAL	<float>() << endl;
+				cout << "\tBArSch_SOCIAL = " << BArSch_SOCIAL	<float>() << endl;
+				cout << "\tBEmOth_SOCIAL = " << BEmOth_SOCIAL	<float>() << endl;
+				cout << "\tBEmInd_SOCIAL = " << BEmInd_SOCIAL	<float>() << endl;
+				cout << "\tBEmGov_SOCIAL = " << BEmGov_SOCIAL	<float>() << endl;
+				cout << "\tBEmSer_SOCIAL = " << BEmSer_SOCIAL	<float>() << endl;
+				cout << "\tBEmMan_SOCIAL = " << BEmMan_SOCIAL	<float>() << endl;
+				cout << "\tBEmRet_SOCIAL = " << BEmRet_SOCIAL	<float>() << endl;
+				cout << "\tTHETAG_SOCIAL = " << THETAG_SOCIAL	<float>() << endl;
+				cout << "\tTHETAM_SOCIAL = " << THETAM_SOCIAL	<float>() << endl;
+				cout << "\tTHETAR_SOCIAL = " << THETAR_SOCIAL	<float>() << endl;
+				cout << "\tTHETAS_SOCIAL = " << THETAS_SOCIAL	<float>() << endl;
+				cout << "\tTHETAI_SOCIAL = " << THETAI_SOCIAL	<float>() << endl;
+				cout << "\tTHETAO_SOCIAL = " << THETAO_SOCIAL	<float>() << endl;
+				cout << "\tGAMMA_SOCIAL = " << GAMMA_SOCIAL 	<float>() << endl;
+
+				cout << "\tBTT_OTHER = " << BTT_OTHER   	<float>() << endl;
+				cout << "\tBINCD_OTHER = " << BINCD_OTHER 	<float>() << endl;
+				cout << "\tBRACED_OTHER = " << BRACED_OTHER	<float>() << endl;
+				cout << "\tBArRes_OTHER = " << BArRes_OTHER	<float>() << endl;
+				cout << "\tBArRec_OTHER = " << BArRec_OTHER	<float>() << endl;
+				cout << "\tBArRet_OTHER = " << BArRet_OTHER	<float>() << endl;
+				cout << "\tBArEnt_OTHER = " << BArEnt_OTHER	<float>() << endl;
+				cout << "\tBArIns_OTHER = " << BArIns_OTHER	<float>() << endl;
+				cout << "\tBArOff_OTHER = " << BArOff_OTHER	<float>() << endl;
+				cout << "\tBArMix_OTHER = " << BArMix_OTHER	<float>() << endl;
+				cout << "\tBArSch_OTHER = " << BArSch_OTHER	<float>() << endl;
+				cout << "\tBEmOth_OTHER = " << BEmOth_OTHER	<float>() << endl;
+				cout << "\tBEmInd_OTHER = " << BEmInd_OTHER	<float>() << endl;
+				cout << "\tBEmGov_OTHER = " << BEmGov_OTHER	<float>() << endl;
+				cout << "\tBEmSer_OTHER = " << BEmSer_OTHER	<float>() << endl;
+				cout << "\tBEmMan_OTHER = " << BEmMan_OTHER	<float>() << endl;
+				cout << "\tBEmRet_OTHER = " << BEmRet_OTHER	<float>() << endl;
+				cout << "\tTHETAG_OTHER = " << THETAG_OTHER	<float>() << endl;
+				cout << "\tTHETAM_OTHER = " << THETAM_OTHER	<float>() << endl;
+				cout << "\tTHETAR_OTHER = " << THETAR_OTHER	<float>() << endl;
+				cout << "\tTHETAS_OTHER = " << THETAS_OTHER	<float>() << endl;
+				cout << "\tTHETAI_OTHER = " << THETAI_OTHER	<float>() << endl;
+				cout << "\tTHETAO_OTHER = " << THETAO_OTHER	<float>() << endl;
+				cout << "\tGAMMA_OTHER = " << GAMMA_OTHER 	<float>() << endl;
+
+				cout << "\tBTTAUTO_WORK = " << BTTAUTO_WORK	<float>() << endl;
+				cout << "\tBINCD_WORK = " << BINCD_WORK 	<float>() << endl;
+				cout << "\tBRACED_WORK = " << BRACED_WORK 	<float>() << endl;
+				cout << "\tBArRes_WORK = " << BArRes_WORK 	<float>() << endl;
+				cout << "\tBArRec_WORK = " << BArRec_WORK 	<float>() << endl;
+				cout << "\tBArRet_WORK = " << BArRet_WORK 	<float>() << endl;
+				cout << "\tBArEnt_WORK = " << BArEnt_WORK 	<float>() << endl;
+				cout << "\tBArIns_WORK = " << BArIns_WORK 	<float>() << endl;
+				cout << "\tBArOff_WORK = " << BArOff_WORK 	<float>() << endl;
+				cout << "\tBArMix_WORK = " << BArMix_WORK 	<float>() << endl;
+				cout << "\tBArSch_WORK = " << BArSch_WORK 	<float>() << endl;
+				cout << "\tBEmOth_WORK = " << BEmOth_WORK 	<float>() << endl;
+				cout << "\tBEmInd_WORK = " << BEmInd_WORK 	<float>() << endl;
+				cout << "\tBEmGov_WORK = " << BEmGov_WORK 	<float>() << endl;
+				cout << "\tBEmSer_WORK = " << BEmSer_WORK 	<float>() << endl;
+				cout << "\tBEmMan_WORK = " << BEmMan_WORK 	<float>() << endl;
+				cout << "\tBEmRet_WORK = " << BEmRet_WORK 	<float>() << endl;
+				cout << "\tTHETAG_WORK = " << THETAG_WORK 	<float>() << endl;
+				cout << "\tTHETAM_WORK = " << THETAM_WORK 	<float>() << endl;
+				cout << "\tTHETAR_WORK = " << THETAR_WORK 	<float>() << endl;
+				cout << "\tTHETAS_WORK = " << THETAS_WORK 	<float>() << endl;
+				cout << "\tTHETAI_WORK = " << THETAI_WORK 	<float>() << endl;
+				cout << "\tTHETAO_WORK = " << THETAO_WORK 	<float>() << endl;
+
+				cout << "\tBTTTRAN_WORK = " << BTTTRAN_WORK     		<float>() << endl;
+				cout << "\tBTTOTHER_WORK = " << BTTOTHER_WORK    		<float>() << endl;
+				cout << "\tBHOME_WORK = " << BHOME_WORK       			<float>() << endl;
+				cout << "\tBEmUnrelated_WORK = " << BEmUnrelated_WORK	<float>() << endl;
+				cout << "\tTHETA_UR_WORK = " << THETA_UR_WORK    		<float>() << endl;
 			}
 
 			template<typename TargetType> void Initialize()
