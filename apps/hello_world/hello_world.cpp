@@ -61,6 +61,32 @@ implementation struct driver_implementation : public Polaris_Component<MasterTyp
 };
 
 
+
+
+
+implementation struct Base : public Polaris_Component<MasterType, INHERIT(Base)>
+{
+	static int x;
+	static int y;
+	static int z;
+	void print()
+	{
+		cout <<"Static value is: "<< Base::x<<", "<<Base::y<<", "<<Base::z<<endl;
+	}
+};
+template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::x = 1;
+template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::y = 2;
+template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::z = 3;
+
+implementation struct Child : public Base<MasterType, INHERIT(Child)>
+{
+	static void init()
+	{
+		Base<MasterType, INHERIT(Child)>::x = 4;
+	}
+};
+
+
 //prototype struct Agent
 //{
 //	tag_as_prototype;
@@ -161,6 +187,8 @@ implementation struct driver_implementation : public Polaris_Component<MasterTyp
 
 struct MasterType
 {
+	typedef Base<MasterType>  base_type;
+	typedef Child<MasterType> child_type;
 	typedef pace_bus_implementation<MasterType> bus_type;
 	typedef driver_implementation<MasterType> driver_type;
 };
@@ -169,6 +197,17 @@ struct MasterType
 
 int main(int argc, char* argv[])
 {
+	float n1 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(0.0);
+	float n2 = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(0.0, 0.0, 1.0);
+
+	Child<MT>* c = Allocate<Child<MT>>();
+	c->init();
+	Base<MT>* b = Allocate<Base<MT>>();
+
+	c->print();
+	b->print();
+
+
 	// There are several pre-set configurations
     polaris::Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(10); // do either single threaded and give iterations, or multi-threaded and also give number of threads

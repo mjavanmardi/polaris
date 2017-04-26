@@ -1666,6 +1666,13 @@ namespace Activity_Components
 				IFDUR = P_dur[0];
 
 				pthis->template Location_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::LOW_FLEXIBILITY);
+
+				// allow flexible timing for work at home activities
+				if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::WORK_AT_HOME_ACTIVITY)
+				{
+					pthis->template Start_Time_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY);
+					pthis->template Duration_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY);
+				}
 			}
 		};
 

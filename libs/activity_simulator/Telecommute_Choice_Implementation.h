@@ -19,43 +19,178 @@ namespace Person_Components
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
+			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
+			{
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Implementation", key, default_value);
+			}
+
+			static bool static_initialize(const string& option_file)
+			{
+				// set the base values
+				base_static_initializer();
+
+				// now see if there are config file changes
+				rapidjson::Document document;
+				//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file for Telecommute_Choice_Implementation was not specified" << endl;
+					return true;
+				}
+
+				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+					return false;
+
+				Z_CONSTANT					<float>(GetOption_Double(document, "Z_CONSTANT"					, Z_CONSTANT				 <float>()));
+				Z_MALE						<float>(GetOption_Double(document, "Z_MALE"						, Z_MALE					 <float>()));
+				Z_INCOME_LOW				<float>(GetOption_Double(document, "Z_INCOME_LOW"				, Z_INCOME_LOW				 <float>()));
+				Z_EDUC_NO_COLLEGE			<float>(GetOption_Double(document, "Z_EDUC_NO_COLLEGE"			, Z_EDUC_NO_COLLEGE			 <float>()));
+				Z_WORK_TRIP_DIST			<float>(GetOption_Double(document, "Z_WORK_TRIP_DIST"			, Z_WORK_TRIP_DIST			 <float>()));
+				Z_NWORKERS					<float>(GetOption_Double(document, "Z_NWORKERS"					, Z_NWORKERS				 <float>()));
+				Z_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "Z_FLEX_WORK_INDICATOR"		, Z_FLEX_WORK_INDICATOR		 <float>()));
+				Z_OCC_TRANS_UTILITY			<float>(GetOption_Double(document, "Z_OCC_TRANS_UTILITY"		, Z_OCC_TRANS_UTILITY		 <float>()));
+				Z_OCC_MANAGEMENT			<float>(GetOption_Double(document, "Z_OCC_MANAGEMENT"			, Z_OCC_MANAGEMENT			 <float>()));
+				Z_OCC_SERVICE				<float>(GetOption_Double(document, "Z_OCC_SERVICE"				, Z_OCC_SERVICE				 <float>()));
+				Z_EMP_DENSITY_OVER_20000	<float>(GetOption_Double(document, "Z_EMP_DENSITY_OVER_20000"	, Z_EMP_DENSITY_OVER_20000	 <float>()));
+				Z_POP_DENSITY				<float>(GetOption_Double(document, "Z_POP_DENSITY"				, Z_POP_DENSITY				 <float>()));
+
+				O_CONSTANT					<float>(GetOption_Double(document, "O_CONSTANT"					, O_CONSTANT				 <float>()));
+				O_INCOME_MED				<float>(GetOption_Double(document, "O_INCOME_MED"				, O_INCOME_MED				 <float>()));
+				O_AGE_35_55					<float>(GetOption_Double(document, "O_AGE_35_55"				, O_AGE_35_55				 <float>()));
+				O_EDUC_GRAD_DEGREE			<float>(GetOption_Double(document, "O_EDUC_GRAD_DEGREE"			, O_EDUC_GRAD_DEGREE		 <float>()));
+				O_WORK_TRIP_TTIME			<float>(GetOption_Double(document, "O_WORK_TRIP_TTIME"			, O_WORK_TRIP_TTIME			 <float>()));
+				O_NVEHICLE					<float>(GetOption_Double(document, "O_NVEHICLE"					, O_NVEHICLE				 <float>()));
+				O_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "O_FLEX_WORK_INDICATOR"		, O_FLEX_WORK_INDICATOR		 <float>()));
+				O_OCC_GOVERNMENT			<float>(GetOption_Double(document, "O_OCC_GOVERNMENT"			, O_OCC_GOVERNMENT			 <float>()));
+				O_OCC_COMMUNICATION			<float>(GetOption_Double(document, "O_OCC_COMMUNICATION"		, O_OCC_COMMUNICATION		 <float>()));
+				O_OCC_MANUFACTURING			<float>(GetOption_Double(document, "O_OCC_MANUFACTURING"		, O_OCC_MANUFACTURING		 <float>()));
+				O_EMP_DENSITY_UNDER_3000	<float>(GetOption_Double(document, "O_EMP_DENSITY_UNDER_3000"	, O_EMP_DENSITY_UNDER_3000	 <float>()));
+
+				T_WORK_DURATION				<float>(GetOption_Double(document, "T_WORK_DURATION"			, T_WORK_DURATION			 <float>()));
+				T_VEH_AVAILABLE				<float>(GetOption_Double(document, "T_VEH_AVAILABLE"			, T_VEH_AVAILABLE			 <float>()));
+				T_HH_VEH_OVER_2_INDICATOR	<float>(GetOption_Double(document, "T_HH_VEH_OVER_2_INDICATOR"	, T_HH_VEH_OVER_2_INDICATOR	 <float>()));
+				T_C1						<float>(GetOption_Double(document, "T_C1"						, T_C1						 <float>()));
+				T_C2						<float>(GetOption_Double(document, "T_C2"						, T_C2						 <float>()));
+				T_C3						<float>(GetOption_Double(document, "T_C3"						, T_C3						 <float>()));
+				T_RHO						<float>(GetOption_Double(document, "T_RHO"						, T_RHO						 <float>()));
+				
+				return true;
+			}
+
+			static void print_parameters()
+			{
+				cout << "Telecommute_Choice_Implementation parameters" << endl;
+				cout << "\tZ_CONSTANT = " << Z_CONSTANT<float>() << endl;
+				cout << "\tZ_MALE = " << Z_MALE<float>() << endl;
+				cout << "\tZ_INCOME_LOW = " << Z_INCOME_LOW<float>() << endl;
+				cout << "\tZ_EDUC_NO_COLLEGE = " << Z_EDUC_NO_COLLEGE<float>() << endl;
+				cout << "\tZ_WORK_TRIP_DIST = " << Z_WORK_TRIP_DIST<float>() << endl;
+				cout << "\tZ_NWORKERS = " << Z_NWORKERS<float>() << endl;
+				cout << "\tZ_FLEX_WORK_INDICATOR = " << Z_FLEX_WORK_INDICATOR<float>() << endl;
+				cout << "\tZ_OCC_TRANS_UTILITY = " << Z_OCC_TRANS_UTILITY<float>() << endl;
+				cout << "\tZ_OCC_MANAGEMENT = " << Z_OCC_MANAGEMENT<float>() << endl;
+				cout << "\tZ_OCC_SERVICE = " << Z_OCC_SERVICE<float>() << endl;
+				cout << "\tZ_EMP_DENSITY_OVER_20000 = " << Z_EMP_DENSITY_OVER_20000<float>() << endl;
+				cout << "\tZ_POP_DENSITY = " << Z_POP_DENSITY<float>() << endl;
+
+				cout << "\tO_CONSTANT = " << O_CONSTANT<float>() << endl;
+				cout << "\tO_INCOME_MED = " << O_INCOME_MED<float>() << endl;
+				cout << "\tO_AGE_35_55 = " << O_AGE_35_55<float>() << endl;
+				cout << "\tO_EDUC_GRAD_DEGREE = " << O_EDUC_GRAD_DEGREE<float>() << endl;
+				cout << "\tO_WORK_TRIP_TTIME = " << O_WORK_TRIP_TTIME<float>() << endl;
+				cout << "\tO_NVEHICLE = " << O_NVEHICLE<float>() << endl;
+				cout << "\tO_FLEX_WORK_INDICATOR = " << O_FLEX_WORK_INDICATOR<float>() << endl;
+				cout << "\tO_OCC_GOVERNMENT = " << O_OCC_GOVERNMENT<float>() << endl;
+				cout << "\tO_OCC_COMMUNICATION = " << O_OCC_COMMUNICATION<float>() << endl;
+				cout << "\tO_OCC_MANUFACTURING = " << O_OCC_MANUFACTURING<float>() << endl;
+				cout << "\tO_EMP_DENSITY_UNDER_3000 = " << O_EMP_DENSITY_UNDER_3000<float>() << endl;
+
+				cout << "\tT_WORK_DURATION = " << T_WORK_DURATION<float>() << endl;
+				cout << "\tT_VEH_AVAILABLE = " << T_VEH_AVAILABLE<float>() << endl;
+				cout << "\tT_HH_VEH_OVER_2_INDICATOR = " << T_HH_VEH_OVER_2_INDICATOR<float>() << endl;
+				cout << "\tT_C1 = " << T_C1<float>() << endl;
+				cout << "\tT_C2 = " << T_C2<float>() << endl;
+				cout << "\tT_C3 = " << T_C3<float>() << endl;
+				cout << "\tT_RHO = " << T_RHO<float>() << endl;
+			}
+
 			//==============================================================================================================================
 			// PARAMETER DECLARATIONS
 			//--------------------------------------------------
 			// Zero-inflation paramaters
-			static m_data(float, Z_CONST, NONE, NONE);
-			static m_data(float, Z_VEH_AVAIL, NONE, NONE);
-			static m_data(float, Z_HU_DENSITY, NONE, NONE);
-			static m_data(float, Z_OCC_INC, NONE, NONE);
-			static m_data(float, Z_OCC_FINANCE, NONE, NONE);
-			static m_data(float, Z_OCC_EDUCATION, NONE, NONE);
-			static m_data(float, Z_DEGREE_ASSOC, NONE, NONE);		// has associates or technical school degree
+			m_static_data(float, Z_CONSTANT, NONE, NONE);
+			m_static_data(float, Z_MALE, NONE, NONE);
+			m_static_data(float, Z_INCOME_LOW, NONE, NONE);
+			m_static_data(float, Z_EDUC_NO_COLLEGE, NONE, NONE);
+			m_static_data(float, Z_WORK_TRIP_DIST, NONE, NONE);
+			m_static_data(float, Z_NWORKERS, NONE, NONE);
+			m_static_data(float, Z_FLEX_WORK_INDICATOR, NONE, NONE);
+			m_static_data(float, Z_OCC_TRANS_UTILITY, NONE, NONE);
+			m_static_data(float, Z_OCC_MANAGEMENT, NONE, NONE);
+			m_static_data(float, Z_OCC_SERVICE, NONE, NONE);
+			m_static_data(float, Z_EMP_DENSITY_OVER_20000, NONE, NONE);
+			m_static_data(float, Z_POP_DENSITY, NONE, NONE);
+
 
 			// Ordered probit model
-			static m_data(float, O_CONST, NONE, NONE);
-			static m_data(float, O_HINC, NONE, NONE);				// inc > 100k
-			static m_data(float, O_MALE, NONE, NONE);
-			static m_data(float, O_EMPFULL, NONE, NONE);
-			static m_data(float, O_DEGREE_GRAD, NONE, NONE);
-			static m_data(float, O_TTIME, NONE, NONE);
-			static m_data(float, O_WORKDUR, NONE, NONE);
-			static m_data(float, O_NVEH, NONE, NONE);
-			static m_data(float, O_OCC_REALESTATE, NONE, NONE);		// real estate, rental, leasing service
-			static m_data(float, O_OCC_COMMUNICATION, NONE, NONE);	// communication industry
-			static m_data(float, O_OCC_PROFESSIONAL, NONE, NONE);	// professional, scientific, technical services
-			static m_data(float, O_OCC_HEALTH, NONE, NONE);			//health care or social assistance
+			m_static_data(float, O_CONSTANT, NONE, NONE);
+			m_static_data(float, O_INCOME_MED, NONE, NONE);
+			m_static_data(float, O_AGE_35_55, NONE, NONE);
+			m_static_data(float, O_EDUC_GRAD_DEGREE, NONE, NONE);
+			m_static_data(float, O_WORK_TRIP_TTIME, NONE, NONE);
+			m_static_data(float, O_NVEHICLE, NONE, NONE);
+			m_static_data(float, O_FLEX_WORK_INDICATOR, NONE, NONE);
+			m_static_data(float, O_OCC_GOVERNMENT, NONE, NONE);
+			m_static_data(float, O_OCC_COMMUNICATION, NONE, NONE);
+			m_static_data(float, O_OCC_MANUFACTURING, NONE, NONE);
+			m_static_data(float, O_EMP_DENSITY_UNDER_3000, NONE, NONE);
+
 
 			// threshold variables
-			static m_data(float, T_EMPPART, NONE, NONE);			// 1=part-time worker, 0=other
-			static m_data(float, T_DEGREE, NONE, NONE);				// has bachelor or grad degree
-			static m_data(float, T_STUDENTPART, NONE, NONE);		// 1=parttime student, 0=other
-			static m_data(float, T_POPDENSITY, NONE, NONE);			
-			static m_data(float, T_C1, NONE, NONE);
-			static m_data(float, T_C2, NONE, NONE);
-			static m_data(float, T_C3, NONE, NONE);
-			static m_data(float, T_RHO, NONE, NONE);
+			m_static_data(float, T_WORK_DURATION, NONE, NONE);				// Average work duration in hours
+			m_static_data(float, T_VEH_AVAILABLE, NONE, NONE);				// vehicle is available for work
+			m_static_data(float, T_HH_VEH_OVER_2_INDICATOR, NONE, NONE);	// HH has more than 2 vehicles
+			m_static_data(float, T_C1, NONE, NONE);
+			m_static_data(float, T_C2, NONE, NONE);
+			m_static_data(float, T_C3, NONE, NONE);
+			m_static_data(float, T_RHO, NONE, NONE);
 
+			static void base_static_initializer()
+			{
+				_Z_CONSTANT = -0.98;
+				_Z_MALE = 0.26;
+				_Z_INCOME_LOW = -0.64;
+				_Z_EDUC_NO_COLLEGE = -0.67;
+				_Z_WORK_TRIP_DIST = 0.22;
+				_Z_NWORKERS = 0.18;
+				_Z_FLEX_WORK_INDICATOR = 0.89;
+				_Z_OCC_TRANS_UTILITY = -0.24;
+				_Z_OCC_MANAGEMENT = -0.61;
+				_Z_OCC_SERVICE = -0.38;
+				_Z_EMP_DENSITY_OVER_20000 = 0.34;
+				_Z_POP_DENSITY = -0.07;
 
+				_O_CONSTANT = -0.62;
+				_O_INCOME_MED = 0.49;
+				_O_AGE_35_55 = 0.2;
+				_O_EDUC_GRAD_DEGREE = 0.31;
+				_O_WORK_TRIP_TTIME = 0.23;
+				_O_NVEHICLE = 0.14;
+				_O_FLEX_WORK_INDICATOR = 0.82;
+				_O_OCC_GOVERNMENT = -0.23;
+				_O_OCC_COMMUNICATION = 0.31;
+				_O_OCC_MANUFACTURING = -0.16;
+				_O_EMP_DENSITY_UNDER_3000 = -0.22;
+
+				_T_WORK_DURATION = -0.03;
+				_T_VEH_AVAILABLE = -0.11;
+				_T_HH_VEH_OVER_2_INDICATOR = 0.26;
+				_T_C1 = -1.6;
+				_T_C2 = -0.47;
+				_T_C3 = 0.43;
+				_T_RHO = 0.28;
+			}
+			
 			//===========================================================================================================================================
 			// Interface definitions	
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
@@ -66,6 +201,8 @@ namespace Person_Components
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_invariant_value_type> los_invariant_itf;
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
 			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
@@ -85,16 +222,37 @@ namespace Person_Components
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Scenario_Interface* scenario = _Parent_Person->scenario_reference<_Scenario_Interface*>();
 				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Skim_Interface* skimmer = network->skimming_faculty<_Skim_Interface*>();
 
 				//==================================
 				// create model variables
 				//----------------------------------
-				float pop_density = 0.0;
-				float house_density = 0.0; // these are set to zero as I don't trust the parameters
+				// estimate flex work schedule probability
+				float flex_work = 0.0;
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < scenario->flexible_work_percentage<float>()) flex_work = 1.0;
+
+				// estimate work distance
+				_Zone_Interface* work_taz = _Parent_Person->Work_Location<_Zone_Interface*>();
+				_Zone_Interface* home_taz = _Parent_Household->Home_Location<_Zone_Interface*>();
+				float work_dist_indicator = 0.0;
+				float work_ttime = 0.0;
+				float emp_20000_indicator = 0.0;
+				float emp_3000_indicator = 0.0;
+				if (home_taz->employment_total<int>() > 20000) emp_20000_indicator = 1.0;
+				if (home_taz->employment_total<int>() < 3000) emp_3000_indicator = 1.0;
+				if (work_taz != nullptr)
+				{
+					los_itf* los = skimmer->template Get_LOS<_Zone_Interface*, Time_Seconds, los_itf*>(home_taz, work_taz, iteration());
+					work_dist_indicator = los->auto_distance<Miles>() > 20.0 ? 1.0 : 0.0;
+					work_ttime = los->auto_ttime<Time_Hours>();
+				}
+				float pop_density = home_taz->area<Square_Miles>() > 0.0 ? home_taz->pop_persons<float>() / home_taz->area<Square_Miles>() / 10000.0f : 0.0;
 				// vehicle availability
 				float veh_avail = 0;
-				if (household_properties->Number_of_workers<int>() > 0) veh_avail = std::max<float>(household_properties->Number_of_vehicles<float>() / household_properties->Number_of_workers<float>(), 1.0);
+				float nworker = household_properties->Number_of_workers<int>();
+				if (nworker > 0) veh_avail = std::max<float>(household_properties->Number_of_vehicles<float>() / nworker, 1.0);
 				// income < 50k
 				float low_income = (household_properties->Income<Dollars>() < 50000.0) ? 1.0: 0.0;
 				float high_income = (household_properties->Income<Dollars>() >= 100000.0) ? 1.0 : 0.0;
@@ -107,64 +265,94 @@ namespace Person_Components
 				float occ_communication = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_INFORMATION ? 1.0 : 0.0;
 				float occ_professional = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_PROFESSIONAL ? 1.0 : 0.0;
 				float occ_healthcare = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_MEDICAL ? 1.0 : 0.0;
+				float occ_trans = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_TRANSPORTATION ? 1.0 : 0.0;
+				float occ_utility = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_UTILITIES ? 1.0 : 0.0;
+				float occ_socialwork = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_SOCIALWORK ? 1.0 : 0.0;
+				float occ_manufacturing = emp_industry == Person_Components::Types::EMPLOYMENT_INDUSTRY_BASE::IND_MANUFACTURING ? 1.0 : 0.0;
+				float occ_government = 0.0;
 				// education level
 				Person_Components::Types::EDUCATION_LEVEL educ = person_properties->Educational_Attainment<Person_Components::Types::EDUCATION_LEVEL>();
 				float educ_assoc = educ == Person_Components::Types::EDUCATION_LEVEL::EDUC_12 ? 1.0 : 0.0;
 				float educ_undergrad = educ == Person_Components::Types::EDUCATION_LEVEL::EDUC_UNDERGRADUATE ? 1.0 : 0.0;
 				float educ_grad = educ == Person_Components::Types::EDUCATION_LEVEL::EDUC_GRADUATE ? 1.0 : 0.0;
+				float educ_assoc_hs = 1.0 - educ_undergrad - educ_grad;
 				float male = person_properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::MALE ? 1.0 : 0.0;
 				float emp_full = person_properties->Is_Fulltime_Worker();
 				float emp_part = person_properties->Is_Parttime_Worker();
 				// other characteristics
-				float trip_time = person_properties->Journey_To_Work_Travel_Time<Time_Minutes>();
-				float work_dur = person_properties->Work_Hours<Time_Minutes>() / 5.0;
+				//float trip_time = person_properties->Journey_To_Work_Travel_Time<Time_Minutes>();
+				float work_dur = person_properties->Work_Hours<Time_Hours>() / 5.0;
 				float nveh = household_properties->Number_of_vehicles<float>();
-
+				float age_35_55 = person_properties->Age<int>() >= 35 && person_properties->Age<int>() <= 55 ? 1.0 : 0.0;
 
 				//=====================================
 				//Telecommute option model
 				//-------------------------------------
-				float az = _Z_CONST + _Z_VEH_AVAIL * veh_avail + _Z_OCC_INC * occ_admin * low_income + _Z_OCC_FINANCE * occ_finance + _Z_OCC_EDUCATION * occ_education + _Z_DEGREE_ASSOC * educ_assoc + _Z_HU_DENSITY * house_density;
-				float bx = _O_CONST + _O_HINC * high_income + _O_MALE * male + _O_EMPFULL * emp_full + _O_DEGREE_GRAD * educ_grad + _O_TTIME * trip_time + _O_WORKDUR * work_dur + _O_NVEH * nveh + _O_OCC_REALESTATE * occ_realestate + _O_OCC_COMMUNICATION * occ_communication + _O_OCC_PROFESSIONAL * occ_professional + _O_OCC_HEALTH * occ_healthcare;
-				float gs = _T_EMPPART * emp_part + _T_DEGREE * (educ_undergrad + educ_grad) + _T_STUDENTPART * person_properties->Is_Student<NT>() + _T_POPDENSITY * pop_density;
+				float az =	_Z_CONSTANT + _Z_MALE*male + _Z_INCOME_LOW*low_income + _Z_EDUC_NO_COLLEGE*educ_assoc_hs + _Z_WORK_TRIP_DIST*work_dist_indicator + _Z_NWORKERS*nworker +
+							_Z_FLEX_WORK_INDICATOR * flex_work + _Z_OCC_TRANS_UTILITY * (occ_trans + occ_utility) + _Z_OCC_MANAGEMENT*occ_admin + _Z_OCC_SERVICE*(occ_healthcare + occ_socialwork) +
+							_Z_EMP_DENSITY_OVER_20000*emp_20000_indicator + _Z_POP_DENSITY*pop_density;
+				float bx =	_O_CONSTANT + _O_INCOME_MED * (1.0 - low_income - high_income) + _O_AGE_35_55*age_35_55 + _O_EDUC_GRAD_DEGREE*educ_grad + _O_WORK_TRIP_TTIME*work_ttime + _O_NVEHICLE*nveh +
+							_O_FLEX_WORK_INDICATOR*flex_work + _O_OCC_GOVERNMENT*occ_government + _O_OCC_COMMUNICATION*occ_communication + 
+							_O_OCC_MANUFACTURING*occ_manufacturing*occ_manufacturing + _O_EMP_DENSITY_UNDER_3000*emp_3000_indicator;
+				float gs = _T_WORK_DURATION * work_dur + _T_VEH_AVAILABLE * veh_avail + _T_HH_VEH_OVER_2_INDICATOR * (nveh > 2.0);
 
 				// set threshold values
-				float threshold[4];
+				float threshold[5];
 				threshold[0] = 0.0;
 				threshold[1] = threshold[0] + exp(_T_C1 + gs);
 				threshold[2] = threshold[1] + exp(_T_C2 + gs);
 				threshold[3] = threshold[2] + exp(_T_C3 + gs);
+				threshold[4] = FLT_MAX;
 
 
 				// probability of telecommute levels
 				float prob[5];
-				prob[0] = 1.0 - GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(az) + GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, -bx, _T_RHO);
-				for (int i=1; i<4; i++) prob[i] = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, threshold[i]-bx, _T_RHO);
-				prob[4] = 1.0;
+				float n1 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(az);
+				float n2 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(-bx);
+				float n3 = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, -bx, -_T_RHO);
+				prob[0] = 1.0 - GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(az) + GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, -bx, -_T_RHO);
+				for (int i = 1; i <= 4; i++) prob[i] = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, threshold[i] - bx, -_T_RHO) - GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(az, threshold[i - 1] - bx, -_T_RHO);
+				for (int i = 1; i <= 4; i++) prob[i] = prob[i] + prob[i - 1];
 
 
 				// determine if telecommuting on travel day or not
 				float r = GLOBALS::Uniform_RNG.Next_Rand<float>();
-				if (r < prob[0]) return Types::TC_NEVER;
+				if		(r < prob[0]) return Types::TC_NEVER;
 				else if (r < prob[1]) return Types::TC_YEARLY; // does not telecommute or few times a year
 				else if (r < prob[2]) return Types::TC_MONTHLY;// once a month or more
 				else if (r < prob[3]) return Types::TC_WEEKLY; // once a week or more
 				else				  return Types::TC_DAILY; // Every day
+
+				
 			}
 		};
 
 		// INITIALIZE TELECOMMUTE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
 		// zero-inflation parameters
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_CONST = -0.72;
+		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_CONST = -0.98;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_VEH_AVAIL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_VEH_AVAIL = -0.8;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_HU_DENSITY) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_HU_DENSITY = -39.99;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_INC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_INC = -0.81;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_FINANCE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_FINANCE = 0.55;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_EDUCATION) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_EDUCATION = -0.57;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_DEGREE_ASSOC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_DEGREE_ASSOC = -0.53;
+		*/
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_CONSTANT);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_MALE);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_INCOME_LOW);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_EDUC_NO_COLLEGE);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_WORK_TRIP_DIST);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_NWORKERS);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_FLEX_WORK_INDICATOR);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_OCC_TRANS_UTILITY);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_OCC_MANAGEMENT);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_OCC_SERVICE);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_EMP_DENSITY_OVER_20000);
+		define_static_member_variable(Telecommute_Choice_Implementation, Z_POP_DENSITY);
+
 		// ordered probit parameters
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_CONST = -0.86;
+		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_CONST = -0.86;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_HINC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_HINC = -0.44;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_MALE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_MALE = 0.07;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_EMPFULL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_EMPFULL = 0.04;
@@ -176,8 +364,21 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_COMMUNICATION) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_COMMUNICATION = 0.38;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_PROFESSIONAL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_PROFESSIONAL = 0.29;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_HEALTH) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_HEALTH = -0.17;
+		*/
+		define_static_member_variable(Telecommute_Choice_Implementation, O_CONSTANT);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_INCOME_MED);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_AGE_35_55);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_EDUC_GRAD_DEGREE);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_WORK_TRIP_TTIME);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_NVEHICLE);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_FLEX_WORK_INDICATOR);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_OCC_GOVERNMENT);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_OCC_COMMUNICATION);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_OCC_MANUFACTURING);
+		define_static_member_variable(Telecommute_Choice_Implementation, O_EMP_DENSITY_UNDER_3000);
+
 		// threshold parameters
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_EMPPART) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_EMPPART = 0.16;
+		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_EMPPART) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_EMPPART = 0.16;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_DEGREE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_DEGREE = 0.22;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_STUDENTPART) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_STUDENTPART = -0.28;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_POPDENSITY) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_POPDENSITY = 4.79;
@@ -185,6 +386,14 @@ namespace Person_Components
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_C2) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_C2 = -1.13;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_C3) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_C3 = -0.34;
 		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_RHO) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_RHO = -0.47;
+		*/
+		define_static_member_variable(Telecommute_Choice_Implementation, T_WORK_DURATION);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_VEH_AVAILABLE);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_HH_VEH_OVER_2_INDICATOR);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_C1);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_C2);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_C3);
+		define_static_member_variable(Telecommute_Choice_Implementation, T_RHO);
 
 
 #pragma endregion

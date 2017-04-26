@@ -481,8 +481,8 @@ namespace Person_Components
 			ACTIVITY_TYPES work_type = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;
 			float p_work_from_home = 0.0;
 			if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_DAILY) p_work_from_home = 1.0;
-			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY) p_work_from_home = 1.5 / 7.0;
-			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_MONTHLY) p_work_from_home = 1.5 / 30.0;
+			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY) p_work_from_home = 1.0 / 5.0;
+			else if (properties->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_MONTHLY) p_work_from_home = 1.0 / 22.0;
 			else p_work_from_home = 0.0;
 
 			EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();

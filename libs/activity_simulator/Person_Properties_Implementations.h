@@ -158,7 +158,8 @@ namespace Person_Components
 			if (properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Choose_School_Location<NT>();
 
 			// Determine the telecommute behavior - if person always telecommutes, reset work location to home
-			this->_Telecommute_Frequency = _Parent_Person->Planning_Faculty<Planning_Faculty_interface*>()->Telecommuting_Choice_Faculty<telecommute_choice_itf*>()->Telecommute_Choice<Types::TELECOMMUTE_FREQUENCY>();
+			this->_Telecommute_Frequency = Types::TC_NEVER;
+			if (properties->template Is_Employed<bool>()) this->_Telecommute_Frequency = _Parent_Person->Planning_Faculty<Planning_Faculty_interface*>()->Telecommuting_Choice_Faculty<telecommute_choice_itf*>()->Telecommute_Choice<Types::TELECOMMUTE_FREQUENCY>();
 
 			// update work location if always telecommuting
 			if (this->_Telecommute_Frequency == Types::TC_DAILY) this->work_location_id(_Parent_Person->Home_Location<int>());

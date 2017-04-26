@@ -372,9 +372,11 @@ namespace Turn_Movement_Components
 					//update inbound link state: N(a',L,t)
 					((_Link_Interface*)_inbound_link)->template link_downstream_cumulative_vehicles<int&>()++;
 					((_Link_Interface*)_inbound_link)->template link_downstream_departed_vehicles<int&>()++;
+					((_Link_Interface*)_inbound_link)->template cacc_count<int&>()--;
 
 					((_Link_Interface*)_outbound_link)->template link_upstream_arrived_vehicles<int&>()++;
 					((_Link_Interface*)_outbound_link)->template link_upstream_cumulative_arrived_vehicles<int&>()++;
+					((_Link_Interface*)_outbound_link)->template cacc_count<int&>()++;
 
 					//update link_turn_travel_delay
 					total_delay_time += delayed_time;

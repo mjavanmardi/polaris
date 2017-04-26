@@ -137,6 +137,9 @@ namespace Link_Components
 			//cached cumulative state - Mid-Trip
 			//m_data(int, cached_link_shifted_cumulative_arrived_vehicles, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
+			// AV information....
+			m_data(int, cacc_count, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
 			//other attributes
 			m_data(float, maximum_flow_rate, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, free_flow_speed, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -398,7 +401,68 @@ namespace Link_Components
 		template<typename MasterType, typename InheritanceList>
 		Link_Implementation<MasterType, InheritanceList>::Link_Implementation()
 		{
+			//TODO: NONE OF THESE WERE INITIALIZED - POTENTIALLY DANGEROUS AS WE CAN'T CATCH ISSUES CAUSED BY THIS IN RELEASE MODE - VERIFY THAT NO NEW PROBLEMS CAUSES - JAA 3/28/17
 			UNLOCK(_link_lock);
+			_uuid = 0;
+			_internal_id = 0;
+			_dbid = 0;
+			_direction = 0;
+			_num_lanes = 0;
+			_length = 0;
+			_speed_limit = 0;
+			_num_left_turn_bays = 0;
+			_num_right_turn_bays = 0;
+			_left_turn_bay_length = 0;
+			_right_turn_bay_length = 0;
+			_num_inbound_turn_lanes = 0;
+			_link_fftt = 0;
+			_link_bwtt = 0;
+			_link_fftt_cached_simulation_interval_size = 0;
+			_link_bwtt_cached_simulation_interval_size = 0;
+			_link_capacity = 0;
+			_link_supply = 0;
+			_link_upstream_arrived_vehicles = 0;
+			_link_downstream_departed_vehicles = 0;
+			_link_origin_arrived_vehicles = 0;
+			_link_origin_departed_vehicles = 0;
+			_link_origin_loaded_vehicles = 0;
+			_link_origin_loaded_capacity_leftover = 0;
+			_link_destination_arrived_vehicles = 0;
+			_link_upstream_cumulative_arrived_vehicles = 0;
+			_link_upstream_cumulative_vehicles = 0;
+			_link_downstream_cumulative_vehicles = 0;
+			_link_downstream_cumulative_arrived_vehicles = 0;
+			_link_origin_cumulative_arrived_vehicles = 0;
+			_link_origin_cumulative_departed_vehicles = 0;
+			_link_destination_cumulative_arrived_vehicles = 0;
+			_cacc_count = 0;
+			_maximum_flow_rate = 0;
+			_free_flow_speed = 0;
+			_backward_wave_speed = 0;
+			_jam_density = 0;
+			_critical_density = 0;
+			_num_vehicles_under_jam_density = 0;
+			_original_free_flow_speed = 0;
+			_original_maximum_flow_rate = 0;
+			_original_speed_limit = 0;
+			_original_num_lanes = 0;
+			_shoulder_opened = 0;
+			_speed_adjustment_factor_due_to_weather = 0;
+			_speed_adjustment_factor_due_to_accident = 0;
+			_capacity_adjustment_factor_due_to_weather = 0;
+			_capacity_adjustment_factor_due_to_accident = 0;
+			_lane_adjustment_due_to_accident = 0;
+			_link_origin_vehicle_current_position = 0;
+			_link_num_vehicles_in_queue = 0;
+			_num_vehicles_on_link = 0;
+			_link_vmt = 0;
+			_link_vht = 0;
+			_C = 0;
+			_Q = 0;
+			_travel_time = 0;
+			_realtime_travel_time = 0;
+			_weather_event_to_process = 0;
+			_accident_event_to_process = 0;		
 		}
 
 		// update link supply
@@ -407,12 +471,6 @@ namespace Link_Components
 		void Link_Implementation<MasterType, InheritanceList>::link_supply_update()
 		{
 			int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-
-			int a;
-			if (current_simulation_interval_index == 170)
-			{
-				a = 10;
-			}
 
 			int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 			//Newell's model
@@ -446,34 +504,46 @@ namespace Link_Components
 			float capacity_adjustment = 0;
 
 
-			if (((_Scenario_Interface*)_global_scenario)->template simulate_cacc<double>() && _link_origin_vehicle_queue.size() > 0)
+			if (((_Scenario_Interface*)_global_scenario)->template simulate_cacc<double>() && _num_vehicles_on_link/*_link_origin_vehicle_queue.size()*/ > 0)
 			{
-				int n_cacc = 0;
-				_Vehicle_Interface* vehicle;
-				for (int iv = 0; iv<_link_origin_vehicle_queue.size(); iv++)
+				float n_veh = 0.0;
+				// - not used - _Vehicle_Interface* vehicle;
+
+				//==========================================================================================================
+				 // I THINK THIS IS WRONG - ONLY MEASURES VEHICLES IN ENTRY QUEUE, AND THE FOR LOOP ADDS A LOT OF PROCESSING TIME - JAA 3/28/17
+				/*for (int iv = 0; iv<_link_origin_vehicle_queue.size(); iv++)
 				{
 					vehicle = (_Vehicle_Interface*)_link_origin_vehicle_queue[iv];
 					_Vehicle_Characteristics_Interface* veh_type = vehicle->template vehicle_characteristics<_Vehicle_Characteristics_Interface*>();
-					n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation());
+					n_cacc += (veh_type->has_cacc() || veh_type->has_full_automation() || vehicle->is_autonomous<bool>());
+					n_veh += 1.0;
 					//std::string cav = vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>()->getType()->getCav();
 					//n_cacc += (cav.compare("CACC")==0);
 					//auto type = v->getType()->getCav();
-				}
-				capacity_adjustment = 0.1*n_cacc;
+				}*/
+
+				//==========================================================================================================
+				//TODO: JOSH*** add fitted capacity change curve from Shladover paper, based on link CACC ratio - replacing what Vadim had here......
+				//capacity_adjustment = 0.1*n_cacc;
+				// used continuously updated CACC count in place of the for loop above
+				capacity_adjustment_factor = 1.0 + 1.0121*pow(min<float>((float)_cacc_count / (float)_num_vehicles_on_link,1.0f), 2.4697);
 			}
+			//_cacc_count = 0;
 
 
 
 			if (this->_link_type == Link_Components::Types::Link_Type_Keys::EXPRESSWAY || this->_link_type == Link_Components::Types::Link_Type_Keys::FREEWAY)
 			{
-				capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_highway<double>();
+				capacity_adjustment_factor *= ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_highway<double>();
 
 			}
 			else if (this->_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL)
 			{
-				capacity_adjustment_factor = ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_arterial<double>();
+				capacity_adjustment_factor *= ((_Scenario_Interface*)_global_scenario)->template capacity_adjustment_arterial<double>();
 
 			}
+			//todo: remove when done
+			//cout << "Capacitiy adjustment=" << capacity_adjustment_factor << ", veh=" << _num_vehicles_on_link << endl;
 
 			current_link_capacity = (float)(simulation_interval_length * _num_lanes * _maximum_flow_rate / 3600.0) * capacity_adjustment_factor;
 			current_link_capacity += capacity_adjustment;
@@ -624,6 +694,9 @@ namespace Link_Components
 				_link_destination_cumulative_arrived_vehicles++;
 				_link_destination_arrived_vehicles++;
 
+				// update cacc count for automated vehicle on network exit - JAA 3/28/17
+				if (vehicle->is_autonomous<bool>()) _cacc_count--;
+
 				if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 				{
 					LOCK(_link_lock);
@@ -666,6 +739,9 @@ namespace Link_Components
 				vehicle->template downstream_preferred_departure_time<int>(pdt);
 				_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 
+				// update cacc count for use in capacity adjustment - JAA 3/28/17
+				//_cacc_count += vehicle->is_autonomous<bool>();
+
 				UNLOCK(_link_lock);
 			}
 		}
@@ -679,6 +755,9 @@ namespace Link_Components
 			for (vehicle_itr = _current_vehicle_queue.begin(); vehicle_itr != _current_vehicle_queue.end(); vehicle_itr++)
 			{
 				((_Intersection_Interface*)_downstream_intersection)->template push_vehicle<NULLTYPE>((*vehicle_itr));
+
+				// update cacc count for use in capacity adjustment - JAA 3/28/17
+				//_cacc_count -= (*vehicle_itr)->is_autonomous<bool>();
 			}
 			_current_vehicle_queue.clear();
 		}
@@ -762,6 +841,10 @@ namespace Link_Components
 			for (int iv = 0; iv<num_departed_vehicles; iv++)
 			{
 				vehicle = (_Vehicle_Interface*)_link_origin_vehicle_queue.front();
+
+				//TODO: update link cacc vehicle count when loading from origin - JAA 3/28/17
+				if (vehicle->is_autonomous<bool>()) ++_cacc_count;
+
 				_link_origin_vehicle_queue.pop_front();
 				//update vehicle state
 				//vehicle->template load<Vehicle_Components::Types::Load_To_Origin_Link>();

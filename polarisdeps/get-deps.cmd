@@ -49,6 +49,7 @@ IF NOT EXIST %LOGDIR% ( mkdir %LOGDIR% )
 IF EXIST %LOGDIR%\boost_build.log (DEL %LOGDIR%\boost_build.log)
 IF EXIST %LOGDIR%\odb_build.log (DEL %LOGDIR%\odb_build.log)
 IF EXIST %LOGDIR%\gtest_build.log (DEL %LOGDIR%\gtest_build.log)
+IF EXIST %LOGDIR%\rapidjson_build.log (DEL %LOGDIR%\rapisjson_build.log)
 
 set BUILD_ERROR=0
 
@@ -66,6 +67,11 @@ cd /D %~dp0
 set ERRORLEVEL=
 call %~dp0build-gtest-1.7.0.cmd %BASEDIR% > %LOGDIR%\gtest_build.log 2>&1
 IF %ERRORLEVEL% NEQ 0 (ECHO Build of GTest 1.7.0 - FAIL  & set BUILD_ERROR=1)
+
+cd /D %~dp0
+set ERRORLEVEL=
+call %~dp0build-rapidjson-1.1.0.cmd %BASEDIR%	> %LOGDIR%\rapidjson_build.log 2>&1
+IF %ERRORLEVEL% NEQ 0 (ECHO Build of RapidJson 1.1.0 - FAIL  & set BUILD_ERROR=1)
 
 cd /D %~dp0
 

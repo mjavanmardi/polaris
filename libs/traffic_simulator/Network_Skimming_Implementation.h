@@ -863,7 +863,7 @@ namespace Network_Skimming_Components
 					((los_invariant_value_itf*)temp_los)->template auto_parking_cost<Stored_Currency_Type>(auto_parking_cost[i]);
 					((los_invariant_value_itf*)temp_los)->template transit_ttime<Stored_Time_Type>(transit_ttime[i]);
 					((los_invariant_value_itf*)temp_los)->template transit_walk_access_time<Stored_Time_Type>(transit_walk_access_time[i]);
-					((los_invariant_value_itf*)temp_los)->template auto_distance /*transit_sov_access_time<Stored_Time_Type>*/<Miles>(auto_distance/*transit_sov_access_time*/[i]);
+					((los_invariant_value_itf*)temp_los)->template auto_distance /*transit_sov_access_time<Stored_Time_Type>*/<Kilometers>(auto_distance/*transit_sov_access_time*/[i]);
 					((los_invariant_value_itf*)temp_los)->template transit_wait_time<Stored_Time_Type>(transit_wait_time[i]);
 					((los_invariant_value_itf*)temp_los)->template transit_fare<Stored_Currency_Type>(transit_fare[i]);
 					temp_invariant_los_array[i] = temp_los;

@@ -148,7 +148,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
 	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::Chicago_Mode_Choice_Option<M> mode_choice_option_type;
 	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
 	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
@@ -244,6 +244,32 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
+bool InitializeModeChoiceParameters(MasterType::scenario_type* scenario)
+{
+	if (!MasterType::mode_choice_option_type::static_initialize(scenario->template mode_choice_option_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize MasterType::mode_choice_option_type parameters." << endl;
+		return false;
+	}
+	MasterType::mode_choice_option_type::print_parameters();
+
+	if (!MasterType::person_destination_choice_option_type::static_initialize(scenario->template person_destination_choice_option_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize MasterType::person_destination_choice_option_type parameters." << endl;
+		return false;
+	}
+	MasterType::person_destination_choice_option_type::print_parameters();
+
+	if (!MasterType::telecommute_chooser_type::static_initialize(scenario->template telecommute_choice_option_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize MasterType::telecommute_chooser_type parameters." << endl;
+		return false;
+	}
+	MasterType::telecommute_chooser_type::print_parameters();
+
+	return true;
+}
+
 int main(int argc,char** argv)
 {
 	#ifdef MEM_DEBUG
@@ -283,7 +309,6 @@ int main(int argc,char** argv)
 	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
-	
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
@@ -522,6 +547,10 @@ int main(int argc,char** argv)
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
+
+	// Initialize telecommute model parameters
+	if (!InitializeModeChoiceParameters(scenario))
+		return 1;
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	

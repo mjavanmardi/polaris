@@ -51,21 +51,22 @@ namespace Household_Components
 			// Tag as Implementation
 			//typedef typename Polaris_Component<MasterType,INHERIT(Vehicle_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+
 			// Pointer to the Parent class
 			m_prototype(Household_Components::Prototypes::Household, typename MasterType::household_type, Parent_Household, NONE, NONE);
-			//m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
-			
+					
 
 			// Interface definitions	
 			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
-			//typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;
-			//typedef Prototypes::Vehicle_Choice_Option<typename MasterType::mode_choice_option_type> _Mode_Choice_Option_Interface;
-			//typedef Choice_Model_Components::Prototypes::Choice_Option<typename MasterType::mode_choice_option_type> _Choice_Option_Interface;
 
 			typedef Household_Components::Prototypes::Household<typename type_of(Parent_Household)> household_itf;
 			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_static_properties_itf;
 		
 			typedef Network_Components::Prototypes::Network< typename household_itf::get_type_of(network_reference)> _Network_Interface;
+			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_invariant_value_type> los_invariant_itf;
 			
 			//typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
 			//typedef Activity_Location_Components::Prototypes::Activity_Location<typename get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;	
@@ -73,13 +74,17 @@ namespace Household_Components
 			//typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
 			//typedef Link_Components::Prototypes::Link<typename get_component_type(_Links_Container_Interface)>  _Link_Interface;
 	
-			//typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
-			//typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 
 			//typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container),int> _Zone_Ids_Interface;
 
 			typedef Random_Access_Sequence< typename household_itf::get_type_of(Vehicles_Container)> _Vehicles_Container_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(_Vehicles_Container_Interface)> _Vehicle_Interface;
+			typedef Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> _Persons_Container_Interface;
+			typedef Person_Components::Prototypes::Person<typename get_component_type(_Persons_Container_Interface)> _Person_Interface;
+			typedef Person_Components::Prototypes::Person_Properties< typename _Person_Interface::get_type_of(Properties)> _Properties_Itf;
+			typedef Person_Components::Prototypes::Person_Properties< typename _Person_Interface::get_type_of(Static_Properties)> _Static_Properties_Itf;
 			typedef typename get_component_type(_Vehicles_Container_Interface) _Vehicle_type;
 			//typedef Vehicle_Components::Prototypes::Vehicle_Characteristics<typename _Vehicle_Interface::get_type_of(vehicle_characteristics)> _Vehicle_Characteristics_Interface;
 
@@ -135,36 +140,106 @@ namespace Household_Components
 						{
 							// Allocate a new vehicle
 							_Vehicle_Interface* veh = (_Vehicle_Interface*)Allocate<_Vehicle_type>();
+							
 							veh->initialize(x->first, _Parent_Household->uuid<int>());
 							veh->is_integrated(true);
+
+							// determine additional technology for vehicle
+							Evaluate_Vehicle_Technology_Purchase(veh, _Parent_Household->Get_Primary_Driver<_Person_Interface*>());
+
 							// Push to household vehicle container
 							vehicles->push_back(veh);
 							break;
 						}
 					}							
-					
-
-					/*
-					// 1. Draw a random set of vehicle properties from your input file for the current zone
-					Vehicle_Components::Types::Fuel_Type_Keys fuel_type;
-					Vehicle_Components::Types::EPA_Vehicle_Class_Keys veh_class;
-					Vehicle_Components::Types::Powertrain_Type_Keys pt_type;
-					
-					//.........
-
-					// 2. search the demand->vehicle_char.. container until you match the three components above, and pull pointer from it
-					for (_Vehicle_Types_Interface::iterator vitr = veh_types->begin(); vitr != veh_types->end(); ++vitr)
-					{
-						_Vehicle_Characteristics_Interface* vc = (_Vehicle_Characteristics_Interface*)(*vitr);
-						if (vc->fuel_type<Vehicle_Components::Types::Fuel_Type_Keys>() == fuel_type && vc->vehicle_class<Vehicle_Components::Types::EPA_Vehicle_Class_Keys>() == veh_class && vc->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == pt_type) veh->vehicle_characteristics(vc);
-					}
-					*/
-					
-					// Done.
 				}				
 			}
 
+			// Implementation of Bansal et. al. (2016) - Transportation Research part C (67) - add automation technology based on calculated willingness to pay
+			template<typename VehicleItfType, typename PersonItfType> void Evaluate_Vehicle_Technology_Purchase(VehicleItfType* veh, PersonItfType* person)
+			{
+				_Person_Interface* p = static_cast<_Person_Interface*>(person);
+				_Static_Properties_Itf* properties = p->Static_Properties<_Static_Properties_Itf*>();
+				household_static_properties_itf* hh_properties = _Parent_Household->Static_Properties<household_static_properties_itf*>();
+				_Network_Interface* network = this->_Parent_Household->network_reference<_Network_Interface*>();
+				_Zone_Interface* home_zone = _Parent_Household->Home_Location<_Zone_Interface*>();
+				_Skim_Interface* skimmer = network->skimming_faculty<_Skim_Interface*>();
 
+				//------------------------------------------------
+				// Get variables for input to OP choice model
+				//------------------------------------------------
+				float age = properties->Age<float>();
+				float male = properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::GENDER::MALE ? 1.0 : 0.0;
+				float lic = 1.0;
+				float children = (float)_Parent_Household->Number_of_Children();
+				Dollars inc = hh_properties->Income<Dollars>();
+
+				float density = 7435.0f; // fix density at the average for model estimation from the paper to remove its effects from the model
+
+				float num_crash = float(age) / 25.0;
+				float smartphone_user = GLOBALS::Normal_RNG.Next_Rand(0.92, 0.27) < 0.5 ? 0.0 : 1.0;
+				float carshare_user = GLOBALS::Normal_RNG.Next_Rand(0.95, 0.21) < 0.5 ? 0.0 : 1.0;
+				float rideshare_user = GLOBALS::Normal_RNG.Next_Rand(0.88, 0.32) < 0.5 ? 0.0 : 1.0;
+				float alone_work = properties->Journey_To_Work_Vehicle_Occupancy<int>() == 1 ? 1.0 : 0.0;
+				float alone_other = GLOBALS::Normal_RNG.Next_Rand(0.29, 0.45) < 0.5 ? 0.0 : 1.0;
+
+				// estimate work distance
+				float work_dist = 0.0;
+				if (p->Work_Location<_Zone_Interface*>() != nullptr)
+				{
+					los_itf* los = skimmer->template Get_LOS<_Zone_Interface*, Time_Seconds, los_itf*>(home_zone, p->Work_Location<_Zone_Interface*>(), iteration());
+					work_dist = los->auto_distance<Miles>();
+				}
+			
+				// estimate annual vmt
+				float age_u35 = age < 35.0 ? 1.0 : 0.0;
+				float age_o65 = age >= 65.0 ? 1.0 : 0.0;
+				float hh_taz_density = home_zone->area<Basic_Units::Area_Variables::Square_Miles>() > 0.0 ? home_zone->employment_total<float>() / home_zone->area<Basic_Units::Area_Variables::Square_Miles>() : 0.0;
+				float veh_per_person = hh_properties->Number_of_vehicles<float>() / hh_properties->Household_size<float>();
+				float inc_hi = inc >= 100000 ? 1.0 : 0.0;
+				float inc_med = inc >= 50000 && inc < 100000 ? 1.0 : 0.0;
+				float full_time_dist = properties->Is_Fulltime_Worker() ? work_dist : 0.0;
+				float part_time_dist = properties->Is_Parttime_Worker() ? work_dist : 0.0;
+				float ln_vmt = std::log(std::max<float>(4826.85 + 436.52 * male - 175.914 * age_u35 + 224.492 * age_o65 + 714.5569 * lic + 602.311 * full_time_dist + 533.078 * part_time_dist - 0.02384 * hh_taz_density + 915.7546 * veh_per_person + 1493.534 * inc_hi + 1152.284 * inc_med, 1000.0f));
+
+				//------------------------------------------------------
+				// Run Ordered Probit WTP model
+				float U = _B_PAST_CRASHES * num_crash +
+					_B_SMARTPHONE * smartphone_user +
+					_B_CARSHARE * carshare_user +
+					_B_RIDESHARE * rideshare_user +
+					_B_DRIVE_ALONE_WORK * alone_work +
+					_B_DRIVE_ALONE_OTHER * alone_other +
+					_B_LN_VMT * ln_vmt +
+					_B_WORK_DIST * work_dist +
+					_B_GENDER * male +
+					_B_LICENSE * lic +
+					_B_NUM_CHILDREN * children +
+					_B_AGE * age +
+					_B_EMPL_DENSITY * density +
+					_B_HHINCOME * inc +
+					_C_CALIBRATION;
+
+				float p1 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(_MU_1 - U);
+				float p2 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(_MU_2 - U);
+				float p3 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(_MU_3 - U);
+				float r = GLOBALS::Uniform_RNG.Next_Rand<float>();
+				float r2 = GLOBALS::Uniform_RNG.Next_Rand<float>();
+
+				float WTP = 0.0;
+				if (r < p1) WTP = r2 * 2000;					// WTP < $2000
+				else if (r < p2) WTP = r2 * 3000 + 2000;		// WTP $2000 - $5000
+				else if (r < p3) WTP = r2 * 5000 + 5000;		// WTP $5000 - $10000
+				else WTP = r2 * 10000.0 + 10000.0;				// WTP > $10,000
+
+				//if (work_dist > 0.0) cout << "WTP,U,VMT,WORK_DIST: " << WTP << ", " << U << ", " << exp(ln_vmt) << ", " << work_dist<<", From-to: "<< home_zone->uuid<int>()<<"-"<< p->Work_Location<_Zone_Interface*>()->uuid<int>()<<endl;
+
+				// Finally, compare cost against willingness to pay and set the automation flag
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				if (WTP > scenario->automation_cost<float>()) veh->is_autonomous(true);
+				else veh->is_autonomous(false);
+				veh->willingness_to_pay(WTP);
+			}
 
 			// Static initialization
 			static m_data(bool, is_initialized, NONE, NONE);
@@ -249,12 +324,77 @@ namespace Household_Components
 					{
 						itr->second.push_back(vehicle_probability_pair_type(veh_char, prob));
 					}
-				}								
+				}		
+
+				//=============================================================
+				// INITIALIZE THE VEHICLE TECHNOLOGY CHOICE MODEL PARAMETERS
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				_B_PAST_CRASHES = scenario->vehicle_techchoice_beta_past_crashes<float>();
+				_B_SMARTPHONE = scenario->vehicle_techchoice_beta_smartphone<float>();
+				_B_CARSHARE = scenario->vehicle_techchoice_beta_carshare<float>();
+				_B_RIDESHARE = scenario->vehicle_techchoice_beta_rideshare<float>();
+				_B_DRIVE_ALONE_WORK = scenario->vehicle_techchoice_beta_drive_alone_work<float>();
+				_B_DRIVE_ALONE_OTHER = scenario->vehicle_techchoice_beta_drive_alone_other<float>();
+				_B_LN_VMT = scenario->vehicle_techchoice_beta_ln_vmt<float>();
+				_B_WORK_DIST = scenario->vehicle_techchoice_beta_work_dist<float>();
+				_B_GENDER = scenario->vehicle_techchoice_beta_gender<float>();
+				_B_LICENSE = scenario->vehicle_techchoice_beta_license<float>();
+				_B_NUM_CHILDREN = scenario->vehicle_techchoice_beta_num_children<float>();
+				_B_AGE = scenario->vehicle_techchoice_beta_age<float>();
+				_B_EMPL_DENSITY = scenario->vehicle_techchoice_beta_empl_density<float>();
+				_B_HHINCOME = scenario->vehicle_techchoice_beta_hhincome<float>();
+				_C_CALIBRATION = scenario->vehicle_techchoice_calibration<float>();
+				_MU_1 = scenario->vehicle_techchoice_mu_1<float>();
+				_MU_2 = scenario->vehicle_techchoice_mu_2<float>();
+				_MU_3 = scenario->vehicle_techchoice_mu_3<float>();
 			}
+
+			// PARAMETER DECLARATIONS - initialize in the static initializer function using scenario parameters
+			#pragma region static parameters
+			static m_data(float, B_PAST_CRASHES, NONE, NONE);
+			static m_data(float, B_SMARTPHONE, NONE, NONE);	
+			static m_data(float, B_CARSHARE, NONE, NONE);
+			static m_data(float, B_RIDESHARE, NONE, NONE);
+			static m_data(float, B_DRIVE_ALONE_WORK, NONE, NONE);
+			static m_data(float, B_DRIVE_ALONE_OTHER, NONE, NONE);
+			static m_data(float, B_LN_VMT, NONE, NONE);
+			static m_data(float, B_WORK_DIST, NONE, NONE);
+			static m_data(float, B_GENDER, NONE, NONE);
+			static m_data(float, B_LICENSE, NONE, NONE);
+			static m_data(float, B_NUM_CHILDREN, NONE, NONE);
+			static m_data(float, B_AGE, NONE, NONE);
+			static m_data(float, B_EMPL_DENSITY, NONE, NONE);
+			static m_data(float, B_HHINCOME, NONE, NONE);
+			static m_data(float, C_CALIBRATION, NONE, NONE);
+			static m_data(float, MU_1, NONE, NONE);
+			static m_data(float, MU_2, NONE, NONE);
+			static m_data(float, MU_3, NONE, NONE);
+			#pragma endregion
 		};
 				
 		template<typename MasterType, typename InheritanceList> typename Vehicle_Chooser_Implementation <MasterType, InheritanceList>::type_of(is_initialized) Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_is_initialized = false;		
 		template<typename MasterType, typename InheritanceList> std::unordered_map<long long, vector<pair<Vehicle_Components::Prototypes::Vehicle_Characteristics<typename MasterType::vehicle_characteristics_type>*,float>>> Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_vehicle_distribution_container;		
+
+		#pragma region Choice option parameters	
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_PAST_CRASHES;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_SMARTPHONE;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_CARSHARE;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_RIDESHARE;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_DRIVE_ALONE_WORK;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_DRIVE_ALONE_OTHER;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_LN_VMT;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_WORK_DIST;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_GENDER;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_LICENSE;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_NUM_CHILDREN;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_AGE;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_EMPL_DENSITY;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_B_HHINCOME;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_C_CALIBRATION;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_MU_1;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_MU_2;
+		template<typename MasterType, typename InheritanceList> float Vehicle_Chooser_Implementation<MasterType, InheritanceList>::_MU_3;
+
 	}
 }
 
