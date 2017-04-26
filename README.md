@@ -8,7 +8,7 @@ It provides implementation of vented models
 in transportation community so that those 
 can be reused by application developers.
 
-The project is distributed under BSD liense.
+The project is distributed under BSD license.
 
 Tool Chains
 ===========
@@ -22,7 +22,7 @@ Linux
 Windows
 -------
 * git
-* cmake 3.2.2 or newer (3.5.2 recommended)
+* cmake 3.2.2 or newer (3.5.2 recommended - NOTE there is a bug in 3.8.0 concerning slashes in paths when locating Boost)
 * Visual Studio 2015 (Update 2 recommended)
 	- Note that there is an issue when running Visual Studio on machines older than Windows 10.
 	- See https://support.microsoft.com/en-us/kb/3118401
@@ -48,6 +48,7 @@ For example:
 	export POLARIS_DEPS_DIR
 	
 Once the environment variable is set correctly clone the repository and call the shell script:
+
 	git clone "https://github.com/anl-polaris/polaris.git" <code_dir>
 	cd <code_dir>/polarisdeps
 	./get_deps.sh
@@ -62,6 +63,7 @@ Here is the list of dependencies:
 * libodb-2.4.0
 * libodb-sqlite-2.4.0
 * sqlite3 (3.11.1)
+* rapidjson-1.1.0 (*NEW - see note below if you want to add to existing dependecies)
 
 Example:
 Run the sript to download, extract and build the dependencies:
@@ -71,6 +73,13 @@ Run the sript to download, extract and build the dependencies:
 	get-deps.cmd <dependencies_dir>
 	
 This may take a while so be patient.
+
+NOTE:
+If you already have dependencies but need to add the new rapidjson dependency:
+
+	cd <code_dir>/polarisdeps
+	build-rapidjson-1.1.0 <dependencies_dir>
+
 
 Building Using Cmake
 ====================
