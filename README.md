@@ -62,6 +62,7 @@ Here is the list of dependencies:
 * libodb-2.4.0
 * libodb-sqlite-2.4.0
 * sqlite3 (3.11.1)
+* rapidjson-1.1.0 (*NEW - see note below if you want to add to existing dependecies)
 
 Example:
 Run the sript to download, extract and build the dependencies:
@@ -71,6 +72,12 @@ Run the sript to download, extract and build the dependencies:
 	get-deps.cmd <dependencies_dir>
 	
 This may take a while so be patient.
+
+NOTE:
+If you already have dependencies but need to add the new rapidjson dependency:
+	cd <code_dir>/polarisdeps
+	build-rapidjson-1.1.0 <dependencies_dir>
+
 
 Building Using Cmake
 ====================
