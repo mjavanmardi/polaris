@@ -147,10 +147,8 @@ struct MasterType
 	typedef Person_Components::Implementations::Activity_Timing_Chooser_Implementation<M> activity_timing_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Chooser_Implementation<M> person_destination_chooser_type;
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
-	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	typedef Person_Components::Implementations::Chicago_Mode_Choice_Option<M> mode_choice_option_type;
-	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
-	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
+	typedef Person_Components::Implementations::ADAPTS_Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	typedef Person_Components::Implementations::ADAPTS_Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
@@ -244,28 +242,35 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 };
 
-bool InitializeModeChoiceParameters(MasterType::scenario_type* scenario)
+bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 {
-	if (!MasterType::mode_choice_option_type::static_initialize(scenario->template mode_choice_option_file<string>()))
+	if (!MasterType::mode_choice_option_type::static_initialize(scenario->mode_choice_model_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize MasterType::mode_choice_option_type parameters." << endl;
+		cout << "ERROR: Unable to initialize Mode Choice Model parameters." << endl;
 		return false;
 	}
 	MasterType::mode_choice_option_type::print_parameters();
 
-	if (!MasterType::person_destination_choice_option_type::static_initialize(scenario->template person_destination_choice_option_file<string>()))
+	if (!MasterType::person_destination_choice_option_type::static_initialize(scenario->template destination_choice_model_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize MasterType::person_destination_choice_option_type parameters." << endl;
+		cout << "ERROR: Unable to initialize Destination Choice Model parameters." << endl;
 		return false;
 	}
 	MasterType::person_destination_choice_option_type::print_parameters();
 
-	if (!MasterType::telecommute_chooser_type::static_initialize(scenario->template telecommute_choice_option_file<string>()))
+	if (!MasterType::telecommute_chooser_type::static_initialize(scenario->template telecommute_choice_model_file<string>()))
 	{
-		cout << "ERROR: Unable to initialize MasterType::telecommute_chooser_type parameters." << endl;
+		cout << "ERROR: Unable to initialize Telecommute Choice Model parameters." << endl;
 		return false;
 	}
 	MasterType::telecommute_chooser_type::print_parameters();
+
+	if (!MasterType::vehicle_chooser_type::static_initialize(scenario->template cav_wtp_model_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize CAV WTP Model parameters." << endl;
+		return false;
+	}
+	//MasterType::vehicle_chooser_type::print_parameters();
 
 	return true;
 }
@@ -548,8 +553,8 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
-	// Initialize telecommute model parameters
-	if (!InitializeModeChoiceParameters(scenario))
+	// Initialize all choice model parameters
+	if (!InitializeChoiceModelParameters(scenario))
 		return 1;
 
 	// Initialize start time model
@@ -559,7 +564,7 @@ int main(int argc,char** argv)
 	MasterType::person_properties_type::Static_Initializer();
 	
 	// Initialize Vehicle Choice Model
-	MasterType::vehicle_chooser_type::static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
+	MasterType::vehicle_chooser_type::distribution_static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
 
 	//==================================================================================================================================
 	// POPSYN stuff

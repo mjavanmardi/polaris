@@ -87,7 +87,7 @@ namespace Person_Components
 
 			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
 			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Destination_Choice_Option", key, default_value);
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Destination_Choice_Model", key, default_value);
 			}
 
 			static bool static_initialize(const string& option_file)
@@ -106,6 +106,10 @@ namespace Person_Components
 
 				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
 					return false;
+
+				// check that model is defined if it is requested through scenario
+				if (!document.HasMember("ADAPTS_Destination_Choice_Model")) THROW_EXCEPTION("ERROR: ADAPTS_Destination_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
+
 
 				BTT_PICK		<float>(GetOption_Double(document, "BTT_PICK"   , BTT_PICK			<float>()));
 				BINCD_PICK		<float>(GetOption_Double(document, "BINCD_PICK" , BINCD_PICK		<float>()));

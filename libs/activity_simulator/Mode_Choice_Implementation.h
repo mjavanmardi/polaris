@@ -940,17 +940,18 @@ namespace Person_Components
 		}
 #pragma endregion
 
-		//======= NEW NESTED LOGIT IMPLEMENTATION ===============================================
 
-		// DETROIT VERSION
-		implementation struct Detroit_Mode_Choice_Option : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType, INHERIT(Detroit_Mode_Choice_Option)>
+		//=============================================================================================
+		// NEW NESTED LOGIT IMPLEMENTATION 
+		//---------------------------------------------------------------------------------------------
+		implementation struct ADAPTS_Mode_Choice_Option : public Choice_Model_Components::Implementations::Nested_Choice_Option_Base<MasterType, INHERIT(ADAPTS_Mode_Choice_Option)>
 		{
 			// Tag as Implementation
-			typedef typename Polaris_Component<MasterType, INHERIT(Detroit_Mode_Choice_Option), Data_Object>::Component_Type ComponentType;
+			typedef typename Polaris_Component<MasterType, INHERIT(ADAPTS_Mode_Choice_Option), Data_Object>::Component_Type ComponentType;
 
 			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
 			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Detroit_Mode_Choice_Option", key, default_value);
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Mode_Choice_Model", key, default_value);
 			}
 
 			static bool static_initialize(const string& option_file)
@@ -962,12 +963,15 @@ namespace Person_Components
 				rapidjson::Document document;
 				if (option_file.length() < 1)
 				{
-					cout << "Warning: option file for Detroit_Mode_Choice_Option was not specified" << endl;
+					cout << "Warning: option file for Mode_Choice_Option was not specified" << endl;
 					return true;
 				}
 
 				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
 					return false;
+
+				// check that model is defined if it is requested through scenario
+				if (!document.HasMember("ADAPTS_Mode_Choice_Model")) THROW_EXCEPTION("ERROR: ADAPTS_Mode_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
 
 				HBW_ASC_AUTO	    		<float>(GetOption_Double(document, "HBW_ASC_AUTO"		, HBW_ASC_AUTO			<float>()));
 				HBO_ASC_AUTO				<float>(GetOption_Double(document, "HBO_ASC_AUTO"		, HBO_ASC_AUTO			<float>()));
@@ -1493,113 +1497,113 @@ namespace Person_Components
 		};
 		
 		#pragma region Choice option parameters	
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_AUTO);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_PASS);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_TAXI);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_WALK);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_TRAN);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_BIKE);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cbd_pa);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost_hinc);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cost_minc);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_dens_bike);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_dens_walk);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_male_taxi);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_notalone_pass);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_over65_pass);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_over65_tran);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ovttime_tran);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_peak_auto);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_bike);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_tran);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_ttime_walk);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_u18_pass);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_pass);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_taxi);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_tran);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_waittime_tran );
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_N_AUTO);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_ASC_N_NM);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_vehavail_nm);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_male_nm);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_B_cbd_nm);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_NEST_AUTO);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBW_NEST_NM);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_AUTO);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_PASS);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_TAXI);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_WALK);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_TRAN);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_BIKE);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_cbd_pa);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_cost);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_cost_hinc);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_cost_minc);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_dens_bike);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_dens_walk);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_male_taxi);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_notalone_pass);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_over65_pass);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_over65_tran);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_ovttime_tran);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_peak_auto);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_ttime_bike);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_ttime_tran);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_ttime_walk);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_u18_pass);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_vehavail_pass);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_vehavail_taxi);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_vehavail_tran);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_waittime_tran );
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_N_AUTO);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_ASC_N_NM);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_vehavail_nm);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_male_nm);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_B_cbd_nm);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_NEST_AUTO);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBW_NEST_NM);
 	
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_AUTO			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_PASS			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_TAXI			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_WALK			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_TRAN			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_BIKE			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cbd_pa			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost_hinc		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cost_minc		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_dens_bike		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_dens_walk		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_male_taxi		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_notalone_pass	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_over65_pass		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_over65_tran		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ovttime_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_peak_auto		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_bike		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_tran		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_ttime_walk		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_u18_pass		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_pass	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_taxi	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_waittime_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_N_AUTO		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_ASC_N_NM			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_vehavail_nm		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_male_nm			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_B_cbd_nm			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_NEST_AUTO			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, HBO_NEST_NM			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_AUTO			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_PASS			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_TAXI			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_WALK			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_TRAN			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_BIKE			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_cbd_pa			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_cost			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_cost_hinc		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_cost_minc		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_dens_bike		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_dens_walk		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_male_taxi		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_notalone_pass	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_over65_pass		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_over65_tran		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_ovttime_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_peak_auto		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_ttime_bike		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_ttime_tran		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_ttime_walk		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_u18_pass		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_vehavail_pass	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_vehavail_taxi	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_vehavail_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_waittime_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_N_AUTO		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_ASC_N_NM			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_vehavail_nm		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_male_nm			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_B_cbd_nm			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_NEST_AUTO			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, HBO_NEST_NM			);
 
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_AUTO			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_PASS			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_TAXI			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_WALK			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_TRAN			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_BIKE			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cbd_pa			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost_hinc		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cost_minc		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_dens_bike		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_dens_walk		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_male_taxi		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_notalone_pass	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_over65_tran		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_over65_pass		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ovttime_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_peak_auto		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_bike		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_tran		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_ttime_walk		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_u18_pass		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_pass	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_taxi	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_waittime_tran	);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_N_AUTO		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_ASC_N_NM			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_vehavail_nm		);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_male_nm			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_B_cbd_nm			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_NEST_AUTO			);
-		define_static_member_variable(Detroit_Mode_Choice_Option, NHB_NEST_NM			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_AUTO			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_PASS			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_TAXI			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_WALK			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_TRAN			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_BIKE			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_cbd_pa			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_cost			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_cost_hinc		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_cost_minc		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_dens_bike		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_dens_walk		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_male_taxi		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_notalone_pass	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_over65_tran		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_over65_pass		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_ovttime_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_peak_auto		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_ttime_bike		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_ttime_tran		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_ttime_walk		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_u18_pass		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_vehavail_pass	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_vehavail_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_vehavail_taxi	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_waittime_tran	);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_N_AUTO		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_ASC_N_NM			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_vehavail_nm		);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_male_nm			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_B_cbd_nm			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_NEST_AUTO			);
+		define_static_member_variable(ADAPTS_Mode_Choice_Option, NHB_NEST_NM			);
 		#pragma endregion
 
-		implementation struct Detroit_Mode_Chooser_Implementation : public Polaris_Component<MasterType, INHERIT(Detroit_Mode_Chooser_Implementation), Data_Object>
+		implementation struct ADAPTS_Mode_Chooser_Implementation : public Polaris_Component<MasterType, INHERIT(ADAPTS_Mode_Chooser_Implementation), Data_Object>
 		{
 			// Tag as Implementation
-			typedef typename Polaris_Component<MasterType, INHERIT(Detroit_Mode_Chooser_Implementation), Data_Object>::Component_Type ComponentType;
+			typedef typename Polaris_Component<MasterType, INHERIT(ADAPTS_Mode_Chooser_Implementation), Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
@@ -2177,34 +2181,6 @@ namespace Person_Components
 			}
 		};
 
-		// CHICAGO VERSION
-		implementation struct Chicago_Mode_Choice_Option : public Detroit_Mode_Choice_Option<MasterType, INHERIT(Chicago_Mode_Choice_Option)>
-		{
-			typedef Detroit_Mode_Choice_Option<MasterType, INHERIT(Chicago_Mode_Choice_Option)> BaseType;
-
-			static void static_initializer()
-			{
-				BaseType::_HBW_ASC_WALK = -0.231;
-				BaseType::_HBW_ASC_TRAN = 0.0;
-				BaseType::_HBW_ASC_BIKE = 0;
-
-				BaseType::_HBO_ASC_WALK = 0.0142;
-				BaseType::_HBO_ASC_TRAN = 0.0;
-				BaseType::_HBO_ASC_BIKE = 0;
-
-				BaseType::_NHB_ASC_WALK = -0.134;
-				BaseType::_NHB_ASC_TRAN = 0.0;
-				BaseType::_NHB_ASC_BIKE = 0;
-
-				BaseType::_HBW_B_ttime_tran = -0.0277;
-				BaseType::_HBO_B_ttime_tran = 0;
-				BaseType::_NHB_B_ttime_tran = -0.00167;
-
-				BaseType::_HBW_B_waittime_tran = -0.06;
-				BaseType::_HBO_B_waittime_tran = -0.03;
-				BaseType::_NHB_B_waittime_tran = -0.15;
-			}
-		};
 	}
 }
 
