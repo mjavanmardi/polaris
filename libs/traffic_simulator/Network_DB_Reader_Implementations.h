@@ -1035,8 +1035,8 @@ namespace Network_Components
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_walk_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_walk_links<_Links_Container_Interface&>().push_back(link);
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
 
@@ -1090,8 +1090,8 @@ namespace Network_Components
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_walk_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_walk_links<_Links_Container_Interface&>().push_back(link);
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
 
@@ -1154,8 +1154,8 @@ namespace Network_Components
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
 
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_transit_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_transit_links<_Links_Container_Interface&>().push_back(link);
+						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						const string& TripsByDepTime = db_itr->getTripsByDepTime();
 						std::istringstream ss(TripsByDepTime);
@@ -1458,90 +1458,71 @@ namespace Network_Components
 					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
 					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
 
-
-					_Links_Container_Interface& inbound_walk_links = intersection->template inbound_walk_links<_Links_Container_Interface&>();
-					_Links_Container_Interface& outbound_walk_links = intersection->template outbound_walk_links<_Links_Container_Interface&>();
-
-
-					_Links_Container_Interface& inbound_transit_links = intersection->template inbound_transit_links<_Links_Container_Interface&>();
-					_Links_Container_Interface& outbound_transit_links = intersection->template outbound_transit_links<_Links_Container_Interface&>();
-
 					typename _Links_Container_Interface::iterator in_links_itr;
 					typename _Links_Container_Interface::iterator out_links_itr;
 
 					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
 					{
-						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
-						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
+						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);						
+						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->_link_type;
+
+						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
 
 						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
 						{
 							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->_link_type;
+							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
+
+							if (in_facility_type == 12)
+							{
+								if (out_facility_type == 12)
+								{
+									cout << "\tWalk to Walk\n";
+								}
+								else if (out_facility_type == 13)
+								{
+									cout << "\tWalk to Transit\n";
+								}
+								else
+								{
+									cout << "\tWalk to Drive\n";
+								}
+							}
+							else if (in_facility_type == 13)
+							{
+								if (out_facility_type == 12)
+								{
+									cout << "\tTransit to Walk\n";
+								}
+								else if (out_facility_type == 13)
+								{
+									cout << "\tTransit to Transit\n";
+								}
+								else
+								{
+									cout << "\tTransit to Drive\n";
+								}
+							}
+							else
+							{
+								if (out_facility_type == 12)
+								{
+									cout << "\tDrive to Walk\n";
+								}
+								else if (out_facility_type == 13)
+								{
+									cout << "\tDrive to Transit\n";
+								}
+								else
+								{
+									cout << "\tDrive to Drive\n";
+								}
+							}
+
+
+
 						}
-
-						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-					}
-
-					for (in_links_itr = inbound_walk_links.begin(); in_links_itr != inbound_walk_links.end(); in_links_itr++)
-					{
-						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
-						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
-
-						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-					}
-
-					for (in_links_itr = inbound_transit_links.begin(); in_links_itr != inbound_transit_links.end(); in_links_itr++)
-					{
-						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
-						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << inbound_link->_link_type << endl;
-
-						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-						for (out_links_itr = outbound_walk_links.begin(); out_links_itr != outbound_walk_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
-						for (out_links_itr = outbound_transit_links.begin(); out_links_itr != outbound_transit_links.end(); out_links_itr++)
-						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << outbound_link->_link_type << endl;
-						}
-
 					}
 				}
 

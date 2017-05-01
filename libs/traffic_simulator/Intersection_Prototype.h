@@ -112,10 +112,10 @@ namespace Intersection_Components
 			accessor(description, NONE, NONE);
 			accessor(inbound_links, NONE, NONE);
 			accessor(outbound_links, NONE, NONE);
-			accessor(inbound_walk_links, NONE, NONE);
+			/*accessor(inbound_walk_links, NONE, NONE);
 			accessor(outbound_walk_links, NONE, NONE);
 			accessor(inbound_transit_links, NONE, NONE);
-			accessor(outbound_transit_links, NONE, NONE);
+			accessor(outbound_transit_links, NONE, NONE);*/
 			accessor(intersection_type, NONE, NONE);
 			accessor(network_reference, NONE, NONE);
 
