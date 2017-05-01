@@ -296,9 +296,10 @@ namespace Scenario_Components
 			accessor(tile_imagery_alpha_level,NONE,NONE);
 
 			//Parameter files
-			accessor(mode_choice_option_file, NONE, NONE);
-			accessor(person_destination_choice_option_file, NONE, NONE);
-			accessor(telecommute_choice_option_file, NONE, NONE);
+			accessor(mode_choice_model_file, NONE, NONE);
+			accessor(destination_choice_model_file, NONE, NONE);
+			accessor(telecommute_choice_model_file, NONE, NONE);
+			accessor(cav_wtp_model_file, NONE, NONE);
 
 
 			template<typename TargetType> void read_scenario_data(const char* filename)
@@ -457,24 +458,6 @@ namespace Scenario_Components
 				// Start time model parameters
 				if (cfgReader.getParameter("vehicle_distribution_file_name", this->template vehicle_distribution_file_name<string*>()) != PARAMETER_FOUND) this->template vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
 				if (cfgReader.getParameter("automation_cost", this->template automation_cost<double*>()) != PARAMETER_FOUND) this->template automation_cost<double>(FLT_MAX);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_past_crashes", this->template vehicle_techchoice_beta_past_crashes<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_past_crashes<double>(0.309);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_smartphone", this->template vehicle_techchoice_beta_smartphone<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_smartphone<double>(0.0);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_carshare", this->template vehicle_techchoice_beta_carshare<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_carshare<double>(-1.149);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_rideshare", this->template vehicle_techchoice_beta_rideshare<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_rideshare<double>(-1.4);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_drive_alone_work", this->template vehicle_techchoice_beta_drive_alone_work<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_drive_alone_work<double>(0.616);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_drive_alone_other", this->template vehicle_techchoice_beta_drive_alone_other<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_drive_alone_other<double>(0.833);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_ln_vmt", this->template vehicle_techchoice_beta_ln_vmt<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_ln_vmt<double>(0.329);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_work_dist", this->template vehicle_techchoice_beta_work_dist<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_work_dist<double>(0.087);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_gender", this->template vehicle_techchoice_beta_gender<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_gender<double>(0.442);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_license", this->template vehicle_techchoice_beta_license<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_license<double>(-1.159);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_num_children", this->template vehicle_techchoice_beta_num_children<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_num_children<double>(0.341);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_age", this->template vehicle_techchoice_beta_age<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_age<double>(-0.039);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_empl_density", this->template vehicle_techchoice_beta_empl_density<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_empl_density<double>(-0.000337);
-				if (cfgReader.getParameter("vehicle_techchoice_beta_hhincome", this->template vehicle_techchoice_beta_hhincome<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_beta_hhincome<double>(0.00000729);
-				if (cfgReader.getParameter("vehicle_techchoice_calibration", this->template vehicle_techchoice_calibration<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_calibration<double>(-5.0);
-				if (cfgReader.getParameter("vehicle_techchoice_mu_1", this->template vehicle_techchoice_mu_1<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_1<double>(-7.401);
-				if (cfgReader.getParameter("vehicle_techchoice_mu_2", this->template vehicle_techchoice_mu_2<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_2<double>(-6.514);
-				if (cfgReader.getParameter("vehicle_techchoice_mu_3", this->template vehicle_techchoice_mu_3<double*>()) != PARAMETER_FOUND) this->template vehicle_techchoice_mu_3<double>(-5.503);
 
 
 				//=======================================================================================================================================================
@@ -689,9 +672,10 @@ namespace Scenario_Components
 				}
 				else use_buildings(true);
 
-				if (cfgReader.getParameter("mode_choice_option_file",						mode_choice_option_file<string*>()) != PARAMETER_FOUND)					mode_choice_option_file<string>("");
-				if (cfgReader.getParameter("person_destination_choice_option_file",			person_destination_choice_option_file<string*>()) != PARAMETER_FOUND)	person_destination_choice_option_file<string>("");
-				if (cfgReader.getParameter("telecommute_choice_option_file",				telecommute_choice_option_file<string*>()) != PARAMETER_FOUND)			telecommute_choice_option_file<string>("");
+				if (cfgReader.getParameter("mode_choice_model_file",			mode_choice_model_file<string*>()) != PARAMETER_FOUND)			mode_choice_model_file<string>("");
+				if (cfgReader.getParameter("destination_choice_model_file",		destination_choice_model_file<string*>()) != PARAMETER_FOUND)	destination_choice_model_file<string>("");
+				if (cfgReader.getParameter("telecommute_choice_model_file",		telecommute_choice_model_file<string*>()) != PARAMETER_FOUND)	telecommute_choice_model_file<string>("");
+				if (cfgReader.getParameter("cav_wtp_model_file",				cav_wtp_model_file<string*>()) != PARAMETER_FOUND)				cav_wtp_model_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -709,88 +693,6 @@ namespace Scenario_Components
 				src.close();
 				dst.close();
 			}
-
-			// template<typename TargetType> void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
-			// {
-				// //network_models::network_information::scenario_data_information::read_scenario_data("", scenario_data);
-				// simulation_interval_length<int>(scenario_data.simulation_interval_length);	// in second
-				// assignment_interval_length<int>(scenario_data.assignment_interval_length); //in second
-				// path_calculation_interval_length<int>(scenario_data.path_calculation_interval_length);
-				
-				// num_threads<int>(scenario_data.num_threads);
-				// demand_od_flag<int>(scenario_data.demand_od_flag);
-
-				// simulation_start_time<int>(scenario_data.simulation_start_time);	//
-				// simulation_end_time<int>(scenario_data.simulation_end_time);	//
-
-				// planning_horizon<int>(scenario_data.planning_horizon); //
-				// num_simulation_intervals<int>(scenario_data.num_simulation_intervals);
-				// num_assignment_intervals<int>(scenario_data.num_assignment_intervals);
-				// num_simulation_intervals_per_assignment_interval<int>(scenario_data.num_simulation_intervals_per_assignment_interval);
-
-				// assignment_mode<int>(scenario_data.assignment_mode);
-
-				// iseed<unsigned long>(scenario_data.iseed);
-
-				// intersection_control_flag<int>(scenario_data.node_control_flag);
-
-				// output_dir_name<string&>() = "";
-				// open_output_files<NULLTYPE>();
-				// open_input_files<NULLTYPE>();
-
-				// network_cumulative_loaded_vehicles<int>(0.0);
-				// network_cumulative_departed_vehicles<int>(0.0);
-				// network_in_network_vehicles<int>(0.0);
-				// network_cumulative_arrived_vehicles<int>(0.0);
-				// network_cumulative_switched_decisions<int>(0.0);
-				// network_average_trip_travel_time<float>(0.0f);
-
-				// network_in_system_vehicles<int>(0.0);
-
-				// assignment_time_in_seconds<double>(0.0);
-			    // simulation_time_in_seconds<double>(0.0);
-			    // operation_time_in_seconds<double>(0.0);
-			    // output_time_in_seconds<double>(0.0);
-
-				// snapshot_period<int>(300);
-				
-				// ///enroute swtiching
-				// realtime_informed_vehicle_market_share<double>(0.5);
-				// information_compliance_rate_mean<double>(0.5);
-				// information_compliance_rate_standard_deviation<double>(0.5);
-				// relative_indifference_band_route_choice_mean<double>(0.1);
-				// relative_indifference_band_route_choice_standard_deviation<double>(0.1);
-				// minimum_travel_time_saving_mean<double>(1.0);	// in minutes
-				// minimum_travel_time_saving_standard_deviation<double>(1.0);	// in minutes
-
-			// }
-
-			// template<typename TargetType> void write_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
-			// {
-
-				// network_models::network_information::scenario_data_information::scenario_data_initialization(scenario_data);
-
-				// scenario_data.simulation_interval_length = simulation_interval_length<int>();	// in second
-				// scenario_data.assignment_interval_length = assignment_interval_length<int>(); //in second
-				// scenario_data.path_calculation_interval_length = path_calculation_interval_length<int>();
-			
-				// scenario_data.simulation_start_time = simulation_start_time<int>();	//
-				// scenario_data.simulation_end_time = simulation_end_time<int>();	//
-
-				// scenario_data.planning_horizon = planning_horizon<int>(); //
-				// scenario_data.num_simulation_intervals = num_simulation_intervals<int>();
-				// scenario_data.num_assignment_intervals = num_assignment_intervals<int>();
-				// scenario_data.num_simulation_intervals_per_assignment_interval = num_simulation_intervals_per_assignment_interval<int>();
-
-				// scenario_data.num_threads = num_threads<int>();
-				// scenario_data.demand_od_flag = 0;
-
-				// scenario_data.assignment_mode = assignment_mode<network_models::network_information::scenario_data_information::Assignment_Simulation_Mode_Keys>();
-
-				// scenario_data.iseed = iseed<unsigned long>();
-
-				// scenario_data.node_control_flag = intersection_control_flag<int>();
-			// }
 
 			template<typename TargetType> void open_output_files()
 			{

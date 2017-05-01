@@ -21,7 +21,7 @@ namespace Person_Components
 
 			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
 			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Implementation", key, default_value);
+				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Model", key, default_value);
 			}
 
 			static bool static_initialize(const string& option_file)
@@ -40,6 +40,10 @@ namespace Person_Components
 
 				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
 					return false;
+
+				// check that model is defined if it is requested through scenario
+				if (!document.HasMember("Telecommute_Choice_Model")) THROW_EXCEPTION("ERROR: Telecommute_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
+
 
 				Z_CONSTANT					<float>(GetOption_Double(document, "Z_CONSTANT"					, Z_CONSTANT				 <float>()));
 				Z_MALE						<float>(GetOption_Double(document, "Z_MALE"						, Z_MALE					 <float>()));

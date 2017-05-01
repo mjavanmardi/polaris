@@ -352,9 +352,10 @@ namespace Scenario_Components
 			m_data(double, condition_time_in_seconds, NONE, NONE);
 			m_data(string, database_name, NONE, NONE);
 
-			m_data(string, mode_choice_option_file, NONE, NONE);
-			m_data(string, person_destination_choice_option_file, NONE, NONE);
-			m_data(string, telecommute_choice_option_file, NONE, NONE);
+			m_data(string, mode_choice_model_file, NONE, NONE);
+			m_data(string, destination_choice_model_file, NONE, NONE);
+			m_data(string, telecommute_choice_model_file, NONE, NONE);
+			m_data(string, cav_wtp_model_file, NONE, NONE);
 		};
 	}
 
