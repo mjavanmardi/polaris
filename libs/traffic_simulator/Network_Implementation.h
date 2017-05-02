@@ -1058,19 +1058,41 @@ namespace Network_Components
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 				typename _Links_Container_Interface::iterator links_itr;
+				
 				_max_free_flow_speed = -1.0;			
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
 				{			
 					_Link_Interface* link = (_Link_Interface*)(*links_itr);
-					float free_flow_speed = (float) ((5280.0) * link->template free_flow_speed<float>()/3600.0); // feet per second
-					float link_travel_time = float (link->template length<float>() / free_flow_speed);
+					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+					{
+						float free_flow_speed = 4.55672; // feet per second
+
+						float link_travel_time = float(link->template length<float>() / free_flow_speed); // Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
+						
+						link_travel_time = max((float)1.0, link_travel_time);
+
+						link->template travel_time<float>(link_travel_time);
+					}
+					else if (facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+					{
+						float link_travel_time = -1;
+						link->template travel_time<float>(link_travel_time);
+					}
+					else
+					{ 
+						float free_flow_speed = (float) ((5280.0) * link->template free_flow_speed<float>()/3600.0); // feet per second
+						float link_travel_time = float (link->template length<float>() / free_flow_speed);
 					
-					_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
+						_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
 
-					link_travel_time = max((float)1.0,link_travel_time);
+						link_travel_time = max((float)1.0,link_travel_time);
 
-					link->template travel_time<float>(link_travel_time);
-					//link->template num_lanes<float>(link_travel_time);
+						link->template travel_time<float>(link_travel_time);
+						//link->template num_lanes<float>(link_travel_time);
+					}
+
 				}
 		
 				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(turn_movements_container)::value_type>::type>  _Turn_Movement_Interface;
@@ -1116,6 +1138,7 @@ namespace Network_Components
 
 				routable_network->template construct_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
 
+				routable_network->template construct_routable_transit_network<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{

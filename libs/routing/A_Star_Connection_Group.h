@@ -78,6 +78,79 @@ namespace polaris
 	};
 
 	template<typename MasterType>
+	struct Custom_Connection_Group<MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type>
+		: public Connection_Group_Base< MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type >
+	{
+		typedef Connection_Group_Base< MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type > Base_t;
+		typedef typename Base_t::Anonymous_Connection_Group Anonymous_Connection_Group;
+		typedef typename Base_t::current_edge_type current_edge_type;
+		typedef typename Base_t::base_edge_type base_edge_type;
+		typedef typename Base_t::connection_type connection_type;
+		typedef typename Base_t::Connection_Implementation Connection_Implementation;
+		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
+		typedef typename Base_t::connection_attributes_type connection_attributes_type;
+
+		template<typename AgentType>
+		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
+		{
+			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
+			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
+
+			for (Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
+			{
+				Evaluate_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
+			}
+
+			return (Anonymous_Connection_Group*)end_connection_itr;
+		}
+
+		//basic A* stuff
+		template<typename AgentType>
+		void Evaluate_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
+		{
+			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
+
+			if (current_neighbor->in_closed_set()) return;
+
+			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
+
+			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+			if (cost_from_origin < current_neighbor->cost_from_origin())
+			{
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+
+				float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				float time_from_origin = current->time_from_origin() + time_cost_between;
+
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				current_neighbor->came_from(current);
+
+				current_neighbor->cost_from_origin(cost_from_origin);
+				current_neighbor->time_from_origin(time_from_origin);
+
+				current_neighbor->time_label(current_edge->time_label() + time_cost_between);
+
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+
+				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+
+				current_neighbor->in_open_set(true);
+
+				// update the label
+				agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			}
+		}
+	};
+
+	template<typename MasterType>
 	struct Custom_Connection_Group<MasterType,typename MasterType::time_dependent_graph_type,typename MasterType::time_dependent_graph_type,typename MasterType::time_dependent_to_time_dependent_type>
 		: public Connection_Group_Base< MasterType, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_graph_type, typename MasterType::time_dependent_to_time_dependent_type >
 	{

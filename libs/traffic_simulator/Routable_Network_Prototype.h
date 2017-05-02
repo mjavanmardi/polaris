@@ -37,6 +37,12 @@ namespace Routing_Components
 				this_component()->construct_time_dependent_routable_network(source_network);
 			}
 
+			template<typename Source_Network_Type>
+			void construct_routable_transit_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			{
+				this_component()->construct_routable_transit_network(source_network);
+			}
+
 			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
 			{
 				return this_component()->compute_static_network_path(origins,destinations,path_container,cost_container);

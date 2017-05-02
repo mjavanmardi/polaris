@@ -146,6 +146,18 @@ namespace Routing_Components
 		};
 
 		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
+
+		template<typename MasterType>
+		struct transit_attributes : public Base_Edge_A_Star<MasterType>
+		{
+			t_data(bool, is_highway);
+		};
+
+		struct transit_to_transit
+		{
+			t_data(float, cost);
+			t_data(float, time_cost);
+		};
 	}
 
 
@@ -158,6 +170,7 @@ namespace Routing_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Routable_Network_Implementation),Data_Object>::Component_Type ComponentType;
 
 			m_data(unsigned int,static_network_graph_id,NONE,NONE);
+			m_data(unsigned int,transit_network_graph_id, NONE, NONE);
 			m_data(unsigned int,time_dependent_network_graph_id,NONE,NONE);
 
 			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
@@ -272,6 +285,7 @@ namespace Routing_Components
 
 				copy->_routable_graph_pool = graph_copy;
 				copy->_static_network_graph_id = _static_network_graph_id;
+				copy->_transit_network_graph_id = _transit_network_graph_id;
 				copy->_time_dependent_network_graph_id = _time_dependent_network_graph_id;
 
 				return (Routable_Network<ComponentType>*)copy;
@@ -507,6 +521,99 @@ namespace Routing_Components
 				//reorganizes data that holds information for a graph structure
 				Interactive_Graph<typename MT::static_graph_type>* routable_network_graph = static_graph->template Compile_Graph<Types::static_attributes<MT>>();
 	
+				//graph_pool->Link_Graphs();
+			}
+
+			void construct_routable_transit_network(Network<typename MasterType::network_type>* source_network)
+			{
+				typedef Network<typename MasterType::network_type> Network_Interface;
+
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+				typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+
+				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(outbound_turn_movements), Turn_Movement_Interface*> Turn_Movement_Container_Interface;
+
+				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+
+
+				Graph_Assembler_Connected_Edge<typename MT::transit_graph_type>* transit_graph = graph_pool->template Create_New_Graph<typename MT::transit_graph_type>();
+
+				_transit_network_graph_id = transit_graph->graph_id();
+				//contains link properties (link properties). Its is a class to be used during graph construction to do things like creating a copy, it also contains a queue of connection groups
+				//static_attribues inherit from A* and hold attributes necessary for running A*
+				Input_Edge<Types::transit_attributes<MT>> input_transit_edge;
+				//information between which links and graphs connection happens
+				Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>::_neighbor_graph_id = transit_graph->graph_id();
+
+				Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>* transit_to_transit_connection_group = new Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>();
+				//additional cost for turn movements
+				Types::transit_to_transit connection_attributes;
+
+
+				Network_Interface* network = source_network;
+
+				Link_Container_Interface* links = network->template links_container<Link_Container_Interface*>();
+
+				for (auto links_itr = links->begin(); links_itr != links->end(); links_itr++)
+				{
+					Link_Interface* current_link = (Link_Interface*)(*links_itr);
+
+					Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
+
+					input_transit_edge._x = downstream_intersection->template x_position<float>();
+					input_transit_edge._y = downstream_intersection->template y_position<float>();
+					input_transit_edge._edge_id = current_link->template uuid<unsigned int>();
+
+					input_transit_edge._cost = current_link->template travel_time<float>();
+					input_transit_edge._time_cost = current_link->template travel_time<float>();
+
+					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+					if (link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+					{
+						input_transit_edge._is_highway = false;
+					}
+					else
+					{
+						input_transit_edge._is_highway = true;
+					}
+
+
+					Turn_Movement_Container_Interface* outbound_turn_movements = current_link->template outbound_turn_movements<Turn_Movement_Container_Interface*>();
+
+					for (auto movements_itr = outbound_turn_movements->begin(); movements_itr != outbound_turn_movements->end(); movements_itr++)
+					{
+						Turn_Movement_Interface* current_movement = (Turn_Movement_Interface*)(*movements_itr);
+
+						long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
+
+						transit_to_transit_connection_group->_neighbors.push_back(neighbor_id);
+
+						connection_attributes._cost = 0.0f;
+						connection_attributes._time_cost = 0.0f;
+
+						transit_to_transit_connection_group->_neighbor_attributes.push_back(connection_attributes);
+					}
+
+					//each edge can have multiple connection groups, like bus->walk or bus->walk. The use pattern is to put connections of the same type into separate group, each group will have a different types of elements
+					input_transit_edge._connection_groups.push_back(transit_to_transit_connection_group);
+
+					transit_graph->template Add_Edge<Types::transit_attributes<MT>>(&input_transit_edge);
+
+					// Clean up connection group
+
+					transit_to_transit_connection_group->_neighbors.clear();
+					transit_to_transit_connection_group->_neighbor_attributes.clear();
+
+					// Clean up input edge
+
+					input_transit_edge._connection_groups.clear();
+				}
+				//reorganizes data that holds information for a graph structure
+				Interactive_Graph<typename MT::transit_graph_type>* routable_network_graph = transit_graph->template Compile_Graph<Types::transit_attributes<MT>>();
+
 				//graph_pool->Link_Graphs();
 			}
 

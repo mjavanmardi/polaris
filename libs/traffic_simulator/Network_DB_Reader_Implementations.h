@@ -1453,7 +1453,7 @@ namespace Network_Components
 					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
 					//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
 
-					cout << "Intersection:" << intersection->_uuid << endl;
+					//cout << "Intersection:" << intersection->_uuid << endl;
 
 					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
 					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
@@ -1467,20 +1467,20 @@ namespace Network_Components
 
 						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
+						//cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
 
 						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
 						{
 							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
+							//cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
 
 							if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 							{
 								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
-									cout << "\tWalk to Walk\n";
+									//cout << "\tWalk to Walk\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1501,7 +1501,7 @@ namespace Network_Components
 								}
 								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
-									cout << "\tWalk to Transit\n";
+									//cout << "\tWalk to Transit\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1522,7 +1522,7 @@ namespace Network_Components
 								}
 								else
 								{
-									cout << "\tWalk to Drive\n";
+									//cout << "\tWalk to Drive\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1546,7 +1546,7 @@ namespace Network_Components
 							{
 								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
-									cout << "\tTransit to Walk\n";
+									//cout << "\tTransit to Walk\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1567,7 +1567,7 @@ namespace Network_Components
 								}
 								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
-									cout << "\tTransit to Transit\n";
+									//cout << "\tTransit to Transit\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1588,7 +1588,7 @@ namespace Network_Components
 								}
 								else
 								{
-									cout << "\tTransit to Drive\n";
+									//cout << "\tTransit to Drive\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1612,7 +1612,7 @@ namespace Network_Components
 							{
 								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
-									cout << "\tDrive to Walk\n";
+									//cout << "\tDrive to Walk\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1633,7 +1633,7 @@ namespace Network_Components
 								}
 								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
-									cout << "\tDrive to Transit\n";
+									//cout << "\tDrive to Transit\n";
 									counter++;
 									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
 									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
@@ -1654,7 +1654,8 @@ namespace Network_Components
 								}
 								else
 								{
-									cout << "\tDrive to Drive\n";
+									//cout << "\tDrive to Drive\n";
+									//Do nothing since drive-to-drive connections are read in from the Connection Table in the SQL Databese!
 								}
 							}
 
