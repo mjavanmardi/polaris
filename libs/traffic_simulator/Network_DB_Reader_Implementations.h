@@ -1463,56 +1463,194 @@ namespace Network_Components
 
 					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
 					{
-						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);						
-						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->_link_type;
+						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+
+						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 						cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
 
 						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
 						{
 							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->_link_type;
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
 							cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
 
-							if (in_facility_type == 12)
+							if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 							{
-								if (out_facility_type == 12)
+								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
 									cout << "\tWalk to Walk\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_WALK);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED); 
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
-								else if (out_facility_type == 13)
+								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
 									cout << "\tWalk to Transit\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_TRANSIT);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
 								else
 								{
 									cout << "\tWalk to Drive\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_DRIVE);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
 							}
-							else if (in_facility_type == 13)
+							else if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 							{
-								if (out_facility_type == 12)
+								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
 									cout << "\tTransit to Walk\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_WALK);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
-								else if (out_facility_type == 13)
+								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
 									cout << "\tTransit to Transit\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_TRANSIT);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
 								else
 								{
 									cout << "\tTransit to Drive\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_DRIVE);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
 							}
 							else
 							{
-								if (out_facility_type == 12)
+								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
 									cout << "\tDrive to Walk\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_WALK);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
-								else if (out_facility_type == 13)
+								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
 									cout << "\tDrive to Transit\n";
+									counter++;
+									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+									//turn_movement->template uuid<int>(db_itr->getConn());
+									turn_movement->template internal_id<int>(counter);
+									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_TRANSIT);
+									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+									typename MasterType::network_type::long_hash_key_type long_hash_key;
+									long_hash_key.inbound_link_id = inbound_link_id;
+									long_hash_key.outbound_link_id = outbound_link_id;
+									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+									turn_movements_container.push_back(turn_movement);
 								}
 								else
 								{

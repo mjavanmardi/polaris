@@ -15,6 +15,14 @@ namespace Turn_Movement_Components
 			THROUGH_TURN,
 			RIGHT_TURN,
 			U_TURN,
+			DRIVE_TO_TRANSIT,
+			DRIVE_TO_WALK,
+			TRANSIT_TO_DRIVE,
+			TRANSIT_TO_TRANSIT,
+			TRANSIT_TO_WALK,
+			WALK_TO_DRIVE,
+			WALK_TO_TRANSIT,
+			WALK_TO_WALK
 		};
 
 		enum Turn_Movement_Rule_Keys
