@@ -104,8 +104,7 @@ namespace Person_Components
 			
 			static bool static_initialize(const string& option_file);
 			static void print_parameters();
-			static void base_static_initializer();
-			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value);
+			static void default_static_initializer();
 
 			// Feature called from prototype and by Choice_Model
 			virtual double Calculate_Utility();
@@ -176,65 +175,61 @@ namespace Person_Components
 		};
 
 		template<typename MasterType, typename InheritanceList>
-		double Mode_Choice_Option<MasterType, InheritanceList>::GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
-		{
-			return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Mode_Choice_Option", key, default_value);
-		}
-
-		template<typename MasterType, typename InheritanceList>
 		bool Mode_Choice_Option<MasterType, InheritanceList>::static_initialize(const string& option_file)
 		{
 			// set the base values
-			base_static_initializer();
+			default_static_initializer();
 
 			// now see if there are config file changes
-			rapidjson::Document document;
-			//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template mode_choice_option_param_file<string>();
 			if (option_file.length() < 1)
 			{
 				cout << "Warning: option file for Mode_Choice_Option was not specified" << endl;
 				return true;
 			}
 
-			if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+			rapidjson::Document document;
+			_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+			if (!scenario->parse_option_file(document, option_file))
 				return false;
 			
-			BHW_CBD_IVTT	<float>(GetOption_Double(document, "BHW_CBD_IVTT"		, BHW_CBD_IVTT	<float>()));
-			BHO_IVTT		<float>(GetOption_Double(document, "BHO_IVTT"			, BHO_IVTT		<float>()));
-			BHO_CBD_IVTT	<float>(GetOption_Double(document, "BHO_CBD_IVTT"		, BHO_CBD_IVTT	<float>()));
-			BNH_IVTT		<float>(GetOption_Double(document, "BNH_IVTT"			, BNH_IVTT		<float>()));
-			BNH_CBD_IVTT	<float>(GetOption_Double(document, "BNH_CBD_IVTT"		, BNH_CBD_IVTT	<float>()));
-			BHW_IVTT		<float>(GetOption_Double(document, "BHW_IVTT"			, BHW_IVTT		<float>()));
-			BHW_WAIT		<float>(GetOption_Double(document, "BHW_WAIT"			, BHW_WAIT		<float>()));
-			BHW_CBD_WAIT	<float>(GetOption_Double(document, "BHW_CBD_WAIT"		, BHW_CBD_WAIT	<float>()));
-			BHO_WAIT		<float>(GetOption_Double(document, "BHO_WAIT"			, BHO_WAIT		<float>()));
-			BHO_CBD_WAIT	<float>(GetOption_Double(document, "BHO_CBD_WAIT"		, BHO_CBD_WAIT	<float>()));
-			BNH_WAIT		<float>(GetOption_Double(document, "BNH_WAIT"			, BNH_WAIT		<float>()));
-			BNH_CBD_WAIT	<float>(GetOption_Double(document, "BNH_CBD_WAIT"		, BNH_CBD_WAIT	<float>()));
-			BHW_TRANSFER	<float>(GetOption_Double(document, "BHW_TRANSFER"		, BHW_TRANSFER	<float>()));
-			BHW_CBD_TRANSFER<float>(GetOption_Double(document, "BHW_CBD_TRANSFER"	, BHW_CBD_TRANSFER<float>()));
-			BHO_TRANSFER	<float>(GetOption_Double(document, "BHO_TRANSFER"		, BHO_TRANSFER	<float>()));
-			BHO_CBD_TRANSFER<float>(GetOption_Double(document, "BHO_CBD_TRANSFER"	, BHO_CBD_TRANSFER<float>()));
-			BNH_TRANSFER	<float>(GetOption_Double(document, "BNH_TRANSFER"		, BNH_TRANSFER	<float>()));
-			BNH_CBD_TRANSFER<float>(GetOption_Double(document, "BNH_CBD_TRANSFER"	, BNH_CBD_TRANSFER<float>()));
-			BHW_WALK		<float>(GetOption_Double(document, "BHW_WALK"			, BHW_WALK		<float>()));
-			BHW_CBD_WALK	<float>(GetOption_Double(document, "BHW_CBD_WALK"		, BHW_CBD_WALK	<float>()));
-			BHO_WALK		<float>(GetOption_Double(document, "BHO_WALK"			, BHO_WALK		<float>()));
-			BHO_CBD_WALK	<float>(GetOption_Double(document, "BHO_CBD_WALK"		, BHO_CBD_WALK	<float>()));
-			BNH_WALK		<float>(GetOption_Double(document, "BNH_WALK"			, BNH_WALK		<float>()));
-			BNH_CBD_WALK	<float>(GetOption_Double(document, "BNH_CBD_WALK"		, BNH_CBD_WALK	<float>()));
-			BHW_COST		<float>(GetOption_Double(document, "BHW_COST"			, BHW_COST		<float>()));
-			BHW_CBD_COST	<float>(GetOption_Double(document, "BHW_CBD_COST"		, BHW_CBD_COST	<float>()));
-			BHO_COST		<float>(GetOption_Double(document, "BHO_COST"			, BHO_COST		<float>()));
-			BHO_CBD_COST	<float>(GetOption_Double(document, "BHO_CBD_COST"		, BHO_CBD_COST	<float>()));
-			BNH_COST		<float>(GetOption_Double(document, "BNH_COST"			, BNH_COST		<float>()));
-			BNH_CBD_COST	<float>(GetOption_Double(document, "BNH_CBD_COST"		, BNH_CBD_COST	<float>()));
-			BHW_BIAS		<float>(GetOption_Double(document, "BHW_BIAS"			, BHW_BIAS		<float>()));
-			BHW_CBD_BIAS	<float>(GetOption_Double(document, "BHW_CBD_BIAS"		, BHW_CBD_BIAS	<float>()));
-			BHO_BIAS		<float>(GetOption_Double(document, "BHO_BIAS"			, BHO_BIAS		<float>()));
-			BHO_CBD_BIAS	<float>(GetOption_Double(document, "BHO_CBD_BIAS"		, BHO_CBD_BIAS	<float>()));
-			BNH_BIAS		<float>(GetOption_Double(document, "BNH_BIAS"			, BNH_BIAS		<float>()));
-			BNH_CBD_BIAS	<float>(GetOption_Double(document, "BNH_CBD_BIAS"		, BNH_CBD_BIAS	<float>()));
+			string section = "Mode_Choice_Option";
+
+			scenario->set_parameter(document, section, "BHW_CBD_IVTT"		, _BHW_CBD_IVTT	);
+			scenario->set_parameter(document, section, "BHO_IVTT"			, _BHO_IVTT		);
+			scenario->set_parameter(document, section, "BHO_CBD_IVTT"		, _BHO_CBD_IVTT	);
+			scenario->set_parameter(document, section, "BNH_IVTT"			, _BNH_IVTT		);
+			scenario->set_parameter(document, section, "BNH_CBD_IVTT"		, _BNH_CBD_IVTT	);
+			scenario->set_parameter(document, section, "BHW_IVTT"			, _BHW_IVTT		);
+			scenario->set_parameter(document, section, "BHW_WAIT"			, _BHW_WAIT		);
+			scenario->set_parameter(document, section, "BHW_CBD_WAIT"		, _BHW_CBD_WAIT	);
+			scenario->set_parameter(document, section, "BHO_WAIT"			, _BHO_WAIT		);
+			scenario->set_parameter(document, section, "BHO_CBD_WAIT"		, _BHO_CBD_WAIT	);
+			scenario->set_parameter(document, section, "BNH_WAIT"			, _BNH_WAIT		);
+			scenario->set_parameter(document, section, "BNH_CBD_WAIT"		, _BNH_CBD_WAIT	);
+			scenario->set_parameter(document, section, "BHW_TRANSFER"		, _BHW_TRANSFER	);
+			scenario->set_parameter(document, section, "BHW_CBD_TRANSFER"	, _BHW_CBD_TRANSFER);
+			scenario->set_parameter(document, section, "BHO_TRANSFER"		, _BHO_TRANSFER	);
+			scenario->set_parameter(document, section, "BHO_CBD_TRANSFER"	, _BHO_CBD_TRANSFER);
+			scenario->set_parameter(document, section, "BNH_TRANSFER"		, _BNH_TRANSFER	);
+			scenario->set_parameter(document, section, "BNH_CBD_TRANSFER"	, _BNH_CBD_TRANSFER);
+			scenario->set_parameter(document, section, "BHW_WALK"			, _BHW_WALK		);
+			scenario->set_parameter(document, section, "BHW_CBD_WALK"		, _BHW_CBD_WALK	);
+			scenario->set_parameter(document, section, "BHO_WALK"			, _BHO_WALK		);
+			scenario->set_parameter(document, section, "BHO_CBD_WALK"		, _BHO_CBD_WALK	);
+			scenario->set_parameter(document, section, "BNH_WALK"			, _BNH_WALK		);
+			scenario->set_parameter(document, section, "BNH_CBD_WALK"		, _BNH_CBD_WALK	);
+			scenario->set_parameter(document, section, "BHW_COST"			, _BHW_COST		);
+			scenario->set_parameter(document, section, "BHW_CBD_COST"		, _BHW_CBD_COST	);
+			scenario->set_parameter(document, section, "BHO_COST"			, _BHO_COST		);
+			scenario->set_parameter(document, section, "BHO_CBD_COST"		, _BHO_CBD_COST	);
+			scenario->set_parameter(document, section, "BNH_COST"			, _BNH_COST		);
+			scenario->set_parameter(document, section, "BNH_CBD_COST"		, _BNH_CBD_COST	);
+			scenario->set_parameter(document, section, "BHW_BIAS"			, _BHW_BIAS		);
+			scenario->set_parameter(document, section, "BHW_CBD_BIAS"		, _BHW_CBD_BIAS	);
+			scenario->set_parameter(document, section, "BHO_BIAS"			, _BHO_BIAS		);
+			scenario->set_parameter(document, section, "BHO_CBD_BIAS"		, _BHO_CBD_BIAS	);
+			scenario->set_parameter(document, section, "BNH_BIAS"			, _BNH_BIAS		);
+			scenario->set_parameter(document, section, "BNH_CBD_BIAS"		, _BNH_CBD_BIAS	);
 
 			return true;
 		}
@@ -450,7 +445,7 @@ namespace Person_Components
 		}
 
 		template<typename MasterType, typename InheritanceList>
-		void Mode_Choice_Option<MasterType, InheritanceList>::base_static_initializer()
+		void Mode_Choice_Option<MasterType, InheritanceList>::default_static_initializer()
 		{
 			_BHW_CBD_IVTT = 0.0159;
 			_BHO_IVTT = 0.0114;
@@ -949,15 +944,10 @@ namespace Person_Components
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType, INHERIT(ADAPTS_Mode_Choice_Option), Data_Object>::Component_Type ComponentType;
 
-			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
-			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "ADAPTS_Mode_Choice_Model", key, default_value);
-			}
-
 			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
-				base_static_initializer();
+				default_static_initializer();
 
 				// now see if there are config file changes
 				rapidjson::Document document;
@@ -967,116 +957,119 @@ namespace Person_Components
 					return true;
 				}
 
-				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				if (!scenario->parse_option_file(document, option_file))
 					return false;
 
 				// check that model is defined if it is requested through scenario
 				if (!document.HasMember("ADAPTS_Mode_Choice_Model")) THROW_EXCEPTION("ERROR: ADAPTS_Mode_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
 
-				HBW_ASC_AUTO	    		<float>(GetOption_Double(document, "HBW_ASC_AUTO"		, HBW_ASC_AUTO			<float>()));
-				HBO_ASC_AUTO				<float>(GetOption_Double(document, "HBO_ASC_AUTO"		, HBO_ASC_AUTO			<float>()));
-				NHB_ASC_AUTO				<float>(GetOption_Double(document, "NHB_ASC_AUTO"		, NHB_ASC_AUTO			<float>()));
-				HBW_ASC_PASS				<float>(GetOption_Double(document, "HBW_ASC_PASS"		, HBW_ASC_PASS			<float>()));
-				HBO_ASC_PASS	    		<float>(GetOption_Double(document, "HBO_ASC_PASS"		, HBO_ASC_PASS			<float>()));
-				NHB_ASC_PASS      			<float>(GetOption_Double(document, "NHB_ASC_PASS"		, NHB_ASC_PASS			<float>()));
-				HBW_ASC_TAXI				<float>(GetOption_Double(document, "HBW_ASC_TAXI"		, HBW_ASC_TAXI			<float>()));
-				HBO_ASC_TAXI	    		<float>(GetOption_Double(document, "HBO_ASC_TAXI"		, HBO_ASC_TAXI			<float>()));
-				NHB_ASC_TAXI      			<float>(GetOption_Double(document, "NHB_ASC_TAXI"		, NHB_ASC_TAXI			<float>()));
-				HBW_ASC_WALK	    		<float>(GetOption_Double(document, "HBW_ASC_WALK"		, HBW_ASC_WALK			<float>()));
-				HBO_ASC_WALK	    		<float>(GetOption_Double(document, "HBO_ASC_WALK"		, HBO_ASC_WALK			<float>()));
-				NHB_ASC_WALK      			<float>(GetOption_Double(document, "NHB_ASC_WALK"		, NHB_ASC_WALK			<float>()));
-				HBW_ASC_TRAN				<float>(GetOption_Double(document, "HBW_ASC_TRAN"		, HBW_ASC_TRAN			<float>()));
-				HBO_ASC_TRAN	    		<float>(GetOption_Double(document, "HBO_ASC_TRAN"		, HBO_ASC_TRAN			<float>()));
-				NHB_ASC_TRAN      			<float>(GetOption_Double(document, "NHB_ASC_TRAN"		, NHB_ASC_TRAN			<float>()));
-				HBW_ASC_BIKE	    		<float>(GetOption_Double(document, "HBW_ASC_BIKE"		, HBW_ASC_BIKE			<float>()));
-				HBO_ASC_BIKE	    		<float>(GetOption_Double(document, "HBO_ASC_BIKE"		, HBO_ASC_BIKE			<float>()));
-				NHB_ASC_BIKE      			<float>(GetOption_Double(document, "NHB_ASC_BIKE"		, NHB_ASC_BIKE			<float>()));
-				HBW_B_cbd_pa				<float>(GetOption_Double(document, "HBW_B_cbd_pa"		, HBW_B_cbd_pa			<float>()));
-				HBO_B_cbd_pa	    		<float>(GetOption_Double(document, "HBO_B_cbd_pa"		, HBO_B_cbd_pa			<float>()));
-				NHB_B_cbd_pa      			<float>(GetOption_Double(document, "NHB_B_cbd_pa"		, NHB_B_cbd_pa			<float>()));
-				HBW_B_cost	    			<float>(GetOption_Double(document, "HBW_B_cost"			, HBW_B_cost			<float>()));
-				HBO_B_cost	    			<float>(GetOption_Double(document, "HBO_B_cost"			, HBO_B_cost			<float>()));
-				NHB_B_cost        			<float>(GetOption_Double(document, "NHB_B_cost"			, NHB_B_cost			<float>()));
-				HBW_B_cost_hinc				<float>(GetOption_Double(document, "HBW_B_cost_hinc"	, HBW_B_cost_hinc		<float>()));
-				HBO_B_cost_hinc				<float>(GetOption_Double(document, "HBO_B_cost_hinc"	, HBO_B_cost_hinc		<float>()));
-				NHB_B_cost_hinc   			<float>(GetOption_Double(document, "NHB_B_cost_hinc"	, NHB_B_cost_hinc		<float>()));
-				HBW_B_cost_minc				<float>(GetOption_Double(document, "HBW_B_cost_minc"	, HBW_B_cost_minc		<float>()));
-				HBO_B_cost_minc				<float>(GetOption_Double(document, "HBO_B_cost_minc"	, HBO_B_cost_minc		<float>()));
-				NHB_B_cost_minc   			<float>(GetOption_Double(document, "NHB_B_cost_minc"	, NHB_B_cost_minc		<float>()));
-				HBW_B_dens_bike				<float>(GetOption_Double(document, "HBW_B_dens_bike"	, HBW_B_dens_bike		<float>()));
-				HBO_B_dens_bike				<float>(GetOption_Double(document, "HBO_B_dens_bike"	, HBO_B_dens_bike		<float>()));
-				NHB_B_dens_bike   			<float>(GetOption_Double(document, "NHB_B_dens_bike"	, NHB_B_dens_bike		<float>()));
-				HBW_B_dens_walk				<float>(GetOption_Double(document, "HBW_B_dens_walk"	, HBW_B_dens_walk		<float>()));
-				HBO_B_dens_walk				<float>(GetOption_Double(document, "HBO_B_dens_walk"	, HBO_B_dens_walk		<float>()));
-				NHB_B_dens_walk   			<float>(GetOption_Double(document, "NHB_B_dens_walk"	, NHB_B_dens_walk		<float>()));
-				HBW_B_male_taxi				<float>(GetOption_Double(document, "HBW_B_male_taxi"	, HBW_B_male_taxi		<float>()));
-				HBO_B_male_taxi				<float>(GetOption_Double(document, "HBO_B_male_taxi"	, HBO_B_male_taxi		<float>()));
-				NHB_B_male_taxi   			<float>(GetOption_Double(document, "NHB_B_male_taxi"	, NHB_B_male_taxi		<float>()));
-				HBW_B_notalone_pass			<float>(GetOption_Double(document, "HBW_B_notalone_pass", HBW_B_notalone_pass	<float>()));
-				HBO_B_notalone_pass			<float>(GetOption_Double(document, "HBO_B_notalone_pass", HBO_B_notalone_pass	<float>()));
-				NHB_B_notalone_pass			<float>(GetOption_Double(document, "NHB_B_notalone_pass", NHB_B_notalone_pass	<float>()));
-				HBW_B_over65_pass			<float>(GetOption_Double(document, "HBW_B_over65_pass"	, HBW_B_over65_pass		<float>()));
-				HBO_B_over65_pass			<float>(GetOption_Double(document, "HBO_B_over65_pass"	, HBO_B_over65_pass		<float>()));
-				NHB_B_over65_pass 			<float>(GetOption_Double(document, "NHB_B_over65_pass"	, NHB_B_over65_pass 	<float>()));
-				HBW_B_over65_tran			<float>(GetOption_Double(document, "HBW_B_over65_tran"	, HBW_B_over65_tran		<float>()));
-				HBO_B_over65_tran			<float>(GetOption_Double(document, "HBO_B_over65_tran"	, HBO_B_over65_tran		<float>()));
-				NHB_B_over65_tran 			<float>(GetOption_Double(document, "NHB_B_over65_tran"	, NHB_B_over65_tran 	<float>()));
-				HBW_B_ovttime_tran			<float>(GetOption_Double(document, "HBW_B_ovttime_tran"	, HBW_B_ovttime_tran	<float>()));
-				HBO_B_ovttime_tran			<float>(GetOption_Double(document, "HBO_B_ovttime_tran"	, HBO_B_ovttime_tran	<float>()));
-				NHB_B_ovttime_tran			<float>(GetOption_Double(document, "NHB_B_ovttime_tran"	, NHB_B_ovttime_tran	<float>()));
-				HBW_B_peak_auto   			<float>(GetOption_Double(document, "HBW_B_peak_auto"	, HBW_B_peak_auto   	<float>()));
-				HBO_B_peak_auto   			<float>(GetOption_Double(document, "HBO_B_peak_auto"	, HBO_B_peak_auto   	<float>()));
-				NHB_B_peak_auto   			<float>(GetOption_Double(document, "NHB_B_peak_auto"	, NHB_B_peak_auto   	<float>()));
-				HBW_B_ttime_bike			<float>(GetOption_Double(document, "HBW_B_ttime_bike"	, HBW_B_ttime_bike		<float>()));
-				HBO_B_ttime_bike			<float>(GetOption_Double(document, "HBO_B_ttime_bike"	, HBO_B_ttime_bike		<float>()));
-				NHB_B_ttime_bike  			<float>(GetOption_Double(document, "NHB_B_ttime_bike"	, NHB_B_ttime_bike  	<float>()));
-				HBW_B_ttime_tran			<float>(GetOption_Double(document, "HBW_B_ttime_tran"	, HBW_B_ttime_tran		<float>()));
-				HBO_B_ttime_tran			<float>(GetOption_Double(document, "HBO_B_ttime_tran"	, HBO_B_ttime_tran		<float>()));
-				NHB_B_ttime_tran  			<float>(GetOption_Double(document, "NHB_B_ttime_tran"	, NHB_B_ttime_tran  	<float>()));
-				HBW_B_ttime_walk			<float>(GetOption_Double(document, "HBW_B_ttime_walk"	, HBW_B_ttime_walk		<float>()));
-				HBO_B_ttime_walk			<float>(GetOption_Double(document, "HBO_B_ttime_walk"	, HBO_B_ttime_walk		<float>()));
-				NHB_B_ttime_walk  			<float>(GetOption_Double(document, "NHB_B_ttime_walk"	, NHB_B_ttime_walk  	<float>()));
-				HBW_B_u18_pass				<float>(GetOption_Double(document, "HBW_B_u18_pass"		, HBW_B_u18_pass		<float>()));
-				HBO_B_u18_pass				<float>(GetOption_Double(document, "HBO_B_u18_pass"		, HBO_B_u18_pass		<float>()));
-				NHB_B_u18_pass    			<float>(GetOption_Double(document, "NHB_B_u18_pass"		, NHB_B_u18_pass    	<float>()));
-				HBW_B_vehavail_pass			<float>(GetOption_Double(document, "HBW_B_vehavail_pass", HBW_B_vehavail_pass	<float>()));
-				HBO_B_vehavail_pass			<float>(GetOption_Double(document, "HBO_B_vehavail_pass", HBO_B_vehavail_pass	<float>()));
-				NHB_B_vehavail_pass			<float>(GetOption_Double(document, "NHB_B_vehavail_pass", NHB_B_vehavail_pass	<float>()));
-				HBW_B_vehavail_taxi			<float>(GetOption_Double(document, "HBW_B_vehavail_taxi", HBW_B_vehavail_taxi	<float>()));
-				HBO_B_vehavail_taxi			<float>(GetOption_Double(document, "HBO_B_vehavail_taxi", HBO_B_vehavail_taxi	<float>()));
-				NHB_B_vehavail_taxi			<float>(GetOption_Double(document, "NHB_B_vehavail_taxi", NHB_B_vehavail_taxi	<float>()));
-				HBW_B_vehavail_tran			<float>(GetOption_Double(document, "HBW_B_vehavail_tran", HBW_B_vehavail_tran	<float>()));
-				HBO_B_vehavail_tran			<float>(GetOption_Double(document, "HBO_B_vehavail_tran", HBO_B_vehavail_tran	<float>()));
-				NHB_B_vehavail_tran			<float>(GetOption_Double(document, "NHB_B_vehavail_tran", NHB_B_vehavail_tran	<float>()));
-				HBW_B_waittime_tran			<float>(GetOption_Double(document, "HBW_B_waittime_tran", HBW_B_waittime_tran	<float>()));
-				HBO_B_waittime_tran			<float>(GetOption_Double(document, "HBO_B_waittime_tran", HBO_B_waittime_tran	<float>()));
-				NHB_B_waittime_tran			<float>(GetOption_Double(document, "NHB_B_waittime_tran", NHB_B_waittime_tran	<float>()));
-				HBW_ASC_N_AUTO				<float>(GetOption_Double(document, "HBW_ASC_N_AUTO"		, HBW_ASC_N_AUTO		<float>()));
-				HBO_ASC_N_AUTO				<float>(GetOption_Double(document, "HBO_ASC_N_AUTO"		, HBO_ASC_N_AUTO		<float>()));
-				NHB_ASC_N_AUTO    			<float>(GetOption_Double(document, "NHB_ASC_N_AUTO"		, NHB_ASC_N_AUTO    	<float>()));
-				HBW_ASC_N_NM	    		<float>(GetOption_Double(document, "HBW_ASC_N_NM"		, HBW_ASC_N_NM			<float>()));
-				HBO_ASC_N_NM	    		<float>(GetOption_Double(document, "HBO_ASC_N_NM"		, HBO_ASC_N_NM			<float>()));
-				NHB_ASC_N_NM      			<float>(GetOption_Double(document, "NHB_ASC_N_NM"		, NHB_ASC_N_NM      	<float>()));
-				HBW_B_vehavail_nm			<float>(GetOption_Double(document, "HBW_B_vehavail_nm"	, HBW_B_vehavail_nm		<float>()));
-				HBO_B_vehavail_nm			<float>(GetOption_Double(document, "HBO_B_vehavail_nm"	, HBO_B_vehavail_nm		<float>()));
-				NHB_B_vehavail_nm 			<float>(GetOption_Double(document, "NHB_B_vehavail_nm"	, NHB_B_vehavail_nm 	<float>()));
-				HBW_B_male_nm	    		<float>(GetOption_Double(document, "HBW_B_male_nm"		, HBW_B_male_nm			<float>()));
-				HBO_B_male_nm	    		<float>(GetOption_Double(document, "HBO_B_male_nm"		, HBO_B_male_nm			<float>()));
-				NHB_B_male_nm     			<float>(GetOption_Double(document, "NHB_B_male_nm"		, NHB_B_male_nm     	<float>()));
-				HBW_B_cbd_nm				<float>(GetOption_Double(document, "HBW_B_cbd_nm"		, HBW_B_cbd_nm			<float>()));
-				HBO_B_cbd_nm	    		<float>(GetOption_Double(document, "HBO_B_cbd_nm"		, HBO_B_cbd_nm			<float>()));
-				NHB_B_cbd_nm      			<float>(GetOption_Double(document, "NHB_B_cbd_nm"		, NHB_B_cbd_nm      	<float>()));
-				HBW_NEST_AUTO	    		<float>(GetOption_Double(document, "HBW_NEST_AUTO"		, HBW_NEST_AUTO			<float>()));
-				HBO_NEST_AUTO	    		<float>(GetOption_Double(document, "HBO_NEST_AUTO"		, HBO_NEST_AUTO			<float>()));
-				NHB_NEST_AUTO     			<float>(GetOption_Double(document, "NHB_NEST_AUTO"		, NHB_NEST_AUTO     	<float>()));
-				HBW_NEST_NM	    			<float>(GetOption_Double(document, "HBW_NEST_NM"		, HBW_NEST_NM	    	<float>()));
-				HBO_NEST_NM	    			<float>(GetOption_Double(document, "HBO_NEST_NM"		, HBO_NEST_NM	    	<float>()));
-				NHB_NEST_NM       			<float>(GetOption_Double(document, "NHB_NEST_NM"		, NHB_NEST_NM       	<float>()));
+				string section = "ADAPTS_Mode_Choice_Model";
+
+				scenario->set_parameter(document, section, "HBW_ASC_AUTO"		, _HBW_ASC_AUTO			);
+				scenario->set_parameter(document, section, "HBO_ASC_AUTO"		, _HBO_ASC_AUTO			);
+				scenario->set_parameter(document, section, "NHB_ASC_AUTO"		, _NHB_ASC_AUTO			);
+				scenario->set_parameter(document, section, "HBW_ASC_PASS"		, _HBW_ASC_PASS			);
+				scenario->set_parameter(document, section, "HBO_ASC_PASS"		, _HBO_ASC_PASS			);
+				scenario->set_parameter(document, section, "NHB_ASC_PASS"		, _NHB_ASC_PASS			);
+				scenario->set_parameter(document, section, "HBW_ASC_TAXI"		, _HBW_ASC_TAXI			);
+				scenario->set_parameter(document, section, "HBO_ASC_TAXI"		, _HBO_ASC_TAXI			);
+				scenario->set_parameter(document, section, "NHB_ASC_TAXI"		, _NHB_ASC_TAXI			);
+				scenario->set_parameter(document, section, "HBW_ASC_WALK"		, _HBW_ASC_WALK			);
+				scenario->set_parameter(document, section, "HBO_ASC_WALK"		, _HBO_ASC_WALK			);
+				scenario->set_parameter(document, section, "NHB_ASC_WALK"		, _NHB_ASC_WALK			);
+				scenario->set_parameter(document, section, "HBW_ASC_TRAN"		, _HBW_ASC_TRAN			);
+				scenario->set_parameter(document, section, "HBO_ASC_TRAN"		, _HBO_ASC_TRAN			);
+				scenario->set_parameter(document, section, "NHB_ASC_TRAN"		, _NHB_ASC_TRAN			);
+				scenario->set_parameter(document, section, "HBW_ASC_BIKE"		, _HBW_ASC_BIKE			);
+				scenario->set_parameter(document, section, "HBO_ASC_BIKE"		, _HBO_ASC_BIKE			);
+				scenario->set_parameter(document, section, "NHB_ASC_BIKE"		, _NHB_ASC_BIKE			);
+				scenario->set_parameter(document, section, "HBW_B_cbd_pa"		, _HBW_B_cbd_pa			);
+				scenario->set_parameter(document, section, "HBO_B_cbd_pa"		, _HBO_B_cbd_pa			);
+				scenario->set_parameter(document, section, "NHB_B_cbd_pa"		, _NHB_B_cbd_pa			);
+				scenario->set_parameter(document, section, "HBW_B_cost"			, _HBW_B_cost			);
+				scenario->set_parameter(document, section, "HBO_B_cost"			, _HBO_B_cost			);
+				scenario->set_parameter(document, section, "NHB_B_cost"			, _NHB_B_cost			);
+				scenario->set_parameter(document, section, "HBW_B_cost_hinc"	, _HBW_B_cost_hinc		);
+				scenario->set_parameter(document, section, "HBO_B_cost_hinc"	, _HBO_B_cost_hinc		);
+				scenario->set_parameter(document, section, "NHB_B_cost_hinc"	, _NHB_B_cost_hinc		);
+				scenario->set_parameter(document, section, "HBW_B_cost_minc"	, _HBW_B_cost_minc		);
+				scenario->set_parameter(document, section, "HBO_B_cost_minc"	, _HBO_B_cost_minc		);
+				scenario->set_parameter(document, section, "NHB_B_cost_minc"	, _NHB_B_cost_minc		);
+				scenario->set_parameter(document, section, "HBW_B_dens_bike"	, _HBW_B_dens_bike		);
+				scenario->set_parameter(document, section, "HBO_B_dens_bike"	, _HBO_B_dens_bike		);
+				scenario->set_parameter(document, section, "NHB_B_dens_bike"	, _NHB_B_dens_bike		);
+				scenario->set_parameter(document, section, "HBW_B_dens_walk"	, _HBW_B_dens_walk		);
+				scenario->set_parameter(document, section, "HBO_B_dens_walk"	, _HBO_B_dens_walk		);
+				scenario->set_parameter(document, section, "NHB_B_dens_walk"	, _NHB_B_dens_walk		);
+				scenario->set_parameter(document, section, "HBW_B_male_taxi"	, _HBW_B_male_taxi		);
+				scenario->set_parameter(document, section, "HBO_B_male_taxi"	, _HBO_B_male_taxi		);
+				scenario->set_parameter(document, section, "NHB_B_male_taxi"	, _NHB_B_male_taxi		);
+				scenario->set_parameter(document, section, "HBW_B_notalone_pass", _HBW_B_notalone_pass	);
+				scenario->set_parameter(document, section, "HBO_B_notalone_pass", _HBO_B_notalone_pass	);
+				scenario->set_parameter(document, section, "NHB_B_notalone_pass", _NHB_B_notalone_pass	);
+				scenario->set_parameter(document, section, "HBW_B_over65_pass"	, _HBW_B_over65_pass	);
+				scenario->set_parameter(document, section, "HBO_B_over65_pass"	, _HBO_B_over65_pass	);
+				scenario->set_parameter(document, section, "NHB_B_over65_pass"	, _NHB_B_over65_pass 	);
+				scenario->set_parameter(document, section, "HBW_B_over65_tran"	, _HBW_B_over65_tran	);
+				scenario->set_parameter(document, section, "HBO_B_over65_tran"	, _HBO_B_over65_tran	);
+				scenario->set_parameter(document, section, "NHB_B_over65_tran"	, _NHB_B_over65_tran 	);
+				scenario->set_parameter(document, section, "HBW_B_ovttime_tran"	, _HBW_B_ovttime_tran	);
+				scenario->set_parameter(document, section, "HBO_B_ovttime_tran"	, _HBO_B_ovttime_tran	);
+				scenario->set_parameter(document, section, "NHB_B_ovttime_tran"	, _NHB_B_ovttime_tran	);
+				scenario->set_parameter(document, section, "HBW_B_peak_auto"	, _HBW_B_peak_auto   	);
+				scenario->set_parameter(document, section, "HBO_B_peak_auto"	, _HBO_B_peak_auto   	);
+				scenario->set_parameter(document, section, "NHB_B_peak_auto"	, _NHB_B_peak_auto   	);
+				scenario->set_parameter(document, section, "HBW_B_ttime_bike"	, _HBW_B_ttime_bike		);
+				scenario->set_parameter(document, section, "HBO_B_ttime_bike"	, _HBO_B_ttime_bike		);
+				scenario->set_parameter(document, section, "NHB_B_ttime_bike"	, _NHB_B_ttime_bike  	);
+				scenario->set_parameter(document, section, "HBW_B_ttime_tran"	, _HBW_B_ttime_tran		);
+				scenario->set_parameter(document, section, "HBO_B_ttime_tran"	, _HBO_B_ttime_tran		);
+				scenario->set_parameter(document, section, "NHB_B_ttime_tran"	, _NHB_B_ttime_tran  	);
+				scenario->set_parameter(document, section, "HBW_B_ttime_walk"	, _HBW_B_ttime_walk		);
+				scenario->set_parameter(document, section, "HBO_B_ttime_walk"	, _HBO_B_ttime_walk		);
+				scenario->set_parameter(document, section, "NHB_B_ttime_walk"	, _NHB_B_ttime_walk  	);
+				scenario->set_parameter(document, section, "HBW_B_u18_pass"		, _HBW_B_u18_pass		);
+				scenario->set_parameter(document, section, "HBO_B_u18_pass"		, _HBO_B_u18_pass		);
+				scenario->set_parameter(document, section, "NHB_B_u18_pass"		, _NHB_B_u18_pass    	);
+				scenario->set_parameter(document, section, "HBW_B_vehavail_pass", _HBW_B_vehavail_pass	);
+				scenario->set_parameter(document, section, "HBO_B_vehavail_pass", _HBO_B_vehavail_pass	);
+				scenario->set_parameter(document, section, "NHB_B_vehavail_pass", _NHB_B_vehavail_pass	);
+				scenario->set_parameter(document, section, "HBW_B_vehavail_taxi", _HBW_B_vehavail_taxi	);
+				scenario->set_parameter(document, section, "HBO_B_vehavail_taxi", _HBO_B_vehavail_taxi	);
+				scenario->set_parameter(document, section, "NHB_B_vehavail_taxi", _NHB_B_vehavail_taxi	);
+				scenario->set_parameter(document, section, "HBW_B_vehavail_tran", _HBW_B_vehavail_tran	);
+				scenario->set_parameter(document, section, "HBO_B_vehavail_tran", _HBO_B_vehavail_tran	);
+				scenario->set_parameter(document, section, "NHB_B_vehavail_tran", _NHB_B_vehavail_tran	);
+				scenario->set_parameter(document, section, "HBW_B_waittime_tran", _HBW_B_waittime_tran	);
+				scenario->set_parameter(document, section, "HBO_B_waittime_tran", _HBO_B_waittime_tran	);
+				scenario->set_parameter(document, section, "NHB_B_waittime_tran", _NHB_B_waittime_tran	);
+				scenario->set_parameter(document, section, "HBW_ASC_N_AUTO"		, _HBW_ASC_N_AUTO		);
+				scenario->set_parameter(document, section, "HBO_ASC_N_AUTO"		, _HBO_ASC_N_AUTO		);
+				scenario->set_parameter(document, section, "NHB_ASC_N_AUTO"		, _NHB_ASC_N_AUTO    	);
+				scenario->set_parameter(document, section, "HBW_ASC_N_NM"		, _HBW_ASC_N_NM			);
+				scenario->set_parameter(document, section, "HBO_ASC_N_NM"		, _HBO_ASC_N_NM			);
+				scenario->set_parameter(document, section, "NHB_ASC_N_NM"		, _NHB_ASC_N_NM      	);
+				scenario->set_parameter(document, section, "HBW_B_vehavail_nm"	, _HBW_B_vehavail_nm	);
+				scenario->set_parameter(document, section, "HBO_B_vehavail_nm"	, _HBO_B_vehavail_nm	);
+				scenario->set_parameter(document, section, "NHB_B_vehavail_nm"	, _NHB_B_vehavail_nm 	);
+				scenario->set_parameter(document, section, "HBW_B_male_nm"		, _HBW_B_male_nm		);
+				scenario->set_parameter(document, section, "HBO_B_male_nm"		, _HBO_B_male_nm		);
+				scenario->set_parameter(document, section, "NHB_B_male_nm"		, _NHB_B_male_nm     	);
+				scenario->set_parameter(document, section, "HBW_B_cbd_nm"		, _HBW_B_cbd_nm			);
+				scenario->set_parameter(document, section, "HBO_B_cbd_nm"		, _HBO_B_cbd_nm			);
+				scenario->set_parameter(document, section, "NHB_B_cbd_nm"		, _NHB_B_cbd_nm      	);
+				scenario->set_parameter(document, section, "HBW_NEST_AUTO"		, _HBW_NEST_AUTO		);
+				scenario->set_parameter(document, section, "HBO_NEST_AUTO"		, _HBO_NEST_AUTO		);
+				scenario->set_parameter(document, section, "NHB_NEST_AUTO"		, _NHB_NEST_AUTO     	);
+				scenario->set_parameter(document, section, "HBW_NEST_NM"		, _HBW_NEST_NM	    	);
+				scenario->set_parameter(document, section, "HBO_NEST_NM"		, _HBO_NEST_NM	    	);
+				scenario->set_parameter(document, section, "NHB_NEST_NM"		, _NHB_NEST_NM       	);
 
 				return true;
 			}
 
-			static void base_static_initializer()
+			static void default_static_initializer()
 			{
 				_HBW_ASC_AUTO = 0.0;
 				_HBW_ASC_PASS = -0.802 - 2.0;

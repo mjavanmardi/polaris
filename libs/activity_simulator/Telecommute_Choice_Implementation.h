@@ -19,15 +19,10 @@ namespace Person_Components
 			// Pointer to the Parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
-			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
-			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "Telecommute_Choice_Model", key, default_value);
-			}
-
 			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
-				base_static_initializer();
+				default_static_initializer();
 
 				// now see if there are config file changes
 				rapidjson::Document document;
@@ -38,45 +33,48 @@ namespace Person_Components
 					return true;
 				}
 
-				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file))
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				if (!scenario->parse_option_file(document, option_file))
 					return false;
 
 				// check that model is defined if it is requested through scenario
 				if (!document.HasMember("Telecommute_Choice_Model")) THROW_EXCEPTION("ERROR: Telecommute_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
 
 
-				Z_CONSTANT					<float>(GetOption_Double(document, "Z_CONSTANT"					, Z_CONSTANT				 <float>()));
-				Z_MALE						<float>(GetOption_Double(document, "Z_MALE"						, Z_MALE					 <float>()));
-				Z_INCOME_LOW				<float>(GetOption_Double(document, "Z_INCOME_LOW"				, Z_INCOME_LOW				 <float>()));
-				Z_EDUC_NO_COLLEGE			<float>(GetOption_Double(document, "Z_EDUC_NO_COLLEGE"			, Z_EDUC_NO_COLLEGE			 <float>()));
-				Z_WORK_TRIP_DIST			<float>(GetOption_Double(document, "Z_WORK_TRIP_DIST"			, Z_WORK_TRIP_DIST			 <float>()));
-				Z_NWORKERS					<float>(GetOption_Double(document, "Z_NWORKERS"					, Z_NWORKERS				 <float>()));
-				Z_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "Z_FLEX_WORK_INDICATOR"		, Z_FLEX_WORK_INDICATOR		 <float>()));
-				Z_OCC_TRANS_UTILITY			<float>(GetOption_Double(document, "Z_OCC_TRANS_UTILITY"		, Z_OCC_TRANS_UTILITY		 <float>()));
-				Z_OCC_MANAGEMENT			<float>(GetOption_Double(document, "Z_OCC_MANAGEMENT"			, Z_OCC_MANAGEMENT			 <float>()));
-				Z_OCC_SERVICE				<float>(GetOption_Double(document, "Z_OCC_SERVICE"				, Z_OCC_SERVICE				 <float>()));
-				Z_EMP_DENSITY_OVER_20000	<float>(GetOption_Double(document, "Z_EMP_DENSITY_OVER_20000"	, Z_EMP_DENSITY_OVER_20000	 <float>()));
-				Z_POP_DENSITY				<float>(GetOption_Double(document, "Z_POP_DENSITY"				, Z_POP_DENSITY				 <float>()));
+				string section = "Telecommute_Choice_Model";
 
-				O_CONSTANT					<float>(GetOption_Double(document, "O_CONSTANT"					, O_CONSTANT				 <float>()));
-				O_INCOME_MED				<float>(GetOption_Double(document, "O_INCOME_MED"				, O_INCOME_MED				 <float>()));
-				O_AGE_35_55					<float>(GetOption_Double(document, "O_AGE_35_55"				, O_AGE_35_55				 <float>()));
-				O_EDUC_GRAD_DEGREE			<float>(GetOption_Double(document, "O_EDUC_GRAD_DEGREE"			, O_EDUC_GRAD_DEGREE		 <float>()));
-				O_WORK_TRIP_TTIME			<float>(GetOption_Double(document, "O_WORK_TRIP_TTIME"			, O_WORK_TRIP_TTIME			 <float>()));
-				O_NVEHICLE					<float>(GetOption_Double(document, "O_NVEHICLE"					, O_NVEHICLE				 <float>()));
-				O_FLEX_WORK_INDICATOR		<float>(GetOption_Double(document, "O_FLEX_WORK_INDICATOR"		, O_FLEX_WORK_INDICATOR		 <float>()));
-				O_OCC_GOVERNMENT			<float>(GetOption_Double(document, "O_OCC_GOVERNMENT"			, O_OCC_GOVERNMENT			 <float>()));
-				O_OCC_COMMUNICATION			<float>(GetOption_Double(document, "O_OCC_COMMUNICATION"		, O_OCC_COMMUNICATION		 <float>()));
-				O_OCC_MANUFACTURING			<float>(GetOption_Double(document, "O_OCC_MANUFACTURING"		, O_OCC_MANUFACTURING		 <float>()));
-				O_EMP_DENSITY_UNDER_3000	<float>(GetOption_Double(document, "O_EMP_DENSITY_UNDER_3000"	, O_EMP_DENSITY_UNDER_3000	 <float>()));
+				scenario->set_parameter(document, section, "Z_CONSTANT"					, _Z_CONSTANT				 );
+				scenario->set_parameter(document, section, "Z_MALE"						, _Z_MALE					 );
+				scenario->set_parameter(document, section, "Z_INCOME_LOW"				, _Z_INCOME_LOW				 );
+				scenario->set_parameter(document, section, "Z_EDUC_NO_COLLEGE"			, _Z_EDUC_NO_COLLEGE		 );
+				scenario->set_parameter(document, section, "Z_WORK_TRIP_DIST"			, _Z_WORK_TRIP_DIST			 );
+				scenario->set_parameter(document, section, "Z_NWORKERS"					, _Z_NWORKERS				 );
+				scenario->set_parameter(document, section, "Z_FLEX_WORK_INDICATOR"		, _Z_FLEX_WORK_INDICATOR	 );
+				scenario->set_parameter(document, section, "Z_OCC_TRANS_UTILITY"		, _Z_OCC_TRANS_UTILITY		 );
+				scenario->set_parameter(document, section, "Z_OCC_MANAGEMENT"			, _Z_OCC_MANAGEMENT			 );
+				scenario->set_parameter(document, section, "Z_OCC_SERVICE"				, _Z_OCC_SERVICE			 );
+				scenario->set_parameter(document, section, "Z_EMP_DENSITY_OVER_20000"	, _Z_EMP_DENSITY_OVER_20000	 );
+				scenario->set_parameter(document, section, "Z_POP_DENSITY"				, _Z_POP_DENSITY			 );
 
-				T_WORK_DURATION				<float>(GetOption_Double(document, "T_WORK_DURATION"			, T_WORK_DURATION			 <float>()));
-				T_VEH_AVAILABLE				<float>(GetOption_Double(document, "T_VEH_AVAILABLE"			, T_VEH_AVAILABLE			 <float>()));
-				T_HH_VEH_OVER_2_INDICATOR	<float>(GetOption_Double(document, "T_HH_VEH_OVER_2_INDICATOR"	, T_HH_VEH_OVER_2_INDICATOR	 <float>()));
-				T_C1						<float>(GetOption_Double(document, "T_C1"						, T_C1						 <float>()));
-				T_C2						<float>(GetOption_Double(document, "T_C2"						, T_C2						 <float>()));
-				T_C3						<float>(GetOption_Double(document, "T_C3"						, T_C3						 <float>()));
-				T_RHO						<float>(GetOption_Double(document, "T_RHO"						, T_RHO						 <float>()));
+				scenario->set_parameter(document, section, "O_CONSTANT"					, _O_CONSTANT				 );
+				scenario->set_parameter(document, section, "O_INCOME_MED"				, _O_INCOME_MED				 );
+				scenario->set_parameter(document, section, "O_AGE_35_55"				, _O_AGE_35_55				 );
+				scenario->set_parameter(document, section, "O_EDUC_GRAD_DEGREE"			, _O_EDUC_GRAD_DEGREE		 );
+				scenario->set_parameter(document, section, "O_WORK_TRIP_TTIME"			, _O_WORK_TRIP_TTIME		 );
+				scenario->set_parameter(document, section, "O_NVEHICLE"					, _O_NVEHICLE				 );
+				scenario->set_parameter(document, section, "O_FLEX_WORK_INDICATOR"		, _O_FLEX_WORK_INDICATOR	 );
+				scenario->set_parameter(document, section, "O_OCC_GOVERNMENT"			, _O_OCC_GOVERNMENT			 );
+				scenario->set_parameter(document, section, "O_OCC_COMMUNICATION"		, _O_OCC_COMMUNICATION		 );
+				scenario->set_parameter(document, section, "O_OCC_MANUFACTURING"		, _O_OCC_MANUFACTURING		 );
+				scenario->set_parameter(document, section, "O_EMP_DENSITY_UNDER_3000"	, _O_EMP_DENSITY_UNDER_3000	 );
+
+				scenario->set_parameter(document, section, "T_WORK_DURATION"			, _T_WORK_DURATION			 );
+				scenario->set_parameter(document, section, "T_VEH_AVAILABLE"			, _T_VEH_AVAILABLE			 );
+				scenario->set_parameter(document, section, "T_HH_VEH_OVER_2_INDICATOR"	, _T_HH_VEH_OVER_2_INDICATOR );
+				scenario->set_parameter(document, section, "T_C1"						, _T_C1						 );
+				scenario->set_parameter(document, section, "T_C2"						, _T_C2						 );
+				scenario->set_parameter(document, section, "T_C3"						, _T_C3						 );
+				scenario->set_parameter(document, section, "T_RHO"						, _T_RHO					 );
 				
 				return true;
 			}
@@ -159,7 +157,7 @@ namespace Person_Components
 			m_static_data(float, T_C3, NONE, NONE);
 			m_static_data(float, T_RHO, NONE, NONE);
 
-			static void base_static_initializer()
+			static void default_static_initializer()
 			{
 				_Z_CONSTANT = -0.98;
 				_Z_MALE = 0.26;
