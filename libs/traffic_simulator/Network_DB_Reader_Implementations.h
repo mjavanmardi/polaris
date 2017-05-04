@@ -107,6 +107,9 @@ namespace Network_Components
 
 					intersection->template uuid<int>( db_itr->getNode() );
 					uuid_max = std::max(uuid_max, intersection->_uuid);
+					ostringstream convert;
+					convert << intersection->_uuid;
+					intersection->template dbid<std::string>(convert.str());
 					intersection->template internal_id<int>(counter);
 					intersection->template x_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
@@ -144,7 +147,7 @@ namespace Network_Components
 					intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
 					uuid_max++;
 					intersection->template uuid<int>(uuid_max);
-					intersection->template dbid<int>(db_itr->getStreet());
+					intersection->template dbid<std::string>(db_itr->getStop());
 					intersection->template internal_id<int>(counter);
 					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
