@@ -157,7 +157,7 @@ namespace Network_Components
 					intersection->template description<std::string>(db_itr->getDescription());
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 
-					net_io_maps.intersection_id_to_ptr[db_itr->getNode()] = intersection;
+					net_io_maps.intersection_id_to_ptr[intersection->_uuid] = intersection;
 
 					if (_scenario_reference->template intersection_control_flag<int>() == 0)
 					{
@@ -1147,8 +1147,8 @@ namespace Network_Components
 						link->template grade<float>(db_itr->getGrade());
 						link->template direction<int>(0.0);
 
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()->getStop()]);
+						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()->getStop()]);
 
 						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
 

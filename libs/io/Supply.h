@@ -251,7 +251,7 @@ private:
 	std::string street;
 	std::string name;
 	std::string description;
-	#pragma db index member(node)
+	#pragma db index member(stop)
 };
 
 #pragma db object
