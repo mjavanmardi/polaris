@@ -944,7 +944,7 @@ namespace Vehicle_Components
 
 			if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 			{
-				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, path_container, cumulative_cost_container);
+				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container);
 			}
 			else
 			{

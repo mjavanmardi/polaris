@@ -141,7 +141,7 @@ namespace Routing_Components
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
-					best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids,destination_ids,path_container,cost_container);
+					best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids,destination_ids, _departure_time, path_container,cost_container);
 				}
 				else
 				{

@@ -377,4 +377,149 @@ namespace polaris
 
 		return total_cost;
 	}
+
+	template<typename MasterType, typename AgentType, typename GraphPoolType>
+	static float Transit_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
+	{
+		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+
+		std::deque< base_edge_type* > modified_edges;
+
+		boost::intrusive::multiset< base_edge_type > open_set;
+
+		std::vector<base_edge_type*> starts;
+		A_Star_Edge<base_edge_type>* start;
+		for (auto itr = start_ids.begin(); itr != start_ids.end(); ++itr)
+		{
+			start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			if (start == nullptr) { THROW_WARNING("Origin: " << (*itr).edge_id << " not found in graph pool!"); return 0.0f; }
+			starts.push_back((base_edge_type*)start);
+		}
+		base_edge_type* start_base = (base_edge_type*)start;
+
+		std::vector<base_edge_type*> ends;
+		A_Star_Edge<base_edge_type>* end;
+		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+		{
+			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			if (end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
+			ends.push_back((base_edge_type*)end);
+		}
+		base_edge_type* end_base = (base_edge_type*)end;
+
+		Routing_Data<base_edge_type> routing_data;
+
+		routing_data.modified_edges = &modified_edges;
+		routing_data.open_set = &open_set;
+		routing_data.start_edge = (base_edge_type*)starts.front();
+		routing_data.end_edge = (base_edge_type*)ends.front();
+		routing_data.start_time = start_time;
+
+		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
+		{
+			start = (A_Star_Edge<base_edge_type>*)(*itr);
+			start->cost_from_origin(0.0f);
+			start->time_from_origin(0.0f);
+			start->time_label((float)start_time);
+
+			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
+
+			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
+
+			open_set.insert(*((base_edge_type*)start));
+
+			if (!start->marked_for_reset())
+			{
+				modified_edges.push_back((base_edge_type*)start);
+				start->marked_for_reset(true);
+			}
+		}
+
+		bool success = false;
+
+		while (open_set.size())
+		{
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+
+			//TODO: remove when done testing
+			if (debug_route)
+			{
+				current->Display();
+			}
+
+			transit_edge_id id;
+
+			id.id = current->edge_id();
+
+			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
+			{
+				success = true;
+				break;
+			}
+
+			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
+
+			current->in_open_set(false);
+			current->in_closed_set(true);
+
+			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
+			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
+
+			while (connection_set_iterator != connection_set_end)
+			{
+				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+			}
+
+		}
+
+		//TODO: remove when done testing
+		if (debug_route)
+		{
+			int test = 1;
+		}
+
+
+		global_edge_id global;
+		global.graph_id = 0;
+
+		float total_cost = 0.0f;
+
+		if (success)
+		{
+			base_edge_type* current = end_base;//(base_edge_type*)end;
+			base_edge_type* cached_current = (base_edge_type*)current;
+
+			while (current != nullptr)
+			{
+				global.edge_id = current->_edge_id;
+
+				out_path.push_back(global);
+				out_cost.push_back(current->_cost_from_origin);
+
+				current = (base_edge_type*)current->came_from();
+
+				cached_current->came_from(nullptr);
+
+				cached_current = current;
+			}
+
+			std::reverse(out_path.begin(), out_path.end());
+			std::reverse(out_cost.begin(), out_cost.end());
+
+			total_cost = out_cost.back();
+
+			// update start_ids/end_ids to includ final routed start/end
+			start_ids.clear();
+			start_ids.push_back(out_path.front());
+			end_ids.clear();
+			end_ids.push_back(out_path.back());
+		}
+
+		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
+		{
+			(*itr)->reset();
+		}
+
+		return total_cost;
+	}
 }

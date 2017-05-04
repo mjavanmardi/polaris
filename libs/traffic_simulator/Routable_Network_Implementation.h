@@ -641,7 +641,7 @@ namespace Routing_Components
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -652,7 +652,8 @@ namespace Routing_Components
 				{
 					global_edge_id start;
 					start.edge_id = *itr;
-					start.graph_id = _static_network_graph_id;
+					//start.graph_id = _static_network_graph_id;
+					start.graph_id = _transit_network_graph_id;
 					starts.push_back(start);
 				}
 
@@ -662,12 +663,20 @@ namespace Routing_Components
 				{
 					global_edge_id end;
 					end.edge_id = *itr;
-					end.graph_id = _static_network_graph_id;
+					//end.graph_id = _static_network_graph_id;
+					end.graph_id = _transit_network_graph_id;
 					ends.push_back(end);
 				}
 
-				float routed_time = A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,starts,ends,0,path_container,cost_container);
-
+				float routed_time;
+				if (starts.at(0).graph_id == _transit_network_graph_id)
+				{
+					routed_time = Transit_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, false);
+				}
+				else
+				{
+					routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container);
+				}
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
 				origins.push_back(starts.front().edge_id);
@@ -703,8 +712,16 @@ namespace Routing_Components
 				}
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
-				float routed_time = Time_Dependent_A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,starts,ends,start_time,path_container,cost_container,debug_route);
-
+				
+				float routed_time;
+				if (starts.at(0).graph_id == _transit_network_graph_id)
+				{
+					routed_time = Transit_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
+				}
+				else
+				{
+					routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
+				}
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
 				origins.push_back(starts.front().edge_id);
