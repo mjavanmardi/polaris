@@ -14,7 +14,7 @@ namespace io
 class MetaData;
 class Tags;
 class Node;
-class TransitNode;
+class Transit_Stops;
 class Zone;
 //class ZoneLandUse;
 class Shape;
@@ -62,13 +62,13 @@ class InputContainer;
 
 
 typedef shared_ptr<Node> node_ptr;
-typedef shared_ptr<TransitNode> transit_node_ptr;
+typedef shared_ptr<Transit_Stops> transit_node_ptr;
 typedef shared_ptr<Link_Type> link_type_ptr;
 typedef shared_ptr<Area_Type> area_type_ptr;
 typedef shared_ptr<Route> route_ptr;
 typedef shared_ptr<Pattern> pattern_ptr;
 #pragma db value(node_ptr) type("INTEGER") not_null
-#pragma db value(transit_node_ptr) type("INTEGER") not_null
+#pragma db value(transit_node_ptr) type("TEXT") not_null
 #pragma db value(link_type_ptr) type("INTEGER") not_null
 #pragma db value(area_type_ptr) type("INTEGER") not_null
 #pragma db value(route_ptr) type("INTEGER") not_null
@@ -121,7 +121,7 @@ class InputContainer
 {
 public:
 	std::map<int, node_ptr > Nodes;
-	std::map<int, transit_node_ptr > TransitNodes;	
+	std::map<std::string, transit_node_ptr > Transit_Stopses;	
 	std::map<int,shared_ptr<Zone> > Zones;
 	std::map<int,shared_ptr<Link> > Links;
 	std::map<int,shared_ptr<Parking> > Parkings;
@@ -204,19 +204,19 @@ private:
 };
 
 #pragma db object //table("Transit_Node")
-class TransitNode
+class Transit_Stops
 {
 public:
 	// Default Constructor
-	TransitNode() {}
+	Transit_Stops() {}
 	//Constructor
-	TransitNode(int node_, double x_, double y_, double z_, int subarea_, int part_, std::string agency_, std::string code_, std::string name_, std::string description_)
-		: node(node_), x(x_), y(y_), z(z_), subarea(subarea_), part(part_), agency(agency_), code(code_), name(name_), description(description_)
+	Transit_Stops(std::string stop_, double x_, double y_, double z_, int subarea_, int part_, std::string agency_, std::string street_, std::string name_, std::string description_)
+		: stop(stop_), x(x_), y(y_), z(z_), subarea(subarea_), part(part_), agency(agency_), street(street_), name(name_), description(description_)
 	{
 	}
 	//Accessors
-	const int& getNode() const { return node; }
-	void setNode(const int& node_) { node = node_; }
+	const std::string& getStop() const { return stop; }
+	void setStop(const int& stop_) { stop = stop_; }
 	const double& getX() const { return x; }
 	void setX(const double& x_) { x = x_; }
 	const double& getY() const { return y; }
@@ -229,26 +229,26 @@ public:
 	void setPart(const int& part_) { part = part_; }
 	const std::string& getAgency() const { return agency; }
 	void setAgency(const std::string& agency_) { agency = agency_; }
-	const std::string& getCode() const { return code; }
-	void setCode(const std::string& code_) { code = code_; }
+	const std::string& getStreet() const { return street; }
+	void setStreet(const std::string& street_) { street = street_; }
 	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { code = name_; }
+	void setName(const std::string& name_) { street = name_; }
 	const std::string& getDescription() const { return description; }
 	void setDescription(const std::string& description_) { description = description_; }
-	const int& getPrimaryKey() const { return node; }
+	const std::string& getPrimaryKey() const { return stop; }
 
 	//Data Fields
 private:
 	friend class odb::access;
 #pragma db id
-	int node;
+	std::string stop;
 	double x;
 	double y;
 	double z;
 	int subarea;
 	int part;
 	std::string agency;
-	std::string code;
+	std::string street;
 	std::string name;
 	std::string description;
 	#pragma db index member(node)
@@ -626,10 +626,10 @@ public:
 	void setName(const std::string& name_) { name = name_; }
 	const transit_node_ptr& getNode_A() const { return node_a; }
 	void setNode_A(const transit_node_ptr& node_a_) { node_a = node_a_; }
-	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.TransitNodes[node_a_]; }
+	void setNode_A(const std::string& node_a_, InputContainer& container) { node_a = container.Transit_Stopses[node_a_]; }
 	const transit_node_ptr& getNode_B() const { return node_b; }
 	void setNode_B(const transit_node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.TransitNodes[node_b_]; }
+	void setNode_B(const std::string& node_b_, InputContainer& container) { node_b = container.Transit_Stopses[node_b_]; }
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }
 	const shared_ptr<Link_Type>& getType() const { return type; }

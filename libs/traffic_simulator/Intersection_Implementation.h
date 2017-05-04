@@ -583,12 +583,13 @@ namespace Intersection_Components
 
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, dbid, NONE, NONE);
 			m_data(int, internal_id, NONE, NONE);
 			m_data(float, x_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, agency, NONE, NONE);
-			m_data(std::string, code, NONE, NONE);
+			m_data(std::string, street, NONE, NONE);
 			m_data(std::string, name, NONE, NONE);
 			m_data(std::string, description, NONE, NONE);
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);

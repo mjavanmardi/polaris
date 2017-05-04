@@ -96,6 +96,8 @@ namespace Network_Components
 
 				cout << "Reading Nodes" << endl;
 
+				int uuid_max = -1;
+
 				for(typename result<Node>::iterator db_itr = node_result.begin (); db_itr != node_result.end (); ++db_itr)
 				{
 					counter++;
@@ -104,6 +106,7 @@ namespace Network_Components
 					intersection=(_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
 
 					intersection->template uuid<int>( db_itr->getNode() );
+					uuid_max = std::max(uuid_max, intersection->_uuid);
 					intersection->template internal_id<int>(counter);
 					intersection->template x_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
@@ -129,23 +132,24 @@ namespace Network_Components
 					intersections_container_ptr->push_back(intersection);
 				}
 
-				result<TransitNode> tr_node_result = db->template query<TransitNode>(query<TransitNode>::true_expr); 
+				result<Transit_Stops> tr_node_result = db->template query<Transit_Stops>(query<Transit_Stops>::true_expr);
 				
 				cout << "Reading Transit Nodes" << endl;
 				
-				for (typename result<TransitNode>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
+				for (typename result<Transit_Stops>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
 				{
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
 					intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
-
-					intersection->template uuid<int>(db_itr->getNode());
+					uuid_max++;
+					intersection->template uuid<int>(uuid_max);
+					intersection->template dbid<int>(db_itr->getStreet());
 					intersection->template internal_id<int>(counter);
 					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
 					intersection->template agency<std::string>(db_itr->getAgency());
-					intersection->template code<std::string>(db_itr->getCode());
+					intersection->template street<std::string>(db_itr->getStreet());
 					intersection->template name<std::string>(db_itr->getName());
 					intersection->template description<std::string>(db_itr->getDescription());
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
