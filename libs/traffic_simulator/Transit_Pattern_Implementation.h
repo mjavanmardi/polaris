@@ -30,6 +30,7 @@ namespace Transit_Pattern_Components
 			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Pattern_Implementation), Data_Object>::Component_Type ComponentType;
 
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, dbid, NONE, NONE);
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::transit_route_type, route, NONE, NONE);
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stops, NONE, NONE);

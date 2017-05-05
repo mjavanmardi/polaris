@@ -21,9 +21,9 @@ namespace Network_Components
 		{
 			dense_hash_map<int, void*> intersection_id_to_ptr;
 			dense_hash_map<std::string, void*> transit_stop_id_to_ptr;
-			dense_hash_map<int, void*> transit_route_id_to_ptr;
-			dense_hash_map<int, void*> transit_pattern_id_to_ptr;
-			dense_hash_map<int, void*> transit_vehicle_trip_id_to_ptr;
+			dense_hash_map<std::string, void*> transit_route_id_to_ptr;
+			dense_hash_map<std::string, void*> transit_pattern_id_to_ptr;
+			dense_hash_map<std::string, void*> transit_vehicle_trip_id_to_ptr;
 			dense_hash_map<long long, void*> link_id_dir_to_ptr;
 		};
 

@@ -28,8 +28,8 @@ namespace Transit_Route_Components
 			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Route_Implementation), Data_Object>::Component_Type ComponentType;
 			
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(std::string, name, NONE, NONE);
+			m_data(std::string, dbid, NONE, NONE);
+			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));			
 			m_data(std::string, agency, NONE, NONE);
 			m_data(std::string, shortname, NONE, NONE);
 			m_data(std::string, longname, NONE, NONE);

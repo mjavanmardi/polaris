@@ -18,8 +18,9 @@ namespace Transit_Route_Components
 			tag_as_prototype;
 
 			accessor(internal_id, NONE, NONE);
+			accessor(dbid, NONE, NONE);
 			accessor(uuid, NONE, NONE);
-			accessor(name, NONE, NONE);
+
 			accessor(agency, NONE, NONE);
 			accessor(shortname, NONE, NONE);
 			accessor(longname, NONE, NONE);

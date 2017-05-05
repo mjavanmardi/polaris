@@ -14,16 +14,16 @@ namespace io
 class MetaData;
 class Tags;
 class Node;
-class Transit_Stops;
 class Zone;
 //class ZoneLandUse;
 class Shape;
 class Link;
-class TransitLink;
-class WalkLink;
-class Route;
-class Pattern;
-class TransitVehTrip;
+class Transit_Links;
+class Transit_Patterns;
+class Transit_Routes;
+class Transit_Stops;
+class Transit_Trips;
+class Transit_Walk;
 class Pocket;
 class Lane_Use;
 class Connect;
@@ -65,8 +65,8 @@ typedef shared_ptr<Node> node_ptr;
 typedef shared_ptr<Transit_Stops> transit_node_ptr;
 typedef shared_ptr<Link_Type> link_type_ptr;
 typedef shared_ptr<Area_Type> area_type_ptr;
-typedef shared_ptr<Route> route_ptr;
-typedef shared_ptr<Pattern> pattern_ptr;
+typedef shared_ptr<Transit_Routes> route_ptr;
+typedef shared_ptr<Transit_Patterns> pattern_ptr;
 #pragma db value(node_ptr) type("INTEGER") not_null
 #pragma db value(transit_node_ptr) type("TEXT") not_null
 #pragma db value(link_type_ptr) type("INTEGER") not_null
@@ -121,7 +121,9 @@ class InputContainer
 {
 public:
 	std::map<int, node_ptr > Nodes;
-	std::map<std::string, transit_node_ptr > Transit_Stopses;	
+	std::map<std::string, transit_node_ptr > TransitStops;
+	std::map<std::string, route_ptr > TransitRoutes;
+	std::map<std::string, pattern_ptr > TransitPatterns;
 	std::map<int,shared_ptr<Zone> > Zones;
 	std::map<int,shared_ptr<Link> > Links;
 	std::map<int,shared_ptr<Parking> > Parkings;
@@ -131,8 +133,6 @@ public:
 	std::map<int,shared_ptr<Veh_Type> > Veh_Types;
 	std::map<int,area_type_ptr > Area_Types;
 	std::map<std::string,shared_ptr<Link_Type> > Link_Types;
-	std::map<int, route_ptr > Routes;
-	std::map<int, pattern_ptr > Patterns;
 };
 
 #pragma db object
@@ -192,14 +192,15 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id
+#pragma db id
 	int node;
+#pragma db null
 	double x;
 	double y;
 	double z;
 	int subarea;
 	int part;
-	#pragma db index member(node)
+#pragma db index member(node)
 
 };
 
@@ -210,36 +211,35 @@ public:
 	// Default Constructor
 	Transit_Stops() {}
 	//Constructor
-	Transit_Stops(std::string stop_, double x_, double y_, double z_, int subarea_, int part_, std::string agency_, std::string street_, std::string name_, std::string description_)
-		: stop(stop_), x(x_), y(y_), z(z_), subarea(subarea_), part(part_), agency(agency_), street(street_), name(name_), description(description_)
+	Transit_Stops(std::string stop_, double x_, double y_, double z_, std::string agency_, std::string name_, std::string description_, std::string street_)
+		: stop(stop_), x(x_), y(y_), z(z_), agency(agency_), name(name_), description(description_), street(street_)
 	{
 	}
 	//Accessors
 	const std::string& getStop() const { return stop; }
-	void setStop(const int& stop_) { stop = stop_; }
+	void setStop(const std::string& stop_) { stop = stop_; }
 	const double& getX() const { return x; }
 	void setX(const double& x_) { x = x_; }
 	const double& getY() const { return y; }
 	void setY(const double& y_) { y = y_; }
 	const double& getZ() const { return z; }
 	void setZ(const double& z_) { z = z_; }
-	const int& getSubarea() const { return subarea; }
-	void setSubarea(const int& subarea_) { subarea = subarea_; }
-	const int& getPart() const { return part; }
-	void setPart(const int& part_) { part = part_; }
 	const std::string& getAgency() const { return agency; }
 	void setAgency(const std::string& agency_) { agency = agency_; }
-	const std::string& getStreet() const { return street; }
-	void setStreet(const std::string& street_) { street = street_; }
 	const std::string& getName() const { return name; }
 	void setName(const std::string& name_) { street = name_; }
 	const std::string& getDescription() const { return description; }
 	void setDescription(const std::string& description_) { description = description_; }
+	const std::string& getStreet() const { return street; }
+	void setStreet(const std::string& street_) { street = street_; }
+
 	const std::string& getPrimaryKey() const { return stop; }
 
 	//Data Fields
 private:
 	friend class odb::access;
+
+//#pragma db null
 #pragma db id
 	std::string stop;
 	double x;
@@ -248,11 +248,203 @@ private:
 	int subarea;
 	int part;
 	std::string agency;
-	std::string street;
 	std::string name;
 	std::string description;
-	#pragma db index member(stop)
+	std::string street;
+//#pragma db index member(stop)
 };
+
+#pragma db object no_id //table("Transit_Links")
+class Transit_Links
+{
+public:
+	// Default Constructor
+	Transit_Links() {}
+	//Constructor
+	Transit_Links(transit_node_ptr node_a_, transit_node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, std::string triplist_, std::string indexlist_)
+		: node_a(node_a_), node_b(node_b_), length(length_), type(type_), triplist(triplist_), indexlist(indexlist_)
+	{
+	}
+	//Accessors	
+	const transit_node_ptr& getNode_A() const { return node_a; }
+	void setNode_A(const transit_node_ptr& node_a_) { node_a = node_a_; }
+	void setNode_A(const std::string& node_a_, InputContainer& container) { node_a = container.TransitStops[node_a_]; }
+	const transit_node_ptr& getNode_B() const { return node_b; }
+	void setNode_B(const transit_node_ptr& node_b_) { node_b = node_b_; }
+	void setNode_B(const std::string& node_b_, InputContainer& container) { node_b = container.TransitStops[node_b_]; }	
+	const double& getLength() const { return length; }
+	void setLength(const double& length_) { length = length_; }
+	const shared_ptr<Link_Type>& getType() const { return type; }
+	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
+	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
+	const std::string& getTriplist() const { return triplist; }
+	void setTriplist(const std::string& triplist_) { triplist = triplist_; }
+	const std::string& getIndexlist() const { return indexlist; }
+	void setIndexlist(const std::string& indexlist_) { indexlist = indexlist_; }
+	//Data Fields
+private:
+	friend class odb::access;
+
+//#pragma db null
+	transit_node_ptr node_a;
+	transit_node_ptr node_b;
+	double length;
+	shared_ptr<Link_Type> type;
+	std::string triplist;
+	std::string indexlist;
+};
+
+#pragma db object no_id //table("Transit_Walk")
+class Transit_Walk
+{
+public:
+	// Default Constructor
+	Transit_Walk() {}
+	//Constructor
+	Transit_Walk(std::string node_a_, std::string node_b_, double length_)
+		: node_a(node_a_), node_b(node_b_), length(length_)
+	{
+	}
+	//Accessors	
+	const std::string& getNode_A() const { return node_a; }
+	void setNode_A(const std::string& node_a_) { node_a = node_a_; }
+	const std::string& getNode_B() const { return node_b; }
+	void setNode_B(const std::string& node_b_) { node_b = node_b_; }
+
+	/*const node_ptr& getNode_A() const { return node_a; }
+	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
+	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
+	const node_ptr& getNode_B() const { return node_b; }
+	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
+	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }*/
+	const double& getLength() const { return length; }
+	void setLength(const double& length_) { length = length_; }	
+
+	//Data Fields
+private:
+	friend class odb::access;
+
+//#pragma db null	
+	std::string node_a;
+	std::string node_b;
+	double length;
+};
+
+#pragma db object //table("Transit_Routes")
+class Transit_Routes
+{
+public:
+	// Default Constructor
+	Transit_Routes() {}
+	//Constructor
+	Transit_Routes(std::string route_, std::string agency_, std::string shortname_, std::string longname_, std::string description_, int type_)
+		: route(route_), agency(agency_), shortname(shortname_), longname(longname_), description(description_), type(type_)
+	{
+	}
+	//Accessors
+	const std::string& getRoute() const { return route; }
+	void setRoute(const std::string& route_) { route = route_; }
+	const std::string& getAgency() const { return agency; }
+	void setAgency(const std::string& agency_) { agency = agency_; }
+	const std::string& getShortname() const { return shortname; }
+	void setShortname(const std::string& shortname_) { shortname = shortname_; }
+	const std::string& getLongname() const { return longname; }
+	void setLongname(const std::string& longname_) { longname = longname_; }
+	const std::string& getDescription() const { return description; }
+	void setDescription(const std::string& description_) { description = description_; }
+	const int& getType() const { return type; }
+	void setType(const int& type_) { type = type_; }
+
+	const std::string& getPrimaryKey() const { return route; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+
+#pragma db id
+	std::string route;
+	std::string agency;
+	std::string shortname;
+	std::string longname;
+	std::string description;
+	int type;
+};
+
+#pragma db object //table("Transit_Patterns")
+class Transit_Patterns
+{
+public:
+	// Default Constructor
+	Transit_Patterns() {}
+	//Constructor
+	Transit_Patterns(std::string pattern_, route_ptr route_, std::string stoplist_)
+		: pattern(pattern_), route(route_), stoplist(stoplist_)
+	{
+	}
+	//Accessors
+	const std::string& getPattern() const { return pattern; }
+	void setPattern(const std::string& pattern_) { pattern = pattern_; }
+	const route_ptr& getRoute() const { return route; }
+	void setRoute(const route_ptr& route_) { route = route_; }
+	void setRoute(const std::string& route_, InputContainer& container) { route = container.TransitRoutes[route_]; }
+	const std::string& getStoplist() const { return stoplist; }
+	void setStoplist(const std::string& stoplist_) { stoplist = stoplist_; }
+	const std::string& getPrimaryKey() const { return pattern; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+
+#pragma db id
+	std::string pattern;
+	route_ptr route;
+	std::string stoplist;
+};
+
+#pragma db object no_id //table("Transit_Trips")
+class Transit_Trips
+{
+public:
+	// Default Constructor
+	Transit_Trips() {}
+	//Constructor
+	Transit_Trips(std::string trip_, int dir_, std::string agency_, pattern_ptr pattern_, route_ptr route_, std::string arrivals_, std::string departures_)
+		: trip(trip_), dir(dir_), agency(agency_), pattern(pattern_), route(route_), arrivals(arrivals_), departures(departures_)
+	{
+	}
+	//Accessors
+	const std::string& getTrip() const { return trip; }
+	void setTrip(const std::string& trip_) { trip = trip_; }
+	const int& getDir() const { return dir; }
+	void setDir(const int& dir_) { dir = dir_; }
+	const std::string& getAgency() const { return agency; }
+	void setAgency(const std::string& agency_) { agency = agency_; }
+	const pattern_ptr& getPattern() const { return pattern; }
+	void setPattern(const pattern_ptr& pattern_) { pattern = pattern_; }
+	void setPattern(const std::string& pattern_, InputContainer& container) { pattern = container.TransitPatterns[pattern_]; }
+	const route_ptr& getRoute() const { return route; }
+	void setRoute(const route_ptr& route_) { route = route_; }
+	void setRoute(const std::string& route_, InputContainer& container) { route = container.TransitRoutes[route_]; }
+	const std::string& getArrivals() const { return arrivals; }
+	void setArrivals(const std::string& arrivals_) { arrivals = arrivals_; }
+	const std::string& getDepartures() const { return departures; }
+	void setDepartures(const std::string& departures_) { departures = departures_; }
+	const std::string& getPrimaryKey() const { return trip; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+
+//#pragma db null
+	std::string trip;
+	int	dir;
+	std::string agency;
+	pattern_ptr pattern;
+	route_ptr route;
+	std::string arrivals;
+	std::string departures;
+};
+
 
 #pragma db object
 class Zone
@@ -608,238 +800,6 @@ private:
 	int right_ba;
 };
 
-#pragma db object //table("TransitLink")
-class TransitLink
-{
-public:
-	// Default Constructor
-	TransitLink() {}
-	//Constructor
-	TransitLink(int link_, std::string name_, transit_node_ptr node_a_, transit_node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, std::string TripsByDepTime_, std::string IndexAlongTripOfStopA_)
-	: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_), TripsByDepTime(TripsByDepTime_), IndexAlongTripOfStopA(IndexAlongTripOfStopA_)
-	{
-	}
-	//Accessors
-	const int& getLink() const { return link; }
-	void setLink(const int& link_) { link = link_; }
-	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { name = name_; }
-	const transit_node_ptr& getNode_A() const { return node_a; }
-	void setNode_A(const transit_node_ptr& node_a_) { node_a = node_a_; }
-	void setNode_A(const std::string& node_a_, InputContainer& container) { node_a = container.Transit_Stopses[node_a_]; }
-	const transit_node_ptr& getNode_B() const { return node_b; }
-	void setNode_B(const transit_node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const std::string& node_b_, InputContainer& container) { node_b = container.Transit_Stopses[node_b_]; }
-	const double& getLength() const { return length; }
-	void setLength(const double& length_) { length = length_; }
-	const shared_ptr<Link_Type>& getType() const { return type; }
-	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
-	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
-	const shared_ptr<Area_Type>& getArea_Type() const { return area_type; }
-	void setArea_Type(const shared_ptr<Area_Type>& area_type_) { area_type = area_type_; }
-	void setArea_Type(const int& area_type_, InputContainer& container) { area_type = container.Area_Types[area_type_]; }
-	const std::string& getUse() const { return use; }
-	void setUse(const std::string& use_) { use = use_; }
-	const double& getGrade() const { return grade; }
-	void setGrade(const double& grade_) { grade = grade_; }
-	const std::string& getTripsByDepTime() const { return TripsByDepTime; }
-	void setTripsByDepTime(const std::string& TripsByDepTime_) { TripsByDepTime = TripsByDepTime_; }
-	const std::string& getIndexAlongTripOfStopA() const { return IndexAlongTripOfStopA; }
-	void setIndexAlongTripOfStopA(const std::string& IndexAlongTripOfStopA_) { IndexAlongTripOfStopA = IndexAlongTripOfStopA_; }
-	const int& getPrimaryKey() const { return link; }
-
-	//Data Fields
-private:
-	friend class odb::access;
-#pragma db id
-	int link;
-#pragma db null
-	std::string name;
-	transit_node_ptr node_a;
-	transit_node_ptr node_b;
-	double length;
-	shared_ptr<Link_Type> type;
-	shared_ptr<Area_Type> area_type;
-	std::string use;
-	double grade;
-	std::string TripsByDepTime;
-	std::string IndexAlongTripOfStopA;
-};
-
-#pragma db object //table("WalkLink")
-class WalkLink
-{
-public:
-	// Default Constructor
-	WalkLink() {}
-	//Constructor
-	WalkLink(int link_, std::string name_, int node_a_, int node_b_, double length_, shared_ptr<Link_Type> type_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_)
-		: link(link_), name(name_), node_a(node_a_), node_b(node_b_), length(length_), type(type_), area_type(area_type_), use(use_), grade(grade_)
-	{
-	}
-	//Accessors
-	const int& getLink() const { return link; }
-	void setLink(const int& link_) { link = link_; }
-	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { name = name_; }
-
-	const int& getNode_A() const { return node_a; }
-	void setNode_A(const int& node_a_) { node_a = node_a_; }
-	const int& getNode_B() const { return node_b; }
-	void setNode_B(const int& node_b_) { node_b = node_b_; }
-
-	/*const node_ptr& getNode_A() const { return node_a; }
-	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
-	void setNode_A(const int& node_a_, InputContainer& container) { node_a = container.Nodes[node_a_]; }
-	const node_ptr& getNode_B() const { return node_b; }
-	void setNode_B(const node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }*/
-	const double& getLength() const { return length; }
-	void setLength(const double& length_) { length = length_; }
-	const shared_ptr<Link_Type>& getType() const { return type; }
-	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
-	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
-	const shared_ptr<Area_Type>& getArea_Type() const { return area_type; }
-	void setArea_Type(const shared_ptr<Area_Type>& area_type_) { area_type = area_type_; }
-	void setArea_Type(const int& area_type_, InputContainer& container) { area_type = container.Area_Types[area_type_]; }
-	const std::string& getUse() const { return use; }
-	void setUse(const std::string& use_) { use = use_; }
-	const double& getGrade() const { return grade; }
-	void setGrade(const double& grade_) { grade = grade_; }
-	const int& getPrimaryKey() const { return link; }
-
-	//Data Fields
-private:
-	friend class odb::access;
-#pragma db id
-	int link;
-#pragma db null
-	std::string name;
-	int node_a;
-	int node_b;
-	double length;
-	shared_ptr<Link_Type> type;
-	shared_ptr<Area_Type> area_type;
-	std::string use;
-	double grade;
-};
-
-#pragma db object //table("Route")
-class Route
-{
-public:
-	// Default Constructor
-	Route() {}
-	//Constructor
-	Route(int route_, std::string name_, std::string agency_, std::string shortname_, std::string longname_, std::string description_, int type_)
-	: route(route_), name(name_), agency(agency_), shortname(shortname_), longname(longname_), description(description_), type(type_)
-	{
-	}
-	//Accessors
-	const int& getRoute() const { return route; }
-	void setRoute(const int& route_) { route = route_; }
-	const std::string& getName() const { return name; }
-	void setName(const std::string& name_) { name = name_; }
-	const std::string& getAgency() const { return agency; }
-	void setAgency(const std::string& agency_) { agency = agency_; }
-	const std::string& getShortname() const { return shortname; }
-	void setShortname(const std::string& shortname_) { shortname = shortname_; }
-	const std::string& getLongname() const { return longname; }
-	void setLongname(const std::string& longname_) { longname = longname_; }
-	const std::string& getDescription() const { return description; }
-	void setDescription(const std::string& description_) { description = description_; }	
-	const int& getType() const { return type; }
-	void setType(const int& type_) { type = type_; }
-	const int& getPrimaryKey() const { return route; }
-
-	//Data Fields
-private:
-	friend class odb::access;
-#pragma db id
-	int route;
-#pragma db null
-	std::string name;
-	std::string agency;
-	std::string shortname;
-	std::string longname;
-	std::string description;
-	int type;
-};
-
-#pragma db object //table("Pattern")
-class Pattern
-{
-public:
-	// Default Constructor
-	Pattern() {}
-	//Constructor
-	Pattern(int pattern_, route_ptr route_, std::string stop_seq_string_)
-	: pattern(pattern_), route(route_), stop_seq_string(stop_seq_string_)
-	{
-	}
-	//Accessors
-	const int& getPattern() const { return pattern; }
-	void setPattern(const int& pattern_) { pattern = pattern_; }	
-	const route_ptr& getRoute() const { return route; }
-	void setRoute(const route_ptr& route_) { route = route_; }
-	void setRoute(const int& route_, InputContainer& container) { route = container.Routes[route_]; }
-	const std::string& getStop_seq_string() const { return stop_seq_string; }
-	void setStop_seq_string(const std::string& stop_seq_string_) { stop_seq_string = stop_seq_string_; }
-	const int& getPrimaryKey() const { return pattern; }
-
-	//Data Fields
-private:
-	friend class odb::access;
-#pragma db id
-	int pattern;
-#pragma db null
-	route_ptr route;
-	std::string stop_seq_string;
-};
-
-#pragma db object //table("TransitVehTrip")
-class TransitVehTrip
-{
-public:
-	// Default Constructor
-	TransitVehTrip() {}
-	//Constructor
-	TransitVehTrip(int trip_, int direction_,	route_ptr route_, pattern_ptr pattern_,	std::string seq_string_, std::string arrivalseconds_string_, std::string departureseconds_string_)
-	: trip(trip_), direction(direction_), route(route_), pattern(pattern_), seq_string(seq_string_), arrivalseconds_string(arrivalseconds_string_), departureseconds_string(departureseconds_string_)
-	{
-	}
-	//Accessors
-	const int& getTrip() const { return trip; }
-	void setTrip(const int& trip_) { trip = trip_; }	
-	const int& getDirection() const { return direction; }
-	void setDirection(const int& direction_) { direction = direction_; }
-	const route_ptr& getRoute() const { return route; }
-	void setRoute(const route_ptr& route_) { route = route_; }
-	void setRoute(const int& route_, InputContainer& container) { route = container.Routes[route_]; }
-	const pattern_ptr& getPattern() const { return pattern; }
-	void setPattern(const pattern_ptr& pattern_) { pattern = pattern_; }
-	void setPattern(const int& pattern_, InputContainer& container) { pattern = container.Patterns[pattern_]; }
-	const std::string& getSeq_string() const { return seq_string; }
-	void setSeq_string(const std::string& seq_string_) { seq_string = seq_string_; }
-	const std::string& getArrivalseconds_string() const { return arrivalseconds_string; }
-	void setArrivalseconds_string(const std::string& arrivalseconds_string_) { arrivalseconds_string = arrivalseconds_string_; }
-	const std::string& getDepartureseconds_string() const { return departureseconds_string; }
-	void setDepartureseconds_string(const std::string& departureseconds_string_) { departureseconds_string = departureseconds_string_; }
-	const int& getPrimaryKey() const { return trip; }
-
-	//Data Fields
-private:
-	friend class odb::access;
-#pragma db id
-	int trip;
-#pragma db null
-	int	direction;
-	route_ptr route;
-	pattern_ptr pattern;
-	std::string seq_string;
-	std::string arrivalseconds_string;
-	std::string departureseconds_string;
-};
 
 #pragma db object //table("POCKET")
 class Pocket

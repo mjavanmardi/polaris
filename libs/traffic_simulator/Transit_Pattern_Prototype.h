@@ -18,6 +18,7 @@ namespace Transit_Pattern_Components
 			tag_as_prototype;
 
 			accessor(internal_id, NONE, NONE);
+			accessor(dbid, NONE, NONE);
 			accessor(uuid, NONE, NONE);
 			accessor(route, NONE, NONE);
 			accessor(pattern_stops, NONE, NONE);

@@ -90,6 +90,9 @@ namespace Network_Components
 				net_io_maps.intersection_id_to_ptr.set_empty_key(-1);
 				net_io_maps.intersection_id_to_ptr.set_deleted_key(-2);
 
+				net_io_maps.transit_stop_id_to_ptr.set_empty_key("-1");
+				net_io_maps.transit_stop_id_to_ptr.set_deleted_key("-2");
+
 				_Intersection_Interface* intersection;
 
 				int counter=-1;
@@ -152,12 +155,13 @@ namespace Network_Components
 					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
 					intersection->template agency<std::string>(db_itr->getAgency());
-					intersection->template street<std::string>(db_itr->getStreet());
 					intersection->template name<std::string>(db_itr->getName());
 					intersection->template description<std::string>(db_itr->getDescription());
+					intersection->template street<std::string>(db_itr->getStreet());
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 
 					net_io_maps.intersection_id_to_ptr[intersection->_uuid] = intersection;
+					net_io_maps.transit_stop_id_to_ptr[db_itr->getStop()] = intersection;
 
 					if (_scenario_reference->template intersection_control_flag<int>() == 0)
 					{
@@ -191,10 +195,10 @@ namespace Network_Components
 
 				transit_routes_container_ptr->clear();
 
-				result<Route> route_result = db->template query<Route>(query<Route>::true_expr);
+				result<Transit_Routes> route_result = db->template query<Transit_Routes>(query<Transit_Routes>::true_expr);
 
-				net_io_maps.transit_route_id_to_ptr.set_empty_key(-1);
-				net_io_maps.transit_route_id_to_ptr.set_deleted_key(-2);
+				net_io_maps.transit_route_id_to_ptr.set_empty_key("-1");
+				net_io_maps.transit_route_id_to_ptr.set_deleted_key("-2");
 
 				_Transit_Route_Interface* transit_route;
 
@@ -202,16 +206,17 @@ namespace Network_Components
 
 				cout << "Reading Transit Routes" << endl;
 
-				for (typename result<Route>::iterator db_itr = route_result.begin(); db_itr != route_result.end(); ++db_itr)
+				for (typename result<Transit_Routes>::iterator db_itr = route_result.begin(); db_itr != route_result.end(); ++db_itr)
 				{
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
 					transit_route = (_Transit_Route_Interface*)Allocate<typename _Transit_Route_Interface::Component_Type>();
 
-					transit_route->template uuid<int>(db_itr->getRoute());
+					transit_route->template dbid<std::string>(db_itr->getRoute());
+					transit_route->template uuid<int>(counter);
 					transit_route->template internal_id<int>(counter);
-					transit_route->template name<std::string>(db_itr->getName());
+
 					transit_route->template agency<std::string>(db_itr->getAgency());
 					transit_route->template shortname<std::string>(db_itr->getShortname());
 					transit_route->template longname<std::string>(db_itr->getLongname());
@@ -243,10 +248,10 @@ namespace Network_Components
 
 				transit_patterns_container_ptr->clear();
 
-				result<Pattern> pattern_result = db->template query<Pattern>(query<Pattern>::true_expr);
+				result<Transit_Patterns> pattern_result = db->template query<Transit_Patterns>(query<Transit_Patterns>::true_expr);
 
-				net_io_maps.transit_pattern_id_to_ptr.set_empty_key(-1);
-				net_io_maps.transit_pattern_id_to_ptr.set_deleted_key(-2);
+				net_io_maps.transit_pattern_id_to_ptr.set_empty_key("-1");
+				net_io_maps.transit_pattern_id_to_ptr.set_deleted_key("-2");
 
 				_Transit_Pattern_Interface* transit_pattern;
 
@@ -254,24 +259,25 @@ namespace Network_Components
 
 				cout << "Reading Transit Patterns" << endl;
 
-				for (typename result<Pattern>::iterator db_itr = pattern_result.begin(); db_itr != pattern_result.end(); ++db_itr)
+				for (typename result<Transit_Patterns>::iterator db_itr = pattern_result.begin(); db_itr != pattern_result.end(); ++db_itr)
 				{
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
 					transit_pattern = (_Transit_Pattern_Interface*)Allocate<typename _Transit_Pattern_Interface::Component_Type>();
 
-					transit_pattern->template uuid<int>(db_itr->getPattern());
+					transit_pattern->template dbid<std::string>(db_itr->getPattern());
+					transit_pattern->template uuid<int>(counter);
 					transit_pattern->template internal_id<int>(counter);
 					transit_pattern->template route<_Transit_Route_Interface*>((_Transit_Route_Interface*)net_io_maps.transit_route_id_to_ptr[db_itr->getRoute()->getRoute()]);
 
-					const string& stop_seq_string = db_itr->getStop_seq_string();
+					const string& stop_seq_string = db_itr->getStoplist();
 					std::istringstream ss(stop_seq_string);
 					std::string sub_string;
 
-					while (std::getline(ss, sub_string, ':'))
+					while (std::getline(ss, sub_string, '|'))
 					{					
-						_Intersection_Interface* pattern_stop = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(sub_string)];
+						_Intersection_Interface* pattern_stop = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[sub_string];
 						if (pattern_stop)
 						{
 							transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().push_back(pattern_stop);
@@ -313,10 +319,10 @@ namespace Network_Components
 
 				transit_vehicle_trips_container_ptr->clear();
 
-				result<TransitVehTrip> transit_vehtrip_result = db->template query<TransitVehTrip>(query<TransitVehTrip>::true_expr);
+				result<Transit_Trips> transit_vehtrip_result = db->template query<Transit_Trips>(query<Transit_Trips>::true_expr);
 
-				net_io_maps.transit_vehicle_trip_id_to_ptr.set_empty_key(-1);
-				net_io_maps.transit_vehicle_trip_id_to_ptr.set_deleted_key(-2);
+				net_io_maps.transit_vehicle_trip_id_to_ptr.set_empty_key("-1");
+				net_io_maps.transit_vehicle_trip_id_to_ptr.set_deleted_key("-2");
 
 				_Transit_Vehicle_Trip_Interface* transit_vehicle_trip;
 
@@ -324,63 +330,51 @@ namespace Network_Components
 
 				cout << "Reading Transit Trips" << endl;
 
-				for (typename result<TransitVehTrip>::iterator db_itr = transit_vehtrip_result.begin(); db_itr != transit_vehtrip_result.end(); ++db_itr)
+				for (typename result<Transit_Trips>::iterator db_itr = transit_vehtrip_result.begin(); db_itr != transit_vehtrip_result.end(); ++db_itr)
 				{
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
 					transit_vehicle_trip = (_Transit_Vehicle_Trip_Interface*)Allocate<typename _Transit_Vehicle_Trip_Interface::Component_Type>();
-
-					transit_vehicle_trip->template uuid<int>(db_itr->getTrip());
+					
+					transit_vehicle_trip->template dbid<std::string>(db_itr->getTrip());
+					transit_vehicle_trip->template uuid<int>(counter);
 					transit_vehicle_trip->template internal_id<int>(counter);
-					transit_vehicle_trip->template direction<int>(db_itr->getDirection());
+					transit_vehicle_trip->template direction<int>(db_itr->getDir());
 					transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>((_Transit_Pattern_Interface*)net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()->getPattern()]);
 
-					const string& arrivalseconds_string = db_itr->getArrivalseconds_string();
+					const string& arrivalseconds_string = db_itr->getArrivals();
 					std::stringstream ss(arrivalseconds_string);
 					std::string sub_string;
 					int myTime;
-					int mySeq;
 
-					while (std::getline(ss, sub_string, ':'))
+					while (std::getline(ss, sub_string, '|'))
 					{
 						myTime = stoi(sub_string);
 						transit_vehicle_trip->template arrival_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
-					const string& departureseconds_string = db_itr->getDepartureseconds_string();
+					const string& departureseconds_string = db_itr->getDepartures();
 					ss.clear();
 					ss.str(departureseconds_string);
 
-					while (std::getline(ss, sub_string, ':'))
+					while (std::getline(ss, sub_string, '|'))
 					{
 						myTime = stoi(sub_string);
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
-					const string& seq_string = db_itr->getSeq_string();
-					ss.clear();
-					ss.str(seq_string);
-
-					while (std::getline(ss, sub_string, ':'))
-					{
-						mySeq = stoi(sub_string);
-						transit_vehicle_trip->template sequence_number<std::vector<int>&>().push_back(mySeq);
-					}
-
-					if (transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_sequence_number.size() ||
-						transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_departure_seconds.size() ||
+					if (transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_departure_seconds.size() ||
 						transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_pattern->_pattern_stops.size()
 						)
 					{
 						cout << "Inconsistency between at least two of the following:" << endl;
-						cout << "Number of stops of the pattern; number of arrival times, departure times, or GTFS sequence numbers of the trip!" << endl;
+						cout << "Number of stops of the pattern; number of arrival times, or departure times of the trip!" << endl;
 						cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
 						cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
 						cout << "Stop sequence size of the pattern: " << transit_vehicle_trip->_pattern->_pattern_stops.size() << endl;
 						cout << "Arrival times sequence size of the trip: " << transit_vehicle_trip->_arrival_seconds.size() << endl;
 						cout << "Departure times sequence size of the trip: " << transit_vehicle_trip->_departure_seconds.size() << endl;
-						cout << "GTFS sequence size of the trip: " << transit_vehicle_trip->_sequence_number.size() << endl;
 						system("pause");
 						exit(0);
 					}
@@ -393,7 +387,6 @@ namespace Network_Components
 							cout << "Departure before arrival error!" << endl;
 							cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
 							cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
-							cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
 							cout << "Internal sequence number (0 start): " << my_itr << endl;
 							cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
 							cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
@@ -409,11 +402,9 @@ namespace Network_Components
 								cout << "Arrival sequence timing error!" << endl;
 								cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
 								cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
-								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
 								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
-								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr+1) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr+1 << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr+1)->_uuid << endl;
 								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr+1) << endl;
@@ -426,11 +417,9 @@ namespace Network_Components
 								cout << "Departure sequence timing error!" << endl;
 								cout << "Trip ID: " << transit_vehicle_trip->_uuid << endl;
 								cout << "Pattern ID: " << transit_vehicle_trip->_pattern->_uuid << endl;
-								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr)->_uuid << endl;
 								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr) << endl;
-								cout << "GTFS sequence number: " << transit_vehicle_trip->_sequence_number.at(my_itr + 1) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr + 1 << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->_pattern->_pattern_stops.at(my_itr + 1)->_uuid << endl;
 								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr + 1) << endl;
@@ -496,6 +485,8 @@ namespace Network_Components
 				
 				int link_counter=-1;
 
+				int dbid_max = -1;
+
 				for(typename result<polaris::io::Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
 					const string& facility_type=db_itr->getType()->getLink_Type();
@@ -555,6 +546,8 @@ namespace Network_Components
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
+
+						dbid_max = std::max(dbid_max, link->_dbid);
 
 						num_lanes = db_itr->getLanes_Ab();
 						
@@ -790,6 +783,8 @@ namespace Network_Components
 						//link->template uuid<int>(link_id_dir.id);
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+												
+						dbid_max = std::max(dbid_max, link->_dbid);
 
 						num_lanes = db_itr->getLanes_Ba();
 						
@@ -996,13 +991,13 @@ namespace Network_Components
 					}
 				}
 
-				result<polaris::io::WalkLink> walk_link_result = db->template query<polaris::io::WalkLink>(query<polaris::io::WalkLink>::true_expr);
+				result<polaris::io::Transit_Walk> walk_link_result = db->template query<polaris::io::Transit_Walk>(query<polaris::io::Transit_Walk>::true_expr);
 
 				cout << "Reading Walk Links" << endl;
 
-				for (typename result<polaris::io::WalkLink>::iterator db_itr = walk_link_result.begin(); db_itr != walk_link_result.end(); ++db_itr)
+				for (typename result<polaris::io::Transit_Walk>::iterator db_itr = walk_link_result.begin(); db_itr != walk_link_result.end(); ++db_itr)
 				{
-					const string& facility_type = db_itr->getType()->getLink_Type();
+					//const string& facility_type = db_itr->getType()->getLink_Type();
 					bool do_this_link = true;
 
 					counter++;
@@ -1010,8 +1005,11 @@ namespace Network_Components
 					if (1 > 0)
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+												
+						dbid_max++;
 
-						link_id_dir.id = db_itr->getLink();
+						//link_id_dir.id = db_itr->getLink();
+						link_id_dir.id = dbid_max;
 						link_id_dir.dir = 0;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
@@ -1020,21 +1018,75 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
-						link->template dbid<int>(db_itr->getLink());
-						link->template name<std::string>(db_itr->getName());
-						link->template grade<float>(db_itr->getGrade());
+						link->template dbid<int>(dbid_max);
 						link->template direction<int>(0.0);
 
 						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);*/
 
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()]);
+						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
+						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 
-						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A())];
+						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B())];
 
-						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+						
+						if (upstream_1 && upstream_2)
+						{
+							cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+						
+						if (upstream_1)
+						{
+							link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
+						}
+						else if (upstream_2)
+						{
+							link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
+						}
+						else
+						{
+							cout << "Walk link to node A maps to nothing" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
 
+						if (downstream_1 && downstream_2)
+						{
+							cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+
+						if (downstream_1)
+						{
+							link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
+						}
+						else if (downstream_2)
+						{
+							link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
+						}
+						else
+						{
+							cout << "Walk link to node B maps to nothing" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+						
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 
@@ -1066,7 +1118,10 @@ namespace Network_Components
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 
-						link_id_dir.id = db_itr->getLink();
+						dbid_max++;
+
+						//link_id_dir.id = db_itr->getLink();
+						link_id_dir.id = dbid_max;
 						link_id_dir.dir = 1;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
@@ -1075,20 +1130,73 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
-						link->template dbid<int>(db_itr->getLink());
-						link->template name<std::string>(db_itr->getName());
-						link->template grade<float>(db_itr->getGrade());
+						link->template dbid<int>(dbid_max);
 						link->template direction<int>(1);
 
 						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);*/
 
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()]);
+						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
+						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 
-						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
+						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B())];
+						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A())];
 
-						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
+						if (upstream_1 && upstream_2)
+						{
+							cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+
+						if (upstream_1)
+						{
+							link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
+						}
+						else if (upstream_2)
+						{
+							link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
+						}
+						else
+						{
+							cout << "Walk link to node B maps to nothing" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+
+						if (downstream_1 && downstream_2)
+						{
+							cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
+
+						if (downstream_1)
+						{
+							link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
+						}
+						else if (downstream_2)
+						{
+							link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
+						}
+						else
+						{
+							cout << "Walk link to node A maps to nothing" << endl;
+							cout << "Link ID: " << link->_dbid << endl;
+							cout << "Node A: " << db_itr->getNode_A() << endl;
+							cout << "Node B: " << db_itr->getNode_B() << endl;
+							system("pause");
+							exit(0);
+						}
 
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
@@ -1118,11 +1226,11 @@ namespace Network_Components
 					}
 				}
 
-				result<polaris::io::TransitLink> transit_link_result = db->template query<polaris::io::TransitLink>(query<polaris::io::TransitLink>::true_expr);
+				result<polaris::io::Transit_Links> transit_link_result = db->template query<polaris::io::Transit_Links>(query<polaris::io::Transit_Links>::true_expr);
 
 				cout << "Reading Transit Links" << endl;
 
-				for (typename result<polaris::io::TransitLink>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
+				for (typename result<polaris::io::Transit_Links>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
 				{
 					const string& facility_type = db_itr->getType()->getLink_Type();
 					bool do_this_link = true;
@@ -1133,7 +1241,10 @@ namespace Network_Components
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 
-						link_id_dir.id = db_itr->getLink();
+						dbid_max++;
+
+						//link_id_dir.id = db_itr->getLink();
+						link_id_dir.id = dbid_max;
 						link_id_dir.dir = 0;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
@@ -1142,18 +1253,12 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
-						link->template dbid<int>(db_itr->getLink());
-						link->template name<std::string>(db_itr->getName());
-						link->template grade<float>(db_itr->getGrade());
+						link->template dbid<int>(dbid_max);
 						link->template direction<int>(0.0);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()->getStop()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()->getStop()]);
-
-						_Intersection_Interface* itx = link->template downstream_intersection<_Intersection_Interface*>();
-
-						((typename MasterType::intersection_type*)itx)->_area_type = db_itr->getArea_Type()->getArea_Type();
-
+						
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 
@@ -1164,14 +1269,14 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
-						const string& TripsByDepTime = db_itr->getTripsByDepTime();
+						const string& TripsByDepTime = db_itr->getTriplist();
 						std::istringstream ss(TripsByDepTime);
 						std::string sub_string;
 						int mySeq;
 
-						while (std::getline(ss, sub_string, ':'))
+						while (std::getline(ss, sub_string, '|'))
 						{
-							_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[stoi(sub_string)];
+							_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[sub_string];
 
 							if (link_trip)
 							{
@@ -1186,11 +1291,11 @@ namespace Network_Components
 
 						}
 
-						const string& IndexAlongTripOfStopA = db_itr->getIndexAlongTripOfStopA();
+						const string& IndexAlongTripOfStopA = db_itr->getIndexlist();
 						ss.clear();
 						ss.str(IndexAlongTripOfStopA);
 
-						while (std::getline(ss, sub_string, ':'))
+						while (std::getline(ss, sub_string, '|'))
 						{
 							mySeq = stoi(sub_string);
 							link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
