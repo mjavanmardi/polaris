@@ -1001,12 +1001,14 @@ namespace Network_Components
 					bool do_this_link = true;
 
 					counter++;
+					dbid_max++;
+
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 					if (1 > 0)
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 												
-						dbid_max++;
+						
 
 						//link_id_dir.id = db_itr->getLink();
 						link_id_dir.id = dbid_max;
@@ -1027,9 +1029,8 @@ namespace Network_Components
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 
-						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A())];
-						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B())];
-
+						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A(),nullptr)];
+						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B(), nullptr)];
 						
 						if (upstream_1 && upstream_2)
 						{
@@ -1118,7 +1119,7 @@ namespace Network_Components
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 
-						dbid_max++;
+						//dbid_max++;
 
 						//link_id_dir.id = db_itr->getLink();
 						link_id_dir.id = dbid_max;
@@ -1139,8 +1140,8 @@ namespace Network_Components
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 
-						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B())];
-						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A())];
+						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B(), nullptr)];
+						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A(), nullptr)];
 
 						if (upstream_1 && upstream_2)
 						{

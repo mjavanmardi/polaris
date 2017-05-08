@@ -211,13 +211,21 @@ public:
 	// Default Constructor
 	Transit_Stops() {}
 	//Constructor
-	Transit_Stops(std::string stop_, double x_, double y_, double z_, std::string agency_, std::string name_, std::string description_, std::string street_)
-		: stop(stop_), x(x_), y(y_), z(z_), agency(agency_), name(name_), description(description_), street(street_)
+	Transit_Stops(std::string stop_, int link_, int dir_, double offset_, double setback_, double x_, double y_, double z_, std::string agency_, std::string name_, std::string description_, std::string street_)
+		: stop(stop_), link(link_), dir(dir_), offset(offset_), setback(setback_), x(x_), y(y_), z(z_), agency(agency_), name(name_), description(description_), street(street_)
 	{
 	}
 	//Accessors
 	const std::string& getStop() const { return stop; }
-	void setStop(const std::string& stop_) { stop = stop_; }
+	void setStop(const std::string& stop_) { stop = stop_; }	
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const int& getDir() const { return dir; }
+	void setDir(const int& dir_) { dir = dir_; }
+	const double& getOffset() const { return offset; }
+	void setOffset(const double& offset_) { offset = offset_; }
+	const double& getSetback() const { return setback; }
+	void setSetback(const double& setback_) { setback = setback_; }
 	const double& getX() const { return x; }
 	void setX(const double& x_) { x = x_; }
 	const double& getY() const { return y; }
@@ -242,11 +250,13 @@ private:
 //#pragma db null
 #pragma db id
 	std::string stop;
+	int link;
+	int dir;
+	double offset;
+	double setback;
 	double x;
 	double y;
 	double z;
-	int subarea;
-	int part;
 	std::string agency;
 	std::string name;
 	std::string description;
@@ -261,17 +271,17 @@ public:
 	// Default Constructor
 	Transit_Links() {}
 	//Constructor
-	Transit_Links(transit_node_ptr node_a_, transit_node_ptr node_b_, double length_, shared_ptr<Link_Type> type_, std::string triplist_, std::string indexlist_)
-		: node_a(node_a_), node_b(node_b_), length(length_), type(type_), triplist(triplist_), indexlist(indexlist_)
+	Transit_Links(transit_node_ptr from_node_, transit_node_ptr to_node_, double length_, shared_ptr<Link_Type> type_, std::string triplist_, std::string indexlist_)
+		: from_node(from_node_), to_node(to_node_), length(length_), type(type_), triplist(triplist_), indexlist(indexlist_)
 	{
 	}
 	//Accessors	
-	const transit_node_ptr& getNode_A() const { return node_a; }
-	void setNode_A(const transit_node_ptr& node_a_) { node_a = node_a_; }
-	void setNode_A(const std::string& node_a_, InputContainer& container) { node_a = container.TransitStops[node_a_]; }
-	const transit_node_ptr& getNode_B() const { return node_b; }
-	void setNode_B(const transit_node_ptr& node_b_) { node_b = node_b_; }
-	void setNode_B(const std::string& node_b_, InputContainer& container) { node_b = container.TransitStops[node_b_]; }	
+	const transit_node_ptr& getNode_A() const { return from_node; }
+	void setNode_A(const transit_node_ptr& from_node_) { from_node = from_node_; }
+	void setNode_A(const std::string& from_node_, InputContainer& container) { from_node = container.TransitStops[from_node_]; }
+	const transit_node_ptr& getNode_B() const { return to_node; }
+	void setNode_B(const transit_node_ptr& to_node_) { to_node = to_node_; }
+	void setNode_B(const std::string& to_node_, InputContainer& container) { to_node = container.TransitStops[to_node_]; }	
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }
 	const shared_ptr<Link_Type>& getType() const { return type; }
@@ -286,8 +296,8 @@ private:
 	friend class odb::access;
 
 //#pragma db null
-	transit_node_ptr node_a;
-	transit_node_ptr node_b;
+	transit_node_ptr from_node;
+	transit_node_ptr to_node;
 	double length;
 	shared_ptr<Link_Type> type;
 	std::string triplist;
@@ -301,15 +311,15 @@ public:
 	// Default Constructor
 	Transit_Walk() {}
 	//Constructor
-	Transit_Walk(std::string node_a_, std::string node_b_, double length_)
-		: node_a(node_a_), node_b(node_b_), length(length_)
+	Transit_Walk(std::string from_node_, std::string to_node_, double length_)
+		: from_node(from_node_), to_node(to_node_), length(length_)
 	{
 	}
 	//Accessors	
-	const std::string& getNode_A() const { return node_a; }
-	void setNode_A(const std::string& node_a_) { node_a = node_a_; }
-	const std::string& getNode_B() const { return node_b; }
-	void setNode_B(const std::string& node_b_) { node_b = node_b_; }
+	const std::string& getNode_A() const { return from_node; }
+	void setNode_A(const std::string& from_node_) { from_node = from_node_; }
+	const std::string& getNode_B() const { return to_node; }
+	void setNode_B(const std::string& to_node_) { to_node = to_node_; }
 
 	/*const node_ptr& getNode_A() const { return node_a; }
 	void setNode_A(const node_ptr& node_a_) { node_a = node_a_; }
@@ -325,8 +335,8 @@ private:
 	friend class odb::access;
 
 //#pragma db null	
-	std::string node_a;
-	std::string node_b;
+	std::string from_node;
+	std::string to_node;
 	double length;
 };
 
