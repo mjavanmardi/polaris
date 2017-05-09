@@ -1004,11 +1004,11 @@ namespace Network_Components
 					dbid_max++;
 
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
-					if (1 > 0)
+
+					//Generating the AB link!
+					if (do_this_link)
 					{
-						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
-												
-						
+						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();						
 
 						//link_id_dir.id = db_itr->getLink();
 						link_id_dir.id = dbid_max;
@@ -1028,9 +1028,24 @@ namespace Network_Components
 
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
+										
+						_Intersection_Interface* upstream_2 = nullptr();
+						_Intersection_Interface* downstream_2 = nullptr();
+						
+						std::stringstream sstrU(db_itr->getNode_A());
+						std::stringstream sstrD(db_itr->getNode_B());
+						int u2;
+						int d2;
 
-						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A(),nullptr)];
-						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B(), nullptr)];
+						if (sstrU >> u2)
+						{
+							upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
+						}
+
+						if (sstrD >> d2)
+						{
+							downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
+						}
 						
 						if (upstream_1 && upstream_2)
 						{
@@ -1059,6 +1074,8 @@ namespace Network_Components
 							system("pause");
 							exit(0);
 						}
+
+
 
 						if (downstream_1 && downstream_2)
 						{
@@ -1115,7 +1132,8 @@ namespace Network_Components
 						}
 					}
 
-					if (0 < 1)
+					//Generating the BA link!
+					if (do_this_link)
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 
@@ -1140,8 +1158,23 @@ namespace Network_Components
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 
-						_Intersection_Interface* upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_B(), nullptr)];
-						_Intersection_Interface* downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[stoi(db_itr->getNode_A(), nullptr)];
+						_Intersection_Interface* upstream_2 = nullptr();
+						_Intersection_Interface* downstream_2 = nullptr();
+
+						std::stringstream sstrU(db_itr->getNode_B());
+						std::stringstream sstrD(db_itr->getNode_A());
+						int u2;
+						int d2;
+
+						if (sstrU >> u2)
+						{
+							upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
+						}
+
+						if (sstrD >> d2)
+						{
+							downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
+						}
 
 						if (upstream_1 && upstream_2)
 						{
@@ -1170,6 +1203,8 @@ namespace Network_Components
 							system("pause");
 							exit(0);
 						}
+
+
 
 						if (downstream_1 && downstream_2)
 						{
@@ -1233,12 +1268,14 @@ namespace Network_Components
 
 				for (typename result<polaris::io::Transit_Links>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
 				{
-					const string& facility_type = db_itr->getType()->getLink_Type();
+					//const string& facility_type = db_itr->getType()->getLink_Type();
 					bool do_this_link = true;
 
 					counter++;
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
-					if (1 > 0)
+					
+					//Transit links are generated only in the defined AB direction!
+					if (do_this_link)
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 

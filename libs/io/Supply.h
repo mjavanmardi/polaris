@@ -271,7 +271,7 @@ public:
 	// Default Constructor
 	Transit_Links() {}
 	//Constructor
-	Transit_Links(transit_node_ptr from_node_, transit_node_ptr to_node_, double length_, shared_ptr<Link_Type> type_, std::string triplist_, std::string indexlist_)
+	Transit_Links(transit_node_ptr from_node_, transit_node_ptr to_node_, double length_, int type_, std::string triplist_, std::string indexlist_)
 		: from_node(from_node_), to_node(to_node_), length(length_), type(type_), triplist(triplist_), indexlist(indexlist_)
 	{
 	}
@@ -284,9 +284,8 @@ public:
 	void setNode_B(const std::string& to_node_, InputContainer& container) { to_node = container.TransitStops[to_node_]; }	
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }
-	const shared_ptr<Link_Type>& getType() const { return type; }
-	void setType(const shared_ptr<Link_Type>& type_) { type = type_; }
-	void setType(const std::string& type_, InputContainer& container) { type = container.Link_Types[type_]; }
+	const int& getType() const { return type; }
+	void setType(const int& type_) { type = type_; }
 	const std::string& getTriplist() const { return triplist; }
 	void setTriplist(const std::string& triplist_) { triplist = triplist_; }
 	const std::string& getIndexlist() const { return indexlist; }
@@ -299,7 +298,7 @@ private:
 	transit_node_ptr from_node;
 	transit_node_ptr to_node;
 	double length;
-	shared_ptr<Link_Type> type;
+	int type;
 	std::string triplist;
 	std::string indexlist;
 };
