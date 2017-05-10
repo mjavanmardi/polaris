@@ -2011,6 +2011,8 @@ namespace Network_Components
 
 				Types::Link_ID_Dir link_id_dir;
 				Types::Link_ID_Dir opp_link_id_dir;
+				Types::Link_ID_Dir walk_link_id_dir;
+				Types::Link_ID_Dir opp_walk_link_id_dir;
 
 				std::unordered_map<int,int> uuid_to_index;
 
@@ -2026,6 +2028,9 @@ namespace Network_Components
 				
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename type_of(network_reference)::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;
+
+				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
 
 				typedef dense_hash_map<int,int> _loc_id_to_idx_container_interface;
 
@@ -2094,6 +2099,42 @@ namespace Network_Components
 						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+
+						_Intersection_Interface* intersection = link->_upstream_intersection;
+						_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
+						typename _Links_Container_Interface::iterator out_links_itr;
+
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+							
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+							{
+								activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+								outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+
+								walk_link_id_dir.id = outbound_link->_dbid;
+								walk_link_id_dir.dir = outbound_link->_direction;
+
+								if (!this->_scenario_reference->template use_link_based_routing<bool>())
+								{
+									
+									opp_walk_link_id_dir.id = walk_link_id_dir.id;
+									opp_walk_link_id_dir.dir = abs(walk_link_id_dir.dir - 1);
+									
+									if (net_io_maps.link_id_dir_to_ptr.count(opp_walk_link_id_dir.id_dir))
+									{
+										outbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_walk_link_id_dir.id_dir];
+										activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+										outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+										activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+									}
+								}
+								break;
+							}
+						}						
 
 						// add the opposite direction link if exists
 						if (!this->_scenario_reference->template use_link_based_routing<bool>())
