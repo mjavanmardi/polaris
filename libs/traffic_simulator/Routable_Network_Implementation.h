@@ -151,13 +151,33 @@ namespace Routing_Components
 		struct transit_attributes : public Base_Edge_A_Star<MasterType>
 		{
 			t_data(bool, is_highway);
+			t_data(float*, moe_ptr);
+
+			static t_data(Layered_Data_Array<float>*, moe_data);
+			static t_data(float, ttime_weight_shape);
+			static t_data(float, ttime_weight_scale);
+			static t_data(float, ttime_weight_factor);
 		};
+
+		template<typename MasterType>
+		Layered_Data_Array<float>* transit_attributes<MasterType>::_moe_data;
+		template<typename MasterType>
+		float transit_attributes<MasterType>::_ttime_weight_shape;
+		template<typename MasterType>
+		float transit_attributes<MasterType>::_ttime_weight_scale;
+		template<typename MasterType>
+		float transit_attributes<MasterType>::_ttime_weight_factor;
 
 		struct transit_to_transit
 		{
 			t_data(float, cost);
 			t_data(float, time_cost);
+			t_data(float*, turn_moe_ptr);
+
+			static t_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
+
+		Layered_Data_Array<float>* transit_to_transit::_turn_moe_data;
 	}
 
 
@@ -547,12 +567,12 @@ namespace Routing_Components
 			{
 				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
-				Types::time_dependent_attributes<MT>::_moe_data = &_moe_data;
-				Types::time_dependent_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_shape<float>();
-				Types::time_dependent_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_scale<float>();
-				Types::time_dependent_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_factor<float>();
+				Types::transit_attributes<MT>::_moe_data = &_moe_data;
+				Types::transit_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->transit_routing_weight_shape<float>();
+				Types::transit_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->transit_routing_weight_scale<float>();
+				Types::transit_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->transit_routing_weight_factor<float>();
 
-				Types::time_dependent_to_time_dependent::_turn_moe_data = &_turn_moe_data;
+				Types::transit_to_transit::_turn_moe_data = &_turn_moe_data;
 
 				typedef Network<typename MasterType::network_type> Network_Interface;
 
@@ -574,17 +594,17 @@ namespace Routing_Components
 
 
 
-				Graph_Assembler_Connected_Edge<typename MT::time_dependent_graph_type>* time_dependent_graph = graph_pool->template Create_New_Graph<typename MT::time_dependent_graph_type>();
+				Graph_Assembler_Connected_Edge<typename MT::transit_graph_type>* transit_graph = graph_pool->template Create_New_Graph<typename MT::transit_graph_type>();
 
-				_time_dependent_network_graph_id = time_dependent_graph->graph_id();
+				_transit_network_graph_id = transit_graph->graph_id();
 
-				Input_Edge<Types::time_dependent_attributes<MT>> input_time_dependent_edge;
+				Input_Edge<Types::transit_attributes<MT>> input_transit_edge;
 
-				Input_Connection_Group_Implementation<typename MT::time_dependent_to_time_dependent_connection_type>::_neighbor_graph_id = time_dependent_graph->graph_id();
+				Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>::_neighbor_graph_id = transit_graph->graph_id();
 
-				Input_Connection_Group_Implementation<typename MT::time_dependent_to_time_dependent_connection_type>* time_dependent_to_time_dependent_connection_group = new Input_Connection_Group_Implementation<typename MT::time_dependent_to_time_dependent_connection_type>();
+				Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>* transit_to_transit_connection_group = new Input_Connection_Group_Implementation<typename MT::transit_to_transit_connection_type>();
 
-				Types::time_dependent_to_time_dependent connection_attributes;
+				Types::transit_to_transit connection_attributes;
 
 
 				Network_Interface* network = source_network;
@@ -601,35 +621,28 @@ namespace Routing_Components
 
 						Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
-						input_time_dependent_edge._x = downstream_intersection->template x_position<float>();
-						input_time_dependent_edge._y = downstream_intersection->template y_position<float>();
-						input_time_dependent_edge._edge_id = current_link->template uuid<unsigned int>();
+						input_transit_edge._x = downstream_intersection->template x_position<float>();
+						input_transit_edge._y = downstream_intersection->template y_position<float>();
+						input_transit_edge._edge_id = current_link->template uuid<unsigned int>();
 
-						input_time_dependent_edge._cost = current_link->template travel_time<float>();
-						input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
+						input_transit_edge._cost = current_link->template travel_time<float>();
+						input_transit_edge._time_cost = current_link->template travel_time<float>();
 
 
 
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
 						{
-							input_time_dependent_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template uuid<int>()]);
+							input_transit_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template uuid<int>()]);
 						}
 						else
 						{
-							input_time_dependent_edge._moe_ptr = nullptr;
+							input_transit_edge._moe_ptr = nullptr;
 							//cout << "unable to find a corresponding moe for link: " << current_link->template dbid<int>() << endl;
 							//exit(0);
 						}
 
-						if (link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
-						{
-							input_time_dependent_edge._is_highway = false;
-						}
-						else
-						{
-							input_time_dependent_edge._is_highway = true;
-						}
-
+						input_transit_edge._is_highway = false;
+						
 
 						Turn_Movement_Container_Interface* outbound_turn_movements = current_link->template outbound_turn_movements<Turn_Movement_Container_Interface*>();
 
@@ -653,31 +666,31 @@ namespace Routing_Components
 
 								long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
 
-								time_dependent_to_time_dependent_connection_group->_neighbors.push_back(neighbor_id);
+								transit_to_transit_connection_group->_neighbors.push_back(neighbor_id);
 
 								connection_attributes._cost = 0.0f;
 								connection_attributes._time_cost = 0.0f;
 
-								time_dependent_to_time_dependent_connection_group->_neighbor_attributes.push_back(connection_attributes);
+								transit_to_transit_connection_group->_neighbor_attributes.push_back(connection_attributes);
 							}
 						}
 
-						input_time_dependent_edge._connection_groups.push_back(time_dependent_to_time_dependent_connection_group);
+						input_transit_edge._connection_groups.push_back(transit_to_transit_connection_group);
 
-						time_dependent_graph->template Add_Edge<Types::time_dependent_attributes<MT>>(&input_time_dependent_edge);
+						transit_graph->template Add_Edge<Types::transit_attributes<MT>>(&input_transit_edge);
 
 						// Clean up connection group
 
-						time_dependent_to_time_dependent_connection_group->_neighbors.clear();
-						time_dependent_to_time_dependent_connection_group->_neighbor_attributes.clear();
+						transit_to_transit_connection_group->_neighbors.clear();
+						transit_to_transit_connection_group->_neighbor_attributes.clear();
 
 						// Clean up input edge
 
-						input_time_dependent_edge._connection_groups.clear();
+						input_transit_edge._connection_groups.clear();
 					}
 				}
 
-				Interactive_Graph<typename MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->template Compile_Graph<Types::time_dependent_attributes<MT>>();
+				Interactive_Graph<typename MT::transit_graph_type>* routable_network_graph = transit_graph->template Compile_Graph<Types::transit_attributes<MT>>();
 
 				//graph_pool->Link_Graphs();
 			}
@@ -717,7 +730,42 @@ namespace Routing_Components
 				{
 					global_edge_id start;
 					start.edge_id = *itr;
-					//start.graph_id = _static_network_graph_id;
+					start.graph_id = _static_network_graph_id;
+					starts.push_back(start);
+				}
+
+				// get edge id list from link id list
+				std::vector<global_edge_id> ends;
+				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+				{
+					global_edge_id end;
+					end.edge_id = *itr;
+					end.graph_id = _static_network_graph_id;
+					ends.push_back(end);
+				}
+
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container);
+				
+				// update origins/destinations lists in from A_Star results
+				origins.clear();
+				origins.push_back(starts.front().edge_id);
+				destinations.clear();
+				destinations.push_back(ends.front().edge_id);
+
+				return routed_time;
+			}
+
+			float compute_transit_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
+			{
+				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
+				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
+
+				// get start id list from link id list
+				std::vector<global_edge_id> starts;
+				for (auto itr = origins.begin(); itr != origins.end(); ++itr)
+				{
+					global_edge_id start;
+					start.edge_id = *itr;
 					start.graph_id = _transit_network_graph_id;
 					starts.push_back(start);
 				}
@@ -728,20 +776,14 @@ namespace Routing_Components
 				{
 					global_edge_id end;
 					end.edge_id = *itr;
-					//end.graph_id = _static_network_graph_id;
 					end.graph_id = _transit_network_graph_id;
 					ends.push_back(end);
 				}
 
-				float routed_time;
-				if (starts.at(0).graph_id == _transit_network_graph_id)
-				{
-					routed_time = Transit_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, false);
-				}
-				else
-				{
-					routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container);
-				}
+				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
+
+				float routed_time = Transit_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
+				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
 				origins.push_back(starts.front().edge_id);
@@ -778,15 +820,8 @@ namespace Routing_Components
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 				
-				float routed_time;
-				if (starts.at(0).graph_id == _transit_network_graph_id)
-				{
-					routed_time = Transit_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
-				}
-				else
-				{
-					routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
-				}
+				float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, debug_route);
+				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
 				origins.push_back(starts.front().edge_id);

@@ -234,6 +234,12 @@ namespace Scenario_Components
 			accessor(time_dependent_routing_weight_factor, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
+
+			accessor(transit_routing, NONE, NONE);
+			accessor(transit_routing_weight_shape, NONE, NONE);
+			accessor(transit_routing_weight_scale, NONE, NONE);
+			accessor(transit_routing_weight_factor, NONE, NONE);
+
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
 			accessor(output_link_moe_for_simulation_interval, NONE, NONE);

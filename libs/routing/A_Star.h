@@ -480,7 +480,7 @@ namespace polaris
 
 
 		global_edge_id global;
-		global.graph_id = 0;
+		global.graph_id = 1;
 
 		float total_cost = 0.0f;
 

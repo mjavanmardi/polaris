@@ -108,6 +108,8 @@ namespace Routing_Components
 				Activity_Location_Interface* destination_loc = _movement_plan->template destination<Activity_Location_Interface*>();
 				Link_Container_Interface* origin_links = origin_loc->template origin_links<Link_Container_Interface*>();
 				Link_Container_Interface* destination_links = destination_loc->template destination_links<Link_Container_Interface*>();
+				Link_Container_Interface* origin_walk_links = origin_loc->template origin_walk_links<Link_Container_Interface*>();
+				Link_Container_Interface* destination_walk_links = destination_loc->template destination_walk_links<Link_Container_Interface*>();
 
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
@@ -129,6 +131,21 @@ namespace Routing_Components
 					destination_ids.push_back(link->template uuid<unsigned int>());
 				}
 
+				std::vector<unsigned int> origin_walk_ids;
+				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+				{
+					Link_Interface* link = (Link_Interface*)(*itr);
+					origin_walk_ids.push_back(link->template uuid<unsigned int>());
+				}
+
+				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
+				std::vector<unsigned int> destination_walk_ids;
+				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+				{
+					Link_Interface* link = (Link_Interface*)(*itr);
+					destination_walk_ids.push_back(link->template uuid<unsigned int>());
+				}
+
 				//list of edgeid, graph_id tuples; internal edge ids
 				std::deque<global_edge_id> path_container;
 				//cost of traversing each of the edges
@@ -136,16 +153,33 @@ namespace Routing_Components
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				float best_route_time_to_destination = 0.0f;
+				float best_transit_route_time_to_destination = 0.0f;
 
 
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
-					best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids,destination_ids, _departure_time, path_container,cost_container);
+					if(!origin_walk_ids.empty() && !destination_walk_ids.empty())
+					{
+						best_transit_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+					}
+					else
+					{
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container);
+					}
+					
 				}
 				else
 				{
-					best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container,debug_route);
+					if (!origin_walk_ids.empty() && !destination_walk_ids.empty())
+					{
+						best_transit_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+					}
+					else
+					{ 
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container,debug_route);
+					}
+
 				}
 
 

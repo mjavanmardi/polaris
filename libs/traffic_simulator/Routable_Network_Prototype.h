@@ -48,6 +48,11 @@ namespace Routing_Components
 				return this_component()->compute_static_network_path(origins,destinations, start_time, path_container,cost_container);
 			}
 
+			float compute_transit_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
+			{
+				return this_component()->compute_transit_network_path(origins, destinations, start_time, path_container, cost_container, debug_route);
+			}
+
 			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)
 			{
 				return this_component()->compute_time_dependent_network_path(origins,destinations,start_time,path_container,cost_container, debug_route);
