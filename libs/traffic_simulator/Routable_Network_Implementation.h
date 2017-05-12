@@ -153,6 +153,14 @@ namespace Routing_Components
 			t_data(bool, is_highway);
 			t_data(float*, moe_ptr);
 
+			t_data(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time);
+			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
+
+			t_data(float, walk_time_from_origin);
+			t_data(float, wait_time_from_origin);
+			t_data(int, wait_count_from_origin);
+			t_data(void*, came_from_trip);
+
 			static t_data(Layered_Data_Array<float>*, moe_data);
 			static t_data(float, ttime_weight_shape);
 			static t_data(float, ttime_weight_scale);
@@ -173,6 +181,8 @@ namespace Routing_Components
 			t_data(float, cost);
 			t_data(float, time_cost);
 			t_data(float*, turn_moe_ptr);
+
+			t_data(float, trip_wait_time);
 
 			static t_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
@@ -380,6 +390,7 @@ namespace Routing_Components
 
 						input_time_dependent_edge._cost = current_link->template travel_time<float>();
 						input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
+
 												
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
 						{
@@ -583,7 +594,8 @@ namespace Routing_Components
 				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
 				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(outbound_turn_movements), Turn_Movement_Interface*> Turn_Movement_Container_Interface;
 
-
+				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
 
 				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
@@ -624,12 +636,17 @@ namespace Routing_Components
 						input_transit_edge._x = downstream_intersection->template x_position<float>();
 						input_transit_edge._y = downstream_intersection->template y_position<float>();
 						input_transit_edge._edge_id = current_link->template uuid<unsigned int>();
+						input_transit_edge._edge_type = current_link->_link_type;
 
 						input_transit_edge._cost = current_link->template travel_time<float>();
 						input_transit_edge._time_cost = current_link->template travel_time<float>();
 
-
-
+						for (auto trips_itr = current_link->_trips_by_dep_time.begin(); trips_itr != current_link->_trips_by_dep_time.end(); ++trips_itr)
+						{
+							_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+							input_transit_edge._trips_by_dep_time.push_back(current_trip);
+						}
+						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
 						{
 							input_transit_edge._moe_ptr = _moe_data.get_element(_link_id_to_moe_data[current_link->template uuid<int>()]);
@@ -641,8 +658,7 @@ namespace Routing_Components
 							//exit(0);
 						}
 
-						input_transit_edge._is_highway = false;
-						
+						input_transit_edge._is_highway = false;						
 
 						Turn_Movement_Container_Interface* outbound_turn_movements = current_link->template outbound_turn_movements<Turn_Movement_Container_Interface*>();
 
@@ -687,6 +703,7 @@ namespace Routing_Components
 						// Clean up input edge
 
 						input_transit_edge._connection_groups.clear();
+						input_transit_edge._trips_by_dep_time.clear();
 					}
 				}
 
