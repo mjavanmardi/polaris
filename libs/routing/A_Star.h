@@ -467,7 +467,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+				connection_set_iterator = connection_set_iterator->Visit_Transit_Neighbors(agent, current, routing_data);
 			}
 
 		}
