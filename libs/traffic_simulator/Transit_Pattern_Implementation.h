@@ -34,7 +34,7 @@ namespace Transit_Pattern_Components
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_prototype(Transit_Route_Components::Prototypes::Transit_Route, typename MasterType::transit_route_type, route, NONE, NONE);
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stops, NONE, NONE);
-			m_container(std::vector<typename MasterType::link_type*>, pattern_link, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, pattern_links, NONE, NONE);
 			
 			/*typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;
 			typedef Intersection_Components::Prototypes::Intersection<type_of(pattern_stops)> _Intersection_Interface; 

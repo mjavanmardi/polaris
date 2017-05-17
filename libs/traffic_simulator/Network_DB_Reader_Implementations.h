@@ -1902,6 +1902,39 @@ namespace Network_Components
 						intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().push_back(inboundOutboundMovements);
 					}
 				}
+
+				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+				
+				typename _Transit_Patterns_Container_Interface::iterator patterns_itr;
+				_Transit_Patterns_Container_Interface& patterns = _network_reference->template transit_patterns_container<_Transit_Patterns_Container_Interface&>();
+
+				cout << "Adding pattern links using pattern stops" << endl;
+
+				for (patterns_itr = patterns.begin(); patterns_itr != patterns.end(); ++patterns_itr)
+				{
+					_Transit_Pattern_Interface* pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+
+					for (int stops_itr = 0; stops_itr < (int)pattern->_pattern_stops.size()-1; stops_itr++)
+					{
+						
+						_Intersection_Interface* a_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr);
+						_Intersection_Interface* b_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr+1);
+						
+						for (int links_itr = 0; links_itr < (int)a_Stop->_outbound_links.size(); links_itr++)
+						{
+							_Link_Interface* out_link = (_Link_Interface*)a_Stop->_outbound_links.at(links_itr);
+
+							_Intersection_Interface* b_Stop_Candidate = (_Intersection_Interface*)out_link->_downstream_intersection;
+
+							if (b_Stop_Candidate == b_Stop)
+							{
+								pattern->_pattern_links.push_back(out_link);
+							}
+						}					
+					}
+				}
+
 			}
 
 			template<typename TargetType> void read_zone_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
