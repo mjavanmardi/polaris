@@ -154,12 +154,14 @@ namespace Routing_Components
 			t_data(float*, moe_ptr);
 
 			t_data(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time);
+			t_data(std::vector<int>, index_along_trip_at_upstream_node)
+
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
 			t_data(float, walk_time_from_origin);
 			t_data(float, wait_time_from_origin);
 			t_data(int, wait_count_from_origin);
-			t_data(void*, came_from_trip);
+			t_data(void*, came_on_trip);
 
 			static t_data(Layered_Data_Array<float>*, moe_data);
 			static t_data(float, ttime_weight_shape);
@@ -641,10 +643,14 @@ namespace Routing_Components
 						input_transit_edge._cost = current_link->template travel_time<float>();
 						input_transit_edge._time_cost = current_link->template travel_time<float>();
 
+						int my_itr = 0;
 						for (auto trips_itr = current_link->_trips_by_dep_time.begin(); trips_itr != current_link->_trips_by_dep_time.end(); ++trips_itr)
 						{
 							_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
 							input_transit_edge._trips_by_dep_time.push_back(current_trip);
+							int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
+							input_transit_edge._index_along_trip_at_upstream_node.push_back(my_index);
+							my_itr++;
 						}
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -704,6 +710,7 @@ namespace Routing_Components
 
 						input_transit_edge._connection_groups.clear();
 						input_transit_edge._trips_by_dep_time.clear();
+						input_transit_edge._index_along_trip_at_upstream_node.clear();
 					}
 				}
 

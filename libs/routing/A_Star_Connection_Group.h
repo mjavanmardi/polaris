@@ -1,6 +1,7 @@
 #pragma once
 #include "Connection_Group_Implementation.h"
 #include "A_Star_Edge.h"
+#include "Network_DB_Reader_Implementations.h"
 
 namespace polaris
 {
@@ -16,11 +17,6 @@ namespace polaris
 		typedef typename Base_t::Connection_Implementation Connection_Implementation;
 		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
 		typedef typename Base_t::connection_attributes_type connection_attributes_type;
-		
-		
-/*
-		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
-		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;*/
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
@@ -95,7 +91,18 @@ namespace polaris
 		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
 		typedef typename Base_t::connection_attributes_type connection_attributes_type;
 
-		typedef typename MasterType::transit_vehicle_trip_type* transit_vehicle_trip_type;
+		typedef Network<typename MasterType::network_type> Network_Interface;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+
+		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+
+		typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+
+		//typedef typename MasterType::transit_pattern_type* transit_pattern_type;
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
@@ -133,15 +140,58 @@ namespace polaris
 
 			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
 
-			for (auto trips_itr = current_neighbor->_trips_by_dep_time.begin(); trips_itr != current_neighbor->_trips_by_dep_time.end(); ++trips_itr)
+			for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
 			{
-				transit_vehicle_trip_type* next_trip = (transit_vehicle_trip_type*)(*trips_itr);
-				cout << next_trip << endl;
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time.at(trips_itr);
+				int mySeq = current_neighbor->_index_along_trip_at_upstream_node.at(trips_itr);
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
+
+				int wait_binary = 1;
+				if (current->came_on_trip() == next_trip)
+				{
+					wait_binary = 0;
+				}
+
+				int walkbinary = 0;
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
+				{
+					walkbinary = 1;
+				}
+
+				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
+
+				int CandidateTransferCount = 0;
+				int nonHomeWait = 0;
+				if (CandidateWaitingCount > 1)
+				{
+					CandidateTransferCount = CandidateWaitingCount - 1;
+					nonHomeWait = 1;
+				}
+
+				float transferPenalty = 300;
+				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 
 
-				float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				float waitTime = next_trip->_departure_seconds.at(mySeq) - (current->_time_from_origin + current->_time_cost);
+				float CandidateWaitLabel = wait_binary * waitTime + current->_wait_time_from_origin;
 
-				if (cost_from_origin < current_neighbor->cost_from_origin())
+
+				//float CandidateDriveLabel = current->_drive_time_from_origin + drivebinary * current->._time_cost;
+				float CandidateWalkLabel = current->_walk_time_from_origin + walkbinary * current->_time_cost;
+
+
+
+				for (int links_itr = mySeq; links_itr < (int)next_pattern->_pattern_links.size(); links_itr++)
+				{
+
+					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(links_itr);
+
+					
+				}
+				//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+				/*if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
 					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
 
@@ -171,7 +221,7 @@ namespace polaris
 
 					// update the label
 					agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-				}
+				}*/
 			}
 		}
 
