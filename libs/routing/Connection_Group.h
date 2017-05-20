@@ -15,7 +15,7 @@ namespace polaris
 
 		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<Base_Edge_Type>& routing_data) = 0;
 
-		virtual Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<Base_Edge_Type>& routing_data) = 0;
+		virtual Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<Base_Edge_Type>& routing_data, void* graph_pool) = 0;
 
 		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::tree_agent_type>* agent, void* current, Routing_Data<Base_Edge_Type>& routing_data) = 0;
 

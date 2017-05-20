@@ -105,7 +105,7 @@ namespace polaris
 		//typedef typename MasterType::transit_pattern_type* transit_pattern_type;
 
 		template<typename AgentType>
-		Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
+		Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
 		{
 			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
 			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
@@ -118,7 +118,7 @@ namespace polaris
 
 				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
+					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
 				}
 				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -132,11 +132,11 @@ namespace polaris
 
 		//basic A* stuff
 		template<typename AgentType>
-		void Evaluate_Transit_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
+		void Evaluate_Transit_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			if (current_neighbor->in_closed_set()) return;
+			//if (current_neighbor->in_closed_set()) return;
 
 			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
 
@@ -169,59 +169,105 @@ namespace polaris
 					nonHomeWait = 1;
 				}
 
+				////////////////////////PARAMETERS
 				float transferPenalty = 300;
+				float waitWeight = 2;
+				////////////////////////PARAMETERS
+
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 
 
 				float waitTime = next_trip->_departure_seconds.at(mySeq) - (current->_time_from_origin + current->_time_cost);
-				float CandidateWaitLabel = wait_binary * waitTime + current->_wait_time_from_origin;
-
+				float CandidateWaitLabel = current->_wait_time_from_origin + wait_binary * waitTime;
 
 				//float CandidateDriveLabel = current->_drive_time_from_origin + drivebinary * current->._time_cost;
 				float CandidateWalkLabel = current->_walk_time_from_origin + walkbinary * current->_time_cost;
 
+				
+				
+				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(mySeq);
 
+				global_edge_id seq_edge_id;
+				seq_edge_id.edge_id = seq_Link->_uuid;
 
-				for (int links_itr = mySeq; links_itr < (int)next_pattern->_pattern_links.size(); links_itr++)
+				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
+
+				float cost_from_origin = current->cost_from_origin() + wait_binary*waitWeight*waitTime + effectiveTransferPen;
+
+				if (cost_from_origin < seq_edge->cost_from_origin())
 				{
+					seq_edge->cost_from_origin(cost_from_origin);
 
-					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(links_itr);
+					float time_from_origin = current->time_from_origin() + wait_binary*waitTime;
+					seq_edge->time_from_origin(time_from_origin);
+					seq_edge->time_label((float)next_trip->_arrival_seconds.at(mySeq));
+					
+					seq_edge->came_from(current);
+					seq_edge->came_on_trip(next_trip);
+					seq_edge->_came_on_seq_index = mySeq;
+					seq_edge->_wait_count_from_origin = CandidateWaitingCount;
+					seq_edge->_wait_time_from_origin = CandidateWaitLabel;
+					seq_edge->_walk_time_from_origin = CandidateWalkLabel;					
+
+					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+					seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+					if (!seq_edge->marked_for_reset())
+					{
+						routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
+						seq_edge->marked_for_reset(true);
+					}
+
+					if (seq_edge->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+					routing_data.open_set->insert(*((base_edge_type*)seq_edge));
+					seq_edge->in_open_set(true);
+					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				}
+
+				for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
+				{
+					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(iSeq);
+
+					global_edge_id seq_edge_id;
+					seq_edge_id.edge_id = seq_Link->_uuid;
+
+					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
+
+					float cost_from_origin = current->cost_from_origin() + wait_binary*waitWeight*waitTime + effectiveTransferPen + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);					
+
+					if (cost_from_origin < seq_edge->cost_from_origin())
+					{
+						seq_edge->cost_from_origin(cost_from_origin);
+						
+						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);
+						seq_edge->time_from_origin(time_from_origin);
+						seq_edge->time_label((float)next_trip->_arrival_seconds.at(iSeq));
+
+						seq_edge->came_from(current);
+						seq_edge->came_on_trip(next_trip);
+						seq_edge->_came_on_seq_index = iSeq;
+						seq_edge->_wait_count_from_origin = CandidateWaitingCount;
+						seq_edge->_wait_time_from_origin = CandidateWaitLabel;
+						seq_edge->_walk_time_from_origin = CandidateWalkLabel;						
+
+						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+						if (!seq_edge->marked_for_reset())
+						{
+							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
+							seq_edge->marked_for_reset(true);
+						}
+
+						if (seq_edge->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
+						seq_edge->in_open_set(true);
+
+						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+					}
 
 					
 				}
-				//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-
-				/*if (cost_from_origin < current_neighbor->cost_from_origin())
-				{
-					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-
-					float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-					float time_from_origin = current->time_from_origin() + time_cost_between;
-
-					if (!current_neighbor->marked_for_reset())
-					{
-						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-						current_neighbor->marked_for_reset(true);
-					}
-
-					current_neighbor->came_from(current);
-
-					current_neighbor->cost_from_origin(cost_from_origin);
-					current_neighbor->time_from_origin(time_from_origin);
-
-					current_neighbor->time_label(current_edge->time_label() + time_cost_between);
-
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-
-					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-
-					current_neighbor->in_open_set(true);
-
-					// update the label
-					agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-				}*/
 			}
 		}
 
@@ -230,43 +276,87 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			if (current_neighbor->in_closed_set()) return;
+			//if (current_neighbor->in_closed_set()) return;
 
 			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
 
-			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-
-			if (cost_from_origin < current_neighbor->cost_from_origin())
+			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
-				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-				float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-				float time_from_origin = current->time_from_origin() + time_cost_between;
-
-				if (!current_neighbor->marked_for_reset())
+				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
-					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-					current_neighbor->marked_for_reset(true);
+					current_neighbor->cost_from_origin(cost_from_origin);
+
+					float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+					current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
+					current_neighbor->time_label(current->time_label() + time_cost_between);					
+					
+					current_neighbor->came_from(current);
+					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
+					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
+					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin + time_cost_between;
+					
+					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
+
+					if (!current_neighbor->marked_for_reset())
+					{
+						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+						current_neighbor->marked_for_reset(true);
+					}			
+
+					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+					current_neighbor->in_open_set(true);
+
+					// update the label
+					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);					
+				}
+			}
+
+			else if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+			{
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current->came_on_trip();
+				int mySeq = current->_came_on_seq_index;
+				//_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)next_trip->_pattern;				
+
+				float cost_from_origin = current->cost_from_origin() + next_trip->_arrival_seconds.at(mySeq + 1) - next_trip->_departure_seconds.at(mySeq);
+
+				if (cost_from_origin < current_neighbor->cost_from_origin())
+				{
+					current_neighbor->cost_from_origin(cost_from_origin);
+					
+					float time_from_origin = current->time_from_origin() + next_trip->_arrival_seconds.at(mySeq + 1) - next_trip->_departure_seconds.at(mySeq);
+					current_neighbor->time_from_origin(time_from_origin);
+					current_neighbor->time_label((float)next_trip->_arrival_seconds.at(mySeq + 1));
+					
+					current_neighbor->came_from(current);
+					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
+					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
+					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin;
+
+					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);					
+					
+					if (!current_neighbor->marked_for_reset())
+					{
+						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+						current_neighbor->marked_for_reset(true);
+					}
+
+					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+					current_neighbor->in_open_set(true);
+
+					// update the label
+					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}
 
-				current_neighbor->came_from(current);
 
-				current_neighbor->cost_from_origin(cost_from_origin);
-				current_neighbor->time_from_origin(time_from_origin);
-
-				current_neighbor->time_label(current_edge->time_label() + time_cost_between);
-
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-
-				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-
-				current_neighbor->in_open_set(true);
-
-				// update the label
-				agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-			}
+				
+			}			
 		}
 	};
 
