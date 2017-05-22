@@ -137,26 +137,42 @@ namespace polaris
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
 			//if (current_neighbor->in_closed_set()) return;
-
-			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
-
+			
 			for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
-			{
+			{						
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time.at(trips_itr);
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node.at(trips_itr);
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
 
-				int wait_binary = 1;
-				if (current->came_on_trip() == next_trip)
-				{
-					wait_binary = 0;
-				}
-
-				int walkbinary = 0;
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				float currentWalkTime;
+				float currentIVTTime;
+				float EarliestBoardTime;
+				int wait_binary = 1;
+
 				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
-					walkbinary = 1;
+					currentWalkTime = current->_time_cost;
+					currentIVTTime = 0;
+					EarliestBoardTime = current->_time_label + currentWalkTime;
+				}
+				else if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					int currentSeq = current->_came_on_seq_index;					
+					EarliestBoardTime = current_trip->_arrival_seconds.at(currentSeq + 1);
+					currentIVTTime = EarliestBoardTime - current->_time_label;
+					currentWalkTime = 0;
+					if (current_trip == next_trip)
+					{
+						wait_binary = 0;
+					}
+				}
+								
+				float waitTime = next_trip->_departure_seconds.at(mySeq) - EarliestBoardTime;
+				if (waitTime < 0)
+				{
+					continue;
 				}
 
 				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
@@ -172,38 +188,46 @@ namespace polaris
 				////////////////////////PARAMETERS
 				float transferPenalty = 300;
 				float waitWeight = 2;
+				float walkWeight = 2;
 				////////////////////////PARAMETERS
 
-				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
-
-
-				float waitTime = next_trip->_departure_seconds.at(mySeq) - (current->_time_from_origin + current->_time_cost);
+				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;		
 				float CandidateWaitLabel = current->_wait_time_from_origin + wait_binary * waitTime;
 
 				//float CandidateDriveLabel = current->_drive_time_from_origin + drivebinary * current->._time_cost;
-				float CandidateWalkLabel = current->_walk_time_from_origin + walkbinary * current->_time_cost;
+				float CandidateWalkLabel = current->_walk_time_from_origin + currentWalkTime;
 
-				
-				
 				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(mySeq);
 
 				global_edge_id seq_edge_id;
 				seq_edge_id.edge_id = seq_Link->_uuid;
+				seq_edge_id.graph_id = 1;
 
 				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 
-				float cost_from_origin = current->cost_from_origin() + wait_binary*waitWeight*waitTime + effectiveTransferPen;
+				if (seq_edge != current_neighbor)
+				{
+					cout << "Link mapping error between networks" << endl;
+					cout << "current_neighbor ID: " << current_neighbor->_edge_id << endl;
+					cout << "seq_Link ID: " << seq_Link->_uuid << endl;
+					cout << "seq_edge ID: " << seq_edge->_edge_id << endl;
+					system("pause");
+					exit(0);
+				}
+
+				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + currentIVTTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;
 
 				if (cost_from_origin < seq_edge->cost_from_origin())
 				{
 					seq_edge->cost_from_origin(cost_from_origin);
 
-					float time_from_origin = current->time_from_origin() + wait_binary*waitTime;
+					float time_from_origin = current->time_from_origin() + currentWalkTime + currentIVTTime + wait_binary*waitTime;
+
 					seq_edge->time_from_origin(time_from_origin);
-					seq_edge->time_label((float)next_trip->_arrival_seconds.at(mySeq));
+					seq_edge->time_label((float)next_trip->_departure_seconds.at(mySeq));
 					
 					seq_edge->came_from(current);
-					seq_edge->came_on_trip(next_trip);
+					seq_edge->_came_on_trip = next_trip;
 					seq_edge->_came_on_seq_index = mySeq;
 					seq_edge->_wait_count_from_origin = CandidateWaitingCount;
 					seq_edge->_wait_time_from_origin = CandidateWaitLabel;
@@ -230,21 +254,23 @@ namespace polaris
 
 					global_edge_id seq_edge_id;
 					seq_edge_id.edge_id = seq_Link->_uuid;
+					seq_edge_id.graph_id = 1;
 
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
-
-					float cost_from_origin = current->cost_from_origin() + wait_binary*waitWeight*waitTime + effectiveTransferPen + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);					
+					
+					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + currentIVTTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
 					{
 						seq_edge->cost_from_origin(cost_from_origin);
 						
-						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);
+						float time_from_origin = current->time_from_origin() + currentWalkTime + currentIVTTime + wait_binary*waitTime + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);
+
 						seq_edge->time_from_origin(time_from_origin);
 						seq_edge->time_label((float)next_trip->_arrival_seconds.at(iSeq));
 
 						seq_edge->came_from(current);
-						seq_edge->came_on_trip(next_trip);
+						seq_edge->_came_on_trip = next_trip;
 						seq_edge->_came_on_seq_index = iSeq;
 						seq_edge->_wait_count_from_origin = CandidateWaitingCount;
 						seq_edge->_wait_time_from_origin = CandidateWaitLabel;
@@ -277,23 +303,28 @@ namespace polaris
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
 			//if (current_neighbor->in_closed_set()) return;
-
-			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
+						
+			////////////////////////PARAMETERS
+			float transferPenalty = 300;
+			float waitWeight = 2;
+			float walkWeight = 2;
+			////////////////////////PARAMETERS
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
-				float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				float cost_from_origin = current->cost_from_origin() + walkWeight * current->_time_cost;
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
 					current_neighbor->cost_from_origin(cost_from_origin);
 
-					float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+					float time_cost_between = current->_time_cost;
 					current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 					current_neighbor->time_label(current->time_label() + time_cost_between);					
 					
 					current_neighbor->came_from(current);
+					current_neighbor->_came_on_seq_index = 0;
 					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
 					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
 					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin + time_cost_between;
@@ -318,21 +349,21 @@ namespace polaris
 
 			else if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
-				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current->came_on_trip();
-				int mySeq = current->_came_on_seq_index;
-				//_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)next_trip->_pattern;				
+				_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+				int currentSeq = current->_came_on_seq_index;					
 
-				float cost_from_origin = current->cost_from_origin() + next_trip->_arrival_seconds.at(mySeq + 1) - next_trip->_departure_seconds.at(mySeq);
+				float cost_from_origin = current->cost_from_origin() + current_trip->_arrival_seconds.at(currentSeq + 1) - current->_time_label;
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
 					current_neighbor->cost_from_origin(cost_from_origin);
 					
-					float time_from_origin = current->time_from_origin() + next_trip->_arrival_seconds.at(mySeq + 1) - next_trip->_departure_seconds.at(mySeq);
+					float time_from_origin = current->time_from_origin() + current_trip->_arrival_seconds.at(currentSeq + 1) - current->_time_label;
 					current_neighbor->time_from_origin(time_from_origin);
-					current_neighbor->time_label((float)next_trip->_arrival_seconds.at(mySeq + 1));
+					current_neighbor->time_label((float)current_trip->_arrival_seconds.at(currentSeq + 1));
 					
 					current_neighbor->came_from(current);
+					current_neighbor->_came_on_seq_index = 0;
 					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
 					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
 					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin;

@@ -49,10 +49,7 @@ namespace polaris
 	
 		void* came_from(){ return this_component()->came_from(); }
 		void came_from(void* value){ this_component()->came_from(value); }
-
-		void* came_on_trip() { return this_component()->came_on_trip(); }
-		void came_on_trip(void* value) { this_component()->came_on_trip(value); }
-
+		
 		float time_label(){ return this_component()->time_label(); }
 		void time_label(float value){ this_component()->time_label(value); }
 

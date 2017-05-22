@@ -382,8 +382,17 @@ namespace polaris
 	static float Transit_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+		typedef Edge_Implementation<Routing_Components::Types::transit_attributes<MasterType>> transit_edge_type;
+
+		typedef Network<typename MasterType::network_type> Network_Interface;
+		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
 		std::deque< base_edge_type* > modified_edges;
+
+		std::deque<Link_Components::Types::Link_Type_Keys> out_type;
+		std::deque<int> out_trip;
+		std::deque<int> out_seq;
 
 		boost::intrusive::multiset< base_edge_type > open_set;
 
@@ -481,30 +490,50 @@ namespace polaris
 
 		global_edge_id global;
 		global.graph_id = 1;
+		_Transit_Vehicle_Trip_Interface* current_trip;
 
-		float total_cost = 0.0f;
+		float total_cost = 0.0f;		
 
 		if (success)
 		{
-			base_edge_type* current = end_base;//(base_edge_type*)end;
-			base_edge_type* cached_current = (base_edge_type*)current;
+			//base_edge_type* current = end_base;//(base_edge_type*)end;
 
+			global.edge_id = end_base->_edge_id;
+			global.graph_id = 1;
+
+			transit_edge_type* current = (transit_edge_type*)graph_pool->Get_Edge(global);
+			transit_edge_type* cached_current = (transit_edge_type*)current;
+			
 			while (current != nullptr)
 			{
 				global.edge_id = current->_edge_id;
 
 				out_path.push_back(global);
 				out_cost.push_back(current->_cost_from_origin);
+				out_type.push_back(current->_edge_type);
+				out_seq.push_back(current->_came_on_seq_index);
 
-				current = (base_edge_type*)current->came_from();
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					out_trip.push_back(current_trip->_uuid);
+				}
+				else
+				{
+					out_trip.push_back(-1);
+				}				
 
+				current = (transit_edge_type*)current->came_from();
 				cached_current->came_from(nullptr);
-
 				cached_current = current;
 			}
 
 			std::reverse(out_path.begin(), out_path.end());
 			std::reverse(out_cost.begin(), out_cost.end());
+			std::reverse(out_type.begin(), out_type.end());
+			std::reverse(out_trip.begin(), out_trip.end());
+			std::reverse(out_seq.begin(), out_seq.end());
 
 			total_cost = out_cost.back();
 
