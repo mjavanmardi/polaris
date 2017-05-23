@@ -172,7 +172,7 @@ namespace Network_Components
 
 				for(typename result<polaris::io::Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
-					const string& facility_type=db_itr->getType()->getLink_Type();
+					const string& facility_type=db_itr->getType();
 					bool do_this_link = false;
 					
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
@@ -701,8 +701,8 @@ namespace Network_Components
 
 				for(typename result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
 				{
-					const string& inbound_link_type = db_itr->getLink()->getType()->getLink_Type();
-					const string& outbound_link_type = db_itr->getTo_Link()->getType()->getLink_Type();
+					const string& inbound_link_type = db_itr->getLink()->getType();
+					const string& outbound_link_type = db_itr->getTo_Link()->getType();
 
 					bool do_this_connection = false;
 					

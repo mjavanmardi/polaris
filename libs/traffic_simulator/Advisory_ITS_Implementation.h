@@ -13,6 +13,20 @@ namespace Advisory_ITS_Components
 		{
 			
 			typedef typename Polaris_Component<MasterType,INHERIT(Simple_Advisory_ITS),Data_Object>::Component_Type ComponentType;
+
+			// Push advisory to all links
+			void Initialize()
+			{
+				std::vector<typename MasterType::link_type* > &links = ((Network<typename MasterType::network_type>*)_global_network)->links_container<std::vector<typename MasterType::link_type*>&>();
+
+
+				for (typename std::vector<typename MasterType::link_type* >::iterator itr = links.begin();itr != links.end();itr++)
+				{
+					((Link_Interface*)(*itr))->template Push_ITS< ComponentType* >((ComponentType*)this);
+				}
+			}
+
+			// Push advisory to select links
 			template<typename TargetType> void Initialize(const std::vector<int>& db_covered_links/*,bool flag=false*/)
 			{
 				using namespace polaris::io;

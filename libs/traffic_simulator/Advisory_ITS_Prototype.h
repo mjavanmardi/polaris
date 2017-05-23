@@ -27,6 +27,11 @@ namespace Advisory_ITS_Components
 				ComponentType::template Initialize_Type<TargetType>();
 			}
 
+			template<typename TargetType> void Initialize()
+			{
+				this_component()->template Initialize<TargetType>();
+			}
+
 			template<typename TargetType> void Initialize(TargetType configuration)
 			{
 				this_component()->template Initialize<TargetType>(configuration);

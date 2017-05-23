@@ -219,7 +219,7 @@ struct MasterType
 
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
 	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
-	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
+	typedef TYPELIST_3(/*link_control_type,depot_type,*/advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 
@@ -285,6 +285,163 @@ int main(int argc,char** argv)
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	string scenario_filename = "scenario.json";
+
+	// command line running
+	if (argc == 2)
+	{
+		string command = argv[1];
+		if (std::strncmp(command.c_str(), "-h", 2) == 0) // Do help
+		{
+			cout << "Keyword arguments for Polaris Command line:" << endl;
+			cout << "-scenario:\tGenerate default scenario file." << endl;
+			cout << "-databases:\tGenerate default input databases." << endl;
+			cout << "-help:\t\tDisplay Polaris keyword help for command line." << endl;
+			cout << "-usage:\t\tDescribe Polaris command line usage pattern." << endl << endl;
+			return EXIT_SUCCESS;
+		}
+		else if (std::strncmp(command.c_str(), "-s", 2) == 0) // Generate default scenario file
+		{
+			ofstream outfile;
+			outfile.open("scenario.json");
+			outfile << "{" << endl;
+			outfile << "\t\"accident_event_duration_reduction\" : 1," << endl;
+			outfile << "\t\"activity_start_time_model_file_name\" : \"start_time_duration_data_new.txt\"," << endl;
+			outfile << "\t\"aggregate_routing\" : false," << endl;
+			outfile << "\t\"analyze_link_groups_file_path_name\" : \"analyze_link_groups\"," << endl;
+			outfile << "\t\"assignment_mode\" :  \"ONE_SHOT_ASSIGNMENT_SIMULATION_MODE\"," << endl;
+			outfile << "\t\"automation_cost\" : 9999999999999," << endl;
+			outfile << "\t\"buildings_geometry_file\" : \"\"," << endl;
+			outfile << "\t\"calculate_realtime_moe\" : true," << endl;
+			outfile << "\t\"capacity_adjustment_arterial\" : 1," << endl;
+			outfile << "\t\"capacity_adjustment_highway\" : 1," << endl;
+			outfile << "\t\"cav_market_penetration\" : 0," << endl;
+			outfile << "\t\"cav_vott_adjustment\" : 1," << endl;
+			outfile << "\t\"cav_wtp_model_file\" : \"\"," << endl;
+			outfile << "\t\"color_cars_randomly\" : false," << endl;
+			outfile << "\t\"compare_with_historic_moe\" : false," << endl;
+			outfile << "\t\"count_integrated_in_network_vehicles_only\" : false," << endl;
+			outfile << "\t\"database_name\" : \"\"," << endl;
+			outfile << "\t\"demand_od_flag\" : 1," << endl;
+			outfile << "\t\"demand_reduction_factor\" : 1," << endl;
+			outfile << "\t\"destination_choice_model_file\" : \"\"," << endl;
+			outfile << "\t\"do_planner_routing\" : false," << endl;
+			outfile << "\t\"ending_time_hh_mm\" : 86400," << endl;
+			outfile << "\t\"enroute_excessive_delay_factor\" : 1," << endl;
+			outfile << "\t\"enroute_switching_enabled\" : true ," << endl;
+			outfile << "\t\"enroute_switching_on_excessive_delay\" : true," << endl;
+			outfile << "\t\"flexible_work_percentage\" : 0.12," << endl;
+			outfile << "\t\"historic_demand_moe_directory\" : \"\"," << endl;
+			outfile << "\t\"historic_link_moe_file_path_name\" : \"historic_moe_link.csv\"," << endl;
+			outfile << "\t\"historic_network_moe_file_path_name\" : \"historic_realtime_moe_network.csv\"," << endl;
+			outfile << "\t\"historical_results_database_name\" : \"\"," << endl;
+			outfile << "\t\"information_compliance_rate_mean\" : 1," << endl;
+			outfile << "\t\"information_compliance_rate_standard_deviation\" : 0.5," << endl;
+			outfile << "\t\"input_highway_cost_skim_file_path_name\" : \"\"," << endl;
+			outfile << "\t\"input_highway_skim_file_path_name\" : \"\"," << endl;
+			outfile << "\t\"input_network_snapshots_file_path_name\" : \"input_network_snapshots\"," << endl;
+			outfile << "\t\"input_popsyn_database_name\" : \"\"," << endl;
+			outfile << "\t\"input_transit_skim_file_path_name\" : \"\"," << endl;
+			outfile << "\t\"ipf_tolerance\" : 0.01," << endl;
+			outfile << "\t\"jam_density_constraints_enforced\" : true," << endl;
+			outfile << "\t\"load_analyze_link_groups_from_file\" : false," << endl;
+			outfile << "\t\"marginal_tolerance\" : 5," << endl;
+			outfile << "\t\"maximum_flow_rate_constraints_enforced\" : true," << endl;
+			outfile << "\t\"maximum_iterations\" : 100," << endl;
+			outfile << "\t\"merging_mode\" :  \"PROPORTION_TO_DEMAND\"," << endl;
+			outfile << "\t\"minimum_delay_ratio_for_enroute_switching\" : 3," << endl;
+			outfile << "\t\"minimum_delay_seconds_for_enroute_switching\" : 300," << endl;
+			outfile << "\t\"minimum_seconds_from_arrival_for_enroute_switching\" : 300," << endl;
+			outfile << "\t\"minimum_travel_time_saving_mean\" : 1," << endl;
+			outfile << "\t\"minimum_travel_time_saving_standard_deviation\" : 1," << endl;
+			outfile << "\t\"mode_choice_model_file\" : \"\"," << endl;
+			outfile << "\t\"multimodal_network_input\" : false," << endl;
+			outfile << "\t\"node_control_flag\" : 0," << endl;
+			outfile << "\t\"num_simulation_intervals_per_assignment_interval\" : 50," << endl;
+			outfile << "\t\"output_analzye_link_group_moe_for_assignment_interval\" : false," << endl;
+			outfile << "\t\"output_dir_name\" : \"\"," << endl;
+			outfile << "\t\"output_highway_cost_skim_file_path_name\" : \"highway_cost_skim_file_out.txt\"," << endl;
+			outfile << "\t\"output_highway_skim_file_path_name\" : \"highway_skim_file_out.txt\"," << endl;
+			outfile << "\t\"output_link_moe_for_assignment_interval\" : false," << endl;
+			outfile << "\t\"output_link_moe_for_simulation_interval\" : false," << endl;
+			outfile << "\t\"output_network_moe_for_assignment_interval\" : false," << endl;
+			outfile << "\t\"output_network_moe_for_simulation_interval\" : false," << endl;
+			outfile << "\t\"output_transit_skim_file_path_name\" : \"transit_skim_file_out.txt\"," << endl;
+			outfile << "\t\"output_turn_movement_moe_for_assignment_interval\" : false," << endl;
+			outfile << "\t\"output_turn_movement_moe_for_simulation_interval\" : false," << endl;
+			outfile << "\t\"percent_to_synthesize\" : 1," << endl;
+			outfile << "\t\"popsyn_control_file\" : \"popsyn_control_file.txt\"," << endl;
+			outfile << "\t\"pretrip_informed_market_share\" : 0.5," << endl;
+			outfile << "\t\"ramp_metering_flag\" : false," << endl;
+			outfile << "\t\"read_demand_from_database\" : false," << endl;
+			outfile << "\t\"read_network_snapshots\" : false," << endl;
+			outfile << "\t\"read_normal_day_link_moe\" : false," << endl;
+			outfile << "\t\"read_population_from_database\" : false," << endl;
+			outfile << "\t\"read_skim_tables\" : false," << endl;
+			outfile << "\t\"realtime_informed_vehicle_market_share\" : 0.5," << endl;
+			outfile << "\t\"relative_indifference_band_route_choice_mean\" : 0.1," << endl;
+			outfile << "\t\"rng_type\" :  \"DETERMINISTIC\"," << endl;
+			outfile << "\t\"routing_with_snapshots\" : false," << endl;
+			outfile << "\t\"run_simulation_for_db_input\" : true," << endl;
+			outfile << "\t\"seed\" : 0," << endl;
+			outfile << "\t\"simulate_cacc\" : false," << endl;
+			outfile << "\t\"simulation_interval_length_in_second\" : 6," << endl;
+			outfile << "\t\"skim_interval_length_minutes\" : 1440," << endl;
+			outfile << "\t\"snapshot_period\" : 300," << endl;
+			outfile << "\t\"starting_time_hh_mm\" : 0," << endl;
+			outfile << "\t\"telecommute_choice_model_file\" : \"\"," << endl;
+			outfile << "\t\"tile_imagery_alpha_level\" : 255," << endl;
+			outfile << "\t\"tile_imagery_file\" : \"\"," << endl;
+			outfile << "\t\"time_dependent_routing\" : false," << endl;
+			outfile << "\t\"time_dependent_routing_weight_factor\" : 1," << endl;
+			outfile << "\t\"time_dependent_routing_weight_scale\" : 1000," << endl;
+			outfile << "\t\"time_dependent_routing_weight_shape\" : 2," << endl;
+			outfile << "\t\"use_link_based_routing\" : false," << endl;
+			outfile << "\t\"use_network_events\" : false," << endl;
+			outfile << "\t\"use_realtime_travel_time_for_enroute_switching\" : false," << endl;
+			outfile << "\t\"use_tmc\" : false," << endl;
+			outfile << "\t\"vehicle_distribution_file_name\" : \"vehicle_distribution.txt\"," << endl;
+			outfile << "\t\"vehicle_taking_action\" : false," << endl;
+			outfile << "\t\"vehicle_tracking_list_file_name\" : \"\"," << endl;
+			outfile << "\t\"vehicle_trajectory_output_threshold\" : -1," << endl;
+			outfile << "\t\"vehicle_trajectory_sample_rate\" : 1," << endl;
+			outfile << "\t\"write_activity_output\" : false," << endl;
+			outfile << "\t\"write_db_input_to_files\" : false," << endl;
+			outfile << "\t\"write_demand_to_database\" : false," << endl;
+			outfile << "\t\"write_full_output\" : false," << endl;
+			outfile << "\t\"write_marginal_output\" : false," << endl;
+			outfile << "\t\"write_network_link_flow\" : false," << endl;
+			outfile << "\t\"write_network_link_turn_time\" : false," << endl;
+			outfile << "\t\"write_network_snapshots\" : false," << endl;
+			outfile << "\t\"write_node_control_state\" : false," << endl;
+			outfile << "\t\"write_output_summary\" : true," << endl;
+			outfile << "\t\"write_skim_tables\" : false," << endl;
+			outfile << "\t\"write_ttime_distribution_from_network_model\" : false," << endl;
+			outfile << "\t\"write_vehicle_trajectory\" : false," << endl;
+			outfile << "\t\"write_visualizer_snapshot\" : false," << endl;
+			outfile << "}" << endl;
+
+			return EXIT_SUCCESS;
+		}
+		else if (std::strncmp(command.c_str(), "-d", 2) == 0) // Generate default databases
+		{
+			unique_ptr<odb::database> db(create_sqlite_database("db", polaris::io::db_inventory[0]));
+			odb::transaction t(db->begin());
+			t.commit();
+
+			unique_ptr<odb::database> db2(create_sqlite_database("db", polaris::io::db_inventory[2]));
+			odb::transaction t2(db2->begin());
+			t2.commit();
+			return EXIT_SUCCESS;
+		}
+		else if (std::strncmp(command.c_str(), "-u", 2) == 0) // Display usage information
+		{
+			cout << endl << "To run Polaris from the command line use the following calling pattern:" << endl;
+			cout << "<binary path>\\Integrated_Model.exe <scenario_file> <number of threads: optional, default = 1> <number of agents hint: optional, default = 0>" << endl;
+			return EXIT_SUCCESS;
+		}	
+	}
+
+	// simulation running
 	if (argc >= 2) scenario_filename = argv[1];
 	int threads = 1;
 	if (argc >= 3) threads = std::max(atoi(argv[2]),threads);

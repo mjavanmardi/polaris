@@ -50,8 +50,7 @@ namespace Scenario_Components
 			accessor(iseed, NONE, NONE);
 						
 			accessor(demand_od_flag, NONE, NONE);
-			accessor(io_source_flag, NONE, NONE);
-
+			
 			accessor(demand_reduction_factor, NONE, NONE);
 
 			accessor(path_calculation_interval_length, NONE, NONE);
@@ -195,7 +194,6 @@ namespace Scenario_Components
 			//===============================================
 			// i/o parameters
 			//===============================================
-			accessor(num_threads, NONE, NONE);
 			accessor(write_db_input_to_files, NONE, NONE); // to control whether database input is written to files
 			accessor(run_simulation_for_db_input, NONE, NONE); // to control whether to run simulation for database input
 
@@ -480,36 +478,19 @@ namespace Scenario_Components
 
 				//===============================================
 				// set control parameters
-				string io_source_string;
-				if (cfgReader.getParameter("io_source_flag", &io_source_string)!= PARAMETER_FOUND) io_source_string = "ODB_IO_SOURCE";
-				if (io_source_string.compare("FILE_IO_SOURCE") == 0)
+				
+				if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) THROW_EXCEPTION("ERROR: Input database name required.")
+				if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
+				if (cfgReader.getParameter("input_popsyn_database_name", input_popsyn_database_name<string*>())!= PARAMETER_FOUND)
 				{
-					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::FILE_IO_SOURCE);
-				} 
-				else if (io_source_string.compare("HARD_CODED_IO_SOURCE") == 0)
-				{
-					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::HARD_CODED_IO_SOURCE);
-				} 
-				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
-				{
-					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
-					if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) database_name<std::string>("");
-					if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
-					if (cfgReader.getParameter("input_popsyn_database_name", input_popsyn_database_name<string*>())!= PARAMETER_FOUND)
-					{
-						input_popsyn_database_name<std::string>("");
-						this->read_population_from_database(false);
-					}
-					else
-					{
-						this->read_population_from_database(true);
-					}
-				} 
+					input_popsyn_database_name<std::string>("");
+					this->read_population_from_database(false);
+				}
 				else
 				{
-					cout << "IO mode not supported" << endl;
-					assert(false);
+					this->read_population_from_database(true);
 				}
+				
 
 
 				num_simulation_intervals<int>(planning_horizon<int>()/simulation_interval_length<int>());
@@ -537,7 +518,6 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool*>())!= PARAMETER_FOUND) count_integrated_in_network_vehicles_only<bool>(false);
 
 				if (cfgReader.getParameter("output_dir_name", output_dir_name<string*>())!= PARAMETER_FOUND) output_dir_name<string>("");
-				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
 				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
 				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
 				if (cfgReader.getParameter("write_node_control_state", write_node_control_state<bool*>())!= PARAMETER_FOUND) write_node_control_state<bool>(false);
@@ -596,15 +576,15 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<IntArray*>()) != PARAMETER_FOUND)
 				{
 					use_skim_intervals<bool>(false);
-					if (cfgReader.getParameter("skim_interval_length_minutes", this->template skim_interval_length_minutes<int*>()) != PARAMETER_FOUND)
+					if (cfgReader.getParameter("skim_interval_length_minutes", this->template skim_interval_length_minutes<int*>()) != PARAMETER_FOUND) skim_interval_length_minutes<int>(1440.0);
 					{
-						do_skimming<bool>(false);
-						if (this->template write_skim_tables<bool>())
-						{
-							THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
-						}
+						//do_skimming<bool>(false);
+						//if (this->template write_skim_tables<bool>())
+						//{
+						//	THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
+						//}
 					}
-					else do_skimming<bool>(true);
+					do_skimming<bool>(true);
 				}
 				else
 				{

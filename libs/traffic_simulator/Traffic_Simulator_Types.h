@@ -18,13 +18,6 @@ namespace Scenario_Components
 				ONE_SHOT_ASSIGNMENT_SIMULATION_MODE=0,
 				ITERATIVE_ASSIGNMENT_SIMULATION_MODE,
 			};
-
-			enum IO_Source_Keys
-			{
-				HARD_CODED_IO_SOURCE=0,
-				ODB_IO_SOURCE,
-				FILE_IO_SOURCE,
-			};
 			
 			enum Type_Sub_Iteration_keys
 			{

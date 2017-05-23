@@ -95,7 +95,7 @@ namespace Sensor_Components
 			}
 
 // TODO: does not compile
-			template<typename TargetType> void Initialize(polaris::io::Fixed_Sensor& instance)
+			/*template<typename TargetType> void Initialize(polaris::io::Fixed_Sensor& instance)
 			{
 				using namespace polaris::io;
 
@@ -132,7 +132,7 @@ namespace Sensor_Components
 //load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::template Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
 				}
 			}
-			
+			*/
 			template<typename TargetType> void Attach_Detector(std::unordered_map<int, Detector1DU<double> >& detector_configuration)
 			{
 				if(!_covered_link) return;
