@@ -217,12 +217,6 @@ namespace Household_Components
 			}
 
 			// Static initialization
-			static double GetOption_Double(rapidjson::Document& document, const std::string& key, double default_value)
-			{
-				return reinterpret_cast<_Scenario_Interface*>(_global_scenario)->get_parameter(document, "CAV_WTP_Model", key, default_value);
-			}
-
-			
 			template<typename T> static void distribution_static_initializer(string filename, T demand)
 			{
 				// make sure this is only run once				
@@ -322,7 +316,6 @@ namespace Household_Components
 				//==================================================================================================================================
 				// INITIALIZE THE VEHICLE TECHNOLOGY CHOICE MODEL PARAMETERS
 				//----------------------------------------------------------------------------------------------------------------------------------
-				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
 
 				// now see if there are config file changes
 				rapidjson::Document document;
@@ -331,29 +324,35 @@ namespace Household_Components
 					cout << "Warning: option file for Vehicle_Chooser_Implementation was not specified" << endl;
 					return true;
 				}
-				if (!reinterpret_cast<_Scenario_Interface*>(_global_scenario)->parse_option_file(document, option_file)) THROW_EXCEPTION("ERROR: unable to parse model file '" << option_file << "'.");
+
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				if (!scenario->parse_option_file(document, option_file)) THROW_EXCEPTION("ERROR: unable to parse model file '" << option_file << "'.");
 
 				// check that model is defined if it is requested through scenario
 				if (!document.HasMember("CAV_WTP_Model")) THROW_EXCEPTION("ERROR: CAV_WTP_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
 
-				B_PAST_CRASHES			<float>(GetOption_Double(document, "B_PAST_CRASHES", B_PAST_CRASHES<float>()));
-				B_SMARTPHONE			<float>(GetOption_Double(document, "B_SMARTPHONE", B_SMARTPHONE<float>()));
-				B_CARSHARE				<float>(GetOption_Double(document, "B_CARSHARE", B_CARSHARE<float>()));
-				B_RIDESHARE				<float>(GetOption_Double(document, "B_RIDESHARE", B_RIDESHARE<float>()));
-				B_DRIVE_ALONE_WORK		<float>(GetOption_Double(document, "B_DRIVE_ALONE_WORK", B_DRIVE_ALONE_WORK<float>()));
-				B_DRIVE_ALONE_OTHER		<float>(GetOption_Double(document, "B_DRIVE_ALONE_OTHER", B_DRIVE_ALONE_OTHER<float>()));
-				B_LN_VMT				<float>(GetOption_Double(document, "B_LN_VMT", B_LN_VMT<float>()));
-				B_WORK_DIST				<float>(GetOption_Double(document, "B_WORK_DIST", B_WORK_DIST<float>()));
-				B_GENDER				<float>(GetOption_Double(document, "B_GENDER", B_GENDER<float>()));
-				B_LICENSE				<float>(GetOption_Double(document, "B_LICENSE", B_LICENSE<float>()));
-				B_NUM_CHILDREN			<float>(GetOption_Double(document, "B_NUM_CHILDREN", B_NUM_CHILDREN<float>()));
-				B_AGE					<float>(GetOption_Double(document, "B_AGE", B_AGE<float>()));
-				B_EMPL_DENSITY			<float>(GetOption_Double(document, "B_EMPL_DENSITY", B_EMPL_DENSITY<float>()));
-				B_HHINCOME				<float>(GetOption_Double(document, "B_HHINCOME", B_HHINCOME<float>()));
-				C_CALIBRATION			<float>(GetOption_Double(document, "C_CALIBRATION", C_CALIBRATION<float>()));
-				MU_1					<float>(GetOption_Double(document, "MU_1", MU_1<float>()));
-				MU_2					<float>(GetOption_Double(document, "MU_2", MU_2<float>()));
-				MU_3					<float>(GetOption_Double(document, "MU_3", MU_3<float>()));
+				string section = "CAV_WTP_Model";
+
+				scenario->set_parameter(document, section, "B_PAST_CRASHES", _B_PAST_CRASHES);
+				scenario->set_parameter(document, section, "B_SMARTPHONE", _B_SMARTPHONE);
+				scenario->set_parameter(document, section, "B_CARSHARE", _B_CARSHARE);
+				scenario->set_parameter(document, section, "B_RIDESHARE", _B_RIDESHARE);
+				scenario->set_parameter(document, section, "B_DRIVE_ALONE_WORK", _B_DRIVE_ALONE_WORK);
+				scenario->set_parameter(document, section, "B_DRIVE_ALONE_OTHER", _B_DRIVE_ALONE_OTHER);
+				scenario->set_parameter(document, section, "B_LN_VMT", _B_LN_VMT);
+				scenario->set_parameter(document, section, "B_WORK_DIST", _B_WORK_DIST);
+				scenario->set_parameter(document, section, "B_GENDER", _B_GENDER);
+				scenario->set_parameter(document, section, "B_LICENSE", _B_LICENSE);
+				scenario->set_parameter(document, section, "B_NUM_CHILDREN", _B_NUM_CHILDREN);
+				scenario->set_parameter(document, section, "B_AGE", _B_AGE);
+				scenario->set_parameter(document, section, "B_EMPL_DENSITY", _B_EMPL_DENSITY);
+				scenario->set_parameter(document, section, "B_HHINCOME", _B_HHINCOME);
+				scenario->set_parameter(document, section, "C_CALIBRATION", _C_CALIBRATION);
+				scenario->set_parameter(document, section, "MU_1", _MU_1);
+				scenario->set_parameter(document, section, "MU_2", _MU_2);
+				scenario->set_parameter(document, section, "MU_3", _MU_3);
+
+				return true;
 			}
 			static void default_static_initializer()
 			{
@@ -375,6 +374,28 @@ namespace Household_Components
 				_MU_1= -7.401;
 				_MU_2= -6.514;
 				_MU_3= -5.503;
+			}
+			static void print_parameters()
+			{
+				cout << "Vehicle_Chooser_Implementation parameters" << endl;
+				cout << "\tB_PAST_CRASHES = " << B_PAST_CRASHES<float>() << endl;
+				cout << "\tB_SMARTPHONE = " << B_SMARTPHONE<float>() << endl;
+				cout << "\tB_CARSHARE = " << B_CARSHARE<float>() << endl;
+				cout << "\tB_RIDESHARE = " << B_RIDESHARE<float>() << endl;
+				cout << "\tB_DRIVE_ALONE_WORK = " << B_DRIVE_ALONE_WORK<float>() << endl;
+				cout << "\tB_DRIVE_ALONE_OTHER = " << B_DRIVE_ALONE_OTHER<float>() << endl;
+				cout << "\tB_LN_VMT = " << B_LN_VMT<float>() << endl;
+				cout << "\tB_WORK_DIST = " << B_WORK_DIST<float>() << endl;
+				cout << "\tB_GENDER = " << B_GENDER<float>() << endl;
+				cout << "\tB_LICENSE = " << B_LICENSE<float>() << endl;
+				cout << "\tB_NUM_CHILDREN = " << B_NUM_CHILDREN<float>() << endl;
+				cout << "\tB_AGE = " << B_AGE<float>() << endl;
+				cout << "\tB_EMPL_DENSITY = " << B_EMPL_DENSITY<float>() << endl;
+				cout << "\tB_HHINCOME = " << B_HHINCOME<float>() << endl;
+				cout << "\tC_CALIBRATION = " << C_CALIBRATION<float>() << endl;
+				cout << "\tMU_1 = " << MU_1<float>() << endl;
+				cout << "\tMU_2 = " << MU_2<float>() << endl;
+				cout << "\tMU_3 = " << MU_3<float>() << endl;
 			}
 
 			// PARAMETER DECLARATIONS - initialize in the static initializer function using scenario parameters

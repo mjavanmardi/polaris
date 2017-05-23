@@ -1354,32 +1354,31 @@ namespace Scenario_Components
 				return true;
 			}
 
-			double get_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, double default_value)
+			void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, float& parameter)
 			{
 				//assert(document.HasMember(section.c_str()));
 				//assert(document[section.c_str()].HasMember(key.c_str()));
 				//assert(document[section.c_str()][key.c_str()].IsDouble());
 				if (!document.HasMember(section.c_str()))
 				{
-					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" <<section << "\'" << endl;
-					return default_value;
+					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" << section << "\'" << endl;
+					return;
 				}
 
 				if (!document[section.c_str()].HasMember(key.c_str()))
 				{
 					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
-					return default_value;
+					return;
 				}
 
 				if (!document[section.c_str()][key.c_str()].IsDouble())
 				{
 					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
-					return default_value;
+					return;
 				}
 
-				return document[section.c_str()][key.c_str()].GetDouble();
+				parameter = document[section.c_str()][key.c_str()].GetDouble();
 			}
-
 
 		};
 	}

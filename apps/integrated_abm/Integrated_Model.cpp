@@ -270,7 +270,7 @@ bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 		cout << "ERROR: Unable to initialize CAV WTP Model parameters." << endl;
 		return false;
 	}
-	//MasterType::vehicle_chooser_type::print_parameters();
+	MasterType::vehicle_chooser_type::print_parameters();
 
 	return true;
 }
