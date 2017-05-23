@@ -15,7 +15,7 @@ def Main(skims, highway_skim_file, transit_skim_file, write_bin, write_csv, writ
 
 	do_highway = GetHighwaySkims(highway_skim_file, skims)
 	
-	#skims.print_header_info()
+	skims.print_header_info()
 	
 	do_transit = GetTransitSkims(transit_skim_file, do_highway, skims)
 	
@@ -652,6 +652,12 @@ class Skim_Results:
 		self.num_zones=0
 		self.num_tzones=0
 		self.intervals=[]
+	def get_interval_idx(self, time):
+		idx = 0
+		for i in self.intervals:
+			if time < i: return idx
+			else: idx += 1
+		return len(self.intervals) - 1		
 	def print_header_info(self):
 		print "Zone info (id, index):"
 		for id, index in self.zone_id_to_index_map.items():
@@ -661,13 +667,15 @@ class Skim_Results:
 		for interval in sorted(self.auto_skims.keys()):
 			print interval
 		print "\r\n"
-	def print_OD_info(self, o_idx, d_idx, do_auto, do_transit):			
+	def print_OD_info(self, o_idx, d_idx, time, do_auto, do_transit, header=False):	
+		i = self.get_interval_idx(time)
 		if o_idx < len(self.zone_id_to_index_map) and d_idx < len(self.zone_id_to_index_map):
-			s = "AutoTime, TransitTime, walk_time, wait_time, fare, dist= "
-			if do_auto: s += str(self.auto_skims[self.intervals[0]][o_idx,d_idx])
+			if header: s = "AutoTime, TransitTime, walk_time, wait_time, fare, dist= "
+			else: s=""
+			if do_auto: s += str(self.auto_skims[self.intervals[i]][o_idx,d_idx])
 			else: s += "NA"
-			if do_transit: s += ", " + str(self.transit_ttime[o_idx,d_idx]) + ", " + str(self.transit_walk_access_time[o_idx,d_idx]) + ", " + str(self.transit_wait_time[o_idx,d_idx]) + ", " + str(self.transit_fare[o_idx,d_idx]) + ", " + str(self.auto_distance[o_idx,d_idx])
-			else: s += ", NA, NA, NA, NA, NA"
+			if do_transit: s += "," + str(self.transit_ttime[o_idx,d_idx]) + "," + str(self.transit_walk_access_time[o_idx,d_idx]) + "," + str(self.transit_wait_time[o_idx,d_idx]) + "," + str(self.transit_fare[o_idx,d_idx]) + "," + str(self.auto_distance[o_idx,d_idx])
+			else: s += ",NA,NA,NA,NA,NA"
 			return s
 	def print_skims(self):
 		for interval in sorted(self.auto_skims.keys()):
@@ -688,8 +696,7 @@ class Skim_Results:
 		if self.transit_wait_time.size>0: print self.transit_wait_time
 		print ''
 		print 'transit_fare'
-		if self.transit_fare.size>0: print self.transit_fare
-		
+		if self.transit_fare.size>0: print self.transit_fare	
 	def resize_arrays(self, nzone):
 		self.transit_ttime = numpy.resize(self.transit_ttime,(nzone,nzone))
 		self.transit_walk_access_time = numpy.resize(self.transit_walk_access_time,(nzone,nzone))
@@ -707,24 +714,26 @@ skims = Skim_Results()
 
 # parse the command line args
 parser = argparse.ArgumentParser(description='Process the skim data')
-parser.add_argument('-auto_skim_file', default='')
-parser.add_argument('-transit_skim_file', default='')
-parser.add_argument('-csv', action='store_const', const=1)
-parser.add_argument('-tab', action='store_const', const=1)
-parser.add_argument('-bin', action='store_const', const=1)
-parser.add_argument('-origin_list', type=int, nargs='*')
-parser.add_argument('-destination_list', type=int, nargs='*')
-parser.add_argument('-read_from_csv', action='store_true')
-parser.add_argument('-convert_to_v1', action='store_true')
-parser.add_argument('-interactive', action='store_true')
-parser.add_argument('-i1_transit_ttime_file', default = '')
-parser.add_argument('-i2_transit_walk_files', nargs='*')
-parser.add_argument('-i3_transit_wait_files', nargs='*')
-parser.add_argument('-i4_transit_fare_file', default = '')
-parser.add_argument('-i5_auto_distance_file',default='')
-parser.add_argument('-zone_id_to_index_file', default = '')
-parser.add_argument('-i6_highway_ttime_files',nargs='*')
-parser.add_argument('-i7_highway_intervals',nargs='*',type=int)
+parser.add_argument('-auto_skim_file', default='', help='An input auto mode skim file to read, in polaris .bin V0 or V1 format')
+parser.add_argument('-transit_skim_file', default='', help='An input transit mode skim file to read, in polaris .bin V0 or V1 format')
+parser.add_argument('-csv', action='store_const', const=1, help='Write CSV output flag')
+parser.add_argument('-tab', action='store_const', const=1, help='Write tab-delimited output flag')
+parser.add_argument('-bin', action='store_const', const=1, help='Write binary output flag')
+parser.add_argument('-origin_list', type=int, nargs='*', help='A list of origin zone IDs used to generate a sub-skim file for only those zones')
+parser.add_argument('-destination_list', type=int, nargs='*', help='A list of destination zone IDs used to generate a sub-skim file for only those zones')
+parser.add_argument('-read_from_csv', action='store_true', help='Flag to indicate that skims will be read and created from  CSV input files, rather than from Polaris format. Automatically sets -bin and -csv to true. Requires -auto_skim_file and/or transit_skim_file to be provided as output')
+parser.add_argument('-convert_to_v1', action='store_true', help='Flag to indicate input skims are in V0 and need to convert to V1')
+parser.add_argument('-interactive', action='store_true', help='Flag to start interactive mode allowing for travel time requests between OD pairs')
+parser.add_argument('-batch', action='store_true', help='Flag to start batch mode allowing for travel time requests between multiple OD pairs, defined in trip_file')
+parser.add_argument('-trip_file', default='', help='CSV file of O,D,departure_times for use in batch mode.')
+parser.add_argument('-i1_transit_ttime_file', default = '', help='Input transit skim csv file. One file describing the transit in-vehicle time for trip from O-D.')
+parser.add_argument('-i2_transit_walk_files', nargs='*', help='Input transit skim csv file. One or more files describing the walking time components for trip from O-D.')
+parser.add_argument('-i3_transit_wait_files', nargs='*', help='Input transit skim csv file. One or more files describing the waiting time components for trip from O-D.')
+parser.add_argument('-i4_transit_fare_file', default = '', help='Input transit skim csv file. One ofile describing the fare for trip from O-D.')
+parser.add_argument('-i5_auto_distance_file',default='', help='Input transit skim csv file. One file describing the auto distance for trip from O-D.')
+parser.add_argument('-zone_id_to_index_file', default = '', help='Map of zone ids to zone indexes. Required for skim file creation from csv files.')
+parser.add_argument('-i6_highway_ttime_files',nargs='*', help='Input csv file, required if read_from_csv to be true and no i*_transit files are specified.  One csv file for each skim time interval, with each row in "O,D,ttime" format.')
+parser.add_argument('-i7_highway_intervals',nargs='*',type=int, help='Defines the end times of the skim intervals for which the -i6_highway_ttime_files were created, one interval per file required.')
 
 args = parser.parse_args()
 
@@ -770,14 +779,15 @@ elif (args.interactive):
 	
 	s = ''
 	while (s != 'q'):
-		s = raw_input('Enter an O,D pair (or q to exit): ')
+		s = raw_input('Enter an O,D,time tuple (or q to exit): ')
 		OD_s = s.split(',')
-		if len(OD_s) != 2:
-			print "Error: enter an OD pair seperated by a comma"
+		if len(OD_s) != 3:
+			print "Error: enter an OD pair and time seperated by a comma"
 			continue
 		try:
 			O = int(OD_s[0])
 			D = int(OD_s[1])
+			T = int(OD_s[2])
 		except ValueError:
 			print "Error: enter a valid OD pair seperated by a comma"
 			continue
@@ -791,7 +801,52 @@ elif (args.interactive):
 		D_idx = skims.zone_id_to_index_map[int(D)]
 		if O_idx is None: raise NameError("Error: Origin zone id '" + O + "' not found.")
 		if D_idx is None: raise NameError("Error: Destination zone id '" + D + "' not found.")
-		print skims.print_OD_info(O_idx, D_idx, do_auto, do_transit)
+		print skims.print_OD_info(O_idx, D_idx, T, do_auto, do_transit)
+
+elif (args.batch):
+	Main(skims, args.auto_skim_file, args.transit_skim_file, False, False, False, None, None)	
+	do_auto = args.auto_skim_file != ''
+	do_transit = args.transit_skim_file != ''
+	
+	with open(args.trip_file[:-4] + '_out.csv', 'wb') as outfile:		
+		outfile.write('ID,O,D,Time,AutoTime,TransitTime,walk_time,wait_time,fare,dist\r\n')
+		with open(args.trip_file, 'r') as infile:
+				cr = csv.reader(infile,delimiter =',')
+				cr.next()
+				try:
+					for row in cr:
+						if len(row) == 3:
+							id_offset = 0
+							ID = '1'
+						if len(row) != 4:
+							print "Error: input must be in 'ID,O,D,departure_time' format."
+							continue
+						else:
+							id_offset = 1
+							ID = row[0]
+						try:
+							O = int(row[0+id_offset])
+							D = int(row[1+id_offset])
+							T = int(row[2+id_offset])
+						
+							if O not in skims.zone_id_to_index_map:
+								print "Origin ID '" + str(O) + "' not found."
+								continue
+							if D not in skims.zone_id_to_index_map:
+								print "Destination ID '" + str(D) + "' not found."
+								continue
+							O_idx = skims.zone_id_to_index_map[int(O)]
+							D_idx = skims.zone_id_to_index_map[int(D)]
+							if O_idx is None: raise NameError("Error: Origin zone id '" + O + "' not found.")
+							if D_idx is None: raise NameError("Error: Destination zone id '" + D + "' not found.")
+							outfile.write(ID + ',' + row[0+id_offset] + ',' + row[1+id_offset] + ',' + row[2+id_offset] + ',' + skims.print_OD_info(O_idx, D_idx, T, do_auto, do_transit) + '\r\n' )
+						except ValueError:
+							print "Error: enter a valid OD pair seperated by a comma: " + str(row)
+							continue
+							
+				except ValueError:
+						print row
+
 else:
 	Main(skims, args.auto_skim_file, args.transit_skim_file, write_bin, write_csv, write_tab, args.origin_list, args.destination_list)
 
