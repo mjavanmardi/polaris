@@ -1294,6 +1294,21 @@ namespace Network_Components
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
 
+				// Validate that all zones have an activity location, throw exception if they do not....
+				bool valid_loc = true;
+				stringstream errors("");
+				for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
+				{
+					_Zone_Interface* zone = zone_itr->second;
+					if (zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().size() == 0)
+					{
+						valid_loc = false;
+						errors << "Zone '" << zone->template uuid<long>() << "' has no activity locations, correct using NetworkEditor." << endl;
+					}
+				}
+				if (!valid_loc) THROW_EXCEPTION(errors.str());
+								
+
 				cout <<"done."<<endl;
 			}
 			

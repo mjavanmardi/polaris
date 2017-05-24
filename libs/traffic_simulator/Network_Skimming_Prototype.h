@@ -359,7 +359,7 @@ namespace Network_Skimming_Components
 
 				if (!valid_skim)
 				{
-					THROW_EXCEPTION(errors.str());
+//					THROW_EXCEPTION(errors.str());
 				}
 
 				// Based on the above selected O/D routing pairs, initialize the skim routers
