@@ -1925,9 +1925,12 @@ namespace Network_Components
 						{
 							_Link_Interface* out_link = (_Link_Interface*)a_Stop->_outbound_links.at(links_itr);
 
+							_Intersection_Interface* a_Stop_Candidate = (_Intersection_Interface*)out_link->_upstream_intersection;
 							_Intersection_Interface* b_Stop_Candidate = (_Intersection_Interface*)out_link->_downstream_intersection;
 
-							if (b_Stop_Candidate == b_Stop)
+							Link_Components::Types::Link_Type_Keys out_type = out_link->_link_type;
+
+							if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 							{
 								pattern->_pattern_links.push_back(out_link);
 							}

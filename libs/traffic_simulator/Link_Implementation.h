@@ -566,6 +566,7 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 		{
+			//Omer fix later!
 			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
