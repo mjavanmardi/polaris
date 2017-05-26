@@ -351,6 +351,7 @@ namespace Network_Components
 					while (std::getline(ss, sub_string, '|'))
 					{
 						myTime = stoi(sub_string);
+						myTime = myTime - _scenario_reference->template simulation_start_time<int>();
 						transit_vehicle_trip->template arrival_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
@@ -361,6 +362,7 @@ namespace Network_Components
 					while (std::getline(ss, sub_string, '|'))
 					{
 						myTime = stoi(sub_string);
+						myTime = myTime - _scenario_reference->template simulation_start_time<int>();
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
 					}
 

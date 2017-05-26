@@ -384,9 +384,22 @@ namespace polaris
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::transit_attributes<MasterType>> transit_edge_type;
 
-		typedef Network<typename MasterType::network_type> Network_Interface;
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+		//Network_Interface* net = (Network_Interface*)Allocate<typename MasterType::network_type>();
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface; 
+		
 		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+
+
+		std::ofstream sp_file;
+		char myLine[2000];
+		std::string myParagraph;
+
+		sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
 
 		std::deque< base_edge_type* > modified_edges;
 
@@ -493,7 +506,7 @@ namespace polaris
 		_Transit_Vehicle_Trip_Interface* current_trip;
 
 		float total_cost = 0.0f;		
-
+				
 		if (success)
 		{
 			//base_edge_type* current = end_base;//(base_edge_type*)end;
@@ -504,6 +517,8 @@ namespace polaris
 			transit_edge_type* current = (transit_edge_type*)graph_pool->Get_Edge(global);
 			transit_edge_type* cached_current = (transit_edge_type*)current;
 			
+			sp_file << "success" << endl;
+
 			while (current != nullptr)
 			{
 				global.edge_id = current->_edge_id;
@@ -513,21 +528,49 @@ namespace polaris
 				out_type.push_back(current->_edge_type);
 				out_seq.push_back(current->_came_on_seq_index);
 
+				_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
+
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
 					out_trip.push_back(current_trip->_uuid);
+
+					sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s",
+						current_link->_upstream_intersection->_dbid.c_str(),
+						current_link->_downstream_intersection->_dbid.c_str(),
+						current->_cost_from_origin,
+						current_trip->_dbid.c_str(),
+						current->_came_on_seq_index,
+						"TRANSIT");
+					myParagraph.insert(0, myLine);
 				}
 				else
 				{
 					out_trip.push_back(-1);
+					sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s", 
+						current_link->_upstream_intersection->_dbid.c_str(), 
+						current_link->_downstream_intersection->_dbid.c_str(), 
+						current->_cost_from_origin, 
+						"0", 
+						current->_came_on_seq_index,
+						"WALK");
+					myParagraph.insert(0, myLine);
+
 				}				
 
 				current = (transit_edge_type*)current->came_from();
 				cached_current->came_from(nullptr);
 				cached_current = current;
+
 			}
+
+			sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence");
+			myParagraph.insert(0, myLine);
+			//sprintf_s(myLine, "TOD:\t%d-%d-%d", start, end, start_time);
+			//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
+			//Our_Line.insert(0, myLine);
+			sp_file << myParagraph << endl;
 
 			std::reverse(out_path.begin(), out_path.end());
 			std::reverse(out_cost.begin(), out_cost.end());
@@ -543,6 +586,11 @@ namespace polaris
 			end_ids.clear();
 			end_ids.push_back(out_path.back());
 		}
+		else
+		{
+			sp_file << "fail" << endl;
+		}
+		sp_file.close();
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
