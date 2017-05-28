@@ -166,6 +166,8 @@ namespace polaris
 					if (current_trip == next_trip)
 					{
 						wait_binary = 0;
+						EarliestBoardTime = current_trip->_departure_seconds.at(currentSeq + 1);
+						currentIVTTime = EarliestBoardTime - current->_time_label;
 					}
 				}
 								
@@ -191,12 +193,10 @@ namespace polaris
 				float walkWeight = 2;
 				////////////////////////PARAMETERS
 
-				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;		
-				float CandidateWaitLabel = current->_wait_time_from_origin + wait_binary * waitTime;
+				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 
 				//float CandidateDriveLabel = current->_drive_time_from_origin + drivebinary * current->._time_cost;
-				float CandidateWalkLabel = current->_walk_time_from_origin + currentWalkTime;
-
+				
 				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(mySeq);
 
 				global_edge_id seq_edge_id;
@@ -230,8 +230,10 @@ namespace polaris
 					seq_edge->_came_on_trip = next_trip;
 					seq_edge->_came_on_seq_index = mySeq;
 					seq_edge->_wait_count_from_origin = CandidateWaitingCount;
-					seq_edge->_wait_time_from_origin = CandidateWaitLabel;
-					seq_edge->_walk_time_from_origin = CandidateWalkLabel;					
+					seq_edge->_wait_time_from_origin = current->_wait_time_from_origin + wait_binary * waitTime;
+					seq_edge->_walk_time_from_origin = current->_walk_time_from_origin + currentWalkTime;
+					seq_edge->_ivt_time_from_origin = current->_ivt_time_from_origin + currentIVTTime;
+					seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
 					seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -273,8 +275,10 @@ namespace polaris
 						seq_edge->_came_on_trip = next_trip;
 						seq_edge->_came_on_seq_index = iSeq;
 						seq_edge->_wait_count_from_origin = CandidateWaitingCount;
-						seq_edge->_wait_time_from_origin = CandidateWaitLabel;
-						seq_edge->_walk_time_from_origin = CandidateWalkLabel;						
+						seq_edge->_wait_time_from_origin = current->_wait_time_from_origin + wait_binary * waitTime;
+						seq_edge->_walk_time_from_origin = current->_walk_time_from_origin + currentWalkTime;
+						seq_edge->_ivt_time_from_origin = current->_ivt_time_from_origin + currentIVTTime + next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq);
+						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -328,6 +332,8 @@ namespace polaris
 					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
 					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
 					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin + time_cost_between;
+					current_neighbor->_ivt_time_from_origin = current->_ivt_time_from_origin;
+					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
@@ -367,6 +373,8 @@ namespace polaris
 					current_neighbor->_wait_count_from_origin = current->_wait_count_from_origin;
 					current_neighbor->_wait_time_from_origin = current->_wait_time_from_origin;
 					current_neighbor->_walk_time_from_origin = current->_walk_time_from_origin;
+					current_neighbor->_ivt_time_from_origin = current->_ivt_time_from_origin + current_trip->_arrival_seconds.at(currentSeq + 1) - current->_time_label;
+					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);					

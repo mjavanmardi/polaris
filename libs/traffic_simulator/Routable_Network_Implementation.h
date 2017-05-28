@@ -158,8 +158,10 @@ namespace Routing_Components
 
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
+			t_data(float, ivt_time_from_origin);
 			t_data(float, walk_time_from_origin);
 			t_data(float, wait_time_from_origin);
+			t_data(float, transfer_pen_from_origin);
 			t_data(int, wait_count_from_origin);
 			t_data(void*, came_on_trip);
 			t_data(int, came_on_seq_index);
