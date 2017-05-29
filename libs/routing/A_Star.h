@@ -547,6 +547,12 @@ namespace polaris
 
 			transit_edge_type* current = (transit_edge_type*)graph_pool->Get_Edge(global);
 			transit_edge_type* cached_current = (transit_edge_type*)current;
+
+			transit_edge_type* intermediate_current;
+			_Link_Interface* intermediate_link;
+
+			transit_edge_type* target_current;
+			_Link_Interface* target_link;
 			
 			sp_file << "\nsuccess";
 
@@ -592,6 +598,48 @@ namespace polaris
 						current->_transfer_pen_from_origin,
 						current->_estimated_cost_origin_destination);
 					myParagraph.insert(0, myLine);
+
+					target_current = (transit_edge_type*)current->came_from();
+					global.edge_id = target_current->_edge_id;
+					target_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
+
+					int mySeq = current->_came_on_seq_index - 1;
+					if (mySeq >= 0 && current_link->_upstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
+					{						
+						intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
+						global.edge_id = intermediate_link->_uuid;
+						intermediate_current = (A_Star_Edge<transit_edge_type>*)graph_pool->Get_Edge(global);
+
+						while (intermediate_link->_downstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
+						{
+							sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f",
+								intermediate_link->_upstream_intersection->_dbid.c_str(),
+								intermediate_link->_downstream_intersection->_dbid.c_str(),
+								0, //intermediate_current->_cost_from_origin,
+								current_trip->_dbid.c_str(),
+								mySeq,
+								"TRANSIT",
+								0, //intermediate_current->_time_from_origin,
+								0, //intermediate_current->_time_label,
+								current->_wait_count_from_origin,
+								0, //intermediate_current->_wait_time_from_origin,
+								0, //intermediate_current->_walk_time_from_origin,
+								0, //intermediate_current->_ivt_time_from_origin,
+								0, //intermediate_current->_transfer_pen_from_origin,
+								0); //intermediate_current->_estimated_cost_origin_destination);
+							myParagraph.insert(0, myLine);
+
+							mySeq = mySeq - 1;
+							if (mySeq >= 0)
+							{
+								intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
+								global.edge_id = intermediate_link->_uuid;
+								intermediate_current = (A_Star_Edge<transit_edge_type>*)graph_pool->Get_Edge(global);
+							}
+						}
+					}
+
+					
 				}
 				else
 				{
