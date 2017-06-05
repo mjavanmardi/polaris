@@ -9,7 +9,7 @@ namespace Traveler_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Traveler 
+		prototype struct Traveler ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

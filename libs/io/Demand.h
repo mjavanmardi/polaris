@@ -23,6 +23,8 @@ class Vehicle_Class;
 class Fuel_Type;
 class Automation_Type;
 class Connectivity_Type;
+class link_travel;
+class Path;
 
 
 #pragma db object //table("SELECTION")
@@ -563,8 +565,8 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
-	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
+	Activity (int id_, int seq_num_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
+	: id (id_), seq_num(seq_num_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
 	{
 	}
 	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_)
@@ -574,6 +576,8 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
+	const int& getSeq_num() const { return seq_num; }
+	void setSeq_num(const int& seq_num_) { seq_num = seq_num_; }
 	const int& getLocation_Id () const {return location_id;}
 	void setLocation_Id (const int& location_id_) {location_id = location_id_;}
 	const double& getStart_Time () const {return start_time;}
@@ -597,6 +601,7 @@ private:
 	friend class odb::access;
 	#pragma db auto id
 	int id;
+	int seq_num;
 	int location_id;
 	double start_time;
 	double duration;
@@ -826,6 +831,111 @@ private:
 	int route;
 
 };
+
+#pragma db value
+class link_travel
+{
+public:
+	// Default Constructor
+	link_travel() {}
+	link_travel(int link_, bool dir_, int entering_time_, int travel_time_, int delayed_time_, float exit_position_)
+		: link(link_), dir(dir_), entering_time(entering_time_), travel_time(travel_time_), delayed_time(delayed_time_), exit_position(exit_position_)
+	{
+	}
+	//Accessors
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const bool& getDir() const { return dir; }
+	void setDir(const bool& dir_) { dir = dir_; }
+	const int& getEntering_Time() const { return entering_time; }
+	void setEntering_Time(const int& entering_time_) { entering_time = entering_time_; }
+	const int& getTravel_Time() const { return travel_time; }
+	void setTravel_Time(const int& travel_time_) { travel_time = travel_time_; }
+	const int& getDelayed_Time() const { return delayed_time; }
+	void setDelayed_Time(const int& delayed_time_) { delayed_time = delayed_time_; }
+	const float& getExit_Position() const { return exit_position; }
+	void setExit_Position(const float& exit_position_) { exit_position = exit_position_; }
+	//Data Fields
+private:
+	friend class odb::access;
+	int link;
+	bool dir;
+	int entering_time;
+	int travel_time;
+	int delayed_time;
+	float exit_position;
+};
+
+
+#pragma db object
+class Path
+{
+public:
+	// Default Constructor
+	Path() {}
+	Path(int id_, shared_ptr<Vehicle> vehicle_, /*int origin_zone_, int destination_zone_,*/ int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int routed_time_, int travel_time_, std::vector<link_travel > links_)
+		: id(id_), vehicle(vehicle_), /*origin_zone (origin_zone_), destination_zone (destination_zone_),*/ origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), routed_time(routed_time_), travel_time(travel_time_), links(links_)
+	{
+	}
+	//Accessors
+	const int& getId() const { return id; }
+	void setId(const int& id_) { id = id_; }
+	const shared_ptr<Vehicle> getVehicle() const { return vehicle; }
+	void setVehicle(const shared_ptr<Vehicle> vehicle_) { vehicle = vehicle_; }
+	//const int& getOrigin_Zone () const {return origin_zone;}
+	//void setOrigin_Zone (const int& origin_zone_) {origin_zone = origin_zone_;}
+	//const int& getDestination_Zone () const {return destination_zone;}
+	//void setDestination_Zone (const int& destination_zone_) {destination_zone = destination_zone_;}
+	const int& getOrigin_Activity_Location() const { return origin_activity_location; }
+	void setOrigin_Activity_Location(const int& origin_activity_location_) { origin_activity_location = origin_activity_location_; }
+	const int& getDestination_Activity_Location() const { return destination_activity_location; }
+	void setDestination_Activity_Location(const int& destination_activity_location_) { destination_activity_location = destination_activity_location_; }
+	const int& getOrigin_Link() const { return origin_link; }
+	void setOrigin_Link(const int& origin_link_) { origin_link = origin_link_; }
+	const int& getDestination_Link() const { return destination_link; }
+	void setDestination_Link(const int& destination_link_) { destination_link = destination_link_; }
+	const int& getNum_Links() const { return num_links; }
+	void setNum_Links(const int& num_links_) { num_links = num_links_; }
+	const int& getDeparture_Time() const { return departure_time; }
+	void setDeparture_Time(const int& departure_time_) { departure_time = departure_time_; }
+	const int& getRouted_Time() const { return routed_time; }
+	void setRouted_Time(const int& routed_time_) { routed_time = routed_time_; }
+	const int& getTravel_Time() const { return travel_time; }
+	void setTravel_Time(const int& travel_time_) { travel_time = travel_time_; }
+	const std::vector<link_travel >& getLinks() const { return links; }
+	void setLinks(const std::vector<link_travel >& links_) { links = links_; }
+	void setLink(const link_travel  links_) { links.push_back(links_); }
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int id;
+#pragma db not_null
+	//#pragma db not_null
+	//int origin_zone;
+	//#pragma db not_null
+	//int destination_zone;
+#pragma db not_null
+	int origin_activity_location;
+#pragma db not_null
+	int destination_activity_location;
+#pragma db not_null
+	int origin_link;
+#pragma db not_null
+	int destination_link;
+#pragma db not_null
+	int num_links;
+#pragma db not_null
+	int departure_time;
+#pragma db not_null
+	int routed_time;
+#pragma db not_null
+	int travel_time;
+	std::vector<link_travel > links;
+	shared_ptr<Vehicle> vehicle;
+	shared_ptr<Trip> trip;
+};
+
 }//end of io namespace
 }//end of polaris namespace
 #endif // IODemand

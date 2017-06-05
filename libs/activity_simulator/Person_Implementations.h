@@ -50,24 +50,12 @@ namespace Person_Components
 
 			typedef typename remove_pointer<Perception_Faculty_type>::type person_perception_type;
 
-			template<typename TargetType> TargetType network_reference()
-			{
-				return this->_Perception_Faculty->person_perception_type::template Network<TargetType>();
-			}
-			template<typename TargetType> void network_reference(TargetType set_value)
-			{
-				this->_Perception_Faculty->person_perception_type::template Network<TargetType>(set_value);
-			}	
+			template<typename TargetType> TargetType network_reference();
+			template<typename TargetType> void network_reference(TargetType set_value);
 			tag_getter_as_available(network_reference);		
 			tag_setter_as_available(network_reference);	
-			template<typename TargetType> TargetType scenario_reference()
-			{
-				return this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>();
-			}
-			template<typename TargetType> void scenario_reference(TargetType set_value)
-			{
-				this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>(set_value);
-			}	
+			template<typename TargetType> TargetType scenario_reference();
+			template<typename TargetType> void scenario_reference(TargetType set_value);
 			tag_getter_as_available(scenario_reference);
 			tag_setter_as_available(scenario_reference);
 
@@ -123,101 +111,159 @@ namespace Person_Components
 			//=======================================================================================================================================================================
 			// FEATURES
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			template<typename TargetType> void Initialize(TargetType id)
-			{	
-				// Create and Initialize the Properties faculty
-				_Properties = (Properties_interface*)Allocate<type_of(Properties)>();
-				_Properties->template Initialize<void>();
-				_Properties->template Parent_Person<ComponentType*>(this);
+			template<typename TargetType> void Initialize(TargetType id);
+			template<typename T> void Print_Preplanned_Activities_Event();
 
-				// Create and Initialize the Planner faculty and its subcomponents
-				_Planning_Faculty = (Planning_Faculty_interface*)Allocate<type_of(Planning_Faculty)>();	
-				_Planning_Faculty->template Parent_Person<ComponentType*>(this);
-				_Planning_Faculty->template Initialize<NULLTYPE>();
+			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref);
 
-				generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)>();
-				generator->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Activity_Generation_Faculty<generator_itf*>(generator);
+			template<typename TargetType> void Set_Locations();
 
-				destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)>();
-				destination_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>(destination_chooser);
+			template<typename TargetType> void arrive_at_destination();
 
-				mode_choice_itf* mode_chooser = (mode_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)>();
-				mode_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Mode_Choice_Faculty<mode_choice_itf*>(mode_chooser);
+			//=======================================================================================================================================================================
+			// PASS THROUGH FEATURES -> dispatched to member sub-objects
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			template<typename TargetType> TargetType current_movement_plan();
 
-				timing_choice_itf* timing_chooser = (timing_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)>();
-				timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
+			//=======================================================================================================================================================================
+			// Record sorting
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			static bool record_comparer(Activity_Record* act1, Activity_Record* act2);
+			template<typename TargetType> TargetType Sort_Activity_Records();
 
-				telecommute_choice_itf* telecommute_chooser = (telecommute_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Telecommuting_Choice_Faculty)>();
-				telecommute_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Telecommuting_Choice_Faculty<telecommute_choice_itf*>(telecommute_chooser);
+			template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
 
-				// Create and Initialize the Scheduling faculty and its subcomponents
-				_Scheduling_Faculty = (Scheduling_Faculty_interface*)Allocate<type_of(Scheduling_Faculty)>();
-				_Scheduling_Faculty->template Parent_Person<ComponentType*>(this);
-				_Scheduling_Faculty->template Initialize<void>();
+			void Leave_Vehicle();
+		};
 
-				// Create and Initialize the Perception faculty and its subcomponents
-				_Perception_Faculty = (Perception_Faculty_interface*)Allocate<type_of(Perception_Faculty)>();	
-				_Perception_Faculty->template Parent_Person<ComponentType*>(this);
-				_Perception_Faculty->template Initialize<void>();
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType Person_Implementation<MasterType, InheritanceList>::network_reference()
+		{
+			return this->_Perception_Faculty->person_perception_type::template Network<TargetType>();
+		}
 
-				// Create and Initialize the routing faculty
-				_router=(router_interface*)Allocate<type_of(router)>();
-				//_router->template traveler<ComponentType*>(this);
-					
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Person_Implementation<MasterType, InheritanceList>::network_reference(TargetType set_value)
+		{
+			this->_Perception_Faculty->person_perception_type::template Network<TargetType>(set_value);
+		}
 
-				// Moving faculty
-				_Moving_Faculty = (Moving_Faculty_interface*)Allocate<type_of(Moving_Faculty)>();
-				_Moving_Faculty->template Parent_Person<ComponentType*>(this);
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType Person_Implementation<MasterType, InheritanceList>::scenario_reference()
+		{
+			return this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>();
+		}
 
-				_vehicle = nullptr;
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Person_Implementation<MasterType, InheritanceList>::scenario_reference(TargetType set_value)
+		{
+			this->_Perception_Faculty->person_perception_type::template Scenario<TargetType>(set_value);
+		}
 
-				// Create and Initialize the vehicle		
-				//_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
-				//_vehicle->template uuid<int>(this->_Household->uuid<int>()*100 + id);
-				//_vehicle->template internal_id<int>(id);
-				//_vehicle->template traveler<ComponentType*>(this);
-				//_vehicle->template router<router_interface*>(_router);
-				//_vehicle->template initialize<NT>();
-				//_vehicle->template is_integrated<bool>(true);
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Person_Implementation<MasterType, InheritanceList>::Initialize(TargetType id)
+		{
+			// Create and Initialize the Properties faculty
+			_Properties = (Properties_interface*)Allocate<type_of(Properties)>();
+			_Properties->template Initialize<void>();
+			_Properties->template Parent_Person<ComponentType*>(this);
+
+			// Create and Initialize the Planner faculty and its subcomponents
+			_Planning_Faculty = (Planning_Faculty_interface*)Allocate<type_of(Planning_Faculty)>();
+			_Planning_Faculty->template Parent_Person<ComponentType*>(this);
+			_Planning_Faculty->template Initialize<NULLTYPE>();
+
+			generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)>();
+			generator->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+			_Planning_Faculty->template Activity_Generation_Faculty<generator_itf*>(generator);
+
+			destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)>();
+			destination_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+			_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>(destination_chooser);
+
+			mode_choice_itf* mode_chooser = (mode_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)>();
+			mode_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+			_Planning_Faculty->template Mode_Choice_Faculty<mode_choice_itf*>(mode_chooser);
+
+			timing_choice_itf* timing_chooser = (timing_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)>();
+			timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+			_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
+
+			telecommute_choice_itf* telecommute_chooser = (telecommute_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Telecommuting_Choice_Faculty)>();
+			telecommute_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+			_Planning_Faculty->template Telecommuting_Choice_Faculty<telecommute_choice_itf*>(telecommute_chooser);
+
+			// Create and Initialize the Scheduling faculty and its subcomponents
+			_Scheduling_Faculty = (Scheduling_Faculty_interface*)Allocate<type_of(Scheduling_Faculty)>();
+			_Scheduling_Faculty->template Parent_Person<ComponentType*>(this);
+			_Scheduling_Faculty->template Initialize<void>();
+
+			// Create and Initialize the Perception faculty and its subcomponents
+			_Perception_Faculty = (Perception_Faculty_interface*)Allocate<type_of(Perception_Faculty)>();
+			_Perception_Faculty->template Parent_Person<ComponentType*>(this);
+			_Perception_Faculty->template Initialize<void>();
+
+			// Create and Initialize the routing faculty
+			_router = (router_interface*)Allocate<type_of(router)>();
+			//_router->template traveler<ComponentType*>(this);
 
 
-				this->_current_location = nullptr;
+			// Moving faculty
+			_Moving_Faculty = (Moving_Faculty_interface*)Allocate<type_of(Moving_Faculty)>();
+			_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
-				// Add basic traveler properties							
-				this->template uuid<int>(id);
-				this->template internal_id<int>(id);
-				_has_done_replanning=false;
-				
-			}
-			template<typename T> void Print_Preplanned_Activities_Event()
-			{
-				typedef Person<ComponentType> _Person_Interface;
-				_Person_Interface* pthis =(_Person_Interface*)this;
+			_vehicle = nullptr;
 
-				typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
-				typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
-
-				typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activities;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activities)>  Activity;
-
-				typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container)> Activity_Records;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)>  Activity_Record;
+			// Create and Initialize the vehicle		
+			//_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
+			//_vehicle->template uuid<int>(this->_Household->uuid<int>()*100 + id);
+			//_vehicle->template internal_id<int>(id);
+			//_vehicle->template traveler<ComponentType*>(this);
+			//_vehicle->template router<router_interface*>(_router);
+			//_vehicle->template initialize<NT>();
+			//_vehicle->template is_integrated<bool>(true);
 
 
-				typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::person_data_logger_type> _Logger_Interface;
+			this->_current_location = nullptr;
+
+			// Add basic traveler properties							
+			this->template uuid<int>(id);
+			this->template internal_id<int>(id);
+			_has_done_replanning = false;
+
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename T>
+		void Person_Implementation<MasterType, InheritanceList>::Print_Preplanned_Activities_Event()
+		{
+			typedef Person<ComponentType> _Person_Interface;
+			_Person_Interface* pthis = (_Person_Interface*)this;
+
+			typedef Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
+			typedef Scenario_Components::Prototypes::Scenario<typename get_type_of(scenario_reference)> scenario_itf;
+
+			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Activity_Container)> Activities;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activities)>  Activity;
+
+			typedef Back_Insertion_Sequence< typename get_type_of(Activity_Record_Container)> Activity_Records;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)>  Activity_Record;
 
 
-				scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
-				Activities* activities = scheduler->template Activity_Container<Activities*>();
-				Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
+			typedef  Person_Components::Prototypes::Person_Data_Logger< typename ComponentType::person_data_logger_type> _Logger_Interface;
+
+
+			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
+			Activities* activities = scheduler->template Activity_Container<Activities*>();
+			Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
 
 #ifdef ANTARES
-				for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
+			for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
 			{
 				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(*itr,false);
@@ -232,72 +278,90 @@ namespace Person_Components
 #endif
 
 
-				//// exit if no activity output is specified
-				//scenario_itf* scenario = (scenario_itf*)_global_scenario;
-				//if (!scenario->template write_activity_output<bool>()) return;
+			//// exit if no activity output is specified
+			//scenario_itf* scenario = (scenario_itf*)_global_scenario;
+			//if (!scenario->template write_activity_output<bool>()) return;
 
 
-				// push the start-of-day at home activity to the output database
-				typename Activities::iterator itr = activities->begin();
-				Activity* act = (Activity*)(*itr);
-				if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
-				{
-					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(act,true);
-				}
-			}
-
-			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+			// push the start-of-day at home activity to the output database
+			typename Activities::iterator itr = activities->begin();
+			Activity* act = (Activity*)(*itr);
+			if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
 			{
-				typedef typename remove_pointer<Perception_Faculty_type>::type perception_faculty_type;
-
-				this->Initialize<IdType>(id);
-				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
-				this->_Perception_Faculty->perception_faculty_type::template Network<NetworkRefType>(network_ref);
-				this->_Perception_Faculty->perception_faculty_type::template Scenario<ScenarioRefType>(scenario_ref);
-				this->_router->template network<NetworkRefType>(network_ref);
-
-				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
-				scenario_reference_interface* scenario = this->scenario_reference<scenario_reference_interface*>();
-				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->template pretrip_informed_market_share<float>());
+				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(act, true);
 			}
+		}
 
-			template<typename TargetType> void Set_Locations()
-			{
-				// This call sets the work/school locations from the properties sub class
-				_Properties->template Set_Locations<NT>();
-			}
+		template<typename MasterType, typename InheritanceList>
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType>
+		void Person_Implementation<MasterType, InheritanceList>::Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
+		{
+			typedef typename remove_pointer<Perception_Faculty_type>::type perception_faculty_type;
 
-			template<typename TargetType> void arrive_at_destination()
-			{
+			this->Initialize<IdType>(id);
+			this->home_synthesis_zone<SynthesisZoneType>(home_zone);
+			this->_Perception_Faculty->perception_faculty_type::template Network<NetworkRefType>(network_ref);
+			this->_Perception_Faculty->perception_faculty_type::template Scenario<ScenarioRefType>(scenario_ref);
+			this->_router->template network<NetworkRefType>(network_ref);
 
-			}
+			// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
+			scenario_reference_interface* scenario = this->scenario_reference<scenario_reference_interface*>();
+			this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->template pretrip_informed_market_share<float>());
+		}
 
-			//=======================================================================================================================================================================
-			// PASS THROUGH FEATURES -> dispatched to member sub-objects
-			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			template<typename TargetType> TargetType current_movement_plan()
-			{
-			}
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Person_Implementation<MasterType, InheritanceList>::Set_Locations()
+		{
+			// This call sets the work/school locations from the properties sub class
+			_Properties->template Set_Locations<NT>();
+		}
 
-			//=======================================================================================================================================================================
-			// Record sorting
-			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			static bool record_comparer(Activity_Record* act1, Activity_Record* act2)
-			{
-				//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;
-				//typedef Back_Insertion_Sequence< type_of(Activity_Container),Activity_Plan*> Activity_Plans;
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Person_Implementation<MasterType, InheritanceList>::arrive_at_destination()
+		{
 
-				//Activity_Record* act1_itf = (Activity_Record*)act1;
-				//Activity_Record* act2_itf = (Activity_Record*)act2;
-				return (act1->template Start_Time<Time_Minutes>() < act2->template Start_Time<Time_Minutes>());
-			}
-			template<typename TargetType> TargetType Sort_Activity_Records()
-			{
-				Activity_Records* records = this->Activity_Record_Container<Activity_Records*>();
-				std::list<Activity_Record*>* recs = (std::list<Activity_Record*>*)records;
-				recs->sort(record_comparer);
-			}
-		};
+		}
 
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType Person_Implementation<MasterType, InheritanceList>::current_movement_plan()
+		{
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		bool Person_Implementation<MasterType, InheritanceList>::record_comparer(Activity_Record* act1, Activity_Record* act2)
+		{
+			//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;
+			//typedef Back_Insertion_Sequence< type_of(Activity_Container),Activity_Plan*> Activity_Plans;
+
+			//Activity_Record* act1_itf = (Activity_Record*)act1;
+			//Activity_Record* act2_itf = (Activity_Record*)act2;
+			return (act1->template Start_Time<Time_Minutes>() < act2->template Start_Time<Time_Minutes>());
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		TargetType Person_Implementation<MasterType, InheritanceList>::Sort_Activity_Records()
+		{
+			Activity_Records* records = this->Activity_Record_Container<Activity_Records*>();
+			std::list<Activity_Record*>* recs = (std::list<Activity_Record*>*)records;
+			recs->sort(record_comparer);
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TimeType>
+		TimeType Person_Implementation<MasterType, InheritanceList>::Get_Estimated_Return_Home_Time()
+		{
+			return this->_Scheduling_Faculty->Get_Estimated_Return_Home_Time<TimeType>();
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Person_Implementation<MasterType, InheritanceList>::Leave_Vehicle()
+		{
+			this->_vehicle->Unassign_From_Person();
+			this->_vehicle = nullptr;
+		}
 	}
 }

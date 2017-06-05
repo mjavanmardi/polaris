@@ -209,9 +209,9 @@ namespace PopSyn
 			accessor(Synthetic_Households_Container, NONE, NONE);	// This is the container holding the flyweighted synthesized data (i.e. multiple pointers to single object) created during the synthesis routine
 			accessor(Synthetic_Persons_Container, NONE, NONE);		// same as above for the synthetic persons
 			accessor(Sample_Data, NONE, NONE);						// This is the container holding the base sample data used in the synthesis routine
-			accessor(scenario_reference, NONE, NONE);				
+			basic_accessor(scenario_reference, NONE, NONE);				
 			accessor(network_reference, NONE, NONE);
-			accessor(parent_reference, NONE, NONE);					// Reference to the parent region which contains the zone (or the parent popsyn when prototype used for regions)
+			basic_accessor(parent_reference, NONE, NONE);					// Reference to the parent region which contains the zone (or the parent popsyn when prototype used for regions)
 			accessor(file_linker_reference, NONE, NONE);		
 			
 			//===================================================================================================================================

@@ -49,13 +49,21 @@ namespace Depot_Components
 
 				// Filter out accident events
 
-				for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
-				{
-					Network_Event<typename MasterType::base_network_event_type>* net_event = *itr;
+				//for(typename std::vector<Network_Event<typename MasterType::base_network_event_type>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				//{
+				//	Network_Event<typename MasterType::base_network_event_type>* net_event = *itr;
 
-					if( net_event->template Is_Type<typename MasterType::accident_network_event_type>() )
+				//	if( net_event->template Is_Type<typename MasterType::accident_network_event_type>() )
+				//	{
+				//		_current_events.push_back( *itr );
+				//	}
+				//}
+				for (const auto& net_event : network_events)
+				{
+					//if (net_event->Is_Type<typename MasterType::accident_network_event_type>())
+					if (typeid(net_event) == typeid(MasterType::accident_network_event_type))
 					{
-						_current_events.push_back( *itr );
+						_current_events.push_back(net_event);
 					}
 				}
 			}

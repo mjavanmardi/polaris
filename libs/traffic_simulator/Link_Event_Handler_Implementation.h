@@ -38,11 +38,11 @@ namespace Link_Components
 		// Adjustment factors recommended by the Guidebook on the Analysis of ATDM Strategies.
 
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_capacity_adjustment_factors_for_weather[19] 
-			= {1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.20, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89};
+		float Link_Implementation<MasterType, InheritanceList>::link_capacity_adjustment_factors_for_weather[19]
+			= { 1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.20, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89 };
 		
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_free_flow_speed_adjustment_factors_for_weather[19][5]
+		float Link_Implementation<MasterType, InheritanceList>::link_free_flow_speed_adjustment_factors_for_weather[19][5]
 			= {
 				{1.00, 1.00, 1.00, 1.00, 1.00},
 				{0.97, 0.96, 0.96, 0.95, 0.94},
@@ -66,7 +66,7 @@ namespace Link_Components
 			};
 
 		template<typename MasterType,typename InheritanceList>
-		float Link_Implementation<MasterType,InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
+		float Link_Implementation<MasterType, InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
 			= {
 				{0.93, 0.79, 0.01, 0.01, 0.01},
 				{0.95, 0.81, 0.35, 0.01, 0.01},

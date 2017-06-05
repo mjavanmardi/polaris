@@ -157,6 +157,8 @@ struct MasterType
 	typedef Person_Components::Implementations::ADAPTS_Destination_Choice_Option<M> person_destination_choice_option_type;
 	typedef Person_Components::Implementations::Detroit_Mode_Chooser_Implementation<M> person_mode_chooser_type;
 	typedef Person_Components::Implementations::Detroit_Mode_Choice_Option<M> mode_choice_option_type;
+	//typedef Person_Components::Implementations::Mode_Chooser_Implementation<M> person_mode_chooser_type;
+	//typedef Person_Components::Implementations::Mode_Choice_Option<M> mode_choice_option_type;
 	typedef Person_Components::Implementations::Telecommute_Choice_Implementation<M> telecommute_chooser_type;
 
 	typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MT> mnl_model_type;
@@ -287,6 +289,29 @@ int main(int argc,char** argv)
 	}
 
 
+	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
+	_global_scenario = scenario;
+
+	
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+
+
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -294,20 +319,12 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
+	cout << "allocating data structures..." << endl;
+
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
 	string output_dir_name = "";
-
-	GLOBALS::Normal_RNG.Initialize();
-	GLOBALS::Uniform_RNG.Initialize();
-
-	cout << "allocating data structures..." <<endl;	
-
-
-	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
-	_global_scenario = scenario;
 
 	typedef Network<typename MasterType::network_type> _Network_Interface;
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
@@ -374,8 +391,7 @@ int main(int argc,char** argv)
 		{
 			typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-			//%%%RLW
-			TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+			TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 			tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			tmc->Initialize<NT>();
 		}
@@ -426,20 +442,7 @@ int main(int argc,char** argv)
 	#pragma endregion
 	
 
-	//==================================================================================================================================
-	// Initialize global randon number generators - if seed set to zero or left blank use system time
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	int seed = scenario->iseed<int>();
-	if (seed != 0)
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
-	}
-	else
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
-	}
+
 
 
 	//==================================================================================================================================
@@ -451,6 +454,11 @@ int main(int argc,char** argv)
 	demand->network_reference<_Network_Interface*>(network);
 	cout << "reading external demand data..." <<endl;
 	demand->read_vehicle_type_data<NT>();
+
+	// Initialize/Load Platoon Data
+	MasterType::platoon_type::static_initializer(scenario->platoon_information_file_name<string>(), demand);
+
+
 	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);
 	_global_demand = demand;
 	
@@ -541,7 +549,7 @@ int main(int argc,char** argv)
 
 
 	// Initialize/Load Platoon Data
-	MasterType::platoon_type::static_initializer(scenario->platoon_information_file_name<string>(), demand);
+	//MasterType::platoon_type::static_initializer(scenario->platoon_information_file_name<string>(), demand);
 	
 	
 
@@ -549,8 +557,7 @@ int main(int argc,char** argv)
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
-// %%%RLW
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
+	popsyn_itf* popsyn = static_cast<popsyn_itf*>(Allocate<MasterType::population_synthesis_type>());
 	if (scenario->read_population_from_database<bool>())
 	{
 		popsyn->Read_From_Database<_Network_Interface*, _Scenario_Interface*>(network,scenario);

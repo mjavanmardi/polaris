@@ -235,42 +235,9 @@ namespace Link_Components
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
 	
-			template<typename TargetType> TargetType travel_time(null_requirement){return (TargetType)(_travel_time);}
-			template<typename TargetType> void travel_time(TargetType set_value,null_requirement)
-			{
-				_travel_time = (float)set_value;
+			m_data(float, travel_time, NONE, NONE);
+			m_data(float, realtime_travel_time, NONE, NONE);
 
-				//TODO:ROUTING_OPERATION
-				//// update replicas
-				//typedef Link<typename MasterType::routable_link_type> replica_interface;
-				//typename replicas_container_type::iterator replica_itr;
-				//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				//{
-				//	replica_interface* replica = (replica_interface*)(*replica_itr);
-				//	replica->template travel_time<float>(_travel_time);
-				//}
-			}
-
-			float _travel_time;
-
-
-			template<typename TargetType> TargetType realtime_travel_time(null_requirement){return (TargetType)(_realtime_travel_time);}
-			template<typename TargetType> void realtime_travel_time(TargetType set_value,null_requirement)
-			{
-				_realtime_travel_time = (float)set_value;
-
-				////TODO:ROUTING_OPERATION
-				//// update replicas
-				//typedef Link<typename MasterType::routable_link_type> replica_interface;
-				//typename replicas_container_type::iterator replica_itr;
-				//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				//{
-				//	replica_interface* replica = (replica_interface*)(*replica_itr);
-				//	replica->template travel_time<float>(_realtime_travel_time);
-				//}
-			}
-
-			float _realtime_travel_time;
 
 		//==================================================================================================================
 		/// Events
@@ -319,22 +286,132 @@ namespace Link_Components
 			typedef Intersection_Components::Prototypes::Intersection<type_of(upstream_intersection)> _Intersection_Interface;
 			typedef Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
-			Link_Implementation()
+			Link_Implementation();
+
+			// update link supply
+			template<typename TargetType> void link_supply_update();
+			
+			// update network state
+			template<typename TargetType> void network_state_update();
+
+// #ifndef EXCLUDE_DEMAND
+			// template<typename TargetType> void accept_vehicle(TargetType veh,requires(TargetType,!check_2(typename MasterType::movement_type,is_same) && !check_2(ComponentType,is_same) && !check_2(typename MasterType::vehicle_type,is_same) && !check_2(typename MasterType::routing_type,is_same) && !check(Traveler_Components::Concepts::Is_Traveler) && !check(Person_Components::Concepts::Is_Person_Mover)))
+// #else
+			// template<typename TargetType> void accept_vehicle(TargetType veh,requires(TargetType,!check_2(typename MasterType::movement_type,is_same) && !check_2(ComponentType,is_same) && !check_2(typename MasterType::vehicle_type,is_same) && !check_2(typename MasterType::routing_type,is_same) && !check(Traveler_Components::Concepts::Is_Traveler)))
+// #endif
+			// {
+				// assert_check_2(typename MasterType::movement_type,is_same,"Invalid CallerType");
+				// assert_check_2(typename MasterType::vehicle_type,is_same,"Invalid CallerType");
+				// assert_check_2(typename MasterType::routing_type,is_same,"Invalid CallerType");
+				// assert_check_2(ComponentType,is_same,"Invalid CallerType");
+			// }
+
+
+			template<typename TargetType> void accept_vehicle_from_origin(TargetType veh);
+			template<typename TargetType> void accept_vehicle_from_network(TargetType veh);
+			template<typename TargetType> void link_moving();
+			template<typename TargetType> void origin_link_loading();
+			template<typename TargetType> void load_vehicles(int num_departed_vehicles);
+			template<typename TargetType> void queue_vehicles();
+			template<typename TargetType> void initialize_features(void* network);
+			void initialize_moe();
+
+			template<typename TargetType> void update_vmt_vht();
+			template<typename TargetType> void calculate_moe_for_simulation_interval();
+
+			template<typename TargetType> void calculate_moe_for_assignment_interval();
+
+			template<typename TargetType> void Initialize();
+
+			static void Newells_Conditional(ComponentType* _this, Event_Response& response);
+
+			//declare_event(Update_Events)
+			void Update_Events();
+
+			template<typename TargetType> void get_events_from_har(TargetType events_set);
+
+			template<typename TargetType> void get_events_from_vms(TargetType events_set);
+
+			static void Weather_Event_Notification(void* link, Network_Event<typename MasterType::weather_network_event_type>* net_event);
+
+			static void Accident_Event_Notification(void* link, Network_Event<typename MasterType::accident_network_event_type>* net_event);
+
+			void record_weather_event(Network_Event<typename MasterType::weather_network_event_type>* net_event);
+				
+			void record_accident_event(Network_Event<typename MasterType::accident_network_event_type>* net_event);
+
+			template<typename TargetType> void handle_events();
+
+			//declare_event(Compute_Step_Flow_Supply_Update)
+			void Compute_Step_Flow_Supply_Update();
+
+			//declare_event(Compute_Step_Origin_Link_Loading)
+			void Compute_Step_Origin_Link_Loading();
+
+			//declare_event(Compute_Step_Flow_Link_Moving)
+			void Compute_Step_Flow_Link_Moving();
+			
+			template<typename TargetType> void Accept_ITS(typename MasterType::variable_speed_sign_type* vss);
+			
+			template<typename TargetType> void Accept_ITS(typename MasterType::variable_word_sign_type* vws);
+			
+			template<typename TargetType> void Accept_ITS(typename MasterType::advisory_radio_type* har);
+
+			template<typename TargetType> void Accept_ITS(typename MasterType::depot_type* depot);
+			
+			template<typename TargetType> void Accept_ITS(typename MasterType::link_sensor_type* link_sensor);
+
+
+			template<typename TargetType> static void subscribe_events();
+
+			//void subscribe_events_local()
+			//{
+			//	// event subscription
+			//	_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
+			//	network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
+			//	network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
+			//}
+
+			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density);
+			template<typename TargetType> void get_prevailing_link_moe(int& volume, float& speed, float& density);
+
+			template<typename TargetType> bool get_normal_day_link_moe(int& volume, float& speed, float& density);
+
+			template<typename TargetType> void open_shoulder();
+
+			template<typename TargetType> void close_shoulder();
+
+			template<typename TargetType> void change_speed_limit(float a_speed_limit);
+
+			template<typename TargetType> float free_flow_speed_estimate();
+
+			template<typename TargetType> float speed_limit_estimate();
+
+			template<typename TargetType> void process_weather_event();
+			template<typename TargetType> void revert_weather_event();
+			template<typename TargetType> float find_free_flow_speed_adjustment_rate_for_weather(int weather_index);
+			template<typename TargetType> int get_weather_index(TargetType weather_event);
+			template<typename TargetType> void process_accident_event();
+			template<typename TargetType> void revert_accident_event();
+			template<typename TargetType> void reset_features();
+		
+			static float link_capacity_adjustment_factors_for_weather[19];
+			static float link_free_flow_speed_adjustment_factors_for_weather[19][5];
+			static float link_capacity_adjustment_factors_for_accident[8][5];
+		};
+
+		template<typename MasterType, typename InheritanceList>
+		Link_Implementation<MasterType, InheritanceList>::Link_Implementation()
 			{
 				UNLOCK(_link_lock);
 			}
 
 			// update link supply
-			template<typename TargetType> void link_supply_update()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::link_supply_update()
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-
-				int a;
-				if (current_simulation_interval_index == 170)
-				{
-					a = 10;
-				}
-
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				//Newell's model
 				int link_upstream_cumulative_vehicles_by_t_minus_one = 0;	
@@ -403,7 +480,9 @@ namespace Link_Components
 			}
 			
 			// update network state
-			template<typename TargetType> void network_state_update()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
@@ -516,20 +595,9 @@ namespace Link_Components
 
 			}
 
-// #ifndef EXCLUDE_DEMAND
-			// template<typename TargetType> void accept_vehicle(TargetType veh,requires(TargetType,!check_2(typename MasterType::movement_type,is_same) && !check_2(ComponentType,is_same) && !check_2(typename MasterType::vehicle_type,is_same) && !check_2(typename MasterType::routing_type,is_same) && !check(Traveler_Components::Concepts::Is_Traveler) && !check(Person_Components::Concepts::Is_Person_Mover)))
-// #else
-			// template<typename TargetType> void accept_vehicle(TargetType veh,requires(TargetType,!check_2(typename MasterType::movement_type,is_same) && !check_2(ComponentType,is_same) && !check_2(typename MasterType::vehicle_type,is_same) && !check_2(typename MasterType::routing_type,is_same) && !check(Traveler_Components::Concepts::Is_Traveler)))
-// #endif
-			// {
-				// assert_check_2(typename MasterType::movement_type,is_same,"Invalid CallerType");
-				// assert_check_2(typename MasterType::vehicle_type,is_same,"Invalid CallerType");
-				// assert_check_2(typename MasterType::routing_type,is_same,"Invalid CallerType");
-				// assert_check_2(ComponentType,is_same,"Invalid CallerType");
-			// }
-
-
-			template<typename TargetType> void accept_vehicle_from_origin(TargetType veh)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::accept_vehicle_from_origin(TargetType veh)
 			{
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 
@@ -539,94 +607,100 @@ namespace Link_Components
 				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
 			}
 
-			template<typename TargetType> void accept_vehicle_from_network(TargetType veh)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::accept_vehicle_from_network(TargetType veh)
+		{
+			int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
+			int current_simulation_interval_index = ((_Network_Interface*)_network_reference)->template current_simulation_interval_index<int>();
+			int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+			_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
+			_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
+
+			vehicle->release_time(current_time);
+
+			if (_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 			{
-				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
-				int current_simulation_interval_index = ((_Network_Interface*)_network_reference)->template current_simulation_interval_index<int>();
-				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
-				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
+				//vehicle->template unload<NULLTYPE>();
+				_link_destination_cumulative_arrived_vehicles++;
+				_link_destination_arrived_vehicles++;
 
-				vehicle->release_time(current_time);
-
-				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
+				if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 				{
-					//vehicle->template unload<NULLTYPE>();
-					_link_destination_cumulative_arrived_vehicles++;
-					_link_destination_arrived_vehicles++;
+					LOCK(_link_lock);
+					_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					UNLOCK(_link_lock);
+				}
+				int departure_time = mp->template departed_time<Time_Seconds>();
+				int arrival_time = mp->template arrived_time<Time_Seconds>();
+				float travel_time = float((arrival_time - departure_time) / 60.0f);
+				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
+				((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
 
-					if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
-					{
-						LOCK(_link_lock);
-						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
-						UNLOCK(_link_lock);
-					}
-					int departure_time = mp->template departed_time<Time_Seconds>();
-					int arrival_time = mp->template arrived_time<Time_Seconds>();
-					float travel_time = float ((arrival_time - departure_time)/60.0f);
-					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
-					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
-					
-					// decrement the in-network vehicles counter
-					if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
-					{
-						if(vehicle->template is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
-					}
-					else
-					{
-						((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
-					}
-					
-					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
-					
-					//Free((typename MasterType::movement_plan_type*)mp);
+				// decrement the in-network vehicles counter
+				if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())
+				{
+					if (vehicle->template is_integrated<bool>()) ((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
 				}
 				else
 				{
-					///set up downstream preferred departure time					
-					int pdt = current_time + _link_fftt;
-
-					int wait_time = 0;
-					auto &platoon_data_vec = vehicle->platoon_data_vec < std::deque < Platoon_Components::Prototypes::Platoon_Data<MasterType::platoon_data_type> * >>();
-					if (!platoon_data_vec.empty())
-					{
-						auto first_platoon_data = platoon_data_vec.front();
-						auto first_link = first_platoon_data->template link< typename Link_Components::Prototypes::Link < typename MasterType::link_type > *>();
-						if (first_link->uuid<int>() == this->_uuid)
-						{
-							wait_time = first_platoon_data->node_wait_time<int>();
-							vehicle->release_time(wait_time + current_time);
-							platoon_data_vec.pop_front();
-						}
-					}
-
-					LOCK(_link_lock);
-					if (_current_vehicle_queue.size() >= 1)
-					{
-						_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
-						int last_vehicle_pdt = last_vehicle->template downstream_preferred_departure_time<int>();
-						pdt = max(float(last_vehicle_pdt), float(pdt ));
-					}
-					
-					vehicle->template downstream_preferred_departure_time<int>(pdt + wait_time);
-					if (wait_time > 0)
-					{
-						_waiting_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
-					}
-					else
-					{
-						_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
-					}
-					UNLOCK(_link_lock);
+					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
 				}
-			}
 
-			template<typename TargetType> void link_moving()
+				((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
+
+				//Free((typename MasterType::movement_plan_type*)mp);
+			}
+			else
+			{
+				///set up downstream preferred departure time
+				int pdt = current_time + _link_fftt;
+
+				int wait_time = 0;
+				auto &platoon_data_vec = vehicle->platoon_data_vec < std::deque < Platoon_Components::Prototypes::Platoon_Data<MasterType::platoon_data_type> * >>();
+				if (!platoon_data_vec.empty())
+				{
+					auto first_platoon_data = platoon_data_vec.front();
+					auto first_link = first_platoon_data->template link< typename Link_Components::Prototypes::Link < typename MasterType::link_type > *>();
+					if (first_link->uuid<int>() == this->_uuid)
+					{
+						wait_time = first_platoon_data->node_wait_time<int>();
+						vehicle->release_time(wait_time + current_time);
+						platoon_data_vec.pop_front();
+					}
+				}
+
+				LOCK(_link_lock);
+				if (_current_vehicle_queue.size() >= 1)
+				{
+					_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
+					int last_vehicle_pdt = last_vehicle->template downstream_preferred_departure_time<int>();
+					pdt = max(float(last_vehicle_pdt), float(pdt));
+				}
+								
+				//vehicle->template downstream_preferred_departure_time<int>(pdt);
+				vehicle->template downstream_preferred_departure_time<int>(pdt + wait_time);
+				if (wait_time > 0)
+				{
+					_waiting_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+				}
+				else
+				{
+					_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+				}
+				UNLOCK(_link_lock);
+			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::link_moving()
 			{
 				typename std::vector<typename MasterType::vehicle_type*>::iterator vehicle_itr;
 				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 
 				//Loop through platooning vehicles that were on hold and if the time to departure on the link has come, depart them.
+				bool released_vehicle = false;
 				for (vehicle_itr = _waiting_vehicle_queue.begin(); vehicle_itr != _waiting_vehicle_queue.end(); vehicle_itr++)
 				{
 					if ((*vehicle_itr)->release_time<int>() <= current_time)
@@ -640,10 +714,11 @@ namespace Link_Components
 						}
 						(*vehicle_itr)->template downstream_preferred_departure_time<int>(pdt);
 						((_Intersection_Interface*)_downstream_intersection)->template push_vehicle<NULLTYPE>((*vehicle_itr));
+						released_vehicle = true;
 					}
 				}
 				//remove the vehicels that have been let go
-				_waiting_vehicle_queue.erase(std::remove_if(_waiting_vehicle_queue.begin(), _waiting_vehicle_queue.end(), [=](MasterType::vehicle_type* x) {return x->release_time<int>() <= current_time; }), _waiting_vehicle_queue.end());
+				if(released_vehicle) _waiting_vehicle_queue.erase(std::remove_if(_waiting_vehicle_queue.begin(), _waiting_vehicle_queue.end(), [=](MasterType::vehicle_type* x) {return x->release_time<int>() <= current_time; }), _waiting_vehicle_queue.end());
 
 
 				for(vehicle_itr=_current_vehicle_queue.begin(); vehicle_itr != _current_vehicle_queue.end();vehicle_itr++)
@@ -653,7 +728,9 @@ namespace Link_Components
 				_current_vehicle_queue.clear();
 			}
 
-			template<typename TargetType> void origin_link_loading()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::origin_link_loading()
 			{
 
 				_link_origin_departed_vehicles = 0;
@@ -722,7 +799,9 @@ namespace Link_Components
 				_link_origin_vehicle_current_position = (int)_link_origin_vehicle_queue.size();
 			}
 			
-			template<typename TargetType> void load_vehicles(int num_departed_vehicles)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::load_vehicles(int num_departed_vehicles)
 			{
 				_Vehicle_Interface* vehicle;
 				for (int iv=0;iv<num_departed_vehicles;iv++)
@@ -762,7 +841,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void queue_vehicles()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::queue_vehicles()
 			{
 				int new_origin_arrived = (int)_link_origin_vehicle_queue.size() - _link_origin_vehicle_current_position;
 				_link_origin_arrived_vehicles += new_origin_arrived;
@@ -775,7 +856,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void initialize_features(void* network)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::initialize_features(void* network)
 			{
 				//network_data
 				//_link_origin_cumulative_arrived_vehicles = 0;
@@ -885,7 +968,8 @@ namespace Link_Components
 				_C = 0.0;
 			}
 
-			void initialize_moe()
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::initialize_moe()
 			{
 				link_moe_data.link_density = 0.0f;
 				link_moe_data.link_in_flow_rate = 0.0f;
@@ -906,7 +990,9 @@ namespace Link_Components
 				link_moe_data.link_travel_time_ratio = 0.0f;
 			}
 
-			template<typename TargetType> void update_vmt_vht()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::update_vmt_vht()
 			{
 				//_link_vmt = link_moe_data.link_out_flow_rate * ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>() * _num_lanes * _length / 5280.0f / 3600.0f;
 				//_link_vht = link_moe_data.link_out_flow_rate * ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>() * _num_lanes * link_moe_data.link_travel_time / 60.0f / 3600.0f;
@@ -914,7 +1000,9 @@ namespace Link_Components
 				_link_vht = link_moe_data.link_out_volume * (link_moe_data.link_travel_time / 60.0f);
 			}
 
-			template<typename TargetType> void calculate_moe_for_simulation_interval()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::calculate_moe_for_simulation_interval()
 			{
 				realtime_link_moe_data.link_in_flow_rate = (realtime_link_moe_data.link_in_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())) / _num_lanes;
 				realtime_link_moe_data.link_out_flow_rate = (realtime_link_moe_data.link_out_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())) / _num_lanes;
@@ -935,7 +1023,9 @@ namespace Link_Components
 				realtime_link_moe_data.link_density_ratio =	realtime_link_moe_data.link_density / _jam_density;
 			}
 
-			template<typename TargetType> void calculate_moe_for_assignment_interval()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::calculate_moe_for_assignment_interval()
 			{
 				link_moe_data.link_in_flow_rate = (link_moe_data.link_in_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>())) / _num_lanes;
 				
@@ -973,7 +1063,9 @@ namespace Link_Components
 
 			}
 
-			template<typename TargetType> void Initialize()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Initialize()
 			{
 				this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
 			
@@ -981,7 +1073,8 @@ namespace Link_Components
 				//load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
 			}
 
-			static void Newells_Conditional(ComponentType* _this,Event_Response& response)
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Newells_Conditional(ComponentType* _this, Event_Response& response)
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
@@ -1024,13 +1117,16 @@ namespace Link_Components
 			}
 
 			//declare_event(Update_Events)
-			void Update_Events()
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Update_Events()
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				_this_ptr->template handle_events<NT>();
 			}
 
-			template<typename TargetType> void get_events_from_har(TargetType events_set)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::get_events_from_har(TargetType events_set)
 			{
 				if (_advisory_radio != nullptr)
 				{
@@ -1046,7 +1142,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void get_events_from_vms(TargetType events_set)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::get_events_from_vms(TargetType events_set)
 			{
 				if (_variable_word_sign != nullptr)
 				{
@@ -1062,31 +1160,37 @@ namespace Link_Components
 				}
 			}
 
-			static void Weather_Event_Notification(void* link, Network_Event<typename MasterType::weather_network_event_type>* net_event)
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Weather_Event_Notification(void* link, Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_weather_event(net_event);
 			}
 
-			static void Accident_Event_Notification(void* link, Network_Event<typename MasterType::accident_network_event_type>* net_event)
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Accident_Event_Notification(void* link, Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
 				((_Link_Component*)link)->record_accident_event(net_event);
 			}
 
-			void record_weather_event(Network_Event<typename MasterType::weather_network_event_type>* net_event)
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::record_weather_event(Network_Event<typename MasterType::weather_network_event_type>* net_event)
 			{
 				_weather_event_to_process = true;
 				_current_weather_event = (Null_Prototype<typename MasterType::weather_network_event_type>*)net_event; 
 			}
 				
-			void record_accident_event(Network_Event<typename MasterType::accident_network_event_type>* net_event)
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::record_accident_event(Network_Event<typename MasterType::accident_network_event_type>* net_event)
 			{
 				_accident_event_to_process = true;
 				_current_accident_event = (Null_Prototype<typename MasterType::accident_network_event_type>*)net_event; 
 			}
 
-			template<typename TargetType> void handle_events()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::handle_events()
 			{
 				//typedef Network<typename MasterType::network_type> _Network_Interface;
 				int time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
@@ -1124,7 +1228,8 @@ namespace Link_Components
 			}
 
 			//declare_event(Compute_Step_Flow_Supply_Update)
-			void Compute_Step_Flow_Supply_Update()
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Compute_Step_Flow_Supply_Update()
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 1: link supply update based on a given traffic flow model
@@ -1132,7 +1237,8 @@ namespace Link_Components
 			}
 
 			//declare_event(Compute_Step_Origin_Link_Loading)
-			void Compute_Step_Origin_Link_Loading()
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Compute_Step_Origin_Link_Loading()
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 6: origin link loading
@@ -1140,7 +1246,8 @@ namespace Link_Components
 			}
 
 			//declare_event(Compute_Step_Flow_Link_Moving)
-			void Compute_Step_Flow_Link_Moving()
+		template<typename MasterType, typename InheritanceList>
+		void Link_Implementation<MasterType, InheritanceList>::Compute_Step_Flow_Link_Moving()
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
@@ -1149,33 +1256,44 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename MasterType::variable_speed_sign_type* vss)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Accept_ITS(typename MasterType::variable_speed_sign_type* vss)
 			{
 				_variable_speed_sign = (variable_speed_sign_type)vss;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename MasterType::variable_word_sign_type* vws)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Accept_ITS(typename MasterType::variable_word_sign_type* vws)
 			{
 				_variable_word_sign = (variable_word_sign_type)vws;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename MasterType::advisory_radio_type* har)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Accept_ITS(typename MasterType::advisory_radio_type* har)
 			{
 				_advisory_radio = (advisory_radio_type)har;
 			}
 
-			template<typename TargetType> void Accept_ITS( typename MasterType::depot_type* depot)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Accept_ITS(typename MasterType::depot_type* depot)
 			{
 				_depot = (depot_type)depot;
 			}
 			
-			template<typename TargetType> void Accept_ITS( typename MasterType::link_sensor_type* link_sensor)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::Accept_ITS(typename MasterType::link_sensor_type* link_sensor)
 			{
 				_link_sensor = (link_sensor_type)link_sensor;
 			}
 
-
-			template<typename TargetType> static void subscribe_events()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::subscribe_events()
 			{
 				// event subscription
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
@@ -1183,15 +1301,9 @@ namespace Link_Components
 				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification,(int)ComponentType::component_id);
 			}
 
-			//void subscribe_events_local()
-			//{
-			//	// event subscription
-			//	_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-			//	network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
-			//	network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
-			//}
-
-			template<typename TargetType> void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
 			{
 				start_time = non_volatile_link_moe_data.start_time;
 				end_time = non_volatile_link_moe_data.end_time;
@@ -1199,14 +1311,19 @@ namespace Link_Components
 				speed = non_volatile_link_moe_data.link_speed;
 				density = non_volatile_link_moe_data.link_density;
 			}
-			template<typename TargetType> void get_prevailing_link_moe(int& volume, float& speed, float& density)
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::get_prevailing_link_moe(int& volume, float& speed, float& density)
 			{
 				volume = non_volatile_link_moe_data.link_out_volume;
 				speed = non_volatile_link_moe_data.link_speed;
 				density = non_volatile_link_moe_data.link_density;
 			}
 
-			template<typename TargetType> bool get_normal_day_link_moe(int& volume, float& speed, float& density)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		bool Link_Implementation<MasterType, InheritanceList>::get_normal_day_link_moe(int& volume, float& speed, float& density)
 			{
 				if (((_Scenario_Interface*)_global_scenario)->template read_normal_day_link_moe<bool>())
 				{
@@ -1221,7 +1338,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void open_shoulder()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::open_shoulder()
 			{
 				if (!_shoulder_opened)
 				{
@@ -1230,7 +1349,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void close_shoulder()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::close_shoulder()
 			{
 				if (_shoulder_opened)
 				{
@@ -1239,7 +1360,9 @@ namespace Link_Components
 				}
 			}
 
-			template<typename TargetType> void change_speed_limit(float a_speed_limit)
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::change_speed_limit(float a_speed_limit)
 			{
 				_speed_limit = a_speed_limit;
 				//_free_flow_speed = min(_free_flow_speed, _speed_limit + 5.0f);
@@ -1248,7 +1371,9 @@ namespace Link_Components
 				_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 			}
 
-			template<typename TargetType> float free_flow_speed_estimate()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		float Link_Implementation<MasterType, InheritanceList>::free_flow_speed_estimate()
 			{
 				float ffspd = -1.0f;
 				if (_speed_limit <= 0.0)
@@ -1267,7 +1392,9 @@ namespace Link_Components
 				return ffspd;
 			}
 
-			template<typename TargetType> float speed_limit_estimate()
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		float Link_Implementation<MasterType, InheritanceList>::speed_limit_estimate()
 			{
 				float spd;
 
@@ -1295,17 +1422,32 @@ namespace Link_Components
 				return spd;
 			}
 
-			template<typename TargetType> void process_weather_event();
-			template<typename TargetType> void revert_weather_event();
-			template<typename TargetType> float find_free_flow_speed_adjustment_rate_for_weather(int weather_index);
-			template<typename TargetType> int get_weather_index(TargetType weather_event);
-			template<typename TargetType> void process_accident_event();
-			template<typename TargetType> void revert_accident_event();
-			template<typename TargetType> void reset_features();
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::process_weather_event();
 		
-			static float link_capacity_adjustment_factors_for_weather[19];
-			static float link_free_flow_speed_adjustment_factors_for_weather[19][5];
-			static float link_capacity_adjustment_factors_for_accident[8][5];
-		};
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::revert_weather_event();
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		float Link_Implementation<MasterType, InheritanceList>::find_free_flow_speed_adjustment_rate_for_weather(int weather_index);
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		int Link_Implementation<MasterType, InheritanceList>::get_weather_index(TargetType weather_event);
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::process_accident_event();
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::revert_accident_event();
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Link_Implementation<MasterType, InheritanceList>::reset_features();
 	}
 }

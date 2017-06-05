@@ -13,7 +13,7 @@ namespace Depot_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Tow_Truck
+		prototype struct Tow_Truck ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			
@@ -26,7 +26,7 @@ namespace Depot_Components
 			accessor(truck_location, NONE, NONE);
 		};
 
-		prototype struct Depot
+		prototype struct Depot ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			

@@ -103,7 +103,7 @@ namespace Routing_Components
 
 
 				// Get the current origin/destination information
-				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();				
+				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
 				//unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
 				Activity_Location_Interface* origin_loc = _movement_plan->template origin<Activity_Location_Interface*>();
 				Activity_Location_Interface* destination_loc = _movement_plan->template destination<Activity_Location_Interface*>();
@@ -141,20 +141,26 @@ namespace Routing_Components
 				bool platoon_member = false;
 				typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> Vehicle_Interface;
 				auto vehicle = this->_movement_plan->parent_vehicle<Vehicle_Interface*>();
-				if (vehicle != nullptr)
+				int trip_id = vehicle->trip_id<int>();
+				if (vehicle->platooning<bool>())
 				{
-					auto trip_id = vehicle->trip_id<int>();
-					auto platoon_data_container = Platoon_Components::Implementations::Platoon_Implementation<MasterType, InheritanceList>::_platoon_data_container;
-					auto platoon_data_it = platoon_data_container.find(trip_id);
+					//auto platoon_data_container = Platoon_Components::Implementations::Platoon_Implementation<MasterType, InheritanceList>::_platoon_data_container;
+					//if (!platoon_data_container.empty())
+					//{
+						//auto platoon_data_it = platoon_data_container.find(trip_id);
+						//if (platoon_data_it != platoon_data_container.end())
+						//{
+							//cout << "found a platoon member!" << endl;
+							platoon_member = true;
+							//vehicle->platoon_data_vec(platoon_data_it->second);
+							//vehicle->write_trajectory(true);
+							//cout << "found a trip! trip_id = " << trip_id << endl;
+							best_route_time_to_destination = Compute_Platoon_Route(routable_network, origin_ids, destination_ids, path_container, cost_container, vehicle);
 
-					if (platoon_data_it != platoon_data_container.end())
-					{
-						platoon_member = true;
-						vehicle->platoon_data_vec (platoon_data_it->second);
-						vehicle->write_trajectory(true);
-						//cout << "found a trip! trip_id = " << trip_id << endl;
-						best_route_time_to_destination = Compute_Platoon_Route(routable_network, origin_ids, destination_ids, path_container, cost_container, vehicle);
-					}
+							//platoon_data_container.erase(platoon_data_it);
+							//if (platoon_data_container.empty()) cout << "no more vehicle for platooning!" << endl;
+						//}
+					//}
 				}
 
 				if(!platoon_member)
@@ -214,8 +220,8 @@ namespace Routing_Components
 
 				auto platoon_data =  vehicle->template platoon_data_vec < typename std::deque< Platoon_Components::Prototypes::Platoon_Data<MasterType::platoon_data_type> *>>();
 				auto first_link = platoon_data[0]->link<link_itf* >();
-				auto last_link = platoon_data[platoon_data.size() - 1]->link<link_itf* >();
-				
+				auto last_link = platoon_data[platoon_data.size() - 1]->link<link_itf* >();								
+
 				//from origin to the beginning of platoon formation
 				std::deque<global_edge_id> path_container_0;	//list of edgeid, graph_id tuples; internal edge ids
 				std::deque<float> cost_container_0;			//cost of traversing each of the edges
@@ -229,6 +235,7 @@ namespace Routing_Components
 				std::vector<unsigned int> origin_ids1;
 				origin_ids1.push_back(last_link->template uuid<unsigned int>());
 				float best_route_time_to_destination_1 = routable_network->compute_time_dependent_network_path(origin_ids1, destination_ids, _departure_time, path_container_1, cost_container_1, debug_route);
+				
 
 				//convert vector of links to vector of edges to create path container!				
 				auto graph_id = path_container_0[0].graph_id;
@@ -237,13 +244,10 @@ namespace Routing_Components
 					auto link =  platoon_data_it->link<link_itf* >();
 					// get edge id from link id
 					global_edge_id edge;
-					edge.edge_id = link->template uuid<unsigned int>();			
+					edge.edge_id = link->template uuid<unsigned int>();
 					edge.graph_id = graph_id;
 					path_container.push_back(edge);
-					
-					//cost_container.push_back(platoon_data_it->);
 					cost_container.push_back(0.0);
-
 					best_route_time_to_destination +=  0.0 ;
 				}
 
@@ -282,6 +286,7 @@ namespace Routing_Components
 			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
 			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<MasterType>);
 
+			tag_getter_as_available(update_increment);
 			template <typename TargetType> TargetType update_increment()
 			{
 				return this->_parent_skimmer->template update_increment<TargetType>();

@@ -226,6 +226,8 @@ namespace Scenario_Components
 			accessor(analyze_link_groups_file, NONE, NONE);
 
 			accessor(result_db_ptr, NONE, NONE);
+			accessor(demand_db_ptr, NONE, NONE);
+			accessor(popsyn_db_ptr, NONE, NONE);
 			accessor(output_result_database_name, NONE, NONE);
 
 			accessor(use_tmc, NONE, NONE);
@@ -429,7 +431,7 @@ namespace Scenario_Components
 
 				//=======================================================================================================================================================
 				// Platoon Information				
-				if (cfgReader.getParameter("platoon_information_file_name", this->template platoon_information_file_name<string*>()) != PARAMETER_FOUND) this->template platoon_information_file_name<string>((string)"platoon_information.txt");
+				if (cfgReader.getParameter("platoon_information_file_name", this->template platoon_information_file_name<string*>()) != PARAMETER_FOUND) this->template platoon_information_file_name<string>((string)"");
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
@@ -814,6 +816,7 @@ namespace Scenario_Components
 				for (typename odb::result<polaris::io::Vehicle_Type>::iterator vt_itr = vt_result.begin(); vt_itr != vt_result.end(); ++vt_itr) vt_vec.push_back(vt_itr.load());
 				td.commit();
 
+				// Create demand database
 				unique_ptr<odb::database> db2(create_sqlite_database(results_name, polaris::io::db_inventory[2]));
 				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[2]));
 				odb::transaction t2(db2->begin());
@@ -823,7 +826,9 @@ namespace Scenario_Components
 				for (typename vector<shared_ptr<polaris::io::Powertrain_Type>>::iterator p_itr = p_vec.begin(); p_itr != p_vec.end(); ++p_itr) db2->persist(*p_itr);
 				for (typename vector<shared_ptr<polaris::io::Vehicle_Class>>::iterator v_itr = v_vec.begin(); v_itr != v_vec.end(); ++v_itr) db2->persist(*v_itr);
 				for (typename vector<shared_ptr<polaris::io::Vehicle_Type>>::iterator vt_itr = vt_vec.begin(); vt_itr != vt_vec.end(); ++vt_itr) db2->persist(*vt_itr);
-				t2.commit();		
+				t2.commit();	
+				shared_ptr<odb::database> db2_ptr = open_sqlite_database_single<shared_ptr<odb::database> >(output_demand_database_name<string>());
+				this->template demand_db_ptr<shared_ptr<odb::database>>(db2_ptr);
 
 				//----------------------
 				// synthetic population database
@@ -832,58 +837,60 @@ namespace Scenario_Components
 				this->output_popsyn_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[5]));
 				odb::transaction t3(db3->begin());
 				t3.commit();
+				shared_ptr<odb::database> db3_ptr = open_sqlite_database_single<shared_ptr<odb::database> >(output_popsyn_database_name<string>());
+				this->template popsyn_db_ptr<shared_ptr<odb::database>>(db3_ptr);
 
 
 				//vehicle trajectory
-				if (this->template write_vehicle_trajectory<bool>())
-				{
-					vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
-					vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
-					if(vehicle_trajectory_file<fstream&>().is_open()) 
-					{ 
-						//vehicle_trajectory_file<fstream&>() 
-						//	<< "vehicle" <<  ","
-						//	<< "origin_zone " <<  ","
-						//	<< "destination_zone" << ","
-						//	<< "origin_activity_location" << ","
-						//	<< "destination_activity_location" << ","
-						//	<< "origin_link" << ","
-						//	<< "destination_link" << ","
-						//	<< "num_links" << ","
-						//	<< "departure_time" << ","
-						//	<< "arrival_time" << ","
-						//	<< "travel_time" << ","
-						//	<< "routed_travel_time" << ","
-						//	<< "travel_time_ratio" << ","
-						//	<< "trip_length" << ","
-						//	<< "num_switches" << ","
-						//	<< "loading_delay" << ","
-						//	<< "entry_queue_length" << ","
-						//	<<endl;
+				//if (this->template write_vehicle_trajectory<bool>())
+				//{
+				//	vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
+				//	vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
+				//	if(vehicle_trajectory_file<fstream&>().is_open()) 
+				//	{ 
+				//		//vehicle_trajectory_file<fstream&>() 
+				//		//	<< "vehicle" <<  ","
+				//		//	<< "origin_zone " <<  ","
+				//		//	<< "destination_zone" << ","
+				//		//	<< "origin_activity_location" << ","
+				//		//	<< "destination_activity_location" << ","
+				//		//	<< "origin_link" << ","
+				//		//	<< "destination_link" << ","
+				//		//	<< "num_links" << ","
+				//		//	<< "departure_time" << ","
+				//		//	<< "arrival_time" << ","
+				//		//	<< "travel_time" << ","
+				//		//	<< "routed_travel_time" << ","
+				//		//	<< "travel_time_ratio" << ","
+				//		//	<< "trip_length" << ","
+				//		//	<< "num_switches" << ","
+				//		//	<< "loading_delay" << ","
+				//		//	<< "entry_queue_length" << ","
+				//		//	<<endl;
 
-						vehicle_trajectory_file<fstream&>() 
-							<< "vehicle" <<  ","
-							<< "link_number" <<  ","
-							<< "link_id" <<  ","
-							<< "link_dir" << ","
-							<< "entering_time" << ","
-							<< "travel_time" << ","
-							<< "start_position" << ","
-							<< "length" << ","
-							//<< "delayed_time"<< ","
-							<< "actual_speed"<< ","
-							<< "free_flow_speed"<< ","
-							<< "stopped_time"<<","
-							<< "stop_position"
-							<<endl;
-					}
-					else
-					{
-						cout << "Cannot open file - "
-							<< vehicle_trajectory_file_name<string&>()
-							<< endl;
-					}
-				}
+				//		vehicle_trajectory_file<fstream&>() 
+				//			<< "vehicle" <<  ","
+				//			<< "link_number" <<  ","
+				//			<< "link_id" <<  ","
+				//			<< "link_dir" << ","
+				//			<< "entering_time" << ","
+				//			<< "travel_time" << ","
+				//			<< "start_position" << ","
+				//			<< "length" << ","
+				//			//<< "delayed_time"<< ","
+				//			<< "actual_speed"<< ","
+				//			<< "free_flow_speed"<< ","
+				//			<< "stopped_time"<<","
+				//			<< "stop_position"
+				//			<<endl;
+				//	}
+				//	else
+				//	{
+				//		cout << "Cannot open file - "
+				//			<< vehicle_trajectory_file_name<string&>()
+				//			<< endl;
+				//	}
+				//}
 
 				//routed path
 				//routed_path_file_name<string&>().assign(output_dir_name<string&>() + "routed_path.csv");

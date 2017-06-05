@@ -231,7 +231,7 @@ namespace Person_Components
 				Revision& location = act->template Location_Planning_Time<Revision&>();
 				Revision& start = act->template Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Route_Planning_Time<Revision&>();
-				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Get_Type_String<NT>() << "\t"<<zone->template uuid<int>()<<"\t";
+				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Get_Type_String() << "\t"<<zone->template uuid<int>()<<"\t";
 				s << "Plan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)
@@ -639,16 +639,16 @@ namespace Person_Components
 					else trip_rec.setDestination(new_destination);
 					trip_rec.setDuration(act->template Duration<Time_Seconds>());
 					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
-					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
-					trip_rec.setHhold(hh->template uuid<int>());
+					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());					
+					trip_rec.setHhold(hh->template uuid<int>()); //trip_rec.setHhold(0);
 					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
-						trip_rec.setMode(0);
+						trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV); //trip_rec.setMode(0);
 						trip_rec.setVehicle(person->vehicle<vehicle_itf*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 					}
-					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(1);
-					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(2);
-					else trip_rec.setMode(3);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)   trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);  //trip_rec.setMode(1);
+					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)   trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS); //trip_rec.setMode(2);
+					else trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);    //else trip_rec.setMode(3);
 					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
 					else trip_rec.setOrigin(new_origin);
 					trip_rec.setPartition(move->template routed_travel_time<int>());
@@ -672,7 +672,7 @@ namespace Person_Components
 				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
 				//polaris::io::Activity* act_rec = new polaris::io::Activity();
 				polaris::io::Activity act_rec;
-
+				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
 				if (new_destination<0)
 					act_rec.setLocation_Id(dest->template uuid<int>());
 				else 
@@ -691,7 +691,7 @@ namespace Person_Components
 					act_rec.setMode("BIKE");
 				else
 					act_rec.setMode ("TRANSIT");
-				act_rec.setType (act->template Get_Type_String<NT>());
+				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	

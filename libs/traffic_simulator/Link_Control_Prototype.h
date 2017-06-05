@@ -13,7 +13,7 @@ namespace Link_Control_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Link_Control
+		prototype struct Link_Control ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			

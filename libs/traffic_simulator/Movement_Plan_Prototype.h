@@ -74,7 +74,6 @@ namespace Movement_Plan_Components
 			{
 				if (this == nullptr) return;
 				this->clear_trajectory();
-				// %%%RLW
 				Free<Component_Type>(this_component());
 			}
 
@@ -330,7 +329,6 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
 				{
-					// %%%RLW - 
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 				trajectory.clear();
@@ -351,7 +349,6 @@ namespace Movement_Plan_Components
 				// Free the allocated memory in the trajectory, if exists
 				for (auto itr = trajectory.begin()+offset; itr != trajectory.end(); ++itr)
 				{
-					// %%% RLW - 
 					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
 				}
 
@@ -451,9 +448,9 @@ namespace Movement_Plan_Components
 				return (TargetType)(trajectory->size());
 			}
 
-			template<typename TargetType> void arrive_to_destination()
+			void arrive_to_destination()
 			{
-				this_component()->template arrive_to_destination<TargetType>();
+				this_component()->arrive_to_destination();
 			}
 
 			template<typename TargetType> void transfer_to_next_link(int delayed_time)

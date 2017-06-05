@@ -38,7 +38,6 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Vehicle_Data_Logger_Implementation<MasterType> vehicle_data_logger_type;
 	typedef NULLTYPE visual_vehicle_type;
 
-	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
 #else
@@ -49,9 +48,9 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
 
-	//%%RLW
 	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<MasterType> vehicle_characteristics_type;
 	typedef polaris::io::Vehicle_Type vehicle_type_db_rec_type;
+	typedef polaris::io::Vehicle vehicle_db_rec_type;
 #endif
 
 	//==============================================================================================
@@ -81,14 +80,9 @@ struct MasterType
 	
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	//TODO:ROUTING
-	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<MasterType> skim_routing_type;
 
-	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
-	//typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
-	
 	typedef Demand_Components::Implementations::Demand_Implementation<MasterType> demand_type;
 
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<MasterType> activity_location_type;
@@ -98,15 +92,6 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
 
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
-
-	//TODO:ROUTING
-	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
 	typedef Operation_Components::Implementations::Operation_Implementation<MasterType> operation_type;
 	
@@ -331,6 +316,7 @@ void run_with_input_from_db(const char* scenario_filename)
 	demand->template scenario_reference<_Scenario_Interface*>(scenario);
 	demand->template network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
+	demand->read_vehicle_type_data<NT>();
 	demand->template read_demand_data<Net_IO_Type>(network_io_maps);
 
 	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
@@ -404,7 +390,7 @@ void run_with_input_from_db(const char* scenario_filename)
 			{
 				typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-				TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+				TMC_Interface* tmc = static_cast<TMC_Interface*>(Allocate< MasterType::traffic_management_center_type >());
 				tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 				tmc->Initialize<NT>();
 			}
@@ -471,7 +457,7 @@ void run_with_input_from_db(const char* scenario_filename)
 		{
 			cout << "Initializing network skims..." <<endl;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
-			_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+			_network_skim_itf* skimmer = static_cast<_network_skim_itf*>(Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>());
 			skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 			if (skimmer->read_input<bool>())
 			{

@@ -100,6 +100,10 @@ namespace Demand_Components
 					string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
 					unique_ptr<database> db(open_sqlite_demand_database(name));
 
+					typedef  Scenario_Components::Prototypes::Scenario< typename get_type_of(scenario_reference)> _Scenario_Interface;
+					typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
+					typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
+
 					typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;
 
 					typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
@@ -116,6 +120,9 @@ namespace Demand_Components
 
 					typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
 					typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
+
+					typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
+					typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
 
 					typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
 					typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
@@ -145,7 +152,7 @@ namespace Demand_Components
 					_Movement_Plan_Interface* movement_plan;
 
 					int traveler_id_counter = -1;
-
+					
 
 					dense_hash_map<int, _Activity_Location_Interface*> activity_id_to_ptr;
 					activity_id_to_ptr.set_empty_key(-1);
@@ -182,15 +189,18 @@ namespace Demand_Components
 						// perform demand reduction
 						if (GLOBALS::Uniform_RNG.template Next_Rand<float>() > demand_percentage) continue;
 
-						trip_id = db_itr->getPrimaryKey();
+						//Just load vehicle trips
+						if( db_itr->getMode()  != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 
+						trip_id = db_itr->getPrimaryKey();						
 
 						if (++counter % 100000 == 0)
 						{
 							cout << counter << " trips processed" << endl;
 						}
 
-						departed_time = db_itr->getStart();
+						//departed_time =  db_itr->getStart() - 28800.0 ;
+						departed_time = db_itr->getStart() ;
 
 						if (departed_time < simulation_start_time || departed_time >= simulation_end_time) {
 							continue;
@@ -251,23 +261,45 @@ namespace Demand_Components
 
 						movement_plan->template network<_Network_Interface*>(network);
 
-
-						vehicle->template uuid<int>(++traveler_id_counter);
-						vehicle->template internal_id<int>(traveler_id_counter);
+						
+						//vehicle->template uuid<int>(++traveler_id_counter);
+						//vehicle->template internal_id<int>(traveler_id_counter);
+						int vehicle_id = db_itr->getVehicle()->getVehicle_Id();
+						int HhID = db_itr->getHhold();
+						traveler_id_counter++;
+						vehicle->template uuid<int>(vehicle_id);
+						vehicle->template internal_id<int>(vehicle_id);
+						
 						vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 						vehicle->template traveler<_Traveler_Interface*>(traveler);
 						vehicle->template router<_Routing_Interface*>(router);
-						vehicle->template is_integrated<bool>(db_itr->getType());
-						vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());						
-						//Mahmoud
-						vehicle->template trip_id<int>(trip_id);
-						if (vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> > () == nullptr)
+						//vehicle->template is_integrated<bool>(db_itr->getType());
+						
+						vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());	
+						//vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), traveler_id_counter);
+						vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), HhID);
+						vehicle->is_integrated(false);
+
+						//Mahmoud: Platoon related
+						//auto platoon_data_container = Platoon_Components::Implementations::Platoon_Implementation<MasterType::platoon_type>::template platoon_data_container<MasterType::platoon_data_type>();
+						auto & platoon_data_container = Platoon_Components::Implementations::template Platoon_Implementation<MasterType>::_platoon_data_container;
+						vehicle->template enroute_switching<bool>(((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>());
+						vehicle->template trip_id<int>(-1);
+						if (!platoon_data_container.empty() )
 						{
-							continue;
+							auto platoon_data_it = platoon_data_container.find(trip_id);
+							if (platoon_data_it != platoon_data_container.end())
+							{
+								//cout << "found a platoon member!" << endl;
+								vehicle->template trip_id<int>(trip_id);
+								vehicle->template enroute_switching<bool>(false);
+								vehicle->platoon_data_vec(platoon_data_it->second);
+								vehicle->write_trajectory(true);
+								vehicle->platooning(true);
+							}
 						}
 
-						vehicle->template initialize<NT>();
-						vehicle->is_integrated(false);
+						
 
 						traveler->template uuid<int>(traveler_id_counter);
 						traveler->template internal_id<int>(traveler_id_counter);
@@ -307,6 +339,19 @@ namespace Demand_Components
 						//	cout << "\t" << traveler_id_counter << endl;
 						//}
 					}
+					t.commit();
+
+					// write vehicles to output demand database
+					shared_ptr<odb::database> out_db_ptr = scenario->template demand_db_ptr<shared_ptr<odb::database>>();
+					transaction t2(out_db_ptr->begin());
+
+					for (typename _Vehicles_Container_Interface::iterator v_itr = vehicles_container<_Vehicles_Container_Interface&>().begin(); v_itr != vehicles_container<_Vehicles_Container_Interface&>().end(); ++v_itr)
+					{
+						shared_ptr<MasterType::vehicle_db_rec_type> veh_rec((*v_itr)->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
+						out_db_ptr->persist(veh_rec);
+						counter++;
+					}
+					t2.commit();
 				}
 				catch (exception& e)
 				{

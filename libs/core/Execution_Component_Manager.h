@@ -119,7 +119,7 @@ namespace polaris
 
 		inline void Clean_Up_Thread_Memory( );
 
-		inline void Free( DataType* ptr ); //%%%RLW
+		inline void Free( DataType* ptr );
 		inline void Lazy_Free( DataType* ptr );
 		inline void Free_Array( DataType* ptr );
 

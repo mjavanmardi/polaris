@@ -280,9 +280,9 @@ namespace polaris
 		typedef typename ComponentType::size_type size_type;
 		typedef T value_type;
 
-		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+		iterator begin(){return (iterator)(static_cast<ComponentType*>(this))->begin();}
 
-		iterator end(){return (iterator)((ComponentType*)this)->end();}
+		iterator end(){return (iterator)(static_cast<ComponentType*>(this))->end();}
 
 		reverse_iterator rbegin(){return (reverse_iterator)((ComponentType*)this)->rbegin();}
 
@@ -1125,6 +1125,8 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
 
 	///----------------------------------------------------------------------------------------------------
 	/// m_prototype_container � member creator, type-definition and basic accessors
