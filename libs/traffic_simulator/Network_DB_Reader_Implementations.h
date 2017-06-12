@@ -491,7 +491,7 @@ namespace Network_Components
 
 				for(typename result<polaris::io::Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
-					const string& facility_type=db_itr->getType()->getLink_Type();
+					const string& facility_type=db_itr->getType();
 					bool do_this_link = false;
 					
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
@@ -1453,8 +1453,8 @@ namespace Network_Components
 
 				for(typename result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
 				{
-					const string& inbound_link_type = db_itr->getLink()->getType()->getLink_Type();
-					const string& outbound_link_type = db_itr->getTo_Link()->getType()->getLink_Type();
+					const string& inbound_link_type = db_itr->getLink()->getType();
+					const string& outbound_link_type = db_itr->getTo_Link()->getType();
 
 					bool do_this_connection = false;
 					
@@ -2345,6 +2345,21 @@ namespace Network_Components
 					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
+
+				// Validate that all zones have an activity location, throw exception if they do not....
+				bool valid_loc = true;
+				stringstream errors("");
+				for (zone_itr = zones->begin(); zone_itr != zones->end(); ++zone_itr)
+				{
+					_Zone_Interface* zone = zone_itr->second;
+					if (zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().size() == 0)
+					{
+						valid_loc = false;
+						errors << "Zone '" << zone->template uuid<long>() << "' has no activity locations, correct using NetworkEditor." << endl;
+					}
+				}
+				if (!valid_loc) THROW_EXCEPTION(errors.str());
+								
 
 				cout <<"done."<<endl;
 			}

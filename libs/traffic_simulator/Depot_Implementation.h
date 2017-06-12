@@ -84,7 +84,7 @@ namespace Depot_Components
 				// // Do Nothing Currently
 			// }
 
-			template<typename TargetType> void Initialize(polaris::io::Depot& instance)
+			/*template<typename TargetType> void Initialize(polaris::io::Depot& instance)
 			{
 				this->template Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 				
@@ -130,7 +130,7 @@ namespace Depot_Components
 				//TODO
                 //RLW%%% _depot_service = new polaris::Depot( instance );
 			}
-
+			*/
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			m_data(Link_Interface*,resident_link, NONE, NONE);
 			m_data(std::vector<Link_Interface*>,covered_links, NONE, NONE);

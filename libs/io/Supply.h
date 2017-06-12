@@ -11,12 +11,12 @@ namespace io
 {
 //Forward declarations.
 //
-class MetaData;
-class Tags;
+//class MetaData;
+//class Tags;
 class Node;
 class Zone;
 //class ZoneLandUse;
-class Shape;
+//class Shape;
 class Link;
 class Transit_Links;
 class Transit_Patterns;
@@ -27,38 +27,38 @@ class Transit_Walk;
 class Pocket;
 class Lane_Use;
 class Connect;
-class Turn_Pen;
+//class Turn_Pen;
 class Parking;
 class Location;
-class Access;
+//class Access;
 class Sign;
 class Signal;
 class Timing;
 class Phasing;
-class Detector;
-class Stop;
-class Fare;
-class Line;
-class Schedule;
-class Driver;
-class Route_Nodes;
-class Ridership;
-class Veh_Type;
+//class Detector;
+//class Stop;
+//class Fare;
+//class Line;
+//class Schedule;
+//class Driver;
+//class Route_Nodes;
+//class Ridership;
+//class Veh_Type;
 class Area_Type;
 class Link_Type;
 
-class LinkList;
-class Component;
+//class LinkList;
+//class Component;
 class VMS;
-class Fixed_Sensor;
+//class Fixed_Sensor;
 class HAR;
 class VSS;
-class Depot;
-class OpenShoulder;
-class Action;
-class Action_Key;
-class Microsoft_Event;
-class InputContainer;
+//class Depot;
+//class OpenShoulder;
+//class Action;
+//class Action_Key;
+//class Microsoft_Event;
+//class InputContainer;
 
 
 typedef shared_ptr<Node> node_ptr;
@@ -129,12 +129,13 @@ public:
 	std::map<int,shared_ptr<Parking> > Parkings;
 	std::map<int,shared_ptr<Location> > Locations;
 	std::map<int,shared_ptr<Signal> > Signals;
-	std::map<int,shared_ptr<Stop> > Stops;
-	std::map<int,shared_ptr<Veh_Type> > Veh_Types;
+	//std::map<int,shared_ptr<Stop> > Stops;
+	//std::map<int,shared_ptr<Veh_Type> > Veh_Types;
 	std::map<int,area_type_ptr > Area_Types;
 	std::map<std::string,shared_ptr<Link_Type> > Link_Types;
 };
 
+/*
 #pragma db object
 class MetaData
 {
@@ -149,7 +150,6 @@ public:
 	std::string key;
 	std::string value;
 };
-
 #pragma db object
 class Tags
 {
@@ -162,6 +162,7 @@ public:
 	std::string key;
 	std::string value;
 };
+*/
 
 #pragma db object //table("NODE")
 class Node
@@ -670,7 +671,7 @@ private:
 //	int employment_other;
 //};
 
-
+/*
 #pragma db object //table("SHAPE")
 class Shape
 {
@@ -705,6 +706,7 @@ private:
 	#pragma db index member(link)
 
 };
+*/
 
 #pragma db object //table("LINK")
 class Link
@@ -713,7 +715,7 @@ public:
 	// Default Constructor
 	Link () {}	
 	//Constructor
-	Link ( int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, double setback_a_, double setback_b_, int bearing_a_, int bearing_b_, shared_ptr<Link_Type> type_, int divided_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, int lanes_ab_, double speed_ab_, double fspd_ab_, int cap_ab_, int lanes_ba_, double speed_ba_, double fspd_ba_, int cap_ba_, int left_ab_, int right_ab_, int left_ba_, int right_ba_ )  
+	Link ( int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, double setback_a_, double setback_b_, int bearing_a_, int bearing_b_, std::string type_, int divided_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, int lanes_ab_, double speed_ab_, double fspd_ab_, int cap_ab_, int lanes_ba_, double speed_ba_, double fspd_ba_, int cap_ba_, int left_ab_, int right_ab_, int left_ba_, int right_ba_ )  
 	: link (link_), name (name_), node_a (node_a_), node_b (node_b_), length (length_), setback_a (setback_a_), setback_b (setback_b_), bearing_a (bearing_a_), bearing_b (bearing_b_), type (type_), divided (divided_), area_type (area_type_), use (use_), grade (grade_), lanes_ab (lanes_ab_), speed_ab (speed_ab_), fspd_ab (fspd_ab_), cap_ab (cap_ab_), lanes_ba (lanes_ba_), speed_ba (speed_ba_), fspd_ba (fspd_ba_), cap_ba (cap_ba_), left_ab (left_ab_), right_ab (right_ab_), left_ba (left_ba_), right_ba (right_ba_)
 	{
 	}
@@ -738,9 +740,11 @@ public:
 	void setBearing_A (const int& bearing_a_){bearing_a = bearing_a_;}
 	const int& getBearing_B () const {return bearing_b;}
 	void setBearing_B (const int& bearing_b_){bearing_b = bearing_b_;}
-	const shared_ptr<Link_Type>& getType () const {return type;}
-	void setType (const shared_ptr<Link_Type>& type_){type = type_;}
-	void setType (const std::string& type_, InputContainer& container){type = container.Link_Types[type_];}
+	//const shared_ptr<Link_Type>& getType () const {return type;}
+	//void setType (const shared_ptr<Link_Type>& type_){type = type_;}
+	//void setType (const std::string& type_, InputContainer& container){type = container.Link_Types[type_];}
+	const std::string& getType() const { return type; }
+	void setType(const std::string& type_) { type = type_; }
 	const int& getDivided () const {return divided;}
 	void setDivided (const int& divided_){divided = divided_;}
 	const shared_ptr<Area_Type>& getArea_Type () const {return area_type;}
@@ -790,7 +794,7 @@ private:
 	double setback_b;
 	int bearing_a;
 	int bearing_b;
-	shared_ptr<Link_Type> type;
+	std::string type;
 	int divided;
 	shared_ptr<Area_Type> area_type;
 	std::string use;
@@ -985,7 +989,7 @@ private:
 
 };
 
-#pragma db object //table("TURN_PEN")
+/*#pragma db object //table("TURN_PEN")
 class Turn_Pen
 {
 public:
@@ -1043,7 +1047,7 @@ private:
 	node_ptr in_node;
 	node_ptr out_node;
 
-};
+};*/
 
 #pragma db object //table("PARKING")
 class Parking
@@ -1183,6 +1187,7 @@ private:
 	//shared_ptr<LocationData> location_data;
 	#pragma db index member(location)
 };
+
 //#pragma db object
 //class LocationData
 //{
@@ -1237,6 +1242,7 @@ private:
 //	std::string land_use;
 //};
 
+/*
 #pragma db object //table("ACCESS")
 class Access
 {
@@ -1284,7 +1290,7 @@ private:
 	int cost;
 
 };
-
+*/
 #pragma db object //table("SIGN")
 class Sign
 {
@@ -1452,6 +1458,7 @@ private:
 
 };
 
+/*
 #pragma db object //table("DETECTOR")
 class Detector
 {
@@ -1503,9 +1510,9 @@ private:
 	int high;
 	#pragma db index member(detector)
 
-};
+};*/
 
-#pragma db object //table("STOP")
+/*#pragma db object //table("STOP")
 class Stop
 {
 public:
@@ -1550,9 +1557,9 @@ private:
 	int space;
 	#pragma db index member(stop)
 
-};
+};*/
 
-#pragma db object //table("FARE")
+/*#pragma db object //table("FARE")
 class Fare
 {
 public:
@@ -1595,9 +1602,9 @@ private:
 	int fare;
 	#pragma db index member(fare)
 
-};
+};*/
 
-#pragma db object //table("LINE")
+/*#pragma db object //table("LINE")
 class Line
 {
 public:
@@ -1645,9 +1652,9 @@ private:
 	shared_ptr<Zone> zone;
 	int flag;
 
-};
+};*/
 
-#pragma db object //table("SCHEDULE")
+/*#pragma db object //table("SCHEDULE")
 class Schedule
 {
 public:
@@ -1679,9 +1686,9 @@ private:
 	shared_ptr<Stop> stops;
 	shared_ptr<Stop> stop;
 
-};
+};*/
 
-#pragma db object //table("DRIVER")
+/*#pragma db object //table("DRIVER")
 class Driver
 {
 public:
@@ -1722,9 +1729,9 @@ private:
 	shared_ptr<Link> link;
 	int dir;
 
-};
+};*/
 
-#pragma db object //table("ROUTE_NODES")
+/*#pragma db object //table("ROUTE_NODES")
 class Route_Nodes
 {
 public:
@@ -1778,9 +1785,9 @@ private:
 	double time;
 	double speed;
 
-};
+};*/
 
-#pragma db object //table("VEH_TYPE")
+/*#pragma db object //table("VEH_TYPE")
 class Veh_Type
 {
 public:
@@ -1842,10 +1849,10 @@ private:
 	int subtype;
 	#pragma db index member(type)
 
-};
+};*/
 
 
-#pragma db object //table("RIDERSHIP")
+/*#pragma db object //table("RIDERSHIP")
 class Ridership
 {
 public:
@@ -1897,7 +1904,9 @@ private:
 	int load;
 	double factor;
 
-};
+};*/
+
+
 #pragma db object
 class Area_Type
 {
@@ -1925,7 +1934,8 @@ private:
 	std::string notes;
 };
 
-#pragma db object
+
+/*#pragma db object
 class Link_Type
 {
 public:
@@ -1956,9 +1966,9 @@ private:
 	std::string use_codes;
 	std::string alternative_labels;
 	std::string notes;
-};
+};*/
 
-#pragma db object
+/*#pragma db object
 class Use_Code
 {
 public:
@@ -1994,9 +2004,9 @@ private:
 	std::string superset_of;
 	std::string alternative_labels;
 	std::string notes;
-};
+};*/
 
-#pragma db object
+/*#pragma db object
 class LinkList
 {
 public:
@@ -2054,7 +2064,7 @@ private:
 	std::string icon;
 	#pragma db inverse(component)
 	std::vector<std::weak_ptr<Action> > actions;
-};
+};*/
 
 
 #pragma db object
@@ -2063,10 +2073,6 @@ class VMS
 public:
 	// Default Constructor
 	VMS () {}        
-	VMS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_)
-	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
-	{
-	}
 	VMS (int id_, int link_, int dir_, float offset_, float setback_, int initial_event_)
 	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
 	{
@@ -2074,8 +2080,6 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component> getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component> component_) {component = component_;}
 	const int& getLink () const {return link;}
 	void setLink (const int& link_) {link = link_;}
 	const int& getDir () const {return dir;}
@@ -2092,7 +2096,6 @@ private:
 	#pragma db auto id
 	int id;
 	#pragma db not_null
-	shared_ptr<Component> component;
 	int link;
 	int dir;
 	float offset;
@@ -2108,10 +2111,6 @@ class HAR
 public:
 	// Default Constructor
 	HAR () {}        
-	HAR (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_, shared_ptr<LinkList> links_)
-	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_), links (links_)
-	{
-	}
 	HAR (int id_, int link_, int dir_, float offset_, float setback_, int initial_event_)
 	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
 	{
@@ -2119,8 +2118,6 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component> getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component> component_) {component = component_;}
 	const int& getLink () const {return link;}
 	void setLink (const int& link_) {link = link_;}
 	const int& getDir () const {return dir;}
@@ -2131,22 +2128,18 @@ public:
 	void setSetback (const float& setback_) {setback = setback_;}
 	const int& getInitial_Event () const {return initial_event;}
 	void setInitial_Event (const int& initial_event_) {initial_event = initial_event_;}
-	const shared_ptr<LinkList> getLinks () const {return links;}
-	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
 	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db auto id
 	int id;
 	#pragma db not_null
-	shared_ptr<Component> component;
 	int link;
 	int dir;
 	float offset;
 	float setback;
 	#pragma db default(-1)
 	int initial_event;
-	shared_ptr<LinkList> links;
 };
 
 
@@ -2156,10 +2149,6 @@ class VSS
 public:
 	// Default Constructor
 	VSS () {}        
-	VSS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_speed_, std::string speed_, shared_ptr<LinkList> links_)
-	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_speed (initial_speed_), speed (speed_), links (links_)
-	{
-	}
 	VSS (int id_, int link_, int dir_, float offset_, float setback_, int initial_speed_, std::string speed_)
 	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_speed (initial_speed_), speed (speed_)
 	{
@@ -2167,8 +2156,6 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component> getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component> component_) {component = component_;}
 	const int& getLink () const {return link;}
 	void setLink (const int& link_) {link = link_;}
 	const int& getDir () const {return dir;}
@@ -2181,15 +2168,12 @@ public:
 	void setInitial_Speed (const int& initial_speed_) {initial_speed = initial_speed_;}
 	const std::string& getSpeed () const {return speed;}
 	void setSpeed (const std::string& speed_) {speed = speed_;}
-	const shared_ptr<LinkList> getLinks () const {return links;}
-	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
 	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db auto id
 	int id;
 	#pragma db not_null
-	shared_ptr<Component> component;
 	int link;
 	int dir;
 	float offset;
@@ -2198,11 +2182,10 @@ private:
 	int initial_speed;
 	#pragma db default("list(35,40,45,55,60)")
 	std::string speed;
-	shared_ptr<LinkList> links;
 };
 
 
-#pragma db object
+/*#pragma db object
 class Depot
 {
 public:
@@ -2263,10 +2246,6 @@ class OpenShoulder
 public:
 	// Default Constructor
 	OpenShoulder () {}        
-	OpenShoulder (int id_, shared_ptr<Component> component_, shared_ptr<LinkList> links_, bool open_)
-	: id (id_), component (component_), links (links_), open (open_)
-	{
-	}
 	OpenShoulder (int id_, bool open_)
 	: id (id_), open (open_)
 	{
@@ -2274,10 +2253,6 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component> getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component> component_) {component = component_;}
-	const shared_ptr<LinkList> getLinks () const {return links;}
-	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
 	const bool& getOpen () const {return open;}
 	void setOpen (const bool& open_) {open = open_;}
 	//Data Fields
@@ -2285,15 +2260,12 @@ private:
 	friend class odb::access;
 	#pragma db auto id
 	int id;
-	#pragma db not_null
-	shared_ptr<Component> component;
-	shared_ptr<LinkList> links;
 	#pragma db default(false)
 	bool open;
 };
 
 
-#pragma db object
+/*#pragma db object
 class Action
 {
 public:
@@ -2465,7 +2437,7 @@ private:
 	bool verified;
 	int link_id;
 	double link_distance;
-};
+};*/
 }//end of io namespace 
 }//end of polaris namespace
 #endif // IOSupply

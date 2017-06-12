@@ -391,10 +391,10 @@ namespace Traffic_Management_Center_Components
 				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
 			}
 
-			for (typename std::vector<Depot_Interface*>::iterator itr = _depots.begin(); itr != _depots.end(); itr++)
-			{
-				(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
-			}
+			//for (typename std::vector<Depot_Interface*>::iterator itr = _depots.begin(); itr != _depots.end(); itr++)
+			//{
+			//	(*itr)->template Push_Network_Events<typename MasterType::base_network_event_type>((std::vector<Network_Event<typename MasterType::base_network_event_type>*>&)current_events);
+			//}
 		}
 
 		template<typename MasterType, typename InheritanceList>
@@ -463,7 +463,7 @@ namespace Traffic_Management_Center_Components
 				}
 			}
 		}
-
+		
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType>
 		void Simple_TMC<MasterType, InheritanceList>::Read_Database()
@@ -525,32 +525,32 @@ namespace Traffic_Management_Center_Components
 			}
 
 
-			cout << "\tDepot" << endl;
+			//cout << "\tDepot" << endl;
 
-			result<polaris::io::Depot> depot_component_result = db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
+			//result<polaris::io::Depot> depot_component_result = db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
 
-			Depot_Interface::template Initialize_Type<NT>();
+			//Depot_Interface::template Initialize_Type<NT>();
 
-			for (typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin(); db_itr != depot_component_result.end(); ++db_itr)
-			{
-				Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
-				its_component->template Initialize< polaris::io::Depot& >(*db_itr);
-				_depots.push_back(its_component);
-			}
+			//for (typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin(); db_itr != depot_component_result.end(); ++db_itr)
+			//{
+			//	Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::Component_Type>();
+			//	//its_component->template Initialize< polaris::io::Depot& >(*db_itr);
+			//	_depots.push_back(its_component);
+			//}
 
 
-			cout << "\tLink Control" << endl;
+			//cout << "\tLink Control" << endl;
 
-			result<OpenShoulder> link_control_component_result = db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
+			//result<OpenShoulder> link_control_component_result = db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
 
-			Link_Control_Interface::template Initialize_Type<NT>();
+			//Link_Control_Interface::template Initialize_Type<NT>();
 
-			for (typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin(); db_itr != link_control_component_result.end(); ++db_itr)
-			{
-				Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
-				its_component->template Initialize< OpenShoulder& >(*db_itr);
-				_link_controls.push_back(its_component);
-			}
+			//for (typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin(); db_itr != link_control_component_result.end(); ++db_itr)
+			//{
+			//	Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::Component_Type>();
+			//	//its_component->template Initialize< OpenShoulder& >(*db_itr);
+			//	_link_controls.push_back(its_component);
+			//}
 
 			//cout << "\tDetectors" << endl;
 

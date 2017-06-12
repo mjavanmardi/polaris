@@ -30,10 +30,9 @@ namespace Scenario_Components
 			m_data(bool, ramp_metering_flag, NONE, NONE);
 
 			m_data(int, demand_od_flag, NONE, NONE);
-			m_data(int, io_source_flag, NONE, NONE);
 			m_data(int, assignment_mode, NONE, NONE);
 			m_data(unsigned long, iseed, NONE, NONE);
-			m_data(int, num_threads, NONE, NONE);
+
 
 			m_data(double, demand_reduction_factor, NONE, NONE);
 			m_data(bool, count_integrated_in_network_vehicles_only, NONE, NONE);
