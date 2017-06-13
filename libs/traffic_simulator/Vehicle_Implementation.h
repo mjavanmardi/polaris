@@ -1165,6 +1165,8 @@ namespace Vehicle_Components
 			_vehicle_ptr = make_shared<polaris::io::Vehicle>();
 			_vehicle_ptr->setHhold(household_id);
 			_vehicle_ptr->setParking(0);
+			_vehicle_ptr->setL3_wtp(0);
+			_vehicle_ptr->setL4_wtp(0);
 			_vehicle_ptr->setSubtype(0);
 			_vehicle_ptr->setType(_vehicle_characteristics->db_ptr<shared_ptr<typename MasterType::vehicle_type_db_rec_type>>());
 		}

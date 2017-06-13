@@ -68,8 +68,8 @@ namespace Household_Components
 				_Properties->template Parent_Household<ComponentType*>(this);
 
 				_Vehicle_Chooser = (Vehicle_Chooser_type)Allocate<type_of(Vehicle_Chooser)>();
-				//_Vehicle_Chooser->Initialize<void>();
-				_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
+				_Vehicle_Chooser->Initialize<ComponentType*>(this);
+				//_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
 					
 				// Add basic traveler properties							
 				this->template uuid<int>(id);

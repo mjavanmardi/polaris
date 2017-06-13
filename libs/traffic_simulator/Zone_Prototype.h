@@ -83,6 +83,7 @@ namespace Zone_Components
 			accessor(avg_ovtt_transit, NONE, NONE);
 			accessor(avg_fare_transit, NONE, NONE);
 			accessor(avg_distance, NONE, NONE);
+			accessor(min_ovtt_transit, NONE, NONE);
 			//accessor(avg_ttime_auto_to_transit_accessible_zones, NONE, NONE);
 			accessor(avg_ttime_auto_peak, NONE, NONE);
 			accessor(avg_ttime_auto_offpeak, NONE, NONE);

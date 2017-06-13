@@ -1004,6 +1004,7 @@ namespace Network_Skimming_Components
 
 				float Nz_inv = 1.0 / (zones_container->size() - 1.0);
 				float alpha = -0.15;
+				float min_transit_ovtt = FLT_MAX;
 
 				// loop through all zones and calculate competing destinations factors for employment categories
 				for (zone_iterator o_zone_itr = zones_container->begin(); o_zone_itr != zones_container->end(); ++o_zone_itr)
@@ -1071,6 +1072,7 @@ namespace Network_Skimming_Components
 							count++;
 							attract_count += attract;
 						}
+						if (ovtt_transit < min_transit_ovtt) min_transit_ovtt = ovtt_transit;
 					}
 
 					// Add accessiblity factors to origin zone
@@ -1085,6 +1087,7 @@ namespace Network_Skimming_Components
 					zone->template avg_ttime_auto_offpeak<Time_Minutes>(1.0 / alpha * log(auto_ttime_offpeak_avg/attract_count));
 					zone->template avg_ttime_auto_peak<Time_Minutes>(1.0 / alpha * log(auto_ttime_avg / attract_count));
 					zone->template avg_distance<Miles>(distance_avg / auto_ttime_avg);
+					zone->template min_ovtt_transit<Time_Minutes>(min_transit_ovtt);
 					if (count_transit > 2)
 					{
 						zone->template avg_ttime_transit<Time_Minutes>(1.0 / alpha * log(tran_ttime_avg / attract_count_transit));

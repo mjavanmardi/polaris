@@ -335,6 +335,10 @@ public:
 	void setHhold (const int& hhold_){hhold = hhold_;}
 	const int& getParking () const {return parking;}
 	void setParking (const int& parking_){parking = parking_;}
+	const int& getL3_wtp() const { return L3_wtp; }
+	void setL3_wtp(const int& L3_wtp_) { L3_wtp = L3_wtp_; }
+	const int& getL4_wtp() const { return L4_wtp; }
+	void setL4_wtp(const int& L4_wtp_) { L4_wtp = L4_wtp_; }
 	const shared_ptr<Vehicle_Type> getType () const {return type;}
 	void setType (const shared_ptr<Vehicle_Type> type_){type = type_;}
 	const int& getSubtype () const {return subtype;}
@@ -349,6 +353,8 @@ private:
 	unsigned long vehicle_id;
 	int hhold;
 	int parking;
+	int L3_wtp;
+	int L4_wtp;
 	#pragma db not_null
 	shared_ptr<Vehicle_Type> type;
 	int subtype;
