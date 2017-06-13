@@ -4,6 +4,7 @@
 #include "Turn_Movement_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Implementation.h"
+#include "scenario_manager\Scenario_Prototype.h"
 
 namespace Network_Components
 {

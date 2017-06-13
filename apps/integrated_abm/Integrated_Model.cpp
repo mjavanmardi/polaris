@@ -27,10 +27,11 @@
 
 
 #include "Polaris_PCH.h"
-#include "User_Space.h"
+#include "Traffic_Simulator.h"
+#include "ITS_Simulator.h"
 #include "Activity_Simulator.h"
 #include "Population_Synthesis.h"
-#include "Scenario_Implementation.h"
+#include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
 
