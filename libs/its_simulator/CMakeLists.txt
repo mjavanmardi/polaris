@@ -1,0 +1,6 @@
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+source_group("Implementations" _Implementation*..h$)
+source_group("Prototypes" _Prototype*..h$)
+add_library(ITS_Simulator ${cppfiles} ${hppfiles})
+set_target_properties(ITS_Simulator PROPERTIES FOLDER libs)

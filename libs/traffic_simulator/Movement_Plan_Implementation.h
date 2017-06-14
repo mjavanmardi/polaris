@@ -82,6 +82,7 @@ namespace Movement_Plan_Components
 			m_data(float, route_length, NONE, NONE);
 			m_data(int, entry_time, NONE, NONE);
 			m_data(int, traveler_id, NONE, NONE);
+			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode, NONE, NONE);
 
 			template<typename TargetType>
 			TargetType absolute_departure_time();
