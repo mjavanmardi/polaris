@@ -693,10 +693,11 @@ namespace Prototypes
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
-		// Skip routing if the mode is not SOV (remove when transit router is developed
-		if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
+		// Skip routing if the mode is not SOV (remove when transit router is developed - 6/14/17 - Testing multimodal router developmen so commenting out this line below
+		movements->mode(act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+		//if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
 
-
+		//=================================================
 		// Do routing at the next timestep for the movement
 		planner->template Schedule_New_Routing<movement_itf*>(iteration() + 1, movements);
 	}
@@ -746,7 +747,7 @@ namespace Prototypes
 		//else max_walk_distance = 0.0;	
 		//if (dist <max_walk_distance) act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 
-		// If no movement involved - i.e. different activity at same location, do auto arrive
+		// If no movement involved - i.e. different activity at same location, do automatic arrival
 		if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
@@ -755,7 +756,7 @@ namespace Prototypes
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
-		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point
+		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point.....)
 		else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
@@ -1050,7 +1051,8 @@ namespace Prototypes
 
 		this->Artificial_Movement_Scheduled<bool>(true);
 
-		int arrival_time = max((int)act->template Start_Time<Simulation_Timestep_Increment>(), iteration() + 1);
+		int arrival_time = iteration() + movements->routed_travel_time<Simulation_Timestep_Increment>();
+		//int arrival_time = max((int)act->template Start_Time<Simulation_Timestep_Increment>(), iteration() + 1);
 
 		this->Artificial_Arrival_Time<Simulation_Timestep_Increment>(arrival_time);
 

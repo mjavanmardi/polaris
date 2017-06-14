@@ -87,6 +87,7 @@ namespace Zone_Components
 
 			member_component_and_feature_accessor(avg_ttime_transit,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ovtt_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(min_ovtt_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_fare_transit, Value, Basic_Units::Prototypes::Currency, Basic_Units::Implementations::Currency_Implementation<NT>);
 			member_component_and_feature_accessor(avg_wait_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_distance, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);

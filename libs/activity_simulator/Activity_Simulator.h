@@ -22,4 +22,5 @@
 #include "Household_Properties_Implemenations.h"
 #include "Household_Implementations.h"
 #include "Vehicle_Chooser_Implementation.h"
+#include "Vehicle_Technology_Choice_Implementation.h"
 

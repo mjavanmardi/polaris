@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
+#include "Traffic_Simulator_Includes.h"
 #include "activity_simulator/Activity_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Prototype.h"
@@ -64,6 +64,7 @@ namespace Movement_Plan_Components
 			accessor(route_length, NONE, NONE);
 			accessor(entry_time, NONE, NONE);
 			accessor(traveler_id, NONE,NONE);
+			accessor(mode, NONE, NONE);
 
 			void Free_Movement()
 			{

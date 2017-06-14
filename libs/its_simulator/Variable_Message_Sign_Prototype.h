@@ -1,8 +1,7 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Network_Event_Prototype.h"
+#include "ITS_Simulator_Includes.h"
 
-namespace Advisory_Radio_Components
+namespace Variable_Message_Sign_Components
 {
 	namespace Types
 	{
@@ -14,7 +13,7 @@ namespace Advisory_Radio_Components
 	
 	namespace Prototypes
 	{
-		//prototype struct Advisory_Radio:public ComponentType
+		//prototype struct Variable_Message_Sign:public ComponentType
 		//{
 		//	tag_as_prototype;
 		//	
@@ -22,7 +21,7 @@ namespace Advisory_Radio_Components
 		//	{
 		//		ComponentType::template Initialize_Type<TargetType>(configuration);
 		//	}
-		//	
+
 		//	template<typename TargetType> void Initialize(TargetType configuration)
 		//	{
 		//		ComponentType::template Initialize<TargetType>(configuration);
@@ -35,15 +34,19 @@ namespace Advisory_Radio_Components
 
 		//	template<typename TargetType> void Get_Messages(std::vector<Network_Event<TargetType>*>& bucket)
 		//	{
-		//		this_component()->template Get_Messages<TargetType>(bucket);
+		//		return this_component()->template Get_Messages<TargetType>(bucket);
 		//	}
 
-		//	accessor(x_position, NONE, NONE);
-		//	accessor(y_position, NONE, NONE);
+		//	template<typename TargetType> TargetType Get_Single_Message()
+		//	{
+		//		return this_component()->template Get_Single_Message<TargetType>();
+		//	}
 
 		//	accessor(active_properties, NONE, NONE);
+		//	accessor(x_position, NONE, NONE);
+		//	accessor(y_position, NONE, NONE);
 		//};
 	}
 }
 
-using namespace Advisory_Radio_Components::Prototypes;
+using namespace Variable_Message_Sign_Components::Prototypes;

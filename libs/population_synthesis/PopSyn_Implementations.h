@@ -1032,7 +1032,7 @@ namespace PopSyn
 									shared_ptr<MasterType::vehicle_db_rec_type> veh_rec(veh->vehicle_ptr<shared_ptr<MasterType::vehicle_db_rec_type>>());
 									veh_rec->setHhold(hh_rec->getHousehold());
 									veh_rec->setSubtype(veh->is_autonomous<bool>());
-									veh_rec->setParking(veh->willingness_to_pay<float>());
+									veh_rec->setL4_wtp(veh->willingness_to_pay<float>());
 									//Set_Person_Record_Locations<shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
 									//Fill_Person_Record<typename get_type_of(network_reference), shared_ptr<MasterType::person_db_rec_type>, person_type*, zone_itf*>(per_rec, person, zone);
 

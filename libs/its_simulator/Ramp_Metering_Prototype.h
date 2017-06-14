@@ -1,7 +1,7 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Link_Prototype.h"
-#include "Scenario_Prototype.h"
+#include "ITS_Simulator_Includes.h"
+//#include "Link_Prototype.h"
+//#include "Scenario_Prototype.h"
 extern void* _global_scenario;
 
 namespace Ramp_Metering_Components

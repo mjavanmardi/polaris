@@ -7,6 +7,7 @@
 #include "Transit_Vehicle_Trip_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Implementation.h"
+#include "scenario_manager\Scenario_Prototype.h"
 
 namespace Network_Components
 {

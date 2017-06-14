@@ -27,10 +27,11 @@
 
 
 #include "Polaris_PCH.h"
-#include "User_Space.h"
+#include "Traffic_Simulator.h"
+#include "ITS_Simulator.h"
 #include "Activity_Simulator.h"
 #include "Population_Synthesis.h"
-#include "Scenario_Implementation.h"
+#include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
 
@@ -137,6 +138,7 @@ struct MasterType
 	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M> household_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
+	typedef Household_Components::Implementations::UIC_Vehicle_Technology_Chooser_Implementation<M> vehicle_technology_chooser_type;
 	
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
@@ -273,12 +275,12 @@ bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 	}
 	MasterType::telecommute_chooser_type::print_parameters();
 
-	if (!MasterType::vehicle_chooser_type::static_initialize(scenario->template cav_wtp_model_file<string>()))
+	if (!MasterType::vehicle_technology_chooser_type::static_initialize(scenario->template cav_wtp_model_file<string>()))
 	{
 		cout << "ERROR: Unable to initialize CAV WTP Model parameters." << endl;
 		return false;
 	}
-	MasterType::vehicle_chooser_type::print_parameters();
+	MasterType::vehicle_technology_chooser_type::print_parameters();
 
 	return true;
 }
@@ -713,14 +715,14 @@ int main(int argc,char** argv)
 		THROW_EXCEPTION("ERROR: No network skimming properties specified in the scenario file.  Please set either 'READ_SKIM_TABLES' or 'WRITE_SKIM_TABLES' to true in order to continue.");
 	}
 
+
 	//==================================================================================================================================
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 100;
 
 	// Initialize all choice model parameters
-	if (!InitializeChoiceModelParameters(scenario))
-		return 1;
+	if (!InitializeChoiceModelParameters(scenario)) return 1;
 
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
@@ -730,6 +732,7 @@ int main(int argc,char** argv)
 	
 	// Initialize Vehicle Choice Model
 	MasterType::vehicle_chooser_type::distribution_static_initializer(scenario->vehicle_distribution_file_name<string>(), demand);
+
 
 	//==================================================================================================================================
 	// POPSYN stuff
@@ -745,7 +748,6 @@ int main(int argc,char** argv)
 		popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 	}
 
-	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
 	// Logging of activity generation / scheduling outputs

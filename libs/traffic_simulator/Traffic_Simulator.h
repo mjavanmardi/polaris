@@ -1,9 +1,7 @@
 #pragma once
 
-//#include "User_Space_Includes.h"
 
 void* _global_network;
-void* _global_scenario;
 void* _global_demand;
 void* _global_person_logger;
 void* _global_vehicle_logger;
@@ -17,6 +15,7 @@ void* _global_vehicle_logger;
 #include "Activity_Location_Implementation.h"
 #include "Traveler_Implementation.h"
 #include "Intersection_Control_Implementation.h"
+#include "Operation_Implementation.h"
 #include "Ramp_Metering_Implementation.h"
 #include "Routable_Network_Implementation.h"
 

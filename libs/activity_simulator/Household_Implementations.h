@@ -3,7 +3,8 @@
 #include "Household_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "traffic_simulator/Network_Prototype.h"
-#include "traffic_simulator/Scenario_Prototype.h"
+#include "scenario_manager\Scenario_Prototype.h"
+
 #include "Network_Skimming_Prototype.h"
 #include "Activity_Prototype.h"
 
@@ -68,8 +69,8 @@ namespace Household_Components
 				_Properties->template Parent_Household<ComponentType*>(this);
 
 				_Vehicle_Chooser = (Vehicle_Chooser_type)Allocate<type_of(Vehicle_Chooser)>();
-				//_Vehicle_Chooser->Initialize<void>();
-				_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
+				_Vehicle_Chooser->Initialize<ComponentType*>(this);
+				//_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
 					
 				// Add basic traveler properties							
 				this->template uuid<int>(id);
