@@ -153,15 +153,16 @@ namespace Routing_Components
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				float best_route_time_to_destination = 0.0f;
-				float best_transit_route_time_to_destination = 0.0f;
+				//float best_transit_route_time_to_destination = 0.0f;
 
-
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
-					if(!origin_walk_ids.empty() && !destination_walk_ids.empty())
+					
+					if(!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_transit_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{
@@ -171,9 +172,9 @@ namespace Routing_Components
 				}
 				else
 				{
-					if (!origin_walk_ids.empty() && !destination_walk_ids.empty())
+					if (!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_transit_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{ 
@@ -185,7 +186,7 @@ namespace Routing_Components
 
 				if(path_container.size())
 				{
-					float routed_travel_time = cost_container.back();
+					float routed_travel_time = best_route_time_to_destination; //cost_container.back();
 
 					_movement_plan->template valid_trajectory<bool>(true);
 					_movement_plan->template routed_travel_time<float>(routed_travel_time);

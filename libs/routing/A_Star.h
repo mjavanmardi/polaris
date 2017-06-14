@@ -536,7 +536,8 @@ namespace polaris
 		global.graph_id = 1;
 		_Transit_Vehicle_Trip_Interface* current_trip;
 
-		float total_cost = 0.0f;		
+		float total_cost = 0.0f;
+		float travel_time = 0.0f;
 				
 		if (success)
 		{
@@ -676,13 +677,14 @@ namespace polaris
 			//Our_Line.insert(0, myLine);
 			sp_file << myParagraph << endl;
 
-			std::reverse(out_path.begin(), out_path.end());
+			std::reverse(out_path.begin(), out_path.end()); //OMER reverse everything!!!!
 			std::reverse(out_cost.begin(), out_cost.end());
 			std::reverse(out_type.begin(), out_type.end());
 			std::reverse(out_trip.begin(), out_trip.end());
 			std::reverse(out_seq.begin(), out_seq.end());
 
 			total_cost = out_cost.back();
+			travel_time = out_time.front();
 
 			// update start_ids/end_ids to includ final routed start/end
 			start_ids.clear();
@@ -701,6 +703,7 @@ namespace polaris
 			(*itr)->reset();
 		}
 
-		return total_cost;
+		//return total_cost;
+		return travel_time;
 	}
 }
