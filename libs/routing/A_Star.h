@@ -396,30 +396,33 @@ namespace polaris
 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-
+		
 		std::ofstream sp_file;
 		char myLine[2000];
 		std::string myParagraph;
 
-		// Initialize executed activities file
-		stringstream sp_filename("");
-		sp_filename << _scenario_reference->template output_dir_name<string>();
-		sp_filename << "sp_output.dat";
-		sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-		/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
-		//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+		if (debug_route)
+		{
+			// Initialize executed activities file
+			stringstream sp_filename("");
+			sp_filename << _scenario_reference->template output_dir_name<string>();
+			sp_filename << "sp_output.dat";
+			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
+			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
+			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+		}
 
 		std::deque< base_edge_type* > modified_edges;
 
 		std::deque<Link_Components::Types::Link_Type_Keys> out_type;
 		std::deque<int> out_trip;
 		std::deque<int> out_seq;
-
 		std::deque<float> out_time;
 		std::deque<float> out_arr_time;
 		std::deque<float> out_wait_time;
 		std::deque<float> out_walk_time;
 		std::deque<float> out_ivt_time;
+		std::deque<float> out_car_time;
 		std::deque<int> out_wait_count;
 		std::deque<float> out_transfer_pen;
 		std::deque<float> out_est_cost;
@@ -473,6 +476,7 @@ namespace polaris
 			start_t->_wait_time_from_origin = 0;
 			start_t->_walk_time_from_origin = 0;
 			start_t->_ivt_time_from_origin = 0;
+			start_t->_car_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
 			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
@@ -495,10 +499,10 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 
 			//TODO: remove when done testing
-			if (debug_route)
+			/*if (debug_route)
 			{
 				current->Display();
-			}
+			}*/
 
 			multimodal_edge_id id;
 
@@ -526,10 +530,10 @@ namespace polaris
 		}
 
 		//TODO: remove when done testing
-		if (debug_route)
+		/*if (debug_route)
 		{
 			int test = 1;
-		}
+		}*/
 
 
 		global_edge_id global;
@@ -555,7 +559,10 @@ namespace polaris
 			multimodal_edge_type* target_current;
 			_Link_Interface* target_link;
 			
-			sp_file << "\nsuccess";
+			if (debug_route)
+			{
+				sp_file << "\nsuccess";
+			}
 
 			while (current != nullptr)
 			{
@@ -574,6 +581,7 @@ namespace polaris
 				out_wait_time.push_back(current->_wait_time_from_origin);
 				out_walk_time.push_back(current->_walk_time_from_origin);
 				out_ivt_time.push_back(current->_ivt_time_from_origin);
+				out_car_time.push_back(current->_car_time_from_origin);
 				out_transfer_pen.push_back(current->_transfer_pen_from_origin);
 				out_est_cost.push_back(current->_estimated_cost_origin_destination);
 
@@ -583,22 +591,26 @@ namespace polaris
 					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
 					out_trip.push_back(current_trip->_uuid);
 
-					sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f",
-						current_link->_upstream_intersection->_dbid.c_str(),
-						current_link->_downstream_intersection->_dbid.c_str(),
-						current->_cost_from_origin,
-						current_trip->_dbid.c_str(),
-						current->_came_on_seq_index,
-						"TRANSIT",
-						current->_time_from_origin,
-						current->_time_label,
-						current->_wait_count_from_origin,
-						current->_wait_time_from_origin,
-						current->_walk_time_from_origin,
-						current->_ivt_time_from_origin,
-						current->_transfer_pen_from_origin,
-						current->_estimated_cost_origin_destination);
-					myParagraph.insert(0, myLine);
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+							current_link->_upstream_intersection->_dbid.c_str(),
+							current_link->_downstream_intersection->_dbid.c_str(),
+							current->_cost_from_origin,
+							current_trip->_dbid.c_str(),
+							current->_came_on_seq_index,
+							"TRANSIT",
+							current->_time_from_origin,
+							current->_time_label,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							current->_estimated_cost_origin_destination);
+						myParagraph.insert(0, myLine);
+					}
 
 					target_current = (multimodal_edge_type*)current->came_from();
 					global.edge_id = target_current->_edge_id;
@@ -613,22 +625,26 @@ namespace polaris
 
 						while (intermediate_link->_downstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
 						{
-							sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f",
-								intermediate_link->_upstream_intersection->_dbid.c_str(),
-								intermediate_link->_downstream_intersection->_dbid.c_str(),
-								0, //intermediate_current->_cost_from_origin,
-								current_trip->_dbid.c_str(),
-								mySeq,
-								"TRANSIT",
-								0, //intermediate_current->_time_from_origin,
-								0, //intermediate_current->_time_label,
-								current->_wait_count_from_origin,
-								0, //intermediate_current->_wait_time_from_origin,
-								0, //intermediate_current->_walk_time_from_origin,
-								0, //intermediate_current->_ivt_time_from_origin,
-								0, //intermediate_current->_transfer_pen_from_origin,
-								0); //intermediate_current->_estimated_cost_origin_destination);
-							myParagraph.insert(0, myLine);
+							if (debug_route)
+							{
+								sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+									intermediate_link->_upstream_intersection->_dbid.c_str(),
+									intermediate_link->_downstream_intersection->_dbid.c_str(),
+									0, //intermediate_current->_cost_from_origin,
+									current_trip->_dbid.c_str(),
+									mySeq,
+									"TRANSIT",
+									0, //intermediate_current->_time_from_origin,
+									0, //intermediate_current->_time_label,
+									current->_wait_count_from_origin,
+									0, //intermediate_current->_wait_time_from_origin,
+									0, //intermediate_current->_walk_time_from_origin,
+									0, //intermediate_current->_ivt_time_from_origin,
+									0, //intermediate_current->_car_time_from_origin,
+									0, //intermediate_current->_transfer_pen_from_origin,
+									0); //intermediate_current->_estimated_cost_origin_destination);
+								myParagraph.insert(0, myLine);
+							}
 
 							mySeq = mySeq - 1;
 							if (mySeq >= 0)
@@ -642,27 +658,60 @@ namespace polaris
 
 					
 				}
+				
+				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
+				{
+					out_trip.push_back(-1);
+
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+							current_link->_upstream_intersection->_dbid.c_str(),
+							current_link->_downstream_intersection->_dbid.c_str(),
+							current->_cost_from_origin,
+							"0",
+							current->_came_on_seq_index,
+							"WALK",
+							current->_time_from_origin,
+							current->_time_label,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							current->_estimated_cost_origin_destination);
+						myParagraph.insert(0, myLine);
+					}
+
+				}	
+
 				else
 				{
 					out_trip.push_back(-1);
-					sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f", 
-						current_link->_upstream_intersection->_dbid.c_str(), 
-						current_link->_downstream_intersection->_dbid.c_str(), 
-						current->_cost_from_origin, 
-						"0", 
-						current->_came_on_seq_index,
-						"WALK",
-						current->_time_from_origin,
-						current->_time_label,
-						current->_wait_count_from_origin,
-						current->_wait_time_from_origin,
-						current->_walk_time_from_origin,
-						current->_ivt_time_from_origin,
-						current->_transfer_pen_from_origin,
-						current->_estimated_cost_origin_destination);
-					myParagraph.insert(0, myLine);
 
-				}				
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+							current_link->_upstream_intersection->_dbid.c_str(),
+							current_link->_downstream_intersection->_dbid.c_str(),
+							current->_cost_from_origin,
+							"0",
+							current->_came_on_seq_index,
+							"DRIVE",
+							current->_time_from_origin,
+							current->_time_label,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							current->_estimated_cost_origin_destination);
+						myParagraph.insert(0, myLine);
+					}
+
+				}
 
 				current = (multimodal_edge_type*)current->came_from();
 				cached_current->came_from(nullptr);
@@ -670,21 +719,33 @@ namespace polaris
 
 			}
 
-			sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tTransfer_Pen\tEst_Cost");
-			myParagraph.insert(0, myLine);
-			//sprintf_s(myLine, "TOD:\t%d-%d-%d", start, end, start_time);
-			//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
-			//Our_Line.insert(0, myLine);
-			sp_file << myParagraph << endl;
+			if (debug_route)
+			{
+				sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost");
+				myParagraph.insert(0, myLine);
+				//sprintf_s(myLine, "TOD:\t%d-%d-%d", start, end, start_time);
+				//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
+				//Our_Line.insert(0, myLine);
+				sp_file << myParagraph << endl;
+			}
 
-			std::reverse(out_path.begin(), out_path.end()); //OMER reverse everything!!!!
+			std::reverse(out_path.begin(), out_path.end());
 			std::reverse(out_cost.begin(), out_cost.end());
 			std::reverse(out_type.begin(), out_type.end());
 			std::reverse(out_trip.begin(), out_trip.end());
 			std::reverse(out_seq.begin(), out_seq.end());
-
+			std::reverse(out_time.begin(), out_time.end());
+			std::reverse(out_arr_time.begin(), out_arr_time.end());
+			std::reverse(out_wait_count.begin(), out_wait_count.end());
+			std::reverse(out_wait_time.begin(), out_wait_time.end());
+			std::reverse(out_walk_time.begin(), out_walk_time.end());
+			std::reverse(out_ivt_time.begin(), out_ivt_time.end());
+			std::reverse(out_car_time.begin(), out_car_time.end());
+			std::reverse(out_transfer_pen.begin(), out_transfer_pen.end());
+			std::reverse(out_est_cost.begin(), out_est_cost.end());
+			
 			total_cost = out_cost.back();
-			travel_time = out_time.front();
+			travel_time = out_time.back();
 
 			// update start_ids/end_ids to includ final routed start/end
 			start_ids.clear();

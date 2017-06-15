@@ -113,7 +113,7 @@ namespace Routing_Components
 
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
-				bool debug_route = false;
+				bool debug_route = true;
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
 				std::vector<unsigned int> origin_ids;
@@ -164,6 +164,10 @@ namespace Routing_Components
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
+					else if (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE)
+					{
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, debug_route);
+					}
 					else
 					{
 						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container);
@@ -172,9 +176,13 @@ namespace Routing_Components
 				}
 				else
 				{
-					if (!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
+					if (!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+					}
+					else if (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE)
+					{
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{ 

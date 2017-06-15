@@ -159,6 +159,7 @@ namespace Routing_Components
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
 			t_data(float, ivt_time_from_origin);
+			t_data(float, car_time_from_origin);
 			t_data(float, walk_time_from_origin);
 			t_data(float, wait_time_from_origin);
 			t_data(float, transfer_pen_from_origin);
@@ -686,8 +687,8 @@ namespace Routing_Components
 							Link_Interface* out_link = current_movement->template outbound_link<Link_Interface*>();
 							Link_Components::Types::Link_Type_Keys out_link_type = out_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{
+							//if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							//{
 								if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
 								{
 									connection_attributes._turn_moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
@@ -705,7 +706,7 @@ namespace Routing_Components
 								connection_attributes._time_cost = 0.0f;
 
 								multimodal_to_multimodal_connection_group->_neighbor_attributes.push_back(connection_attributes);
-							}
+							//}
 						}
 
 						input_multimodal_edge._connection_groups.push_back(multimodal_to_multimodal_connection_group);
