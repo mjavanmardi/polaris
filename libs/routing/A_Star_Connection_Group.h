@@ -79,10 +79,10 @@ namespace polaris
 	};
 
 	template<typename MasterType>
-	struct Custom_Connection_Group<MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type>
-		: public Connection_Group_Base< MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type >
+	struct Custom_Connection_Group<MasterType, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_to_multimodal_type>
+		: public Connection_Group_Base< MasterType, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_to_multimodal_type >
 	{
-		typedef Connection_Group_Base< MasterType, typename MasterType::transit_graph_type, typename MasterType::transit_graph_type, typename MasterType::transit_to_transit_type > Base_t;
+		typedef Connection_Group_Base< MasterType, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_graph_type, typename MasterType::multimodal_to_multimodal_type > Base_t;
 		typedef typename Base_t::Anonymous_Connection_Group Anonymous_Connection_Group;
 		typedef typename Base_t::current_edge_type current_edge_type;
 		typedef typename Base_t::base_edge_type base_edge_type;
@@ -105,7 +105,7 @@ namespace polaris
 		//typedef typename MasterType::transit_pattern_type* transit_pattern_type;
 
 		template<typename AgentType>
-		Anonymous_Connection_Group* Visit_Transit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
+		Anonymous_Connection_Group* Visit_Multimodal_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
 		{
 			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
 			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();

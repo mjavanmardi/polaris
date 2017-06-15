@@ -162,7 +162,7 @@ namespace Routing_Components
 					
 					if(!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{
@@ -174,7 +174,7 @@ namespace Routing_Components
 				{
 					if (!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_transit_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{ 

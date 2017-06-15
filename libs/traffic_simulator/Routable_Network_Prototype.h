@@ -38,9 +38,9 @@ namespace Routing_Components
 			}
 
 			template<typename Source_Network_Type>
-			void construct_routable_transit_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			void construct_routable_multimodal_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				this_component()->construct_routable_transit_network(source_network);
+				this_component()->construct_routable_multimodal_network(source_network);
 			}
 
 			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container)
@@ -48,9 +48,9 @@ namespace Routing_Components
 				return this_component()->compute_static_network_path(origins,destinations, start_time, path_container,cost_container);
 			}
 
-			float compute_transit_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
+			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
 			{
-				return this_component()->compute_transit_network_path(origins, destinations, start_time, path_container, cost_container, debug_route);
+				return this_component()->compute_multimodal_network_path(origins, destinations, start_time, path_container, cost_container, debug_route);
 			}
 
 			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)

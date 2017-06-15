@@ -233,10 +233,10 @@ namespace Scenario_Components
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
 
-			accessor(transit_routing, NONE, NONE);
-			accessor(transit_routing_weight_shape, NONE, NONE);
-			accessor(transit_routing_weight_scale, NONE, NONE);
-			accessor(transit_routing_weight_factor, NONE, NONE);
+			accessor(multimodal_routing, NONE, NONE);
+			accessor(multimodal_routing_weight_shape, NONE, NONE);
+			accessor(multimodal_routing_weight_scale, NONE, NONE);
+			accessor(multimodal_routing_weight_factor, NONE, NONE);
 
 			accessor(historic_demand_moe_directory, NONE, NONE);
 

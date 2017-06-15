@@ -238,10 +238,10 @@ struct MasterType
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
 
-	typedef Edge_Implementation<Routing_Components::Types::transit_attributes<MasterType>> transit_edge_type;
-	typedef Graph_Implementation<MasterType, NTL, transit_edge_type> transit_graph_type;
-	typedef Routing_Components::Types::transit_to_transit transit_to_transit_type;
-	typedef Custom_Connection_Group<MasterType, transit_graph_type, transit_graph_type, transit_to_transit_type> transit_to_transit_connection_type;
+	typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, multimodal_edge_type> multimodal_graph_type;
+	typedef Routing_Components::Types::multimodal_to_multimodal multimodal_to_multimodal_type;
+	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;
 	
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;

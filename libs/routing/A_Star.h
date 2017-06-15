@@ -4,7 +4,7 @@
 namespace polaris
 {
 	//this is not a descriptive name, this is used for any ID
-	union transit_edge_id
+	union multimodal_edge_id
 	{
 		struct composite_id
 		{
@@ -77,7 +77,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 
-			transit_edge_id id;
+			multimodal_edge_id id;
 			
 			id.id = current->edge_id();
 
@@ -302,7 +302,7 @@ namespace polaris
 				current->Display();
 			}
 
-			transit_edge_id id;
+			multimodal_edge_id id;
 			
 			id.id = current->edge_id();
 
@@ -379,10 +379,10 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Transit_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
+	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
-		typedef Edge_Implementation<Routing_Components::Types::transit_attributes<MasterType>> transit_edge_type;
+		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
 
 		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 		Network_Interface* net = (Network_Interface*)_global_network;
@@ -465,7 +465,7 @@ namespace polaris
 			start_g.graph_id = 1;
 			start_g.edge_id = start->_edge_id;
 
-			transit_edge_type* start_t = (transit_edge_type*)graph_pool->Get_Edge(start_g);
+			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
 
 			start_t->_came_on_seq_index = 0;
 			start_t->_came_on_trip = nullptr();
@@ -500,7 +500,7 @@ namespace polaris
 				current->Display();
 			}
 
-			transit_edge_id id;
+			multimodal_edge_id id;
 
 			id.id = current->edge_id();
 
@@ -520,7 +520,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Transit_Neighbors(agent, current, routing_data, graph_pool);
+				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
 			}
 
 		}
@@ -546,13 +546,13 @@ namespace polaris
 			global.edge_id = end_base->_edge_id;
 			global.graph_id = 1;
 
-			transit_edge_type* current = (transit_edge_type*)graph_pool->Get_Edge(global);
-			transit_edge_type* cached_current = (transit_edge_type*)current;
+			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
+			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;
 
-			transit_edge_type* intermediate_current;
+			multimodal_edge_type* intermediate_current;
 			_Link_Interface* intermediate_link;
 
-			transit_edge_type* target_current;
+			multimodal_edge_type* target_current;
 			_Link_Interface* target_link;
 			
 			sp_file << "\nsuccess";
@@ -600,7 +600,7 @@ namespace polaris
 						current->_estimated_cost_origin_destination);
 					myParagraph.insert(0, myLine);
 
-					target_current = (transit_edge_type*)current->came_from();
+					target_current = (multimodal_edge_type*)current->came_from();
 					global.edge_id = target_current->_edge_id;
 					target_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
 
@@ -609,7 +609,7 @@ namespace polaris
 					{						
 						intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
 						global.edge_id = intermediate_link->_uuid;
-						intermediate_current = (A_Star_Edge<transit_edge_type>*)graph_pool->Get_Edge(global);
+						intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
 
 						while (intermediate_link->_downstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
 						{
@@ -635,7 +635,7 @@ namespace polaris
 							{
 								intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
 								global.edge_id = intermediate_link->_uuid;
-								intermediate_current = (A_Star_Edge<transit_edge_type>*)graph_pool->Get_Edge(global);
+								intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
 							}
 						}
 					}
@@ -664,7 +664,7 @@ namespace polaris
 
 				}				
 
-				current = (transit_edge_type*)current->came_from();
+				current = (multimodal_edge_type*)current->came_from();
 				cached_current->came_from(nullptr);
 				cached_current = current;
 
