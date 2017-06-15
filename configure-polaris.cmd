@@ -36,7 +36,7 @@ IF EXIST ../build.cfg (
 )
 
 SET ERRORLEVEL=
-cmake -DDEPS_DIR=%DEPS_DIR% !var! -DFixedDemandSimulator=1 -DIntegratedModel=1 -DCMAKE_CONFIGURATION_TYPES="Debug;Release;RelWithDebInfo" -G "Visual Studio 14 Win64" ..
+cmake -DDEPS_DIR=%DEPS_DIR% !var! -DCMAKE_CONFIGURATION_TYPES="Debug;Release;RelWithDebInfo" -G "Visual Studio 14 Win64" ..
 IF %ERRORLEVEL% NEQ 0 (ECHO Error configuring Polaris projects. & ENDLOCAL & cd .. & EXIT /B 1)
 
 :: now generate Antares projects/soultion
