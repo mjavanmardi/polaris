@@ -5,224 +5,189 @@ using namespace std;
 
 using namespace polaris;
 
+prototype struct Driver;
+prototype struct Bus;
+prototype struct Agency;
 
-implementation struct bus_implementation : public Polaris_Component<MasterType, INHERIT(bus_implementation), polaris::Execution_Object>
+prototype struct Bus : public ComponentType
 {
-	int _start_time;
+	tag_as_prototype;
 
 	void initialize(int start_time)
 	{
-		_start_time = start_time;
-		Load_Event<bus_implementation>(&do_bus_stuff, start_time, 0);
+		this_component()->initialize(start_time);
 	}
-	static void do_bus_stuff(bus_implementation* _this, Event_Response& response)
+	void do_bus_stuff()
 	{
-		cout << "I am a basic bus. My start time is " <<_this->_start_time<< endl;
+		this_component()->do_bus_stuff();
+	}
+	accessor(start_time, true, true);
+	accessor(my_bus_number, true, true);
+	accessor(my_driver, true, true);
+};
+implementation struct bus_implementation : public Polaris_Component<MasterType, INHERIT(bus_implementation), polaris::Execution_Object>
+{
+	m_data(int, start_time, NONE, NONE);
+	m_data(int, my_bus_number, NONE, NONE);
+	m_prototype(Driver, typename MasterType::driver_type, my_driver, NONE, NONE);
+
+	void initialize(int start_time, requires(ComponentType,check_2(ComponentType,typename MasterType::bus_type,is_base_of)))
+	{
+		_start_time = start_time;
+		Load_Event<typename MasterType::bus_type>(&do_bus_scheduling, start_time, 1);
+	}
+	static void do_bus_scheduling(typename MasterType::bus_type* _this, Event_Response& response)
+	{	
 		response.next._iteration = iteration() + 5;
-		response.next._sub_iteration = 0;
+		response.next._sub_iteration = 1;
+		_this->do_bus_stuff();
+	}
+	void do_bus_stuff()
+	{
+		cout << "I am a basic bus. My start time is " << this->_start_time << endl;
 	}
 };
 implementation struct cta_bus_implementation : public bus_implementation<MasterType,INHERIT(cta_bus_implementation)>
 {
+	typedef true_type cta_bus_type;
 	void do_bus_stuff()
 	{
-		cout << "I am a CTA bus." << endl;
+		cout << "I am a CTA bus, my driver is "<<_my_driver->name<string>() << endl;
 	}
 };
 implementation struct pace_bus_implementation : public bus_implementation<MasterType, INHERIT(pace_bus_implementation)>
 {
+	typedef true_type pace_bus_type;
 	void do_bus_stuff()
 	{
-		cout << "I am a pace bus." << endl;
+		cout << "I am a pace bus, my driver is " << _my_driver->name<string>() << endl;
 	}
 };
 
 
+prototype struct Driver : public ComponentType
+{
+	tag_as_prototype;
+
+	void initialize(string name, int start_time)
+	{
+		this->name(name);
+		this_component()->initialize(start_time);
+	}
+	accessor(name, true, true);
+	accessor(my_bus, true, true);
+	accessor(my_agency, true, true);
+};
 implementation struct driver_implementation : public Polaris_Component<MasterType, INHERIT(driver_implementation), polaris::Execution_Object>
 {
-	typename MasterType::bus_type* bus;
-	string _name;
+	m_data(string, name, NONE, NONE);
+	m_prototype(Bus, typename MasterType::bus_type, my_bus, NONE, NONE);
+	m_prototype(Agency, typename MasterType::agency_type, my_agency, NONE, NONE);
 
-	void initialize(string name)
+	void initialize(int start_time)
 	{
-		_name = name;
 		cout << "Initializing " << _name << endl;
-		bus = Allocate < MasterType::bus_type>();
-		bus->initialize(iteration() + 3);
-		Load_Event<driver_implementation>(&Do_driver_stuff, 0, 0);
+
+		this->my_bus(Allocate <typename MasterType::bus_type>());
+		_my_bus->initialize(start_time + 2);
+		_my_bus->my_driver(this);
+		_my_bus->my_bus_number(_my_agency->buses<typename type_of(my_agency)::get_type_of(buses)*>()->size()*100+101);
+		_my_agency->buses<typename type_of(my_agency)::get_type_of(buses)*>()->push_back(_my_bus);
+
+		Load_Event<typename MasterType::driver_type>(&Do_driver_event, start_time, 0);
 	}
-	static void Do_driver_stuff(driver_implementation* _this, Event_Response& response)
+	static void Do_driver_event(typename MasterType::driver_type* _this, Event_Response& response)
 	{
 		response.next._iteration = iteration() + 2;
 		response.next._sub_iteration = 0;
-		cout << "I am " << _this->_name << ", the time is " << iteration() << endl;
+		_this->Do_driver_stuff<NT>();
+	}
+	template <typename T> void Do_driver_stuff()
+	{
+		cout << "I am basic driver " << _name << ", the time is " << iteration() << endl;
 	}
 	
 };
-
-
-
-
-
-implementation struct Base : public Polaris_Component<MasterType, INHERIT(Base)>
+implementation struct cta_driver_implementation : public driver_implementation<MasterType,INHERIT(cta_driver_implementation)>
 {
-	static int x;
-	static int y;
-	static int z;
-	void print()
+	template <typename T> void Do_driver_stuff(requires(T, check_2(my_bus_component_type, cta_bus_implementation<MasterType>, is_same)))
 	{
-		cout <<"Static value is: "<< Base::x<<", "<<Base::y<<", "<<Base::z<<endl;
+		cout << "I am CTA driver " << _name << ", the time is " << iteration() << endl;
 	}
+	template <typename T> void Do_driver_stuff(requires(T, !check_2(my_bus_component_type, cta_bus_implementation<MasterType>, is_same)))
+	{
+		assert_check_2(my_bus_component_type, cta_bus_implementation<MasterType>, !is_same, "Error - CTA drivers can only drive CTA buses.");
+	}
+
 };
-template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::x = 1;
-template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::y = 2;
-template <typename MasterType, typename InheritanceList> int Base<MasterType, InheritanceList>::z = 3;
-
-implementation struct Child : public Base<MasterType, INHERIT(Child)>
+implementation struct pace_driver_implementation : public driver_implementation<MasterType, INHERIT(pace_driver_implementation)>
 {
-	static void init()
+	template <typename T> void Do_driver_stuff(requires(T, check_2(my_bus_component_type, pace_bus_implementation<MasterType>, is_same)))
 	{
-		Base<MasterType, INHERIT(Child)>::x = 4;
+		cout << "I am Pace driver " << _name << ", the time is " << iteration() << endl;
 	}
+	template <typename T> void Do_driver_stuff(requires(T, !check_2(my_bus_component_type, pace_bus_implementation<MasterType>, is_same)))
+	{
+		assert_check_2(my_bus_component_type, cta_bus_implementation<MasterType>, !is_same, "Error - PACE drivers can only drive PACE buses.");
+	}
+
 };
 
 
-//prototype struct Agent
-//{
-//	tag_as_prototype;
-//
-//	void initialize(int start_time, int start_subiteration)
-//	{
-//		this->my_subiteration(start_subiteration);
-//
-//		this_component()->initialize(start_time);
-//	}
-//	accessor(name, true, true);
-//	accessor(my_subiteration,true,true);
-//	accessor(money, true, true);
-//	accessor(my_parent, true, true);
-//};
-//
-//prototype struct Link
-//{
-//	tag_as_prototype;
-//	accessor(name, NONE, NONE);
-//	accessor(agent, NONE, NONE);
-//};
-//
-//
-//implementation struct base_agent_impl : public Polaris_Component<MasterType, INHERIT(base_agent_impl),Execution_Object>
-//{
-//	void initialize(int start_time)
-//	{
-//		_name = "Base";
-//        this->template Load_Event<base_agent_impl>(&Do_stuff, start_time, this->my_subiteration<int>());
-//	}
-//	static void Do_stuff(base_agent_impl* _this, Event_Response& response)
-//	{
-//		response.next._iteration = iteration() + 2;
-//		response.next._sub_iteration = _this->my_subiteration<int>();
-//		_this->write_stuff();
-//	}
-//	void write_stuff()
-//	{
-//		cout << "Hello world, I am "<<this->name<string>()<<" this is iteration " << iteration()<<", subiteration "<<sub_iteration() << endl;
-//	}
-//
-//	m_data(string, name, true, true);
-//	m_data(int, my_subiteration, true, true);
-//	//m_data(int, money,true,true);
-//};
-//implementation struct other_agent_impl : public base_agent_impl<MasterType, INHERIT(other_agent_impl)>
-//{
-//	m_data(float, money, true, true);
-//	void initialize(int start_time)
-//	{
-//		_name = "Other";
-//        this->template Load_Event<other_agent_impl>(&Do_stuff, start_time, this->template my_subiteration<int>());
-//	}
-//	static void Do_stuff(other_agent_impl* _this, Event_Response& response)
-//	{
-//		response.next._iteration = iteration() + 3;
-//        response.next._sub_iteration = _this->template my_subiteration<int>();
-//		_this->write_stuff();
-//	}
-//	void write_stuff()
-//	{
-//		this->_money += 1;
-//        cout << "Hello world, I am " << this->template name<string>() << " this is iteration " << iteration() << ", subiteration " << sub_iteration() << endl;
-//	}
-//
-//	m_prototype(Agent, typename MasterType::base_agent_type, my_parent, true, true);
-//};
-//
-//implementation struct link_impl : public Polaris_Component<MasterType, INHERIT(link_impl), Execution_Object>
-//{
-//	void initialize(int start_time)
-//	{
-//		typedef Agent<MasterType::agent_type> agent_itf;
-//		agent_itf* my_agent = (agent_itf*)Allocate<typename MasterType::agent_type>();
-//		my_agent->initialize(2, 2);
-//		this->the_agent(my_agent);
-//		my_agent->money<float>(3.0f);
-//
-//        this->template Load_Event<link_impl>(&Do_stuff, start_time, 0);
-//	}
-//	static void Do_stuff(link_impl* _this, Event_Response& response)
-//	{
-//		response.next._iteration = iteration() + 1;
-//		response.next._sub_iteration = 0;
-//
-//		_this->Do_the_stuff();
-//	}
-//	void Do_the_stuff()
-//	{
-//        cout << "I am link. My agent has " << this->_the_agent->template money<int>() << " money." << endl;
-//		this->_the_agent->my_parent<void*>();
-//	}
-//
-//	m_data(string, name, true, true);
-//	m_prototype(Agent, typename MasterType::agent_type, the_agent, true, true);
-//};
+prototype struct Agency : public ComponentType
+{
+	tag_as_prototype;
+	void initialize(){this_component()->initialize();}
+};
+implementation struct agency_implementation : public Polaris_Component<MasterType, INHERIT(agency_implementation), polaris::Data_Object>
+{
+	m_container(std::vector<Driver<typename MasterType::driver_type>*>, drivers, NONE, NONE);
+	m_container(std::vector<Bus<typename MasterType::bus_type>*>, buses, NONE, NONE);
+
+	void initialize()
+	{
+		create_driver("John", 2);		
+		create_driver("David", 3);
+		list_my_drivers_and_buses();
+	}
+	void create_driver(string name, int start_time)
+	{
+		Driver<MasterType::driver_type>* driver = (Driver<MasterType::driver_type>*)Allocate<MasterType::driver_type>();
+		driver->my_agency(this);
+		driver->initialize(name, start_time);
+		_drivers.push_back(driver);
+	}
+
+	void list_my_drivers_and_buses()
+	{
+		cout << "Agency drivers:" << endl;
+		for (drivers_type::iterator itr = _drivers.begin(); itr != _drivers.end(); ++itr) cout << (*itr)->name<string>() << endl;
+		cout << "Agency buses:" << endl;
+		for (buses_type::iterator itr = _buses.begin(); itr != _buses.end(); ++itr) cout << (*itr)->my_bus_number<int>() << endl;
+		cout << endl;
+	}
+};
 
 struct MasterType
 {
-	typedef Base<MasterType>  base_type;
-	typedef Child<MasterType> child_type;
-	typedef pace_bus_implementation<MasterType> bus_type;
-	typedef driver_implementation<MasterType> driver_type;
+	typedef cta_bus_implementation<MasterType> bus_type;
+	typedef cta_driver_implementation<MasterType> driver_type;
+	typedef agency_implementation<MasterType> agency_type;
 };
-
 
 
 int main(int argc, char* argv[])
 {
-	float n1 = GLOBALS::Normal_Distribution->Cumulative_Distribution_Value<float>(0.0);
-	float n2 = GLOBALS::Bivariate_Normal_Distribution->Cumulative_Distribution_Value<float>(0.0, 0.0, 1.0);
-
-	Child<MT>* c = Allocate<Child<MT>>();
-	c->init();
-	Base<MT>* b = Allocate<Base<MT>>();
-
-	c->print();
-	b->print();
-
-
 	// There are several pre-set configurations
     polaris::Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(10); // do either single threaded and give iterations, or multi-threaded and also give number of threads
     INITIALIZE_SIMULATION(cfg);
 
-
 	// Add your own set up code - make sure all execution agents have an event loaded.
-	MasterType::driver_type* the_driver = Allocate<MasterType::driver_type>();
-
-	the_driver->initialize("John");
-
+	Agency<typename MasterType::agency_type>* the_agency = (Agency<MasterType::agency_type>*)Allocate<MasterType::agency_type>();
+	the_agency->initialize();
 
 	START();
 
-	char done;
-	cin >> done;
 	return true;
 }

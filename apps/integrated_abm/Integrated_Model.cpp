@@ -28,6 +28,7 @@
 
 #include "Polaris_PCH.h"
 #include "Traffic_Simulator.h"
+#include "Traveler_Simulator.h"
 #include "ITS_Simulator.h"
 #include "Activity_Simulator.h"
 #include "Population_Synthesis.h"
