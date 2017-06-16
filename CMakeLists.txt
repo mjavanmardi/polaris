@@ -197,6 +197,7 @@ include_directories(libs/flow_lib)
 include_directories(libs/population_synthesis)
 include_directories(libs/activity_simulator)
 include_directories(libs/traffic_simulator)
+include_directories(libs/traveler_simulator)
 include_directories(libs/its_simulator)
 include_directories(libs/scenario_manager)
 
@@ -215,6 +216,7 @@ add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
 add_subdirectory (libs/its_simulator)
+add_subdirectory (libs/traveler_simulator)
 
 
 

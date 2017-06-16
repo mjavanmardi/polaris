@@ -1,19 +1,13 @@
 #pragma once
-#include "Traffic_Simulator_Includes.h"
-#include "activity_simulator/Activity_Prototype.h"
-#include "Activity_Location_Prototype.h"
-#include "Link_Prototype.h"
-#include "Zone_Prototype.h"
+#include "Traveler_Simulator_Includes.h"
+//#include "activity_simulator/Activity_Prototype.h"
+//#include "Activity_Location_Prototype.h"
+//#include "Link_Prototype.h"
+//#include "Zone_Prototype.h"
 #include "routing/Routing.h"
 
 namespace Movement_Plan_Components
 {
-	namespace Types
-	{
-		struct Load_To_Entry_Queue{};
-		struct Load_To_Origin_Link{};
-	}
-
 
 	namespace Prototypes
 	{

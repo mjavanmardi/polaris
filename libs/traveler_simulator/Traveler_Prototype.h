@@ -1,12 +1,9 @@
 #pragma once
-#include "Traffic_Simulator_Includes.h"
+#include "Traveler_Simulator_Includes.h"
 
 namespace Traveler_Components
 {
-	namespace Types
-	{
-	}
-	
+
 	namespace Prototypes
 	{
 		prototype struct Traveler ADD_DEBUG_INFO

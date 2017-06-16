@@ -1,44 +1,14 @@
 #pragma once
 
-#include "Traffic_Simulator_Includes.h"
-#include "Link_Prototype.h"
+#include "Traveler_Simulator_Includes.h"
+//#include "Link_Prototype.h"
 //#include "../File_IO/network_demand_data.h"
 
 /*------------------------------------------------*/
 
-#ifdef Advanced
-#include "Transims_Demand_API.h"
-#endif
 
 namespace Demand_Components
 {
-	//==================================================================================================================
-	/// TYPE Of interest to the Demand Prototype.
-	/// Used in concept checking, component functions, etc.
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Types
-	{
-		namespace ModelTypes
-		{
-			typedef true_type TransimsType;
-		}
-		namespace FileTypes
-		{
-			typedef true_type TripFile;
-			typedef true_type ControlFile;
-		}
-		namespace FileFormatTypes
-		{
-			typedef true_type Tab_Delimited;
-			typedef true_type CSV_Delimited;
-			typedef true_type Binary;
-		}
-		
-		struct Hard_Coded_Demand{};
-		struct ODB_Demand{};
-		struct File_Demand{};
-
-	}
 	
 	namespace Prototypes
 	{
