@@ -400,7 +400,7 @@ namespace polaris
 		std::ofstream sp_file;
 		char myLine[2000];
 		std::string myParagraph;
-
+		bool write_route = false;
 		if (debug_route)
 		{
 			// Initialize executed activities file
@@ -561,7 +561,7 @@ namespace polaris
 			
 			if (debug_route)
 			{
-				sp_file << "\nsuccess";
+				//sp_file << "\nsuccess";
 			}
 
 			while (current != nullptr)
@@ -590,7 +590,7 @@ namespace polaris
 				{
 					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
 					out_trip.push_back(current_trip->_uuid);
-
+					write_route = true;
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
@@ -662,7 +662,7 @@ namespace polaris
 				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
 					out_trip.push_back(-1);
-
+					//write_route = true;
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
@@ -689,7 +689,7 @@ namespace polaris
 				else
 				{
 					out_trip.push_back(-1);
-
+					//write_route = true;
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
@@ -719,7 +719,7 @@ namespace polaris
 
 			}
 
-			if (debug_route)
+			if (debug_route && write_route)
 			{
 				sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost");
 				myParagraph.insert(0, myLine);

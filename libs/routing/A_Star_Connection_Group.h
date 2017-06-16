@@ -113,6 +113,7 @@ namespace polaris
 			for (Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
 			{
 				
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection_itr->neighbor();
 				Link_Components::Types::Link_Type_Keys current_neighbor_type = current_neighbor->_edge_type;
 
@@ -124,7 +125,7 @@ namespace polaris
 				{
 					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
-				else
+				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK)
 				{
 					Evaluate_Drive_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
@@ -206,6 +207,7 @@ namespace polaris
 				float waitWeight = 2;
 				float walkWeight = 2;
 				float ivtWeight = 1;
+				float carWeight = 3;
 				////////////////////////PARAMETERS OMER
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
@@ -230,7 +232,7 @@ namespace polaris
 					exit(0);
 				}
 
-				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;
+				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;
 
 				if (cost_from_origin < seq_edge->cost_from_origin())
 				{
@@ -276,7 +278,7 @@ namespace polaris
 
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 					
-					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq) );
+					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds.at(iSeq) - next_trip->_departure_seconds.at(mySeq) );
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
 					{
@@ -330,6 +332,7 @@ namespace polaris
 			float waitWeight = 2;
 			float walkWeight = 2;
 			float ivtWeight = 1;
+			float carWeight = 3;
 			////////////////////////PARAMETERS
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
@@ -416,7 +419,7 @@ namespace polaris
 
 			else
 			{
-				float cost_from_origin = current->cost_from_origin() + current->_time_cost;
+				float cost_from_origin = current->cost_from_origin() + carWeight*current->_time_cost;
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
@@ -466,12 +469,13 @@ namespace polaris
 			float waitWeight = 2;
 			float walkWeight = 2;
 			float ivtWeight = 1;
+			float carWeight = 3;
 			////////////////////////PARAMETERS
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
-				float cost_from_origin = current->cost_from_origin() + walkWeight * current->_time_cost;
+				float cost_from_origin = current->cost_from_origin() + walkWeight*current->_time_cost;
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
@@ -552,7 +556,7 @@ namespace polaris
 
 			else
 			{
-				float cost_from_origin = current->cost_from_origin() + current->_time_cost + connection->_time_cost;
+				float cost_from_origin = current->cost_from_origin() + carWeight*(current->_time_cost + connection->_time_cost);
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
