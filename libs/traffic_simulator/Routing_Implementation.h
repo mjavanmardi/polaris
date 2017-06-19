@@ -111,7 +111,7 @@ namespace Routing_Components
 
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
-				bool debug_route = true;
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
 				std::vector<unsigned int> origin_ids;
@@ -158,11 +158,11 @@ namespace Routing_Components
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 					
-					if(!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
+					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
-					else if (!destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
@@ -174,11 +174,11 @@ namespace Routing_Components
 				}
 				else
 				{
-					if (!origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}
-					else if (!destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
 					}

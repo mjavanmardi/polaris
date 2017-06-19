@@ -210,6 +210,7 @@ struct MasterType
 
 	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;
 
+	typedef Routing_Components::Implementations::multimodal_to_multimodal multimodal_to_multimodal_type;
 
 
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;

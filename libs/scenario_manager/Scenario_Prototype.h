@@ -232,11 +232,16 @@ namespace Scenario_Components
 			accessor(time_dependent_routing_weight_factor, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
-
 			accessor(multimodal_routing, NONE, NONE);
 			accessor(multimodal_routing_weight_shape, NONE, NONE);
 			accessor(multimodal_routing_weight_scale, NONE, NONE);
 			accessor(multimodal_routing_weight_factor, NONE, NONE);
+
+			/*accessor(transferPenalty, NONE, NONE);
+			accessor(waitWeight, NONE, NONE);
+			accessor(walkWeight, NONE, NONE);
+			accessor(ivtWeight, NONE, NONE);
+			accessor(carWeight, NONE, NONE);*/
 
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
@@ -304,6 +309,7 @@ namespace Scenario_Components
 			accessor(destination_choice_model_file, NONE, NONE);
 			accessor(telecommute_choice_model_file, NONE, NONE);
 			accessor(cav_wtp_model_file, NONE, NONE);
+			accessor(multimodal_routing_model_file, NONE, NONE);
 
 
 			template<typename TargetType> void read_scenario_data(const char* filename)
@@ -646,6 +652,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1000.0);
 				if (cfgReader.getParameter("time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double*>()) != PARAMETER_FOUND) time_dependent_routing_weight_factor<double>(1.0);
 				
+				if (cfgReader.getParameter("multimodal_routing", multimodal_routing<bool*>()) != PARAMETER_FOUND) multimodal_routing<bool>(false);
+
 				if (cfgReader.getParameter("accident_event_duration_reduction", accident_event_duration_reduction<double*>())!= PARAMETER_FOUND) accident_event_duration_reduction<double>(1.0);
 				
 
@@ -662,6 +670,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("destination_choice_model_file",		destination_choice_model_file<string*>()) != PARAMETER_FOUND)	destination_choice_model_file<string>("");
 				if (cfgReader.getParameter("telecommute_choice_model_file",		telecommute_choice_model_file<string*>()) != PARAMETER_FOUND)	telecommute_choice_model_file<string>("");
 				if (cfgReader.getParameter("cav_wtp_model_file",				cav_wtp_model_file<string*>()) != PARAMETER_FOUND)				cav_wtp_model_file<string>("");
+				if (cfgReader.getParameter("multimodal_routing_model_file", multimodal_routing_model_file<string*>()) != PARAMETER_FOUND)				multimodal_routing_model_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1364,6 +1373,32 @@ namespace Scenario_Components
 				}
 
 				parameter = document[section.c_str()][key.c_str()].GetDouble();
+			}
+
+			void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, bool& parameter)
+			{
+				//assert(document.HasMember(section.c_str()));
+				//assert(document[section.c_str()].HasMember(key.c_str()));
+				//assert(document[section.c_str()][key.c_str()].IsDouble());
+				if (!document.HasMember(section.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" << section << "\'" << endl;
+					return;
+				}
+
+				if (!document[section.c_str()].HasMember(key.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
+					return;
+				}
+
+				if (!document[section.c_str()][key.c_str()].IsBool())
+				{
+					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
+					return;
+				}
+
+				parameter = document[section.c_str()][key.c_str()].GetBool();
 			}
 
 		};

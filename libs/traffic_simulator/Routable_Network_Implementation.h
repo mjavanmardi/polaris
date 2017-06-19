@@ -204,6 +204,9 @@ namespace Routing_Components
 		implementation struct Routable_Network_Implementation:public Polaris_Component<MasterType,INHERIT(Routable_Network_Implementation),Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Routable_Network_Implementation),Data_Object>::Component_Type ComponentType;
+			typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+
+			//m_prototype(Routing_Components::Prototypes::Routable_Network, typename MasterType::multimodal_routing_option_type, Routable_Network, NONE, NONE);
 
 			m_data(unsigned int,static_network_graph_id,NONE,NONE);
 			m_data(unsigned int,multimodal_network_graph_id, NONE, NONE);
@@ -216,6 +219,68 @@ namespace Routing_Components
 
 			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
 			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
+
+			static bool static_initialize(const string& option_file)
+			{
+				// set the base values
+				default_static_initializer();
+
+				// now see if there are config file changes
+				rapidjson::Document document;
+				if (option_file.length() < 1)
+				{
+					cout << "Warning: option file for multimodal_routing was not specified" << endl;
+					return true;
+				}
+
+				_Scenario_Interface* scenario = static_cast<_Scenario_Interface*>(_global_scenario);
+				if (!scenario->parse_option_file(document, option_file))
+					return false;
+
+				// check that model is defined if it is requested through scenario
+				if (!document.HasMember("multimodal_routing")) THROW_EXCEPTION("ERROR: multimodal_routing parameter not found in '" << option_file << "', but specified in scenario.json.");
+
+				string section = "multimodal_routing";
+
+				scenario->set_parameter(document, section, "transferPenalty", _transferPenalty);
+				scenario->set_parameter(document, section, "waitWeight", _waitWeight);
+				scenario->set_parameter(document, section, "walkWeight", _walkWeight);
+				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
+				scenario->set_parameter(document, section, "carWeight", _carWeight);
+				scenario->set_parameter(document, section, "debug_route", _debug_route);
+
+				return true;
+			}
+
+			static void print_parameters()
+			{
+				cout << "Multimodal Routing parameters" << endl;
+				cout << "\ttransferPenalty = " << transferPenalty	<float>() << endl;
+				cout << "\twaitWeight = " << waitWeight		<float>() << endl;
+				cout << "\twalkWeight = " << walkWeight	<float>() << endl;
+				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
+				cout << "\tcarWeight = " << carWeight	<float>() << endl;
+				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
+			}
+			
+			static void default_static_initializer()
+			{
+				_transferPenalty = 300;
+				_waitWeight = 2;
+				_walkWeight = 2;
+				_ivtWeight = 0.95;
+				_carWeight = 1;
+				_debug_route = false;
+			}
+
+			#pragma region static parameters declaration		
+			m_static_data(float, transferPenalty, NONE, NONE);
+			m_static_data(float, waitWeight, NONE, NONE);
+			m_static_data(float, walkWeight, NONE, NONE);
+			m_static_data(float, ivtWeight, NONE, NONE);
+			m_static_data(float, carWeight, NONE, NONE);
+			m_static_data(bool, debug_route, NONE, NONE);
+			#pragma endregion
 
 			static void initialize_moe_data()
 			{
@@ -984,6 +1049,14 @@ namespace Routing_Components
 				}
 			}
 		};
+		#pragma region static choice option parameter definitions
+		define_static_member_variable(Routable_Network_Implementation, transferPenalty);
+		define_static_member_variable(Routable_Network_Implementation, waitWeight);
+		define_static_member_variable(Routable_Network_Implementation, walkWeight);
+		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
+		define_static_member_variable(Routable_Network_Implementation, carWeight);
+		define_static_member_variable(Routable_Network_Implementation, debug_route);
+		#pragma endregion
 
 		template<typename MasterType, typename InheritanceList>
 		Layered_Data_Array<float> Routable_Network_Implementation<MasterType,InheritanceList>::_moe_data;

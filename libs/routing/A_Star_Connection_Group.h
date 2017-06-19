@@ -102,6 +102,7 @@ namespace polaris
 		typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
 
+		//typedef Routing_Components::Implementations::Routable_Network_Implementation< typename MasterType::routable_network_type> _Routable_Network_Interface;
 		//typedef typename MasterType::transit_pattern_type* transit_pattern_type;
 
 		template<typename AgentType>
@@ -150,6 +151,13 @@ namespace polaris
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+								
+				float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+				float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
+				float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+				float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+				float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+
 				float currentWalkTime;
 				float currentIVTTime;
 				float currentCarTime;
@@ -200,15 +208,7 @@ namespace polaris
 				{
 					CandidateTransferCount = CandidateWaitingCount - 1;
 					nonHomeWait = 1;
-				}
-
-				////////////////////////PARAMETERS OMER
-				float transferPenalty = 300;
-				float waitWeight = 2;
-				float walkWeight = 2;
-				float ivtWeight = 1;
-				float carWeight = 3;
-				////////////////////////PARAMETERS OMER
+				}				
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 
@@ -325,15 +325,13 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			//if (current_neighbor->in_closed_set()) return;
-						
-			////////////////////////PARAMETERS
-			float transferPenalty = 300;
-			float waitWeight = 2;
-			float walkWeight = 2;
-			float ivtWeight = 1;
-			float carWeight = 3;
-			////////////////////////PARAMETERS
+			//if (current_neighbor->in_closed_set()) return;						
+
+			float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
+			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
@@ -464,13 +462,11 @@ namespace polaris
 
 			//if (current_neighbor->in_closed_set()) return;
 
-			////////////////////////PARAMETERS
-			float transferPenalty = 300;
-			float waitWeight = 2;
-			float walkWeight = 2;
-			float ivtWeight = 1;
-			float carWeight = 3;
-			////////////////////////PARAMETERS
+			float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
+			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)

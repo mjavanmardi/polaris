@@ -154,6 +154,12 @@ namespace Scenario_Components
 			m_data(double, multimodal_routing_weight_scale, NONE, NONE);
 			m_data(double, multimodal_routing_weight_factor, NONE, NONE);
 
+			/*m_data(double, transferPenalty, NONE, NONE);
+			m_data(double, waitWeight, NONE, NONE);
+			m_data(double, walkWeight, NONE, NONE);
+			m_data(double, ivtWeight, NONE, NONE);
+			m_data(double, carWeight, NONE, NONE);*/
+
 			m_data(string, activity_start_time_model_file_name, NONE, NONE);
 
 			m_data(string, vehicle_distribution_file_name, NONE, NONE);
@@ -360,6 +366,7 @@ namespace Scenario_Components
 			m_data(string, destination_choice_model_file, NONE, NONE);
 			m_data(string, telecommute_choice_model_file, NONE, NONE);
 			m_data(string, cav_wtp_model_file, NONE, NONE);
+			m_data(string, multimodal_routing_model_file, NONE, NONE);
 		};
 	}
 

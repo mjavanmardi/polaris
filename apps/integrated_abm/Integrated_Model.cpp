@@ -242,8 +242,8 @@ struct MasterType
 	typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, multimodal_edge_type> multimodal_graph_type;
 	typedef Routing_Components::Types::multimodal_to_multimodal multimodal_to_multimodal_type;
-	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;
-	
+	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;	
+
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
 	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
@@ -282,6 +282,18 @@ bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 		return false;
 	}
 	MasterType::vehicle_technology_chooser_type::print_parameters();
+
+	return true;
+}
+
+bool InitializeMultiModalRoutingParameters(MasterType::scenario_type* scenario)
+{
+	if (!MasterType::routable_network_type::static_initialize(scenario->multimodal_routing_model_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize Multimodal Routing parameters." << endl;
+		return false;
+	}
+	MasterType::routable_network_type::print_parameters();
 
 	return true;
 }
@@ -406,6 +418,7 @@ int main(int argc,char** argv)
 			outfile << "\t\"time_dependent_routing_weight_factor\" : 1," << endl;
 			outfile << "\t\"time_dependent_routing_weight_scale\" : 1000," << endl;
 			outfile << "\t\"time_dependent_routing_weight_shape\" : 2," << endl;
+			outfile << "\t\"multimodal_routing\" : false," << endl;
 			outfile << "\t\"use_link_based_routing\" : false," << endl;
 			outfile << "\t\"use_network_events\" : false," << endl;
 			outfile << "\t\"use_realtime_travel_time_for_enroute_switching\" : false," << endl;
@@ -725,6 +738,7 @@ int main(int argc,char** argv)
 	// Initialize all choice model parameters
 	if (!InitializeChoiceModelParameters(scenario)) return 1;
 
+	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
 
