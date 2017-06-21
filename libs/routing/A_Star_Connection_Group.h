@@ -157,6 +157,7 @@ namespace polaris
 				float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 				float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 				float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+				float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
 
 				float currentWalkTime;
 				float currentIVTTime;
@@ -200,6 +201,12 @@ namespace polaris
 					continue;
 				}
 
+				//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
+				if (waitTime > waitThreshold)
+				{
+					return;
+				}
+
 				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
 
 				int CandidateTransferCount = 0;
@@ -211,9 +218,7 @@ namespace polaris
 				}				
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
-
-				//float CandidateDriveLabel = current->_drive_time_from_origin + drivebinary * current->._time_cost;
-				
+								
 				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(mySeq);
 
 				global_edge_id seq_edge_id;
@@ -267,14 +272,17 @@ namespace polaris
 					seq_edge->in_open_set(true);
 					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}
-
-				for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
+								
+				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
+				int iSeq = mySeq + 1;
+				bool hit_dest = false;
+				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false)
 				{
 					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(iSeq);
 
 					global_edge_id seq_edge_id;
 					seq_edge_id.edge_id = seq_Link->_uuid;
-					seq_edge_id.graph_id = 1;
+					seq_edge_id.graph_id = 1;									
 
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 					
@@ -314,8 +322,13 @@ namespace polaris
 
 						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 					}
-
 					
+					/*if (agent->at_destination((base_edge_type*)seq_edge, ends))
+					{
+						hit_dest == true;
+					}*/
+
+					iSeq++;
 				}
 			}
 		}

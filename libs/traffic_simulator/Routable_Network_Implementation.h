@@ -247,6 +247,7 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "walkWeight", _walkWeight);
 				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
 				scenario->set_parameter(document, section, "carWeight", _carWeight);
+				scenario->set_parameter(document, section, "waitThreshold", _waitThreshold);
 				scenario->set_parameter(document, section, "debug_route", _debug_route);
 
 				return true;
@@ -260,16 +261,18 @@ namespace Routing_Components
 				cout << "\twalkWeight = " << walkWeight	<float>() << endl;
 				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
 				cout << "\tcarWeight = " << carWeight	<float>() << endl;
+				cout << "\twaitThreshold = " << waitThreshold	<float>() << endl;
 				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
 			}
 			
 			static void default_static_initializer()
 			{
 				_transferPenalty = 300;
-				_waitWeight = 2;
-				_walkWeight = 2;
+				_waitWeight = 2.0;
+				_walkWeight = 2.0;
 				_ivtWeight = 0.95;
-				_carWeight = 1;
+				_carWeight = 1.00;
+				_waitThreshold = 3600.00;
 				_debug_route = false;
 			}
 
@@ -279,6 +282,7 @@ namespace Routing_Components
 			m_static_data(float, walkWeight, NONE, NONE);
 			m_static_data(float, ivtWeight, NONE, NONE);
 			m_static_data(float, carWeight, NONE, NONE);
+			m_static_data(float, waitThreshold, NONE, NONE);
 			m_static_data(bool, debug_route, NONE, NONE);
 			#pragma endregion
 
@@ -1055,6 +1059,7 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, walkWeight);
 		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
 		define_static_member_variable(Routable_Network_Implementation, carWeight);
+		define_static_member_variable(Routable_Network_Implementation, waitThreshold);
 		define_static_member_variable(Routable_Network_Implementation, debug_route);
 		#pragma endregion
 

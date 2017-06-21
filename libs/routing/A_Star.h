@@ -508,7 +508,12 @@ namespace polaris
 
 			id.id = current->edge_id();
 
-			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
+			/*if (agent->at_destination((base_edge_type*)current, ends, &end_base))
+			{
+				success = true;
+				break;
+			}*/
+			if (agent->at_destination((base_edge_type*)current, ends))
 			{
 				success = true;
 				break;
@@ -630,19 +635,19 @@ namespace polaris
 								sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
 									intermediate_link->_upstream_intersection->_dbid.c_str(),
 									intermediate_link->_downstream_intersection->_dbid.c_str(),
-									0, //intermediate_current->_cost_from_origin,
+									0.0, //intermediate_current->_cost_from_origin,
 									current_trip->_dbid.c_str(),
 									mySeq,
 									"TRANSIT",
-									0, //intermediate_current->_time_from_origin,
-									0, //intermediate_current->_time_label,
+									0.0, //intermediate_current->_time_from_origin,
+									0.0, //intermediate_current->_time_label,
 									current->_wait_count_from_origin,
-									0, //intermediate_current->_wait_time_from_origin,
-									0, //intermediate_current->_walk_time_from_origin,
-									0, //intermediate_current->_ivt_time_from_origin,
-									0, //intermediate_current->_car_time_from_origin,
-									0, //intermediate_current->_transfer_pen_from_origin,
-									0); //intermediate_current->_estimated_cost_origin_destination);
+									0.0, //intermediate_current->_wait_time_from_origin,
+									0.0, //intermediate_current->_walk_time_from_origin,
+									0.0, //intermediate_current->_ivt_time_from_origin,
+									0.0, //intermediate_current->_car_time_from_origin,
+									0.0, //intermediate_current->_transfer_pen_from_origin,
+									0.0); //intermediate_current->_estimated_cost_origin_destination);
 								myParagraph.insert(0, myLine);
 							}
 
