@@ -135,6 +135,7 @@ namespace Scenario_Components {
 namespace Vehicle_Components {
 	namespace Types
 	{
+		
 	}
 
 	namespace Prototypes

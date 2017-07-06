@@ -1,17 +1,9 @@
 #pragma once
-#include "Traffic_Simulator_Includes.h"
+#include "Traveler_Simulator_Includes.h"
 #include "antares\Geometry_Implementation.h"
 
 namespace Vehicle_Components
 {
-
-namespace Concepts
-{
-}
-
-namespace Types
-{
-}
 
 namespace Prototypes
 {

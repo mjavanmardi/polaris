@@ -1,12 +1,10 @@
 #pragma once
 #include "Routing_Prototype.h"
-#include "Routable_Link_Implementation.h"
-#include "Routable_Intersection_Implementation.h"
-#ifndef EXCLUDE_DEMAND
-//#include "Person_Implementations.h"
-#endif
+//#include "Routable_Link_Implementation.h"
+//#include "Routable_Intersection_Implementation.h"
+
 #include "Network_Skimming_Prototype.h"
-#include <iostream>
+
 namespace Routing_Components
 {
 	namespace Types
