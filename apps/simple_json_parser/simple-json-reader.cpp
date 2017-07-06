@@ -15,7 +15,7 @@ using std::string;
 bool print_error_msg(rapidjson::Document& document, std::string json_file)
 {
 	// Get the parse error and offset
-	unsigned parse_error = document.GetParseError();
+	rapidjson::ParseErrorCode parse_error = document.GetParseError();
 	size_t parse_offset = document.GetErrorOffset();
 
 	cout << "ERROR: ";
