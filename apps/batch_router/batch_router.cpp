@@ -1,11 +1,15 @@
 #define EXCLUDE_DEMAND
 
 #include "Polaris_PCH.h"
+#include "Traffic_Simulator.h"
+#include "Traveler_Simulator.h"
+#include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
 #include "Batch_Router_Implementation.h"
 
 using namespace polaris;
+
 
 
 
@@ -20,6 +24,7 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<M> vehicle_characteristics_type;
 	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
 
 	typedef Scenario_Components::Implementations::Scenario_Implementation<M> scenario_type;
@@ -27,11 +32,15 @@ struct MasterType
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> movement_type;
 
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> turn_movement_type;
+	typedef Transit_Route_Components::Implementations::Transit_Route_Implementation<M> transit_route_type;
+	typedef Transit_Pattern_Components::Implementations::Transit_Pattern_Implementation<M> transit_pattern_type;
+	typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<M> transit_vehicle_trip_type;
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
+	typedef Traveler_Components::Implementations::Traveler_Implementation<M> person_type;
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
@@ -84,8 +93,11 @@ struct MasterType
 	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+	#pragma endregion
 
-
+	//==============================================================================================
+	#pragma region ROUTING Types
+	//----------------------------------------------------------------------------------------------
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
@@ -94,6 +106,11 @@ struct MasterType
 	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
+
+	typedef Edge_Implementation<Routing_Components::Types::transit_attributes<MasterType>> transit_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, transit_edge_type> transit_graph_type;
+	typedef Routing_Components::Types::transit_to_transit transit_to_transit_type;
+	typedef Custom_Connection_Group<MasterType, transit_graph_type, transit_graph_type, transit_to_transit_type> transit_to_transit_connection_type;
 	
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
@@ -109,12 +126,12 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 
 //==============================================================================================
 // Main Batch_Router function
-// This routine expects 2 (or optionally 3) call line arguments:
+// This routine expects 3 (or optionally 4) call line arguments:
 // argv[1] = database_filename: the filepath to the supply database containing the network information
 // argv[2] = historical_moe_database_name: the filepath to the database containing the historical network MOE data
 // argv[3] = trips_filename: filepath to a delimited data file containing the list of trips to be routed in the following format:
 //	1			2							3															4										5
-//	Trip_ID		Mode ('Auto', 'Transit')	Origin Location (location id code from supply database)		Destination Location (same as origin)	Departure time
+//	Trip_ID		Mode ('sov,rail,bus,walk')	Origin Location (location id code from supply database)		Destination Location (same as origin)	Departure time
 // argv[4] = num_threads: defaults to 1 if not present, more than 1 runs multithreaded mode
 int main(int argc,char** argv)
 {
@@ -140,6 +157,8 @@ int main(int argc,char** argv)
 
 	int threads = 1;
 	if (argc >= 5) threads = std::max(atoi(argv[4]),threads);
+
+	for (int i = 0; i < threads; ++i) results_by_thread.push_back(stringstream(""));
 
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(100, threads);
@@ -319,7 +338,7 @@ int main(int argc,char** argv)
 		int time = fr.Get_Int(4);
 
 		_Trip_Interface* trip=(_Trip_Interface*)Allocate<typename MasterType::trip_type>();
-		trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
+		trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(mode, trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
 	}
 
 
@@ -329,6 +348,13 @@ int main(int argc,char** argv)
 	cout <<"Starting simulation..."<<endl;
 	try	{START();}
 	catch (std::exception ex){ cout << ex.what();}
+
+	// WRITE results
+	File_IO::File_Writer fw;
+	fw.Open("routed_results.txt");
+	for (int i = 0; i < num_sim_threads(); ++i) fw.Write(results_by_thread[i]);
+
+
 	cout << "Finished! Press 'Any' key" << endl;
 
 }
@@ -366,6 +392,10 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	s.clear(); s.str("");
 	s<<"\t\"historical_results_database_name\" : \""<<historical_db_name<<"\",";
 	fw.Write_Line(s);
+	fw.Write_Line("\t\"multimodal_routing\" : true,");
+	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
+	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
 	fw.Write_Line("\t\"time_dependent_routing\" : true\n}");
+	
 	fw.Close();
 }

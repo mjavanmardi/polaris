@@ -228,8 +228,11 @@ struct MasterType
 	typedef TYPELIST_3(/*link_control_type,depot_type,*/advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+	#pragma endregion
 
-
+	//==============================================================================================
+	#pragma region ROUTING Types
+	//----------------------------------------------------------------------------------------------
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
