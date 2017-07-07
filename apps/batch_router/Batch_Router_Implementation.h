@@ -130,9 +130,9 @@ namespace Batch_Router_Components
 				movement_plan->template destination<_Activity_Location_Interface*>(dest);
 				movement_plan->template departed_time<Time_Seconds>(departed_time);
 				movement_plan->template initialize_trajectory<NULLTYPE>();
-				if (strcmp(mode.c_str(),"rail")==0)			movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::RAIL);
-				else if (strcmp(mode.c_str(), "bus")==0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
-				else if (strcmp(mode.c_str(), "walk")==0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
+				if (strcmp(mode.c_str(),"rail")==0 || strcmp(mode.c_str(), "Rail")==0 || strcmp(mode.c_str(), "RAIL")==0)			movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::RAIL);
+				else if (strcmp(mode.c_str(), "bus")==0 || strcmp(mode.c_str(), "Bus") == 0 || strcmp(mode.c_str(), "BUS") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
+				else if (strcmp(mode.c_str(), "walk")==0 || strcmp(mode.c_str(), "Walk") == 0 || strcmp(mode.c_str(), "WALK") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 				else										movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 
 				router->template network<_Network_Interface*>(network);

@@ -124,6 +124,18 @@ struct MasterType
 
 void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, File_IO::File_Info& historical_db);
 
+bool InitializeMultiModalRoutingParameters(MasterType::scenario_type* scenario)
+{
+	if (!MasterType::routable_network_type::static_initialize(scenario->multimodal_routing_model_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize Multimodal Routing parameters." << endl;
+		return false;
+	}
+	MasterType::routable_network_type::print_parameters();
+
+	return true;
+}
+
 //==============================================================================================
 // Main Batch_Router function
 // This routine expects 3 (or optionally 4) call line arguments:
@@ -306,7 +318,8 @@ int main(int argc,char** argv)
 	}
 	#pragma endregion
 
-
+	// Initialize routing parameters
+	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
 
 	//==================================================================================================================================
 	// Batch Routing stuff
