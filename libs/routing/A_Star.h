@@ -401,6 +401,7 @@ namespace polaris
 		char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
+		Counter c;
 		if (debug_route)
 		{
 			// Initialize executed activities file
@@ -410,6 +411,9 @@ namespace polaris
 			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
 			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
 			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+
+			// do route calculation timing for debug routes
+			c.Start();
 		}
 
 		std::deque< base_edge_type* > modified_edges;
@@ -566,7 +570,8 @@ namespace polaris
 			
 			if (debug_route)
 			{
-				//sp_file << "\nsuccess";
+				sp_file << "\nsuccess";
+				sp_file << ",Router run-time (ms)," << c.Stop() << endl;
 			}
 
 			while (current != nullptr)
@@ -667,7 +672,7 @@ namespace polaris
 				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
 					out_trip.push_back(-1);
-					//write_route = true;
+					write_route = true;
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
@@ -694,7 +699,7 @@ namespace polaris
 				else
 				{
 					out_trip.push_back(-1);
-					//write_route = true;
+					write_route = true;
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
