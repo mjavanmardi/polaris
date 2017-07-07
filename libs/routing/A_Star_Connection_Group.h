@@ -164,6 +164,7 @@ namespace polaris
 				float currentCarTime;
 				float EarliestBoardTime;
 				int wait_binary = 1;
+				bool seqStay = true;
 
 				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -272,11 +273,15 @@ namespace polaris
 					seq_edge->in_open_set(true);
 					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}
+				else
+				{
+					seqStay = false;
+				}
 								
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
 				int iSeq = mySeq + 1;
 				bool hit_dest = false;
-				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false)
+				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(iSeq);
 
@@ -321,6 +326,10 @@ namespace polaris
 						seq_edge->in_open_set(true);
 
 						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+					}
+					else
+					{
+						seqStay = false;
 					}
 					
 					/*if (agent->at_destination((base_edge_type*)seq_edge, ends))
