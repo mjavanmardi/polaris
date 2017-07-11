@@ -154,7 +154,8 @@ namespace Routing_Components
 			t_data(float*, moe_ptr);
 
 			t_data(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time);
-			t_data(std::vector<int>, index_along_trip_at_upstream_node)
+			t_data(std::vector<int>, index_along_trip_at_upstream_node);
+			t_data(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns);
 
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
@@ -248,6 +249,8 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
 				scenario->set_parameter(document, section, "carWeight", _carWeight);
 				scenario->set_parameter(document, section, "waitThreshold", _waitThreshold);
+				scenario->set_parameter(document, section, "walkThreshold", _walkThreshold);
+				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
 				scenario->set_parameter(document, section, "debug_route", _debug_route);
 
 				return true;
@@ -262,6 +265,8 @@ namespace Routing_Components
 				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
 				cout << "\tcarWeight = " << carWeight	<float>() << endl;
 				cout << "\twaitThreshold = " << waitThreshold	<float>() << endl;
+				cout << "\twalkThreshold = " << walkThreshold	<float>() << endl;
+				cout << "\twalkSpeed = " << walkSpeed	<float>() << endl;
 				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
 			}
 			
@@ -273,6 +278,8 @@ namespace Routing_Components
 				_ivtWeight = 0.95;
 				_carWeight = 1.00;
 				_waitThreshold = 3600.00;
+				_walkThreshold = 2000;
+				_walkSpeed = 1.38889;
 				_debug_route = false;
 			}
 
@@ -283,6 +290,8 @@ namespace Routing_Components
 			m_static_data(float, ivtWeight, NONE, NONE);
 			m_static_data(float, carWeight, NONE, NONE);
 			m_static_data(float, waitThreshold, NONE, NONE);
+			m_static_data(float, walkThreshold, NONE, NONE);
+			m_static_data(float, walkSpeed, NONE, NONE);
 			m_static_data(bool, debug_route, NONE, NONE);
 			#pragma endregion
 
@@ -669,6 +678,9 @@ namespace Routing_Components
 				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
 				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(outbound_turn_movements), Turn_Movement_Interface*> Turn_Movement_Container_Interface;
 
+				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
@@ -724,6 +736,12 @@ namespace Routing_Components
 							int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
 							input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
 							my_itr++;
+						}
+
+						for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
+						{
+							_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+							input_multimodal_edge._unique_patterns.push_back(current_pattern);
 						}
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -792,6 +810,7 @@ namespace Routing_Components
 						input_multimodal_edge._connection_groups.clear();
 						input_multimodal_edge._trips_by_dep_time.clear();
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
+						input_multimodal_edge._unique_patterns.clear();
 					//}
 				}				
 
@@ -1060,6 +1079,8 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
 		define_static_member_variable(Routable_Network_Implementation, carWeight);
 		define_static_member_variable(Routable_Network_Implementation, waitThreshold);
+		define_static_member_variable(Routable_Network_Implementation, walkThreshold);
+		define_static_member_variable(Routable_Network_Implementation, walkSpeed);
 		define_static_member_variable(Routable_Network_Implementation, debug_route);
 		#pragma endregion
 

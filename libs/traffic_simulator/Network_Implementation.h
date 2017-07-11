@@ -1066,10 +1066,12 @@ namespace Network_Components
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{
-						float free_flow_speed = 4.55672; // feet per second
-
-						float link_travel_time = float(link->template length<float>() / free_flow_speed); // Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
+					{						
+						float free_flow_speed = 1.38889; // meters per second
+						free_flow_speed = 3.28084 * free_flow_speed; // feet per second
+						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to seconds
+						
+						// Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
 						
 						link_travel_time = max((float)1.0, link_travel_time);
 

@@ -398,6 +398,7 @@ namespace polaris
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 		
 		std::ofstream sp_file;
+		std::ofstream perf_file;
 		char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
@@ -411,6 +412,11 @@ namespace polaris
 			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
 			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
 			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+
+			stringstream perf_filename("");
+			perf_filename << _scenario_reference->template output_dir_name<string>();
+			perf_filename << "perf_output.dat";
+			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			// do route calculation timing for debug routes
 			c.Start();
@@ -497,10 +503,11 @@ namespace polaris
 		}
 
 		bool success = false;
-
+		int scanScount = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+			++scanScount;
 
 			//TODO: remove when done testing
 			/*if (debug_route)
@@ -517,7 +524,7 @@ namespace polaris
 				success = true;
 				break;
 			}*/
-			if (agent->at_destination((base_edge_type*)current, ends))
+			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
 				success = true;
 				break;
@@ -554,8 +561,7 @@ namespace polaris
 				
 		if (success)
 		{
-			//base_edge_type* current = end_base;//(base_edge_type*)end;
-
+			
 			global.edge_id = end_base->_edge_id;
 			global.graph_id = 1;
 
@@ -570,8 +576,8 @@ namespace polaris
 			
 			if (debug_route)
 			{
-				sp_file << "\nsuccess";
-				sp_file << ",Router run-time (ms)," << c.Stop() << endl;
+				perf_file << "success\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << c.Stop() << endl;
 			}
 
 			while (current != nullptr)
@@ -765,7 +771,11 @@ namespace polaris
 		}
 		else
 		{
-			sp_file << "fail" << endl;
+			if (debug_route)
+			{
+				perf_file << "fail\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << c.Stop() << endl;
+			}
 		}
 		sp_file.close();
 

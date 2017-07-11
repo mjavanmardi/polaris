@@ -23,6 +23,7 @@ namespace Transit_Pattern_Components
 			accessor(route, NONE, NONE);
 			accessor(pattern_stops, NONE, NONE);
 			accessor(pattern_links, NONE, NONE);
+			accessor(scanned, NONE, NONE)
 		};
 
 

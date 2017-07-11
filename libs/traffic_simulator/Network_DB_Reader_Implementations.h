@@ -470,6 +470,10 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef std::unordered_map<int,std::vector<typename MasterType::link_type*>> id_to_links_type;
 
+				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+
+
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
@@ -1322,6 +1326,26 @@ namespace Network_Components
 							if (link_trip)
 							{
 								link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
+								_Transit_Pattern_Interface* link_pattern = link_trip->_pattern;
+								bool pattern_add = true;
+
+								int my_itr = 0;
+								for (auto itr = link->_unique_patterns.begin(); itr != link->_unique_patterns.end(); ++itr)
+								{
+									_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(my_itr);
+
+									if (my_pattern == link_pattern)
+									{
+										pattern_add = false;
+										break;
+									}
+									++my_itr;
+								}
+
+								if (pattern_add)
+								{
+									link->template unique_patterns<_Transit_Patterns_Container_Interface&>().push_back(link_pattern);
+								}
 							}
 							else
 							{

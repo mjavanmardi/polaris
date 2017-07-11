@@ -143,12 +143,29 @@ namespace polaris
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
 			//if (current_neighbor->in_closed_set()) return;
+			for (int patterns_itr = 0; patterns_itr < current_neighbor->_unique_patterns.size(); ++patterns_itr)
+			{
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) current_neighbor->_unique_patterns.at(patterns_itr);
+				next_pattern->_scanned = false;
+			}
+			bool reachEnd = false;
+			int ReachEndCount = 0;
 			
-			for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
+			int trips_itr = 0;
+			int patterns_ctr = 0;
+			//for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
+			while (trips_itr < current_neighbor->_trips_by_dep_time.size() && patterns_ctr <= current_neighbor->_unique_patterns.size())
 			{						
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time.at(trips_itr);
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node.at(trips_itr);
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
+
+				++trips_itr;
+
+				if (next_pattern->_scanned)
+				{
+					continue;
+				}
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 								
@@ -158,13 +175,16 @@ namespace polaris
 				float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 				float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 				float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
+				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+				walkThreshold = walkThreshold / walkSpeed;				
 
 				float currentWalkTime;
 				float currentIVTTime;
 				float currentCarTime;
 				float EarliestBoardTime;
 				int wait_binary = 1;
-				bool seqStay = true;
+				bool seqStay = true;													
 
 				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -208,6 +228,15 @@ namespace polaris
 					return;
 				}
 
+				if (current->_walk_time_from_origin + currentWalkTime > walkThreshold)
+				{
+					//continue;
+					return;
+				}
+
+				next_pattern->_scanned = true;
+				++patterns_ctr;
+
 				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
 
 				int CandidateTransferCount = 0;
@@ -217,6 +246,11 @@ namespace polaris
 					CandidateTransferCount = CandidateWaitingCount - 1;
 					nonHomeWait = 1;
 				}				
+
+				if (CandidateTransferCount > 4)
+				{
+					continue;
+				}
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 								
@@ -228,7 +262,7 @@ namespace polaris
 
 				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 
-				if (seq_edge != current_neighbor)
+				/*if (seq_edge != current_neighbor)
 				{
 					cout << "Link mapping error between networks" << endl;
 					cout << "current_neighbor ID: " << current_neighbor->_edge_id << endl;
@@ -236,9 +270,9 @@ namespace polaris
 					cout << "seq_edge ID: " << seq_edge->_edge_id << endl;
 					system("pause");
 					exit(0);
-				}
+				}*/
 
-				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;
+				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;				
 
 				if (cost_from_origin < seq_edge->cost_from_origin())
 				{
@@ -353,12 +387,20 @@ namespace polaris
 			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
 			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>(); 
+			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+			walkThreshold = walkThreshold / walkSpeed;
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
 				float cost_from_origin = current->cost_from_origin() + walkWeight*current->_time_cost;
+
+				if (current->_walk_time_from_origin + current->_time_cost > walkThreshold)
+				{
+					return;
+				}
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
@@ -489,11 +531,19 @@ namespace polaris
 			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+			walkThreshold = walkThreshold / walkSpeed;
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
 				float cost_from_origin = current->cost_from_origin() + walkWeight*current->_time_cost;
+
+				if (current->_walk_time_from_origin + current->_time_cost > walkThreshold)
+				{
+					return;
+				}
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{

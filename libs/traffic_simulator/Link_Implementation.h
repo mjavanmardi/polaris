@@ -169,6 +169,7 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 
 			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time, NONE, NONE);
+			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
 			m_container(std::vector<int>, index_along_trip_at_upstream_node, NONE, NONE);
 
 		//==================================================================================================================
