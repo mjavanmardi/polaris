@@ -127,6 +127,7 @@ namespace polaris
 					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
 				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK)
+				//else
 				{
 					Evaluate_Drive_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
@@ -183,8 +184,7 @@ namespace polaris
 				float currentIVTTime;
 				float currentCarTime;
 				float EarliestBoardTime;
-				int wait_binary = 1;
-				bool seqStay = true;													
+				int wait_binary = 1;												
 
 				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -272,6 +272,8 @@ namespace polaris
 					exit(0);
 				}*/
 
+				bool seqStay = true;
+
 				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;				
 
 				if (cost_from_origin < seq_edge->cost_from_origin())
@@ -311,10 +313,17 @@ namespace polaris
 				{
 					seqStay = false;
 				}
+
+				bool hit_dest = false;
+
+				if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+				{
+					hit_dest = true;
+				}
 								
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
 				int iSeq = mySeq + 1;
-				bool hit_dest = false;
+				
 				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(iSeq);
@@ -366,10 +375,10 @@ namespace polaris
 						seqStay = false;
 					}
 					
-					/*if (agent->at_destination((base_edge_type*)seq_edge, ends))
+					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 					{
-						hit_dest == true;
-					}*/
+						hit_dest = true;
+					}
 
 					iSeq++;
 				}

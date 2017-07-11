@@ -1036,8 +1036,8 @@ namespace Network_Components
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 										
-						_Intersection_Interface* upstream_2 = nullptr();
-						_Intersection_Interface* downstream_2 = nullptr();
+						_Intersection_Interface* upstream_2 = nullptr;
+						_Intersection_Interface* downstream_2 = nullptr;
 						
 						std::stringstream sstrU(db_itr->getNode_A());
 						std::stringstream sstrD(db_itr->getNode_B());
@@ -1165,8 +1165,8 @@ namespace Network_Components
 						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
 
-						_Intersection_Interface* upstream_2 = nullptr();
-						_Intersection_Interface* downstream_2 = nullptr();
+						_Intersection_Interface* upstream_2 = nullptr;
+						_Intersection_Interface* downstream_2 = nullptr;
 
 						std::stringstream sstrU(db_itr->getNode_B());
 						std::stringstream sstrD(db_itr->getNode_A());
@@ -2174,9 +2174,16 @@ namespace Network_Components
 							
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 							{
-								activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
-								outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+								if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), outbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+								{
+
+								}
+								else
+								{
+									activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+									outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+									activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+								}
 
 								walk_link_id_dir.id = outbound_link->_dbid;
 								walk_link_id_dir.dir = outbound_link->_direction;
@@ -2190,14 +2197,174 @@ namespace Network_Components
 									if (net_io_maps.link_id_dir_to_ptr.count(opp_walk_link_id_dir.id_dir))
 									{
 										outbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_walk_link_id_dir.id_dir];
-										activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
-										outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-										activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+
+										if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), outbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+										{
+
+										}
+										else
+										{
+											activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+											outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+											activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+										}
 									}
 								}
 								break;
 							}
-						}						
+						}	
+
+						intersection = link->_downstream_intersection;
+						outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
+						//typename _Links_Container_Interface::iterator out_links_itr;
+
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+							{								
+								if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), outbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+								{
+
+								}
+								else
+								{
+									activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+									outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+									activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+								}
+
+								walk_link_id_dir.id = outbound_link->_dbid;
+								walk_link_id_dir.dir = outbound_link->_direction;
+
+								if (!this->_scenario_reference->template use_link_based_routing<bool>())
+								{
+
+									opp_walk_link_id_dir.id = walk_link_id_dir.id;
+									opp_walk_link_id_dir.dir = abs(walk_link_id_dir.dir - 1);
+
+									if (net_io_maps.link_id_dir_to_ptr.count(opp_walk_link_id_dir.id_dir))
+									{
+										outbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_walk_link_id_dir.id_dir];
+										if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), outbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+										{
+
+										}
+										else
+										{
+											activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+											outbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+											activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(outbound_link);
+										}
+									}
+								}
+								break;
+							}
+						}
+
+						intersection = link->_upstream_intersection;
+						_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
+						typename _Links_Container_Interface::iterator in_links_itr;
+
+						for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+						{
+							_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+							Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+							if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+							{
+								if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), inbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+								{
+
+								}
+								else
+								{
+									activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+									inbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+									activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+								}
+
+								walk_link_id_dir.id = inbound_link->_dbid;
+								walk_link_id_dir.dir = inbound_link->_direction;
+
+								if (!this->_scenario_reference->template use_link_based_routing<bool>())
+								{
+
+									opp_walk_link_id_dir.id = walk_link_id_dir.id;
+									opp_walk_link_id_dir.dir = abs(walk_link_id_dir.dir - 1);
+
+									if (net_io_maps.link_id_dir_to_ptr.count(opp_walk_link_id_dir.id_dir))
+									{
+										inbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_walk_link_id_dir.id_dir];
+
+										if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), inbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+										{
+
+										}
+										else
+										{
+											activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+											inbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+											activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+										}
+									}
+								}
+								break;
+							}
+						}
+
+						intersection = link->_downstream_intersection;
+						inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
+						//typename _Links_Container_Interface::iterator in_links_itr;
+
+						for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+						{
+							_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+							Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+							if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+							{
+								if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), inbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+								{
+
+								}
+								else
+								{
+									activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+									inbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+									activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+								}
+
+								walk_link_id_dir.id = inbound_link->_dbid;
+								walk_link_id_dir.dir = inbound_link->_direction;
+
+								if (!this->_scenario_reference->template use_link_based_routing<bool>())
+								{
+
+									opp_walk_link_id_dir.id = walk_link_id_dir.id;
+									opp_walk_link_id_dir.dir = abs(walk_link_id_dir.dir - 1);
+
+									if (net_io_maps.link_id_dir_to_ptr.count(opp_walk_link_id_dir.id_dir))
+									{
+										inbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_walk_link_id_dir.id_dir];
+
+										if (std::find(activity_location->template origin_walk_links<_Links_Container_Interface&>().begin(), activity_location->template origin_walk_links<_Links_Container_Interface&>().end(), inbound_link) != activity_location->template origin_walk_links<_Links_Container_Interface&>().end())
+										{
+
+										}
+										else
+										{
+											activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+											inbound_link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+											activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(inbound_link);
+										}
+									}
+								}
+								break;
+							}
+						}
 
 						// add the opposite direction link if exists
 						if (!this->_scenario_reference->template use_link_based_routing<bool>())

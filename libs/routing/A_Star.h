@@ -16,9 +16,41 @@ namespace polaris
 	};
 
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
-	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost)
+	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network; 
+		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
+
+		std::ofstream sp_file;
+		std::ofstream perf_file;
+		char myLine[2000];
+		std::string myParagraph;
+		bool write_route = false;
+		Counter A_Star_Time;
+		Counter Visit_Time;
+		float Total_Visit_Time;
+		
+		if (debug_route)
+		{
+			// Initialize executed activities file
+			stringstream sp_filename("");
+			sp_filename << _scenario_reference->template output_dir_name<string>();
+			sp_filename << "sp_output.dat";
+			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
+			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
+			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+
+			stringstream perf_filename("");
+			perf_filename << _scenario_reference->template output_dir_name<string>();
+			perf_filename << "perf_output.dat";
+			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
+
+			// do route calculation timing for debug routes
+			A_Star_Time.Start();
+		}
 
 		std::deque< base_edge_type* > modified_edges;
 		
@@ -72,10 +104,13 @@ namespace polaris
 		}
 		
 		bool success = false;
+		int scanScount = 0;
+		Total_Visit_Time = 0;
 
 		while( open_set.size() )
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+			++scanScount;
 
 			multimodal_edge_id id;
 			
@@ -95,10 +130,13 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType,base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType,base_edge_type>* const connection_set_end = current->end_connection_groups();
 
+			Visit_Time.Start();
 			while( connection_set_iterator != connection_set_end )
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
+			Visit_Time.Stop();
+			Total_Visit_Time += Visit_Time.Stop();
 
 		}
 
@@ -110,6 +148,13 @@ namespace polaris
 
 		if(success)
 		{
+			if (debug_route)
+			{
+				perf_file << "success\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+			}
+
 			base_edge_type* current = end_base;//(base_edge_type*)end;
 			base_edge_type* cached_current = (base_edge_type*)current;
 
@@ -137,6 +182,15 @@ namespace polaris
 			start_ids.push_back(out_path.front());
 			end_ids.clear();
 			end_ids.push_back(out_path.back());
+		}
+		else
+		{
+			if (debug_route)
+			{
+				perf_file << "fail\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+			}
 		}
 		
 		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
@@ -379,7 +433,7 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
+	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, std::vector<global_edge_id>& tr_end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -402,7 +456,9 @@ namespace polaris
 		char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
-		Counter c;
+		Counter A_Star_Time;
+		Counter Visit_Time;
+		float Total_Visit_Time;
 		if (debug_route)
 		{
 			// Initialize executed activities file
@@ -419,7 +475,7 @@ namespace polaris
 			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			// do route calculation timing for debug routes
-			c.Start();
+			A_Star_Time.Start();
 		}
 
 		std::deque< base_edge_type* > modified_edges;
@@ -459,9 +515,20 @@ namespace polaris
 		}
 		base_edge_type* end_base = (base_edge_type*)end;
 
+		std::vector<base_edge_type*> tr_ends;
+		A_Star_Edge<base_edge_type>* tr_end;
+		for (auto itr = tr_end_ids.begin(); itr != tr_end_ids.end(); ++itr)
+		{
+			tr_end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			if (tr_end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
+			tr_ends.push_back((base_edge_type*)tr_end);
+		}
+		//base_edge_type* tr_end_base = (base_edge_type*)tr_end;
+
 		Routing_Data<base_edge_type> routing_data;
 
 		routing_data.modified_edges = &modified_edges;
+		routing_data.end_transit_edges = &tr_ends;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
 		routing_data.end_edge = (base_edge_type*)ends.front();
@@ -481,7 +548,7 @@ namespace polaris
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
 
 			start_t->_came_on_seq_index = 0;
-			start_t->_came_on_trip = nullptr();
+			start_t->_came_on_trip = nullptr;
 			start_t->_wait_count_from_origin = 0;
 			start_t->_wait_time_from_origin = 0;
 			start_t->_walk_time_from_origin = 0;
@@ -504,6 +571,7 @@ namespace polaris
 
 		bool success = false;
 		int scanScount = 0;
+		Total_Visit_Time = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
@@ -538,10 +606,13 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
+			Visit_Time.Start();
 			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
 			}
+			Visit_Time.Stop();
+			Total_Visit_Time += Visit_Time.Stop();
 
 		}
 
@@ -561,7 +632,13 @@ namespace polaris
 				
 		if (success)
 		{
-			
+			if (debug_route)
+			{
+				perf_file << "success\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+			}
+
 			global.edge_id = end_base->_edge_id;
 			global.graph_id = 1;
 
@@ -574,12 +651,7 @@ namespace polaris
 			multimodal_edge_type* target_current;
 			_Link_Interface* target_link;
 			
-			if (debug_route)
-			{
-				perf_file << "success\tscanScount:\t" << scanScount;
-				perf_file << "\tRouter run-time (ms):\t" << c.Stop() << endl;
-			}
-
+			
 			while (current != nullptr)
 			{
 				global.edge_id = current->_edge_id;
@@ -774,7 +846,8 @@ namespace polaris
 			if (debug_route)
 			{
 				perf_file << "fail\tscanScount:\t" << scanScount;
-				perf_file << "\tRouter run-time (ms):\t" << c.Stop() << endl;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			}
 		}
 		sp_file.close();

@@ -32,6 +32,9 @@ namespace Routing_Components
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename movement_plan_interface::get_type_of(origin_location)> Activity_Location_Interface;
 			typedef Random_Access_Sequence<typename Activity_Location_Interface::get_type_of(destination_links)> Link_Container_Interface;
 
+			typedef Network<typename MasterType::network_type> Network_Interface;
+			typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+
 			template<typename Movement_Plan_Type>
 			void Attach_New_Movement_Plan(Movement_Plan<Movement_Plan_Type>* mp)
 			{
@@ -123,10 +126,25 @@ namespace Routing_Components
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_ids;
+				//std::vector<unsigned int> destination_tr_ids;
 				for (auto itr = destination_links->begin(); itr != destination_links->end(); ++itr)
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
 					destination_ids.push_back(link->template uuid<unsigned int>());
+
+					/*Intersection_Interface* up_node = link->_upstream_intersection;					
+					Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
+					typename Link_Container_Interface::iterator in_links_itr;
+					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+					{
+						Link_Interface* inbound_link = (Link_Interface*)(*in_links_itr);
+						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+						if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+						{
+							destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
+						}
+					}*/
+
 				}
 
 				std::vector<unsigned int> origin_walk_ids;
@@ -138,10 +156,24 @@ namespace Routing_Components
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_walk_ids;
+				std::vector<unsigned int> destination_tr_ids;
 				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
 					destination_walk_ids.push_back(link->template uuid<unsigned int>());
+
+					Intersection_Interface* up_node = link->_upstream_intersection;
+					Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
+					typename Link_Container_Interface::iterator in_links_itr;
+					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+					{
+						Link_Interface* inbound_link = (Link_Interface*)(*in_links_itr);
+						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+						if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+						{
+							destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
+						}
+					}
 				}
 
 				//list of edgeid, graph_id tuples; internal edge ids
@@ -160,15 +192,16 @@ namespace Routing_Components
 					
 					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
+						//best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{
-						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container);
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					
 				}
@@ -176,11 +209,11 @@ namespace Routing_Components
 				{
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else
 					{ 

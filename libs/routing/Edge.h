@@ -9,6 +9,7 @@ namespace polaris
 	struct Routing_Data
 	{
 		std::deque< Base_Edge_Type* >* modified_edges;
+		std::vector< Base_Edge_Type* >* end_transit_edges;
 		boost::intrusive::multiset< Base_Edge_Type >* open_set;
 		Base_Edge_Type* start_edge;
 		Base_Edge_Type* end_edge;
