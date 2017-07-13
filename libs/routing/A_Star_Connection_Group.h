@@ -149,8 +149,6 @@ namespace polaris
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) current_neighbor->_unique_patterns.at(patterns_itr);
 				next_pattern->_scanned = false;
 			}
-			bool reachEnd = false;
-			int ReachEndCount = 0;
 			
 			int trips_itr = 0;
 			int patterns_ctr = 0;
@@ -203,9 +201,10 @@ namespace polaris
 					currentCarTime = 0;
 					if (current_trip == next_trip)
 					{
-						wait_binary = 0;
+						continue;
+						/*wait_binary = 0;
 						EarliestBoardTime = current_trip->_departure_seconds.at(currentSeq + 1);
-						currentIVTTime = EarliestBoardTime - current->_time_label;
+						currentIVTTime = EarliestBoardTime - current->_time_label;*/
 					}
 				}
 				else

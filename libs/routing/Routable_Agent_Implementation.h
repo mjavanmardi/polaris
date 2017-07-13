@@ -49,7 +49,7 @@ namespace polaris
 
 			// vehicle speed
 			//float cost = sqrt(x_dist + y_dist)/89.0f;
-			float cost = sqrt(x_dist + y_dist) / 50.0f;
+			float cost = sqrt(x_dist + y_dist) / 10.0f;
 			return cost;
 		}
 
