@@ -688,6 +688,7 @@ namespace Routing_Components
 				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
 
 				//_routable_graph_pool = graph_pool;
+				cout << "Constructing multi-modal routable network..." << endl;
 
 				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
 
@@ -714,6 +715,9 @@ namespace Routing_Components
 				{
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+					float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
 					//if (link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 					//{
@@ -728,15 +732,34 @@ namespace Routing_Components
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
 
-						int my_itr = 0;
-						for (auto trips_itr = current_link->_trips_by_dep_time.begin(); trips_itr != current_link->_trips_by_dep_time.end(); ++trips_itr)
+						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
-							_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-							input_multimodal_edge._trips_by_dep_time.push_back(current_trip);
-							int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
-							input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
-							my_itr++;
+							int my_itr = 0;
+							float min_travel_time = FLT_MAX / 2.0f;
+							for (auto trips_itr = current_link->_trips_by_dep_time.begin(); trips_itr != current_link->_trips_by_dep_time.end(); ++trips_itr)
+							{
+								_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+								input_multimodal_edge._trips_by_dep_time.push_back(current_trip);
+								int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
+								input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
+
+								float temp_travel_time = current_trip->_arrival_seconds.at(my_index + 1) - current_trip->_arrival_seconds.at(my_index);
+								if (ivtWeight * temp_travel_time < min_travel_time)
+								{
+									min_travel_time = ivtWeight * temp_travel_time;
+								}
+								my_itr++;
+							}
+							input_multimodal_edge._min_multi_modal_cost = min_travel_time;
 						}
+						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
+						{
+							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
+						}
+						else
+						{
+							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
+						}						
 
 						for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
 						{
@@ -982,6 +1005,25 @@ namespace Routing_Components
 				//end.graph_id = _static_network_graph_id;
 
 				float routed_time = A_Star_Tree<MT,typename MT::tree_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,0,cost_container);
+
+				return routed_time;
+			}
+
+			float compute_dijkstra_network_tree(unsigned int origin, std::vector<float>& cost_container)
+			{
+				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
+
+				global_edge_id start;
+
+				start.edge_id = origin;
+				start.graph_id = _multimodal_network_graph_id;
+
+				//global_edge_id end;
+
+				//end.edge_id = destination;
+				//end.graph_id = _static_network_graph_id;
+
+				float routed_time = A_Star_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, 0, cost_container);
 
 				return routed_time;
 			}

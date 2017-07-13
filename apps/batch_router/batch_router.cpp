@@ -100,6 +100,7 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+	typedef Multi_Modal_Tree_Agent_Implementation<MasterType> multi_modal_tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
@@ -213,6 +214,9 @@ int main(int argc,char** argv)
 
 	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 
+	// Initialize routing parameters
+	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
+
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 	typedef Operation<MasterType::operation_type> _Operation_Interface;
@@ -318,8 +322,7 @@ int main(int argc,char** argv)
 	}
 	#pragma endregion
 
-	// Initialize routing parameters
-	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
+	
 
 	//==================================================================================================================================
 	// Batch Routing stuff

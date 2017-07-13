@@ -273,6 +273,7 @@ namespace polaris
 
 			//current->
 			out_edge_costs.push_back( (*itr)->estimated_cost_origin_destination() );
+			start->_dijkstra_cost.push_back((*itr)->estimated_cost_origin_destination());
 		}
 		
 		
@@ -284,9 +285,8 @@ namespace polaris
 		}
 
 		return total_cost;
-	}
-
-
+	}	
+	
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
 	static float Time_Dependent_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route=false)
 	{
