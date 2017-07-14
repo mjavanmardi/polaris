@@ -719,8 +719,8 @@ namespace Routing_Components
 					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
-					//if (link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-					//{
+					if (link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+					{
 
 						Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
@@ -797,8 +797,8 @@ namespace Routing_Components
 							Link_Interface* out_link = current_movement->template outbound_link<Link_Interface*>();
 							Link_Components::Types::Link_Type_Keys out_link_type = out_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							//if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							//{
+							if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							{
 								if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
 								{
 									connection_attributes._turn_moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
@@ -816,7 +816,7 @@ namespace Routing_Components
 								connection_attributes._time_cost = 0.0f;
 
 								multimodal_to_multimodal_connection_group->_neighbor_attributes.push_back(connection_attributes);
-							//}
+							}
 						}
 
 						input_multimodal_edge._connection_groups.push_back(multimodal_to_multimodal_connection_group);
@@ -834,7 +834,7 @@ namespace Routing_Components
 						input_multimodal_edge._trips_by_dep_time.clear();
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
 						input_multimodal_edge._unique_patterns.clear();
-					//}
+					}
 				}				
 
 				Interactive_Graph<typename MT::multimodal_graph_type>* routable_network_graph = multimodal_graph->template Compile_Graph<Types::multimodal_attributes<MT>>();
@@ -1007,25 +1007,32 @@ namespace Routing_Components
 				float routed_time = A_Star_Tree<MT,typename MT::tree_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,0,cost_container);
 
 				return routed_time;
-			}
+			}				
 
-			float compute_dijkstra_network_tree(unsigned int origin, std::vector<float>& cost_container)
+			void compute_dijkstra_network_tree()
 			{
+				cout << "Constructing all-to-all Dijkstra for better A* estimations..." << endl;
+
+				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
 				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
 
-				global_edge_id start;
+				std::vector<float> cost_container;
+				std::vector<base_edge_type*>* loop_edges = _routable_graph_pool->Get_Edges(_multimodal_network_graph_id);
+				
+				int my_itr = 0;
+				for (auto itr = loop_edges->begin(); itr != loop_edges->end(); itr++)
+				{
+					cost_container.clear();					
+					A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
 
-				start.edge_id = origin;
-				start.graph_id = _multimodal_network_graph_id;
+					global_edge_id start;
+					start.edge_id = current->_edge_id;
+					start.graph_id = _multimodal_network_graph_id;
 
-				//global_edge_id end;
-
-				//end.edge_id = destination;
-				//end.graph_id = _static_network_graph_id;
-
-				float routed_time = A_Star_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, 0, cost_container);
-
-				return routed_time;
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, 0, cost_container);
+					if (my_itr % 1000 == 0) cout << "\tOrigin:\t" << my_itr << endl;
+					++my_itr;
+				}
 			}
 
 			void update_edge_turn_cost(unsigned int edge_id,float edge_cost,unsigned int outbound_turn_index,float turn_cost)

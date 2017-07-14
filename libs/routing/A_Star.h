@@ -26,7 +26,7 @@ namespace polaris
 
 		std::ofstream sp_file;
 		std::ofstream perf_file;
-		char myLine[2000];
+		//char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
 		Counter A_Star_Time;
@@ -202,17 +202,17 @@ namespace polaris
 		return total_cost;
 	}
 
-	template<typename MasterType,typename AgentType,typename GraphPoolType>
+	template<typename MasterType, typename AgentType, typename GraphPoolType>
 	static float A_Star_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, unsigned int start_time, std::vector<float>& out_edge_costs)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
 		std::deque< base_edge_type* > modified_edges;
-		
+
 		boost::intrusive::multiset< base_edge_type > open_set;
 
 		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
-		if(start == nullptr){ THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
+		if (start == nullptr) { THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
 
 		A_Star_Edge<base_edge_type>* end = nullptr;
 
@@ -229,37 +229,37 @@ namespace polaris
 
 		float initial_estimated_cost_origin_destination = start->cost_from_origin();
 
-		start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
+		start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
-		open_set.insert( *((base_edge_type*)start) );
+		open_set.insert(*((base_edge_type*)start));
 
-		if( !start->marked_for_reset() )
+		if (!start->marked_for_reset())
 		{
 			modified_edges.push_back((base_edge_type*)start);
 			start->marked_for_reset(true);
 		}
-		
+
 		bool success = false;
 
-		while( open_set.size() )
+		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 
-			if( agent->at_destination((base_edge_type*)current, (base_edge_type*)end) )
+			if (agent->at_destination((base_edge_type*)current, (base_edge_type*)end))
 			{
 				success = true;
 				break;
 			}
-			
-			open_set.erase( open_set.iterator_to( *((base_edge_type*)current) ) );
+
+			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 
 			current->in_open_set(false);
 			current->in_closed_set(true);
 
-			Anonymous_Connection_Group<MasterType,base_edge_type>* connection_set_iterator = current->begin_connection_groups();
-			const Anonymous_Connection_Group<MasterType,base_edge_type>* const connection_set_end = current->end_connection_groups();
+			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
+			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
-			while( connection_set_iterator != connection_set_end )
+			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
@@ -267,26 +267,148 @@ namespace polaris
 
 		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
 
-		for(auto itr = edges->begin();itr!=edges->end();itr++)
+		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
 
 			//current->
-			out_edge_costs.push_back( (*itr)->estimated_cost_origin_destination() );
-			start->_dijkstra_cost.push_back((*itr)->estimated_cost_origin_destination());
+			out_edge_costs.push_back((*itr)->estimated_cost_origin_destination());
 		}
-		
-		
+
+
 		float total_cost = 0.0f;
 
-		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
+		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
 			(*itr)->reset();
 		}
 
 		return total_cost;
-	}	
+	}
 	
+	template<typename MasterType, typename AgentType, typename GraphPoolType>
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, unsigned int start_time, std::vector<float>& out_edge_costs)
+	{
+		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+		
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+		
+		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
+
+		std::ofstream sp_file;
+		std::ofstream perf_file;
+		char myLine[2000];
+		std::string myParagraph;
+		bool write_route = false;
+		Counter A_Star_Time;
+		Counter Visit_Time;
+		float Total_Visit_Time;
+		bool debug_route = true;
+		if (debug_route)
+		{
+			// Initialize executed activities file
+			stringstream sp_filename("");
+			sp_filename << _scenario_reference->template output_dir_name<string>();
+			sp_filename << "dijkstra_sp_output.dat";
+			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
+			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
+			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
+
+			stringstream perf_filename("");
+			perf_filename << _scenario_reference->template output_dir_name<string>();
+			perf_filename << "dijkstra_perf_output.dat";
+			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
+
+			// do route calculation timing for debug routes
+			A_Star_Time.Start();
+		}
+
+		std::deque< base_edge_type* > modified_edges;
+
+		boost::intrusive::multiset< base_edge_type > open_set;
+
+		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
+		if (start == nullptr) { THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
+
+
+		Routing_Data<base_edge_type> routing_data;
+
+		routing_data.modified_edges = &modified_edges;
+		routing_data.open_set = &open_set;
+		routing_data.start_edge = (base_edge_type*)start;
+
+		start->cost_from_origin(0.0f);
+		start->estimated_cost_origin_destination(0.0f);
+
+		open_set.insert(*((base_edge_type*)start));
+
+		if (!start->marked_for_reset())
+		{
+			modified_edges.push_back((base_edge_type*)start);
+			start->marked_for_reset(true);
+		}
+
+		bool success = false;
+		int scanScount = 0;
+		Total_Visit_Time = 0;
+		while (open_set.size())
+		{
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+			++scanScount;
+
+			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
+
+			current->in_open_set(false);
+			current->in_closed_set(true);
+
+			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
+			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
+
+			Visit_Time.Start();
+			while (connection_set_iterator != connection_set_end)
+			{
+				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+			}
+			Visit_Time.Stop();
+			Total_Visit_Time += Visit_Time.Stop();
+		}
+
+		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
+		
+		start->_dijkstra_cost.resize(400000);
+		for (auto itr = edges->begin(); itr != edges->end(); itr++)
+		{
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
+
+			//current->
+			//out_edge_costs.push_back((*itr)->estimated_cost_origin_destination());
+
+			start->_dijkstra_cost.at(current->_edge_id) = current->estimated_cost_origin_destination();
+
+			//sp_file << start->_edge_id << "," << current->_edge_id << "," << current->_estimated_cost_origin_destination << endl;
+			//start->_dijkstra_cost.push_back((*itr)->estimated_cost_origin_destination());
+		}
+
+
+		float total_cost = 0.0f;
+
+		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
+		{
+			(*itr)->reset();
+		}
+
+		if (debug_route)
+		{
+			perf_file << "success\tscanScount:\t" << scanScount;
+			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+			perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+		}
+
+		return total_cost;
+	}
+
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
 	static float Time_Dependent_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route=false)
 	{

@@ -1127,10 +1127,10 @@ namespace Network_Components
 			void construct_routable_networks()
 			{
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
-				typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
+				/*typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-				typename _Links_Container_Interface::iterator links_itr;
+				typename _Links_Container_Interface::iterator links_itr;*/
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
@@ -1158,20 +1158,8 @@ namespace Network_Components
 				routable_network->finalize();
 
 				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && ((_Scenario_Interface*)_global_scenario)->template multimodal_dijkstra<bool>())
-				{
-					cout << "Calculating tree-based Dijkstra's for better A* estimations:" << endl;
-					int origin_id;
-					std::vector<float> cost_container;
-					int my_itr = 0;
-					for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
-					{
-						cost_container.clear();
-						_Link_Interface* link = (_Link_Interface*)(*links_itr);
-						origin_id = link->template uuid<unsigned int>();
-						routable_network->compute_dijkstra_network_tree(origin_id, cost_container);
-						if (my_itr % 10000 == 0) cout << "\tOrigin:\t" << my_itr << endl;
-						++my_itr;
-					}
+				{					
+					routable_network->compute_dijkstra_network_tree();
 				}
 
 				for(uint i=1;i<num_sim_threads();i++)

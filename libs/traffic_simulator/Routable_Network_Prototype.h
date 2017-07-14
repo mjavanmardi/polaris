@@ -63,9 +63,9 @@ namespace Routing_Components
 				return this_component()->compute_static_network_tree(origin,edge_cost_container);
 			}
 
-			float compute_dijkstra_network_tree(unsigned int origin, std::vector<float>& edge_cost_container)
+			void compute_dijkstra_network_tree()
 			{
-				return this_component()->compute_dijkstra_network_tree(origin, edge_cost_container);
+				return this_component()->compute_dijkstra_network_tree();
 			}
 			
 			void initialize()

@@ -261,7 +261,7 @@ namespace polaris
 
 	template<typename MasterType>
 	struct Multi_Modal_Tree_Agent_Implementation
-	{
+	{			
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -278,7 +278,7 @@ namespace polaris
 		{
 			return 0.0f;
 		}
-
+		
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
