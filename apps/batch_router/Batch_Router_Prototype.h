@@ -4,6 +4,8 @@
 #include "Traffic_Simulator_Concepts.h"
 
 static vector<stringstream> results_by_thread;
+static vector<int> object_count_by_thread;
+static File_IO::File_Writer fw_output;
 
 namespace Batch_Router_Components
 {

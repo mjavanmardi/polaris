@@ -171,7 +171,11 @@ int main(int argc,char** argv)
 	int threads = 1;
 	if (argc >= 5) threads = std::max(atoi(argv[4]),threads);
 
-	for (int i = 0; i < threads; ++i) results_by_thread.push_back(stringstream(""));
+	for (int i = 0; i < threads; ++i)
+	{
+		results_by_thread.push_back(stringstream(""));
+		object_count_by_thread.push_back(0);
+	}
 
 	Simulation_Configuration cfg;
 	cfg.Multi_Threaded_Setup(100, threads);
@@ -357,6 +361,8 @@ int main(int argc,char** argv)
 		trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(mode, trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
 	}
 
+	// WRITE results
+	fw_output.Open("routed_results.txt");
 
 	//==================================================================================================================================
 	// Start Simulation
@@ -366,9 +372,7 @@ int main(int argc,char** argv)
 	catch (std::exception ex){ cout << ex.what();}
 
 	// WRITE results
-	File_IO::File_Writer fw;
-	fw.Open("routed_results.txt");
-	for (int i = 0; i < num_sim_threads(); ++i) fw.Write(results_by_thread[i]);
+	for (int i = 0; i < num_sim_threads(); ++i) fw_output.Write(results_by_thread[i]);
 
 
 	cout << "Finished! Press 'Any' key" << endl;

@@ -36,6 +36,12 @@ namespace Transit_Pattern_Components
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stops, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, pattern_links, NONE, NONE);
 			m_data(bool, scanned, NONE, NONE);
+
+			typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
+
+			m_container(std::vector<base_edge_type*>, pattern_edges, NONE, NONE);
+
+
 			/*typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;
 			typedef Intersection_Components::Prototypes::Intersection<type_of(pattern_stops)> _Intersection_Interface; 
 			typedef Link_Components::Prototypes::Link<type_of(pattern_link)> _Link_Interface;*/
@@ -55,6 +61,7 @@ namespace Transit_Pattern_Components
 			}*/
 
 		};
+
 	}
 }
 

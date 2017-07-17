@@ -165,7 +165,7 @@ namespace Routing_Components
 			t_data(float, wait_time_from_origin);
 			t_data(float, transfer_pen_from_origin);
 			t_data(int, wait_count_from_origin);
-			t_data(void*, came_on_trip);
+			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
 
 			static t_data(Layered_Data_Array<float>*, moe_data);
@@ -685,6 +685,7 @@ namespace Routing_Components
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
 
+
 				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
 
 				//_routable_graph_pool = graph_pool;
@@ -692,6 +693,7 @@ namespace Routing_Components
 
 				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
 
+				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
 
 
 				Graph_Assembler_Connected_Edge<typename MT::multimodal_graph_type>* multimodal_graph = graph_pool->template Create_New_Graph<typename MT::multimodal_graph_type>();
@@ -710,6 +712,7 @@ namespace Routing_Components
 				Network_Interface* network = source_network;
 
 				Link_Container_Interface* links = network->template links_container<Link_Container_Interface*>();
+
 
 				for (auto links_itr = links->begin(); links_itr != links->end(); links_itr++)
 				{
@@ -837,8 +840,29 @@ namespace Routing_Components
 					}
 				}				
 
+				
+
 				Interactive_Graph<typename MT::multimodal_graph_type>* routable_network_graph = multimodal_graph->template Compile_Graph<Types::multimodal_attributes<MT>>();
 
+				_Transit_Patterns_Container_Interface* patterns = network->template transit_patterns_container<_Transit_Patterns_Container_Interface*>();
+				for (auto patterns_itr = patterns->begin(); patterns_itr != patterns->end(); ++patterns_itr)
+				{
+					_Transit_Pattern_Interface* pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+					Link_Container_Interface* pattern_links = pattern->pattern_links<Link_Container_Interface*>();
+
+					for (auto links_itr = pattern_links->begin(); links_itr != pattern_links->end(); links_itr++)
+					{
+						Link_Interface* current_link = (Link_Interface*)(*links_itr);
+
+						global_edge_id edge_id;
+						edge_id.edge_id = current_link->_uuid;
+						edge_id.graph_id = 1;
+
+						base_edge_type* edge = (base_edge_type*)graph_pool->Get_Edge(edge_id);
+
+						pattern->_pattern_edges.push_back(edge);
+					}
+				}
 				//graph_pool->Link_Graphs();
 			}
 
