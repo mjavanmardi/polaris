@@ -102,8 +102,53 @@ namespace polaris
 		typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
 
-		//typedef Routing_Components::Implementations::Routable_Network_Implementation< typename MasterType::routable_network_type> _Routable_Network_Interface;
-		//typedef typename MasterType::transit_pattern_type* transit_pattern_type;
+		template<typename AgentType>
+		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
+		{
+			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
+			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
+
+			for (Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
+			{
+				Evaluate_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
+			}
+
+			return (Anonymous_Connection_Group*)end_connection_itr;
+		}
+
+		//basic A* stuff
+		template<typename AgentType>
+		void Evaluate_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
+		{
+			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
+
+			if (current_neighbor->in_closed_set()) return;
+
+			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+			if (cost_from_origin < current_neighbor->cost_from_origin())
+			{
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+								
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				current_neighbor->came_from(current);
+				current_neighbor->cost_from_origin(cost_from_origin);
+				current_neighbor->estimated_cost_origin_destination(cost_from_origin);
+
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+
+				current_neighbor->in_open_set(true);
+
+				// update the label
+				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			}
+		}
+
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Multimodal_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
@@ -127,6 +172,7 @@ namespace polaris
 					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
 				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK)
+				//else
 				{
 					Evaluate_Drive_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
@@ -143,12 +189,27 @@ namespace polaris
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
 			//if (current_neighbor->in_closed_set()) return;
+			for (int patterns_itr = 0; patterns_itr < current_neighbor->_unique_patterns.size(); ++patterns_itr)
+			{
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) current_neighbor->_unique_patterns.at(patterns_itr);
+				next_pattern->_scanned = false;
+			}
 			
-			for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
+			int trips_itr = 0;
+			int patterns_ctr = 0;
+			//for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
+			while (trips_itr < current_neighbor->_trips_by_dep_time.size() && patterns_ctr <= current_neighbor->_unique_patterns.size())
 			{						
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time.at(trips_itr);
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node.at(trips_itr);
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
+
+				++trips_itr;
+
+				if (next_pattern->_scanned)
+				{
+					continue;
+				}
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 								
@@ -158,12 +219,15 @@ namespace polaris
 				float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 				float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 				float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
+				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+				walkThreshold = walkThreshold / walkSpeed;				
 
 				float currentWalkTime;
 				float currentIVTTime;
 				float currentCarTime;
 				float EarliestBoardTime;
-				int wait_binary = 1;
+				int wait_binary = 1;												
 
 				if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -182,9 +246,10 @@ namespace polaris
 					currentCarTime = 0;
 					if (current_trip == next_trip)
 					{
-						wait_binary = 0;
+						continue;
+						/*wait_binary = 0;
 						EarliestBoardTime = current_trip->_departure_seconds.at(currentSeq + 1);
-						currentIVTTime = EarliestBoardTime - current->_time_label;
+						currentIVTTime = EarliestBoardTime - current->_time_label;*/
 					}
 				}
 				else
@@ -207,6 +272,15 @@ namespace polaris
 					return;
 				}
 
+				if (current->_walk_time_from_origin + currentWalkTime > walkThreshold)
+				{
+					//continue;
+					return;
+				}
+
+				next_pattern->_scanned = true;
+				++patterns_ctr;
+
 				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
 
 				int CandidateTransferCount = 0;
@@ -216,6 +290,11 @@ namespace polaris
 					CandidateTransferCount = CandidateWaitingCount - 1;
 					nonHomeWait = 1;
 				}				
+
+				if (CandidateTransferCount > 4)
+				{
+					continue;
+				}
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 								
@@ -227,7 +306,7 @@ namespace polaris
 
 				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 
-				if (seq_edge != current_neighbor)
+				/*if (seq_edge != current_neighbor)
 				{
 					cout << "Link mapping error between networks" << endl;
 					cout << "current_neighbor ID: " << current_neighbor->_edge_id << endl;
@@ -235,9 +314,11 @@ namespace polaris
 					cout << "seq_edge ID: " << seq_edge->_edge_id << endl;
 					system("pause");
 					exit(0);
-				}
+				}*/
 
-				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;
+				bool seqStay = true;
+
+				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;				
 
 				if (cost_from_origin < seq_edge->cost_from_origin())
 				{
@@ -259,6 +340,7 @@ namespace polaris
 					seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + seq_edge->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!seq_edge->marked_for_reset())
@@ -272,11 +354,22 @@ namespace polaris
 					seq_edge->in_open_set(true);
 					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}
+				else
+				{
+					seqStay = false;
+				}
+
+				bool hit_dest = false;
+
+				if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+				{
+					hit_dest = true;
+				}
 								
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
 				int iSeq = mySeq + 1;
-				bool hit_dest = false;
-				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false)
+				
+				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links.at(iSeq);
 
@@ -308,6 +401,7 @@ namespace polaris
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+						neighbor_estimated_cost_origin_destination = cost_from_origin + seq_edge->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 						if (!seq_edge->marked_for_reset())
@@ -322,11 +416,15 @@ namespace polaris
 
 						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 					}
-					
-					/*if (agent->at_destination((base_edge_type*)seq_edge, ends))
+					else
 					{
-						hit_dest == true;
-					}*/
+						seqStay = false;
+					}
+					
+					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+					{
+						hit_dest = true;
+					}
 
 					iSeq++;
 				}
@@ -344,12 +442,20 @@ namespace polaris
 			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
 			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>(); 
+			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+			walkThreshold = walkThreshold / walkSpeed;
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
 				float cost_from_origin = current->cost_from_origin() + walkWeight*current->_time_cost;
+
+				if (current->_walk_time_from_origin + current->_time_cost > walkThreshold)
+				{
+					return;
+				}
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
@@ -369,6 +475,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
 
 					if (!current_neighbor->marked_for_reset())
@@ -411,6 +518,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);					
 					
 					if (!current_neighbor->marked_for_reset())
@@ -450,6 +558,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -480,11 +589,19 @@ namespace polaris
 			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+			walkThreshold = walkThreshold / walkSpeed;
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
 				float cost_from_origin = current->cost_from_origin() + walkWeight*current->_time_cost;
+
+				if (current->_walk_time_from_origin + current->_time_cost > walkThreshold)
+				{
+					return;
+				}
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
@@ -504,6 +621,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -546,6 +664,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -585,6 +704,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost.at(routing_data.end_edge->_edge_id);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
