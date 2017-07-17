@@ -102,6 +102,7 @@ namespace polaris
 		typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
 
+
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
 		{
@@ -306,6 +307,8 @@ namespace polaris
 
 				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
 
+				/*A_Star_Edge<neighbor_edge_type>* */seq_edge = (A_Star_Edge<neighbor_edge_type>*)next_pattern->_pattern_edges[mySeq];
+
 				/*if (seq_edge != current_neighbor)
 				{
 					cout << "Link mapping error between networks" << endl;
@@ -378,6 +381,8 @@ namespace polaris
 					seq_edge_id.graph_id = 1;									
 
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
+
+					/*A_Star_Edge<neighbor_edge_type>* */seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq];
 					
 					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds[iSeq]- next_trip->_departure_seconds[mySeq] );
 
