@@ -183,7 +183,6 @@ namespace Routing_Components
 				
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				float best_route_time_to_destination = 0.0f;
-				//float best_transit_route_time_to_destination = 0.0f;
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
@@ -193,7 +192,6 @@ namespace Routing_Components
 					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
-						//best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_ids, destination_tr_ids, _departure_time, path_container, cost_container, debug_route);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{

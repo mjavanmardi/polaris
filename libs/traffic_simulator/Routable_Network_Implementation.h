@@ -165,7 +165,7 @@ namespace Routing_Components
 			t_data(float, wait_time_from_origin);
 			t_data(float, transfer_pen_from_origin);
 			t_data(int, wait_count_from_origin);
-			t_data(void*, came_on_trip);
+			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
 
 			static t_data(Layered_Data_Array<float>*, moe_data);
