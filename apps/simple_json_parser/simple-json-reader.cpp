@@ -1,12 +1,13 @@
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
 #include "rapidjson/istreamwrapper.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
+#include "rapidjson/pointer.h"
 #include <conio.h>
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include "D:/EnhancerScenario/EnhancerScenario/option_parameters.h"
 
 using std::cout;
 using std::endl;
@@ -213,6 +214,166 @@ bool parse_json_file(rapidjson::Document& document, std::string json_file)
 	return ret_val;
 }
 
+std::vector<std::string> split_section(const char *str, char c = '/')
+{
+	std::vector<std::string> result;
+
+	do
+	{
+		const char* begin = str;
+
+		while (*str != c && *str)
+		{
+			str++;
+		}
+
+		result.push_back(std::string(begin, str));
+	} while (0 != *str++);
+
+	return result;
+}
+
+template <class T>
+
+void get_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, T& parameter)
+{
+	rapidjson::Value* value;
+
+	// add "/" in front of key for Pointer
+	std::string str_key = "/" + key;
+	const char* char_key = str_key.c_str();
+
+	// if section is not defined then use key
+	if (section.compare("") == 0)
+	{
+		// check if key value is not found
+		value = rapidjson::Pointer(char_key).Get(document);
+		if (!value)
+		{
+			cout << "Unable to locate key \'" << char_key << "\'" << endl;
+			return;
+		}
+	}
+	else
+	{
+		std::vector<string> section_tokens;
+		section_tokens = split_section(section.c_str(), '/');
+
+		// add "/" to each token for Pointer
+		for (auto& element : section_tokens)
+		{
+			element = "/" + element;
+		}
+
+		// check if first section is not found
+		cout << "section token 0 is " << section_tokens[0] << endl;
+		value = rapidjson::Pointer(section_tokens[0].c_str()).Get(document);
+		if (!value)
+		{
+			cout << "Unable to locate section \'" << section_tokens[0] << "\'";
+			if (section_tokens.size() > 0)
+			{
+				cout << " from \'" << section << "\'" << endl;
+			}
+			return;
+		}
+		
+		// loop for each token element
+		for (unsigned i = 1; i < section_tokens.size(); ++i)
+		{
+			cout << section_tokens[i] << endl;
+
+			// check if next section is not found
+			value = rapidjson::Pointer(section_tokens[i].c_str()).Get(*value);
+			if (!value)
+			{
+				cout << "Unable to locate sub section \'" << section_tokens[i] << "\' from \'" << section << "\'" << endl;
+				return;
+			}
+		}
+
+		// if key is defined
+		if (key.compare("") != 0)
+		{
+			// check if key value is not found
+			value = rapidjson::Pointer(char_key).Get(*value);
+			if (!value)
+			{
+				cout << "Unable to locate key \'" << char_key << "\' from \'" << section << "\'" << endl;
+				return;
+			}
+		}
+	}
+
+	// get parameter
+	get_parameter(*value, parameter);
+}
+
+void get_parameter(rapidjson::Value& value, std::string& parameter)
+{
+	if (!value.IsString())
+	{
+		cout << "Value is not set as string value. (" << value.GetString() << ")" << endl;
+		return;
+	}
+	else
+	{
+		parameter = value.GetString();
+	}
+}
+
+void get_parameter(rapidjson::Value& value, int& parameter)
+{
+	if (!value.IsInt())
+	{
+		cout << "Value is not set as integer value. (" << value.GetString() << ")" << endl;
+		return;
+	}
+	else
+	{
+		parameter = value.GetInt();
+	}
+}
+
+void get_parameter(rapidjson::Value& value, double& parameter)
+{
+	if (!value.IsDouble())
+	{
+		cout << "Value is not set as double value. (" << value.GetString() << ")" << endl;
+		return;
+	}
+	else
+	{
+		parameter = value.GetDouble();
+	}
+}
+
+void get_parameter(rapidjson::Value& value, float& parameter)
+{
+	if (!value.IsFloat())
+	{
+		cout << "Value is not set as float value. (" << value.GetString() << ")" << endl;
+		return;
+	}
+	else
+	{
+		parameter = value.GetFloat();
+	}
+}
+
+void get_parameter(rapidjson::Value& value, bool& parameter)
+{
+	if (!value.IsBool())
+	{
+		cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
+		return;
+	}
+	else
+	{
+		parameter = value.GetBool();
+	}
+}
+
 int main(int argc, char** argv)
 {
 	// Read JSON file name
@@ -234,6 +395,53 @@ int main(int argc, char** argv)
 
 	if (parse_json_file(document, json_filename))
 	{
+		// Set string parameter
+		get_parameter(document, "hello", "", _hello);
+		cout << "hello " << _hello << endl;
+
+		get_parameter(document, "bye", "name1", _name1);
+		cout << "bye " << _name1 << endl;
+
+		get_parameter(document, "state/Illinois/city/Chicago/school", "UoC", _UoC);
+		cout << "state/Illinois/city/Chicago/school/UoC is " << _UoC << endl;
+
+		// Set int parameter
+		get_parameter(document, "", "i", _i);
+		cout << "i is " << _i << endl;
+
+		get_parameter(document, "bye", "num2", _num2);
+		cout << "bye/num2 is " << _num2 << endl;
+
+		get_parameter(document, "state/Illinois/city/Chicago/area_code", "city", _city);
+		cout << "state/Illinois/city/Chicago/area_code/city is " << _city << endl;
+
+		// Set double parameter
+		get_parameter(document, "pi", "", _pi);
+		cout << "pi is " << _pi << endl;
+		_pi = 0.0;
+		get_parameter(document, "", "pi", _pi);
+		cout << "pi is " << _pi << endl;
+
+		get_parameter(document, "grades", "John", _John);
+		cout << "grades for John is " << _John << endl;
+
+		// Set float parameter
+		get_parameter(document, "const", "", _const);
+		cout << "const is " << _const << endl;
+
+		get_parameter(document, "finished/homework", "number2", _number2);
+		cout << "finished/homework/number2 is " << _number2 << endl;
+
+		get_parameter(document, "finished/homework/number3", "partA", _partA);
+		cout << "finished/homework/number3/partA is " << _partA << endl;
+
+		// Set bool parameter
+		get_parameter(document, "t", "", _t);
+		cout << "t is " << _t << endl;
+
+		get_parameter(document, "finished", "assignment", _assignment);
+		cout << "finished/assignment is " << _assignment << endl;
+
 		cout << "Success!" << endl;
 	}
 	cout << "Press any key to exit" << endl;
