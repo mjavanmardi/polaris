@@ -317,6 +317,8 @@ namespace polaris
 				}*/
 
 				bool seqStay = true;
+				bool enterRegion = false;
+				bool exitRegion = false;
 
 				float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen ;				
 
@@ -361,14 +363,19 @@ namespace polaris
 
 				bool hit_dest = false;
 
+				/*float estimated_walk_distance_between = agent->estimated_walk_distance_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+				if (estimated_walk_distance_between < 1640.42)
+				{
+					enterRegion = true;
+				}*/
+
 				if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 				{
 					hit_dest = true;
 				}
 								
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
-				int iSeq = mySeq + 1;
-				
+				int iSeq = mySeq + 1;				
 				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links[iSeq];
@@ -421,6 +428,22 @@ namespace polaris
 						seqStay = false;
 					}
 					
+					/*float estimated_walk_distance_between = agent->estimated_walk_distance_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+					if (estimated_walk_distance_between < 1640.42)
+					{
+						enterRegion = true;
+					}
+
+					if (enterRegion && estimated_walk_distance_between > 1640.42)
+					{
+						exitRegion = true;
+					}
+
+					if (enterRegion && exitRegion)
+					{
+						hit_dest = true;
+					}*/
+
 					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 					{
 						hit_dest = true;

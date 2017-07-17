@@ -728,13 +728,13 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
-			Visit_Time.Start();
+			//Visit_Time.Start();
 			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
 			}
-			Visit_Time.Stop();
-			Total_Visit_Time += Visit_Time.Stop();
+			//Visit_Time.Stop();
+			//Total_Visit_Time += Visit_Time.Stop();
 
 		}
 

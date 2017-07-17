@@ -49,7 +49,20 @@ namespace polaris
 
 			// vehicle speed
 			//float cost = sqrt(x_dist + y_dist)/89.0f;
-			float cost = sqrt(x_dist + y_dist) / 89.0f;
+			float cost = sqrt(x_dist + y_dist) / 50.0f;
+			return cost;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_walk_distance_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			float x_dist = current->_x - destination->_x;
+			x_dist *= x_dist;
+
+			float y_dist = current->_y - destination->_y;
+			y_dist *= y_dist;
+
+			float cost = sqrt(x_dist + y_dist);
 			return cost;
 		}
 
