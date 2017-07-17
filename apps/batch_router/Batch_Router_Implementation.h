@@ -100,7 +100,7 @@ namespace Batch_Router_Components
 				int simulation_end_time = scenario->template simulation_end_time<int>();
 				if (departed_time < simulation_start_time || departed_time >= simulation_end_time)
 				{
-					results_by_thread[__thread_id] << Trip_Id << ": Trip start time is out of bounds - skipped.";
+					results_by_thread[0] << Trip_Id << ": Trip start time is out of bounds - skipped.";
 					return;
 				}
 
@@ -113,7 +113,7 @@ namespace Batch_Router_Components
 				_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
 				if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>() || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 				{
-					results_by_thread[__thread_id] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
+					results_by_thread[0] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
 					return;
 				}
 
@@ -170,6 +170,18 @@ namespace Batch_Router_Components
 				{
 					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
 				}
+
+				object_count_by_thread[__thread_id]++;
+
+				if (object_count_by_thread[__thread_id] > 100)
+				{
+					_lock l;
+					LOCK(l);
+					fw_output.Write(results_by_thread[__thread_id]);
+					object_count_by_thread[__thread_id] = 0;
+					UNLOCK(l);
+				}
+
 				
 			}
 			
