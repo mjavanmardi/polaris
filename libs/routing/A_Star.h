@@ -385,7 +385,7 @@ namespace polaris
 			//current->
 			//out_edge_costs.push_back((*itr)->estimated_cost_origin_destination());
 
-			start->_dijkstra_cost.at(current->_edge_id) = current->estimated_cost_origin_destination();
+			start->_dijkstra_cost[current->_edge_id] = current->estimated_cost_origin_destination();
 
 			//sp_file << start->_edge_id << "," << current->_edge_id << "," << current->_estimated_cost_origin_destination << endl;
 			//start->_dijkstra_cost.push_back((*itr)->estimated_cost_origin_destination());
@@ -829,7 +829,7 @@ namespace polaris
 					int mySeq = current->_came_on_seq_index - 1;
 					if (mySeq >= 0 && current_link->_upstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
 					{						
-						intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
+						intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
 						global.edge_id = intermediate_link->_uuid;
 						intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
 
@@ -859,7 +859,7 @@ namespace polaris
 							mySeq = mySeq - 1;
 							if (mySeq >= 0)
 							{
-								intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links.at(mySeq);
+								intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
 								global.edge_id = intermediate_link->_uuid;
 								intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
 							}
