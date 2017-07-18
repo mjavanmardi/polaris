@@ -55,6 +55,8 @@ namespace Batch_Router_Components
 
 			m_data(int, ID, NONE, NONE);
 
+			m_data(_lock, write_lock, NONE, NONE);
+
 			m_container(concat(std::vector<pair<bool,location_interface*>>),origin_routing_results, NONE, NONE);
 			m_container(concat(std::vector<pair<bool,location_interface*>>),destination_routing_results, NONE, NONE);
 
@@ -171,16 +173,15 @@ namespace Batch_Router_Components
 					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
 				}
 
-				/*object_count_by_thread[__thread_id]++;
+				object_count_by_thread[__thread_id]++;
 
 				if (object_count_by_thread[__thread_id] > 100)
 				{
-					_lock l;
-					LOCK(l);
+					LOCK(_write_lock);
 					fw_output.Write(results_by_thread[__thread_id]);
 					object_count_by_thread[__thread_id] = 0;
-					UNLOCK(l);
-				}*/
+					UNLOCK(_write_lock);
+				}
 
 				
 			}
