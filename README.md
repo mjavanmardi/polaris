@@ -129,6 +129,10 @@ Or combine the configuration and build steps into one:
 Execution binary for debug is located in <code_dir>\build_vs2015\bin\Debug
 Execution binary for release is located in <code_dir>\build_vs2015\bin\Release
 
+Test application with sample data:
+	cd <code_dir>\data\test_city
+	..\..\build_vs2015\bin\Release\Integrated_Model.exe scenario_init.json
+
 
 
 
