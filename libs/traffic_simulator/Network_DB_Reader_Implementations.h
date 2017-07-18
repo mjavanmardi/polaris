@@ -2163,7 +2163,7 @@ namespace Network_Components
 
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 
-						if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
+						/*if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
 						{
 
 						}
@@ -2172,7 +2172,7 @@ namespace Network_Components
 							zone->template origin_links<_Links_Container_Interface&>().push_back(link);
 							link->_zone = zone;
 							zone->template destination_links<_Links_Container_Interface&>().push_back(link);
-						}
+						}*/
 
 						_Intersection_Interface* intersection = link->_upstream_intersection;
 						_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();

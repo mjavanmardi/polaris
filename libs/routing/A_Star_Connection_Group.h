@@ -299,26 +299,8 @@ namespace polaris
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 								
-				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links[mySeq];
-
-				global_edge_id seq_edge_id;
-				seq_edge_id.edge_id = seq_Link->_uuid;
-				seq_edge_id.graph_id = 1;
-
-				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
-
-				/*A_Star_Edge<neighbor_edge_type>* */seq_edge = (A_Star_Edge<neighbor_edge_type>*)next_pattern->_pattern_edges[mySeq];
-
-				/*if (seq_edge != current_neighbor)
-				{
-					cout << "Link mapping error between networks" << endl;
-					cout << "current_neighbor ID: " << current_neighbor->_edge_id << endl;
-					cout << "seq_Link ID: " << seq_Link->_uuid << endl;
-					cout << "seq_edge ID: " << seq_edge->_edge_id << endl;
-					system("pause");
-					exit(0);
-				}*/
-
+				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)next_pattern->_pattern_edges[mySeq];
+								
 				bool seqStay = true;
 				bool enterRegion = false;
 				bool exitRegion = false;
@@ -367,7 +349,7 @@ namespace polaris
 				bool hit_dest = false;
 
 				/*float estimated_walk_distance_between = agent->estimated_walk_distance_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-				if (estimated_walk_distance_between < 1640.42)
+				if (estimated_walk_distance_between < 800)
 				{
 					enterRegion = true;
 				}*/
@@ -381,16 +363,8 @@ namespace polaris
 				int iSeq = mySeq + 1;				
 				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
-					_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links[iSeq];
-
-					global_edge_id seq_edge_id;
-					seq_edge_id.edge_id = seq_Link->_uuid;
-					seq_edge_id.graph_id = 1;									
-
-					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_id);
-
-					/*A_Star_Edge<neighbor_edge_type>* */seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq];
-					
+					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq];
+										
 					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds[iSeq]- next_trip->_departure_seconds[mySeq] );
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
@@ -434,12 +408,12 @@ namespace polaris
 					}
 					
 					/*float estimated_walk_distance_between = agent->estimated_walk_distance_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-					if (estimated_walk_distance_between < 1640.42)
+					if (estimated_walk_distance_between < 800)
 					{
 						enterRegion = true;
 					}
 
-					if (enterRegion && estimated_walk_distance_between > 1640.42)
+					if (enterRegion && estimated_walk_distance_between > 800)
 					{
 						exitRegion = true;
 					}

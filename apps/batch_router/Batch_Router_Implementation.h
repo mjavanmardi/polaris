@@ -171,7 +171,7 @@ namespace Batch_Router_Components
 					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
 				}
 
-				object_count_by_thread[__thread_id]++;
+				/*object_count_by_thread[__thread_id]++;
 
 				if (object_count_by_thread[__thread_id] > 100)
 				{
@@ -180,7 +180,7 @@ namespace Batch_Router_Components
 					fw_output.Write(results_by_thread[__thread_id]);
 					object_count_by_thread[__thread_id] = 0;
 					UNLOCK(l);
-				}
+				}*/
 
 				
 			}
