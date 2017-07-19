@@ -72,6 +72,8 @@ Run the sript to download, extract and build the dependencies:
 	cd <code_dir>/polarisdeps
 	get-deps.cmd <dependencies_dir>
 	
+If you do not set <dependencies_dir> it will default to c:\opt\polarisdeps
+	
 This may take a while so be patient.
 
 NOTE:
@@ -112,6 +114,8 @@ The argument to the configure script will ovrride the environment variable.
 	configure-polaris.cmd <dependencies_dir>
 	cd build_vs2015
 
+<dependencies_dir> should be the directory where you built the 3rd party libraries. If you do not set <dependencies_dir> it will default to c:\opt\polarisdeps
+	
 Open Visual Studio:
 
 	polaris.sln
