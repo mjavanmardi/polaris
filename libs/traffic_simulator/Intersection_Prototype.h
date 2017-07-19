@@ -113,6 +113,7 @@ namespace Intersection_Components
 			accessor(description, NONE, NONE);
 			accessor(inbound_links, NONE, NONE);
 			accessor(outbound_links, NONE, NONE);
+			accessor(zone, NONE, NONE);
 			/*accessor(inbound_walk_links, NONE, NONE);
 			accessor(outbound_walk_links, NONE, NONE);
 			accessor(inbound_transit_links, NONE, NONE);

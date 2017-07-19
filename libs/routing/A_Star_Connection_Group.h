@@ -93,6 +93,8 @@ namespace polaris
 
 		typedef Network<typename MasterType::network_type> Network_Interface;
 
+		typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
+
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
@@ -189,6 +191,20 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
+			float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
+			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
+			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+			walkThreshold = walkThreshold / walkSpeed;
+
+			bool multimodal_dijkstra = ((Scenario_Interface*)_global_scenario)->_multimodal_dijkstra;
+				
+			//Scenario_Components::Implementations::Scenario_Implementation<MasterType>::_multimodal_dijkstra;
+
 			//if (current_neighbor->in_closed_set()) return;
 			for (auto patterns_itr = current_neighbor->_unique_patterns.begin(); patterns_itr != current_neighbor->_unique_patterns.end(); patterns_itr++)
 			{
@@ -212,17 +228,7 @@ namespace polaris
 					continue;
 				}
 
-				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
-								
-				float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
-				float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
-				float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
-				float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-				float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
-				float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
-				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-				walkThreshold = walkThreshold / walkSpeed;				
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;			
 
 				float currentWalkTime;
 				float currentIVTTime;
@@ -327,8 +333,15 @@ namespace polaris
 					seq_edge->_car_time_from_origin = current->_car_time_from_origin + currentCarTime;
 					seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
+					}
 					seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!seq_edge->marked_for_reset())
@@ -387,8 +400,15 @@ namespace polaris
 						seq_edge->_car_time_from_origin = current->_car_time_from_origin + currentCarTime;
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
+						float neighbor_estimated_cost_origin_destination;
+						if (!multimodal_dijkstra)
+						{
+							neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+						}
+						else
+						{
+							neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
+						}
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 						if (!seq_edge->marked_for_reset())
@@ -445,10 +465,13 @@ namespace polaris
 			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
 			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>(); 
+			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+			float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
 			float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
 			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 			walkThreshold = walkThreshold / walkSpeed;
+
+			bool multimodal_dijkstra = ((Scenario_Interface*)_global_scenario)->_multimodal_dijkstra;
 
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
@@ -477,8 +500,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
 
 					if (!current_neighbor->marked_for_reset())
@@ -520,8 +550,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);					
 					
 					if (!current_neighbor->marked_for_reset())
@@ -560,8 +597,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -596,6 +640,8 @@ namespace polaris
 			float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 			walkThreshold = walkThreshold / walkSpeed;
 
+			bool multimodal_dijkstra = ((Scenario_Interface*)_global_scenario)->_multimodal_dijkstra;
+
 			Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 			{
@@ -623,8 +669,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -666,8 +719,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -706,8 +766,15 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					float neighbor_estimated_cost_origin_destination;
+					if (!multimodal_dijkstra)
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+					}
+					else
+					{
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
+					}
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())

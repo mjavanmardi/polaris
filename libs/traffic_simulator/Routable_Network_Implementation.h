@@ -738,7 +738,7 @@ namespace Routing_Components
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
 						
-						int zone_id = current_link->_zones[0];
+						int zone_id = current_link->_zone;
 						input_multimodal_edge._zone = zone_id;
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
@@ -1081,7 +1081,10 @@ namespace Routing_Components
 
 					
 					int zone_id = origin_zone->_uuid;
-					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, 0);
+					if (!starts.empty())
+					{
+						float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, 0);
+					}
 					
 										
 					

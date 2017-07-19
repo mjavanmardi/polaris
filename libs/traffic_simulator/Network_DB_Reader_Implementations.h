@@ -118,6 +118,7 @@ namespace Network_Components
 					intersection->template x_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
+					intersection->template zone<int>(db_itr->getZone()->getZone());
 					
 					net_io_maps.intersection_id_to_ptr[db_itr->getNode()]=intersection;
 
@@ -160,6 +161,7 @@ namespace Network_Components
 					intersection->template description<std::string>(db_itr->getDescription());
 					intersection->template street<std::string>(db_itr->getStreet());
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
+					intersection->template zone<int>(db_itr->getZone()->getZone());
 
 					net_io_maps.intersection_id_to_ptr[intersection->_uuid] = intersection;
 					net_io_maps.transit_stop_id_to_ptr[db_itr->getStop()] = intersection;
@@ -556,6 +558,9 @@ namespace Network_Components
 
 						dbid_max = std::max(dbid_max, link->_dbid);
 
+						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+						link->template zone<int>(zone_id);
+
 						num_lanes = db_itr->getLanes_Ab();
 						
 						//if(facility_type=="EXPRESSWAY" || facility_type=="FREEWAY")
@@ -792,6 +797,9 @@ namespace Network_Components
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 												
 						dbid_max = std::max(dbid_max, link->_dbid);
+
+						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+						link->template zone<int>(zone_id);
 
 						num_lanes = db_itr->getLanes_Ba();
 						
@@ -1117,6 +1125,9 @@ namespace Network_Components
 
 						dbid_max = std::max(dbid_max, link->_dbid);
 
+						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+						link->template zone<int>(zone_id);
+
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
@@ -1248,6 +1259,9 @@ namespace Network_Components
 
 						dbid_max = std::max(dbid_max, link->_dbid);
 
+						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+						link->template zone<int>(zone_id);
+
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
@@ -1310,6 +1324,9 @@ namespace Network_Components
 						
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+						link->template zone<int>(zone_id);
 
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
@@ -1996,6 +2013,8 @@ namespace Network_Components
 
 				_Zones_Container_Interface& zones_container = _network_reference->template zones_container<_Zones_Container_Interface&>();
 				_zone_ids_interface& zone_ids_container = _network_reference->template zone_ids_container<_zone_ids_interface&>();
+				
+				_Links_Container_Interface& links_container = _network_reference->template links_container<_Links_Container_Interface&>();
 
 				// initialzie zone hash_map
 				zones_container.set_empty_key(-1);
@@ -2068,6 +2087,22 @@ namespace Network_Components
 					int index = zone->template internal_id<int>();
 					int uuid = zone->template uuid<int>();
 					zone_ids_container[index]=uuid;
+				}
+
+				typename _Links_Container_Interface::iterator links_itr;
+				for (links_itr = links_container.begin(); links_itr != links_container.end(); links_itr++)
+				{
+					_Link_Interface* link = (_Link_Interface*)(*links_itr);
+					Link_Components::Types::Link_Type_Keys link_type = link->_link_type;
+					if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::WALK)
+					{
+						int zone_id = link->_zone;
+						zone_itr = zones_container.find(zone_id);
+						zone = (_Zone_Interface*)zone_itr->second;
+						zone->template origin_links<_Links_Container_Interface&>().push_back(link);
+						zone->template destination_links<_Links_Container_Interface&>().push_back(link);
+					}
+
 				}
 			}
 		
@@ -2415,20 +2450,7 @@ namespace Network_Components
 						activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
 						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
-
-						if (this->_scenario_reference->template multimodal_dijkstra<bool>())
-						{
-							if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
-							{
-
-							}
-							else
-							{
-								zone->template origin_links<_Links_Container_Interface&>().push_back(link);
-								link->_zones.push_back(zone->_uuid);
-								zone->template destination_links<_Links_Container_Interface&>().push_back(link);
-							}
-						}
+												
 
 						if (!this->_scenario_reference->template use_link_based_routing<bool>())
 						{
@@ -2439,21 +2461,7 @@ namespace Network_Components
 								link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
 								activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
 								link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
-
-								if (this->_scenario_reference->template multimodal_dijkstra<bool>())
-								{
-									if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
-									{
-
-									}
-									else
-									{
-										zone->template origin_links<_Links_Container_Interface&>().push_back(link);
-										link->_zones.push_back(zone->_uuid);
-										zone->template destination_links<_Links_Container_Interface&>().push_back(link);
-									}
-								}
+								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);											
 							}
 						}
 				

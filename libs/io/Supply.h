@@ -174,8 +174,8 @@ public:
 	// Default Constructor
 	Node () {}	
 	//Constructor
-	Node ( int node_, double x_, double y_, double z_, int subarea_, int part_ )  
-	: node (node_), x (x_), y (y_), z (z_), subarea (subarea_), part (part_)
+	Node ( int node_, double x_, double y_, double z_, int subarea_, int part_, shared_ptr<Zone> zone_ )
+	: node (node_), x (x_), y (y_), z (z_), subarea (subarea_), part (part_), zone(zone_)
 	{
 	}
 	//Accessors
@@ -192,7 +192,10 @@ public:
 	const int& getPart () const {return part;}
 	void setPart (const int& part_){part = part_;}
 	const int& getPrimaryKey () const {return node;}
-
+	const shared_ptr<Zone>& getZone() const { return zone; }
+	void setNode_A(const shared_ptr<Zone>& zone_) { zone = zone_; }
+	void setNode_A(const int& zone_, InputContainer& container) { zone = container.Zones[zone_]; }
+	
 //Data Fields
 private:
 	friend class odb::access;
@@ -204,6 +207,7 @@ private:
 	double z;
 	int subarea;
 	int part;
+	shared_ptr<Zone> zone;
 #pragma db index member(node)
 
 };
@@ -215,8 +219,8 @@ public:
 	// Default Constructor
 	Transit_Stops() {}
 	//Constructor
-	Transit_Stops(std::string stop_, int link_, int dir_, double offset_, double setback_, double x_, double y_, double z_, std::string agency_, std::string name_, std::string description_, std::string street_)
-		: stop(stop_), link(link_), dir(dir_), offset(offset_), setback(setback_), x(x_), y(y_), z(z_), agency(agency_), name(name_), description(description_), street(street_)
+	Transit_Stops(std::string stop_, int link_, int dir_, double offset_, double setback_, double x_, double y_, double z_, std::string agency_, std::string name_, std::string description_, std::string street_, shared_ptr<Zone> zone_)
+		: stop(stop_), link(link_), dir(dir_), offset(offset_), setback(setback_), x(x_), y(y_), z(z_), agency(agency_), name(name_), description(description_), street(street_), zone(zone_)
 	{
 	}
 	//Accessors
@@ -244,6 +248,9 @@ public:
 	void setDescription(const std::string& description_) { description = description_; }
 	const std::string& getStreet() const { return street; }
 	void setStreet(const std::string& street_) { street = street_; }
+	const shared_ptr<Zone>& getZone() const { return zone; }
+	void setNode_A(const shared_ptr<Zone>& zone_) { zone = zone_; }
+	void setNode_A(const int& zone_, InputContainer& container) { zone = container.Zones[zone_]; }
 
 	const std::string& getPrimaryKey() const { return stop; }
 
@@ -265,6 +272,7 @@ private:
 	std::string name;
 	std::string description;
 	std::string street;
+	shared_ptr<Zone> zone;
 //#pragma db index member(stop)
 };
 

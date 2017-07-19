@@ -425,6 +425,9 @@ namespace polaris
 			current->dijkstra_cost[zone] = current->estimated_cost_origin_destination();
 		}
 
+		sp_file.close();
+		perf_file.close();
+
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
 			(*itr)->reset();
@@ -997,6 +1000,7 @@ namespace polaris
 			}
 		}
 		sp_file.close();
+		perf_file.close();
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
