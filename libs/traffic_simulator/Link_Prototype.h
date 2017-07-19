@@ -42,6 +42,7 @@ namespace Link_Components
 			accessor(length, NONE, NONE);
 			accessor(link_type, NONE, NONE);
 			accessor(activity_locations, NONE, NONE);
+			accessor(zone, NONE, NONE);
 			accessor(dbid, NONE, NONE);
 			accessor(direction, NONE, NONE);
 			accessor(name, NONE, NONE);

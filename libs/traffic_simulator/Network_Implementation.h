@@ -1159,7 +1159,7 @@ namespace Network_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && ((_Scenario_Interface*)_global_scenario)->template multimodal_dijkstra<bool>())
 				{					
-					routable_network->compute_dijkstra_network_tree();
+					routable_network->compute_dijkstra_network_tree<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);
 				}
 
 				for(uint i=1;i<num_sim_threads();i++)

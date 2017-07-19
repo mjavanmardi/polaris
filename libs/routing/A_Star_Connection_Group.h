@@ -300,6 +300,7 @@ namespace polaris
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 								
 				A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)next_pattern->_pattern_edges[mySeq];
+				_Link_Interface* seq_Link = (_Link_Interface*)next_pattern->_pattern_links[mySeq];
 								
 				bool seqStay = true;
 				bool enterRegion = false;
@@ -327,7 +328,7 @@ namespace polaris
 					seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + seq_edge->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
 					seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!seq_edge->marked_for_reset())
@@ -364,7 +365,7 @@ namespace polaris
 				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq];
-										
+															
 					float cost_from_origin = current->cost_from_origin() + walkWeight*currentWalkTime + ivtWeight*currentIVTTime + carWeight*currentCarTime + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds[iSeq]- next_trip->_departure_seconds[mySeq] );
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
@@ -387,7 +388,7 @@ namespace polaris
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-						//neighbor_estimated_cost_origin_destination = cost_from_origin + seq_edge->_dijkstra_cost[routing_data.end_edge->_edge_id];
+						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 						if (!seq_edge->marked_for_reset())
@@ -477,7 +478,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
 
 					if (!current_neighbor->marked_for_reset())
@@ -520,7 +521,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);					
 					
 					if (!current_neighbor->marked_for_reset())
@@ -560,7 +561,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -623,7 +624,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -666,7 +667,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -706,7 +707,7 @@ namespace polaris
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					//neighbor_estimated_cost_origin_destination = cost_from_origin + current_neighbor->_dijkstra_cost[routing_data.end_edge->_edge_id];
+					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())

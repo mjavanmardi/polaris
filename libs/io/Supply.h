@@ -63,12 +63,14 @@ class VSS;
 
 typedef shared_ptr<Node> node_ptr;
 typedef shared_ptr<Transit_Stops> transit_node_ptr;
+typedef shared_ptr<Transit_Walk> walk_link_ptr;
 typedef shared_ptr<Link_Type> link_type_ptr;
 typedef shared_ptr<Area_Type> area_type_ptr;
 typedef shared_ptr<Transit_Routes> route_ptr;
 typedef shared_ptr<Transit_Patterns> pattern_ptr;
 #pragma db value(node_ptr) type("INTEGER") not_null
 #pragma db value(transit_node_ptr) type("TEXT") not_null
+#pragma db value(walk_link_ptr) type("INTEGER") not_null
 #pragma db value(link_type_ptr) type("INTEGER") not_null
 #pragma db value(area_type_ptr) type("INTEGER") not_null
 #pragma db value(route_ptr) type("INTEGER") not_null
@@ -122,6 +124,7 @@ class InputContainer
 public:
 	std::map<int, node_ptr > Nodes;
 	std::map<std::string, transit_node_ptr > TransitStops;
+	std::map<int, walk_link_ptr > Transit_Walk;
 	std::map<std::string, route_ptr > TransitRoutes;
 	std::map<std::string, pattern_ptr > TransitPatterns;
 	std::map<int,shared_ptr<Zone> > Zones;
@@ -311,8 +314,8 @@ public:
 	// Default Constructor
 	Transit_Walk() {}
 	//Constructor
-	Transit_Walk(std::string from_node_, std::string to_node_, double length_)
-		: from_node(from_node_), to_node(to_node_), length(length_)
+	Transit_Walk(std::string from_node_, std::string to_node_, double length_, int walk_link_)
+		: from_node(from_node_), to_node(to_node_), length(length_), walk_link(walk_link_)
 	{
 	}
 	//Accessors	
@@ -329,15 +332,20 @@ public:
 	void setNode_B(const int& node_b_, InputContainer& container) { node_b = container.Nodes[node_b_]; }*/
 	const double& getLength() const { return length; }
 	void setLength(const double& length_) { length = length_; }	
+	const int& getLink() const { return walk_link; }
+	void setLink(const int& walk_link_) { walk_link = walk_link_; }
 
+	const int& getPrimaryKey() const { return walk_link; }
 	//Data Fields
 private:
 	friend class odb::access;
-
-//#pragma db null	
+#pragma db id
+	int walk_link;
+#pragma db null	
 	std::string from_node;
 	std::string to_node;
 	double length;
+	
 };
 
 #pragma db object //table("Transit_Routes")
@@ -1118,9 +1126,9 @@ public:
 	// Default Constructor
 	Location () {}        
 	Location (int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_, /*shared_ptr<LocationData> location_data_,*/
-			 int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
+			 int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_, walk_link_ptr walk_link_)
 	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), /*location_data (location_data_)*/
-	  truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), area_type (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
+	  truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), area_type (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_), walk_link (walk_link_)
 	{
 	}
 	//Accessors
@@ -1161,6 +1169,9 @@ public:
 	void setY (const double& y_) {y = y_;}
 	const std::string& getLand_Use () const {return land_use;}
 	void setLand_Use (const std::string& land_use_) {land_use = land_use_;}
+	void setWalkLink(const int& walk_link_, InputContainer& container) { walk_link = container.Transit_Walk[walk_link_]; }
+	const walk_link_ptr& getWalkLink() const { return walk_link; }
+	void setWalkLink(const walk_link_ptr& walk_link_) { walk_link = walk_link_; }
 	//const shared_ptr<LocationData>& getLocation_Data () const {return location_data;}
 	//void setLocation_Data (const shared_ptr<LocationData>& location_data_) {location_data = location_data_;}
 //Data Fields
@@ -1184,6 +1195,7 @@ private:
 	double x;
 	double y;
 	std::string land_use;
+	walk_link_ptr walk_link;
 	//shared_ptr<LocationData> location_data;
 	#pragma db index member(location)
 };

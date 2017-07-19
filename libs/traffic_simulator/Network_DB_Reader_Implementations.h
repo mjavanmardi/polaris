@@ -1008,7 +1008,7 @@ namespace Network_Components
 					bool do_this_link = true;
 
 					counter++;
-					dbid_max++;
+					//dbid_max++;
 
 					if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
@@ -1017,8 +1017,8 @@ namespace Network_Components
 					{
 						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();						
 
-						//link_id_dir.id = db_itr->getLink();
-						link_id_dir.id = dbid_max;
+						link_id_dir.id = db_itr->getLink();
+						//link_id_dir.id = dbid_max;
 						link_id_dir.dir = 0;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
@@ -1027,7 +1027,7 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
-						link->template dbid<int>(dbid_max);
+						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(0.0);
 
 						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
@@ -1115,6 +1115,8 @@ namespace Network_Components
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 
+						dbid_max = std::max(dbid_max, link->_dbid);
+
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
@@ -1146,8 +1148,8 @@ namespace Network_Components
 
 						//dbid_max++;
 
-						//link_id_dir.id = db_itr->getLink();
-						link_id_dir.id = dbid_max;
+						link_id_dir.id = db_itr->getLink();
+						//link_id_dir.id = dbid_max;
 						link_id_dir.dir = 1;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
@@ -1156,7 +1158,7 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
-						link->template dbid<int>(dbid_max);
+						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(1);
 
 						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
@@ -1243,6 +1245,8 @@ namespace Network_Components
 
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+						dbid_max = std::max(dbid_max, link->_dbid);
 
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
@@ -2074,14 +2078,15 @@ namespace Network_Components
 
 				Types::Link_ID_Dir link_id_dir;
 				Types::Link_ID_Dir opp_link_id_dir;
-				Types::Link_ID_Dir walk_link_id_dir;
-				Types::Link_ID_Dir opp_walk_link_id_dir;
+				/*Types::Link_ID_Dir walk_link_id_dir;
+				Types::Link_ID_Dir opp_walk_link_id_dir;*/
 
 				std::unordered_map<int,int> uuid_to_index;
 
 				cout << "Reading Activity Locations..." << endl;
 
 				int counter=0;
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename type_of(network_reference)::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
@@ -2160,7 +2165,6 @@ namespace Network_Components
 
 						activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
 						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 
 						/*if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
@@ -2174,7 +2178,7 @@ namespace Network_Components
 							zone->template destination_links<_Links_Container_Interface&>().push_back(link);
 						}*/
 
-						_Intersection_Interface* intersection = link->_upstream_intersection;
+						/*_Intersection_Interface* intersection = link->_upstream_intersection;
 						_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
 						typename _Links_Container_Interface::iterator out_links_itr;
 
@@ -2375,7 +2379,7 @@ namespace Network_Components
 								}
 								break;
 							}
-						}
+						}*/
 
 						// add the opposite direction link if exists
 						if (!this->_scenario_reference->template use_link_based_routing<bool>())
@@ -2388,6 +2392,68 @@ namespace Network_Components
 								activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
 								link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 								activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+
+								/*if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
+								{
+
+								}
+								else if (link->_zone != nullptr)
+								{
+									zone->template origin_links<_Links_Container_Interface&>().push_back(link);
+									link->_zone = zone;
+									zone->template destination_links<_Links_Container_Interface&>().push_back(link);
+								}*/
+							}
+						}
+
+						//Walk Links!!!
+						link_id_dir.id = db_itr->getWalkLink()->getLink();
+						link_id_dir.dir = 0;						
+						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+						link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+						activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
+						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
+
+						if (this->_scenario_reference->template multimodal_dijkstra<bool>())
+						{
+							if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
+							{
+
+							}
+							else
+							{
+								zone->template origin_links<_Links_Container_Interface&>().push_back(link);
+								link->_zones.push_back(zone->_uuid);
+								zone->template destination_links<_Links_Container_Interface&>().push_back(link);
+							}
+						}
+
+						if (!this->_scenario_reference->template use_link_based_routing<bool>())
+						{
+							opp_link_id_dir.id = link_id_dir.id;
+							opp_link_id_dir.dir = abs(link_id_dir.dir - 1);
+							if (net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+							{
+								link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
+								activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
+								link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
+
+								if (this->_scenario_reference->template multimodal_dijkstra<bool>())
+								{
+									if (std::find(zone->template origin_links<_Links_Container_Interface&>().begin(), zone->template origin_links<_Links_Container_Interface&>().end(), link) != zone->template origin_links<_Links_Container_Interface&>().end())
+									{
+
+									}
+									else
+									{
+										zone->template origin_links<_Links_Container_Interface&>().push_back(link);
+										link->_zones.push_back(zone->_uuid);
+										zone->template destination_links<_Links_Container_Interface&>().push_back(link);
+									}
+								}
 							}
 						}
 				

@@ -63,9 +63,10 @@ namespace Routing_Components
 				return this_component()->compute_static_network_tree(origin,edge_cost_container);
 			}
 
-			void compute_dijkstra_network_tree()
+			template<typename Source_Network_Type>
+			void compute_dijkstra_network_tree(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				return this_component()->compute_dijkstra_network_tree();
+				return this_component()->compute_dijkstra_network_tree(source_network);
 			}
 			
 			void initialize()

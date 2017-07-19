@@ -92,7 +92,7 @@ namespace Link_Components
 			
 			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
 
-			m_container(typename MasterType::zone_type*, zone, NONE, NONE);
+			m_container(std::vector<int>, zones, NONE, NONE);
 
 			m_data(Link_Components::Types::Link_Type_Keys, link_type, NONE, NONE);
 			

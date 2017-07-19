@@ -167,6 +167,7 @@ namespace Routing_Components
 			t_data(int, wait_count_from_origin);
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
+			t_data(int, zone);
 
 			static t_data(Layered_Data_Array<float>*, moe_data);
 			static t_data(float, ttime_weight_shape);
@@ -684,6 +685,8 @@ namespace Routing_Components
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
+				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 
 
 				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
@@ -734,6 +737,9 @@ namespace Routing_Components
 
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
+						
+						int zone_id = current_link->_zones[0];
+						input_multimodal_edge._zone = zone_id;
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
@@ -1033,30 +1039,57 @@ namespace Routing_Components
 				return routed_time;
 			}				
 
-			void compute_dijkstra_network_tree()
+			void compute_dijkstra_network_tree(Network<typename MasterType::network_type>* source_network)
 			{
 				cout << "Constructing all-to-all Dijkstra for better A* estimations..." << endl;
 
-				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
 				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
 
-				std::vector<float> cost_container;
-				std::vector<base_edge_type*>* loop_edges = _routable_graph_pool->Get_Edges(_multimodal_network_graph_id);
+				typedef Network<typename MasterType::network_type> Network_Interface;
+
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+
+				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename Network_Interface::get_type_of(zones_container)::value_type>::type> _Zone_Interface;
+				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 				
+				Network_Interface* network = source_network;
+				
+				_Zones_Container_Interface::iterator orig_zone_itr;
+				_Zones_Container_Interface* origin_zones = network->zones_container<_Zones_Container_Interface*>();
+
+				_Zones_Container_Interface::iterator dest_zone_itr;
+				_Zones_Container_Interface* destination_zones = network->zones_container<_Zones_Container_Interface*>();
+
 				int my_itr = 0;
-				for (auto itr = loop_edges->begin(); itr != loop_edges->end(); itr++)
+				for (auto orig_zone_itr = origin_zones->begin(); orig_zone_itr != origin_zones->end(); orig_zone_itr++)
 				{
-					cost_container.clear();					
-					A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
+					
+					_Zone_Interface* origin_zone = (_Zone_Interface*)(orig_zone_itr->second);
+					std::vector<Link_Interface*> origins = origin_zone->_origin_links;
+					
+					std::vector<global_edge_id> starts;
+					for (auto itr = origins.begin(); itr != origins.end(); ++itr)
+					{
+						global_edge_id start;
+						Link_Interface* origin_link = (Link_Interface*)(*itr);
+						start.edge_id = origin_link->_uuid;
+						start.graph_id = _multimodal_network_graph_id;
+						starts.push_back(start);
+					}
 
-					global_edge_id start;
-					start.edge_id = current->_edge_id;
-					start.graph_id = _multimodal_network_graph_id;
-
-					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, 0, cost_container);
-					if (my_itr % 1000 == 0) cout << "\tOrigin:\t" << my_itr << endl;
+					
+					int zone_id = origin_zone->_uuid;
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, 0);
+					
+										
+					
+					if (my_itr % 10 == 0) cout << "\tOrigin:\t" << my_itr << endl;
 					++my_itr;
 				}
+
+
 			}
 
 			void update_edge_turn_cost(unsigned int edge_id,float edge_cost,unsigned int outbound_turn_index,float turn_cost)
