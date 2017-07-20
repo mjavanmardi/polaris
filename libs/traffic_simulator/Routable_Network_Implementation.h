@@ -725,8 +725,8 @@ namespace Routing_Components
 					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
-					if (link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-					{
+					/*if (link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+					{*/
 
 						Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
@@ -806,8 +806,8 @@ namespace Routing_Components
 							Link_Interface* out_link = current_movement->template outbound_link<Link_Interface*>();
 							Link_Components::Types::Link_Type_Keys out_link_type = out_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{
+							/*if (out_link_type == Link_Components::Types::Link_Type_Keys::WALK || out_link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							{*/
 								if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
 								{
 									connection_attributes._turn_moe_ptr = _turn_moe_data.get_element(_turn_id_to_moe_data[current_movement->template uuid<int>()]);
@@ -825,7 +825,7 @@ namespace Routing_Components
 								connection_attributes._time_cost = 0.0f;
 
 								multimodal_to_multimodal_connection_group->_neighbor_attributes.push_back(connection_attributes);
-							}
+							//}
 						}
 
 						input_multimodal_edge._connection_groups.push_back(multimodal_to_multimodal_connection_group);
@@ -843,7 +843,7 @@ namespace Routing_Components
 						input_multimodal_edge._trips_by_dep_time.clear();
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
 						input_multimodal_edge._unique_patterns.clear();
-					}
+					//}
 				}				
 
 				

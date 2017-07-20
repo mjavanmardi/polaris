@@ -2094,14 +2094,14 @@ namespace Network_Components
 				{
 					_Link_Interface* link = (_Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = link->_link_type;
-					if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{
+					/*if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::WALK)
+					{*/
 						int zone_id = link->_zone;
 						zone_itr = zones_container.find(zone_id);
 						zone = (_Zone_Interface*)zone_itr->second;
 						zone->template origin_links<_Links_Container_Interface&>().push_back(link);
 						zone->template destination_links<_Links_Container_Interface&>().push_back(link);
-					}
+					//}
 
 				}
 			}

@@ -604,7 +604,7 @@ namespace polaris
 		std::ofstream perf_file;
 		char myLine[2000];
 		std::string myParagraph;
-		bool write_route = false;
+		bool write_route = true;
 		Counter A_Star_Time;
 		Counter Visit_Time;
 		float Total_Visit_Time;

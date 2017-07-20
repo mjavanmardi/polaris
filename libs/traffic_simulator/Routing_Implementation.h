@@ -131,20 +131,6 @@ namespace Routing_Components
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
 					destination_ids.push_back(link->template uuid<unsigned int>());
-
-					/*Intersection_Interface* up_node = link->_upstream_intersection;					
-					Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
-					typename Link_Container_Interface::iterator in_links_itr;
-					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
-					{
-						Link_Interface* inbound_link = (Link_Interface*)(*in_links_itr);
-						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
-						if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-						{
-							destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
-						}
-					}*/
-
 				}
 
 				std::vector<unsigned int> origin_walk_ids;
