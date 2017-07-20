@@ -960,9 +960,9 @@ namespace polaris
 			{
 				sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost");
 				myParagraph.insert(0, myLine);
-				//sprintf_s(myLine, "TOD:\t%d-%d-%d", start, end, start_time);
+				sprintf_s(myLine, "\nTOD:\t%d-%d-%d", start, end, start_time);
 				//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
-				//Our_Line.insert(0, myLine);
+				myParagraph.insert(0, myLine);
 				sp_file << myParagraph << endl;
 			}
 
