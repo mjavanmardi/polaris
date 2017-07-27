@@ -8,8 +8,8 @@ IF NOT "%1" == "" (
 ) ELSE IF NOT "%POLARIS_DEPS_DIR%" == "" (
 	set BASEDIR=%POLARIS_DEPS_DIR%
 ) ELSE (
-	set BASEDIR=%CD%
-	call polaris-env.bat %CD%
+	set BASEDIR=C:\opt\polarisdeps
+	call polaris-env.bat c:\opt\polarisdeps
 )
 
 echo BASEDIR=%BASEDIR%
