@@ -582,7 +582,7 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, std::vector<global_edge_id>& tr_end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, bool debug_route = false)
+	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, std::vector<global_edge_id>& tr_end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -602,6 +602,7 @@ namespace polaris
 		
 		std::ofstream sp_file;
 		std::ofstream perf_file;
+		std::ofstream res_file;
 		char myLine[2000];
 		std::string myParagraph;
 		bool write_route = true;
@@ -620,8 +621,13 @@ namespace polaris
 
 			stringstream perf_filename("");
 			perf_filename << _scenario_reference->template output_dir_name<string>();
-			perf_filename << "perf_output.dat";
+			perf_filename << "sp_perf_output.dat";
 			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
+
+			stringstream res_filename("");
+			res_filename << _scenario_reference->template output_dir_name<string>();
+			res_filename << "sp_labels_output.dat";
+			res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			// do route calculation timing for debug routes
 			A_Star_Time.Start();
@@ -781,25 +787,40 @@ namespace polaris
 				
 		if (success)
 		{
-			if (debug_route)
-			{
-				perf_file << "success\tscanScount:\t" << scanScount;
-				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
-			}
-
 			global.edge_id = end_base->_edge_id;
 			global.graph_id = 1;
 
 			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;
+			
+			if (debug_route)
+			{
+				perf_file << "success\tscanScount:\t" << scanScount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+								
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					current->_time_label,
+					current->_cost_from_origin,					
+					current->_time_from_origin,					
+					current->_wait_count_from_origin,
+					current->_wait_time_from_origin,
+					current->_walk_time_from_origin,
+					current->_ivt_time_from_origin,
+					current->_car_time_from_origin,
+					current->_transfer_pen_from_origin,
+					current->_estimated_cost_origin_destination);
+				res_file << myLine << endl;
+			}
 
 			multimodal_edge_type* intermediate_current;
 			_Link_Interface* intermediate_link;
 
 			multimodal_edge_type* target_current;
 			_Link_Interface* target_link;
-			
 			
 			while (current != nullptr)
 			{
@@ -960,7 +981,7 @@ namespace polaris
 			{
 				sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost");
 				myParagraph.insert(0, myLine);
-				sprintf_s(myLine, "\nTOD:\t%d-%d-%d", start, end, start_time);
+				sprintf_s(myLine, "\nTOD:\t%d-%d-%d", origin_loc_id, destination_loc_id, start_time);
 				//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
 				myParagraph.insert(0, myLine);
 				sp_file << myParagraph << endl;
@@ -1001,6 +1022,7 @@ namespace polaris
 		}
 		sp_file.close();
 		perf_file.close();
+		res_file.close();
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{

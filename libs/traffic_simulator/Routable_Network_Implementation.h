@@ -253,12 +253,23 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "walkThreshold", _walkThreshold);
 				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
 				scenario->set_parameter(document, section, "debug_route", _debug_route);
+				scenario->set_parameter(document, section, "multimodal_dijkstra", _multimodal_dijkstra);
+
+				std::ofstream res_file;
+				if (_debug_route)
+				{
+					stringstream res_filename("");
+					res_filename << scenario->template output_dir_name<string>();
+					res_filename << "sp_labels_output.dat";
+					res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
+					res_file << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost" << endl;
+				}
 
 				return true;
 			}
 
 			static void print_parameters()
-			{
+			{				
 				cout << "Multimodal Routing parameters" << endl;
 				cout << "\ttransferPenalty = " << transferPenalty	<float>() << endl;
 				cout << "\twaitWeight = " << waitWeight		<float>() << endl;
@@ -269,6 +280,7 @@ namespace Routing_Components
 				cout << "\twalkThreshold = " << walkThreshold	<float>() << endl;
 				cout << "\twalkSpeed = " << walkSpeed	<float>() << endl;
 				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
+				cout << "\tmultimodal_dijkstra = " << multimodal_dijkstra	<bool>() << endl;
 			}
 			
 			static void default_static_initializer()
@@ -294,6 +306,7 @@ namespace Routing_Components
 			m_static_data(float, walkThreshold, NONE, NONE);
 			m_static_data(float, walkSpeed, NONE, NONE);
 			m_static_data(bool, debug_route, NONE, NONE);
+			m_static_data(bool, multimodal_dijkstra, NONE, NONE);
 			#pragma endregion
 
 			static void initialize_moe_data()
@@ -664,9 +677,9 @@ namespace Routing_Components
 				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
 				Types::multimodal_attributes<MT>::_moe_data = &_moe_data;
-				Types::multimodal_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->multimodal_routing_weight_shape<float>();
-				Types::multimodal_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->multimodal_routing_weight_scale<float>();
-				Types::multimodal_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->multimodal_routing_weight_factor<float>();
+				Types::multimodal_attributes<MT>::_ttime_weight_shape = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_shape<float>();
+				Types::multimodal_attributes<MT>::_ttime_weight_scale = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_scale<float>();
+				Types::multimodal_attributes<MT>::_ttime_weight_factor = ((Scenario_Interface*)_global_scenario)->time_dependent_routing_weight_factor<float>();
 
 				Types::multimodal_to_multimodal::_turn_moe_data = &_turn_moe_data;
 
@@ -932,7 +945,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::vector<unsigned int>& tr_destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
+			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::vector<unsigned int>& tr_destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -970,7 +983,7 @@ namespace Routing_Components
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 
-				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, tr_ends, start_time, path_container, cost_container, debug_route);
+				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, tr_ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1088,7 +1101,7 @@ namespace Routing_Components
 					
 										
 					
-					if (my_itr % 10 == 0) cout << "\tOrigin:\t" << my_itr << endl;
+					if (my_itr % 100 == 0) cout << "\tOrigin:\t" << my_itr << endl;
 					++my_itr;
 				}
 
@@ -1203,6 +1216,7 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, walkThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkSpeed);
 		define_static_member_variable(Routable_Network_Implementation, debug_route);
+		define_static_member_variable(Routable_Network_Implementation, multimodal_dijkstra);
 		#pragma endregion
 
 		template<typename MasterType, typename InheritanceList>

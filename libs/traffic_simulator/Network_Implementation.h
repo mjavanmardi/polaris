@@ -1066,8 +1066,8 @@ namespace Network_Components
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{						
-						float free_flow_speed = 1.38889; // meters per second
+					{		
+						float free_flow_speed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 						free_flow_speed = 3.28084 * free_flow_speed; // feet per second
 						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to seconds
 						
@@ -1131,6 +1131,7 @@ namespace Network_Components
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 				typename _Links_Container_Interface::iterator links_itr;*/
+				bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
@@ -1157,7 +1158,7 @@ namespace Network_Components
 
 				routable_network->finalize();
 
-				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && ((_Scenario_Interface*)_global_scenario)->template multimodal_dijkstra<bool>())
+				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && multimodal_dijkstra )
 				{					
 					routable_network->compute_dijkstra_network_tree<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);
 				}

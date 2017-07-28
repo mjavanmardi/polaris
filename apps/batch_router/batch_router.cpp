@@ -357,8 +357,17 @@ int main(int argc,char** argv)
 		int dest = fr.Get_Int(3);
 		int time = fr.Get_Int(4);
 
+		_Activity_Location_Interface* orig_loc = activity_id_to_ptr[orig];
+		_Activity_Location_Interface* dest_loc = activity_id_to_ptr[dest];
+
+		if (orig_loc == nullptr || dest_loc == nullptr)
+		{
+			cout << "Origing or destiantion are invalid for trip " << trip_id << endl;
+			continue;
+		}
+
 		_Trip_Interface* trip=(_Trip_Interface*)Allocate<typename MasterType::trip_type>();
-		trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(mode, trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
+		trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(mode, trip_id, network,orig_loc,dest_loc,time);
 	}
 
 	// WRITE results
@@ -415,9 +424,8 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Write_Line("\t\"seed\" : 1234567,");
 	fw.Write_Line("\t\"multimodal_routing\" : true,");
 	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
-	fw.Write_Line("\t\"multimodal_dijkstra\" : true,");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : false\n}");
+	fw.Write_Line("\t\"time_dependent_routing\" : true\n}");
 	
 	fw.Close();
 }
