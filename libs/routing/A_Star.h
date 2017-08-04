@@ -1,5 +1,9 @@
 #pragma once
 #include "Graph_Implementation.h"
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
 
 namespace polaris
 {
@@ -606,8 +610,11 @@ namespace polaris
 		char myLine[2000];
 		std::string myParagraph;
 		bool write_route = true;
-		Counter A_Star_Time;
-		Counter Visit_Time;
+		//Counter A_Star_Time;
+		//Counter Visit_Time;
+		high_resolution_clock::time_point t1;
+		high_resolution_clock::time_point t2;
+
 		float Total_Visit_Time;
 		if (debug_route)
 		{
@@ -630,7 +637,8 @@ namespace polaris
 			res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			// do route calculation timing for debug routes
-			A_Star_Time.Start();
+			//A_Star_Time.Start();
+			t1 = high_resolution_clock::now();
 		}
 
 		std::deque< base_edge_type* > modified_edges;
@@ -793,11 +801,15 @@ namespace polaris
 			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;
 			
+			t2 = high_resolution_clock::now();
+			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
+			__int64 astar_time = elapsed_time;
 			if (debug_route)
 			{
 				perf_file << "success\tscanScount:\t" << scanScount;
-				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+				//perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+				perf_file << "\tRouter run-time (ms):\t" << astar_time << endl;
+				//perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 								
 				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
 					origin_loc_id,
@@ -1016,8 +1028,8 @@ namespace polaris
 			if (debug_route)
 			{
 				perf_file << "fail\tscanScount:\t" << scanScount;
-				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
+//				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
+//				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			}
 		}
 		sp_file.close();

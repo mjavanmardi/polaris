@@ -298,10 +298,10 @@ namespace polaris
 					nonHomeWait = 1;
 				}				
 
-				if (CandidateTransferCount > 4)
+				/*if (CandidateTransferCount > 4)
 				{
 					continue;
-				}
+				}*/
 
 				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
 								
