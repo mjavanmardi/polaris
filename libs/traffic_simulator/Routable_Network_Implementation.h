@@ -262,7 +262,7 @@ namespace Routing_Components
 					res_filename << scenario->template output_dir_name<string>();
 					res_filename << "sp_labels_output.dat";
 					res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
-					res_file << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost" << endl;
+					res_file << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime" << endl;
 				}
 
 				return true;

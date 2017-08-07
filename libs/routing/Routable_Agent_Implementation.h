@@ -377,13 +377,13 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_min_multi_modal_cost;
+			return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_time_cost + connection->_time_cost;
+			return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>

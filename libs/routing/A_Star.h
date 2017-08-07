@@ -108,13 +108,13 @@ namespace polaris
 		}
 		
 		bool success = false;
-		int scanScount = 0;
+		int scanCount = 0;
 		Total_Visit_Time = 0;
 
 		while( open_set.size() )
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanScount;
+			++scanCount;
 
 			multimodal_edge_id id;
 			
@@ -154,7 +154,7 @@ namespace polaris
 		{
 			if (debug_route)
 			{
-				perf_file << "success\tscanScount:\t" << scanScount;
+				perf_file << "success\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
 				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			}
@@ -191,7 +191,7 @@ namespace polaris
 		{
 			if (debug_route)
 			{
-				perf_file << "fail\tscanScount:\t" << scanScount;
+				perf_file << "fail\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
 				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			}
@@ -366,7 +366,7 @@ namespace polaris
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
-			start->cost_from_origin(0.0f);
+			start->cost_from_origin(start->_min_multi_modal_cost);
 			start->estimated_cost_origin_destination(0.0f);
 
 			open_set.insert(*((base_edge_type*)start));
@@ -379,12 +379,12 @@ namespace polaris
 		}
 
 		bool success = false;
-		int scanScount = 0;
+		int scanCount = 0;
 		Total_Visit_Time = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanScount;
+			++scanCount;
 					
 			/*if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
@@ -414,7 +414,7 @@ namespace polaris
 
 		if (debug_route)
 		{
-			perf_file << "success\tscanScount:\t" << scanScount;
+			perf_file << "success\tscanScount:\t" << scanCount;
 			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
 			perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			//perf_file << "\tCost:\t" << total_cost << endl;
@@ -603,9 +603,11 @@ namespace polaris
 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-		
+
+		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+
 		std::ofstream sp_file;
-		std::ofstream perf_file;
 		std::ofstream res_file;
 		char myLine[2000];
 		std::string myParagraph;
@@ -625,11 +627,6 @@ namespace polaris
 			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
 			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
 			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
-
-			stringstream perf_filename("");
-			perf_filename << _scenario_reference->template output_dir_name<string>();
-			perf_filename << "sp_perf_output.dat";
-			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			stringstream res_filename("");
 			res_filename << _scenario_reference->template output_dir_name<string>();
@@ -700,23 +697,36 @@ namespace polaris
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
-			start->cost_from_origin(0.0f);
-			start->time_from_origin(0.0f);
-			start->time_label((float)start_time);
 
 			global_edge_id start_g;
 			start_g.graph_id = 1;
 			start_g.edge_id = start->_edge_id;
 
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
+			Link_Components::Types::Link_Type_Keys current_type = start_t->_edge_type;
 
-			start_t->_came_on_seq_index = 0;
+			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
+			{
+				start->cost_from_origin(walkWeight*start->_time_cost);
+				start_t->_walk_time_from_origin = start->_time_cost;
+				start_t->_car_time_from_origin = 0;
+			}
+			else
+			{
+				start->cost_from_origin(carWeight*start->_time_cost);
+				start_t->_walk_time_from_origin = 0;
+				start_t->_car_time_from_origin = start->_time_cost;
+			}
+			/*start->cost_from_origin(0.0f);
+			start->time_from_origin(0.0f);*/
+			start->time_from_origin(start->_time_cost);
+			start->time_label((float)(start_time + start->_time_cost));			
+
+			start_t->_came_on_seq_index = -1;
 			start_t->_came_on_trip = nullptr;
 			start_t->_wait_count_from_origin = 0;
 			start_t->_wait_time_from_origin = 0;
-			start_t->_walk_time_from_origin = 0;
 			start_t->_ivt_time_from_origin = 0;
-			start_t->_car_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
 			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
@@ -733,12 +743,12 @@ namespace polaris
 		}
 
 		bool success = false;
-		int scanScount = 0;
+		int scanCount = 0;
 		Total_Visit_Time = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanScount;
+			++scanCount;
 
 			//TODO: remove when done testing
 			/*if (debug_route)
@@ -805,13 +815,8 @@ namespace polaris
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			__int64 astar_time = elapsed_time;
 			if (debug_route)
-			{
-				perf_file << "success\tscanScount:\t" << scanScount;
-				//perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tRouter run-time (ms):\t" << astar_time << endl;
-				//perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
-								
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+			{								
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -824,7 +829,9 @@ namespace polaris
 					current->_ivt_time_from_origin,
 					current->_car_time_from_origin,
 					current->_transfer_pen_from_origin,
-					current->_estimated_cost_origin_destination);
+					current->_estimated_cost_origin_destination,
+					scanCount,
+					astar_time);
 				res_file << myLine << endl;
 			}
 
@@ -882,49 +889,49 @@ namespace polaris
 						myParagraph.insert(0, myLine);
 					}
 
-					target_current = (multimodal_edge_type*)current->came_from();
+					/*target_current = (multimodal_edge_type*)current->came_from();
 					global.edge_id = target_current->_edge_id;
-					target_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
+					target_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);*/
 
-					int mySeq = current->_came_on_seq_index - 1;
-					if (mySeq >= 0 && current_link->_upstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
-					{						
-						intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
-						global.edge_id = intermediate_link->_uuid;
-						intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
+					//int mySeq = current->_came_on_seq_index - 1;
+					//if (mySeq >= 0 && current_link->_upstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
+					//{						
+					//	intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
+					//	global.edge_id = intermediate_link->_uuid;
+					//	intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
 
-						while (intermediate_link->_downstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
-						{
-							if (debug_route)
-							{
-								sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
-									intermediate_link->_upstream_intersection->_dbid.c_str(),
-									intermediate_link->_downstream_intersection->_dbid.c_str(),
-									0.0, //intermediate_current->_cost_from_origin,
-									current_trip->_dbid.c_str(),
-									mySeq,
-									"TRANSIT",
-									0.0, //intermediate_current->_time_from_origin,
-									0.0, //intermediate_current->_time_label,
-									current->_wait_count_from_origin,
-									0.0, //intermediate_current->_wait_time_from_origin,
-									0.0, //intermediate_current->_walk_time_from_origin,
-									0.0, //intermediate_current->_ivt_time_from_origin,
-									0.0, //intermediate_current->_car_time_from_origin,
-									0.0, //intermediate_current->_transfer_pen_from_origin,
-									0.0); //intermediate_current->_estimated_cost_origin_destination);
-								myParagraph.insert(0, myLine);
-							}
+					//	while (intermediate_link->_downstream_intersection->_dbid != target_link->_downstream_intersection->_dbid && mySeq >= 0)
+					//	{
+					//		if (debug_route)
+					//		{
+					//			sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+					//				intermediate_link->_upstream_intersection->_dbid.c_str(),
+					//				intermediate_link->_downstream_intersection->_dbid.c_str(),
+					//				0.0, //intermediate_current->_cost_from_origin,
+					//				current_trip->_dbid.c_str(),
+					//				mySeq,
+					//				"TRANSIT",
+					//				0.0, //intermediate_current->_time_from_origin,
+					//				0.0, //intermediate_current->_time_label,
+					//				current->_wait_count_from_origin,
+					//				0.0, //intermediate_current->_wait_time_from_origin,
+					//				0.0, //intermediate_current->_walk_time_from_origin,
+					//				0.0, //intermediate_current->_ivt_time_from_origin,
+					//				0.0, //intermediate_current->_car_time_from_origin,
+					//				0.0, //intermediate_current->_transfer_pen_from_origin,
+					//				0.0); //intermediate_current->_estimated_cost_origin_destination);
+					//			myParagraph.insert(0, myLine);
+					//		}
 
-							mySeq = mySeq - 1;
-							if (mySeq >= 0)
-							{
-								intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
-								global.edge_id = intermediate_link->_uuid;
-								intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
-							}
-						}
-					}
+					//		mySeq = mySeq - 1;
+					//		if (mySeq >= 0)
+					//		{
+					//			intermediate_link = (_Link_Interface*)current_trip->_pattern->_pattern_links[mySeq];
+					//			global.edge_id = intermediate_link->_uuid;
+					//			intermediate_current = (A_Star_Edge<multimodal_edge_type>*)graph_pool->Get_Edge(global);
+					//		}
+					//	}
+					//}
 
 					
 				}
@@ -1027,13 +1034,9 @@ namespace polaris
 		{
 			if (debug_route)
 			{
-				perf_file << "fail\tscanScount:\t" << scanScount;
-//				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-//				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
 			}
 		}
 		sp_file.close();
-		perf_file.close();
 		res_file.close();
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
