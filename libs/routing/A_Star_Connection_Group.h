@@ -212,16 +212,18 @@ namespace polaris
 				next_pattern->_scanned = false;
 			}
 			
-			int trips_itr = 0;
-			int patterns_ctr = 0;
+			int trips_ctr = 0;
+			//int patterns_ctr = 0;
 			//for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
-			while (trips_itr < current_neighbor->_trips_by_dep_time.size() && patterns_ctr <= current_neighbor->_unique_patterns.size())
+
+			for (auto trips_itr = current_neighbor->_trips_by_dep_time.begin(); trips_itr != current_neighbor->_trips_by_dep_time.end(); trips_itr++)
+			//while (trips_itr < current_neighbor->_trips_by_dep_time.size() && patterns_ctr <= current_neighbor->_unique_patterns.size())
 			{						
-				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_itr];
-				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_itr];
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
 
-				++trips_itr;
+				++trips_ctr;
 
 				if (next_pattern->_scanned)
 				{
@@ -259,7 +261,7 @@ namespace polaris
 				}
 				
 				next_pattern->_scanned = true;
-				++patterns_ctr;
+				//++patterns_ctr;
 
 				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
 

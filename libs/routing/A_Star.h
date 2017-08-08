@@ -367,7 +367,7 @@ namespace polaris
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 			start->cost_from_origin(start->_min_multi_modal_cost);
-			start->estimated_cost_origin_destination(0.0f);
+			start->estimated_cost_origin_destination(start->_min_multi_modal_cost);
 
 			open_set.insert(*((base_edge_type*)start));
 
@@ -426,7 +426,8 @@ namespace polaris
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
-			current->dijkstra_cost[zone] = current->estimated_cost_origin_destination();
+			A_Star_Edge<base_edge_type>* prev = (A_Star_Edge<base_edge_type>*) current->_came_from;
+			current->dijkstra_cost[zone] = prev->_cost_from_origin;
 		}
 
 		sp_file.close();
@@ -1025,6 +1026,12 @@ namespace polaris
 			total_cost = out_cost.back();
 			travel_time = out_time.back();
 
+			for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+			{
+				end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+				end->_time_cost_temp = end->_time_cost;
+			}
+
 			// update start_ids/end_ids to includ final routed start/end
 			start_ids.clear();
 			start_ids.push_back(out_path.front());
@@ -1033,18 +1040,18 @@ namespace polaris
 		}
 		else
 		{
+			for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+			{
+				end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+				end->_time_cost_temp = end->_time_cost;
+			}
+
 			if (debug_route)
 			{
 			}
 		}
 		sp_file.close();
-		res_file.close();
-
-		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
-		{
-			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
-			end->_time_cost_temp = end->_time_cost;
-		}
+		res_file.close();		
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
