@@ -282,6 +282,8 @@ namespace polaris
 				bool hit_dest = false;
 
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
+				float prev_estimated_cost_origin_destination = FLT_MAX / 2.0f;
+
 				int iSeq = mySeq + 1;				
 				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
@@ -319,6 +321,12 @@ namespace polaris
 						}
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
+						if (neighbor_estimated_cost_origin_destination - cost_from_origin > 1.1*prev_estimated_cost_origin_destination)
+						{
+							hit_dest = true;
+						}						
+						prev_estimated_cost_origin_destination = neighbor_estimated_cost_origin_destination - cost_from_origin;
+
 						if (!seq_edge->marked_for_reset())
 						{
 							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
@@ -352,10 +360,10 @@ namespace polaris
 						hit_dest = true;
 					}*/
 
-					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+					/*if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 					{
 						hit_dest = true;
-					}
+					}*/
 
 					iSeq++;
 				}
@@ -382,9 +390,9 @@ namespace polaris
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 			
-			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
+			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost_temp;
 
-			if (current->_walk_time_from_origin + current_neighbor->_time_cost > walkThreshold)
+			if (current->_walk_time_from_origin + current_neighbor->_time_cost_temp > walkThreshold)
 			{
 				return;
 			}
@@ -393,7 +401,7 @@ namespace polaris
 			{
 				current_neighbor->cost_from_origin(cost_from_origin);
 
-				float time_cost_between = current_neighbor->_time_cost;
+				float time_cost_between = current_neighbor->_time_cost_temp;
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 				current_neighbor->time_label(current->time_label() + time_cost_between);					
 					
@@ -452,7 +460,7 @@ namespace polaris
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 									
 			//float cost_from_origin = current->cost_from_origin() + carWeight*agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-			float cost_from_origin = current->cost_from_origin() + carWeight*current_neighbor->_time_cost;
+			float cost_from_origin = current->cost_from_origin() + carWeight*current_neighbor->_time_cost_temp;
 
 			float driveThreshold;
 			if (!multimodal_dijkstra)
@@ -463,7 +471,7 @@ namespace polaris
 			{
 				driveThreshold = routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
 			}
-			if (carWeight*(current->_car_time_from_origin + current_neighbor->_time_cost) > driveThreshold)
+			if (carWeight*(current->_car_time_from_origin + current_neighbor->_time_cost_temp) > driveThreshold)
 			{
 				//continue;
 				return;
@@ -474,7 +482,7 @@ namespace polaris
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				//float time_cost_between = current->_time_cost + connection->_time_cost;
-				float time_cost_between = current_neighbor->_time_cost;
+				float time_cost_between = current_neighbor->_time_cost_temp;
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 				current_neighbor->time_label(current->time_label() + time_cost_between);
 

@@ -750,6 +750,7 @@ namespace Routing_Components
 
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
+						input_multimodal_edge._time_cost_temp = current_link->template travel_time<float>();
 						
 						int zone_id = current_link->_zone;
 						input_multimodal_edge._zone = zone_id;

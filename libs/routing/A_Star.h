@@ -670,6 +670,7 @@ namespace polaris
 		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
 		{
 			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			end->_time_cost_temp = 0;
 			if (end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
 			ends.push_back((base_edge_type*)end);
 		}
@@ -809,8 +810,8 @@ namespace polaris
 			global.graph_id = 1;
 
 			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
-			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;
-			
+			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;					
+
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			__int64 astar_time = elapsed_time;
@@ -821,8 +822,8 @@ namespace polaris
 					destination_loc_id,
 					start_time,
 					current->_time_label,
-					current->_cost_from_origin,					
-					current->_time_from_origin,					
+					current->_cost_from_origin,
+					current->_time_from_origin,
 					current->_wait_count_from_origin,
 					current->_wait_time_from_origin,
 					current->_walk_time_from_origin,
@@ -1038,6 +1039,12 @@ namespace polaris
 		}
 		sp_file.close();
 		res_file.close();
+
+		for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
+		{
+			end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
+			end->_time_cost_temp = end->_time_cost;
+		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{

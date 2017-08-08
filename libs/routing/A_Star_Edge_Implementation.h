@@ -36,6 +36,7 @@ namespace polaris
 
 		t_data(float, cost);
 		t_data(float, time_cost);
+		t_data(float, time_cost_temp);
 		t_data(float, min_multi_modal_cost);
 		//t_data(std::vector<float>, dijkstra_cost);
 		std::map<int,float> dijkstra_cost;
