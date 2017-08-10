@@ -47,9 +47,9 @@ namespace polaris
 			float y_dist = current->_y - destination->_y;
 			y_dist *= y_dist;
 
-			// vehicle speed
-			//float cost = sqrt(x_dist + y_dist)/89.0f;
-			float cost = sqrt(x_dist + y_dist) / 50.0f;
+			// vehicle speed in fps
+			float cost = sqrt(x_dist + y_dist)/89.0f;
+			//float cost = sqrt(x_dist + y_dist) / 50.0f;
 			return cost;
 		}
 

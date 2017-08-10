@@ -777,11 +777,13 @@ namespace Routing_Components
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
+							//input_multimodal_edge._min_multi_modal_cost = 10 * walkWeight*current_link->template travel_time<float>();
 							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
 						}
 						else
 						{
 							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
+							//input_multimodal_edge._min_multi_modal_cost = FLT_MAX / 2.0f;
 						}						
 
 						for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)

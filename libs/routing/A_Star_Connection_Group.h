@@ -263,13 +263,13 @@ namespace polaris
 				next_pattern->_scanned = true;
 				//++patterns_ctr;
 
-				int CandidateWaitingCount = current->_wait_count_from_origin + wait_binary;
+				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
-				int CandidateTransferCount = 0;
+				int TransferCount = 0;
 				int nonHomeWait = 0;
-				if (CandidateWaitingCount > 1)
+				if (WaitingCount > 1)
 				{
-					CandidateTransferCount = CandidateWaitingCount - 1;
+					TransferCount = WaitingCount - 1;
 					nonHomeWait = 1;
 				}				
 
@@ -278,7 +278,7 @@ namespace polaris
 					continue;
 				}*/
 
-				float effectiveTransferPen = CandidateTransferCount * wait_binary * transferPenalty;
+				float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 																				
 				bool seqStay = true;
 				bool hit_dest = false;
@@ -287,17 +287,27 @@ namespace polaris
 				float prev_estimated_cost_origin_destination = FLT_MAX / 2.0f;
 
 				int iSeq = mySeq + 1;				
-				while (iSeq < (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
+				while (iSeq <= (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
 				{
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq - 1];
-															
-					float cost_from_origin = current->cost_from_origin() + wait_binary*waitWeight*waitTime + effectiveTransferPen + ivtWeight*(next_trip->_arrival_seconds[iSeq]- next_trip->_departure_seconds[mySeq] );
+					
+					float ivtTime;
+					if (wait_binary == 1)
+					{
+						ivtTime = next_trip->_arrival_seconds[iSeq] - next_trip->_departure_seconds[mySeq];
+					}
+					else
+					{
+						ivtTime = next_trip->_arrival_seconds[iSeq] - current->_time_label;
+					}
+
+					float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
 					{
 						seq_edge->cost_from_origin(cost_from_origin);
 						
-						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + next_trip->_arrival_seconds[iSeq] - next_trip->_departure_seconds[mySeq];
+						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
 
 						seq_edge->time_from_origin(time_from_origin);
 						seq_edge->time_label((float)next_trip->_arrival_seconds[iSeq]);
@@ -305,10 +315,10 @@ namespace polaris
 						seq_edge->came_from(current);
 						seq_edge->_came_on_trip = next_trip;
 						seq_edge->_came_on_seq_index = iSeq;
-						seq_edge->_wait_count_from_origin = CandidateWaitingCount;
+						seq_edge->_wait_count_from_origin = WaitingCount;
 						seq_edge->_wait_time_from_origin = current->_wait_time_from_origin + wait_binary * waitTime;
 						seq_edge->_walk_time_from_origin = current->_walk_time_from_origin;
-						seq_edge->_ivt_time_from_origin = current->_ivt_time_from_origin + next_trip->_arrival_seconds[iSeq] - next_trip->_departure_seconds[mySeq];
+						seq_edge->_ivt_time_from_origin = current->_ivt_time_from_origin + ivtTime;
 						seq_edge->_car_time_from_origin = current->_car_time_from_origin;
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 

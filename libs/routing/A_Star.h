@@ -368,6 +368,8 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 			start->cost_from_origin(start->_min_multi_modal_cost);
 			start->estimated_cost_origin_destination(start->_min_multi_modal_cost);
+			//start->cost_from_origin(0.0f);
+			//start->estimated_cost_origin_destination(0.0f);
 
 			open_set.insert(*((base_edge_type*)start));
 
@@ -427,7 +429,15 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
 			A_Star_Edge<base_edge_type>* prev = (A_Star_Edge<base_edge_type>*) current->_came_from;
-			current->dijkstra_cost[zone] = prev->_cost_from_origin;
+			//current->dijkstra_cost[zone] = current->_cost_from_origin;
+			if (prev != nullptr)
+			{
+				current->dijkstra_cost[zone] = prev->_cost_from_origin;
+			}
+			else
+			{
+				current->dijkstra_cost[zone] = 0;
+			}
 		}
 
 		sp_file.close();
