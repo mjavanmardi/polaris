@@ -47,7 +47,7 @@ This may take a while so be patient.
 
 Build Code Using Cmake
 ----------------------
-Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set or supply the dependency folder to the configure_polaris acript.
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set or supply the dependency folder to the configure_polaris script.
 The argument to the configure script will ovrride the environment variable.
 
 	git clone "https://github.com/anl-polaris/polaris.git" <code_dir>
