@@ -9,7 +9,7 @@ application developers.
 The project is distributed under BSD license.
 
 POLARIS can be run in a Windows or a Linux(under development) environment. 
-These instructions are given below.
+Instructions are given below.
 
 Windows
 =======
