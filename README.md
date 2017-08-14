@@ -1,14 +1,15 @@
 Overview
 =========
-POLARIS provides libraries and tools to help transportation 
-engineers create transportation system simulations, and in 
-particular to simulate a Traffic Management 
-Center along with ITS infrastructure. 
-It provides implementation of vented models 
-in transportation community so that those 
-can be reused by application developers.
+POLARIS provides libraries and tools to help transportation engineers create 
+transportation system simulations, and in particular to simulate a Traffic 
+Management Center along with ITS infrastructure. It provides implementation 
+of vented models in transportation community so that those can be reused by 
+application developers.
 
 The project is distributed under BSD license.
+
+POLARIS can be run in a Windows or a Linux(under development) environment. 
+These instructions are given below.
 
 Windows
 =======
@@ -47,7 +48,8 @@ This may take a while so be patient.
 
 Build Code Using Cmake
 ----------------------
-Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set or supply the dependency folder to the configure_polaris script.
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR 
+variable is set or supply the dependency folder to the configure_polaris script.
 The argument to the configure script will ovrride the environment variable.
 
 	git clone "https://github.com/anl-polaris/polaris.git" <code_dir>
@@ -59,7 +61,8 @@ Open Visual Studio:
 
 	polaris.sln
 	
-Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools Command Shell)
+Or use msbuild: (NOTE: this should be performed in a Visual Studio Native Tools 
+Command Shell)
 
 	msbuild polaris.sln /p:Configuration=Debug /p:Platform=x64
 	msbuild polaris.sln /p:Configuration=Release /p:Platform=x64
@@ -97,24 +100,29 @@ Here is the list of dependencies:
 * libodb-sqlite-2.4.0
 * sqlite3 (3.11.1)
 
-The POLARIS_DEPS_DIR environment variable must be set to build dependecies and application binaries. You can do this by editing your .bashrc file (in your home directory).
+The POLARIS_DEPS_DIR environment variable must be set to build dependecies 
+and application binaries. You can do this by editing your .bashrc file (in 
+your home directory).
 
 Set the environment variable from a shell prompt:
 
 	POLARIS_DEPS_DIR=~/polaris/deps
 	export POLARIS_DEPS_DIR
 	
-After the environment variable is set, clone the repository and call the shell script:
+After the environment variable is set, clone the repository and call the shell 
+script:
 
 	git clone "https://github.com/anl-polaris/polaris.git" <code_dir>
 	cd <code_dir>/polarisdeps
 	./get_deps.sh
 	
-This will download the required compressed files, extract them and then build the dependencies. This may take a while so be patient.
+This will download the required compressed files, extract them and then build 
+the dependencies. This may take a while so be patient.
 
 Build Code Using Cmake
 ----------------------
-Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR variable is set.
+Download polaris in an appropriate directory. Be sure the POLARIS_DEPS_DIR 
+variable is set.
 
 	git clone "https://github.com/anl-polaris/polaris.git" <code_dir>
 	cd <code_dir>
