@@ -1,8 +1,8 @@
 Overview
 =========
 POLARIS provides libraries and tools to help transportation 
-engineers to create transportation system simulations. 
-In particular to simulate a Traffic Management 
+engineers create transportation system simulations, and in 
+particular to simulate a Traffic Management 
 Center along with ITS infrastructure. 
 It provides implementation of vented models 
 in transportation community so that those 
