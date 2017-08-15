@@ -113,12 +113,6 @@ namespace Routing_Components
 				Link_Container_Interface* destination_links = destination_loc->template destination_links<Link_Container_Interface*>();
 				Link_Container_Interface* origin_walk_links = origin_loc->template origin_walk_links<Link_Container_Interface*>();
 				Link_Container_Interface* destination_walk_links = destination_loc->template destination_walk_links<Link_Container_Interface*>();
-
-				if (origin_loc_id == 109572 && destination_loc_id == 66401 && _departure_time == 13905)
-				{
-					cout << "aa" << endl;
-				}
-				
 				
 				// Debug_route is false, set to true under certain conditions to print the routing output
 				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();

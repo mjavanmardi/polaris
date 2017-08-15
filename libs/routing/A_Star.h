@@ -303,7 +303,7 @@ namespace polaris
 
 		std::ofstream sp_file;
 		std::ofstream perf_file;
-		char myLine[2000];
+		//char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
 		Counter A_Star_Time;
@@ -341,7 +341,7 @@ namespace polaris
 			if (start == nullptr) { THROW_WARNING("Origin: " << (*itr).edge_id << " not found in graph pool!"); return 0.0f; }
 			starts.push_back((base_edge_type*)start);
 		}
-		base_edge_type* start_base; // = (base_edge_type*)start;
+//		base_edge_type* start_base; // = (base_edge_type*)start;
 
 		//std::vector<base_edge_type*> ends;
 		//A_Star_Edge<base_edge_type>* end;
@@ -618,6 +618,8 @@ namespace polaris
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
+		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+
 		std::ofstream sp_file;
 		std::ofstream res_file;
 		char myLine[2000];
@@ -741,8 +743,15 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
-
+			float initial_estimated_cost_origin_destination;
+			if (!multimodal_dijkstra)
+			{
+				initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
+			}
+			else
+			{
+				initial_estimated_cost_origin_destination = start->cost_from_origin() + routing_data.end_edge->dijkstra_cost[start_t->_zone];
+			}
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));

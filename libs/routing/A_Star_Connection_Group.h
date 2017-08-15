@@ -206,21 +206,26 @@ namespace polaris
 			//Scenario_Components::Implementations::Scenario_Implementation<MasterType>::_multimodal_dijkstra;
 
 			//if (current_neighbor->in_closed_set()) return;
-			for (auto patterns_itr = current_neighbor->_unique_patterns.begin(); patterns_itr != current_neighbor->_unique_patterns.end(); patterns_itr++)
+
+			int unique_patterns_size = current_neighbor->unique_patterns.size();
+			int patterns_ctr;
+			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{
-				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->unique_patterns[patterns_ctr];
 				next_pattern->_scanned = false;
 			}
 			
 			int trips_ctr = 0;
-			//int patterns_ctr = 0;
-			//for (int trips_itr = 0; trips_itr < current_neighbor->_trips_by_dep_time.size(); ++trips_itr)
+			patterns_ctr = 0;
 
-			for (auto trips_itr = current_neighbor->_trips_by_dep_time.begin(); trips_itr != current_neighbor->_trips_by_dep_time.end(); trips_itr++)
-			//while (trips_itr < current_neighbor->_trips_by_dep_time.size() && patterns_ctr <= current_neighbor->_unique_patterns.size())
+			int trips_by_dep_time_size = current_neighbor->trips_by_dep_time.size();
+			
+			//for (auto trips_itr = current_neighbor->trips_by_dep_time.begin(); trips_itr != current_neighbor->trips_by_dep_time.end(); trips_itr++)
+			while (trips_ctr < trips_by_dep_time_size && patterns_ctr <= unique_patterns_size)
 			{						
-				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
+				//_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->trips_by_dep_time[trips_ctr];
+				int mySeq = current_neighbor->index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
 
 				++trips_ctr;
@@ -232,18 +237,18 @@ namespace polaris
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;			
 
-				float currentWalkTime;
-				float currentIVTTime;
-				float currentCarTime;
-				float EarliestBoardTime;
+				//float currentWalkTime;
+				//float currentIVTTime;
+				//float currentCarTime;
+				//float EarliestBoardTime;
 				int wait_binary = 1;											
 								 
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;					
-					if (current_trip == next_trip)
+					if (current_trip->_uuid == next_trip->_uuid)
 					{
-						continue;
+						//continue;
 						wait_binary = 0;
 					}
 				}
@@ -261,7 +266,7 @@ namespace polaris
 				}
 				
 				next_pattern->_scanned = true;
-				//++patterns_ctr;
+				++patterns_ctr;
 
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
@@ -284,10 +289,12 @@ namespace polaris
 				bool hit_dest = false;
 
 				//for (int iSeq = mySeq+1; iSeq < (int)next_pattern->_pattern_links.size(); iSeq++)
-				float prev_estimated_cost_origin_destination = FLT_MAX / 2.0f;
+				//float prev_estimated_cost_origin_destination = FLT_MAX / 2.0f;
 
-				int iSeq = mySeq + 1;				
-				while (iSeq <= (int)next_pattern->_pattern_links.size() && hit_dest == false && seqStay == true)
+				int iSeq = mySeq + 1;
+				int pattern_links_size = next_pattern->_pattern_links.size();
+				//while (iSeq <= pattern_links_size && iSeq <= mySeq + (int)(pattern_links_size/4) && hit_dest == false && seqStay == true)
+				while (iSeq <= mySeq + 1 && hit_dest == false && seqStay == true)
 				{
 					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq - 1];
 					
@@ -332,13 +339,17 @@ namespace polaris
 							neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
 						}
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-						if (neighbor_estimated_cost_origin_destination - cost_from_origin > 1.1*prev_estimated_cost_origin_destination)
+												
+						/*if (agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge) < prev_estimated_cost_origin_destination)
+						{
+							prev_estimated_cost_origin_destination = agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
+						}
+						
+						if (agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge) > 1.5*prev_estimated_cost_origin_destination)
 						{
 							hit_dest = true;
 						}						
-						prev_estimated_cost_origin_destination = neighbor_estimated_cost_origin_destination - cost_from_origin;
-
+*/
 						if (!seq_edge->marked_for_reset())
 						{
 							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
@@ -372,10 +383,10 @@ namespace polaris
 						hit_dest = true;
 					}*/
 
-					/*if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 					{
 						hit_dest = true;
-					}*/
+					}
 
 					iSeq++;
 				}
