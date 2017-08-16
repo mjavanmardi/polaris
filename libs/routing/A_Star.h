@@ -624,7 +624,6 @@ namespace polaris
 		std::ofstream res_file;
 		char myLine[2000];
 		std::string myParagraph;
-		bool write_route = true;
 		//Counter A_Star_Time;
 		//Counter Visit_Time;
 		high_resolution_clock::time_point t1;
@@ -770,22 +769,11 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
-
-			//TODO: remove when done testing
-			/*if (debug_route)
+			
+			if (current->_cost_from_origin > 28800)
 			{
-				current->Display();
-			}*/
-
-			multimodal_edge_id id;
-
-			id.id = current->edge_id();
-
-			/*if (agent->at_destination((base_edge_type*)current, ends, &end_base))
-			{
-				success = true;
 				break;
-			}*/
+			}
 			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
 				success = true;
@@ -800,23 +788,13 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
-			//Visit_Time.Start();
 			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
 			}
-			//Visit_Time.Stop();
-			//Total_Visit_Time += Visit_Time.Stop();
 
 		}
-
-		//TODO: remove when done testing
-		/*if (debug_route)
-		{
-			int test = 1;
-		}*/
-
-
+		
 		global_edge_id global;
 		global.graph_id = 1;
 		_Transit_Vehicle_Trip_Interface* current_trip;
@@ -827,17 +805,15 @@ namespace polaris
 		if (success)
 		{
 			global.edge_id = end_base->_edge_id;
-			global.graph_id = 1;
 
-			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
-			multimodal_edge_type* cached_current = (multimodal_edge_type*)current;					
+			multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);				
 
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			__int64 astar_time = elapsed_time;
 			if (debug_route)
 			{								
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d",
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -855,7 +831,8 @@ namespace polaris
 					astar_time);
 				res_file << myLine << endl;
 			}
-									
+
+			int route_ctr = 0;
 			while (current != nullptr)
 			{
 				global.edge_id = current->_edge_id;
@@ -882,25 +859,30 @@ namespace polaris
 				{
 					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
 					out_trip.push_back(current_trip->_uuid);
-					write_route = true;
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
-							current->_cost_from_origin,
 							current_trip->_dbid.c_str(),
 							current->_came_on_seq_index,
 							"TRANSIT",
-							current->_time_from_origin,
 							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination);
+							current->_estimated_cost_origin_destination,
+							scanCount,
+							astar_time);
 						myParagraph.insert(0, myLine);
 					}				
 
@@ -910,25 +892,30 @@ namespace polaris
 				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
 					out_trip.push_back(-1);
-					write_route = true;
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
-							current->_cost_from_origin,
-							"0",
+							"WALK",
 							current->_came_on_seq_index,
 							"WALK",
-							current->_time_from_origin,
 							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination);
+							current->_estimated_cost_origin_destination,
+							scanCount,
+							astar_time);
 						myParagraph.insert(0, myLine);
 					}
 
@@ -937,44 +924,42 @@ namespace polaris
 				else
 				{
 					out_trip.push_back(-1);
-					write_route = true;
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%s\t%s\t%f\t%s\t%d\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
-							current->_cost_from_origin,
-							"0",
+							"DRIVE",
 							current->_came_on_seq_index,
 							"DRIVE",
-							current->_time_from_origin,
 							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination);
+							current->_estimated_cost_origin_destination,
+							scanCount,
+							astar_time);
 						myParagraph.insert(0, myLine);
 					}
 
 				}
 
 				current = (multimodal_edge_type*)current->came_from();
-				cached_current->came_from(nullptr);
-				cached_current = current;
-
+				route_ctr++;
 			}
 
-			if (debug_route && write_route)
-			{
-				sprintf_s(myLine, "\nNode_A\tNode_B\tGen_Cost\tTrip_ID\tSequence\tType\tTime\tArr_Time\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost");
-				myParagraph.insert(0, myLine);
-				sprintf_s(myLine, "\nTOD:\t%d-%d-%d", origin_loc_id, destination_loc_id, start_time);
-				//sp_file << "Origin:\t" << start << "\tDestination:\t" << end << "Departure:\t" << start_time << endl;
-				myParagraph.insert(0, myLine);
-				sp_file << myParagraph << endl;
+			if (debug_route)
+			{				
+				sp_file << myParagraph;
 			}
 
 			std::reverse(out_path.begin(), out_path.end());
@@ -1015,8 +1000,29 @@ namespace polaris
 				end->_time_cost_temp = end->_time_cost;
 			}
 
+			t2 = high_resolution_clock::now();
+			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
+			__int64 astar_time = elapsed_time;
+
 			if (debug_route)
 			{
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					864000.0,
+					864000.0,
+					864000.0,
+					100,
+					864000.0,
+					864000.0,
+					864000.0,
+					864000.0,
+					864000.0,
+					864000.0,
+					scanCount,
+					astar_time);
+				res_file << myLine << endl;
 			}
 		}
 		sp_file.close();

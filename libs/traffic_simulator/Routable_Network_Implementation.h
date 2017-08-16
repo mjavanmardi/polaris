@@ -259,14 +259,23 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "debug_route", _debug_route);
 				scenario->set_parameter(document, section, "multimodal_dijkstra", _multimodal_dijkstra);
 
+				std::ofstream sp_file;
 				std::ofstream res_file;
 				if (_debug_route)
 				{
+					stringstream sp_filename("");
+					sp_filename << scenario->template output_dir_name<string>();
+					sp_filename << "sp_output.dat";
+					sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
+					sp_file << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime";						
+					sp_file.close();
+					
 					stringstream res_filename("");
 					res_filename << scenario->template output_dir_name<string>();
 					res_filename << "sp_labels_output.dat";
 					res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
 					res_file << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime" << endl;
+					res_file.close();
 				}
 
 				return true;
@@ -292,10 +301,10 @@ namespace Routing_Components
 				_transferPenalty = 300;
 				_waitWeight = 2.0;
 				_walkWeight = 2.0;
-				_ivtWeight = 0.95;
-				_carWeight = 1.00;
+				_ivtWeight = 1.00;
+				_carWeight = 3.00;
 				_waitThreshold = 3600.00;
-				_walkThreshold = 2000;
+				_walkThreshold = 5000;
 				_walkSpeed = 1.38889;
 				_debug_route = false;
 			}

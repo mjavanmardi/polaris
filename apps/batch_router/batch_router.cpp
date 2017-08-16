@@ -383,6 +383,13 @@ int main(int argc,char** argv)
 	// WRITE results
 	for (int i = 0; i < num_sim_threads(); ++i) fw_output.Write(results_by_thread[i]);
 
+	std::ofstream sp_file;
+	stringstream sp_filename("");
+	sp_filename << scenario->template output_dir_name<string>();
+	sp_filename << "sp_output.dat";
+	sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
+	sp_file << "\n";
+	sp_file.close();
 
 	cout << "Finished! Press 'Any' key" << endl;
 
