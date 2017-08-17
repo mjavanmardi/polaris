@@ -301,31 +301,18 @@ namespace polaris
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 
-		std::ofstream sp_file;
 		std::ofstream perf_file;
-		//char myLine[2000];
 		std::string myParagraph;
 		bool write_route = false;
 		Counter A_Star_Time;
-		Counter Visit_Time;
-		float Total_Visit_Time;
 		bool debug_route = true;
 		if (debug_route)
 		{
-			// Initialize executed activities file
-			stringstream sp_filename("");
-			sp_filename << _scenario_reference->template output_dir_name<string>();
-			sp_filename << "dijkstra_sp_output.dat";
-			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
-			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
-
 			stringstream perf_filename("");
 			perf_filename << _scenario_reference->template output_dir_name<string>();
 			perf_filename << "dijkstra_perf_output.dat";
 			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
 
-			// do route calculation timing for debug routes
 			A_Star_Time.Start();
 		}
 
@@ -341,24 +328,12 @@ namespace polaris
 			if (start == nullptr) { THROW_WARNING("Origin: " << (*itr).edge_id << " not found in graph pool!"); return 0.0f; }
 			starts.push_back((base_edge_type*)start);
 		}
-//		base_edge_type* start_base; // = (base_edge_type*)start;
-
-		//std::vector<base_edge_type*> ends;
-		//A_Star_Edge<base_edge_type>* end;
-		//for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
-		//{
-		//	end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
-		//	if (end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
-		//	ends.push_back((base_edge_type*)end);
-		//}
-		//base_edge_type* end_base; // = (base_edge_type*)end;
 
 		Routing_Data<base_edge_type> routing_data;
 
 		routing_data.modified_edges = &modified_edges;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
-		//routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.start_time = start_time;
 
 		int zone = zone_id;
@@ -366,10 +341,8 @@ namespace polaris
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
-			start->cost_from_origin(start->_min_multi_modal_cost);
-			start->estimated_cost_origin_destination(start->_min_multi_modal_cost);
-			//start->cost_from_origin(0.0f);
-			//start->estimated_cost_origin_destination(0.0f);
+			start->cost_from_origin(0.0f);
+			start->estimated_cost_origin_destination(0.0f);
 
 			open_set.insert(*((base_edge_type*)start));
 
@@ -382,17 +355,10 @@ namespace polaris
 
 		bool success = false;
 		int scanCount = 0;
-		Total_Visit_Time = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
-					
-			/*if (agent->at_destination((base_edge_type*)current, ends, &end_base))
-			{
-				success = true;
-				break;
-			}*/
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 
@@ -402,13 +368,10 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
-			Visit_Time.Start();
 			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
-			Visit_Time.Stop();
-			Total_Visit_Time += Visit_Time.Stop();
 
 		}			
 
@@ -417,9 +380,7 @@ namespace polaris
 		if (debug_route)
 		{
 			perf_file << "success\tscanScount:\t" << scanCount;
-			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-			perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
-			//perf_file << "\tCost:\t" << total_cost << endl;
+			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 		}
 
 		global_edge_id start_id;
@@ -428,20 +389,8 @@ namespace polaris
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
-			A_Star_Edge<base_edge_type>* prev = (A_Star_Edge<base_edge_type>*) current->_came_from;
-			//current->dijkstra_cost[zone] = current->_cost_from_origin;
-			if (prev != nullptr)
-			{
-				current->dijkstra_cost[zone] = prev->_cost_from_origin;
-			}
-			else
-			{
-				current->dijkstra_cost[zone] = 0;
-			}
+			current->dijkstra_cost[zone] = current->_cost_from_origin;
 		}
-
-		sp_file.close();
-		perf_file.close();
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
@@ -770,7 +719,7 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			if (current->_cost_from_origin > 28800)
+			if (current->_cost_from_origin > 28800 || scanCount > 10000)
 			{
 				break;
 			}

@@ -49,8 +49,30 @@ namespace polaris
 
 			// vehicle speed in fps
 			float cost = sqrt(x_dist + y_dist)/89.0f;
-			//float cost = sqrt(x_dist + y_dist) / 50.0f;
 			return cost;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination, bool multimodal_dijkstra)
+		{
+			if (!multimodal_dijkstra)
+			{
+				float x_dist = current->_x - destination->_x;
+				x_dist *= x_dist;
+
+				float y_dist = current->_y - destination->_y;
+				y_dist *= y_dist;
+
+				// vehicle speed in fps
+				float cost = sqrt(x_dist + y_dist) / 89.0f;
+				return cost;
+			}
+			else
+			{
+				float cost = destination->dijkstra_cost[current->_zone];
+				return cost;
+			}
+			
 		}
 
 		template<typename CurrentEdgeType>
@@ -358,16 +380,6 @@ namespace polaris
 			return false;
 		}
 
-		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, Base_Edge_A_Star<MasterType>** final_destination)
-		{
-			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
-			{
-				*final_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
-				if (current->_edge_id == (*final_destination)->_edge_id) return true;
-			}
-			return false;
-		}
-
 		template<typename CurrentEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
 		{
@@ -377,13 +389,13 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_min_multi_modal_cost;
+			return current->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_min_multi_modal_cost;
+			return current->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>

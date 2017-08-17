@@ -26,6 +26,9 @@ namespace polaris
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, DestinationEdgeType* destination){ return this_component()->estimated_cost_between(current, destination); }
 
+		template<typename CurrentEdgeType, typename DestinationEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, DestinationEdgeType* destination, bool multimodal_dijkstra) { return this_component()->estimated_cost_between(current, destination, multimodal_dijkstra); }
+
 		//cost between 2 edges. Can implement different turn movements preferences for an agent, for example if left turns are not prefered, then wehn passed, use very high cost to avoid those movements
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){ return this_component()->cost_between(current, neighbor, connection); }	

@@ -204,23 +204,23 @@ namespace polaris
 				
 			//if (current_neighbor->in_closed_set()) return;
 
-			int unique_patterns_size = current_neighbor->unique_patterns.size();
+			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{
-				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->unique_patterns[patterns_ctr];
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
 				next_pattern->_scanned = false;
 			}
 			
 			int trips_ctr = 0;
 			patterns_ctr = 0;
 
-			int trips_by_dep_time_size = current_neighbor->trips_by_dep_time.size();
+			int trips_by_dep_time_size = current_neighbor->_trips_by_dep_time.size();
 			
 			while (trips_ctr < trips_by_dep_time_size && patterns_ctr <= unique_patterns_size)
 			{						
-				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->trips_by_dep_time[trips_ctr];
-				int mySeq = current_neighbor->index_along_trip_at_upstream_node[trips_ctr];
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
+				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
 
 				++trips_ctr;
@@ -310,15 +310,7 @@ namespace polaris
 						seq_edge->_car_time_from_origin = current->_car_time_from_origin;
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-						float neighbor_estimated_cost_origin_destination;
-						if (!multimodal_dijkstra)
-						{
-							neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge);
-						}
-						else
-						{
-							neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[seq_edge->_zone];
-						}
+						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge, multimodal_dijkstra);
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);									
 
 						if (!seq_edge->marked_for_reset())
@@ -367,23 +359,23 @@ namespace polaris
 			
 			//if (current_neighbor->in_closed_set()) return;
 
-			int unique_patterns_size = current_neighbor->unique_patterns.size();
+			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{
-				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->unique_patterns[patterns_ctr];
+				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
 				next_pattern->_scanned = false;
 			}
 
 			int trips_ctr = 0;
 			patterns_ctr = 0;
 
-			int trips_by_dep_time_size = current_neighbor->trips_by_dep_time.size();
+			int trips_by_dep_time_size = current_neighbor->_trips_by_dep_time.size();
 
 			while (trips_ctr < trips_by_dep_time_size && patterns_ctr <= unique_patterns_size)
 			{
-				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->trips_by_dep_time[trips_ctr];
-				int mySeq = current_neighbor->index_along_trip_at_upstream_node[trips_ctr];
+				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
+				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)next_trip->_pattern;
 
 				++trips_ctr;
@@ -464,15 +456,7 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-					float neighbor_estimated_cost_origin_destination;
-					if (!multimodal_dijkstra)
-					{
-						neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-					}
-					else
-					{
-						neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
-					}
+					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -534,16 +518,8 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
-				float neighbor_estimated_cost_origin_destination;
-				if (!multimodal_dijkstra)
-				{
-					neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-				}
-				else
-				{
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
-				}
-				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);											
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
 				{
@@ -615,15 +591,7 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-				float neighbor_estimated_cost_origin_destination;
-				if (!multimodal_dijkstra)
-				{
-					neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-				}
-				else
-				{
-					neighbor_estimated_cost_origin_destination = cost_from_origin + routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
-				}
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
