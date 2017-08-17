@@ -776,23 +776,23 @@ namespace Routing_Components
 								input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
 
 								float temp_travel_time = current_trip->_arrival_seconds.at(my_index + 1) - current_trip->_arrival_seconds.at(my_index);
-								if (ivtWeight * temp_travel_time < min_travel_time)
+								if (temp_travel_time < min_travel_time)
 								{
-									min_travel_time = ivtWeight * temp_travel_time;
+									min_travel_time = temp_travel_time;
 								}
 								my_itr++;
 							}
-							input_multimodal_edge._min_multi_modal_cost = min_travel_time;
+							input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							//input_multimodal_edge._min_multi_modal_cost = 10 * walkWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
+							//input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
+							input_multimodal_edge._min_multi_modal_cost = 10 * walkWeight*current_link->template travel_time<float>();
 						}
 						else
 						{
-							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							//input_multimodal_edge._min_multi_modal_cost = FLT_MAX / 2.0f;
+							//input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
+							input_multimodal_edge._min_multi_modal_cost = FLT_MAX / 2.0f;
 						}						
 
 						for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
