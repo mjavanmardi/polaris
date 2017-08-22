@@ -401,6 +401,52 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
 	};
+	
+	template<typename MasterType>
+	struct Walk_to_Transit_Tree_Agent_Implementation
+	{
+		template<typename CurrentEdgeType, typename ConnectionType>
+		bool process_connection_set(CurrentEdgeType* current)
+		{
+			return true;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return false;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
+		{
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				if (current->_edge_id == itr_destination->_edge_id) return true;
+			}
+			return false;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return 0.0f;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_walk_length;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_walk_length;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
+	};
 
 
 	//template<typename MasterType>

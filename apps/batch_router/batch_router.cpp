@@ -101,6 +101,7 @@ struct MasterType
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 	typedef Multi_Modal_Tree_Agent_Implementation<MasterType> multi_modal_tree_agent_type;
+	typedef Walk_to_Transit_Tree_Agent_Implementation<MasterType> walk_to_transit_tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;

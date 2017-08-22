@@ -68,6 +68,12 @@ namespace Routing_Components
 			{
 				return this_component()->compute_dijkstra_network_tree(source_network);
 			}
+
+			template<typename Source_Network_Type>
+			void compute_dijkstra_transit_distance(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			{
+				return this_component()->compute_dijkstra_transit_distance(source_network);
+			}
 			
 			void initialize()
 			{
