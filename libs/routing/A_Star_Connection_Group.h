@@ -533,31 +533,21 @@ namespace polaris
 			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();		
 
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
-									
-			//float cost_from_origin = current->cost_from_origin() + carWeight*agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-			float cost_from_origin = current->cost_from_origin() + carWeight*current_neighbor->_time_cost_temp;
+			
+			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-			float driveThreshold;
-			if (!multimodal_dijkstra)
+			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+			if (carWeight*(current->_car_time_from_origin + time_cost_between) > heuristicPortion)
 			{
-				driveThreshold = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
-			}
-			else
-			{
-				driveThreshold = routing_data.end_edge->dijkstra_cost[current_neighbor->_zone];
-			}
-			if (carWeight*(current->_car_time_from_origin + current_neighbor->_time_cost_temp) > driveThreshold)
-			{
-				//continue;
 				return;
-			}
+			}				
+
+			float cost_from_origin = current->cost_from_origin() + carWeight * time_cost_between;
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{
 				current_neighbor->cost_from_origin(cost_from_origin);
 
-				//float time_cost_between = current->_time_cost + connection->_time_cost;
-				float time_cost_between = current_neighbor->_time_cost_temp;
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 				current_neighbor->time_label(current->time_label() + time_cost_between);
 
@@ -570,7 +560,7 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + heuristicPortion;
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
