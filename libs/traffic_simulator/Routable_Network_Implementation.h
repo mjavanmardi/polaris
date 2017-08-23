@@ -249,6 +249,8 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "walkWeight", _walkWeight);
 				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
 				scenario->set_parameter(document, section, "carWeight", _carWeight);
+				scenario->set_parameter(document, section, "scanThreshold", _scanThreshold);
+				scenario->set_parameter(document, section, "costThreshold", _costThreshold);
 				scenario->set_parameter(document, section, "waitThreshold", _waitThreshold);
 				scenario->set_parameter(document, section, "walkThreshold", _walkThreshold);
 				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
@@ -285,6 +287,8 @@ namespace Routing_Components
 				cout << "\twalkWeight = " << walkWeight	<float>() << endl;
 				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
 				cout << "\tcarWeight = " << carWeight	<float>() << endl;
+				cout << "\tscanThreshold = " << scanThreshold	<float>() << endl;
+				cout << "\tcostThreshold = " << costThreshold	<float>() << endl;
 				cout << "\twaitThreshold = " << waitThreshold	<float>() << endl;
 				cout << "\twalkThreshold = " << walkThreshold	<float>() << endl;
 				cout << "\twalkSpeed = " << walkSpeed	<float>() << endl;
@@ -299,6 +303,8 @@ namespace Routing_Components
 				_walkWeight = 2.0;
 				_ivtWeight = 1.00;
 				_carWeight = 3.00;
+				_scanThreshold = 10000;
+				_costThreshold = 28800.00;
 				_waitThreshold = 3600.00;
 				_walkThreshold = 5000;
 				_walkSpeed = 1.38889;
@@ -311,6 +317,8 @@ namespace Routing_Components
 			m_static_data(float, walkWeight, NONE, NONE);
 			m_static_data(float, ivtWeight, NONE, NONE);
 			m_static_data(float, carWeight, NONE, NONE);
+			m_static_data(float, scanThreshold, NONE, NONE);
+			m_static_data(float, costThreshold, NONE, NONE);
 			m_static_data(float, waitThreshold, NONE, NONE);
 			m_static_data(float, walkThreshold, NONE, NONE);
 			m_static_data(float, walkSpeed, NONE, NONE);
@@ -1302,6 +1310,8 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, walkWeight);
 		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
 		define_static_member_variable(Routable_Network_Implementation, carWeight);
+		define_static_member_variable(Routable_Network_Implementation, scanThreshold);
+		define_static_member_variable(Routable_Network_Implementation, costThreshold);
 		define_static_member_variable(Routable_Network_Implementation, waitThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkSpeed);

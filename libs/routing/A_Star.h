@@ -671,7 +671,12 @@ namespace polaris
 
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
+		float costThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::costThreshold<float>();
 		float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+		float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+		float walkThreshold_Time = walkThreshold / walkSpeed;
+
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 		std::ofstream sp_file;
@@ -797,15 +802,7 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			float initial_estimated_cost_origin_destination;
-			if (!multimodal_dijkstra)
-			{
-				initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (base_edge_type*)ends.front());
-			}
-			else
-			{
-				initial_estimated_cost_origin_destination = start->cost_from_origin() + routing_data.end_edge->dijkstra_cost[start_t->_zone];
-			}
+			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (base_edge_type*)ends.front(), multimodal_dijkstra);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));
@@ -815,8 +812,8 @@ namespace polaris
 				modified_edges.push_back((base_edge_type*)start);
 				start->marked_for_reset(true);
 			}
-
-			if (start->_distance_to_transit > walkThreshold)
+						
+			if (start->_distance_to_transit > walkThreshold  && initial_estimated_cost_origin_destination >  walkWeight * walkThreshold_Time)
 			{
 				early_break = true;
 			}
@@ -830,7 +827,7 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			if (current->_cost_from_origin > 28800 || scanCount > 10000)
+			if (current->_cost_from_origin > costThreshold || scanCount > scanThreshold)
 			{
 				break;
 			}
