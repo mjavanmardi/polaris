@@ -168,8 +168,7 @@ namespace Scenario_Components
 			accessor(write_demand_to_database, NONE, NONE);			//
 			accessor(read_demand_from_database, NONE, NONE);		// 
 			accessor(read_population_from_database, NONE, NONE);	// run model with pre-existing synthetic population *must reference <db>-Popsyn.sqlite database
-			accessor(activity_start_time_model_file_name,NONE,NONE);
-
+			
 			accessor(flexible_work_percentage, NONE, NONE);
 			//===============================================
 			// Vehicle Choice parameters
@@ -298,6 +297,7 @@ namespace Scenario_Components
 			accessor(destination_choice_model_file, NONE, NONE);
 			accessor(telecommute_choice_model_file, NONE, NONE);
 			accessor(cav_wtp_model_file, NONE, NONE);
+			accessor(timing_choice_model_file, NONE, NONE);
 
 
 			template<typename TargetType> void read_scenario_data(const char* filename)
@@ -468,10 +468,6 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("write_full_output", this->template write_full_output<bool*>()) != PARAMETER_FOUND) this->template write_full_output<bool>(false);
 				string popsyn_control_string;
 				if (cfgReader.getParameter("popsyn_control_file", this->template popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->template popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
-
-				// Start time model parameters
-				if (cfgReader.getParameter("activity_start_time_model_file_name", this->template activity_start_time_model_file_name<string*>()) != PARAMETER_FOUND) this->template activity_start_time_model_file_name<string>((string)"start_time_duration_data_new.txt");
-
 
 				if (cfgReader.getParameter("write_visualizer_snapshot", this->template write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->template write_visualizer_snapshot<bool>(false);
 
@@ -656,6 +652,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("destination_choice_model_file",		destination_choice_model_file<string*>()) != PARAMETER_FOUND)	destination_choice_model_file<string>("");
 				if (cfgReader.getParameter("telecommute_choice_model_file",		telecommute_choice_model_file<string*>()) != PARAMETER_FOUND)	telecommute_choice_model_file<string>("");
 				if (cfgReader.getParameter("cav_wtp_model_file",				cav_wtp_model_file<string*>()) != PARAMETER_FOUND)				cav_wtp_model_file<string>("");
+				if (cfgReader.getParameter("timing_choice_model_file",			timing_choice_model_file<string*>()) != PARAMETER_FOUND)		timing_choice_model_file<string>("");
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1334,22 +1331,13 @@ namespace Scenario_Components
 				return true;
 			}
 
-			void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, float& parameter)
+			template<typename ParamType> void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, ParamType& parameter)
 			{
-				//assert(document.HasMember(section.c_str()));
-				//assert(document[section.c_str()].HasMember(key.c_str()));
-				//assert(document[section.c_str()][key.c_str()].IsDouble());
-				if (!document.HasMember(section.c_str()))
-				{
-					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" << section << "\'" << endl;
-					return;
-				}
-
-				if (!document[section.c_str()].HasMember(key.c_str()))
-				{
-					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
-					return;
-				}
+				static_assert(false, "ParamType not supported");
+			}
+			template<> void set_parameter<double>(rapidjson::Document& document, const std::string& section, const std::string& key, double& parameter)
+			{
+				if (!check_parameter(document, section, key)) return;
 
 				if (!document[section.c_str()][key.c_str()].IsDouble())
 				{
@@ -1359,7 +1347,45 @@ namespace Scenario_Components
 
 				parameter = document[section.c_str()][key.c_str()].GetDouble();
 			}
+			template<> void set_parameter<float>(rapidjson::Document& document, const std::string& section, const std::string& key, float& parameter)
+			{
+				if (!check_parameter(document, section, key)) return;
 
+				if (!document[section.c_str()][key.c_str()].IsDouble())
+				{
+					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
+					return;
+				}
+
+				parameter = document[section.c_str()][key.c_str()].GetDouble();
+			}
+			template<> void set_parameter<string>(rapidjson::Document& document, const std::string& section, const std::string& key, string& parameter)
+			{
+				if (!check_parameter(document, section, key)) return;
+
+				if (!document[section.c_str()][key.c_str()].IsString())
+				{
+					cout << "Key \'" << key << "\' is not set as a string value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
+					return;
+				}
+
+				parameter = document[section.c_str()][key.c_str()].GetString();
+			}
+			bool check_parameter(rapidjson::Document& document, const std::string& section, const std::string& key)
+			{
+				if (!document.HasMember(section.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" << section << "\'" << endl;
+					return false;
+				}
+
+				if (!document[section.c_str()].HasMember(key.c_str()))
+				{
+					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
+					return false;
+				}
+				return true;
+			}
 		};
 	}
 }

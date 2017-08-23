@@ -149,7 +149,7 @@ namespace Scenario_Components
 			m_data(double, time_dependent_routing_weight_scale, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_factor, NONE, NONE);
 
-			m_data(string, activity_start_time_model_file_name, NONE, NONE);
+			m_data(string, timing_choice_model_file, NONE, NONE);
 
 			m_data(string, vehicle_distribution_file_name, NONE, NONE);
 

@@ -332,14 +332,6 @@ namespace Person_Components
 		// INITIALIZE TELECOMMUTE CHOICE MODEL STATIC PARAMETERS
 		#pragma region Choice option parameters	
 		// zero-inflation parameters
-		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_CONST = -0.98;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_VEH_AVAIL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_VEH_AVAIL = -0.8;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_HU_DENSITY) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_HU_DENSITY = -39.99;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_INC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_INC = -0.81;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_FINANCE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_FINANCE = 0.55;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_OCC_EDUCATION) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_OCC_EDUCATION = -0.57;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(Z_DEGREE_ASSOC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_Z_DEGREE_ASSOC = -0.53;
-		*/
 		define_static_member_variable(Telecommute_Choice_Implementation, Z_CONSTANT);
 		define_static_member_variable(Telecommute_Choice_Implementation, Z_MALE);
 		define_static_member_variable(Telecommute_Choice_Implementation, Z_INCOME_LOW);
@@ -354,19 +346,6 @@ namespace Person_Components
 		define_static_member_variable(Telecommute_Choice_Implementation, Z_POP_DENSITY);
 
 		// ordered probit parameters
-		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_CONST) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_CONST = -0.86;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_HINC) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_HINC = -0.44;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_MALE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_MALE = 0.07;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_EMPFULL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_EMPFULL = 0.04;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_DEGREE_GRAD) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_DEGREE_GRAD = 0.18;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_TTIME) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_TTIME = 0.03;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_WORKDUR) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_WORKDUR = -0.0007;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_NVEH) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_NVEH = -0.07;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_REALESTATE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_REALESTATE = -0.48;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_COMMUNICATION) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_COMMUNICATION = 0.38;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_PROFESSIONAL) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_PROFESSIONAL = 0.29;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(O_OCC_HEALTH) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_O_OCC_HEALTH = -0.17;
-		*/
 		define_static_member_variable(Telecommute_Choice_Implementation, O_CONSTANT);
 		define_static_member_variable(Telecommute_Choice_Implementation, O_INCOME_MED);
 		define_static_member_variable(Telecommute_Choice_Implementation, O_AGE_35_55);
@@ -380,15 +359,6 @@ namespace Person_Components
 		define_static_member_variable(Telecommute_Choice_Implementation, O_EMP_DENSITY_UNDER_3000);
 
 		// threshold parameters
-		/*template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_EMPPART) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_EMPPART = 0.16;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_DEGREE) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_DEGREE = 0.22;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_STUDENTPART) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_STUDENTPART = -0.28;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_POPDENSITY) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_POPDENSITY = 4.79;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_C1) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_C1 = -2.9;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_C2) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_C2 = -1.13;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_C3) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_C3 = -0.34;
-		template<typename MasterType, typename InheritanceList> typename Telecommute_Choice_Implementation<MasterType, InheritanceList>::type_of(T_RHO) Telecommute_Choice_Implementation<MasterType, InheritanceList>::_T_RHO = -0.47;
-		*/
 		define_static_member_variable(Telecommute_Choice_Implementation, T_WORK_DURATION);
 		define_static_member_variable(Telecommute_Choice_Implementation, T_VEH_AVAILABLE);
 		define_static_member_variable(Telecommute_Choice_Implementation, T_HH_VEH_OVER_2_INDICATOR);
@@ -396,9 +366,7 @@ namespace Person_Components
 		define_static_member_variable(Telecommute_Choice_Implementation, T_C2);
 		define_static_member_variable(Telecommute_Choice_Implementation, T_C3);
 		define_static_member_variable(Telecommute_Choice_Implementation, T_RHO);
-
-
-#pragma endregion
+		#pragma endregion
 	}
 }
 
