@@ -651,7 +651,7 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, std::vector<global_edge_id>& tr_end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, /*std::vector<global_edge_id>& tr_end_ids,*/ unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -748,20 +748,20 @@ namespace polaris
 		}
 		base_edge_type* end_base = (base_edge_type*)end;
 
-		std::vector<base_edge_type*> tr_ends;
+		/*std::vector<base_edge_type*> tr_ends;
 		A_Star_Edge<base_edge_type>* tr_end;
 		for (auto itr = tr_end_ids.begin(); itr != tr_end_ids.end(); ++itr)
 		{
 			tr_end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 			if (tr_end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
 			tr_ends.push_back((base_edge_type*)tr_end);
-		}
+		}*/
 		//base_edge_type* tr_end_base = (base_edge_type*)tr_end;
 
 		Routing_Data<base_edge_type> routing_data;
 
 		routing_data.modified_edges = &modified_edges;
-		routing_data.end_transit_edges = &tr_ends;
+		//routing_data.end_transit_edges = &tr_ends;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
 		routing_data.end_edge = (base_edge_type*)ends.front();
@@ -827,7 +827,7 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			if (current->_cost_from_origin > costThreshold || scanCount > scanThreshold)
+			if (current->_cost_from_origin > costThreshold || scanCount > (int)scanThreshold)
 			{
 				break;
 			}

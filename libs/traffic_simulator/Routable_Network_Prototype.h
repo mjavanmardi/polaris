@@ -48,9 +48,9 @@ namespace Routing_Components
 				return this_component()->compute_static_network_path(origins,destinations, start_time, path_container,cost_container, debug_route);
 			}
 
-			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, std::vector<unsigned int>& tr_destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, /*std::vector<unsigned int>& tr_destinations,*/ unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 			{
-				return this_component()->compute_multimodal_network_path(origins, destinations, tr_destinations, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 			}
 
 			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)

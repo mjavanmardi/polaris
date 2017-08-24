@@ -325,10 +325,10 @@ namespace polaris
 						seqStay = false;
 					}					
 
-					if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
+					/*if (agent->at_destination((base_edge_type*)seq_edge, *(routing_data.end_transit_edges)))
 					{
 						hit_dest = true;
-					}
+					}*/
 
 					iSeq++;
 				}
@@ -370,10 +370,25 @@ namespace polaris
 
 				++trips_ctr;
 
+				float waitTime = next_trip->_departure_seconds[mySeq] - current->_time_label;
+				if (waitTime < 0)
+				{
+					continue;
+				}
+
+				//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
+				if (waitTime > waitThreshold)
+				{
+					return;
+				}
+
 				if (next_pattern->_scanned)
 				{
 					continue;
 				}
+
+				next_pattern->_scanned = true;
+				++patterns_ctr;
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 
@@ -388,30 +403,15 @@ namespace polaris
 					}
 				}
 
-				float waitTime = next_trip->_departure_seconds[mySeq] - current->_time_label;
-				if (waitTime < 0)
-				{
-					continue;
-				}
-
-				//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-				if (waitTime > waitThreshold)
-				{
-					return;
-				}
-
-				next_pattern->_scanned = true;
-				++patterns_ctr;
-
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
-				int TransferCount = 0;
-				int nonHomeWait = 0;
+				int TransferCount = std::max(WaitingCount - 1,0);
+				/*int nonHomeWait = 0;
 				if (WaitingCount > 1)
 				{
 					TransferCount = WaitingCount - 1;
 					nonHomeWait = 1;
-				}
+				}*/
 
 				float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;				
 				

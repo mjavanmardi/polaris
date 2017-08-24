@@ -143,13 +143,13 @@ namespace Routing_Components
 
 				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_walk_ids;
-				std::vector<unsigned int> destination_tr_ids;
+				//std::vector<unsigned int> destination_tr_ids;
 				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
 				{
 					Link_Interface* link = (Link_Interface*)(*itr);
 					destination_walk_ids.push_back(link->template uuid<unsigned int>());
 
-					Intersection_Interface* up_node = link->_upstream_intersection;
+					/*Intersection_Interface* up_node = link->_upstream_intersection;
 					Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
 					typename Link_Container_Interface::iterator in_links_itr;
 					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
@@ -160,7 +160,7 @@ namespace Routing_Components
 						{
 							destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
 						}
-					}
+					}*/
 				}
 
 				//list of edgeid, graph_id tuples; internal edge ids
@@ -178,11 +178,11 @@ namespace Routing_Components
 					
 					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
 					else
 					{
@@ -194,11 +194,11 @@ namespace Routing_Components
 				{
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, destination_tr_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
 					else
 					{ 
