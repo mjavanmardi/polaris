@@ -541,6 +541,8 @@ int main(int argc,char** argv)
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
+	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
+
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
 	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
@@ -742,8 +744,7 @@ int main(int argc,char** argv)
 
 	// Initialize all choice model parameters
 	if (!InitializeChoiceModelParameters(scenario)) return 1;
-
-	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
+	
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
 
