@@ -1069,7 +1069,7 @@ namespace Network_Components
 					{		
 						float free_flow_speed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 						free_flow_speed = 3.28084 * free_flow_speed; // feet per second
-						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to seconds
+						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to feet
 						
 						// Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
 						

@@ -27,35 +27,7 @@ namespace polaris
 		Network_Interface* net = (Network_Interface*)_global_network; 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-
-		std::ofstream sp_file;
-		std::ofstream perf_file;
-		//char myLine[2000];
-		std::string myParagraph;
-		bool write_route = false;
-		Counter A_Star_Time;
-		Counter Visit_Time;
-		float Total_Visit_Time;
 		
-		if (debug_route)
-		{
-			// Initialize executed activities file
-			stringstream sp_filename("");
-			sp_filename << _scenario_reference->template output_dir_name<string>();
-			sp_filename << "sp_output.dat";
-			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
-			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
-
-			stringstream perf_filename("");
-			perf_filename << _scenario_reference->template output_dir_name<string>();
-			perf_filename << "perf_output.dat";
-			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
-
-			// do route calculation timing for debug routes
-			A_Star_Time.Start();
-		}
-
 		std::deque< base_edge_type* > modified_edges;
 		
 		boost::intrusive::multiset< base_edge_type > open_set;
@@ -108,13 +80,10 @@ namespace polaris
 		}
 		
 		bool success = false;
-		int scanCount = 0;
-		Total_Visit_Time = 0;
 
 		while( open_set.size() )
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
 
 			multimodal_edge_id id;
 			
@@ -134,14 +103,10 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType,base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType,base_edge_type>* const connection_set_end = current->end_connection_groups();
 
-			Visit_Time.Start();
 			while( connection_set_iterator != connection_set_end )
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
-			Visit_Time.Stop();
-			Total_Visit_Time += Visit_Time.Stop();
-
 		}
 
 		
@@ -152,13 +117,6 @@ namespace polaris
 
 		if(success)
 		{
-			if (debug_route)
-			{
-				perf_file << "success\tscanScount:\t" << scanCount;
-				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
-			}
-
 			base_edge_type* current = end_base;//(base_edge_type*)end;
 			base_edge_type* cached_current = (base_edge_type*)current;
 
@@ -188,14 +146,6 @@ namespace polaris
 			end_ids.push_back(out_path.back());
 		}
 		else
-		{
-			if (debug_route)
-			{
-				perf_file << "fail\tscanScount:\t" << scanCount;
-				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop();
-				perf_file << "\tVisitor run-time (ms):\t" << Total_Visit_Time << endl;
-			}
-		}
 		
 		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
 		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
@@ -569,10 +519,10 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			
 			//TODO: remove when done testing
-			if (debug_route)
+			/*if (debug_route)
 			{
 				current->Display();
-			}
+			}*/
 
 			multimodal_edge_id id;
 			
@@ -600,10 +550,10 @@ namespace polaris
 		}
 
 		//TODO: remove when done testing
-		if (debug_route)
+		/*if (debug_route)
 		{
 			int test = 1;
-		}
+		}*/
 
 		
 		global_edge_id global;
