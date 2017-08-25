@@ -241,7 +241,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_id, unsigned int start_time)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_id, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -255,7 +255,6 @@ namespace polaris
 		std::string myParagraph;
 		bool write_route = false;
 		Counter A_Star_Time;
-		bool debug_route = true;
 		if (debug_route)
 		{
 			stringstream perf_filename("");
@@ -284,7 +283,6 @@ namespace polaris
 		routing_data.modified_edges = &modified_edges;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
-		routing_data.start_time = start_time;
 
 		int zone = zone_id;
 
@@ -351,7 +349,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Walk(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id)
+	static float Dijkstra_Walk(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
@@ -365,7 +363,6 @@ namespace polaris
 		std::string myParagraph;
 		bool write_route = false;
 		Counter A_Star_Time;
-		bool debug_route = true;
 		if (debug_route)
 		{
 			stringstream perf_filename("");

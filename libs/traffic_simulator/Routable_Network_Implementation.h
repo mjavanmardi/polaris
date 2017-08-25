@@ -1089,7 +1089,9 @@ namespace Routing_Components
 				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename Network_Interface::get_type_of(zones_container)::value_type>::type> _Zone_Interface;
 				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
-				
+
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+
 				Network_Interface* network = source_network;
 				
 				_Zones_Container_Interface::iterator orig_zone_itr;
@@ -1115,11 +1117,10 @@ namespace Routing_Components
 						starts.push_back(start);
 					}
 
-					
 					int zone_id = origin_zone->_uuid;
 					if (!starts.empty())
 					{
-						float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, 0);
+						float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, debug_route);
 					}
 					
 										
@@ -1147,6 +1148,8 @@ namespace Routing_Components
 				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
 				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
 				
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+
 				Network_Interface* network = source_network;
 
 				Link_Container_Interface::iterator link_itr;
@@ -1196,7 +1199,7 @@ namespace Routing_Components
 				{
 					global_edge_id start = global_edge_id (*orig_itr);
 					
-					float routed_time = Dijkstra_Walk<MT, typename MT::walk_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start);
+					float routed_time = Dijkstra_Walk<MT, typename MT::walk_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, debug_route);
 					
 
 					if (my_itr % 10000 == 0) cout << "\tLink Counter:\t" << my_itr << endl;
