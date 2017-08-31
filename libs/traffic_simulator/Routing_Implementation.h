@@ -180,7 +180,7 @@ namespace Routing_Components
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
@@ -196,7 +196,7 @@ namespace Routing_Components
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::HOV || mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
