@@ -102,7 +102,8 @@ namespace Batch_Router_Components
 				int simulation_end_time = scenario->template simulation_end_time<int>();
 				if (departed_time < simulation_start_time || departed_time >= simulation_end_time)
 				{
-					results_by_thread[0] << Trip_Id << ": Trip start time is out of bounds - skipped.";
+					//TODO: Remove when done testing routing execution time
+					//results_by_thread[0] << Trip_Id << ": Trip start time is out of bounds - skipped.";
 					return;
 				}
 
@@ -115,7 +116,8 @@ namespace Batch_Router_Components
 				_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
 				if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>() || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 				{
-					results_by_thread[0] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
+					//TODO: Remove when done testing routing execution time
+					//results_by_thread[0] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
 					return;
 				}
 
@@ -157,9 +159,12 @@ namespace Batch_Router_Components
 
 				if (movement->valid_trajectory<bool>())
 				{
-					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
+					//TODO: Remove when done testing routing execution time
+					results_by_thread[__thread_id] << movement->routing_execution_time<__int64>() << "\t";
+									
+					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << endl;
 					
-					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+					/*_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
 
 					for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
 					{
@@ -167,11 +172,12 @@ namespace Batch_Router_Components
 						link_itf* link = tu->link<link_itf*>();
 						results_by_thread[__thread_id]<<_ID<<": (" << link->dbid<int>()<<"."<<link->direction<int>()<<") "<<tu->estimated_link_accepting_time<int>()<<", ";
 					}
-					results_by_thread[__thread_id] << endl;
+					results_by_thread[__thread_id] << endl;*/
 				}
 				else
 				{
-					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
+					//TODO: Remove when done testing routing execution time
+					//results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
 				}
 
 				object_count_by_thread[__thread_id]++;

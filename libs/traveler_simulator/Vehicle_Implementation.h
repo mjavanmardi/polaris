@@ -692,7 +692,7 @@ namespace Vehicle_Components
 					int inbound_link_id = route_link->template uuid<int>();
 					int outbound_link_id = next_route_link->template uuid<int>();
 
-					//Omer fix later!
+					//TODO: Omer fix later!
 					if (route_link->_link_type != Link_Components::Types::Link_Type_Keys::WALK && route_link->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && next_route_link->_link_type != Link_Components::Types::Link_Type_Keys::WALK && next_route_link->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
 						typename MasterType::network_type::long_hash_key_type long_hash_key;

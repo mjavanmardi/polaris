@@ -60,6 +60,9 @@ namespace Movement_Plan_Components
 			accessor(traveler_id, NONE,NONE);
 			accessor(mode, NONE, NONE);
 
+			//TODO: Remove when done testing routing execution time
+			accessor(routing_execution_time, NONE, NONE);
+
 			void Free_Movement()
 			{
 				if (this == nullptr) return;

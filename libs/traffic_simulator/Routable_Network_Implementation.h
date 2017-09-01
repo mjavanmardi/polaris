@@ -968,7 +968,8 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, /*std::vector<unsigned int>& tr_destinations,*/ unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+			//TODO: Remove when done testing routing execution time
+			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, /*std::vector<unsigned int>& tr_destinations,*/ unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, __int64& astar_time, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -1006,7 +1007,8 @@ namespace Routing_Components
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 
-				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+				//TODO: Remove when done testing routing execution time
+				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();

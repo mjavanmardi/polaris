@@ -598,7 +598,7 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, /*std::vector<global_edge_id>& tr_end_ids,*/ unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, /*std::vector<global_edge_id>& tr_end_ids,*/ unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, __int64& astar_time, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -652,9 +652,11 @@ namespace polaris
 			res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
 
 			// do route calculation timing for debug routes
-			//A_Star_Time.Start();
-			t1 = high_resolution_clock::now();
+			//A_Star_Time.Start();			
 		}
+
+		//TODO: Remove when done testing routing execution time		
+		t1 = high_resolution_clock::now();
 
 		std::deque< base_edge_type* > modified_edges;
 
@@ -814,7 +816,7 @@ namespace polaris
 
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
-			__int64 astar_time = elapsed_time;
+			astar_time = elapsed_time;
 			if (debug_route)
 			{								
 				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -1006,7 +1008,7 @@ namespace polaris
 
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
-			__int64 astar_time = elapsed_time;
+			astar_time = elapsed_time;
 
 			if (debug_route)
 			{

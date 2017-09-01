@@ -569,7 +569,7 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 		{
-			//Omer fix later!
+			//TODO: Omer fix later!
 			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
@@ -1122,7 +1122,11 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::Initialize()
 		{
-			this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			//TODO:Omer make sure this does not cause any issues
+			if (this->_link_type != Types::Link_Type_Keys::WALK && this->_link_type != Types::Link_Type_Keys::TRANSIT)
+			{
+				this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			}
 
 			//TODO
 			//load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
@@ -1131,6 +1135,7 @@ namespace Link_Components
 		template<typename MasterType, typename InheritanceList>
 		void Link_Implementation<MasterType, InheritanceList>::Newells_Conditional(ComponentType* _this, Event_Response& response)
 		{
+			
 			_Link_Interface* _this_ptr = (_Link_Interface*)_this;
 			if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
 			{

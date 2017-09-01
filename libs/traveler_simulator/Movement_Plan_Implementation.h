@@ -84,6 +84,9 @@ namespace Movement_Plan_Components
 			m_data(int, traveler_id, NONE, NONE);
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode, NONE, NONE);
 
+			//TODO: Remove when done testing routing execution time
+			m_data(int, routing_execution_time, NONE, NONE);
+
 			template<typename TargetType>
 			TargetType absolute_departure_time();
 			tag_getter_as_available(absolute_departure_time);
