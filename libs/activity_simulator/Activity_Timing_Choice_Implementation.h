@@ -22,7 +22,28 @@ namespace Person_Components
 
 			// pointer back to parent class
 			m_prototype(Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
+
+			//===========================================================================================================================================
+			// Interface definitions	
+			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_properties_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
+			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_static_properties_itf;
+			typedef Prototypes::Person_Scheduler<typename person_itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
+			typedef Network_Components::Prototypes::Network< typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
+			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> los_itf;
+			typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_invariant_value_type> los_invariant_itf;
+			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
+			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)>  _Activity_Location_Interface;
+			typedef Random_Access_Sequence< typename _Activity_Location_Interface::get_type_of(origin_links)> _Links_Container_Interface;
+			typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)>  _Link_Interface;
+			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
+			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container), int> _Zone_Ids_Interface;
+
 
 			// static start time and duration lookup container for each activity type
 			static m_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
@@ -133,6 +154,186 @@ namespace Person_Components
 				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first);
 				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.second);
 				return return_val;
+			}
+
+			template<typename ActivityRefType, typename ReturnType> pair<ReturnType, ReturnType> Timing_Choice(ActivityRefType activity_ref)
+			{
+				typedef Activity_Components::Prototypes::Activity_Planner<strip_modifiers(ActivityRefType)::Component_Type> Activity_interface;
+				typedef typename Activity_interface::Involved_Persons_Container_type Involved_Persons_interface;
+								
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				household_itf* _Parent_Household = _Parent_Person->person_itf::template Household<household_itf*>();
+				household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<household_static_properties_itf*>();
+				person_static_properties_itf* person_properties = _Parent_Person->Static_Properties<person_static_properties_itf*>();
+
+				// external knowledge references
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Scenario_Interface* scenario = _Parent_Person->scenario_reference<_Scenario_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Skim_Interface* skimmer = network->skimming_faculty<_Skim_Interface*>();
+
+				Activity_interface* act = (Activity_interface*)activity_ref;
+				_Activity_Location_Interface* loc = act->Location<_Activity_Location_Interface*>();
+				_Zone_Interface* dest_zone = nullptr;
+				if (act->Location_Is_Planned() && loc != nullptr) dest_zone = loc->zone<_Zone_Interface*>();
+				_Zone_Interface* home_taz = _Parent_Household->Home_Location<_Zone_Interface*>();
+
+				//==================================
+				// create model variables
+				//----------------------------------
+				float Mode_auto = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
+				float Mode_transit = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS;
+				float Mode_passenger = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
+				float Location_CBD = 0.0;
+				float Location_city = 0.0;
+				float Location_suburbs = 0.0;
+				if (dest_zone != nullptr)
+				{
+					Location_CBD = dest_zone->areatype<int>() < 3 ? 1.0 : 0.0;
+					Location_city = dest_zone->areatype<int>() == 3 ? 1.0 : 0.0;;
+					Location_suburbs = dest_zone->areatype<int>() > 3 && dest_zone->areatype<int>() < 7 ? 1.0 : 0.0;
+				}
+				else
+				{
+					Location_CBD = home_taz->areatype<int>() < 3 ? 1.0 : 0.0;
+					Location_city = home_taz->areatype<int>() == 3 ? 1.0 : 0.0;;
+					Location_suburbs = home_taz->areatype<int>() > 3 && home_taz->areatype<int>() < 7 ? 1.0 : 0.0;
+				}
+				float Party_alone = act->Involved_Persons_Container<Involved_Persons_interface&>().size() == 0 ? 1.0 : 0.0;
+				float Party_joint = !Party_alone;
+				float Flex_start = act->Start_Time_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>() == Activity_Components::Types::LOW_FLEXIBILITY;
+				float Flex_duration = act->Duration_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>() == Activity_Components::Types::LOW_FLEXIBILITY;
+				
+				float AM_peak_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(6.0, 9.0);
+				float AM_Offpeak_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(9.0, 12.0);
+				float PM_Offpeak_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(12.0, 16.0);
+				float PM_peak_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(16.0,19.0);
+				float Evening_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(19.0, 24.0);
+				float Night_Occupancy = scheduler->Percent_Free_Time_In_Schedule<Time_Hours>(0.0, 6.0);
+
+				float Age_18_24 = person_properties->Age<int>() >= 18 && person_properties->Age<int>() < 25 ? 1.0 : 0.0;
+				float Age_25_34 = person_properties->Age<int>() >= 25 && person_properties->Age<int>() < 35 ? 1.0 : 0.0;
+				float Age_60 = person_properties->Age<int>() >= 60 ? 1.0 : 0.0;
+				float Income_low = (household_properties->Income<Dollars>() < 50000.0) ? 1.0 : 0.0;
+				float Income_high = (household_properties->Income<Dollars>() >= 100000.0) ? 1.0 : 0.0;
+				float Income_med = 1.0 - Income_low - Income_high;
+				
+				float Gender = person_properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::MALE ? 1.0 : 0.0;
+				float HH_size = household_properties->Household_size<float>();
+				float Student_fulltime = person_properties->Is_Student<bool>();
+				float Work_fulltime = person_properties->Is_Fulltime_Worker();
+				float Work_parttime = person_properties->Is_Parttime_Worker();
+				float Workers = household_properties->Number_of_workers<int>() >= 2 ? 1.0 : 0.0;
+				float degree = person_properties->Educational_Attainment<Types::EDUCATION_LEVEL>() == Types::EDUC_UNDERGRADUATE || person_properties->Educational_Attainment<Types::EDUCATION_LEVEL>() == Types::EDUC_GRADUATE ? 1.0 : 0.0;
+
+				// use actual person properties instead of static person properties here
+				float Telework = _Parent_Person->Properties<person_properties_itf*>()->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_DAILY || _Parent_Person->Properties<person_properties_itf*>()->Telecommute_Frequency<Types::TELECOMMUTE_FREQUENCY>() == Types::TC_WEEKLY ? 1.0 : 0.0 ;
+
+				// Travel time and variability estimation
+				float AM_Peak_TTV = 0;
+				float AM_Offpeak_TTV = 0;
+				float PM_Offpeak_TTV = 0;
+				float PM_Peak_TTV = 0;
+				float Evening_TTV = 0;
+				float Night_TTV = 0;
+				float AM_Peak_TT = 0;
+				float AM_Offpeak_TT = 0;
+				float PM_Offpeak_TT = 0;
+				float PM_Peak_TT = 0;
+				float Evening_TT = 0;
+				float Night_TT = 0;
+
+				// Known destination, use exact travel time characteristics
+				if (dest_zone != nullptr)
+				{
+					pair<Time_Minutes, float> tts_ampeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 6.0, 9.0);
+					AM_Peak_TT = tts_ampeak.first;
+					AM_Peak_TTV = tts_ampeak.second;
+					pair<Time_Minutes, float> tts_amoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 9.0, 12.0);
+					AM_Offpeak_TT = tts_amoff.first;
+					AM_Offpeak_TTV = tts_amoff.second;
+					pair<Time_Minutes, float> tts_pmoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 12.0, 16.0);
+					PM_Offpeak_TT = tts_pmoff.first;
+					PM_Offpeak_TTV = tts_pmoff.second;
+					pair<Time_Minutes, float> tts_pmpeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 16.0, 19.0);
+					PM_Peak_TT = tts_pmpeak.first;
+					PM_Peak_TTV = tts_pmpeak.second;
+					pair<Time_Minutes, float> tts_evening = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 19.0, 24.0);
+					Evening_TT = tts_evening.first;
+					Evening_TTV = tts_evening.second;
+					pair<Time_Minutes, float> tts_night = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 0.0, 6.0);
+					Night_TT = tts_evening.first;
+					Night_TTV = tts_evening.second;
+				}
+				// Unknown destination, use TT characteristics from the accessibilty calculations
+				{
+					AM_Peak_TT =	home_taz->template avg_ttime_auto_ampeak<Time_Minutes>();
+					PM_Peak_TT =	home_taz->template avg_ttime_auto_pmpeak<Time_Minutes>();
+					AM_Offpeak_TT = home_taz->template avg_ttime_auto_offpeak<Time_Minutes>();
+					PM_Offpeak_TT = home_taz->template avg_ttime_auto_offpeak<Time_Minutes>();
+					Evening_TT =	home_taz->template avg_ttime_auto_night<Time_Minutes>();
+					Night_TT =		home_taz->template avg_ttime_auto_night<Time_Minutes>();
+					AM_Peak_TTV =	home_taz->template avg_ttime_var_auto_ampeak<float>();
+					PM_Peak_TTV =	home_taz->template avg_ttime_var_auto_pmpeak<float>();
+					AM_Offpeak_TTV= home_taz->template avg_ttime_var_auto_offpeak<float>();
+					PM_Offpeak_TTV= home_taz->template avg_ttime_var_auto_offpeak<float>();
+					Evening_TTV =	home_taz->template avg_ttime_var_auto_night<float>();
+					Night_TTV =		home_taz->template avg_ttime_var_auto_night<float>();
+				}
+
+				// RUM portion of utility
+				float U_am_peak =	-1.0*FLT_MAX;
+				float U_am_offpeak =-1.0*FLT_MAX;
+				float U_pm_offpeak =-1.0*FLT_MAX;
+				float U_pm_peak =	-1.0*FLT_MAX;
+				float U_evening =	-1.0*FLT_MAX;
+	
+				U_am_peak = _S_AMPEAK_AGE_60*Age_60 + _S_AMPEAK_HH_WORKERS*Workers + _S_AMPEAK_FLEX_START*Flex_start + _S_AMPEAK_FLEX_DURATION*Flex_duration + _S_AMPEAK_PARTY_JOINT*Party_joint;
+				U_am_offpeak = _S_AMOFFPEAK_CONSTANT + _S_AMOFFPEAK_WORK_PARTTIME*Work_parttime + _S_AMOFFPEAK_STUDENT_FULLTIME*Student_fulltime + _S_AMOFFPEAK_MODE_PASSENGER*Mode_passenger;
+				U_pm_offpeak = _S_PMOFFPEAK_CONSTANT + _S_PMOFFPEAK_INCOME_LOW*Income_low + _S_PMOFFPEAK_MODE_TRANSIT*Mode_transit;
+				U_pm_peak = _S_PMPEAK_CONSTANT + _S_PMPEAK_WORK_FULLTIME*Work_fulltime + _S_PMPEAK_INCOME_HIGH*Income_high + _S_PMPEAK_HH_WORKERS*Workers + _S_PMPEAK_FLEX_START*Flex_start;
+				U_evening = _S_EVENING_CONSTANT + _S_EVENING_TELEWORK*Telework + _S_EVENING_INCOME_LOW*Income_low + _S_EVENING_DEGREE_COLLEGE*degree;
+
+				// RRM portion of utility
+				float R_am_peak = FLT_MAX;
+				float R_am_offpeak = FLT_MAX;
+				float R_pm_offpeak = FLT_MAX;
+				float R_pm_peak = FLT_MAX;
+				float R_evening = FLT_MAX;
+
+				R_am_peak =		- 1.0*log(1.0 + exp(_S_AMPEAK_TT*(AM_Offpeak_TT - AM_Peak_TT))) - log(1.0 + exp(_S_AMPEAK_TT*(PM_Peak_TT - AM_Peak_TT))) - log(1.0 + exp(_S_AMPEAK_TT*(PM_Offpeak_TT - AM_Peak_TT))) - log(1.0 + exp(_S_AMPEAK_TT*(Evening_TT - AM_Peak_TT))) - log(1.0 + exp(_S_AMPEAK_TT*(Night_TT - AM_Peak_TT)));
+				R_am_offpeak =  - 1.0*log(1.0 + exp(_S_AMOFFPEAK_TT*(AM_Peak_TT - AM_Offpeak_TT))) - log(1.0 + exp(_S_AMOFFPEAK_TT*(PM_Peak_TT - AM_Offpeak_TT))) - log(1.0 + exp(_S_AMOFFPEAK_TT*(PM_Offpeak_TT - AM_Offpeak_TT))) - log(1.0 + exp(_S_AMOFFPEAK_TT*(Evening_TT - AM_Offpeak_TT))) - log(1.0 + exp(_S_AMOFFPEAK_TT*(Night_TT - AM_Offpeak_TT)))
+								- 1.0*log(1.0 + exp(_S_AMOFFPEAK_TTV*(AM_Peak_TTV - AM_Offpeak_TTV))) - log(1.0 + exp(_S_AMOFFPEAK_TTV*(PM_Peak_TTV - AM_Offpeak_TTV))) - log(1.0 + exp(_S_AMOFFPEAK_TTV*(PM_Offpeak_TTV - AM_Offpeak_TTV))) - log(1.0 + exp(_S_AMOFFPEAK_TTV*(Evening_TTV - AM_Offpeak_TTV))) - log(1.0 + exp(_S_AMOFFPEAK_TTV*(Night_TTV - AM_Offpeak_TTV)))
+								- 1.0*log(1.0 + exp(_S_AMOFFPEAK_OCCUPANCY*(AM_peak_Occupancy - AM_Offpeak_Occupancy))) - log(1.0 + exp(_S_AMOFFPEAK_OCCUPANCY*(PM_peak_Occupancy - AM_Offpeak_Occupancy))) - log(1.0 + exp(_S_AMOFFPEAK_OCCUPANCY*(PM_Offpeak_Occupancy - AM_Offpeak_Occupancy))) - log(1.0 + exp(_S_AMOFFPEAK_OCCUPANCY*(Evening_Occupancy - AM_Offpeak_Occupancy))) - log(1.0 + exp(_S_AMOFFPEAK_OCCUPANCY*(Night_Occupancy - AM_Offpeak_Occupancy)));
+				R_pm_offpeak =  - 1.0*log(1.0 + exp(_S_PMOFFPEAK_TT*(AM_Peak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMOFFPEAK_TT*(PM_Peak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMOFFPEAK_TT*(AM_Offpeak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMOFFPEAK_TT*(Evening_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMOFFPEAK_TT*(Night_TT - PM_Offpeak_TT)))
+								- 1.0*log(1.0 + exp(_S_PMOFFPEAK_OCCUPANCY*(AM_peak_Occupancy - PM_Offpeak_Occupancy))) - log(1.0 + exp(_S_PMOFFPEAK_OCCUPANCY*(PM_peak_Occupancy - PM_Offpeak_Occupancy))) - log(1.0 + exp(_S_PMOFFPEAK_OCCUPANCY*(AM_Offpeak_Occupancy - PM_Offpeak_Occupancy))) - log(1.0 + exp(_S_PMOFFPEAK_OCCUPANCY*(Evening_Occupancy - PM_Offpeak_Occupancy))) - log(1.0 + exp(_S_PMOFFPEAK_OCCUPANCY*(Night_Occupancy - PM_Offpeak_Occupancy)));
+				R_pm_peak =		- 1.0*log(1.0 + exp(_S_PMPEAK_TT*(AM_Peak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMPEAK_TT*(PM_Peak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMPEAK_TT*(AM_Offpeak_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMPEAK_TT*(Evening_TT - PM_Offpeak_TT))) - log(1.0 + exp(_S_PMPEAK_TT*(Night_TT - PM_Offpeak_TT)))
+								- 1.0*log(1.0 + exp(_S_PMPEAK_OCCUPANCY*(AM_peak_Occupancy - PM_peak_Occupancy))) - log(1.0 + exp(_S_PMPEAK_OCCUPANCY*(PM_Offpeak_Occupancy - PM_peak_Occupancy))) - log(1.0 + exp(_S_PMPEAK_OCCUPANCY*(AM_Offpeak_Occupancy - PM_peak_Occupancy))) - log(1.0 + exp(_S_PMPEAK_OCCUPANCY*(Evening_Occupancy - PM_peak_Occupancy))) - log(1.0 + exp(_S_PMPEAK_OCCUPANCY*(Night_Occupancy - PM_peak_Occupancy)));
+				R_evening =		- 1.0*log(1.0 + exp(_S_EVENING_TT*(AM_Offpeak_TT - Evening_TT))) - log(1.0 + exp(_S_EVENING_TT*(PM_Peak_TT - Evening_TT))) - log(1.0 + exp(_S_EVENING_TT*(PM_Offpeak_TT - Evening_TT))) - log(1.0 + exp(_S_EVENING_TT*(AM_Peak_TT - Evening_TT))) - log(1.0 + exp(_S_EVENING_TT*(Night_TT - Evening_TT)));
+
+				U_am_peak += R_am_peak;
+				U_am_offpeak += R_am_offpeak;
+				U_pm_offpeak += R_pm_offpeak;
+				U_pm_peak += R_pm_peak;
+				U_evening += R_evening;
+				float U_sum = exp(U_am_peak) + exp(U_am_offpeak) + exp(U_pm_offpeak) + exp(U_pm_peak) + exp(U_evening) + 1.0;
+
+				float P_am_peak = exp(U_am_peak) / U_sum;
+				float P_am_offpeak = exp(U_am_offpeak) / U_sum + P_am_peak;
+				float P_pm_offpeak = exp(U_pm_offpeak) / U_sum + P_am_offpeak;
+				float P_pm_peak = exp(U_pm_peak) / U_sum + P_pm_offpeak;
+				float P_evening = exp(U_evening) / U_sum + P_pm_peak;
+				float P_night = 1.0 / U_sum + P_evening;
+
+				float r = GLOBALS::Uniform_RNG.Next_Rand<float>();
+
+				if		(r < P_am_peak)		return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 6.0, 9.0);
+				else if (r < P_am_offpeak)	return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 9.0, 12.0);
+				else if (r < P_pm_offpeak)	return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 12.0, 16.0);
+				else if (r < P_pm_peak)		return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 16.0, 19.0);
+				else if (r < P_evening)		return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 19.0, 24.0);
+				else						return Get_Start_Time_and_Duration<ReturnType, ActivityRefType, Time_Hours>(activity_ref, 0.0, 6.0);
 			}
 
 
@@ -600,6 +801,6 @@ namespace Person_Components
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_PMPEAK);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_EVENING);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_NIGHT);
-
+		#pragma endregion
 	}
 }

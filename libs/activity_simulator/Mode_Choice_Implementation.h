@@ -724,7 +724,7 @@ namespace Person_Components
 				los_itf* los = (los_itf*)Allocate<typename MasterType::los_value_type>();
 				los_invariant_itf* ilos = (los_invariant_itf*)Allocate<typename MasterType::los_invariant_value_type>();
 				los->LOS_time_invariant(ilos);
-				los->auto_ttime(origin_zone->template avg_ttime_auto_peak<Time_Minutes>());
+				los->auto_ttime(origin_zone->template avg_ttime_auto_ampeak<Time_Minutes>());
 				los->transit_ttime(origin_zone->avg_ttime_transit<Time_Minutes>());
 				los->transit_fare(origin_zone->avg_fare_transit<Dollars>());
 				los->transit_walk_access_time(origin_zone->avg_ovtt_transit<Time_Minutes>());
@@ -1760,7 +1760,7 @@ namespace Person_Components
 					los_itf* los = (los_itf*)Allocate<typename MasterType::los_value_type>();
 					los_invariant_itf* ilos = (los_invariant_itf*)Allocate<typename MasterType::los_invariant_value_type>();
 					los->LOS_time_invariant(ilos);
-					los->auto_ttime(origin_zone->template avg_ttime_auto_peak<Time_Minutes>());
+					los->auto_ttime(origin_zone->template avg_ttime_auto_ampeak<Time_Minutes>());
 					los->transit_ttime(origin_zone->avg_ttime_transit<Time_Minutes>());
 					los->transit_fare(origin_zone->avg_fare_transit<Dollars>());
 					los->transit_walk_access_time(origin_zone->avg_ovtt_transit<Time_Minutes>());

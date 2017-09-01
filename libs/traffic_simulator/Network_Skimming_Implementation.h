@@ -1019,8 +1019,9 @@ namespace Network_Skimming_Components
 					float C_ind=0;
 					float C_oth=0;
 
-					float auto_ttime_avg = 0, auto_ttime_avg_comp = 0, auto_ttime_offpeak_avg = 0, auto_ttime_offpeak_avg_comp = 0, distance_avg = 0;
+					float auto_ttime_ampeak_max_avg = 0, auto_ttime_ampeak_min_avg = 0, auto_ttime_pmpeak_max_avg = 0, auto_ttime_pmpeak_min_avg = 0, auto_ttime_offpeak_max_avg = 0, auto_ttime_offpeak_min_avg = 0, auto_ttime_night_max_avg = 0, auto_ttime_night_min_avg = 0, distance_avg = 0;
 					float tran_ttime_avg = 0, tran_ovtt_avg = 0, tran_wait_avg = 0, tran_fare_avg = 0;
+					float auto_ttime_avg_comp = 0, auto_ttime_offpeak_avg_comp = 0;
 					int count=0, count_transit=0;
 					float attract_count = 0, attract_count_transit=0;
 								
@@ -1034,8 +1035,15 @@ namespace Network_Skimming_Components
 						if (zone == dzone) continue;
 
 						// get TTime by automobile and transit through skim interface, in minutes
-						Time_Minutes ttime_auto_peak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
-						Time_Minutes ttime_auto_offpeak = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
+						Time_Minutes ttime_auto_ampeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 7.5);
+						Time_Minutes ttime_auto_ampeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 6.0);
+						Time_Minutes ttime_auto_offpeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 14.0);
+						Time_Minutes ttime_auto_offpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 12.0);
+						Time_Minutes ttime_auto_pmpeak_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 17.5);
+						Time_Minutes ttime_auto_pmpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 19.0);
+						Time_Minutes ttime_auto_night_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 20.0);
+						Time_Minutes ttime_auto_night_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 1.0);
+
 						Time_Minutes ttime_transit = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
 						los_value_itf* los_value = skim->Get_LOS<zone_itf*, Time_Minutes, los_value_itf*>(zone, dzone, 9.0);
 						Time_Minutes ovtt_transit = los_value->transit_walk_access_time<Time_Minutes>();
@@ -1044,12 +1052,12 @@ namespace Network_Skimming_Components
 						Miles distance = los_value->auto_distance<Miles>();
 
 						// update the accessibilty factors: (1/Nz-1) * (sum(Emp * exp(alpha*ttime)))
-						C_gov += Nz_inv * dzone->template employment_government<float>() * exp(alpha*ttime_auto_peak);
-						C_man += Nz_inv * dzone->template employment_manufacturing<float>() * exp(alpha*ttime_auto_peak);
-						C_ret += Nz_inv * dzone->template employment_retail<float>() * exp(alpha*ttime_auto_peak);
-						C_ser += Nz_inv * dzone->template employment_services<float>() * exp(alpha*ttime_auto_peak);
-						C_ind += Nz_inv * dzone->template employment_industrial<float>() * exp(alpha*ttime_auto_peak);
-						C_oth += Nz_inv * dzone->template employment_other<float>() * exp(alpha*ttime_auto_peak);
+						C_gov += Nz_inv * dzone->template employment_government<float>() * exp(alpha*ttime_auto_ampeak_max);
+						C_man += Nz_inv * dzone->template employment_manufacturing<float>() * exp(alpha*ttime_auto_ampeak_max);
+						C_ret += Nz_inv * dzone->template employment_retail<float>() * exp(alpha*ttime_auto_ampeak_max);
+						C_ser += Nz_inv * dzone->template employment_services<float>() * exp(alpha*ttime_auto_ampeak_max);
+						C_ind += Nz_inv * dzone->template employment_industrial<float>() * exp(alpha*ttime_auto_ampeak_max);
+						C_oth += Nz_inv * dzone->template employment_other<float>() * exp(alpha*ttime_auto_ampeak_max);
 
 						float attract = dzone->template employment_total<float>() + dzone->template pop_persons<float>();
 
@@ -1064,11 +1072,17 @@ namespace Network_Skimming_Components
 							attract_count_transit += attract;
 						}
 						// updata average auto travel times if auto is available
-						if (ttime_auto_peak < 1440 && ttime_auto_peak > 0)
+						if (ttime_auto_ampeak_max < 1440 && ttime_auto_ampeak_max > 0)
 						{
-							auto_ttime_avg += attract * exp(alpha * ttime_auto_peak);
-							auto_ttime_offpeak_avg += attract * exp(alpha * ttime_auto_offpeak);
-							distance_avg += attract * exp(alpha * ttime_auto_peak) * distance;
+							auto_ttime_ampeak_max_avg += attract * exp(alpha * ttime_auto_ampeak_max);
+							auto_ttime_pmpeak_max_avg += attract * exp(alpha * ttime_auto_pmpeak_max);
+							auto_ttime_offpeak_max_avg += attract * exp(alpha * ttime_auto_offpeak_max);
+							auto_ttime_night_max_avg += attract * exp(alpha * ttime_auto_night_max);
+							auto_ttime_ampeak_min_avg += attract * exp(alpha * ttime_auto_ampeak_min);
+							auto_ttime_pmpeak_min_avg += attract * exp(alpha * ttime_auto_pmpeak_min);
+							auto_ttime_offpeak_min_avg += attract * exp(alpha * ttime_auto_offpeak_min);
+							auto_ttime_night_min_avg += attract * exp(alpha * ttime_auto_night_min);
+							distance_avg += attract * exp(alpha * ttime_auto_ampeak_max) * distance;
 							count++;
 							attract_count += attract;
 						}
@@ -1084,9 +1098,17 @@ namespace Network_Skimming_Components
 					zone->accessibility_employment_services(C_ser);
 
 					// update the average travel times to all other zones for 'zone' by mode - weighted by attractiveness of zone (i.e. how well served are the attractive zones)
-					zone->template avg_ttime_auto_offpeak<Time_Minutes>(1.0 / alpha * log(auto_ttime_offpeak_avg/attract_count));
-					zone->template avg_ttime_auto_peak<Time_Minutes>(1.0 / alpha * log(auto_ttime_avg / attract_count));
-					zone->template avg_distance<Miles>(distance_avg / auto_ttime_avg);
+					zone->template avg_ttime_auto_ampeak<Time_Minutes>(0.5 / alpha * log(auto_ttime_ampeak_max_avg / attract_count) + 0.5 / alpha * log(auto_ttime_ampeak_min_avg / attract_count));
+					zone->template avg_ttime_auto_pmpeak<Time_Minutes>(0.5 / alpha * log(auto_ttime_pmpeak_max_avg / attract_count) + 0.5 / alpha * log(auto_ttime_pmpeak_min_avg / attract_count));
+					zone->template avg_ttime_auto_offpeak<Time_Minutes>(0.5 / alpha * log(auto_ttime_offpeak_max_avg / attract_count) + 0.5 / alpha * log(auto_ttime_offpeak_min_avg / attract_count));
+					zone->template avg_ttime_auto_night<Time_Minutes>(0.5 / alpha * log(auto_ttime_night_max_avg / attract_count) + 0.5 / alpha * log(auto_ttime_night_min_avg / attract_count));
+
+					zone->template avg_ttime_var_auto_ampeak<float>(abs(0.5 / alpha * log(auto_ttime_ampeak_max_avg / attract_count) - 0.5 / alpha * log(auto_ttime_ampeak_min_avg / attract_count)) / zone->template avg_ttime_auto_ampeak<Time_Minutes>());
+					zone->template avg_ttime_var_auto_pmpeak<float>(abs(0.5 / alpha * log(auto_ttime_pmpeak_max_avg / attract_count) - 0.5 / alpha * log(auto_ttime_pmpeak_min_avg / attract_count)) / zone->template avg_ttime_auto_pmpeak<Time_Minutes>());
+					zone->template avg_ttime_var_auto_offpeak<float>(abs(0.5 / alpha * log(auto_ttime_offpeak_max_avg / attract_count) - 0.5 / alpha * log(auto_ttime_offpeak_min_avg / attract_count)) / zone->template avg_ttime_auto_offpeak<Time_Minutes>());
+					zone->template avg_ttime_var_auto_night<float>(abs(0.5 / alpha * log(auto_ttime_night_max_avg / attract_count) - 0.5 / alpha * log(auto_ttime_night_min_avg / attract_count)) / zone->template avg_ttime_auto_night<Time_Minutes>());
+					
+					zone->template avg_distance<Miles>(distance_avg / auto_ttime_ampeak_max_avg);
 					zone->template min_ovtt_transit<Time_Minutes>(min_transit_ovtt);
 					if (count_transit > 2)
 					{

@@ -151,7 +151,7 @@ namespace Person_Components
 			static bool comparer(typename MasterType::activity_type* act1, typename MasterType::activity_type* act2);
 			
 			template<typename TargetType> TargetType Sort_Activity_Schedule();
-
+			template<typename TimeType> float Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end);
 
 			//=======================================================================================================
 			//
@@ -937,6 +937,46 @@ namespace Person_Components
 
 		}
 
+		template<typename MasterType, typename InheritanceList>
+		template<typename TimeType>
+		float General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end)
+		{
+			if (range_end <= range_start) return 0.0;
+
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
+			Time_Minutes start = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Minutes>(range_start);
+			Time_Minutes end   = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Minutes>(range_end);
+			Time_Minutes eval_time = start;
+
+			Time_Minutes occupied_time = 0.0;
+
+			Activity_Plan* prev = previous_activity_plan<Time_Minutes,Activity_Plan*>(start);
+			if (prev->End_Time<Time_Minutes>() > start && prev->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY) occupied_time = occupied_time + prev->End_Time<Time_Minutes>() - start;
+
+			Activity_Plan* next = next_activity_plan<Time_Minutes, Activity_Plan*>(start);
+
+			while (next != nullptr)
+			{
+				if (next->Start_Time<Time_Minutes>() > end) break; // no more possible activities occupying time in range
+
+				 // ignore at home activities other than work
+				if (next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
+				{
+					if (next->End_Time<Time_Minutes>() > end)
+					{
+						occupied_time = occupied_time + (end - next->Start_Time<Time_Minutes>());
+						break;
+					}
+					else occupied_time = occupied_time + next->Duration<Time_Minutes>();
+				}
+				next = next_activity_plan<Time_Minutes, Activity_Plan*>(next->End_Time<Time_Minutes>());
+			}
+
+			return occupied_time / (end - start);
+
+		}
 
 		//=======================================================================================================
 		//

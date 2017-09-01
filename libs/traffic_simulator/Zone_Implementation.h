@@ -92,8 +92,14 @@ namespace Zone_Components
 			member_component_and_feature_accessor(avg_wait_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_distance, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
 			//member_component_and_feature_accessor(avg_ttime_auto_to_transit_accessible_zones,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
-			member_component_and_feature_accessor(avg_ttime_auto_peak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_ttime_auto_ampeak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_ttime_auto_pmpeak, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(avg_ttime_auto_offpeak,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(avg_ttime_auto_night, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			m_data(float, avg_ttime_var_auto_ampeak, NONE, NONE);
+			m_data(float, avg_ttime_var_auto_pmpeak, NONE, NONE);
+			m_data(float, avg_ttime_var_auto_offpeak, NONE, NONE);
+			m_data(float, avg_ttime_var_auto_night, NONE, NONE);
 
 			m_data(int, pop_households, NONE, NONE);
 			m_data(int, pop_persons, NONE, NONE);

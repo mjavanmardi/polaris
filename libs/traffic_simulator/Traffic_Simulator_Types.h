@@ -81,5 +81,10 @@ namespace Scenario_Components
 				REALTIME_INFORMED,
 				ITS_INFORMED
 			};
+
+			enum Area_Type_Keys
+			{
+
+			};
 	}
 }
