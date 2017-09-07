@@ -145,7 +145,6 @@ namespace polaris
 			end_ids.clear();
 			end_ids.push_back(out_path.back());
 		}
-		else
 		
 		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
 		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)

@@ -46,7 +46,10 @@ namespace polaris
 
 			if( cost_from_origin < current_neighbor->cost_from_origin() )
 			{
-				if( current_neighbor->in_open_set() ) routing_data.open_set->erase( routing_data.open_set->iterator_to( *((base_edge_type*)current_neighbor)  ) );
+				if (current_neighbor->in_open_set())
+				{
+					routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				}
 
 				float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				float time_from_origin = current->time_from_origin() + time_cost_between;

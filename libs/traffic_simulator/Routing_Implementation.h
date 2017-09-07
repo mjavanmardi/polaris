@@ -115,7 +115,7 @@ namespace Routing_Components
 				Link_Container_Interface* destination_walk_links = destination_loc->template destination_walk_links<Link_Container_Interface*>();
 				
 				//TODO: Remove when done testing routing execution time
-				__int64 astar_time;
+				__int64 astar_time = -1;
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
 				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();

@@ -160,7 +160,7 @@ namespace Batch_Router_Components
 				if (movement->valid_trajectory<bool>())
 				{
 					//TODO: Remove when done testing routing execution time
-					results_by_thread[__thread_id] << movement->routing_execution_time<__int64>() << "\t";
+					results_by_thread[__thread_id] << (int) (movement->routing_execution_time<__int64>()) << "\t";
 									
 					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << endl;
 					
