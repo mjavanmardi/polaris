@@ -54,9 +54,12 @@ namespace Network_Components
 				cout << "done."<<endl;
 
 				read_intersection_data<TargetType>(db, net_io_maps);
-				read_transit_route_data<TargetType>(db, net_io_maps);
-				read_transit_pattern_data<TargetType>(db, net_io_maps);
-				read_transit_vehicle_trip_data<TargetType>(db, net_io_maps);
+				if (_scenario_reference->template multimodal_routing<bool>())
+				{
+					read_transit_route_data<TargetType>(db, net_io_maps);
+					read_transit_pattern_data<TargetType>(db, net_io_maps);
+					read_transit_vehicle_trip_data<TargetType>(db, net_io_maps);
+				}
 				read_link_data<TargetType>(db, net_io_maps);
 				read_turn_movement_data<TargetType>(db, net_io_maps);
 				read_zone_data<TargetType>(db, net_io_maps);
@@ -118,7 +121,11 @@ namespace Network_Components
 					intersection->template x_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
 					intersection->template y_position<float>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
-					intersection->template zone<int>(db_itr->getZone()->getZone());
+					
+					if (_scenario_reference->template multimodal_routing<bool>())
+					{
+						intersection->template zone<int>(db_itr->getZone()->getZone());
+					}
 					
 					net_io_maps.intersection_id_to_ptr[db_itr->getNode()]=intersection;
 
@@ -142,46 +149,49 @@ namespace Network_Components
 
 				result<Transit_Stops> tr_node_result = db->template query<Transit_Stops>(query<Transit_Stops>::true_expr);
 				
-				cout << "Reading Transit Nodes" << endl;
-				
-				for (typename result<Transit_Stops>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
+				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					counter++;
-					if (counter % 10000 == 0) cout << "\t" << counter << endl;
+					cout << "Reading Transit Nodes" << endl;
 
-					intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
-					uuid_max++;
-					intersection->template uuid<int>(uuid_max);
-					intersection->template dbid<std::string>(db_itr->getStop());
-					intersection->template internal_id<int>(counter);
-					intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
-					intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
-					intersection->template agency<std::string>(db_itr->getAgency());
-					intersection->template name<std::string>(db_itr->getName());
-					intersection->template description<std::string>(db_itr->getDescription());
-					intersection->template street<std::string>(db_itr->getStreet());
-					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
-					intersection->template zone<int>(db_itr->getZone()->getZone());
-
-					net_io_maps.intersection_id_to_ptr[intersection->_uuid] = intersection;
-					net_io_maps.transit_stop_id_to_ptr[db_itr->getStop()] = intersection;
-
-					if (_scenario_reference->template intersection_control_flag<int>() == 0)
+					for (typename result<Transit_Stops>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
 					{
-						intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
+						counter++;
+						if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
-						_Intersection_Control_Interface* intersection_control = (_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
-						intersection_control->template intersection<_Intersection_Interface*>(intersection);
+						intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
+						uuid_max++;
+						intersection->template uuid<int>(uuid_max);
+						intersection->template dbid<std::string>(db_itr->getStop());
+						intersection->template internal_id<int>(counter);
+						intersection->template x_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
+						intersection->template y_position<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
+						intersection->template agency<std::string>(db_itr->getAgency());
+						intersection->template name<std::string>(db_itr->getName());
+						intersection->template description<std::string>(db_itr->getDescription());
+						intersection->template street<std::string>(db_itr->getStreet());
+						intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
+						intersection->template zone<int>(db_itr->getZone()->getZone());
 
-						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
-						control_plan->template control_plan_index<int>(0.0);
-						control_plan->template control_type<int>(Intersection_Components::Types::NO_CONTROL);
-						control_plan->template starting_time<int>(0.0);
-						control_plan->template ending_time<int>(24 * 60 * 60);
-						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
-						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+						net_io_maps.intersection_id_to_ptr[intersection->_uuid] = intersection;
+						net_io_maps.transit_stop_id_to_ptr[db_itr->getStop()] = intersection;
+
+						if (_scenario_reference->template intersection_control_flag<int>() == 0)
+						{
+							intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
+
+							_Intersection_Control_Interface* intersection_control = (_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+							intersection_control->template intersection<_Intersection_Interface*>(intersection);
+
+							_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+							control_plan->template control_plan_index<int>(0.0);
+							control_plan->template control_type<int>(Intersection_Components::Types::NO_CONTROL);
+							control_plan->template starting_time<int>(0.0);
+							control_plan->template ending_time<int>(24 * 60 * 60);
+							intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+							intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+						}
+						intersections_container_ptr->push_back(intersection);
 					}
-					intersections_container_ptr->push_back(intersection);
 				}
 			}
 
@@ -558,8 +568,11 @@ namespace Network_Components
 
 						dbid_max = std::max(dbid_max, link->_dbid);
 
-						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
-						link->template zone<int>(zone_id);
+						if (_scenario_reference->template multimodal_routing<bool>())
+						{
+							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+							link->template zone<int>(zone_id);
+						}
 
 						num_lanes = db_itr->getLanes_Ab();
 						
@@ -798,8 +811,11 @@ namespace Network_Components
 												
 						dbid_max = std::max(dbid_max, link->_dbid);
 
-						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
-						link->template zone<int>(zone_id);
+						if (_scenario_reference->template multimodal_routing<bool>())
+						{
+							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+							link->template zone<int>(zone_id);
+						}
 
 						num_lanes = db_itr->getLanes_Ba();
 						
@@ -1006,464 +1022,467 @@ namespace Network_Components
 					}
 				}
 
-				result<polaris::io::Transit_Walk> walk_link_result = db->template query<polaris::io::Transit_Walk>(query<polaris::io::Transit_Walk>::true_expr);
-
-				cout << "Reading Walk Links" << endl;
-
-				for (typename result<polaris::io::Transit_Walk>::iterator db_itr = walk_link_result.begin(); db_itr != walk_link_result.end(); ++db_itr)
+				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					//const string& facility_type = db_itr->getType()->getLink_Type();
-					bool do_this_link = true;
+					result<polaris::io::Transit_Walk> walk_link_result = db->template query<polaris::io::Transit_Walk>(query<polaris::io::Transit_Walk>::true_expr);
 
-					counter++;
-					//dbid_max++;
+					cout << "Reading Walk Links" << endl;
 
-					if (counter % 10000 == 0) cout << "\t" << counter << endl;
-
-					//Generating the AB link!
-					if (do_this_link)
+					for (typename result<polaris::io::Transit_Walk>::iterator db_itr = walk_link_result.begin(); db_itr != walk_link_result.end(); ++db_itr)
 					{
-						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();						
+						//const string& facility_type = db_itr->getType()->getLink_Type();
+						bool do_this_link = true;
 
-						link_id_dir.id = db_itr->getLink();
-						//link_id_dir.id = dbid_max;
-						link_id_dir.dir = 0;
-
-						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
-
-						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
-						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
-						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
-
-						link->template dbid<int>(db_itr->getLink());
-						link->template direction<int>(0.0);
-
-						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);*/
-
-						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
-						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
-										
-						_Intersection_Interface* upstream_2 = nullptr;
-						_Intersection_Interface* downstream_2 = nullptr;
-						
-						std::stringstream sstrU(db_itr->getNode_A());
-						std::stringstream sstrD(db_itr->getNode_B());
-						int u2;
-						int d2;
-
-						if (sstrU >> u2)
-						{
-							upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
-						}
-
-						if (sstrD >> d2)
-						{
-							downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
-						}
-						
-						if (upstream_1 && upstream_2)
-						{
-							cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
-						
-						if (upstream_1)
-						{
-							link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
-						}
-						else if (upstream_2)
-						{
-							link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
-						}
-						else
-						{
-							cout << "Walk link to node A maps to nothing" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
-
-
-
-						if (downstream_1 && downstream_2)
-						{
-							cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
-
-						if (downstream_1)
-						{
-							link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
-						}
-						else if (downstream_2)
-						{
-							link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
-						}
-						else
-						{
-							cout << "Walk link to node B maps to nothing" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
-						
-						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
-
-						dbid_max = std::max(dbid_max, link->_dbid);
-
-						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
-						link->template zone<int>(zone_id);
-
-						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-
-						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
-
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-						links_container_ptr->push_back(link);
-
-						typename id_to_links_type::iterator links_itr;
-						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
-						links_itr = id_to_links_map.find(link_id_dir.id);
-						if (links_itr != id_to_links_map.end())
-						{
-							links_itr->second.push_back((typename MasterType::link_type*)link);
-						}
-						else
-						{
-							std::vector<typename MasterType::link_type*> links_arr;
-							links_arr.push_back((typename MasterType::link_type*)link);
-							id_to_links_map[link_id_dir.id] = links_arr;
-						}
-					}
-
-					//Generating the BA link!
-					if (do_this_link)
-					{
-						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
-
+						counter++;
 						//dbid_max++;
 
-						link_id_dir.id = db_itr->getLink();
-						//link_id_dir.id = dbid_max;
-						link_id_dir.dir = 1;
+						if (counter % 10000 == 0) cout << "\t" << counter << endl;
 
-						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
-
-						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
-						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
-						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
-
-						link->template dbid<int>(db_itr->getLink());
-						link->template direction<int>(1);
-
-						/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);*/
-
-						_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
-						_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
-
-						_Intersection_Interface* upstream_2 = nullptr;
-						_Intersection_Interface* downstream_2 = nullptr;
-
-						std::stringstream sstrU(db_itr->getNode_B());
-						std::stringstream sstrD(db_itr->getNode_A());
-						int u2;
-						int d2;
-
-						if (sstrU >> u2)
+						//Generating the AB link!
+						if (do_this_link)
 						{
-							upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
-						}
+							link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
 
-						if (sstrD >> d2)
-						{
-							downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
-						}
+							link_id_dir.id = db_itr->getLink();
+							//link_id_dir.id = dbid_max;
+							link_id_dir.dir = 0;
 
-						if (upstream_1 && upstream_2)
-						{
-							cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
+							net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
 
-						if (upstream_1)
-						{
-							link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
-						}
-						else if (upstream_2)
-						{
-							link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
-						}
-						else
-						{
-							cout << "Walk link to node B maps to nothing" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
+							typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+							link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+							(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
+							link->template dbid<int>(db_itr->getLink());
+							link->template direction<int>(0.0);
 
+							/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
+							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);*/
 
-						if (downstream_1 && downstream_2)
-						{
-							cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
+							_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
+							_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
 
-						if (downstream_1)
-						{
-							link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
-						}
-						else if (downstream_2)
-						{
-							link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
-						}
-						else
-						{
-							cout << "Walk link to node A maps to nothing" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Node A: " << db_itr->getNode_A() << endl;
-							cout << "Node B: " << db_itr->getNode_B() << endl;
-							system("pause");
-							exit(0);
-						}
+							_Intersection_Interface* upstream_2 = nullptr;
+							_Intersection_Interface* downstream_2 = nullptr;
 
-						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+							std::stringstream sstrU(db_itr->getNode_A());
+							std::stringstream sstrD(db_itr->getNode_B());
+							int u2;
+							int d2;
 
-						dbid_max = std::max(dbid_max, link->_dbid);
-
-						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
-						link->template zone<int>(zone_id);
-
-						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-
-						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
-
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-						links_container_ptr->push_back(link);
-
-						typename id_to_links_type::iterator links_itr;
-						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
-						links_itr = id_to_links_map.find(link_id_dir.id);
-						if (links_itr != id_to_links_map.end())
-						{
-							links_itr->second.push_back((typename MasterType::link_type*)link);
-						}
-						else
-						{
-							std::vector<typename MasterType::link_type*> links_arr;
-							links_arr.push_back((typename MasterType::link_type*)link);
-							id_to_links_map[link_id_dir.id] = links_arr;
-						}
-					}
-				}
-
-				result<polaris::io::Transit_Links> transit_link_result = db->template query<polaris::io::Transit_Links>(query<polaris::io::Transit_Links>::true_expr);
-
-				cout << "Reading Transit Links" << endl;
-
-				for (typename result<polaris::io::Transit_Links>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
-				{
-					//const string& facility_type = db_itr->getType()->getLink_Type();
-					bool do_this_link = true;
-
-					counter++;
-					if (counter % 10000 == 0) cout << "\t" << counter << endl;
-					
-					//Transit links are generated only in the defined AB direction!
-					if (do_this_link)
-					{
-						link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
-
-						dbid_max++;
-
-						//link_id_dir.id = db_itr->getLink();
-						link_id_dir.id = dbid_max;
-						link_id_dir.dir = 0;
-
-						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
-
-						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
-						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
-						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
-
-						link->template dbid<int>(dbid_max);
-						link->template direction<int>(0.0);
-
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()->getStop()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()->getStop()]);
-						
-						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
-
-						int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
-						link->template zone<int>(zone_id);
-
-						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-
-						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
-
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-						const string& TripsByDepTime = db_itr->getTriplist();
-						std::istringstream ss(TripsByDepTime);
-						std::string sub_string;
-						int mySeq;
-
-						while (std::getline(ss, sub_string, '|'))
-						{
-							_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[sub_string];
-
-							if (link_trip)
+							if (sstrU >> u2)
 							{
-								link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
-								_Transit_Pattern_Interface* link_pattern = link_trip->_pattern;
-								bool pattern_add = true;
+								upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
+							}
 
-								int my_itr = 0;
-								for (auto itr = link->_unique_patterns.begin(); itr != link->_unique_patterns.end(); ++itr)
-								{
-									_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(my_itr);
+							if (sstrD >> d2)
+							{
+								downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
+							}
 
-									if (my_pattern == link_pattern)
-									{
-										pattern_add = false;
-										break;
-									}
-									++my_itr;
-								}
+							if (upstream_1 && upstream_2)
+							{
+								cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
 
-								if (pattern_add)
-								{
-									link->template unique_patterns<_Transit_Patterns_Container_Interface&>().push_back(link_pattern);
-								}
+							if (upstream_1)
+							{
+								link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
+							}
+							else if (upstream_2)
+							{
+								link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
 							}
 							else
 							{
-								cout << "The link " << link->_dbid << " points to a non-existing trip: " << sub_string << endl;
+								cout << "Walk link to node A maps to nothing" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
 								system("pause");
 								exit(0);
 							}
 
-						}
 
-						const string& IndexAlongTripOfStopA = db_itr->getIndexlist();
-						ss.clear();
-						ss.str(IndexAlongTripOfStopA);
 
-						while (std::getline(ss, sub_string, '|'))
-						{
-							mySeq = stoi(sub_string);
-							link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
-						}
-
-						if ( link->_trips_by_dep_time.size() != link->_index_along_trip_at_upstream_node.size() )
-						{
-							cout << "Inconsistency between number of trips and trip indices on a link!" << endl;
-							cout << "Link ID: " << link->_dbid << endl;
-							cout << "Trip sequence size of the link: " << link->_trips_by_dep_time.size() << endl;
-							cout << "Trip sequence indices size of the trip: " << link->_index_along_trip_at_upstream_node.size() << endl;
-							system("pause");
-							exit(0);
-						}
-
-						int my_itr = 0;
-						for (auto itr = link->_trips_by_dep_time.begin(); itr != link->_trips_by_dep_time.end(); ++itr)
-						{
-							int temp_seq = link->_index_along_trip_at_upstream_node.at(my_itr);
-
-							int temp_stop1 = link->_upstream_intersection->_uuid;
-							int temp_stop2 = link->_trips_by_dep_time.at(my_itr)->_pattern->_pattern_stops.at(temp_seq)->_uuid;
-							int temp_trip = link->_trips_by_dep_time.at(my_itr)->_uuid;
-							int temp_pattern = link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid;
-
-							if (temp_stop1 != temp_stop2)
+							if (downstream_1 && downstream_2)
 							{
-								cout << "Link's upstream node does not match the stop ID of the trip!" << endl;
+								cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
 								cout << "Link ID: " << link->_dbid << endl;
-								cout << "Trip's sequence by departure time (0 start) on link: " << my_itr << endl;
-								cout << "Trip ID: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
-								cout << "Pattern ID: " << link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid << endl;
-								cout << "Claimed sequence number of the upstream node along the trip: " << temp_seq << endl;
-								cout << "Link's upstream node ID: " << temp_stop1 << endl;
-								cout << "Node ID along the trip at " << temp_seq << " is: " << temp_stop2 << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
 								system("pause");
 								exit(0);
-							}	
+							}
 
-							if (my_itr + 1 < link->_trips_by_dep_time.size())
+							if (downstream_1)
 							{
-								
-								int temp_seq1 = link->_index_along_trip_at_upstream_node.at(my_itr);
-								int temp_seq2 = link->_index_along_trip_at_upstream_node.at(my_itr + 1);
+								link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
+							}
+							else if (downstream_2)
+							{
+								link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
+							}
+							else
+							{
+								cout << "Walk link to node B maps to nothing" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
 
-								int temp_time1 = link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1);
-								int temp_time2 = link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2);
-								
-								if (link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1) > link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2))
+							link->template internal_id<int>(++link_counter);
+							link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+							dbid_max = std::max(dbid_max, link->_dbid);
+
+							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+							link->template zone<int>(zone_id);
+
+							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
+
+							link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+							link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+							links_container_ptr->push_back(link);
+
+							typename id_to_links_type::iterator links_itr;
+							id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+							links_itr = id_to_links_map.find(link_id_dir.id);
+							if (links_itr != id_to_links_map.end())
+							{
+								links_itr->second.push_back((typename MasterType::link_type*)link);
+							}
+							else
+							{
+								std::vector<typename MasterType::link_type*> links_arr;
+								links_arr.push_back((typename MasterType::link_type*)link);
+								id_to_links_map[link_id_dir.id] = links_arr;
+							}
+						}
+
+						//Generating the BA link!
+						if (do_this_link)
+						{
+							link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+							//dbid_max++;
+
+							link_id_dir.id = db_itr->getLink();
+							//link_id_dir.id = dbid_max;
+							link_id_dir.dir = 1;
+
+							net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+							typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+							link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+							(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+							link->template dbid<int>(db_itr->getLink());
+							link->template direction<int>(1);
+
+							/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
+							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);*/
+
+							_Intersection_Interface* upstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()];
+							_Intersection_Interface* downstream_1 = (_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()];
+
+							_Intersection_Interface* upstream_2 = nullptr;
+							_Intersection_Interface* downstream_2 = nullptr;
+
+							std::stringstream sstrU(db_itr->getNode_B());
+							std::stringstream sstrD(db_itr->getNode_A());
+							int u2;
+							int d2;
+
+							if (sstrU >> u2)
+							{
+								upstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[u2];
+							}
+
+							if (sstrD >> d2)
+							{
+								downstream_2 = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[d2];
+							}
+
+							if (upstream_1 && upstream_2)
+							{
+								cout << "Walk link to node A maps to both Drive and Transit Node. Naming conflict!" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
+
+							if (upstream_1)
+							{
+								link->template upstream_intersection<_Intersection_Interface*>(upstream_1);
+							}
+							else if (upstream_2)
+							{
+								link->template upstream_intersection<_Intersection_Interface*>(upstream_2);
+							}
+							else
+							{
+								cout << "Walk link to node B maps to nothing" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
+
+
+
+							if (downstream_1 && downstream_2)
+							{
+								cout << "Walk link to node B maps to both Drive and Transit Node. Naming conflict!" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
+
+							if (downstream_1)
+							{
+								link->template downstream_intersection<_Intersection_Interface*>(downstream_1);
+							}
+							else if (downstream_2)
+							{
+								link->template downstream_intersection<_Intersection_Interface*>(downstream_2);
+							}
+							else
+							{
+								cout << "Walk link to node A maps to nothing" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Node A: " << db_itr->getNode_A() << endl;
+								cout << "Node B: " << db_itr->getNode_B() << endl;
+								system("pause");
+								exit(0);
+							}
+
+							link->template internal_id<int>(++link_counter);
+							link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+							dbid_max = std::max(dbid_max, link->_dbid);
+
+							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+							link->template zone<int>(zone_id);
+
+							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
+
+							link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+							link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+							links_container_ptr->push_back(link);
+
+							typename id_to_links_type::iterator links_itr;
+							id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+							links_itr = id_to_links_map.find(link_id_dir.id);
+							if (links_itr != id_to_links_map.end())
+							{
+								links_itr->second.push_back((typename MasterType::link_type*)link);
+							}
+							else
+							{
+								std::vector<typename MasterType::link_type*> links_arr;
+								links_arr.push_back((typename MasterType::link_type*)link);
+								id_to_links_map[link_id_dir.id] = links_arr;
+							}
+						}
+					}
+
+					result<polaris::io::Transit_Links> transit_link_result = db->template query<polaris::io::Transit_Links>(query<polaris::io::Transit_Links>::true_expr);
+
+					cout << "Reading Transit Links" << endl;
+
+					for (typename result<polaris::io::Transit_Links>::iterator db_itr = transit_link_result.begin(); db_itr != transit_link_result.end(); ++db_itr)
+					{
+						//const string& facility_type = db_itr->getType()->getLink_Type();
+						bool do_this_link = true;
+
+						counter++;
+						if (counter % 10000 == 0) cout << "\t" << counter << endl;
+
+						//Transit links are generated only in the defined AB direction!
+						if (do_this_link)
+						{
+							link = (_Link_Interface*)Allocate<typename MasterType::link_type>();
+
+							dbid_max++;
+
+							//link_id_dir.id = db_itr->getLink();
+							link_id_dir.id = dbid_max;
+							link_id_dir.dir = 0;
+
+							net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir] = link;
+
+							typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+							link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+							(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
+
+							link->template dbid<int>(dbid_max);
+							link->template direction<int>(0.0);
+
+							link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()->getStop()]);
+							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()->getStop()]);
+
+							link->template internal_id<int>(++link_counter);
+							link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
+
+							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
+							link->template zone<int>(zone_id);
+
+							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
+
+							link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
+							link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
+
+							const string& TripsByDepTime = db_itr->getTriplist();
+							std::istringstream ss(TripsByDepTime);
+							std::string sub_string;
+							int mySeq;
+
+							while (std::getline(ss, sub_string, '|'))
+							{
+								_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[sub_string];
+
+								if (link_trip)
 								{
-									cout << "Trips on the link are not ordered by departure time!" << endl;
-									cout << "Link ID: " << link->_dbid << endl;
-									cout << "Trip ID_1: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
-									cout << "Trip ID_2: " << link->_trips_by_dep_time.at(my_itr + 1)->_uuid << endl;
-									cout << "Trip 1's sequence by departure time (0 start) on link: " << my_itr << endl;
-									cout << "Trip 2's sequence by departure time (0 start) on link: " << my_itr + 1 << endl;
-									cout << "Sequence number of the upstream node along the trip 1: " << temp_seq1 << endl;
-									cout << "Sequence number of the upstream node along the trip 2: " << temp_seq2 << endl;
-									cout << "Departure time from the upstream node of trip 1: " << temp_time1 << endl;
-									cout << "Departure time from the upstream node of trip 2: " << temp_time2 << endl;
+									link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
+									_Transit_Pattern_Interface* link_pattern = link_trip->_pattern;
+									bool pattern_add = true;
+
+									int my_itr = 0;
+									for (auto itr = link->_unique_patterns.begin(); itr != link->_unique_patterns.end(); ++itr)
+									{
+										_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(my_itr);
+
+										if (my_pattern == link_pattern)
+										{
+											pattern_add = false;
+											break;
+										}
+										++my_itr;
+									}
+
+									if (pattern_add)
+									{
+										link->template unique_patterns<_Transit_Patterns_Container_Interface&>().push_back(link_pattern);
+									}
+								}
+								else
+								{
+									cout << "The link " << link->_dbid << " points to a non-existing trip: " << sub_string << endl;
 									system("pause");
 									exit(0);
-									//
-								}	
-							}
-							++my_itr;
-						}
-						
-						links_container_ptr->push_back(link);
+								}
 
-						typename id_to_links_type::iterator links_itr;
-						id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
-						links_itr = id_to_links_map.find(link_id_dir.id);
-						if (links_itr != id_to_links_map.end())
-						{
-							links_itr->second.push_back((typename MasterType::link_type*)link);
-						}
-						else
-						{
-							std::vector<typename MasterType::link_type*> links_arr;
-							links_arr.push_back((typename MasterType::link_type*)link);
-							id_to_links_map[link_id_dir.id] = links_arr;
+							}
+
+							const string& IndexAlongTripOfStopA = db_itr->getIndexlist();
+							ss.clear();
+							ss.str(IndexAlongTripOfStopA);
+
+							while (std::getline(ss, sub_string, '|'))
+							{
+								mySeq = stoi(sub_string);
+								link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
+							}
+
+							if (link->_trips_by_dep_time.size() != link->_index_along_trip_at_upstream_node.size())
+							{
+								cout << "Inconsistency between number of trips and trip indices on a link!" << endl;
+								cout << "Link ID: " << link->_dbid << endl;
+								cout << "Trip sequence size of the link: " << link->_trips_by_dep_time.size() << endl;
+								cout << "Trip sequence indices size of the trip: " << link->_index_along_trip_at_upstream_node.size() << endl;
+								system("pause");
+								exit(0);
+							}
+
+							int my_itr = 0;
+							for (auto itr = link->_trips_by_dep_time.begin(); itr != link->_trips_by_dep_time.end(); ++itr)
+							{
+								int temp_seq = link->_index_along_trip_at_upstream_node.at(my_itr);
+
+								int temp_stop1 = link->_upstream_intersection->_uuid;
+								int temp_stop2 = link->_trips_by_dep_time.at(my_itr)->_pattern->_pattern_stops.at(temp_seq)->_uuid;
+								int temp_trip = link->_trips_by_dep_time.at(my_itr)->_uuid;
+								int temp_pattern = link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid;
+
+								if (temp_stop1 != temp_stop2)
+								{
+									cout << "Link's upstream node does not match the stop ID of the trip!" << endl;
+									cout << "Link ID: " << link->_dbid << endl;
+									cout << "Trip's sequence by departure time (0 start) on link: " << my_itr << endl;
+									cout << "Trip ID: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
+									cout << "Pattern ID: " << link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid << endl;
+									cout << "Claimed sequence number of the upstream node along the trip: " << temp_seq << endl;
+									cout << "Link's upstream node ID: " << temp_stop1 << endl;
+									cout << "Node ID along the trip at " << temp_seq << " is: " << temp_stop2 << endl;
+									system("pause");
+									exit(0);
+								}
+
+								if (my_itr + 1 < link->_trips_by_dep_time.size())
+								{
+
+									int temp_seq1 = link->_index_along_trip_at_upstream_node.at(my_itr);
+									int temp_seq2 = link->_index_along_trip_at_upstream_node.at(my_itr + 1);
+
+									int temp_time1 = link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1);
+									int temp_time2 = link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2);
+
+									if (link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1) > link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2))
+									{
+										cout << "Trips on the link are not ordered by departure time!" << endl;
+										cout << "Link ID: " << link->_dbid << endl;
+										cout << "Trip ID_1: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
+										cout << "Trip ID_2: " << link->_trips_by_dep_time.at(my_itr + 1)->_uuid << endl;
+										cout << "Trip 1's sequence by departure time (0 start) on link: " << my_itr << endl;
+										cout << "Trip 2's sequence by departure time (0 start) on link: " << my_itr + 1 << endl;
+										cout << "Sequence number of the upstream node along the trip 1: " << temp_seq1 << endl;
+										cout << "Sequence number of the upstream node along the trip 2: " << temp_seq2 << endl;
+										cout << "Departure time from the upstream node of trip 1: " << temp_time1 << endl;
+										cout << "Departure time from the upstream node of trip 2: " << temp_time2 << endl;
+										system("pause");
+										exit(0);
+										//
+									}
+								}
+								++my_itr;
+							}
+
+							links_container_ptr->push_back(link);
+
+							typename id_to_links_type::iterator links_itr;
+							id_to_links_type& id_to_links_map = _network_reference->template db_id_to_links_map<id_to_links_type&>();
+							links_itr = id_to_links_map.find(link_id_dir.id);
+							if (links_itr != id_to_links_map.end())
+							{
+								links_itr->second.push_back((typename MasterType::link_type*)link);
+							}
+							else
+							{
+								std::vector<typename MasterType::link_type*> links_arr;
+								links_arr.push_back((typename MasterType::link_type*)link);
+								id_to_links_map[link_id_dir.id] = links_arr;
+							}
 						}
 					}
 				}
@@ -1641,230 +1660,232 @@ namespace Network_Components
 
 					turn_movements_container.push_back(turn_movement);
 				}
-
+								
+				//Adding multi-modal connections
 				typename _Intersections_Container_Interface::iterator intersections_itr;
-
-				cout << "Adding multi-modal connections" << endl;
-
-				for (intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
+				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
-					//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
-
-					//cout << "Intersection:" << intersection->_uuid << endl;
-
-					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
-					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
-
-					typename _Links_Container_Interface::iterator in_links_itr;
-					typename _Links_Container_Interface::iterator out_links_itr;
-
-					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+					cout << "Adding multi-modal connections" << endl;
+					for (intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
 					{
-						_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
+						_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
+						//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
 
-						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+						//cout << "Intersection:" << intersection->_uuid << endl;
 
-						//cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
+						_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
+						_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
 
-						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						typename _Links_Container_Interface::iterator in_links_itr;
+						typename _Links_Container_Interface::iterator out_links_itr;
+
+						for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
 						{
-							_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
-							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+							_Link_Interface* inbound_link = (_Link_Interface*)(*in_links_itr);
 
-							//cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
+							Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+							//cout << "\tInbound link's A Node:" << inbound_link->_upstream_intersection->_uuid << "\tType:" << in_facility_type << endl;
+
+							for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
 							{
-								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+								_Link_Interface* outbound_link = (_Link_Interface*)(*out_links_itr);
+								Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+								//cout << "\t\tOutbound link's B Node:" << outbound_link->_downstream_intersection->_uuid << "\tType:" << out_facility_type;
+
+								if (in_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 								{
-									//cout << "\tWalk to Walk\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_WALK);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED); 
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
+									if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+									{
+										//cout << "\tWalk to Walk\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_WALK);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									{
+										//cout << "\tWalk to Transit\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_TRANSIT);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else
+									{
+										//cout << "\tWalk to Drive\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_DRIVE);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
 								}
-								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+								else if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
-									//cout << "\tWalk to Transit\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_TRANSIT);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
+									if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+									{
+										//cout << "\tTransit to Walk\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_WALK);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									{
+										//cout << "\tTransit to Transit\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_TRANSIT);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else
+									{
+										//cout << "\tTransit to Drive\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_DRIVE);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
 								}
 								else
 								{
-									//cout << "\tWalk to Drive\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::WALK_TO_DRIVE);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
+									if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+									{
+										//cout << "\tDrive to Walk\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_WALK);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									{
+										//cout << "\tDrive to Transit\n";
+										counter++;
+										turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+										turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+										turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
+										//turn_movement->template uuid<int>(db_itr->getConn());
+										turn_movement->template internal_id<int>(counter);
+										turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_TRANSIT);
+										turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+										int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+										int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
+										typename MasterType::network_type::long_hash_key_type long_hash_key;
+										long_hash_key.inbound_link_id = inbound_link_id;
+										long_hash_key.outbound_link_id = outbound_link_id;
+										typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+										//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
+										turn_movements_container.push_back(turn_movement);
+									}
+									else
+									{
+										//cout << "\tDrive to Drive\n";
+										//Do nothing since drive-to-drive connections are read in from the Connection Table in the SQL Databese!
+									}
 								}
-							}
-							else if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{
-								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-								{
-									//cout << "\tTransit to Walk\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_WALK);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
-								}
-								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-								{
-									//cout << "\tTransit to Transit\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_TRANSIT);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
-								}
-								else
-								{
-									//cout << "\tTransit to Drive\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::TRANSIT_TO_DRIVE);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
-								}
-							}
-							else
-							{
-								if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-								{
-									//cout << "\tDrive to Walk\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_WALK);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
-								}
-								else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-								{
-									//cout << "\tDrive to Transit\n";
-									counter++;
-									turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-									turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
-									turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
-									//turn_movement->template uuid<int>(db_itr->getConn());
-									turn_movement->template internal_id<int>(counter);
-									turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::DRIVE_TO_TRANSIT);
-									turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-									int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
-									int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
-									typename MasterType::network_type::long_hash_key_type long_hash_key;
-									long_hash_key.inbound_link_id = inbound_link_id;
-									long_hash_key.outbound_link_id = outbound_link_id;
-									typename MasterType::network_type::type_of_link_turn_movement_map& link_turn_movement_map = _network_reference->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-									//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
-									link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-									turn_movements_container.push_back(turn_movement);
-								}
-								else
-								{
-									//cout << "\tDrive to Drive\n";
-									//Do nothing since drive-to-drive connections are read in from the Connection Table in the SQL Databese!
-								}
-							}
 
 
 
+							}
 						}
 					}
 				}
 
 
-
+				//Configuring Connections
 				cout << "Configuring Connections" << endl;
 
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
@@ -1880,15 +1901,11 @@ namespace Network_Components
 					outbound_link->template inbound_turn_movements<_Turn_Movements_Container_Interface&>().push_back(turn_mvmt);
 				}
 
+				//Configuring Outbound Inbound Movements
+				cout << "Configuring Outbound Inbound Movements" << endl;
 
 				typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer< typename _Intersection_Interface::get_type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
 				typedef  Random_Access_Sequence< typename _Intersection_Interface::get_type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
-
-
-				// configure outbound_inbound_movements
-//				typename _Intersections_Container_Interface::iterator intersections_itr;
-
-				cout << "Configuring Outbound Inbound Movements" << endl;
 
 				for(intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
 				{
@@ -1920,15 +1937,12 @@ namespace Network_Components
 					}
 				}
 
-
+				//Configuring Inbound Outbound Movements
+				cout << "Configuring Inbound Outbound Movements" << endl;
 
 				typedef  Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer< typename _Intersection_Interface::get_type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
 				typedef  Random_Access_Sequence< typename _Intersection_Interface::get_type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
-
-
-				cout << "Configuring Inbound Outbound Movements" << endl;
-
-				// configure inbound_outbound_movements
+								
 				for (int i = 0; i < (int)intersections_container.size(); i++)
 				{
 					_Intersection_Interface* intersection = (_Intersection_Interface*)intersections_container[i];
@@ -1951,38 +1965,42 @@ namespace Network_Components
 					}
 				}
 
-				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
-				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
-				
-				typename _Transit_Patterns_Container_Interface::iterator patterns_itr;
-				_Transit_Patterns_Container_Interface& patterns = _network_reference->template transit_patterns_container<_Transit_Patterns_Container_Interface&>();
-
-				cout << "Adding pattern links using pattern stops" << endl;
-
-				for (patterns_itr = patterns.begin(); patterns_itr != patterns.end(); ++patterns_itr)
+				//Adding pattern links using pattern stops
+				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					_Transit_Pattern_Interface* pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+					cout << "Adding pattern links using pattern stops" << endl;
 
-					for (int stops_itr = 0; stops_itr < (int)pattern->_pattern_stops.size()-1; stops_itr++)
+					typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+					typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+				
+					typename _Transit_Patterns_Container_Interface::iterator patterns_itr;
+					_Transit_Patterns_Container_Interface& patterns = _network_reference->template transit_patterns_container<_Transit_Patterns_Container_Interface&>();
+
+					for (patterns_itr = patterns.begin(); patterns_itr != patterns.end(); ++patterns_itr)
 					{
-						
-						_Intersection_Interface* a_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr);
-						_Intersection_Interface* b_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr+1);
-						
-						for (int links_itr = 0; links_itr < (int)a_Stop->_outbound_links.size(); links_itr++)
+						_Transit_Pattern_Interface* pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+
+						for (int stops_itr = 0; stops_itr < (int)pattern->_pattern_stops.size() - 1; stops_itr++)
 						{
-							_Link_Interface* out_link = (_Link_Interface*)a_Stop->_outbound_links.at(links_itr);
 
-							_Intersection_Interface* a_Stop_Candidate = (_Intersection_Interface*)out_link->_upstream_intersection;
-							_Intersection_Interface* b_Stop_Candidate = (_Intersection_Interface*)out_link->_downstream_intersection;
+							_Intersection_Interface* a_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr);
+							_Intersection_Interface* b_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr + 1);
 
-							Link_Components::Types::Link_Type_Keys out_type = out_link->_link_type;
-
-							if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							for (int links_itr = 0; links_itr < (int)a_Stop->_outbound_links.size(); links_itr++)
 							{
-								pattern->_pattern_links.push_back(out_link);
+								_Link_Interface* out_link = (_Link_Interface*)a_Stop->_outbound_links.at(links_itr);
+
+								_Intersection_Interface* a_Stop_Candidate = (_Intersection_Interface*)out_link->_upstream_intersection;
+								_Intersection_Interface* b_Stop_Candidate = (_Intersection_Interface*)out_link->_downstream_intersection;
+
+								Link_Components::Types::Link_Type_Keys out_type = out_link->_link_type;
+
+								if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+								{
+									pattern->_pattern_links.push_back(out_link);
+								}
 							}
-						}					
+						}
 					}
 				}
 
@@ -2090,19 +2108,20 @@ namespace Network_Components
 				}
 
 				typename _Links_Container_Interface::iterator links_itr;
-				for (links_itr = links_container.begin(); links_itr != links_container.end(); links_itr++)
+				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					_Link_Interface* link = (_Link_Interface*)(*links_itr);
-					Link_Components::Types::Link_Type_Keys link_type = link->_link_type;
-					/*if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{*/
+					for (links_itr = links_container.begin(); links_itr != links_container.end(); links_itr++)
+					{
+						_Link_Interface* link = (_Link_Interface*)(*links_itr);
+						Link_Components::Types::Link_Type_Keys link_type = link->_link_type;
+					
 						int zone_id = link->_zone;
 						zone_itr = zones_container.find(zone_id);
 						zone = (_Zone_Interface*)zone_itr->second;
 						zone->template origin_links<_Links_Container_Interface&>().push_back(link);
 						zone->template destination_links<_Links_Container_Interface&>().push_back(link);
-					//}
 
+					}
 				}
 			}
 		
@@ -2442,26 +2461,28 @@ namespace Network_Components
 						}
 
 						//Walk Links!!!
-						link_id_dir.id = db_itr->getWalkLink()->getLink();
-						link_id_dir.dir = 0;						
-						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-						link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-						activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
-						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-						activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
-												
-
-						if (!this->_scenario_reference->template use_link_based_routing<bool>())
+						if (_scenario_reference->template multimodal_routing<bool>())
 						{
-							opp_link_id_dir.id = link_id_dir.id;
-							opp_link_id_dir.dir = abs(link_id_dir.dir - 1);
-							if (net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+							link_id_dir.id = db_itr->getWalkLink()->getLink();
+							link_id_dir.dir = 0;
+							assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+							link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+							activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
+							link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
+
+							if (!this->_scenario_reference->template use_link_based_routing<bool>())
 							{
-								link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
-								activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
-								link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-								activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);											
+								opp_link_id_dir.id = link_id_dir.id;
+								opp_link_id_dir.dir = abs(link_id_dir.dir - 1);
+								if (net_io_maps.link_id_dir_to_ptr.count(opp_link_id_dir.id_dir))
+								{
+									link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[opp_link_id_dir.id_dir];
+									activity_location->template origin_walk_links<_Links_Container_Interface&>().push_back(link);
+									link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+									activity_location->template destination_walk_links<_Links_Container_Interface&>().push_back(link);
+								}
 							}
 						}
 				

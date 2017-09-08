@@ -136,34 +136,40 @@ namespace Routing_Components
 					Link_Interface* link = (Link_Interface*)(*itr);
 					destination_ids.push_back(link->template uuid<unsigned int>());
 				}
-
+				
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
 				std::vector<unsigned int> origin_walk_ids;
-				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
-				{
-					Link_Interface* link = (Link_Interface*)(*itr);
-					origin_walk_ids.push_back(link->template uuid<unsigned int>());
-				}
-
-				// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 				std::vector<unsigned int> destination_walk_ids;
 				//std::vector<unsigned int> destination_tr_ids;
-				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>())
 				{
-					Link_Interface* link = (Link_Interface*)(*itr);
-					destination_walk_ids.push_back(link->template uuid<unsigned int>());
-
-					/*Intersection_Interface* up_node = link->_upstream_intersection;
-					Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
-					typename Link_Container_Interface::iterator in_links_itr;
-					for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
+					
+					for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 					{
-						Link_Interface* inbound_link = (Link_Interface*)(*in_links_itr);
-						Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
-						if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+						Link_Interface* link = (Link_Interface*)(*itr);
+						origin_walk_ids.push_back(link->template uuid<unsigned int>());
+					}
+
+					// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
+					
+					for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+					{
+						Link_Interface* link = (Link_Interface*)(*itr);
+						destination_walk_ids.push_back(link->template uuid<unsigned int>());
+
+						/*Intersection_Interface* up_node = link->_upstream_intersection;
+						Link_Container_Interface& inbound_links = up_node->template inbound_links<Link_Container_Interface&>();
+						typename Link_Container_Interface::iterator in_links_itr;
+						for (in_links_itr = inbound_links.begin(); in_links_itr != inbound_links.end(); in_links_itr++)
 						{
-							destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
-						}
-					}*/
+							Link_Interface* inbound_link = (Link_Interface*)(*in_links_itr);
+							Link_Components::Types::Link_Type_Keys in_facility_type = inbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+							if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							{
+								destination_tr_ids.push_back(inbound_link->template uuid<unsigned int>());
+							}
+						}*/
+					}
 				}
 
 				//list of edgeid, graph_id tuples; internal edge ids
@@ -171,7 +177,7 @@ namespace Routing_Components
 				//cost of traversing each of the edges
 				std::deque<float> cost_container;
 				
-				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+				
 				float best_route_time_to_destination = 0.0f;
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
