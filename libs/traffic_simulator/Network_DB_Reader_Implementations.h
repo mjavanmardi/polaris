@@ -147,11 +147,13 @@ namespace Network_Components
 					intersections_container_ptr->push_back(intersection);
 				}
 
-				result<Transit_Stops> tr_node_result = db->template query<Transit_Stops>(query<Transit_Stops>::true_expr);
+				
 				
 				if (_scenario_reference->template multimodal_routing<bool>())
 				{
 					cout << "Reading Transit Nodes" << endl;
+
+					result<Transit_Stops> tr_node_result = db->template query<Transit_Stops>(query<Transit_Stops>::true_expr);
 
 					for (typename result<Transit_Stops>::iterator db_itr = tr_node_result.begin(); db_itr != tr_node_result.end(); ++db_itr)
 					{
