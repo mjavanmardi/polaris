@@ -474,21 +474,24 @@ int main(int argc,char** argv)
 	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
+	cout << "reading scenario data..." << endl;
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
+
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
 	GLOBALS::Normal_RNG.Initialize();
 	GLOBALS::Uniform_RNG.Initialize();
-	int seed = scenario->iseed<int>();
+	unsigned long seed = scenario->iseed<unsigned long>();
 	if (seed != 0)
 	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+		GLOBALS::Normal_RNG.Set_Seed<unsigned long>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<unsigned long>(seed);
 	}
 	else
 	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
+		GLOBALS::Normal_RNG.Set_Seed<unsigned long>();
+		GLOBALS::Uniform_RNG.Set_Seed<unsigned long>();
 	}
 
 
@@ -511,9 +514,6 @@ int main(int argc,char** argv)
 
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
-
-	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
