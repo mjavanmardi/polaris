@@ -54,5 +54,7 @@
 	"mode_choice_model_file" : "TestModeChoiceModel.json",
 	"destination_choice_model_file" : "TestDestinationChoiceModel.json",
 	"telecommute_choice_model_file" : "TestTelecommuteChoiceModel.json",
-	"cav_wtp_model_file" : "TestCAVWTPModel.json"
+	"cav_wtp_model_file" : "TestCAVWTPModel.json",	
+	"multimodal_routing" : true,
+	"multimodal_routing_model_file" : "MultiModalRoutingModel.json"
 }
