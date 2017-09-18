@@ -1,5 +1,5 @@
 #pragma once
-#include "cfg_reader.h"
+//#include "cfg_reader.h"
 //#include "Traffic_Simulator_Includes.h"
 
 #include <errno.h>
@@ -25,6 +25,8 @@ namespace Scenario_Components
 		prototype struct Scenario ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
+
+			typedef std::vector<int> IntArray;
 
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
@@ -967,7 +969,7 @@ namespace Scenario_Components
 				if (value)
 				{
 					// TODO: If parameter is set, then need to determine how it is used
-					//set_parameter<IntArray>(document, "", "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<IntArray &>());
+					set_parameter<std::vector<int>>(document, "", "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>());
 					use_skim_intervals<bool>(true);
 					do_skimming<bool>(true);
 				}
@@ -1869,16 +1871,6 @@ namespace Scenario_Components
 				return assignment_interval_length<int>();
 			}
 
-			int getParameter(const char *parameterName, int *paramValue);
-			int getParameter(const char *parameterName, double *paramValue);
-			int getParameter(const char *parameterName, std::string *paramValue);
-			int getParameter(const char *parameterName, bool *paramValue);
-			int getParameter(const char *parameterName, IntArray *parameter);
-			int getParameter(const char *parameterName, DoubleArray *parameter);
-			int getParameter(const char *parameterName, StringArray *parameter);
-			int getParameter(const char *parameterName, BoolArray *parameter);
-			int getParameter(const char *parameterName, unsigned long *paramValue);
-
 			bool print_error_msg(rapidjson::Document& document, std::string json_file)
 			{
 				// Get the parse error and offset
@@ -2108,7 +2100,7 @@ namespace Scenario_Components
 
 			template <class T>
 
-			void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, T& parameter)
+			bool set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, T& parameter)
 			{
 				rapidjson::Value* value;
 
@@ -2124,7 +2116,7 @@ namespace Scenario_Components
 					if (!value)
 					{
 						cout << "Unable to locate key \'" << char_key << "\'" << endl;
-						return;
+						return false;
 					}
 				}
 				else
@@ -2148,7 +2140,7 @@ namespace Scenario_Components
 						{
 							cout << " from \'" << section << "\'" << endl;
 						}
-						return;
+						return false;
 					}
 
 					// loop for each token element
@@ -2161,7 +2153,7 @@ namespace Scenario_Components
 						if (!value)
 						{
 							cout << "Unable to locate sub section \'" << section_tokens[i] << "\' from \'" << section << "\'" << endl;
-							return;
+							return false;
 						}
 					}
 
@@ -2173,16 +2165,16 @@ namespace Scenario_Components
 						if (!value)
 						{
 							cout << "Unable to locate key \'" << char_key << "\' from \'" << section << "\'" << endl;
-							return;
+							return false;
 						}
 					}
 				}
 
 				// get parameter
-				get_parameter(*value, parameter);
+				return set_parameter(*value, parameter);
 			}
 
-			void get_parameter(rapidjson::Value& value, std::string& parameter)
+			bool set_parameter(rapidjson::Value& value, std::string& parameter)
 			{
 				if (value.IsString())
 				{
@@ -2191,10 +2183,12 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as string value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
 			}
 
-			void get_parameter(rapidjson::Value& value, int& parameter)
+			bool set_parameter(rapidjson::Value& value, int& parameter)
 			{
 				if (value.IsInt())
 				{
@@ -2203,10 +2197,12 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as integer value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
 			}
 
-			void get_parameter(rapidjson::Value& value, unsigned long& parameter)
+			bool set_parameter(rapidjson::Value& value, unsigned long& parameter)
 			{
 				if (value.IsUint64())
 				{
@@ -2215,10 +2211,12 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as unsigned long value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
 			}
 
-			void get_parameter(rapidjson::Value& value, double& parameter)
+			bool set_parameter(rapidjson::Value& value, double& parameter)
 			{
 				if (value.IsDouble())
 				{
@@ -2235,10 +2233,12 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as double value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
 			}
 
-			void get_parameter(rapidjson::Value& value, float& parameter)
+			bool set_parameter(rapidjson::Value& value, float& parameter)
 			{
 				if (value.IsFloat())
 				{
@@ -2251,10 +2251,12 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as float value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
 			}
 
-			void get_parameter(rapidjson::Value& value, bool& parameter)
+			bool set_parameter(rapidjson::Value& value, bool& parameter)
 			{
 				if (value.IsBool())
 				{
@@ -2263,7 +2265,24 @@ namespace Scenario_Components
 				else
 				{
 					cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
+					return false;
 				}
+				return true;
+			}
+
+			bool set_parameter(rapidjson::Value& value, std::vector<int>& parameter)
+			{
+				if (value.IsArray())
+				{
+					for(rapidjson::SizeType i=0; i<value.Size(); ++i)
+						parameter.push_back(value[i].GetInt());
+				}
+				else
+				{
+					cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
 			}
 		};
 	}
