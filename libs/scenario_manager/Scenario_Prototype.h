@@ -429,7 +429,6 @@ namespace Scenario_Components
 
 				// now see if there are config file changes
 				rapidjson::Document document;
-				rapidjson::Value* value;
 
 				if (!parse_option_file(document, filename))
 					THROW_EXCEPTION("Scenario file '" << filename << "' was not able to be opened.");
@@ -438,10 +437,8 @@ namespace Scenario_Components
 				// set start time
 				std::string start_time_in_string;
 				int start_time;
-				value = rapidjson::Pointer("/starting_time_hh_mm").Get(document);
-				if (value)
+				if (set_parameter<std::string>(document, "", "starting_time_hh_mm", start_time_in_string))
 				{
-					set_parameter<std::string>(document, "", "starting_time_hh_mm", start_time_in_string);
 					start_time_in_string += ":00";
 					start_time = convert_hhmmss_to_seconds(start_time_in_string);
 					//assert(start_time == 0); // to be done for start time > 0
@@ -453,10 +450,8 @@ namespace Scenario_Components
 				// set end time
 				std::string end_time_in_string;
 				int end_time;
-				value = rapidjson::Pointer("/ending_time_hh_mm").Get(document);
-				if (value)
+				if(set_parameter<std::string>(document, "", "ending_time_hh_mm", end_time_in_string))
 				{
-					set_parameter<std::string>(document, "", "ending_time_hh_mm", end_time_in_string);
 					end_time_in_string += ":00";
 					end_time = convert_hhmmss_to_seconds(end_time_in_string);
 				}
@@ -467,39 +462,23 @@ namespace Scenario_Components
 
 				//===============================================
 				// set interval length
-				value = rapidjson::Pointer("/simulation_interval_length_in_second").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "simulation_interval_length_in_second", simulation_interval_length<int &>());
-				}
+				set_parameter<int>(document, "", "simulation_interval_length_in_second", simulation_interval_length<int &>());
 
 				//===============================================
 				// set the demand reduction factor, used to reduce the demand read from the database
-				value = rapidjson::Pointer("/demand_reduction_factor").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "demand_reduction_factor", demand_reduction_factor<double &>());
-				}
+				set_parameter<double>(document, "", "demand_reduction_factor", demand_reduction_factor<double &>());
 				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>();
 
 				//===============================================
 				// set sim_interval per assignment interval
 				int assignment_intervals;
-				value = rapidjson::Pointer("/num_simulation_intervals_per_assignment_interval").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "num_simulation_intervals_per_assignment_interval", assignment_intervals);
-				}
+				set_parameter<int>(document, "", "num_simulation_intervals_per_assignment_interval", assignment_intervals);
 				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
 
 				//===============================================
 				// set assignment mode
 				std::string assignment_mode_string;
-				value = rapidjson::Pointer("/assignment_mode").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "assignment_mode", assignment_mode_string);
-				}
+				set_parameter<std::string>(document, "", "assignment_mode", assignment_mode_string);
 				if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
 				{
 					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
@@ -516,20 +495,13 @@ namespace Scenario_Components
 
 				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
 				// If left to false, then we can route to an activity location on a link using either DIR (i.e. left hand turns into activity location ) [RECOMMENDED]
-				value = rapidjson::Pointer("/use_link_based_routing").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "use_link_based_routing", use_link_based_routing<bool &>());
-				}
+				set_parameter<bool>(document, "", "use_link_based_routing", use_link_based_routing<bool &>());
 
 				//===============================================
 				// set rng type
 				std::string rng_type_string;
-				value = rapidjson::Pointer("/rng_type").Get(document);
-				if (value)
+				if(set_parameter<std::string>(document, "", "rng_type", rng_type_string))
 				{
-					set_parameter<std::string>(document, "", "rng_type", rng_type_string);
-				
 					if (rng_type_string.compare("DETERMINISTIC") == 0)
 					{
 						rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
@@ -548,11 +520,7 @@ namespace Scenario_Components
 				//===============================================
 				// set merging mode
 				std::string merging_mode_string;
-				value = rapidjson::Pointer("/merging_mode").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "merging_mode", merging_mode_string);
-				}
+				set_parameter<std::string>(document, "", "merging_mode", merging_mode_string);
 				if (merging_mode_string.compare("DRIVING_RULE") == 0)
 				{
 					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
@@ -577,187 +545,69 @@ namespace Scenario_Components
 
 				//===============================================
 				// set control parameters
-				value = rapidjson::Pointer("/seed").Get(document);
-				if (value)
-				{
-					set_parameter<unsigned long>(document, "", "seed", iseed<unsigned long &>());
-				}
-				value = rapidjson::Pointer("/node_control_flag").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "node_control_flag", intersection_control_flag<int &>());
-				}
-				value = rapidjson::Pointer("/ramp_metering_flag").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "ramp_metering_flag", ramp_metering_flag<bool &>());
-				}
-				value = rapidjson::Pointer("/demand_od_flag").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "demand_od_flag", demand_od_flag<int &>());
-				}
-				value = rapidjson::Pointer("/snapshot_period").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "snapshot_period", snapshot_period<int &>());
-				}
+				set_parameter<unsigned long>(document, "", "seed", iseed<unsigned long &>());
+				set_parameter<int>(document, "", "node_control_flag", intersection_control_flag<int &>());
+				set_parameter<bool>(document, "", "ramp_metering_flag", ramp_metering_flag<bool &>());
+				set_parameter<int>(document, "", "demand_od_flag", demand_od_flag<int &>());
+				set_parameter<int>(document, "", "snapshot_period", snapshot_period<int &>());
 
 				//===============================================
 				// tile imagery parameters
-				value = rapidjson::Pointer("/tile_imagery_file").Get(document);
-				if (value)
+				if (set_parameter<std::string>(document, "", "tile_imagery_file", tile_imagery_file<std::string &>()))
 				{
 					use_tile_imagery<bool>(true);
-					set_parameter<std::string>(document, "", "tile_imagery_file", tile_imagery_file<std::string &>());
-
-					value = rapidjson::Pointer("tile_imagery_alpha_level").Get(document);
-					if (value)
-					{
-						set_parameter<int>(document, "", "tile_imagery_alpha_level", tile_imagery_alpha_level<int &>());
-					}
+					set_parameter<int>(document, "", "tile_imagery_alpha_level", tile_imagery_alpha_level<int &>());
 				}
 				else
 				{
 					use_tile_imagery<bool>(false);
 				}
 
-				value = rapidjson::Pointer("/color_cars_randomly").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "color_cars_randomly", color_cars_randomly<bool &>());
-				}
+				set_parameter<bool>(document, "", "color_cars_randomly", color_cars_randomly<bool &>());
 
 				//===============================================
 				// Demand model parameters 
-				value = rapidjson::Pointer("/write_activity_output").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_activity_output", this->template write_activity_output<bool &>());
-				}
-				value = rapidjson::Pointer("/aggregate_routing").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "aggregate_routing", this->template aggregate_routing<bool &>());
-				}
-				value = rapidjson::Pointer("/do_planner_routing").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "do_planner_routing", this->template do_planner_routing<bool &>());
-				}
-				value = rapidjson::Pointer("/write_demand_to_database").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_demand_to_database", this->template write_demand_to_database<bool &>());
-				}
-				value = rapidjson::Pointer("/read_demand_from_database").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "read_demand_from_database", this->template read_demand_from_database<bool &>());
-				}
-				value = rapidjson::Pointer("/read_population_from_database").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "read_population_from_database", this->template read_population_from_database<bool &>());
-				}
-				value = rapidjson::Pointer("/cav_market_penetration").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "cav_market_penetration", this->template cav_market_penetration<double &>());
-				}
-				value = rapidjson::Pointer("/cav_vott_adjustment").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "cav_vott_adjustment", this->template cav_vott_adjustment<double &>());
-				}
+				set_parameter<bool>(document, "", "write_activity_output", this->template write_activity_output<bool &>());
+				set_parameter<bool>(document, "", "aggregate_routing", this->template aggregate_routing<bool &>());
+				set_parameter<bool>(document, "", "do_planner_routing", this->template do_planner_routing<bool &>());
+				set_parameter<bool>(document, "", "write_demand_to_database", this->template write_demand_to_database<bool &>());
+				set_parameter<bool>(document, "", "read_demand_from_database", this->template read_demand_from_database<bool &>());
+				set_parameter<bool>(document, "", "read_population_from_database", this->template read_population_from_database<bool &>());
+				set_parameter<double>(document, "", "cav_market_penetration", this->template cav_market_penetration<double &>());
+				set_parameter<double>(document, "", "cav_vott_adjustment", this->template cav_vott_adjustment<double &>());
 
 				//=======================================================================================================================================================
 				// Vehicle Choice Model parameters
 				// Start time model parameters
-				value = rapidjson::Pointer("/vehicle_distribution_file_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/automation_cost").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "automation_cost", this->template automation_cost<double &>());
-				}
+				set_parameter<std::string>(document, "", "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
+				set_parameter<double>(document, "", "automation_cost", this->template automation_cost<double &>());
 
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
-				value = rapidjson::Pointer("/percent_to_synthesize").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "percent_to_synthesize", this->template percent_to_synthesize<double &>());
-				}
-				value = rapidjson::Pointer("/ipf_tolerance").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "ipf_tolerance", this->template ipf_tolerance<double &>());
-				}
-				value = rapidjson::Pointer("/marginal_tolerance").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "marginal_tolerance", this->template marginal_tolerance<int &>());
-				}
-				value = rapidjson::Pointer("/maximum_iterations").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "maximum_iterations", this->template maximum_iterations<int &>());
-				}
-				value = rapidjson::Pointer("/write_marginal_output").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_marginal_output", this->template write_marginal_output<bool &>());
-				}
-				value = rapidjson::Pointer("/write_full_output").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_full_output", this->template write_full_output<bool &>());
-				}
-				std::string popsyn_control_string;
-				value = rapidjson::Pointer("/popsyn_control_file").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "popsyn_control_file", this->template popsyn_control_file_name<std::string &>());
-				}
+				set_parameter<double>(document, "", "percent_to_synthesize", this->template percent_to_synthesize<double &>());
+				set_parameter<double>(document, "", "ipf_tolerance", this->template ipf_tolerance<double &>());
+				set_parameter<int>(document, "", "marginal_tolerance", this->template marginal_tolerance<int &>());
+				set_parameter<int>(document, "", "maximum_iterations", this->template maximum_iterations<int &>());
+				set_parameter<bool>(document, "", "write_marginal_output", this->template write_marginal_output<bool &>());
+				set_parameter<bool>(document, "", "write_full_output", this->template write_full_output<bool &>());
+				set_parameter<std::string>(document, "", "popsyn_control_file", this->template popsyn_control_file_name<std::string &>());
 
 				// Start time model parameters
-				value = rapidjson::Pointer("/activity_start_time_model_file_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "activity_start_time_model_file_name", this->template activity_start_time_model_file_name<std::string &>());
-				}
-
-				value = rapidjson::Pointer("/write_visualizer_snapshot").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_visualizer_snapshot", this->template write_visualizer_snapshot<bool &>());
-				}
+				set_parameter<std::string>(document, "", "activity_start_time_model_file_name", this->template activity_start_time_model_file_name<std::string &>());
+				set_parameter<bool>(document, "", "write_visualizer_snapshot", this->template write_visualizer_snapshot<bool &>());
 
 				//===============================================
 				// set control parameters
-				value = rapidjson::Pointer("/database_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "database_name", database_name<std::string &>());
-				}
-				else
+				if (!set_parameter<std::string>(document, "", "database_name", database_name<std::string &>()))
 				{
 					THROW_EXCEPTION("ERROR: Input database name required.");
 				}
-				value = rapidjson::Pointer("/historical_results_database_name").Get(document);
-				if (value)
+
+				set_parameter<std::string>(document, "", "historical_results_database_name", historical_results_database_name<std::string &>());
+
+				if (set_parameter<std::string>(document, "", "input_popsyn_database_name", input_popsyn_database_name<std::string &>()))
 				{
-					set_parameter<std::string>(document, "", "historical_results_database_name", historical_results_database_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/input_popsyn_database_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "input_popsyn_database_name", input_popsyn_database_name<std::string &>());
 					this->read_population_from_database(true);
 				}
 				else
@@ -788,124 +638,34 @@ namespace Scenario_Components
 				output_time_in_seconds<double>(0.0);
 
 				// set I/O parameters		
-				value = rapidjson::Pointer("/count_integrated_in_network_vehicles_only").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool &>());
-				}
-
-				value = rapidjson::Pointer("/output_dir_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "output_dir_name", output_dir_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/write_db_input_to_files").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_db_input_to_files", write_db_input_to_files<bool &>());
-				}
-				value = rapidjson::Pointer("/run_simulation_for_db_input").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "run_simulation_for_db_input", run_simulation_for_db_input<bool &>());
-				}
-				value = rapidjson::Pointer("/write_node_control_state").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_node_control_state", write_node_control_state<bool &>());
-				}
-				value = rapidjson::Pointer("/write_network_link_flow").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_network_link_flow", write_network_link_flow<bool &>());
-				}
-				value = rapidjson::Pointer("/write_network_link_turn_time").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_network_link_turn_time", write_network_link_turn_time<bool &>());
-				}
-				value = rapidjson::Pointer("/write_output_summary").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_output_summary", write_output_summary<bool &>());
-				}
-				value = rapidjson::Pointer("/output_link_moe_for_simualtion_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/output_turn_movement_moe_for_simualtion_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/output_network_moe_for_simulation_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/write_network_snapshots").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_network_snapshots", write_network_snapshots<bool &>());
-				}
-				value = rapidjson::Pointer("/read_network_snapshots").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "read_network_snapshots", read_network_snapshots<bool &>());
-				}
-				value = rapidjson::Pointer("/routing_with_snapshots").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "routing_with_snapshots", routing_with_snapshots<bool &>());
-				}
-
-				value = rapidjson::Pointer("/input_network_snapshots_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<std::string &>());
-				}
+				set_parameter<bool>(document, "", "count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool &>());
+				set_parameter<std::string>(document, "", "output_dir_name", output_dir_name<std::string &>());
+				set_parameter<bool>(document, "", "write_db_input_to_files", write_db_input_to_files<bool &>());
+				set_parameter<bool>(document, "", "run_simulation_for_db_input", run_simulation_for_db_input<bool &>());
+				set_parameter<bool>(document, "", "write_node_control_state", write_node_control_state<bool &>());
+				set_parameter<bool>(document, "", "write_network_link_flow", write_network_link_flow<bool &>());
+				set_parameter<bool>(document, "", "write_network_link_turn_time", write_network_link_turn_time<bool &>());
+				set_parameter<bool>(document, "", "write_output_summary", write_output_summary<bool &>());
+				set_parameter<bool>(document, "", "output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "", "output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "", "output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "", "write_network_snapshots", write_network_snapshots<bool &>());
+				set_parameter<bool>(document, "", "read_network_snapshots", read_network_snapshots<bool &>());
+				set_parameter<bool>(document, "", "routing_with_snapshots", routing_with_snapshots<bool &>());
+				set_parameter<std::string>(document, "", "input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<std::string &>());
 
 				// read capacity adjustments 
-				value = rapidjson::Pointer("/capacity_adjustment_highway").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
-				}
-				value = rapidjson::Pointer("/capacity_adjustment_arterial").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
-				}
-				value = rapidjson::Pointer("/simulate_cacc").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "simulate_cacc", simulate_cacc<bool &>());
-				}
-
-				value = rapidjson::Pointer("/flexible_work_percentage").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "flexible_work_percentage", flexible_work_percentage<double &>());
-				}
+				set_parameter<double>(document, "", "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
+				set_parameter<double>(document, "", "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
+				set_parameter<bool>(document, "", "simulate_cacc", simulate_cacc<bool &>());
+				set_parameter<double>(document, "", "flexible_work_percentage", flexible_work_percentage<double &>());
 
 				//===============================================
 				// Vehicle trajectory tracking parameters
-				value = rapidjson::Pointer("/write_vehicle_trajectory").Get(document);
-				if (value)
+				set_parameter<bool>(document, "", "write_vehicle_trajectory", write_vehicle_trajectory<bool &>());
+				set_parameter<double>(document, "", "vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double &>());
+				if (set_parameter<std::string>(document, "", "vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<std::string &>()))
 				{
-					set_parameter<bool>(document, "", "write_vehicle_trajectory", write_vehicle_trajectory<bool &>());
-				}
-				value = rapidjson::Pointer("/vehicle_trajectory_sample_rate").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double &>());
-				}
-				value = rapidjson::Pointer("/vehicle_tracking_list_file_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<std::string &>());
-
 					vehicle_trajectory_sample_rate<double>(0.0);
 					use_vehicle_tracking_list<bool>(true);
 					File_IO::File_Reader fr;
@@ -925,61 +685,24 @@ namespace Scenario_Components
 				}
 
 				// GET NETWORK SKIMMING PARAMETERS
-				value = rapidjson::Pointer("/write_skim_tables").Get(document);
-				if (value)
+				set_parameter<bool>(document, "", "write_skim_tables", this->template write_skim_tables<bool &>());
+				set_parameter<bool>(document, "", "read_skim_tables", this->template read_skim_tables<bool &>());
+				set_parameter<std::string>(document, "", "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
+				if (set_parameter<std::vector<int>>(document, "", "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
 				{
-					set_parameter<bool>(document, "", "write_skim_tables", this->template write_skim_tables<bool &>());
-				}
-				value = rapidjson::Pointer("/read_skim_tables").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "read_skim_tables", this->template read_skim_tables<bool &>());
-				}
-				value = rapidjson::Pointer("/input_highway_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/output_highway_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/input_highway_cost_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/output_highway_cost_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/input_transit_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/output_transit_skim_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/skim_interval_endpoint_minutes").Get(document);
-				if (value)
-				{
-					// TODO: If parameter is set, then need to determine how it is used
-					set_parameter<std::vector<int>>(document, "", "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>());
 					use_skim_intervals<bool>(true);
 					do_skimming<bool>(true);
 				}
 				else
 				{
 					use_skim_intervals<bool>(false);
-					value = rapidjson::Pointer("/skim_interval_length_minutes").Get(document);
-					if (value)
+					if (set_parameter<int>(document, "", "skim_interval_length_minutes", this->template skim_interval_length_minutes<int &>()))
 					{
-						set_parameter<int>(document, "", "skim_interval_length_minutes", this->template skim_interval_length_minutes<int &>());
 						do_skimming<bool>(true);
 					}
 					else
@@ -992,223 +715,54 @@ namespace Scenario_Components
 					}
 				}
 
-				value = rapidjson::Pointer("/compare_with_historic_moe").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "compare_with_historic_moe", compare_with_historic_moe<bool &>());
-				}
-				value = rapidjson::Pointer("/historic_network_moe_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "historic_network_moe_file_path_name", historic_network_moe_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/historic_link_moe_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "historic_link_moe_file_path_name", historic_link_moe_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/read_normal_day_link_moe").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "read_normal_day_link_moe", read_normal_day_link_moe<bool &>());
-				}
-				value = rapidjson::Pointer("/normal_day_link_moe_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<std::string &>());
-				}
-				value = rapidjson::Pointer("/historic_demand_moe_directory").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "historic_demand_moe_directory", historic_demand_moe_directory<std::string &>());
-				}
-
-				value = rapidjson::Pointer("/output_link_moe_for_assignment_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/output_turn_movement_moe_for_assignment_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/output_network_moe_for_assignment_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/output_analyze_link_group_moe_for_assignment_interval").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool &>());
-				}
-				value = rapidjson::Pointer("/load_analyze_link_groups_from_file").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool &>());
-				}
-				value = rapidjson::Pointer("/analyze_link_groups_file_path_name").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<std::string &>());
-				}
+				set_parameter<bool>(document, "", "compare_with_historic_moe", compare_with_historic_moe<bool &>());
+				set_parameter<std::string>(document, "", "historic_network_moe_file_path_name", historic_network_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "historic_link_moe_file_path_name", historic_link_moe_file_path_name<std::string &>());
+				set_parameter<bool>(document, "", "read_normal_day_link_moe", read_normal_day_link_moe<bool &>());
+				set_parameter<std::string>(document, "", "normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "", "historic_demand_moe_directory", historic_demand_moe_directory<std::string &>());
+				set_parameter<bool>(document, "", "output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "", "output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "", "output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "", "output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "", "load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool &>());
+				set_parameter<std::string>(document, "", "analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<std::string &>());
 
 				//if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
-				value = rapidjson::Pointer("/write_ttime_distribution_from_network_model").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool &>());
-				}
-				value = rapidjson::Pointer("/vehicle_trajectory_output_threshold").Get(document);
-				if (value)
-				{
-					set_parameter<int>(document, "", "vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int &>());
-				}
-
-				value = rapidjson::Pointer("/use_tmc").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "use_tmc", use_tmc<bool &>());
-				}
-				value = rapidjson::Pointer("/use_network_events").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "use_network_events", use_network_events<bool &>());
-				}
-
-				value = rapidjson::Pointer("/jam_density_constraints_enforced").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "jam_density_constraints_enforced", jam_density_constraints_enforced<bool &>());
-				}
-				value = rapidjson::Pointer("/maximum_flow_rate_constraints_enforced").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool &>());
-				}
-				value = rapidjson::Pointer("/vehicle_taking_action").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "vehicle_taking_action", vehicle_taking_action<bool &>());
-				}
+				set_parameter<bool>(document, "", "write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool &>());
+				set_parameter<int>(document, "", "vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int &>());
+				set_parameter<bool>(document, "", "use_tmc", use_tmc<bool &>());
+				set_parameter<bool>(document, "", "use_network_events", use_network_events<bool &>());
+				set_parameter<bool>(document, "", "jam_density_constraints_enforced", jam_density_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "", "maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "", "vehicle_taking_action", vehicle_taking_action<bool &>());
 
 				///enroute switching pretrip_informed_market_share
-				value = rapidjson::Pointer("/pretrip_informed_market_share").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "pretrip_informed_market_share", pretrip_informed_market_share<double &>());
-				}
-				value = rapidjson::Pointer("/realtime_informed_vehicle_market_share").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double &>());
-				}
-				value = rapidjson::Pointer("/information_compliance_rate_mean").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "information_compliance_rate_mean", information_compliance_rate_mean<double &>());
-				}
-				value = rapidjson::Pointer("/information_compliance_rate_standard_deviation").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double &>());
-				}
-				value = rapidjson::Pointer("/relative_indifference_band_route_choice_mean").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double &>());
-				}
-				value = rapidjson::Pointer("/minimum_travel_time_saving_mean").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double &>()); // in minutes
-				}
-				value = rapidjson::Pointer("/minimum_travel_time_saving_standard_deviation").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double &>()); // in minutes
-				}
-				value = rapidjson::Pointer("/enroute_switching_enabled").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "enroute_switching_enabled", enroute_switching_enabled<bool &>());
-				}
-				value = rapidjson::Pointer("/use_realtime_travel_time_for_enroute_switching").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool &>());
-				}
-				value = rapidjson::Pointer("/minimum_delay_ratio_for_enroute_switching").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double &>());
-				}
-				value = rapidjson::Pointer("/minimum_delay_seconds_for_enroute_switching").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double &>());
-				}
-				value = rapidjson::Pointer("/enroute_switching_on_excessive_delay").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool &>());
-				}
-				value = rapidjson::Pointer("/multimodal_network_input").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "multimodal_network_input", multimodal_network_input<bool &>());
-				}
-				value = rapidjson::Pointer("/enroute_excessive_delay_factor").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "enroute_excessive_delay_factor", enroute_excessive_delay_factor<double &>());
-				}
-				value = rapidjson::Pointer("/minimum_seconds_from_arrival_for_enroute_switching").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double &>());
-				}
-
-				value = rapidjson::Pointer("/time_dependent_routing").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "time_dependent_routing", time_dependent_routing<bool &>());
-				}
-				value = rapidjson::Pointer("/time_dependent_routing_weight_shape").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
-				}
-				value = rapidjson::Pointer("/time_dependent_routing_weight_scale").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
-				}
-				value = rapidjson::Pointer("/time_dependent_routing_weight_factor").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
-				}
+				set_parameter<double>(document, "", "pretrip_informed_market_share", pretrip_informed_market_share<double &>());
+				set_parameter<double>(document, "", "realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double &>());
+				set_parameter<double>(document, "", "information_compliance_rate_mean", information_compliance_rate_mean<double &>());
+				set_parameter<double>(document, "", "information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double &>());
+				set_parameter<double>(document, "", "relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double &>());
+				set_parameter<double>(document, "", "minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double &>()); // in minutes
+				set_parameter<double>(document, "", "minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double &>()); // in minutes
+				set_parameter<bool>(document, "", "enroute_switching_enabled", enroute_switching_enabled<bool &>());
+				set_parameter<bool>(document, "", "use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool &>());
+				set_parameter<double>(document, "", "minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double &>());
+				set_parameter<double>(document, "", "minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "", "enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool &>());
+				set_parameter<bool>(document, "", "multimodal_network_input", multimodal_network_input<bool &>());
+				set_parameter<double>(document, "", "enroute_excessive_delay_factor", enroute_excessive_delay_factor<double &>());
+				set_parameter<double>(document, "", "minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "", "time_dependent_routing", time_dependent_routing<bool &>());
+				set_parameter<double>(document, "", "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
+				set_parameter<double>(document, "", "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
+				set_parameter<double>(document, "", "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
+				set_parameter<double>(document, "", "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
+				set_parameter<bool>(document, "", "calculate_realtime_moe", calculate_realtime_moe<bool &>());
 				
-				value = rapidjson::Pointer("/accident_event_duration_reduction").Get(document);
-				if (value)
-				{
-					set_parameter<double>(document, "", "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
-				}
-				
-
-				value = rapidjson::Pointer("/calculate_realtime_moe").Get(document);
-				if (value)
-				{
-					set_parameter<bool>(document, "", "calculate_realtime_moe", calculate_realtime_moe<bool &>());
-				}
-				
-				value = rapidjson::Pointer("/buildings_geometry_file").Get(document);
-				if (value)
+				if (set_parameter<std::string>(document, "", "buildings_geometry_file", buildings_geometry_file<std::string &>()))
 				{
 					use_buildings(true);
-					set_parameter<std::string>(document, "", "buildings_geometry_file", buildings_geometry_file<std::string &>());
 				}
 				else
 				{
@@ -1216,26 +770,10 @@ namespace Scenario_Components
 					buildings_geometry_file<string&>()="";
 				}
 
-				value = rapidjson::Pointer("/mode_choice_model_file").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "mode_choice_model_file", mode_choice_model_file<std::string &>());
-				}
-				value = rapidjson::Pointer("/destination_choice_model_file").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "destination_choice_model_file", destination_choice_model_file<std::string &>());
-				}
-				value = rapidjson::Pointer("/telecommute_choice_model_file").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
-				}
-				value = rapidjson::Pointer("/cav_wtp_model_file").Get(document);
-				if (value)
-				{
-					set_parameter<std::string>(document, "", "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
-				}
+				set_parameter<std::string>(document, "", "mode_choice_model_file", mode_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "", "destination_choice_model_file", destination_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "", "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "", "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
