@@ -137,8 +137,8 @@ namespace Batch_Router_Components
 				if (strcmp(mode.c_str(),"rail")==0 || strcmp(mode.c_str(), "Rail")==0 || strcmp(mode.c_str(), "RAIL")==0)			movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::RAIL);
 				else if (strcmp(mode.c_str(), "bus")==0 || strcmp(mode.c_str(), "Bus") == 0 || strcmp(mode.c_str(), "BUS") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 				else if (strcmp(mode.c_str(), "walk")==0 || strcmp(mode.c_str(), "Walk") == 0 || strcmp(mode.c_str(), "WALK") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
-				else if (strcmp(mode.c_str(), "pnr") == 0 || strcmp(mode.c_str(), "Pnr") == 0 || strcmp(mode.c_str(), "PNR") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);
-				else										movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else if (strcmp(mode.c_str(), "pnr") == 0 || strcmp(mode.c_str(), "Pnr") == 0 || strcmp(mode.c_str(), "PNR") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE);
+				else movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 
 				router->template network<_Network_Interface*>(network);
 				router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
