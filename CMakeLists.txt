@@ -11,6 +11,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #options to be used while running cmake
 option(Antares "Build with Antares" OFF)
+option(BatchRouter "Build BathRouter application" ON)
 option(Popsyn "Build Popsyn App" OFF)
 option(Statewide "Build Statewide Model App" OFF)
 option(Coretests "Include Unit Tests for Core" OFF)
@@ -310,6 +311,10 @@ else()
 		#add_subdirectory (libs/routing) 
 	endif()
 
+	if (BatchRouter)
+		add_subdirectory (apps/batch_router)
+	endif()
+	
 	if (IntegratedModel)
 		add_subdirectory (apps/integrated_abm)
 	endif()
