@@ -77,7 +77,10 @@ struct MasterType
 	
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<MasterType> turn_movement_type;
 
-	
+	typedef Transit_Route_Components::Implementations::Transit_Route_Implementation<MasterType> transit_route_type;
+	typedef Transit_Pattern_Components::Implementations::Transit_Pattern_Implementation<MasterType> transit_pattern_type;
+	typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<MasterType> transit_vehicle_trip_type;
+
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
@@ -197,6 +200,17 @@ struct MasterType
 
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
 
+
+
+	typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
+
+	typedef Graph_Implementation<MasterType, NTL, multimodal_edge_type> multimodal_graph_type;
+
+	typedef Routing_Components::Types::multimodal_to_multimodal multimodal_to_multimodal_type;
+
+	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;
+
+	typedef Routing_Components::Implementations::multimodal_to_multimodal multimodal_to_multimodal_type;
 
 
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;

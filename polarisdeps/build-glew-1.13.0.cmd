@@ -7,7 +7,7 @@ IF NOT "%1" == "" (
 ) ELSE IF NOT "%POLARIS_DEPS_DIR%" == "" (
 	  set BASEDIR=%POLARIS_DEPS_DIR%
 ) ELSE (
-	set BASEDIR=%CD%
+	set BASEDIR=C:\opt\polarisdeps
 )
 
 :: get our slashes all straightened out :)

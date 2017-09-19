@@ -1,0 +1,17 @@
+{
+	"multimodal_routing" :
+	{
+		"transferPenalty" 			: 300.0,
+		"waitWeight" 			: 2.00,
+		"walkWeight" 			: 2.00,
+		"ivtWeight" 			: 1.00,
+		"carWeight" 			: 3.00,
+		"scanThreshold"			: 10000.00,
+		"costThreshold"			: 28800.00,
+		"waitThreshold"			: 3600.00,
+		"walkThreshold"			: 5000.00,
+		"walkSpeed"				: 1.38889,
+		"debug_route"			: false,
+		"multimodal_dijkstra"	: true
+	}
+}

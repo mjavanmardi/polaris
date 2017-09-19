@@ -15,6 +15,7 @@
 #include "Sensor_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Routable_Network_Prototype.h"
+#include "Transit_Vehicle_Trip_Prototype.h"
 
 namespace Link_Components
 {
@@ -86,8 +87,12 @@ namespace Link_Components
 			m_data(int, num_lanes, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, length, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, grade, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, name, NONE, NONE);
 			
 			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
+
+			m_data(int, zone, NONE, NONE);
 
 			m_data(Link_Components::Types::Link_Type_Keys, link_type, NONE, NONE);
 			
@@ -160,6 +165,14 @@ namespace Link_Components
 			m_data(float, capacity_adjustment_factor_due_to_weather, NONE, NONE);
 			m_data(float, capacity_adjustment_factor_due_to_accident, NONE, NONE);
 			m_data(float, lane_adjustment_due_to_accident, NONE, NONE);
+
+		//==================================================================================================================
+		/// Transit-Related Members
+		//------------------------------------------------------------------------------------------------------------------
+
+			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time, NONE, NONE);
+			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
+			m_container(std::vector<int>, index_along_trip_at_upstream_node, NONE, NONE);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -262,7 +275,7 @@ namespace Link_Components
 			m_prototype(Null_Prototype, typename MasterType::link_sensor_type, link_sensor, NONE, NONE);
 
 
-
+			typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<type_of(trips_by_dep_time)> _Transit_Vehicle_Trip_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
@@ -556,115 +569,119 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 		{
-			int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-			int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-
-			int link_shifted_cumulative_arrived_vehicles = 0;
-
-			if ((current_simulation_interval_index) >= _link_fftt_cached_simulation_interval_size)
+			//TODO: Omer fix later!
+			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
-				int t_minus_fftt = (current_simulation_interval_index - _link_fftt_cached_simulation_interval_size) % _link_fftt_cached_simulation_interval_size;
-				link_shifted_cumulative_arrived_vehicles = _cached_link_upstream_cumulative_vehicles_array[t_minus_fftt];
-			}
-			else
-			{
-				link_shifted_cumulative_arrived_vehicles = 0;
-			}
+				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
-			_C = _link_upstream_cumulative_vehicles + _link_capacity;
-			int link_downstream_cumulative_vehicles_by_t_minus_bwtt = 0;
-			//N(a,L(a),t-bwtt)
-			if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
-			{
-				int t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size) % _link_bwtt_cached_simulation_interval_size;
-				link_downstream_cumulative_vehicles_by_t_minus_bwtt = _cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt];
-			}
-			_Q = _num_vehicles_under_jam_density + link_downstream_cumulative_vehicles_by_t_minus_bwtt;
+				int link_shifted_cumulative_arrived_vehicles = 0;
 
-			int upstream_cumulative_departed_vehicles = 0;
-			upstream_cumulative_departed_vehicles =
-				_link_upstream_cumulative_arrived_vehicles +
-				_link_origin_cumulative_departed_vehicles -
-				_link_destination_cumulative_arrived_vehicles;
-
-			upstream_cumulative_departed_vehicles = max(0, upstream_cumulative_departed_vehicles);
-
-			if (((_Scenario_Interface*)_global_scenario)->template jam_density_constraints_enforced<bool>())
-			{
-				_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
-			}
-			else
-			{
-				int t_minus_bwtt = -1;
-
-				if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
+				if ((current_simulation_interval_index) >= _link_fftt_cached_simulation_interval_size)
 				{
-					t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size) % _link_bwtt_cached_simulation_interval_size;
-				}
-
-				if (t_minus_bwtt>-1)
-				{
-					int jam_vehicles = (int)(_num_lanes * _length * _jam_density / 5280.0f);
-					jam_vehicles = max(_num_lanes * 2, jam_vehicles);
-					int cached = _cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt] + jam_vehicles;
-					_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles, cached);
+					int t_minus_fftt = (current_simulation_interval_index - _link_fftt_cached_simulation_interval_size) % _link_fftt_cached_simulation_interval_size;
+					link_shifted_cumulative_arrived_vehicles = _cached_link_upstream_cumulative_vehicles_array[t_minus_fftt];
 				}
 				else
 				{
+					link_shifted_cumulative_arrived_vehicles = 0;
+				}
+
+				_C = _link_upstream_cumulative_vehicles + _link_capacity;
+				int link_downstream_cumulative_vehicles_by_t_minus_bwtt = 0;
+				//N(a,L(a),t-bwtt)
+				if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
+				{
+					int t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size) % _link_bwtt_cached_simulation_interval_size;
+					link_downstream_cumulative_vehicles_by_t_minus_bwtt = _cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt];
+				}
+				_Q = _num_vehicles_under_jam_density + link_downstream_cumulative_vehicles_by_t_minus_bwtt;
+
+				int upstream_cumulative_departed_vehicles = 0;
+				upstream_cumulative_departed_vehicles =
+					_link_upstream_cumulative_arrived_vehicles +
+					_link_origin_cumulative_departed_vehicles -
+					_link_destination_cumulative_arrived_vehicles;
+
+				upstream_cumulative_departed_vehicles = max(0, upstream_cumulative_departed_vehicles);
+
+				if (((_Scenario_Interface*)_global_scenario)->template jam_density_constraints_enforced<bool>())
+				{
 					_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
 				}
-			}
-
-			int t_fftt = (current_simulation_interval_index) % _link_fftt_cached_simulation_interval_size;
-			int t_bwtt = (current_simulation_interval_index) % _link_bwtt_cached_simulation_interval_size;
-
-			_cached_link_upstream_cumulative_vehicles_array[t_fftt] = _link_upstream_cumulative_vehicles;
-			_cached_link_downstream_cumulative_vehicles_array[t_bwtt] = _link_downstream_cumulative_vehicles;
-
-			_link_num_vehicles_in_queue = link_shifted_cumulative_arrived_vehicles - _link_downstream_cumulative_vehicles;
-			_num_vehicles_on_link = _link_upstream_cumulative_vehicles - _link_downstream_cumulative_vehicles;
-
-			_link_downstream_cumulative_arrived_vehicles = link_shifted_cumulative_arrived_vehicles;
-
-
-			typedef typename remove_pointer<network_reference_type>::type::Component_Type::routable_networks_type routable_networks_type;
-
-			Prototype_Random_Access_Sequence<routable_networks_type, Routable_Network>* routable_networks = _network_reference->template routable_networks<routable_networks_type>();
-
-
-			//Note, this variable is the delay for link + turn delay
-			//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay
-
-			unsigned int outbound_turn_index = 0;
-
-			for (auto itr = _outbound_turn_movements.begin(); itr != _outbound_turn_movements.end(); itr++, outbound_turn_index++)
-			{
-				Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
-
-
-				turn_movement->template update_state<NT>();
-
-				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-
-				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				else
 				{
-					float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
+					int t_minus_bwtt = -1;
 
-					//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
-					//{
-					//	cout << cost_update << endl;
-					//}
-
-					for (auto routable_itr = routable_networks->begin(); routable_itr != routable_networks->end(); routable_itr++)
+					if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
 					{
-						Routable_Network<typename MasterType::routable_network_type>* current_network = *routable_itr;
+						t_minus_bwtt = (current_simulation_interval_index - _link_bwtt_cached_simulation_interval_size) % _link_bwtt_cached_simulation_interval_size;
+					}
 
-						current_network->update_edge_turn_cost(_uuid, _link_fftt, outbound_turn_index, cost_update - _link_fftt);
+					if (t_minus_bwtt > -1)
+					{
+						int jam_vehicles = (int)(_num_lanes * _length * _jam_density / 5280.0f);
+						jam_vehicles = max(_num_lanes * 2, jam_vehicles);
+						int cached = _cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt] + jam_vehicles;
+						_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles, cached);
+					}
+					else
+					{
+						_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
 					}
 				}
 
-			}
+				int t_fftt = (current_simulation_interval_index) % _link_fftt_cached_simulation_interval_size;
+				int t_bwtt = (current_simulation_interval_index) % _link_bwtt_cached_simulation_interval_size;
 
+				_cached_link_upstream_cumulative_vehicles_array[t_fftt] = _link_upstream_cumulative_vehicles;
+				_cached_link_downstream_cumulative_vehicles_array[t_bwtt] = _link_downstream_cumulative_vehicles;
+
+				_link_num_vehicles_in_queue = link_shifted_cumulative_arrived_vehicles - _link_downstream_cumulative_vehicles;
+				_num_vehicles_on_link = _link_upstream_cumulative_vehicles - _link_downstream_cumulative_vehicles;
+
+				_link_downstream_cumulative_arrived_vehicles = link_shifted_cumulative_arrived_vehicles;
+
+
+				typedef typename remove_pointer<network_reference_type>::type::Component_Type::routable_networks_type routable_networks_type;
+
+				Prototype_Random_Access_Sequence<routable_networks_type, Routable_Network>* routable_networks = _network_reference->template routable_networks<routable_networks_type>();
+
+
+				//Note, this variable is the delay for link + turn delay
+				//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay
+
+				unsigned int outbound_turn_index = 0;
+
+				for (auto itr = _outbound_turn_movements.begin(); itr != _outbound_turn_movements.end(); itr++, outbound_turn_index++)
+				{
+					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
+
+					if (turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::LEFT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::THROUGH_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::RIGHT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::U_TURN)
+					{
+						turn_movement->template update_state<NT>();
+
+						int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
+
+						//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+						{
+							float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
+
+							//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
+							//{
+							//	cout << cost_update << endl;
+							//}
+
+							for (auto routable_itr = routable_networks->begin(); routable_itr != routable_networks->end(); routable_itr++)
+							{
+								Routable_Network<typename MasterType::routable_network_type>* current_network = *routable_itr;
+
+								current_network->update_edge_turn_cost(_uuid, _link_fftt, outbound_turn_index, cost_update - _link_fftt);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		template<typename MasterType, typename InheritanceList>
@@ -1105,7 +1122,11 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::Initialize()
 		{
-			this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			//TODO:Omer make sure this does not cause any issues
+			if (this->_link_type != Types::Link_Type_Keys::WALK && this->_link_type != Types::Link_Type_Keys::TRANSIT)
+			{
+				this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			}
 
 			//TODO
 			//load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
@@ -1114,6 +1135,7 @@ namespace Link_Components
 		template<typename MasterType, typename InheritanceList>
 		void Link_Implementation<MasterType, InheritanceList>::Newells_Conditional(ComponentType* _this, Event_Response& response)
 		{
+			
 			_Link_Interface* _this_ptr = (_Link_Interface*)_this;
 			if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
 			{

@@ -1,6 +1,5 @@
 #pragma once
-//#include "cfg_reader.h"
-//#include "Traffic_Simulator_Includes.h"
+//#include "Scenario_Manager_Includes.h"
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -235,6 +234,17 @@ namespace Scenario_Components
 			accessor(time_dependent_routing_weight_factor, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
+			accessor(multimodal_routing, NONE, NONE);
+			accessor(multimodal_routing_weight_shape, NONE, NONE);
+			accessor(multimodal_routing_weight_scale, NONE, NONE);
+			accessor(multimodal_routing_weight_factor, NONE, NONE);
+
+			/*accessor(transferPenalty, NONE, NONE);
+			accessor(waitWeight, NONE, NONE);
+			accessor(walkWeight, NONE, NONE);
+			accessor(ivtWeight, NONE, NONE);
+			accessor(carWeight, NONE, NONE);*/
+
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
 			accessor(output_link_moe_for_simulation_interval, NONE, NONE);
@@ -301,6 +311,7 @@ namespace Scenario_Components
 			accessor(destination_choice_model_file, NONE, NONE);
 			accessor(telecommute_choice_model_file, NONE, NONE);
 			accessor(cav_wtp_model_file, NONE, NONE);
+			accessor(multimodal_routing_model_file, NONE, NONE);
 
 			void default_static_initializer()
 			{
@@ -757,6 +768,7 @@ namespace Scenario_Components
 				set_parameter<double>(document, "", "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
 				set_parameter<double>(document, "", "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
 				set_parameter<double>(document, "", "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
+				set_parameter<bool>(document, "", "multimodal_routing", multimodal_routing<bool &>());
 				set_parameter<double>(document, "", "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
 				set_parameter<bool>(document, "", "calculate_realtime_moe", calculate_realtime_moe<bool &>());
 				
@@ -774,6 +786,7 @@ namespace Scenario_Components
 				set_parameter<std::string>(document, "", "destination_choice_model_file", destination_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "", "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "", "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
+				set_parameter<std::string>(document, "", "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

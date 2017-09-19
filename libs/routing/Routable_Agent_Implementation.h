@@ -28,6 +28,16 @@ namespace polaris
 			return false;
 		}
 
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
+		{
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				if (current->_edge_id == itr_destination->_edge_id) return true;
+			}
+			return false;
+		}
+
 		template<typename CurrentEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
 		{
@@ -37,10 +47,32 @@ namespace polaris
 			float y_dist = current->_y - destination->_y;
 			y_dist *= y_dist;
 
-			// vehicle speed
+			// vehicle speed in fps
 			float cost = sqrt(x_dist + y_dist)/89.0f;
-			
 			return cost;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination, bool multimodal_dijkstra)
+		{
+			if (!multimodal_dijkstra)
+			{
+				float x_dist = current->_x - destination->_x;
+				x_dist *= x_dist;
+
+				float y_dist = current->_y - destination->_y;
+				y_dist *= y_dist;
+
+				// vehicle speed in fps
+				float cost = sqrt(x_dist + y_dist) / 89.0f;
+				return cost;
+			}
+			else
+			{
+				float cost = destination->dijkstra_cost[current->_zone];
+				return cost;
+			}
+			
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -206,6 +238,57 @@ namespace polaris
 			}
 		}
 
+		float time_cost_between(typename MT::multimodal_edge_type* current, typename MT::multimodal_edge_type* neighbor, typename MT::multimodal_to_multimodal_type* connection)
+		{
+			// moe lookup
+			int current_time = current->time_label();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
+
+			if (turn_moe_ptr != nullptr)
+			{
+				int sim_time = iteration();
+
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = current->moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost_temp; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				if (t > ttime_step)
+				{
+					ttime_accumulation += ttime_step;
+					t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
+					ttime_step = current->moe_data()->layer_step<float>();
+					while (t - ttime_accumulation > ttime_step)
+					{
+						ttime_accumulation += ttime_step;
+						t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
+
+					}
+				}
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+
+
+
+				// updates to handle mixing of historical and real-time info in cost function
+				float time_cost_current = connection->_time_cost + neighbor->_time_cost_temp;
+
+				int t_diff = abs(current_time - iteration());
+
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+
+				float time_cost = w*time_cost_current + (1 - w)*t;
+				
+				return time_cost;
+				
+			}
+			else
+			{				
+				return connection->_time_cost + neighbor->_time_cost_temp;
+			}
+		}
+
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){}
 
@@ -247,6 +330,88 @@ namespace polaris
 
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){}
+	};
+
+	template<typename MasterType>
+	struct Multi_Modal_Tree_Agent_Implementation
+	{			
+		template<typename CurrentEdgeType, typename ConnectionType>
+		bool process_connection_set(CurrentEdgeType* current)
+		{
+			return true;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return false;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return 0.0f;
+		}
+		
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_min_multi_modal_cost;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_min_multi_modal_cost;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
+	};
+	
+	template<typename MasterType>
+	struct Walk_to_Transit_Tree_Agent_Implementation
+	{
+		template<typename CurrentEdgeType, typename ConnectionType>
+		bool process_connection_set(CurrentEdgeType* current)
+		{
+			return true;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return false;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
+		{
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				if (current->_edge_id == itr_destination->_edge_id) return true;
+			}
+			return false;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return 0.0f;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_walk_length;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			return current->_walk_length;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
 	};
 
 

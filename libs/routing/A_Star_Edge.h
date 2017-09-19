@@ -49,9 +49,15 @@ namespace polaris
 	
 		void* came_from(){ return this_component()->came_from(); }
 		void came_from(void* value){ this_component()->came_from(value); }
-
+		
 		float time_label(){ return this_component()->time_label(); }
 		void time_label(float value){ this_component()->time_label(value); }
+
+		float distance_to_transit() { return this_component()->distance_to_transit(); }
+		void distance_to_transit(float value) { this_component()->distance_to_transit(value); }
+
+		bool touch_transit() { return this_component()->touch_transit(); }
+		void touch_transit(bool value) { this_component()->touch_transit(value); }
 
 		void Display(){this_component()->Display();}
 

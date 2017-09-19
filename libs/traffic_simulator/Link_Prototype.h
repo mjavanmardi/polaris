@@ -18,7 +18,9 @@ namespace Link_Components
 			WALKWAY,
 			BIKEWAY,
 			WATERWAY,
-			EXTERNAL
+			EXTERNAL,
+			WALK,
+			TRANSIT
 		};
 	}
 
@@ -40,8 +42,11 @@ namespace Link_Components
 			accessor(length, NONE, NONE);
 			accessor(link_type, NONE, NONE);
 			accessor(activity_locations, NONE, NONE);
+			accessor(zone, NONE, NONE);
 			accessor(dbid, NONE, NONE);
 			accessor(direction, NONE, NONE);
+			accessor(name, NONE, NONE);
+			accessor(grade, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -90,6 +95,14 @@ namespace Link_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(link_vmt, NONE, NONE);
 			accessor(link_vht, NONE, NONE);
+			//------------------------------------------------------------------------------------------------------------------
+
+			//==================================================================================================================
+			/// transit link
+			//------------------------------------------------------------------------------------------------------------------
+			accessor(trips_by_dep_time, NONE, NONE);
+			accessor(index_along_trip_at_upstream_node, NONE, NONE);
+			accessor(unique_patterns, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================

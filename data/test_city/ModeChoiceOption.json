@@ -1,0 +1,46 @@
+{
+	"Mode_Choice_Option" :
+	{
+		"BHW_CBD_IVTT" 	: 0.0159,
+		"BHO_IVTT" 		: 0.0114,
+		"BHO_CBD_IVTT" 	: 0.0159,
+		"BNH_IVTT" 		: 0.0114,
+		"BNH_CBD_IVTT" 	: 0.0159,
+		"BHW_IVTT" 		: 0.0186,
+
+		"BHW_WAIT" 		: 0.0811,
+		"BHW_CBD_WAIT" 	: 0.0173,
+		"BHO_WAIT" 		: 0.061,
+		"BHO_CBD_WAIT" 	: 0.0173,
+		"BNH_WAIT" 		: 0.061,
+		"BNH_CBD_WAIT" 	: 0.0173,
+
+		"BHW_TRANSFER" 		: 0.0399,
+		"BHW_CBD_TRANSFER" 	: 0.029,
+		"BHO_TRANSFER" 		: 0.0589,
+		"BHO_CBD_TRANSFER" 	: 0.029,
+		"BNH_TRANSFER" 		: 0.0589,
+		"BNH_CBD_TRANSFER" 	: 0.029,
+
+		"BHW_WALK" 		: 0.0584,
+		"BHW_CBD_WALK" 	: 0.0486,
+		"BHO_WALK" 		: 0.0663,
+		"BHO_CBD_WALK" 	: 0.0486,
+		"BNH_WALK" 		: 0.0663,
+		"BNH_CBD_WALK" 	: 0.0486,
+
+		"BHW_COST" 		: 0.00119,
+		"BHW_CBD_COST" 	: 0.00141,
+		"BHO_COST" 		: 0.00546,
+		"BHO_CBD_COST" 	: 0.00141,
+		"BNH_COST" 		: 0.00546,
+		"BNH_CBD_COST" 	: 0.00141,
+
+		"BHW_BIAS" 		: -2.0,
+		"BHW_CBD_BIAS" 	: -1.0,
+		"BHO_BIAS" 		: -1.9,
+		"BHO_CBD_BIAS" 	: -1.0,
+		"BNH_BIAS" 		: -2.0,
+		"BNH_CBD_BIAS" 	: -1.0
+	}
+}

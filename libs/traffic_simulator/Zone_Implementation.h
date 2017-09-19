@@ -165,6 +165,11 @@ namespace Zone_Components
 			m_container(std::vector<typename MasterType::activity_location_type*>, discretionary_locations, NONE, NONE);
 			m_container(std::vector<typename MasterType::activity_location_type*>, school_locations, NONE, NONE);
 
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, origin_links, NONE, NONE);
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, destination_links, NONE, NONE);
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, origin_walk_links, NONE, NONE);
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, destination_walk_links, NONE, NONE);
+
 		};
 	}
 

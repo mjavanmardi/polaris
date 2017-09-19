@@ -583,13 +583,23 @@ namespace Intersection_Components
 
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, dbid, NONE, NONE);
 			m_data(int, internal_id, NONE, NONE);
 			m_data(float, x_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, y_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, z_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, zone, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(std::string, agency, NONE, NONE);
+			m_data(std::string, street, NONE, NONE);
+			m_data(std::string, name, NONE, NONE);
+			m_data(std::string, description, NONE, NONE);
 			m_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, inbound_links, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, outbound_links, NONE, NONE);
+			/*m_container(std::vector<typename MasterType::link_type*>, inbound_walk_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_walk_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, inbound_transit_links, NONE, NONE);
+			m_container(std::vector<typename MasterType::link_type*>, outbound_transit_links, NONE, NONE);*/
 			m_container(std::vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, NONE, NONE);
 			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
