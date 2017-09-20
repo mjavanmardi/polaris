@@ -284,7 +284,7 @@ namespace Prototypes
 		int loc_id = properties->template work_location_id<int>();
 		if (loc_id < 0)
 		{
-			THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
+			//THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
 			return nullptr;
 		}
 		return (TargetType)(*locations)[loc_id];
@@ -308,7 +308,7 @@ namespace Prototypes
 		int loc_id = properties->template work_location_id<int>();
 		if (loc_id < 0 || loc_id >= locations->size())
 		{
-			THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
+			//THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
 			return nullptr;
 		}
 		activity_location_itf* loc = (activity_location_itf*)((*locations)[loc_id]);
@@ -398,7 +398,7 @@ namespace Prototypes
 		int loc_id = properties->template school_location_id<int>();
 		if (loc_id < 0)
 		{
-			THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
+			//THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
 			return nullptr;
 		}
 		return (TargetType)(*locations)[loc_id];
@@ -421,7 +421,7 @@ namespace Prototypes
 		int loc_id = properties->template school_location_id<int>();
 		if (loc_id < 0)
 		{
-			THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
+			//THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
 			return nullptr;
 		}
 		activity_location_itf* loc = (*locations)[loc_id];

@@ -18,6 +18,8 @@ namespace Person_Components
 
 			typedef pair<float,data_type> record_type;
 			typedef std::map<float,data_type> map_type;
+			typedef pair<int, float> start_record_type;
+			typedef std::map<int, float> start_map_type;
 
 
 			// pointer back to parent class
@@ -47,6 +49,7 @@ namespace Person_Components
 
 			// static start time and duration lookup container for each activity type
 			static m_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
+			static m_container(concat(std::unordered_map<int, start_map_type>), start_time_container, NONE, NONE); // maps to the probabilities of start times alone, by activity type integer
 			
 
 			//=======================================================================================================
@@ -132,7 +135,19 @@ namespace Person_Components
 				Time_Minutes end = GLOBALS::Time_Converter.template Convert_Value<InputTimeType,Time_Minutes>(range_end);
 				
 				// draw random from uniform distribution and get corresponding data item - loop while draw is outside of range
-				int iter = 0;
+				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
+
+				start_map_type::iterator range_start_itr = _start_time_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].lower_bound(start);
+				start_map_type::iterator range_end_itr = _start_time_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].lower_bound(end);
+
+				float p_range_start = range_start_itr->second;
+				float p_range_end = 1.0;
+				if (range_end_itr != _start_time_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) p_range_end = range_end_itr->second;
+
+				float rand2 = rand * (p_range_end - p_range_start) + p_range_start;
+				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand2);
+
+				/*int iter = 0;
 				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
 				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 				while (itr->second.first < start || itr->second.first >= end)
@@ -145,7 +160,7 @@ namespace Person_Components
 						THROW_WARNING("Warning, could not find a start time value within given range: random start time has been selected.");
 						break;
 					}
-				}
+				}*/
 
 				// make sure valid entry is found
 				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
@@ -283,17 +298,27 @@ namespace Person_Components
 				}
 
 				// RUM portion of utility
-				float U_am_peak =	-1.0*FLT_MAX;
-				float U_am_offpeak =-1.0*FLT_MAX;
-				float U_pm_offpeak =-1.0*FLT_MAX;
-				float U_pm_peak =	-1.0*FLT_MAX;
-				float U_evening =	-1.0*FLT_MAX;
+				Activity_Components::Types::ACTIVITY_TYPES act_type = act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				float D_EO = act_type == Activity_Components::Types::EAT_OUT_ACTIVITY? 1.0 : 0.0;
+				float D_S = act_type == Activity_Components::Types::SOCIAL_ACTIVITY ? 1.0 : 0.0;
+				float D_MS = act_type == Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY || act_type == Activity_Components::Types::OTHER_SHOPPING_ACTIVITY ? 1.0 : 0.0;
+				float D_OS = act_type == Activity_Components::Types::OTHER_SHOPPING_ACTIVITY ? 1.0 : 0.0;
+				float D_PB = act_type == Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY || act_type == Activity_Components::Types::HEALTHCARE_ACTIVITY || act_type == Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY || act_type == Activity_Components::Types::ERRANDS_ACTIVITY ? 1.0 : 0.0;
+				float D_L = act_type == Activity_Components::Types::LEISURE_ACTIVITY || act_type == Activity_Components::Types::RECREATION_ACTIVITY ? 1.0 : 0.0;
+				float D_RC = act_type == Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY ? 1.0 : 0.0;;
+
+				float U_am_peak =	 _C_AMPEAK_EAT_OUT_ACTIVITY * D_EO	  + _C_AMPEAK_SOCIAL_ACTIVITY * D_S		+ _C_AMPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_AMPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY *	D_PB + _C_AMPEAK_LEISURE_ACTIVITY * D_L		+ _C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_am_offpeak = _C_AMOFFPEAK_EAT_OUT_ACTIVITY * D_EO + _C_AMOFFPEAK_SOCIAL_ACTIVITY * D_S	+ _C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS + _C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY * D_PB + _C_AMOFFPEAK_LEISURE_ACTIVITY * D_L	+ _C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_pm_offpeak = _C_PMOFFPEAK_EAT_OUT_ACTIVITY * D_EO + _C_PMOFFPEAK_SOCIAL_ACTIVITY * D_S	+ _C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS + _C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY * D_PB + _C_PMOFFPEAK_LEISURE_ACTIVITY * D_L	+ _C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_pm_peak =	 _C_PMPEAK_EAT_OUT_ACTIVITY * D_EO	  + _C_PMPEAK_SOCIAL_ACTIVITY * D_S		+ _C_PMPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_PMPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY *	D_PB + _C_PMPEAK_LEISURE_ACTIVITY * D_L		+ _C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_evening =	 _C_EVENING_EAT_OUT_ACTIVITY * D_EO	  + _C_EVENING_SOCIAL_ACTIVITY  * D_S	+ _C_EVENING_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_EVENING_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_EVENING_PERSONAL_BUSINESS_ACTIVITY *D_PB	 + _C_EVENING_LEISURE_ACTIVITY * D_L	+ _C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_night =		 _C_NIGHT_EAT_OUT_ACTIVITY * D_EO	  +	_C_NIGHT_SOCIAL_ACTIVITY  * D_S		+ _C_NIGHT_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_NIGHT_OTHER_SHOPPING_ACTIVITY * D_OS			+ _C_NIGHT_PERSONAL_BUSINESS_ACTIVITY *D_PB		 + _C_NIGHT_LEISURE_ACTIVITY * D_L		+ _C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
 	
-				U_am_peak = _S_AMPEAK_AGE_60*Age_60 + _S_AMPEAK_HH_WORKERS*Workers + _S_AMPEAK_FLEX_START*Flex_start + _S_AMPEAK_FLEX_DURATION*Flex_duration + _S_AMPEAK_PARTY_JOINT*Party_joint;
-				U_am_offpeak = _S_AMOFFPEAK_CONSTANT + _S_AMOFFPEAK_WORK_PARTTIME*Work_parttime + _S_AMOFFPEAK_STUDENT_FULLTIME*Student_fulltime + _S_AMOFFPEAK_MODE_PASSENGER*Mode_passenger;
-				U_pm_offpeak = _S_PMOFFPEAK_CONSTANT + _S_PMOFFPEAK_INCOME_LOW*Income_low + _S_PMOFFPEAK_MODE_TRANSIT*Mode_transit;
-				U_pm_peak = _S_PMPEAK_CONSTANT + _S_PMPEAK_WORK_FULLTIME*Work_fulltime + _S_PMPEAK_INCOME_HIGH*Income_high + _S_PMPEAK_HH_WORKERS*Workers + _S_PMPEAK_FLEX_START*Flex_start;
-				U_evening = _S_EVENING_CONSTANT + _S_EVENING_TELEWORK*Telework + _S_EVENING_INCOME_LOW*Income_low + _S_EVENING_DEGREE_COLLEGE*degree;
+				U_am_peak += _S_AMPEAK_AGE_60*Age_60 + _S_AMPEAK_HH_WORKERS*Workers + _S_AMPEAK_FLEX_START*Flex_start + _S_AMPEAK_FLEX_DURATION*Flex_duration + _S_AMPEAK_PARTY_JOINT*Party_joint;
+				U_am_offpeak += _S_AMOFFPEAK_CONSTANT + _S_AMOFFPEAK_WORK_PARTTIME*Work_parttime + _S_AMOFFPEAK_STUDENT_FULLTIME*Student_fulltime + _S_AMOFFPEAK_MODE_PASSENGER*Mode_passenger;
+				U_pm_offpeak += _S_PMOFFPEAK_CONSTANT + _S_PMOFFPEAK_INCOME_LOW*Income_low + _S_PMOFFPEAK_MODE_TRANSIT*Mode_transit;
+				U_pm_peak += _S_PMPEAK_CONSTANT + _S_PMPEAK_WORK_FULLTIME*Work_fulltime + _S_PMPEAK_INCOME_HIGH*Income_high + _S_PMPEAK_HH_WORKERS*Workers + _S_PMPEAK_FLEX_START*Flex_start;
+				U_evening += _S_EVENING_CONSTANT + _S_EVENING_TELEWORK*Telework + _S_EVENING_INCOME_LOW*Income_low + _S_EVENING_DEGREE_COLLEGE*degree;
 
 				// RRM portion of utility
 				float R_am_peak = FLT_MAX;
@@ -317,14 +342,14 @@ namespace Person_Components
 				U_pm_offpeak += R_pm_offpeak;
 				U_pm_peak += R_pm_peak;
 				U_evening += R_evening;
-				float U_sum = exp(U_am_peak) + exp(U_am_offpeak) + exp(U_pm_offpeak) + exp(U_pm_peak) + exp(U_evening) + 1.0;
+				float U_sum = exp(U_am_peak) + exp(U_am_offpeak) + exp(U_pm_offpeak) + exp(U_pm_peak) + exp(U_evening) + exp(U_night);
 
 				float P_am_peak = exp(U_am_peak) / U_sum;
 				float P_am_offpeak = exp(U_am_offpeak) / U_sum + P_am_peak;
 				float P_pm_offpeak = exp(U_pm_offpeak) / U_sum + P_am_offpeak;
 				float P_pm_peak = exp(U_pm_peak) / U_sum + P_pm_offpeak;
 				float P_evening = exp(U_evening) / U_sum + P_pm_peak;
-				float P_night = 1.0 / U_sum + P_evening;
+				float P_night = exp(U_night) / U_sum + P_evening;
 
 				float r = GLOBALS::Uniform_RNG.Next_Rand<float>();
 
@@ -363,27 +388,55 @@ namespace Person_Components
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::PART_TIME_WORK_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(Activity_Components::Types::WORK_AT_HOME_ACTIVITY, map_type()));
 
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::PRIMARY_WORK_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::SCHOOL_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::EAT_OUT_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::ERRANDS_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::HEALTHCARE_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::LEISURE_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::OTHER_SHOPPING_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::PICK_UP_OR_DROP_OFF_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::SOCIAL_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::PART_TIME_WORK_ACTIVITY, start_map_type()));
+				_start_time_container.insert(pair<int, start_map_type>(Activity_Components::Types::WORK_AT_HOME_ACTIVITY, start_map_type()));
+
 				// add items
-				ifstream data_file;
-				data_file.open(_START_DURATION_DISTRIBUTION_FILE.c_str(), ios::in);
-				if (!data_file.is_open()) cout << endl << "Could not open 'start_time_duration_data.txt' in the working directory.  Check to make sure the start-time duration file exists.";
+				File_IO::File_Reader data_file;
+				if (!data_file.Open(_START_DURATION_DISTRIBUTION_FILE.c_str())) cout << endl << "Could not open 'start_time_duration_data.txt' in the working directory.  Check to make sure the start-time duration file exists.";
 
-				string line;
 				int act_type;
-				float prob, start, dur;
+				float start, dur, cum_prob;
 
-				getline(data_file,line);
-
-				while(data_file >> act_type >> start >> dur >> prob )
+				while(data_file.Read())
 				{
-					_start_time_duration_container[act_type].insert(record_type(prob,data_type(start,dur)));
-				}
+					act_type = data_file.Get_Int(0);
+					start = data_file.Get_Data<float>(1);
+					dur = data_file.Get_Data<float>(2);
+					cum_prob = data_file.Get_Data<float>(3);
 
+					if (cum_prob < 0.0 || cum_prob > 1.0) THROW_EXCEPTION("ERROR: cumulative probability value out of bounds (0 <= x <= 1) for activity type id '" << act_type << "' in file '" << _START_DURATION_DISTRIBUTION_FILE.c_str() << "'.");
+					
+					_start_time_duration_container[act_type].insert(record_type(cum_prob,data_type(start,dur)));
+
+					// add the start time only probabilities for range draws
+					if (_start_time_container[act_type].find((int)start) == _start_time_container[act_type].end()) _start_time_container[act_type].insert(start_record_type((int)start, cum_prob));
+				}
+				
 				//copy primary work into work_at_home
 				for (map_type::iterator itr = _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
 				{
 					_start_time_duration_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
 				}
+				for (start_map_type::iterator itr = _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
+				{
+					_start_time_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
+				}
+
+				//evaluate
 			}
 
 			static bool static_initialize(const string& option_file)
@@ -567,6 +620,56 @@ namespace Person_Components
 				cout << "\tSIGMA_EVENING = " << SIGMA_EVENING<float>() << endl;
 				cout << "\tSIGMA_NIGHT = " << SIGMA_NIGHT<float>() << endl<<endl;
 
+				// CALIBRATION PARAMS
+				cout << "\tC_NIGHT_EAT_OUT_ACTIVITY = " << C_NIGHT_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_SOCIAL_ACTIVITY = " << C_NIGHT_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_MAJOR_SHOPPING_ACTIVITY = " << C_NIGHT_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_OTHER_SHOPPING_ACTIVITY = " << C_NIGHT_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_PERSONAL_BUSINESS_ACTIVITY = " << C_NIGHT_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_LEISURE_ACTIVITY = " << C_NIGHT_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+				cout << "\tC_AMPEAK_EAT_OUT_ACTIVITY = " << C_AMPEAK_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_SOCIAL_ACTIVITY = " << C_AMPEAK_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_MAJOR_SHOPPING_ACTIVITY = " << C_AMPEAK_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_OTHER_SHOPPING_ACTIVITY = " << C_AMPEAK_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_PERSONAL_BUSINESS_ACTIVITY = " << C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_LEISURE_ACTIVITY = " << C_AMPEAK_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+				cout << "\tC_AMOFFPEAK_EAT_OUT_ACTIVITY = " << C_AMOFFPEAK_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_SOCIAL_ACTIVITY = " << C_AMOFFPEAK_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = " << C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY = " << C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = " << C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_LEISURE_ACTIVITY = " << C_AMOFFPEAK_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+				cout << "\tC_PMOFFPEAK_EAT_OUT_ACTIVITY = " << C_PMOFFPEAK_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_SOCIAL_ACTIVITY = " << C_PMOFFPEAK_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = " << C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY = " << C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = " << C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_LEISURE_ACTIVITY = " << C_PMOFFPEAK_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+				cout << "\tC_PMPEAK_EAT_OUT_ACTIVITY = " << C_PMPEAK_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_SOCIAL_ACTIVITY = " << C_PMPEAK_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_MAJOR_SHOPPING_ACTIVITY = " << C_PMPEAK_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_OTHER_SHOPPING_ACTIVITY = " << C_PMPEAK_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_PERSONAL_BUSINESS_ACTIVITY = " << C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_LEISURE_ACTIVITY = " << C_PMPEAK_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+				cout << "\tC_EVENING_EAT_OUT_ACTIVITY = " << C_EVENING_EAT_OUT_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_SOCIAL_ACTIVITY = " << C_EVENING_SOCIAL_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_MAJOR_SHOPPING_ACTIVITY = " << C_EVENING_MAJOR_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_OTHER_SHOPPING_ACTIVITY = " << C_EVENING_OTHER_SHOPPING_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_PERSONAL_BUSINESS_ACTIVITY = " << C_EVENING_PERSONAL_BUSINESS_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_LEISURE_ACTIVITY = " << C_EVENING_LEISURE_ACTIVITY<float>() << endl;
+				cout << "\tC_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY = " << C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY<float>() << endl;
+
+
 			}
 
 			//==============================================================================================================================
@@ -645,6 +748,50 @@ namespace Person_Components
 			m_static_data(float, SIGMA_PMPEAK, NONE, NONE);
 			m_static_data(float, SIGMA_EVENING, NONE, NONE);
 			m_static_data(float, SIGMA_NIGHT, NONE, NONE);
+			// CALIBRATION PARAMETERS
+			m_static_data(float, C_NIGHT_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_EAT_OUT_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_SOCIAL_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_LEISURE_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+
 			#pragma endregion
 			static void default_static_initializer()
 			{
@@ -654,19 +801,19 @@ namespace Person_Components
 				_S_AMPEAK_FLEX_START = -0.91;
 				_S_AMPEAK_FLEX_DURATION = -2.73;
 				_S_AMPEAK_PARTY_JOINT = -1.04;
-				_S_AMOFFPEAK_CONSTANT = 12.97;
+				//_S_AMOFFPEAK_CONSTANT = 12.97;
 				_S_AMOFFPEAK_WORK_PARTTIME = 0.79;
 				_S_AMOFFPEAK_STUDENT_FULLTIME = -1.64;
 				_S_AMOFFPEAK_MODE_PASSENGER = -0.92;
-				_S_PMOFFPEAK_CONSTANT = 9.53;
+				//_S_PMOFFPEAK_CONSTANT = 9.53;
 				_S_PMOFFPEAK_INCOME_LOW = 0;
 				_S_PMOFFPEAK_MODE_TRANSIT = 0;
-				_S_PMPEAK_CONSTANT = 6.13;
+				//_S_PMPEAK_CONSTANT = 6.13;
 				_S_PMPEAK_WORK_FULLTIME = 0.78;
 				_S_PMPEAK_INCOME_HIGH = 0.78;
 				_S_PMPEAK_HH_WORKERS = -0.89;
 				_S_PMPEAK_FLEX_START = 0;
-				_S_EVENING_CONSTANT = 5.45;
+				//_S_EVENING_CONSTANT = 5.45;
 				_S_EVENING_TELEWORK = 1.00;
 				_S_EVENING_INCOME_LOW = -0.82;
 				_S_EVENING_DEGREE_COLLEGE = 0;
@@ -720,6 +867,57 @@ namespace Person_Components
 				_SIGMA_EVENING = 0;
 				_SIGMA_NIGHT = 0;
 
+
+				// CALIBRATION PARAMS
+				_C_NIGHT_EAT_OUT_ACTIVITY = -2.18746979167709;
+				_C_NIGHT_SOCIAL_ACTIVITY = -0.151816316237445;
+				_C_NIGHT_MAJOR_SHOPPING_ACTIVITY = -2.85765460061451;
+				_C_NIGHT_OTHER_SHOPPING_ACTIVITY = 9.41071271155101;
+				_C_NIGHT_PERSONAL_BUSINESS_ACTIVITY = -0.911532111211412;
+				_C_NIGHT_LEISURE_ACTIVITY = -1.32124654710803;
+				_C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY = -2.86111801068855;
+
+				_C_AMPEAK_EAT_OUT_ACTIVITY = 4.01939434863257;
+				_C_AMPEAK_SOCIAL_ACTIVITY = 3.68241396812662;
+				_C_AMPEAK_MAJOR_SHOPPING_ACTIVITY = 3.25236740295476;
+				_C_AMPEAK_OTHER_SHOPPING_ACTIVITY = 9.34296388363308;
+				_C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY = 4.68187615209834;
+				_C_AMPEAK_LEISURE_ACTIVITY = 4.10568214795307;
+				_C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 4.61642065450194;
+
+				_C_AMOFFPEAK_EAT_OUT_ACTIVITY = 11.73400885942;
+				_C_AMOFFPEAK_SOCIAL_ACTIVITY = 11.8974348175282;
+				_C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = 12.3074872613248;
+				_C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY = 8.87281202321024;
+				_C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = 12.3549662246864;
+				_C_AMOFFPEAK_LEISURE_ACTIVITY = 11.665493893404;
+				_C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 11.3502211363177;
+
+				_C_PMOFFPEAK_EAT_OUT_ACTIVITY = 8.29570297286496;
+				_C_PMOFFPEAK_SOCIAL_ACTIVITY = 8.2636508852272;
+				_C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = 8.96573213111903;
+				_C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY = 8.67323965737224;
+				_C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = 8.29077195328999;
+				_C_PMOFFPEAK_LEISURE_ACTIVITY = 7.67140922742426;
+				_C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 6.73947277775626;
+
+				_C_PMPEAK_EAT_OUT_ACTIVITY = 8.56496442100565;
+				_C_PMPEAK_SOCIAL_ACTIVITY = 8.86015755670407;
+				_C_PMPEAK_MAJOR_SHOPPING_ACTIVITY = 8.53454880764985;
+				_C_PMPEAK_OTHER_SHOPPING_ACTIVITY = 8.95759392229733;
+				_C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY = 8.19209176966924;
+				_C_PMPEAK_LEISURE_ACTIVITY = 8.47875111138397;
+				_C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 8.27369601572888;
+
+				_C_EVENING_EAT_OUT_ACTIVITY = 3.44822162072985;
+				_C_EVENING_SOCIAL_ACTIVITY = 3.85677427346912;
+				_C_EVENING_MAJOR_SHOPPING_ACTIVITY = 3.13715990832404;
+				_C_EVENING_OTHER_SHOPPING_ACTIVITY = 9.08506444532619;
+				_C_EVENING_PERSONAL_BUSINESS_ACTIVITY = 2.64971477681271;
+				_C_EVENING_LEISURE_ACTIVITY = 3.09576742130294;
+				_C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY = 2.93456285488138;
+
+
 			}
 		};
 
@@ -727,9 +925,10 @@ namespace Person_Components
 		// INITIALIZE TIMING CHOICE MODEL STATIC PARAMETERS
 		template<typename MasterType, typename InheritanceList> typename Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::type_of(is_initialized) Activity_Timing_Chooser_Implementation<MasterType,InheritanceList>::_is_initialized = false;
 		template<typename MasterType, typename InheritanceList> std::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
+		template<typename MasterType, typename InheritanceList> std::unordered_map<int, std::map<int, float>> Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::_start_time_container;
 
 		#pragma region Choice option parameters	
-		// zero-inflation parameters
+		// start parameters
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, START_DURATION_DISTRIBUTION_FILE);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, S_AMPEAK_AGE_60);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, S_AMPEAK_HH_WORKERS);
@@ -761,7 +960,7 @@ namespace Person_Components
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, S_PMPEAK_OCCUPANCY);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, S_PMPEAK_TT);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, S_EVENING_TT);
-
+		//DURATION parameters
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, D_AMPEAK_CONSTANT);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, D_AMPEAK_FLEX_DURATION);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, D_AMPEAK_TELEWORK);
@@ -801,6 +1000,56 @@ namespace Person_Components
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_PMPEAK);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_EVENING);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_NIGHT);
+		// Calibration parameters
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_EAT_OUT_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SOCIAL_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_MAJOR_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_OTHER_SHOPPING_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_PERSONAL_BUSINESS_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_LEISURE_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+
 		#pragma endregion
 	}
 }

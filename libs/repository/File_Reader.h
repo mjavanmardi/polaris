@@ -222,6 +222,17 @@ namespace File_IO
 			iss>>x;
 			return x;
 		}
+		float Get_Float(int column)
+		{
+			int x;
+			if (column >= _string_data.size())
+			{
+				THROW_EXCEPTION("ERROR, requested column is out of bounds for file");
+			}
+			istringstream iss(_string_data[column]);
+			iss >> x;
+			return x;
+		}
 		template<class T>
 		bool Get_Data(T& t, int column)
 		{
@@ -232,6 +243,18 @@ namespace File_IO
 			istringstream iss(_string_data[column]);
 			iss>>t;
 			return true;
+		}
+		template<class T>
+		T Get_Data(int column)
+		{
+			T ret_val;
+			if (column >= _string_data.size())
+			{
+				THROW_EXCEPTION("ERROR, requested column is out of bounds for file");
+			}
+			istringstream iss(_string_data[column]);
+			iss >> ret_val;
+			return ret_val;
 		}
 		template<class T>
 		bool Get_Data(std::vector<T> &data, std::vector<int> columns)

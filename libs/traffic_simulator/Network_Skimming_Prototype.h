@@ -546,7 +546,7 @@ namespace Network_Skimming_Components
 				// Extract zone ID information from the input origin/destination type (either location or zone)
 				int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(origin);
 
-				// Do a lookup to make sure the zone is in the network (may be able to remove this)
+				//TODO: remove when done test.  Do a lookup to make sure the zone is in the network (may be able to remove this)
 				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
 				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->template uuid<int>()<<","<<origin->template internal_id<int>());
 

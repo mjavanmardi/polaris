@@ -1954,7 +1954,10 @@ namespace Person_Components
 					if (restrict_choice_set)
 					{
 						avail_time = max_end - min_start - _Current_Activity->template Duration<Time_Minutes>();
-						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;
+						// if there is no time available between previous and next activity, use the travel time from previous to next location as the available time (i.e. search for stops along the travel route, more or less....)
+						if (avail_time < 0.0) avail_time = network->Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes, Time_Minutes>(prev_loc, next_loc, Vehicle_Components::Types::SOV, min_start);
+
+						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;	
 					}
 				}
 				else
