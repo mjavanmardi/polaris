@@ -97,6 +97,7 @@ namespace Routing_Components
 		m_data(int,layer_step,NONE,NONE);
 
 		m_data(std::vector<DataRecord>,layer_data,NONE,NONE);
+
 	};
 
 
@@ -769,8 +770,8 @@ namespace Routing_Components
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost_temp = current_link->template travel_time<float>();
 						
-						int zone_id = current_link->_zone;
-						input_multimodal_edge._zone = zone_id;
+						int zone_index = current_link->_zone_index;
+						input_multimodal_edge._zone = zone_index;
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
@@ -796,13 +797,11 @@ namespace Routing_Components
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
 							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							//input_multimodal_edge._min_multi_modal_cost = 10 * walkWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>();
+							input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
 						}
 						else
 						{
 							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							//input_multimodal_edge._min_multi_modal_cost = FLT_MAX / 2.0f;
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
 						}						
 
@@ -1076,59 +1075,56 @@ namespace Routing_Components
 
 				return routed_time;
 			}				
+			
+			void schedule_dijkstra_network_tree(Network<typename MasterType::network_type>* source_network)
+			{				
+				typedef Network<typename MasterType::network_type> _Network_Interface;
+				typedef Routing_Components::Prototypes::Routing<typename MasterType::dijkstra_heuristics_routing_type> _Routing_Interface;
 
-			void compute_dijkstra_network_tree(Network<typename MasterType::network_type>* source_network)
-			{
-				cout << "Constructing all-zones-to-all-edges Dijkstra for better A* estimations..." << endl;
-
-				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
-
-				typedef Network<typename MasterType::network_type> Network_Interface;
-
-				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
-				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
-
-				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename Network_Interface::get_type_of(zones_container)::value_type>::type> _Zone_Interface;
-				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+				typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 
 				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 
-				Network_Interface* network = source_network;
+				_Network_Interface* network = source_network;
 				
+
 				_Zones_Container_Interface::iterator orig_zone_itr;
 				_Zones_Container_Interface* origin_zones = network->zones_container<_Zones_Container_Interface*>();
 
-				_Zones_Container_Interface::iterator dest_zone_itr;
-				_Zones_Container_Interface* destination_zones = network->zones_container<_Zones_Container_Interface*>();
-
-				int my_itr = 0;
 				for (auto orig_zone_itr = origin_zones->begin(); orig_zone_itr != origin_zones->end(); orig_zone_itr++)
 				{
-					
+					_Routing_Interface* dijkstra_router = (_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 					_Zone_Interface* origin_zone = (_Zone_Interface*)(orig_zone_itr->second);
-					std::vector<Link_Interface*> origins = origin_zone->_origin_links;
-					
-					std::vector<global_edge_id> starts;
-					for (auto itr = origins.begin(); itr != origins.end(); ++itr)
-					{
-						global_edge_id start;
-						Link_Interface* origin_link = (Link_Interface*)(*itr);
-						start.edge_id = origin_link->_uuid;
-						start.graph_id = _multimodal_network_graph_id;
-						starts.push_back(start);
-					}
+					dijkstra_router->origin_zone(origin_zone);
+					dijkstra_router->template network<_Network_Interface*>(network);
+					dijkstra_router->Schedule_Route_Computation(iteration());
+				}
+			}
 
-					int zone_id = origin_zone->_uuid;
-					if (!starts.empty())
-					{
-						float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_id, debug_route);
-					}
-					
-										
-					
-					if (my_itr % 100 == 0) cout << "\tOrigin:\t" << my_itr << endl;
-					++my_itr;
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route = false)
+			{		
+				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
+
+				typedef Network<typename MasterType::network_type> _Network_Interface;
+
+				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename Network_Interface::get_type_of(zones_container)::value_type>::type> _Zone_Interface;
+				typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
+								
+				// get start id list from link id list
+				std::vector<global_edge_id> starts;
+				for (auto itr = origins.begin(); itr != origins.end(); ++itr)
+				{
+					global_edge_id start;
+					start.edge_id = *itr;
+					start.graph_id = _multimodal_network_graph_id;
+					starts.push_back(start);
+				}
+
+				if (!starts.empty())
+				{
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route);
 				}
 
 

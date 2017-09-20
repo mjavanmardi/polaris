@@ -66,9 +66,14 @@ namespace Routing_Components
 			}
 
 			template<typename Source_Network_Type>
-			void compute_dijkstra_network_tree(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			void schedule_dijkstra_network_tree(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				return this_component()->compute_dijkstra_network_tree(source_network);
+				return this_component()->schedule_dijkstra_network_tree(source_network);
+			}
+
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route = false)
+			{
+				return this_component()->compute_dijkstra_network_tree(origins, zone_index, debug_route);
 			}
 
 			template<typename Source_Network_Type>

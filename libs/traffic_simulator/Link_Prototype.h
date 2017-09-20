@@ -43,6 +43,7 @@ namespace Link_Components
 			accessor(link_type, NONE, NONE);
 			accessor(activity_locations, NONE, NONE);
 			accessor(zone, NONE, NONE);
+			accessor(zone_index, NONE, NONE);
 			accessor(dbid, NONE, NONE);
 			accessor(direction, NONE, NONE);
 			accessor(name, NONE, NONE);
@@ -102,7 +103,8 @@ namespace Link_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(trips_by_dep_time, NONE, NONE);
 			accessor(index_along_trip_at_upstream_node, NONE, NONE);
-			accessor(unique_patterns, NONE, NONE);
+			accessor(unique_patterns, NONE, NONE);	
+			accessor(dijkstra_cost, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================

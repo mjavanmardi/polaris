@@ -32,8 +32,12 @@ namespace Routing_Components
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename movement_plan_interface::get_type_of(origin_location)> Activity_Location_Interface;
 			typedef Random_Access_Sequence<typename Activity_Location_Interface::get_type_of(destination_links)> Link_Container_Interface;
 
+
 			typedef Network<typename MasterType::network_type> Network_Interface;
 			typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+
+			typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 
 			template<typename Movement_Plan_Type>
 			void Attach_New_Movement_Plan(Movement_Plan<Movement_Plan_Type>* mp)
@@ -331,6 +335,79 @@ namespace Routing_Components
 				_travel_times_to_link_container.clear();
 
 				routable_network->compute_static_network_tree(origin_id,_travel_times_to_link_container);
+			}
+		};
+
+
+		implementation struct Dijkstra_for_Heuristics_Implementation : public Routing_Implementation<MasterType, INHERIT(Dijkstra_for_Heuristics_Implementation)>
+		{
+			using Routing_Implementation<MasterType, INHERIT(Dijkstra_for_Heuristics_Implementation)>::_network;
+			typedef typename  Routing_Implementation<MasterType, INHERIT(Dijkstra_for_Heuristics_Implementation)>::Component_Type ComponentType;
+			
+			m_prototype(Zone, typename MasterType::zone_type, origin_zone, NONE, NONE);
+			
+			// Events and event handling
+			void Schedule_Route_Computation(Simulation_Timestep_Increment start, Simulation_Timestep_Increment planning_time)
+			{
+				this_component()->template Load_Event<ComponentType>(&Compute_Route_Event_Controller, start + 1, 0);
+			}
+
+			static void Compute_Route_Event_Controller(ComponentType* _this, Event_Response& response)
+			{
+				if (sub_iteration() == 0)
+				{
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
+					_this->Compute_MM_Dijkstra_Tree();
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in routing conditional!" << endl;
+				}
+			}
+
+
+			void Compute_MM_Dijkstra_Tree()
+			{
+				if (_network == nullptr)
+				{
+					THROW_EXCEPTION("Network is undefined.");
+				}
+				else if (((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				{
+					THROW_EXCEPTION("_routable_networks is undefined.");
+				}
+				else if (thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				{
+					THROW_EXCEPTION("_routable_networks is not large enough.");
+				}	
+				else if (_origin_zone == nullptr)
+				{
+					THROW_EXCEPTION("Origin zone is undefined.");
+				}
+
+				// Debug_route is false, set to true under certain conditions to print the routing output
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+
+				// get a routable network; routable_network know what thread you are
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
+								
+								
+				//_Zone_Interface* origin_zone = origin_zone;
+				int origin_zone_index = _origin_zone->_internal_id;
+				Link_Container_Interface* origin_links = _origin_zone->origin_links<Link_Container_Interface*>();
+
+				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
+				std::vector<unsigned int> origin_ids;
+				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+				{
+					Link_Interface* origin_link = (Link_Interface*)(*itr);
+					origin_ids.push_back(origin_link->template uuid<unsigned int>());
+				}				
+
+				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route);
+
 			}
 		};
 	}

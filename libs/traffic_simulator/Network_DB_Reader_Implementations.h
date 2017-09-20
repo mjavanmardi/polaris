@@ -2123,6 +2123,9 @@ namespace Network_Components
 						zone->template origin_links<_Links_Container_Interface&>().push_back(link);
 						zone->template destination_links<_Links_Container_Interface&>().push_back(link);
 
+						int zone_index = zone->template internal_id<int>();
+						link->_zone_index = zone_index;
+						link->_dijkstra_cost.resize(zone_count);
 					}
 				}
 			}

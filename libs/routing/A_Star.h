@@ -240,7 +240,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_id, bool debug_route = false)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route = false)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -249,6 +249,9 @@ namespace polaris
 		
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 		std::ofstream perf_file;
 		std::string myParagraph;
@@ -283,7 +286,7 @@ namespace polaris
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
 
-		int zone = zone_id;
+		int zone = zone_index;
 
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
@@ -326,17 +329,20 @@ namespace polaris
 
 		if (debug_route)
 		{
-			perf_file << "success\tscanScount:\t" << scanCount;
+			perf_file << "success\tzone:\t" << zone;
+			perf_file << "\tscanScount:\t" << scanCount;
 			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 		}
 
-		global_edge_id start_id;
-		start_id = start_ids.front();
-		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
+		global_edge_id current_g;
+		current_g.graph_id = 1;		
+		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(current_g.graph_id);
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
-			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;
-			current->dijkstra_cost[zone] = current->_cost_from_origin;
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;						
+			current_g.edge_id = current->_edge_id;
+			_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(current_g.edge_id);			
+			current_link->_dijkstra_cost[zone] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -614,7 +620,7 @@ namespace polaris
 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-
+		
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
@@ -637,7 +643,6 @@ namespace polaris
 		float Total_Visit_Time;
 		if (debug_route)
 		{
-			// Initialize executed activities file
 			stringstream sp_filename("");
 			sp_filename << _scenario_reference->template output_dir_name<string>();
 			sp_filename << "sp_output.dat";
@@ -649,9 +654,6 @@ namespace polaris
 			res_filename << _scenario_reference->template output_dir_name<string>();
 			res_filename << "sp_labels_output.dat";
 			res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
-
-			// do route calculation timing for debug routes
-			//A_Star_Time.Start();			
 		}
 
 		//TODO: Remove when done testing routing execution time		
@@ -817,7 +819,7 @@ namespace polaris
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			astar_time = elapsed_time;
 			if (debug_route)
-			{								
+			{										
 				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 					origin_loc_id,
 					destination_loc_id,

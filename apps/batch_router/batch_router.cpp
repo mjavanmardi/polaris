@@ -38,6 +38,7 @@ struct MasterType
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
+	typedef Routing_Components::Implementations::Dijkstra_for_Heuristics_Implementation<M> dijkstra_heuristics_routing_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> person_type;
@@ -433,7 +434,7 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Write_Line("\t\"multimodal_routing\" : true,");
 	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : true,");
+	fw.Write_Line("\t\"time_dependent_routing\" : false,");
 	fw.Write_Line("\t\"write_demand_to_database\" : true\n}");
 	
 	fw.Close();

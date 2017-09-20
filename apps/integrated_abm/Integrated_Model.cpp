@@ -88,6 +88,7 @@ struct MasterType
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
+	typedef Routing_Components::Implementations::Dijkstra_for_Heuristics_Implementation<M> dijkstra_heuristics_routing_type;
 	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
 	//typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;

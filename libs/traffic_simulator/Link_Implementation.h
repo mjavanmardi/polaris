@@ -76,7 +76,7 @@ namespace Link_Components
 		{
 			 
 			typedef typename Polaris_Component<MasterType,INHERIT(Link_Implementation),Execution_Object>::Component_Type ComponentType;
-
+			
 		//==================================================================================================================
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -93,6 +93,7 @@ namespace Link_Components
 			m_container(std::vector<typename MasterType::activity_location_type*>, activity_locations, NONE, NONE);
 
 			m_data(int, zone, NONE, NONE);
+			m_data(int, zone_index, NONE, NONE);
 
 			m_data(Link_Components::Types::Link_Type_Keys, link_type, NONE, NONE);
 			
@@ -173,7 +174,7 @@ namespace Link_Components
 			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time, NONE, NONE);
 			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
 			m_container(std::vector<int>, index_along_trip_at_upstream_node, NONE, NONE);
-
+			m_container(std::vector<float>, dijkstra_cost, NONE, NONE);
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------

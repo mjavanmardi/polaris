@@ -55,6 +55,12 @@ namespace polaris
 		template<typename CurrentEdgeType>
 		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination, bool multimodal_dijkstra)
 		{
+			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+			Network_Interface* net = (Network_Interface*)_global_network;
+
+			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+			typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+
 			if (!multimodal_dijkstra)
 			{
 				float x_dist = current->_x - destination->_x;
@@ -69,7 +75,14 @@ namespace polaris
 			}
 			else
 			{
-				float cost = destination->dijkstra_cost[current->_zone];
+				global_edge_id destination_g;
+				destination_g.graph_id = 1;
+				destination_g.edge_id = destination->_edge_id;
+
+				_Link_Interface* destination_link = net->template get_link_ptr<typename MasterType::link_type>(destination_g.edge_id);
+				
+				
+				float cost = destination_link->_dijkstra_cost[current->_zone];
 				return cost;
 			}
 			
