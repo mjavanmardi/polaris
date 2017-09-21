@@ -43,38 +43,38 @@ namespace Person_Components
 
 				string section = "Telecommute_Choice_Model";
 
-				scenario->set_parameter(document, section, "Z_CONSTANT"					, _Z_CONSTANT				 );
-				scenario->set_parameter(document, section, "Z_MALE"						, _Z_MALE					 );
-				scenario->set_parameter(document, section, "Z_INCOME_LOW"				, _Z_INCOME_LOW				 );
-				scenario->set_parameter(document, section, "Z_EDUC_NO_COLLEGE"			, _Z_EDUC_NO_COLLEGE		 );
-				scenario->set_parameter(document, section, "Z_WORK_TRIP_DIST"			, _Z_WORK_TRIP_DIST			 );
-				scenario->set_parameter(document, section, "Z_NWORKERS"					, _Z_NWORKERS				 );
-				scenario->set_parameter(document, section, "Z_FLEX_WORK_INDICATOR"		, _Z_FLEX_WORK_INDICATOR	 );
-				scenario->set_parameter(document, section, "Z_OCC_TRANS_UTILITY"		, _Z_OCC_TRANS_UTILITY		 );
-				scenario->set_parameter(document, section, "Z_OCC_MANAGEMENT"			, _Z_OCC_MANAGEMENT			 );
-				scenario->set_parameter(document, section, "Z_OCC_SERVICE"				, _Z_OCC_SERVICE			 );
-				scenario->set_parameter(document, section, "Z_EMP_DENSITY_OVER_20000"	, _Z_EMP_DENSITY_OVER_20000	 );
-				scenario->set_parameter(document, section, "Z_POP_DENSITY"				, _Z_POP_DENSITY			 );
+				scenario->set_parameter<float>(document, section, "Z_CONSTANT"					, _Z_CONSTANT				 );
+				scenario->set_parameter<float>(document, section, "Z_MALE"						, _Z_MALE					 );
+				scenario->set_parameter<float>(document, section, "Z_INCOME_LOW"				, _Z_INCOME_LOW				 );
+				scenario->set_parameter<float>(document, section, "Z_EDUC_NO_COLLEGE"			, _Z_EDUC_NO_COLLEGE		 );
+				scenario->set_parameter<float>(document, section, "Z_WORK_TRIP_DIST"			, _Z_WORK_TRIP_DIST			 );
+				scenario->set_parameter<float>(document, section, "Z_NWORKERS"					, _Z_NWORKERS				 );
+				scenario->set_parameter<float>(document, section, "Z_FLEX_WORK_INDICATOR"		, _Z_FLEX_WORK_INDICATOR	 );
+				scenario->set_parameter<float>(document, section, "Z_OCC_TRANS_UTILITY"		, _Z_OCC_TRANS_UTILITY		 );
+				scenario->set_parameter<float>(document, section, "Z_OCC_MANAGEMENT"			, _Z_OCC_MANAGEMENT			 );
+				scenario->set_parameter<float>(document, section, "Z_OCC_SERVICE"				, _Z_OCC_SERVICE			 );
+				scenario->set_parameter<float>(document, section, "Z_EMP_DENSITY_OVER_20000"	, _Z_EMP_DENSITY_OVER_20000	 );
+				scenario->set_parameter<float>(document, section, "Z_POP_DENSITY"				, _Z_POP_DENSITY			 );
 
-				scenario->set_parameter(document, section, "O_CONSTANT"					, _O_CONSTANT				 );
-				scenario->set_parameter(document, section, "O_INCOME_MED"				, _O_INCOME_MED				 );
-				scenario->set_parameter(document, section, "O_AGE_35_55"				, _O_AGE_35_55				 );
-				scenario->set_parameter(document, section, "O_EDUC_GRAD_DEGREE"			, _O_EDUC_GRAD_DEGREE		 );
-				scenario->set_parameter(document, section, "O_WORK_TRIP_TTIME"			, _O_WORK_TRIP_TTIME		 );
-				scenario->set_parameter(document, section, "O_NVEHICLE"					, _O_NVEHICLE				 );
-				scenario->set_parameter(document, section, "O_FLEX_WORK_INDICATOR"		, _O_FLEX_WORK_INDICATOR	 );
-				scenario->set_parameter(document, section, "O_OCC_GOVERNMENT"			, _O_OCC_GOVERNMENT			 );
-				scenario->set_parameter(document, section, "O_OCC_COMMUNICATION"		, _O_OCC_COMMUNICATION		 );
-				scenario->set_parameter(document, section, "O_OCC_MANUFACTURING"		, _O_OCC_MANUFACTURING		 );
-				scenario->set_parameter(document, section, "O_EMP_DENSITY_UNDER_3000"	, _O_EMP_DENSITY_UNDER_3000	 );
+				scenario->set_parameter<float>(document, section, "O_CONSTANT"					, _O_CONSTANT				 );
+				scenario->set_parameter<float>(document, section, "O_INCOME_MED"				, _O_INCOME_MED				 );
+				scenario->set_parameter<float>(document, section, "O_AGE_35_55"				, _O_AGE_35_55				 );
+				scenario->set_parameter<float>(document, section, "O_EDUC_GRAD_DEGREE"			, _O_EDUC_GRAD_DEGREE		 );
+				scenario->set_parameter<float>(document, section, "O_WORK_TRIP_TTIME"			, _O_WORK_TRIP_TTIME		 );
+				scenario->set_parameter<float>(document, section, "O_NVEHICLE"					, _O_NVEHICLE				 );
+				scenario->set_parameter<float>(document, section, "O_FLEX_WORK_INDICATOR"		, _O_FLEX_WORK_INDICATOR	 );
+				scenario->set_parameter<float>(document, section, "O_OCC_GOVERNMENT"			, _O_OCC_GOVERNMENT			 );
+				scenario->set_parameter<float>(document, section, "O_OCC_COMMUNICATION"		, _O_OCC_COMMUNICATION		 );
+				scenario->set_parameter<float>(document, section, "O_OCC_MANUFACTURING"		, _O_OCC_MANUFACTURING		 );
+				scenario->set_parameter<float>(document, section, "O_EMP_DENSITY_UNDER_3000"	, _O_EMP_DENSITY_UNDER_3000	 );
 
-				scenario->set_parameter(document, section, "T_WORK_DURATION"			, _T_WORK_DURATION			 );
-				scenario->set_parameter(document, section, "T_VEH_AVAILABLE"			, _T_VEH_AVAILABLE			 );
-				scenario->set_parameter(document, section, "T_HH_VEH_OVER_2_INDICATOR"	, _T_HH_VEH_OVER_2_INDICATOR );
-				scenario->set_parameter(document, section, "T_C1"						, _T_C1						 );
-				scenario->set_parameter(document, section, "T_C2"						, _T_C2						 );
-				scenario->set_parameter(document, section, "T_C3"						, _T_C3						 );
-				scenario->set_parameter(document, section, "T_RHO"						, _T_RHO					 );
+				scenario->set_parameter<float>(document, section, "T_WORK_DURATION"			, _T_WORK_DURATION			 );
+				scenario->set_parameter<float>(document, section, "T_VEH_AVAILABLE"			, _T_VEH_AVAILABLE			 );
+				scenario->set_parameter<float>(document, section, "T_HH_VEH_OVER_2_INDICATOR"	, _T_HH_VEH_OVER_2_INDICATOR );
+				scenario->set_parameter<float>(document, section, "T_C1"						, _T_C1						 );
+				scenario->set_parameter<float>(document, section, "T_C2"						, _T_C2						 );
+				scenario->set_parameter<float>(document, section, "T_C3"						, _T_C3						 );
+				scenario->set_parameter<float>(document, section, "T_RHO"						, _T_RHO					 );
 				
 				return true;
 			}
