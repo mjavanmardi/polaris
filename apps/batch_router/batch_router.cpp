@@ -379,17 +379,22 @@ int main(int argc,char** argv)
 	// WRITE results
 	fw_output.Open("routed_results.txt");
 
+	
+	stringstream details_title("");
+	details_title << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
 	stringstream details_filename("");
 	details_filename << scenario->template output_dir_name<string>();
 	details_filename << "sp_output.dat";
-	fw_mm_sp_details.Open(details_filename.str());
-	fw_mm_sp_details.Write("Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime");
+	fw_mm_sp_details.Open(details_filename.str());	
+	fw_mm_sp_details.Write(details_title);
 	
+	stringstream summary_title("");
+	summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
 	stringstream summary_filename("");
 	summary_filename << scenario->template output_dir_name<string>();
 	summary_filename << "sp_labels_output.dat";
 	fw_mm_sp_summary.Open(summary_filename.str());
-	fw_mm_sp_summary.Write("Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime");
+	fw_mm_sp_summary.Write_NoDelim(summary_title);
 
 	stringstream dijkstra_filename("");
 	dijkstra_filename << scenario->template output_dir_name<string>();
@@ -405,15 +410,12 @@ int main(int argc,char** argv)
 
 	// WRITE results
 	for (int i = 0; i < num_sim_threads(); ++i) 
-	{ 
+	{ 		
 		fw_output.Write(results_by_thread[i]);
-		fw_mm_sp_summary.Write(summary_by_thread[i]);
-		fw_mm_sp_details.Write(details_by_thread[i]);
+		fw_mm_sp_summary.Write_NoDelim(summary_by_thread[i]);
+		fw_mm_sp_details.Write_NoDelim(details_by_thread[i]);
 	}	
-
-	fw_mm_sp_details.Write("\n");
-	fw_mm_sp_summary.Write("\n");
-	fw_dijkstra_summary.Write("\n");
+		
 	fw_mm_sp_details.Close();
 	fw_mm_sp_summary.Close();
 	fw_dijkstra_summary.Close();

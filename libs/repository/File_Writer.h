@@ -91,6 +91,12 @@ namespace File_IO
 			S<<data;
 			_file<<S.str()<<DELIM;
 		}
+		void Write_NoDelim(stringstream& S)
+		{
+			_file << S.str();
+			S.str("");
+			S.clear();
+		}
 		void Write_Line(stringstream &S)
 		{
 			_file<<S.str()<<endl;

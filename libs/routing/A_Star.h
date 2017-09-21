@@ -666,6 +666,11 @@ namespace polaris
 		high_resolution_clock::time_point t2;
 
 		float Total_Visit_Time;
+		if (debug_route)
+		{
+			// do route calculation timing for debug routes
+			//A_Star_Time.Start();			
+		}
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
@@ -817,7 +822,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "\n%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1005,7 +1010,7 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "\n%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,

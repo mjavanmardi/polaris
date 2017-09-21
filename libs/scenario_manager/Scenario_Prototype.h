@@ -481,27 +481,29 @@ namespace Scenario_Components
 				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>();
 
 				//===============================================
-				// set sim_interval per assignment interval
-				int assignment_intervals;
-				set_parameter<int>(document, "", "num_simulation_intervals_per_assignment_interval", assignment_intervals);
-				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				// set sim_interval per assignment interval				
+				set_parameter<int>(document, "", "num_simulation_intervals_per_assignment_interval", num_simulation_intervals_per_assignment_interval<int &>());
+				assignment_interval_length<int>(num_simulation_intervals_per_assignment_interval<int>()*simulation_interval_length<int>());
+				
 
 				//===============================================
 				// set assignment mode
 				std::string assignment_mode_string;
-				set_parameter<std::string>(document, "", "assignment_mode", assignment_mode_string);
-				if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+				if (set_parameter<std::string>(document, "", "assignment_mode", assignment_mode_string))
 				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
-				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else
-				{
-					cout << "Assignment mode not supported" << endl;
-					assert(false);
+					if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else
+					{
+						cout << "Assignment mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
@@ -531,27 +533,29 @@ namespace Scenario_Components
 				//===============================================
 				// set merging mode
 				std::string merging_mode_string;
-				set_parameter<std::string>(document, "", "merging_mode", merging_mode_string);
-				if (merging_mode_string.compare("DRIVING_RULE") == 0)
+				if (set_parameter<std::string>(document, "", "merging_mode", merging_mode_string))
 				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
-				}
-				else
-				{
-					cout << "Merging mode not supported" << endl;
-					assert(false);
+					if (merging_mode_string.compare("DRIVING_RULE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
+					}
+					else
+					{
+						cout << "Merging mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				//===============================================

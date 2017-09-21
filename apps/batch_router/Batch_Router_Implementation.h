@@ -149,7 +149,9 @@ namespace Batch_Router_Components
 				router->Schedule_Route_Computation(departed_time, t + 1);
 
 				// Load the trip conditional at timestep t + 5, which fills the trip results after routing is completed
-				Load_Event<ComponentType>(Trip_Conditional, t + 5, Types::SUB_ITERATIONS::INITIALIZE);
+				//TODO Omer: Check t + 2 vs t+ 5 does not affect things badly.
+				//Load_Event<ComponentType>(Trip_Conditional, t + 5, Types::SUB_ITERATIONS::INITIALIZE);
+				Load_Event<ComponentType>(Trip_Conditional, t + 2, Types::SUB_ITERATIONS::INITIALIZE);
 			}
 			template<typename TargetType> void Get_Results()
 			{
@@ -185,12 +187,12 @@ namespace Batch_Router_Components
 
 				object_count_by_thread[__thread_id]++;
 
-				if (object_count_by_thread[__thread_id] > 100)
+				if (object_count_by_thread[__thread_id] >= 100)
 				{
 					LOCK(_write_lock);
 					fw_output.Write(results_by_thread[__thread_id]);
-					fw_mm_sp_summary.Write(summary_by_thread[__thread_id]);
-					fw_mm_sp_details.Write(details_by_thread[__thread_id]);
+					fw_mm_sp_summary.Write_NoDelim(summary_by_thread[__thread_id]);
+					fw_mm_sp_details.Write_NoDelim(details_by_thread[__thread_id]);
 					object_count_by_thread[__thread_id] = 0;
 					UNLOCK(_write_lock);
 				}
