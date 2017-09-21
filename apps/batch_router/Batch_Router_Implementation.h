@@ -101,9 +101,8 @@ namespace Batch_Router_Components
 				int simulation_start_time = scenario->template simulation_start_time<int>();
 				int simulation_end_time = scenario->template simulation_end_time<int>();
 				if (departed_time < simulation_start_time || departed_time >= simulation_end_time)
-				{
-					//TODO: Remove when done testing routing execution time
-					//results_by_thread[0] << Trip_Id << ": Trip start time is out of bounds - skipped.";
+				{					
+					results_by_thread[0] << Trip_Id << ": Trip start time is out of bounds - skipped.";
 					return;
 				}
 
@@ -116,8 +115,7 @@ namespace Batch_Router_Components
 				_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
 				if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>() || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 				{
-					//TODO: Remove when done testing routing execution time
-					//results_by_thread[0] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
+					results_by_thread[0] << Trip_Id << "Origin/Destination pair is not routable - skipped.";
 					return;
 				}
 
@@ -159,12 +157,17 @@ namespace Batch_Router_Components
 
 				if (movement->valid_trajectory<bool>())
 				{
-					//TODO: Remove when done testing routing execution time
-					results_by_thread[__thread_id] << (int) (movement->routing_execution_time<__int64>()) << "\t";
-									
-					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << endl;
 					
-					/*_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+					/*if (movement->routing_execution_time<__int64>() >= 0)
+					{*/
+						summary_by_thread[__thread_id] << movement->summary_string<std::string>();
+						details_by_thread[__thread_id] << movement->detail_string<std::string>();						
+					//}
+									
+					
+					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
+
+					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
 
 					for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
 					{
@@ -172,12 +175,12 @@ namespace Batch_Router_Components
 						link_itf* link = tu->link<link_itf*>();
 						results_by_thread[__thread_id]<<_ID<<": (" << link->dbid<int>()<<"."<<link->direction<int>()<<") "<<tu->estimated_link_accepting_time<int>()<<", ";
 					}
-					results_by_thread[__thread_id] << endl;*/
+					results_by_thread[__thread_id] << endl;
 				}
 				else
 				{
-					//TODO: Remove when done testing routing execution time
-					//results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
+					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
+					summary_by_thread[__thread_id] << movement->summary_string<std::string>();						
 				}
 
 				object_count_by_thread[__thread_id]++;
@@ -186,6 +189,8 @@ namespace Batch_Router_Components
 				{
 					LOCK(_write_lock);
 					fw_output.Write(results_by_thread[__thread_id]);
+					fw_mm_sp_summary.Write(summary_by_thread[__thread_id]);
+					fw_mm_sp_details.Write(details_by_thread[__thread_id]);
 					object_count_by_thread[__thread_id] = 0;
 					UNLOCK(_write_lock);
 				}

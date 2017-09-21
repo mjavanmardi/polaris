@@ -180,7 +180,20 @@ namespace Routing_Components
 				std::deque<global_edge_id> path_container;
 				//cost of traversing each of the edges
 				std::deque<float> cost_container;
-				
+				std::deque<Link_Components::Types::Link_Type_Keys> out_type;
+				std::deque<int> out_trip;
+				std::deque<int> out_seq;
+				std::deque<float> out_time;
+				std::deque<float> out_arr_time;
+				std::deque<float> out_wait_time;
+				std::deque<float> out_walk_time;
+				std::deque<float> out_ivt_time;
+				std::deque<float> out_car_time;
+				std::deque<int> out_wait_count;
+				std::deque<float> out_transfer_pen;
+				std::deque<float> out_heur_cost;
+				std::string summary_paragraph = "";
+				std::string detail_paragraph = "";
 				
 				float best_route_time_to_destination = 0.0f;
 
@@ -191,11 +204,11 @@ namespace Routing_Components
 					//TODO: Remove when done testing routing execution time
 					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 					}
 					else
 					{
@@ -208,11 +221,11 @@ namespace Routing_Components
 					//TODO: Remove when done testing routing execution time
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 					}
 					else
 					{ 
@@ -233,8 +246,12 @@ namespace Routing_Components
 					_movement_plan->set_trajectory(path_container, cost_container);
 
 					//TODO: Remove when done testing routing execution time
-					_movement_plan->routing_execution_time(astar_time);
-
+					if (astar_time >= 0)
+					{
+						_movement_plan->routing_execution_time(astar_time);
+						_movement_plan->summary_string(summary_paragraph);
+						_movement_plan->detail_string(detail_paragraph);
+					}
 					// update movement plan O/D based on returned routing results
 					Link_Interface* olink = nullptr;
 					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
@@ -258,6 +275,11 @@ namespace Routing_Components
 				else
 				{
 					//cout << "Unable to route: " << origin_id << "," << destination_id << endl;
+					if (astar_time >= 0)
+					{
+						_movement_plan->routing_execution_time(astar_time);
+						_movement_plan->summary_string(summary_paragraph);
+					}
 				}
 			}
 
@@ -390,6 +412,8 @@ namespace Routing_Components
 				// Debug_route is false, set to true under certain conditions to print the routing output
 				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 
+				std::string summary_paragraph = "";
+
 				// get a routable network; routable_network know what thread you are
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
 								
@@ -406,7 +430,7 @@ namespace Routing_Components
 					origin_ids.push_back(origin_link->template uuid<unsigned int>());
 				}				
 
-				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route);
+				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route, summary_paragraph);
 
 			}
 		};

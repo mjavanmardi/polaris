@@ -100,6 +100,10 @@ namespace Movement_Plan_Components
 			int _current_trajectory_index;
 			m_data(bool, valid_trajectory, NONE, NONE);
 			m_data(bool, is_integrated, NONE, NONE);
+
+			//TODO Omer: Remove when done testing routing execution time
+			m_data(std::string, summary_string, NONE, NONE);
+			m_data(std::string, detail_string, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>

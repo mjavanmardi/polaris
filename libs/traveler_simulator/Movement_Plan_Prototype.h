@@ -62,6 +62,8 @@ namespace Movement_Plan_Components
 
 			//TODO: Remove when done testing routing execution time
 			accessor(routing_execution_time, NONE, NONE);
+			accessor(summary_string, NONE, NONE);
+			accessor(detail_string, NONE, NONE);
 
 			void Free_Movement()
 			{

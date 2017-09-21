@@ -240,7 +240,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route = false)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route, std::string& summary_paragraph)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -252,18 +252,12 @@ namespace polaris
 
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
-
-		std::ofstream perf_file;
-		std::string myParagraph;
+				
+		char myLine[2000];
 		bool write_route = false;
 		Counter A_Star_Time;
 		if (debug_route)
 		{
-			stringstream perf_filename("");
-			perf_filename << _scenario_reference->template output_dir_name<string>();
-			perf_filename << "dijkstra_perf_output.dat";
-			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
-
 			A_Star_Time.Start();
 		}
 
@@ -329,9 +323,17 @@ namespace polaris
 
 		if (debug_route)
 		{
-			perf_file << "success\tzone:\t" << zone;
-			perf_file << "\tscanScount:\t" << scanCount;
-			perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
+			float perf_time = A_Star_Time.Stop();
+			sprintf_s(myLine, "\n%s\t%s\t%d\t%s\t%d\t%s\t%f",
+				"success",
+				"zone:",
+				zone,
+				"scanScount:",
+				scanCount,
+				"Router run-time (ms):",
+				perf_time
+				);
+			summary_paragraph.insert(0, myLine);
 		}
 
 		global_edge_id current_g;
@@ -603,7 +605,33 @@ namespace polaris
 	}
 
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Multimodal_A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, /*std::vector<global_edge_id>& tr_end_ids,*/ unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, __int64& astar_time, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+	static float Multimodal_A_Star(
+		Routable_Agent<AgentType>* agent, 
+		Graph_Pool<GraphPoolType>* graph_pool, 
+		std::vector<global_edge_id>& start_ids, 
+		std::vector<global_edge_id>& end_ids,
+		/*std::vector<global_edge_id>& tr_end_ids,*/ 
+		unsigned int start_time, 
+		std::deque< global_edge_id >& out_path, 
+		std::deque< float >& out_cost, 
+		std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
+		std::deque<int>& out_trip,
+		std::deque<int>& out_seq,
+		std::deque<float>& out_time,
+		std::deque<float>& out_arr_time,
+		std::deque<float>& out_wait_time,
+		std::deque<float>& out_walk_time,
+		std::deque<float>& out_ivt_time,
+		std::deque<float>& out_car_time,
+		std::deque<int>& out_wait_count,
+		std::deque<float>& out_transfer_pen,
+		std::deque<float>& out_heur_cost,	
+		__int64& astar_time, 
+		unsigned int origin_loc_id,
+		unsigned int destination_loc_id,
+		bool debug_route,
+		std::string& summary_paragraph,
+		std::string& detail_paragraph)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -631,49 +659,18 @@ namespace polaris
 
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
-		std::ofstream sp_file;
-		std::ofstream res_file;
 		char myLine[2000];
-		std::string myParagraph;
 		//Counter A_Star_Time;
 		//Counter Visit_Time;
 		high_resolution_clock::time_point t1;
 		high_resolution_clock::time_point t2;
 
 		float Total_Visit_Time;
-		if (debug_route)
-		{
-			stringstream sp_filename("");
-			sp_filename << _scenario_reference->template output_dir_name<string>();
-			sp_filename << "sp_output.dat";
-			sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-			/*if (!this->sp_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");*/
-			//sp_file.open("sp_output.dat", std::ofstream::out | std::ofstream::app);
-
-			stringstream res_filename("");
-			res_filename << _scenario_reference->template output_dir_name<string>();
-			res_filename << "sp_labels_output.dat";
-			res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
-		}
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
 
 		std::deque< base_edge_type* > modified_edges;
-
-		std::deque<Link_Components::Types::Link_Type_Keys> out_type;
-		std::deque<int> out_trip;
-		std::deque<int> out_seq;
-		std::deque<float> out_time;
-		std::deque<float> out_arr_time;
-		std::deque<float> out_wait_time;
-		std::deque<float> out_walk_time;
-		std::deque<float> out_ivt_time;
-		std::deque<float> out_car_time;
-		std::deque<int> out_wait_count;
-		std::deque<float> out_transfer_pen;
-		std::deque<float> out_est_cost;
-
 		boost::intrusive::multiset< base_edge_type > open_set;
 		bool early_break = false;
 
@@ -820,7 +817,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+				sprintf_s(myLine, "\n%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -836,7 +833,7 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time);
-				res_file << myLine << endl;
+				summary_paragraph.insert(0,myLine);
 			}
 
 			int route_ctr = 0;
@@ -859,7 +856,7 @@ namespace polaris
 				out_ivt_time.push_back(current->_ivt_time_from_origin);
 				out_car_time.push_back(current->_car_time_from_origin);
 				out_transfer_pen.push_back(current->_transfer_pen_from_origin);
-				out_est_cost.push_back(current->_estimated_cost_origin_destination);
+				out_heur_cost.push_back(current->_estimated_cost_origin_destination - current->_cost_from_origin);
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
@@ -887,10 +884,10 @@ namespace polaris
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scanCount,
 							astar_time);
-						myParagraph.insert(0, myLine);
+						detail_paragraph.insert(0, myLine);
 					}				
 
 					
@@ -920,10 +917,10 @@ namespace polaris
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scanCount,
 							astar_time);
-						myParagraph.insert(0, myLine);
+						detail_paragraph.insert(0, myLine);
 					}
 
 				}	
@@ -952,21 +949,16 @@ namespace polaris
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
-							current->_estimated_cost_origin_destination,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scanCount,
 							astar_time);
-						myParagraph.insert(0, myLine);
+						detail_paragraph.insert(0, myLine);
 					}
 
 				}
 
 				current = (multimodal_edge_type*)current->came_from();
 				route_ctr++;
-			}
-
-			if (debug_route)
-			{				
-				sp_file << myParagraph;
 			}
 
 			std::reverse(out_path.begin(), out_path.end());
@@ -982,7 +974,7 @@ namespace polaris
 			std::reverse(out_ivt_time.begin(), out_ivt_time.end());
 			std::reverse(out_car_time.begin(), out_car_time.end());
 			std::reverse(out_transfer_pen.begin(), out_transfer_pen.end());
-			std::reverse(out_est_cost.begin(), out_est_cost.end());
+			std::reverse(out_heur_cost.begin(), out_heur_cost.end());
 			
 			total_cost = out_cost.back();
 			travel_time = out_time.back();
@@ -1013,7 +1005,7 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+				sprintf_s(myLine, "\n%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1029,11 +1021,9 @@ namespace polaris
 					864000.0,
 					scanCount,
 					astar_time);
-				res_file << myLine << endl;
+				summary_paragraph.insert(0, myLine);
 			}
-		}
-		sp_file.close();
-		res_file.close();		
+		}		
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{

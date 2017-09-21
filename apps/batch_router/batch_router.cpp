@@ -176,6 +176,8 @@ int main(int argc,char** argv)
 	for (int i = 0; i < threads; ++i)
 	{
 		results_by_thread.push_back(stringstream(""));
+		summary_by_thread.push_back(stringstream(""));
+		details_by_thread.push_back(stringstream(""));
 		object_count_by_thread.push_back(0);
 	}
 
@@ -215,6 +217,23 @@ int main(int argc,char** argv)
 
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
+
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	#pragma region RNG initialization
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
+	#pragma endregion
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
@@ -311,22 +330,7 @@ int main(int argc,char** argv)
 	
 
 
-	//==================================================================================================================================
-	// Initialize global randon number generators - if seed set to zero or left blank use system time
-	//---------------------------------------------------------------------------------------------------------------------------------- 
-	#pragma region RNG initialization
-	int seed = scenario->iseed<int>();
-	if (seed != 0)
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
-	}
-	else
-	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
-	}
-	#pragma endregion
+	
 
 	
 
@@ -375,6 +379,23 @@ int main(int argc,char** argv)
 	// WRITE results
 	fw_output.Open("routed_results.txt");
 
+	stringstream details_filename("");
+	details_filename << scenario->template output_dir_name<string>();
+	details_filename << "sp_output.dat";
+	fw_mm_sp_details.Open(details_filename.str());
+	fw_mm_sp_details.Write("Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime");
+	
+	stringstream summary_filename("");
+	summary_filename << scenario->template output_dir_name<string>();
+	summary_filename << "sp_labels_output.dat";
+	fw_mm_sp_summary.Open(summary_filename.str());
+	fw_mm_sp_summary.Write("Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime");
+
+	stringstream dijkstra_filename("");
+	dijkstra_filename << scenario->template output_dir_name<string>();
+	dijkstra_filename << "dijkstra_perf_output.dat";
+	fw_dijkstra_summary.Open(dijkstra_filename.str());
+
 	//==================================================================================================================================
 	// Start Simulation
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -383,16 +404,19 @@ int main(int argc,char** argv)
 	catch (std::exception ex){ cout << ex.what();}
 
 	// WRITE results
-	for (int i = 0; i < num_sim_threads(); ++i) fw_output.Write(results_by_thread[i]);
+	for (int i = 0; i < num_sim_threads(); ++i) 
+	{ 
+		fw_output.Write(results_by_thread[i]);
+		fw_mm_sp_summary.Write(summary_by_thread[i]);
+		fw_mm_sp_details.Write(details_by_thread[i]);
+	}	
 
-	std::ofstream sp_file;
-	stringstream sp_filename("");
-	sp_filename << scenario->template output_dir_name<string>();
-	sp_filename << "sp_output.dat";
-	sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-	sp_file << "\n";
-	sp_file.close();
-
+	fw_mm_sp_details.Write("\n");
+	fw_mm_sp_summary.Write("\n");
+	fw_dijkstra_summary.Write("\n");
+	fw_mm_sp_details.Close();
+	fw_mm_sp_summary.Close();
+	fw_dijkstra_summary.Close();
 	cout << "Finished! Press 'Any' key" << endl;
 
 }

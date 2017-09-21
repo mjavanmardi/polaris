@@ -257,26 +257,7 @@ namespace Routing_Components
 				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
 				scenario->set_parameter(document, section, "debug_route", _debug_route);
 				scenario->set_parameter(document, section, "multimodal_dijkstra", _multimodal_dijkstra);
-
-				std::ofstream sp_file;
-				std::ofstream res_file;
-				if (_debug_route)
-				{
-					stringstream sp_filename("");
-					sp_filename << scenario->template output_dir_name<string>();
-					sp_filename << "sp_output.dat";
-					sp_file.open(sp_filename.str(), std::ofstream::out | std::ofstream::app);
-					sp_file << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime";						
-					sp_file.close();
-					
-					stringstream res_filename("");
-					res_filename << scenario->template output_dir_name<string>();
-					res_filename << "sp_labels_output.dat";
-					res_file.open(res_filename.str(), std::ofstream::out | std::ofstream::app);
-					res_file << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime" << endl;
-					res_file.close();
-				}
-
+				
 				return true;
 			}
 
@@ -310,6 +291,7 @@ namespace Routing_Components
 				_walkThreshold = 5000;
 				_walkSpeed = 1.38889;
 				_debug_route = false;
+				_multimodal_dijkstra = false;
 			}
 
 			#pragma region static parameters declaration		
@@ -968,7 +950,31 @@ namespace Routing_Components
 			}
 
 			//TODO: Remove when done testing routing execution time
-			float compute_multimodal_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, /*std::vector<unsigned int>& tr_destinations,*/ unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, __int64& astar_time, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route = false)
+			float compute_multimodal_network_path(
+				std::vector<unsigned int>& origins, 
+				std::vector<unsigned int>& destinations, 
+				/*std::vector<unsigned int>& tr_destinations,*/ 
+				unsigned int start_time, 
+				std::deque<global_edge_id>& path_container, 
+				std::deque<float>& cost_container,
+				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
+				std::deque<int>& out_trip,
+				std::deque<int>& out_seq,
+				std::deque<float>& out_time,
+				std::deque<float>& out_arr_time,
+				std::deque<float>& out_wait_time,
+				std::deque<float>& out_walk_time,
+				std::deque<float>& out_ivt_time,
+				std::deque<float>& out_car_time,
+				std::deque<int>& out_wait_count,
+				std::deque<float>& out_transfer_pen,
+				std::deque<float>& out_heur_cost,
+				__int64& astar_time, 
+				unsigned int origin_loc_id, 
+				unsigned int destination_loc_id, 
+				bool debug_route,
+				std::string& summary_paragraph,
+				std::string& detail_paragraph)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -1007,7 +1013,7 @@ namespace Routing_Components
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 
 				//TODO: Remove when done testing routing execution time
-				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, astar_time, origin_loc_id, destination_loc_id, debug_route);
+				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1102,7 +1108,7 @@ namespace Routing_Components
 				}
 			}
 
-			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route = false)
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route, std::string& summary_paragraph)
 			{		
 				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
 
@@ -1124,7 +1130,7 @@ namespace Routing_Components
 
 				if (!starts.empty())
 				{
-					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route);
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route, summary_paragraph);
 				}
 
 
