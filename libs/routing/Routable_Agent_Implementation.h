@@ -37,23 +37,31 @@ namespace polaris
 			}
 			return false;
 		}
-
+		
 		template<typename CurrentEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
 		{
-			float x_dist = current->_x - destination->_x;
-			x_dist *= x_dist;
-			
-			float y_dist = current->_y - destination->_y;
-			y_dist *= y_dist;
+			float cost = 0;
+			int dest_ctr = 0;
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				float x_dist = current->_x - itr_destination->_x;
+				x_dist *= x_dist;
 
-			// vehicle speed in fps
-			float cost = sqrt(x_dist + y_dist)/89.0f;
+				float y_dist = current->_y - itr_destination->_y;
+				y_dist *= y_dist;
+
+
+				// vehicle speed in fps
+				float temp_cost = sqrt(x_dist + y_dist) / 89.0f;
+				cost = cost + (temp_cost - cost) / (dest_ctr + 1);
+				dest_ctr++;
+			}
 			return cost;
 		}
-
-		template<typename CurrentEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination, bool multimodal_dijkstra)
+						
+		float estimated_cost_between(typename MT::multimodal_edge_type* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, bool multimodal_dijkstra)
 		{
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 			Network_Interface* net = (Network_Interface*)_global_network;
@@ -63,31 +71,46 @@ namespace polaris
 
 			if (!multimodal_dijkstra)
 			{
-				float x_dist = current->_x - destination->_x;
-				x_dist *= x_dist;
+				float cost = 0;
+				int dest_ctr = 0;
+				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+				{
+					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+					float x_dist = current->_x - itr_destination->_x;
+					x_dist *= x_dist;
 
-				float y_dist = current->_y - destination->_y;
-				y_dist *= y_dist;
+					float y_dist = current->_y - itr_destination->_y;
+					y_dist *= y_dist;
 
-				// vehicle speed in fps
-				float cost = sqrt(x_dist + y_dist) / 89.0f;
+
+					// vehicle speed in fps
+					float temp_cost = sqrt(x_dist + y_dist) / 89.0f;
+					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
+					dest_ctr++;
+				}
 				return cost;
 			}
 			else
 			{
-				global_edge_id destination_g;
-				destination_g.graph_id = 1;
-				destination_g.edge_id = destination->_edge_id;
+				float cost = 0;
+				int dest_ctr = 0;
+				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+				{
+					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+					global_edge_id destination_g;
+					destination_g.graph_id = 1;
+					destination_g.edge_id = itr_destination->_edge_id;
+					_Link_Interface* destination_link = net->template get_link_ptr<typename MasterType::link_type>(destination_g.edge_id);
 
-				_Link_Interface* destination_link = net->template get_link_ptr<typename MasterType::link_type>(destination_g.edge_id);
-				
-				
-				float cost = destination_link->_dijkstra_cost[current->_zone];
+					float temp_cost = destination_link->_dijkstra_cost[current->_zone];
+					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
+					dest_ctr++;
+				}
 				return cost;
 			}
-			
-		}
 
+		}
+		
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
@@ -265,16 +288,19 @@ namespace polaris
 				float ttime_accumulation = 0;
 				float ttime_step = current->moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost_temp; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost_temp;
+				//float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
+					//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
 					ttime_step = current->moe_data()->layer_step<float>();
 					while (t - ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
 						t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
+						//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
 
 					}
 				}
@@ -284,6 +310,7 @@ namespace polaris
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = connection->_time_cost + neighbor->_time_cost_temp;
+				//float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -299,6 +326,7 @@ namespace polaris
 			else
 			{				
 				return connection->_time_cost + neighbor->_time_cost_temp;
+				//return connection->_time_cost + neighbor->_time_cost;
 			}
 		}
 
@@ -324,7 +352,7 @@ namespace polaris
 		}
 
 		template<typename CurrentEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
 		{
 			return 0.0f;
 		}
@@ -360,7 +388,7 @@ namespace polaris
 		}
 
 		template<typename CurrentEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
 		{
 			return 0.0f;
 		}
@@ -406,7 +434,7 @@ namespace polaris
 		}
 
 		template<typename CurrentEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
 		{
 			return 0.0f;
 		}

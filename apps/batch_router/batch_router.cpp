@@ -390,16 +390,22 @@ int main(int argc,char** argv)
 	
 	stringstream summary_title("");
 	summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
+	//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
 	stringstream summary_filename("");
 	summary_filename << scenario->template output_dir_name<string>();
 	summary_filename << "sp_labels_output.dat";
 	fw_mm_sp_summary.Open(summary_filename.str());
 	fw_mm_sp_summary.Write_NoDelim(summary_title);
 
-	stringstream dijkstra_filename("");
+	stringstream debug_filename("");
+	debug_filename << scenario->template output_dir_name<string>();
+	debug_filename << "debug_ODT.dat";
+	fw_debug_ODT.Open(debug_filename.str());
+
+	/*stringstream dijkstra_filename("");
 	dijkstra_filename << scenario->template output_dir_name<string>();
 	dijkstra_filename << "dijkstra_perf_output.dat";
-	fw_dijkstra_summary.Open(dijkstra_filename.str());
+	fw_dijkstra_summary.Open(dijkstra_filename.str());*/
 
 	//==================================================================================================================================
 	// Start Simulation
@@ -418,7 +424,7 @@ int main(int argc,char** argv)
 		
 	fw_mm_sp_details.Close();
 	fw_mm_sp_summary.Close();
-	fw_dijkstra_summary.Close();
+	//fw_dijkstra_summary.Close();
 	cout << "Finished! Press 'Any' key" << endl;
 
 }
@@ -456,11 +462,11 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	s.clear(); s.str("");
 	s<<"\t\"historical_results_database_name\" : \""<<historical_db_name<<"\",";
 	fw.Write_Line(s);
-	fw.Write_Line("\t\"seed\" : 1234567,");
+	fw.Write_Line("\t\"seed\" : 1234566,");
 	fw.Write_Line("\t\"multimodal_routing\" : true,");
 	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : false,");
+	fw.Write_Line("\t\"time_dependent_routing\" : true,");
 	fw.Write_Line("\t\"write_demand_to_database\" : true\n}");
 	
 	fw.Close();

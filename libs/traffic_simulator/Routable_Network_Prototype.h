@@ -43,9 +43,9 @@ namespace Routing_Components
 				this_component()->construct_routable_multimodal_network(source_network);
 			}
 
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route = false)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
 			{
-				return this_component()->compute_static_network_path(origins,destinations, start_time, path_container,cost_container, debug_route);
+				return this_component()->compute_static_network_path(origins,destinations, start_time, path_container,cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
 			}
 
 			//TODO: Remove when done testing routing execution time
@@ -79,9 +79,9 @@ namespace Routing_Components
 				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, bool debug_route=false)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
 			{
-				return this_component()->compute_time_dependent_network_path(origins,destinations,start_time,path_container,cost_container, debug_route);
+				return this_component()->compute_time_dependent_network_path(origins,destinations,start_time,path_container,cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
 			}
 
 			float compute_static_network_tree(unsigned int origin, std::vector<float>& edge_cost_container)

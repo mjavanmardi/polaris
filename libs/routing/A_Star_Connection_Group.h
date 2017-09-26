@@ -67,7 +67,7 @@ namespace polaris
 				
 				current_neighbor->time_label( current_edge->time_label() + time_cost_between );
 
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 
 				current_neighbor->estimated_cost_origin_destination( neighbor_estimated_cost_origin_destination );
 				
@@ -76,7 +76,7 @@ namespace polaris
 				current_neighbor->in_open_set(true);
 
 				// update the label
-				agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 			}
 		}
 	};
@@ -308,7 +308,7 @@ namespace polaris
 						seq_edge->_car_time_from_origin = current->_car_time_from_origin;
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, routing_data.end_edge, multimodal_dijkstra);
+						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra);
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);									
 
 						if (!seq_edge->marked_for_reset())
@@ -449,7 +449,7 @@ namespace polaris
 					current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 					current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 					if (!current_neighbor->marked_for_reset())
@@ -484,8 +484,10 @@ namespace polaris
 
 			
 			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost_temp;
+			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 
 			if (current->_walk_time_from_origin + current_neighbor->_time_cost_temp > walkThreshold_Time)
+			//if (current->_walk_time_from_origin + current_neighbor->_time_cost > walkThreshold_Time)
 			{
 				return;
 			}
@@ -495,6 +497,7 @@ namespace polaris
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				float time_cost_between = current_neighbor->_time_cost_temp;
+				//float time_cost_between = current_neighbor->_time_cost;
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 				current_neighbor->time_label(current->time_label() + time_cost_between);					
 					
@@ -507,7 +510,7 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
@@ -539,7 +542,7 @@ namespace polaris
 			
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge, multimodal_dijkstra);
+			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 			if (carWeight*(current->_car_time_from_origin + time_cost_between) > heuristicPortion)
 			{
 				return;
@@ -639,7 +642,7 @@ namespace polaris
 				
 				current_neighbor->time_label( current_edge->time_label() + time_cost_between );
 
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, routing_data.end_edge);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 
 				current_neighbor->estimated_cost_origin_destination( neighbor_estimated_cost_origin_destination );
 				

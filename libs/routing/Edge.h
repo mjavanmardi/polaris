@@ -13,6 +13,7 @@ namespace polaris
 		boost::intrusive::multiset< Base_Edge_Type >* open_set;
 		Base_Edge_Type* start_edge;
 		Base_Edge_Type* end_edge;
+		std::vector< Base_Edge_Type* >* ends;
 		unsigned int start_time;
 	};
 

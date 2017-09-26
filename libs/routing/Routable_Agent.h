@@ -21,13 +21,12 @@ namespace polaris
 
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
 		bool at_destination(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations) { return this_component()->at_destination(current, destinations); }
-
-		//heuristic cost for the A* algorithm
+		
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, DestinationEdgeType* destination){ return this_component()->estimated_cost_between(current, destination); }
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations) { return this_component()->estimated_cost_between(current, destinations); }
 
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, DestinationEdgeType* destination, bool multimodal_dijkstra) { return this_component()->estimated_cost_between(current, destination, multimodal_dijkstra); }
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations, bool multimodal_dijkstra) { return this_component()->estimated_cost_between(current, destinations, multimodal_dijkstra); }
 
 		//cost between 2 edges. Can implement different turn movements preferences for an agent, for example if left turns are not prefered, then wehn passed, use very high cost to avoid those movements
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>

@@ -212,7 +212,7 @@ namespace Routing_Components
 					}
 					else
 					{
-						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, debug_route);
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
 					}
 					
 				}
@@ -229,7 +229,7 @@ namespace Routing_Components
 					}
 					else
 					{ 
-						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container,debug_route);
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
 					}
 
 				}
@@ -246,12 +246,12 @@ namespace Routing_Components
 					_movement_plan->set_trajectory(path_container, cost_container);
 
 					//TODO: Remove when done testing routing execution time
-					if (astar_time >= 0)
-					{
+					//if (astar_time >= 0)
+					//{
 						_movement_plan->routing_execution_time(astar_time);
 						_movement_plan->summary_string(summary_paragraph);
 						_movement_plan->detail_string(detail_paragraph);
-					}
+					//}
 					// update movement plan O/D based on returned routing results
 					Link_Interface* olink = nullptr;
 					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
@@ -275,11 +275,11 @@ namespace Routing_Components
 				else
 				{
 					//cout << "Unable to route: " << origin_id << "," << destination_id << endl;
-					if (astar_time >= 0)
-					{
+					//if (astar_time >= 0)
+					//{
 						_movement_plan->routing_execution_time(astar_time);
 						_movement_plan->summary_string(summary_paragraph);
-					}
+					//}
 				}
 			}
 
