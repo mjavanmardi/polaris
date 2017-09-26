@@ -72,14 +72,14 @@ namespace polaris
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
 				float ttime_accumulation = 0;
-				float ttime_step = current->moe_data()->layer_step<float>();
+				float ttime_step = connection->turn_moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
-					ttime_step = current->moe_data()->layer_step<float>();
+					ttime_step = connection->turn_moe_data()->layer_step<float>();
 					while (t - ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
@@ -148,14 +148,14 @@ namespace polaris
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
 				float ttime_accumulation = 0;
-				float ttime_step = current->moe_data()->layer_step<float>();
+				float ttime_step = connection->turn_moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
-					ttime_step = current->moe_data()->layer_step<float>();
+					ttime_step = connection->turn_moe_data()->layer_step<float>();
 					while (t - ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;

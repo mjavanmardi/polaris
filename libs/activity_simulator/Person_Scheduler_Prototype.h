@@ -66,7 +66,7 @@ namespace Person_Components
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan);
 			template<typename TargetType> void Remove_Movement_Plan(TargetType movement_plan);
 			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan);
-			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan);
+			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, bool delete_activity=true);
 			template<typename TargetType> void Sort_Activity_Schedule();
 			template<typename TimeType> float Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end);
 		};
@@ -165,9 +165,9 @@ namespace Person_Components
 
 		template<typename ComponentType>
 		template<typename TargetType>
-		void Person_Scheduler<ComponentType>::Remove_Activity_Plan(TargetType activity_plan)
+		void Person_Scheduler<ComponentType>::Remove_Activity_Plan(TargetType activity_plan, bool delete_activity = true)
 		{
-			this_component()->template Remove_Activity_Plan<TargetType>(activity_plan);
+			this_component()->template Remove_Activity_Plan<TargetType>(activity_plan, delete_activity);
 		}
 
 		template<typename ComponentType>

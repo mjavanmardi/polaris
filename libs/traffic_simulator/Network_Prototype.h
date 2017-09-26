@@ -175,6 +175,16 @@ namespace Network_Components
 
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
 				ReturnType ret_value = skim->template Get_TTime<LocationType, ModeType, TimeType, ReturnType>(Origin, Destination, Mode_Indicator, Start_Time);
+
+				//TODO: remove when done testing - Check for bad ttime values - set maximum travel time returned from skimmer to 3 hours, if skim time is longer than this use euclidean distance divided by 15mph
+				if (ret_value > GLOBALS::Time_Converter.Convert_Value<Time_Hours, ReturnType>(3.0))
+				{
+					//cout << "WARNING: Travel time value is bad...";
+					typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> LOS_itf;
+
+					LOS_itf* los = skim->template Get_LOS<LocationType, TimeType, LOS_itf*>(Origin, Destination, Start_Time);
+					return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los->auto_distance<Basic_Units::Length_Variables::Miles>() / 15.0);
+				}
 				
 				return ret_value;
 			}

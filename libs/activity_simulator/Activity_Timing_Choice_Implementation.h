@@ -145,7 +145,7 @@ namespace Person_Components
 				if (range_end_itr != _start_time_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) p_range_end = range_end_itr->second;
 
 				float rand2 = rand * (p_range_end - p_range_start) + p_range_start;
-				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand2);
+				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].lower_bound(rand2);
 
 				/*int iter = 0;
 				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
@@ -163,7 +163,10 @@ namespace Person_Components
 				}*/
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
+				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end())
+				{
+					THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() << "' and random value = " << rand);
+				}
 			
 				pair<ReturnTimeType,ReturnTimeType> return_val;
 				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first);
