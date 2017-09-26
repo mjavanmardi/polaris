@@ -879,7 +879,7 @@ namespace Routing_Components
 
 						global_edge_id edge_id;
 						edge_id.edge_id = current_link->_uuid;
-						edge_id.graph_id = 1;
+						edge_id.graph_id = _multimodal_network_graph_id;
 
 						base_edge_type* edge = (base_edge_type*)graph_pool->Get_Edge(edge_id);
 

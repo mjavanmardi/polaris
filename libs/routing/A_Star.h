@@ -28,6 +28,8 @@ namespace polaris
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 		
+		int graph_id = start_ids.front().graph_id;
+
 		char myLine[2000];
 		std::deque< base_edge_type* > modified_edges;		
 		boost::intrusive::multiset< base_edge_type > open_set;
@@ -68,7 +70,7 @@ namespace polaris
 			start->time_from_origin(0.0f);
 			start->time_label((float)start_time);
 
-			float initial_estimated_cost_origin_destination = start->cost_from_origin() +agent->estimated_cost_between((base_edge_type*)start, (std::vector<base_edge_type*>)ends);
+			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (std::vector<base_edge_type*>)ends);
 
 			start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
 		
@@ -102,11 +104,7 @@ namespace polaris
 			//	//cout << debug_content.str();
 			//	fw_debug_ODT.Write_NoDelim(debug_content);
 			//}
-
-			multimodal_edge_id id;
 			
-			id.id = current->edge_id();
-
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
 				success = true;
@@ -129,7 +127,7 @@ namespace polaris
 
 		
 		global_edge_id global;
-		global.graph_id = 0;
+		global.graph_id = graph_id;
 
 		float total_cost = FLT_MAX;
 
@@ -212,6 +210,8 @@ namespace polaris
 
 		boost::intrusive::multiset< base_edge_type > open_set;
 
+		int graph_id = start_id.graph_id;
+
 		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 		if (start == nullptr) { THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
 
@@ -266,7 +266,7 @@ namespace polaris
 			}
 		}
 
-		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(start_id.graph_id);
+		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(graph_id);
 
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
@@ -300,7 +300,9 @@ namespace polaris
 
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
-				
+		
+		int graph_id = start_ids.front().graph_id;
+
 		char myLine[2000];
 		bool write_route = false;
 		Counter A_Star_Time;
@@ -385,8 +387,8 @@ namespace polaris
 		}
 
 		global_edge_id current_g;
-		current_g.graph_id = 1;		
-		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(current_g.graph_id);
+		current_g.graph_id = graph_id;
+		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(graph_id);
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;						
@@ -512,6 +514,8 @@ namespace polaris
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
+		int graph_id = start_ids.front().graph_id;
+
 		char myLine[2000];
 		std::deque< base_edge_type* > modified_edges;
 		boost::intrusive::multiset< base_edge_type > open_set;
@@ -587,9 +591,6 @@ namespace polaris
 			//	fw_debug_ODT.Write_NoDelim(debug_content);
 			//}
 
-			multimodal_edge_id id;
-			
-			id.id = current->edge_id();
 
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
@@ -620,7 +621,7 @@ namespace polaris
 
 		
 		global_edge_id global;
-		global.graph_id = 0;
+		global.graph_id = graph_id;
 
 		float total_cost = 0.0f;
 
@@ -748,6 +749,8 @@ namespace polaris
 
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
+		int graph_id = start_ids.front().graph_id;
+
 		char myLine[2000];
 		//Counter A_Star_Time;
 		//Counter Visit_Time;
@@ -815,7 +818,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			global_edge_id start_g;
-			start_g.graph_id = 1;
+			start_g.graph_id = graph_id;
 			start_g.edge_id = start->_edge_id;
 
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
@@ -870,14 +873,15 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			//if (origin_loc_id == 150872 && destination_loc_id == 21980 && start_time == 61426)
-			//{
-			//					
-			//	stringstream debug_content("");				
-			//	debug_content << origin_loc_id << "\t" << destination_loc_id << "\t" << start_time << "\t" << scanCount << "\t" << current->_edge_id << "\t" << current->_estimated_cost_origin_destination << "\t" << current->_cost_from_origin << endl;
-			//	//cout << debug_content.str();
-			//	fw_debug_ODT.Write_NoDelim(debug_content);
-			//}
+			if (origin_loc_id == 63173 && destination_loc_id == 149041 && start_time == 55501 && scanCount <=15)
+			{
+								
+				stringstream debug_content("");				
+				debug_content << origin_loc_id << "\t" << destination_loc_id << "\t" << start_time << "\t" << scanCount << "\t" << current->_edge_id << "\t" << current->_estimated_cost_origin_destination << "\t" << current->_cost_from_origin << endl;
+				//cout << debug_content.str();
+				fw_debug_ODT.Write_NoDelim(debug_content);
+			}
+
 			if (current->_cost_from_origin > costThreshold || scanCount > (int)scanThreshold)
 			{
 				break;
@@ -904,7 +908,7 @@ namespace polaris
 		}
 		
 		global_edge_id global;
-		global.graph_id = 1;
+		global.graph_id = graph_id;
 		_Transit_Vehicle_Trip_Interface* current_trip;
 
 		float total_cost = 0.0f;
