@@ -171,7 +171,7 @@ namespace polaris
 
 				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					Evaluate_Transit_Neighbor_Seq<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
+					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
 				}
 				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -382,9 +382,10 @@ namespace polaris
 				int wait_binary = 1;
 				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
 
+				_Transit_Vehicle_Trip_Interface* current_trip = nullptr;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
