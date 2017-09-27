@@ -171,7 +171,7 @@ namespace polaris
 
 				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
+					Evaluate_Transit_Neighbor_Seq<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
 				}
 				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -231,17 +231,18 @@ namespace polaris
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;			
 
 				int wait_binary = 1;											
-								 
+				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;					
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
+						waitTime = 0.0;
 					}
 				}
 
-				float waitTime = next_trip->_departure_seconds[mySeq] - current->_time_label;
+				
 				if (waitTime < 0)
 				{
 					continue;
@@ -280,11 +281,11 @@ namespace polaris
 					float ivtTime;
 					if (wait_binary == 1)
 					{
-						ivtTime = next_trip->_arrival_seconds[iSeq] - next_trip->_departure_seconds[mySeq];
+						ivtTime = (float)next_trip->_arrival_seconds[iSeq] - (float)next_trip->_departure_seconds[mySeq];
 					}
 					else
 					{
-						ivtTime = next_trip->_arrival_seconds[iSeq] - current->_time_label;
+						ivtTime = (float)next_trip->_arrival_seconds[iSeq] - current->_time_label;
 					}
 
 					float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;
@@ -317,7 +318,10 @@ namespace polaris
 							seq_edge->marked_for_reset(true);
 						}
 
-						if (seq_edge->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+						if (seq_edge->in_open_set())
+						{
+							routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+						}
 						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
 						seq_edge->in_open_set(true);
 
@@ -373,8 +377,22 @@ namespace polaris
 
 				++trips_ctr;
 
-				float waitTime = next_trip->_departure_seconds[mySeq] - current->_time_label;
-				if (waitTime < 0)
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+
+				int wait_binary = 1;
+				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
+
+				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					if (current_trip->_uuid == next_trip->_uuid)
+					{
+						wait_binary = 0;
+						waitTime = 0.0;
+					}
+				}
+				
+				if (waitTime < 0.0)
 				{
 					continue;
 				}
@@ -393,7 +411,7 @@ namespace polaris
 				next_pattern->_scanned = true;
 				++patterns_ctr;
 
-				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				/*Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 
 				int wait_binary = 1;
 
@@ -404,7 +422,7 @@ namespace polaris
 					{
 						wait_binary = 0;
 					}
-				}
+				}*/
 
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
@@ -421,11 +439,11 @@ namespace polaris
 				float ivtTime;
 				if (wait_binary == 1)
 				{
-					ivtTime = next_trip->_arrival_seconds[mySeq + 1] - next_trip->_departure_seconds[mySeq];
+					ivtTime = (float)next_trip->_arrival_seconds[mySeq + 1] - (float)next_trip->_departure_seconds[mySeq];
 				}
 				else
 				{
-					ivtTime = next_trip->_arrival_seconds[mySeq + 1] - current->_time_label;
+					ivtTime = (float)next_trip->_arrival_seconds[mySeq + 1] - current->_time_label;
 				}
 
 				float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;

@@ -222,7 +222,7 @@ namespace Routing_Components
 
 			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
 			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
-
+			
 			static bool static_initialize(const string& option_file)
 			{
 				// set the base values
@@ -1010,10 +1010,9 @@ namespace Routing_Components
 				//	tr_ends.push_back(tr_end);
 				//}
 
-				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
-
-				//TODO: Remove when done testing routing execution time
+				
 				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1337,5 +1336,6 @@ namespace Routing_Components
 
 		template<typename MasterType, typename InheritanceList>
 		std::unordered_map<int, int> Routable_Network_Implementation<MasterType, InheritanceList>::_turn_id_to_moe_data;
+
 	}
 }
