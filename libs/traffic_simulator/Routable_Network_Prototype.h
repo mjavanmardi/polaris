@@ -38,9 +38,9 @@ namespace Routing_Components
 			}
 
 			template<typename Source_Network_Type>
-			void construct_routable_multimodal_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			void construct_multimodal_routable_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				this_component()->construct_routable_multimodal_network(source_network);
+				this_component()->construct_multimodal_routable_network(source_network);
 			}
 
 			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)

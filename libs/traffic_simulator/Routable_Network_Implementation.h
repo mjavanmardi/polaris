@@ -672,7 +672,7 @@ namespace Routing_Components
 				//graph_pool->Link_Graphs();
 			}
 
-			void construct_routable_multimodal_network(Network<typename MasterType::network_type>* source_network)
+			void construct_multimodal_routable_network(Network<typename MasterType::network_type>* source_network)
 			{
 				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
@@ -702,9 +702,6 @@ namespace Routing_Components
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
 
 
-				//Graph_Pool<typename MT::graph_pool_type>* graph_pool = (Graph_Pool<typename MT::graph_pool_type>*) new typename MT::graph_pool_type();
-
-				//_routable_graph_pool = graph_pool;
 				cout << "Constructing multi-modal routable network..." << endl;
 
 				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
@@ -861,9 +858,7 @@ namespace Routing_Components
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
 						input_multimodal_edge._unique_patterns.clear();
 					//}
-				}				
-
-				
+				}								
 
 				Interactive_Graph<typename MT::multimodal_graph_type>* routable_network_graph = multimodal_graph->template Compile_Graph<Types::multimodal_attributes<MT>>();
 
@@ -877,13 +872,9 @@ namespace Routing_Components
 					{
 						Link_Interface* current_link = (Link_Interface*)(*links_itr);
 
-						global_edge_id edge_id;
-						edge_id.edge_id = current_link->_uuid;
-						edge_id.graph_id = _multimodal_network_graph_id;
+						int edge_id = current_link->_uuid;
 
-						base_edge_type* edge = (base_edge_type*)graph_pool->Get_Edge(edge_id);
-
-						pattern->_pattern_edges.push_back(edge);
+						pattern->_pattern_edge_ids.push_back(edge_id);
 					}
 				}
 				//graph_pool->Link_Graphs();

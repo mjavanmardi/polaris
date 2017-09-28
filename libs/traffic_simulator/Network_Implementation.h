@@ -1147,7 +1147,7 @@ namespace Network_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>())
 				{
-					routable_network->template construct_routable_multimodal_network<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);					
+					routable_network->template construct_multimodal_routable_network<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);
 				}
 				
 

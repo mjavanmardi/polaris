@@ -877,7 +877,7 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			if (origin_loc_id == 67 && destination_loc_id == 128)
+			/*if (origin_loc_id == 67 && destination_loc_id == 128)
 			{								
 				global.edge_id = current->_edge_id;
 				_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
@@ -904,7 +904,7 @@ namespace polaris
 					current->_cost_from_origin
 					);
 				detail_paragraph.insert(0, myLine);
-			}
+			}*/
 
 			if (current->_cost_from_origin > costThreshold || scanCount > (int)scanThreshold)
 			{

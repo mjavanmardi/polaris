@@ -171,7 +171,8 @@ namespace polaris
 
 				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
+					//Evaluate_Transit_Neighbor_Seq<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
+					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
 				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
@@ -202,12 +203,14 @@ namespace polaris
 				
 			//if (current_neighbor->in_closed_set()) return;
 
+			std::map<int, bool> pattern_scanned;
+
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
-				next_pattern->_scanned = false;
+				pattern_scanned[next_pattern->_uuid] = false;
 			}
 			
 			int trips_ctr = 0;
@@ -223,7 +226,7 @@ namespace polaris
 
 				++trips_ctr;
 
-				if (next_pattern->_scanned)
+				if (pattern_scanned[next_pattern->_uuid])
 				{
 					continue;
 				}
@@ -254,7 +257,7 @@ namespace polaris
 					return;
 				}
 				
-				next_pattern->_scanned = true;
+				pattern_scanned[next_pattern->_uuid] = true;
 				++patterns_ctr;
 
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
@@ -276,7 +279,11 @@ namespace polaris
 				int pattern_links_size = next_pattern->_pattern_links.size();
 				while (iSeq <= pattern_links_size && hit_dest == false && seqStay == true)
 				{
-					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*) next_pattern->_pattern_edges[iSeq - 1];
+					global_edge_id seq_edge_g;
+					seq_edge_g.graph_id = 1;
+					seq_edge_g.edge_id = next_pattern->_pattern_edge_ids[iSeq - 1];
+					
+					A_Star_Edge<neighbor_edge_type>* seq_edge = (A_Star_Edge<neighbor_edge_type>*)graph_pool->Get_Edge(seq_edge_g);
 					
 					float ivtTime;
 					if (wait_binary == 1)
@@ -292,6 +299,19 @@ namespace polaris
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
 					{
+						if (!seq_edge->marked_for_reset())
+						{
+							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
+							seq_edge->marked_for_reset(true);
+						}
+
+						if (seq_edge->in_open_set())
+						{
+							routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+						}
+						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
+						seq_edge->in_open_set(true);						
+						
 						seq_edge->cost_from_origin(cost_from_origin);
 						
 						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
@@ -310,20 +330,7 @@ namespace polaris
 						seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra);
-						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);									
-
-						if (!seq_edge->marked_for_reset())
-						{
-							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
-							seq_edge->marked_for_reset(true);
-						}
-
-						if (seq_edge->in_open_set())
-						{
-							routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
-						}
-						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
-						seq_edge->in_open_set(true);
+						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 					}
@@ -343,7 +350,7 @@ namespace polaris
 		}
 
 		template<typename AgentType>
-		void Evaluate_Transit_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool)
+		void Evaluate_Transit_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
@@ -356,12 +363,14 @@ namespace polaris
 			
 			//if (current_neighbor->in_closed_set()) return;
 
+			std::map<int, bool> pattern_scanned;
+
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
-				next_pattern->_scanned = false;
+				pattern_scanned[next_pattern->_uuid] = false;
 			}
 
 			int trips_ctr = 0;
@@ -376,6 +385,11 @@ namespace polaris
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)next_trip->_pattern;
 
 				++trips_ctr;
+
+				if (pattern_scanned[next_pattern->_uuid])
+				{
+					continue;
+				}
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 
@@ -404,27 +418,9 @@ namespace polaris
 					return;
 				}
 
-				if (next_pattern->_scanned)
-				{
-					continue;
-				}
-
-				next_pattern->_scanned = true;
+				pattern_scanned[next_pattern->_uuid] = true;
 				++patterns_ctr;
-
-				/*Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
-
-				int wait_binary = 1;
-
-				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-				{
-					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
-					if (current_trip->_uuid == next_trip->_uuid)
-					{
-						wait_binary = 0;
-					}
-				}*/
-
+				
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
 				int TransferCount = std::max(WaitingCount - 1,0);
@@ -451,6 +447,16 @@ namespace polaris
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
+					if (!current_neighbor->marked_for_reset())
+					{
+						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+						current_neighbor->marked_for_reset(true);
+					}
+
+					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+					current_neighbor->in_open_set(true);
+
 					current_neighbor->cost_from_origin(cost_from_origin);
 
 					float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
@@ -470,16 +476,6 @@ namespace polaris
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-					if (!current_neighbor->marked_for_reset())
-					{
-						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-						current_neighbor->marked_for_reset(true);
-					}
-
-					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-					current_neighbor->in_open_set(true);
 
 					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}		
@@ -513,6 +509,16 @@ namespace polaris
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+				current_neighbor->in_open_set(true);				
+				
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				float time_cost_between = current_neighbor->_time_cost_temp;
@@ -531,16 +537,6 @@ namespace polaris
 					
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-				if (!current_neighbor->marked_for_reset())
-				{
-					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-					current_neighbor->marked_for_reset(true);
-				}			
-
-				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-				current_neighbor->in_open_set(true);
 
 				// update the label
 				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);					
@@ -571,6 +567,16 @@ namespace polaris
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+				current_neighbor->in_open_set(true); 
+				
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
@@ -586,17 +592,7 @@ namespace polaris
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + heuristicPortion;
-				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
-
-				if (!current_neighbor->marked_for_reset())
-				{
-					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-					current_neighbor->marked_for_reset(true);
-				}
-
-				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-				current_neighbor->in_open_set(true);
+				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);			
 
 				// update the label
 				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);					
