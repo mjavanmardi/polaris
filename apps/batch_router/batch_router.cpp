@@ -379,33 +379,26 @@ int main(int argc,char** argv)
 	// WRITE results
 	fw_output.Open("routed_results.txt");
 
-	
-	stringstream details_title("");
-	details_title << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime";
-	stringstream details_filename("");
-	details_filename << scenario->template output_dir_name<string>();
-	details_filename << "sp_output.dat";
-	fw_mm_sp_details.Open(details_filename.str());	
-	fw_mm_sp_details.Write(details_title);
-	
-	stringstream summary_title("");
-	summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
-	//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
-	stringstream summary_filename("");
-	summary_filename << scenario->template output_dir_name<string>();
-	summary_filename << "sp_labels_output.dat";
-	fw_mm_sp_summary.Open(summary_filename.str());
-	fw_mm_sp_summary.Write_NoDelim(summary_title);
+	bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+	if (debug_route)
+	{
+		stringstream details_title("");
+		details_title << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime";
+		stringstream details_filename("");
+		details_filename << scenario->template output_dir_name<string>();
+		details_filename << "sp_output.dat";
+		fw_mm_sp_details.Open(details_filename.str());
+		fw_mm_sp_details.Write(details_title);
 
-	stringstream debug_filename("");
-	debug_filename << scenario->template output_dir_name<string>();
-	debug_filename << "debug_ODT.dat";
-	fw_debug_ODT.Open(debug_filename.str());
-
-	/*stringstream dijkstra_filename("");
-	dijkstra_filename << scenario->template output_dir_name<string>();
-	dijkstra_filename << "dijkstra_perf_output.dat";
-	fw_dijkstra_summary.Open(dijkstra_filename.str());*/
+		stringstream summary_title("");
+		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
+		//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
+		stringstream summary_filename("");
+		summary_filename << scenario->template output_dir_name<string>();
+		summary_filename << "sp_labels_output.dat";
+		fw_mm_sp_summary.Open(summary_filename.str());
+		fw_mm_sp_summary.Write_NoDelim(summary_title);
+	}
 
 	//==================================================================================================================================
 	// Start Simulation
@@ -424,7 +417,6 @@ int main(int argc,char** argv)
 		
 	fw_mm_sp_details.Close();
 	fw_mm_sp_summary.Close();
-	//fw_dijkstra_summary.Close();
 	cout << "Finished! Press 'Any' key" << endl;
 
 }

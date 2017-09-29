@@ -303,13 +303,12 @@ namespace polaris
 		
 		int graph_id = start_ids.front().graph_id;
 
-		char myLine[2000];
-		bool write_route = false;
-		Counter A_Star_Time;
+		//char myLine[2000];
+		/*Counter A_Star_Time;
 		if (debug_route)
 		{
 			A_Star_Time.Start();
-		}
+		}*/
 
 		std::deque< base_edge_type* > modified_edges;
 
@@ -329,9 +328,7 @@ namespace polaris
 		routing_data.modified_edges = &modified_edges;
 		routing_data.open_set = &open_set;
 		routing_data.start_edge = (base_edge_type*)starts.front();
-
-		int zone = zone_index;
-
+		
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
@@ -371,7 +368,7 @@ namespace polaris
 
 		float total_cost = 0;
 
-		if (debug_route)
+		/*if (debug_route)
 		{
 			float perf_time = A_Star_Time.Stop();
 			sprintf_s(myLine, "\n%s\t%s\t%d\t%s\t%d\t%s\t%f",
@@ -383,8 +380,8 @@ namespace polaris
 				"Router run-time (ms):",
 				perf_time
 				);
-			summary_paragraph.insert(0, myLine);
-		}
+			summary_paragraph.insert(0, myLine);			
+		}*/
 
 		global_edge_id current_g;
 		current_g.graph_id = graph_id;
@@ -394,7 +391,7 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;						
 			current_g.edge_id = current->_edge_id;
 			_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(current_g.edge_id);			
-			current_link->_dijkstra_cost[zone] = current->_cost_from_origin;
+			current_link->_dijkstra_cost[zone_index] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -418,7 +415,6 @@ namespace polaris
 
 		std::ofstream perf_file;
 		std::string myParagraph;
-		bool write_route = false;
 		Counter A_Star_Time;
 		if (debug_route)
 		{
@@ -1121,6 +1117,7 @@ namespace polaris
 			start_ids.push_back(out_path.front());
 			end_ids.clear();
 			end_ids.push_back(out_path.back());
+			
 		}
 		else
 		{

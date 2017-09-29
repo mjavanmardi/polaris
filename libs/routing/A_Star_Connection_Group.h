@@ -298,20 +298,7 @@ namespace polaris
 					float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;
 
 					if (cost_from_origin < seq_edge->cost_from_origin())
-					{
-						if (!seq_edge->marked_for_reset())
-						{
-							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
-							seq_edge->marked_for_reset(true);
-						}
-
-						if (seq_edge->in_open_set())
-						{
-							routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
-						}
-						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
-						seq_edge->in_open_set(true);						
-						
+					{						
 						seq_edge->cost_from_origin(cost_from_origin);
 						
 						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
@@ -331,6 +318,19 @@ namespace polaris
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra);
 						seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+						if (!seq_edge->marked_for_reset())
+						{
+							routing_data.modified_edges->push_back((base_edge_type*)seq_edge);
+							seq_edge->marked_for_reset(true);
+						}
+
+						if (seq_edge->in_open_set())
+						{
+							routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)seq_edge)));
+						}
+						routing_data.open_set->insert(*((base_edge_type*)seq_edge));
+						seq_edge->in_open_set(true);
 
 						//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 					}
@@ -447,16 +447,6 @@ namespace polaris
 
 				if (cost_from_origin < current_neighbor->cost_from_origin())
 				{
-					if (!current_neighbor->marked_for_reset())
-					{
-						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-						current_neighbor->marked_for_reset(true);
-					}
-
-					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-					current_neighbor->in_open_set(true);
-
 					current_neighbor->cost_from_origin(cost_from_origin);
 
 					float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
@@ -476,6 +466,16 @@ namespace polaris
 
 					float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 					current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+					if (!current_neighbor->marked_for_reset())
+					{
+						routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+						current_neighbor->marked_for_reset(true);
+					}
+
+					if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+					routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+					current_neighbor->in_open_set(true);
 
 					//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				}		
@@ -508,17 +508,7 @@ namespace polaris
 			}
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
-			{
-				if (!current_neighbor->marked_for_reset())
-				{
-					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-					current_neighbor->marked_for_reset(true);
-				}
-
-				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-				current_neighbor->in_open_set(true);				
-				
+			{	
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				float time_cost_between = current_neighbor->_time_cost_temp;
@@ -537,6 +527,16 @@ namespace polaris
 					
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
+
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+				current_neighbor->in_open_set(true);
 
 				// update the label
 				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);					
@@ -566,17 +566,7 @@ namespace polaris
 			float cost_from_origin = current->cost_from_origin() + carWeight * time_cost_between;
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
-			{
-				if (!current_neighbor->marked_for_reset())
-				{
-					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-					current_neighbor->marked_for_reset(true);
-				}
-
-				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
-				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
-				current_neighbor->in_open_set(true); 
-				
+			{				
 				current_neighbor->cost_from_origin(cost_from_origin);
 
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
@@ -593,6 +583,16 @@ namespace polaris
 
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + heuristicPortion;
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);			
+
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
+
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+				current_neighbor->in_open_set(true);
 
 				// update the label
 				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);					

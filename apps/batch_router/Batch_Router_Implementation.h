@@ -160,13 +160,8 @@ namespace Batch_Router_Components
 				if (movement->valid_trajectory<bool>())
 				{
 					
-					/*if (movement->routing_execution_time<__int64>() >= 0)
-					{*/
-						summary_by_thread[__thread_id] << __thread_id << "\t" << movement->summary_string<std::string>() ;
-						details_by_thread[__thread_id] << movement->detail_string<std::string>();						
-					//}
-									
-					
+					summary_by_thread[__thread_id] << __thread_id << "\t" << movement->summary_string<std::string>() ;
+					details_by_thread[__thread_id] << movement->detail_string<std::string>();					
 					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
 
 					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
@@ -182,12 +177,12 @@ namespace Batch_Router_Components
 				else
 				{
 					results_by_thread[__thread_id] << _ID <<": Error, movement was not routable."<<endl;
-					summary_by_thread[__thread_id] << movement->summary_string<std::string>() << "\t" << __thread_id;
+					summary_by_thread[__thread_id] << __thread_id << "\t" << movement->summary_string<std::string>();
 				}
 
 				object_count_by_thread[__thread_id]++;
 
-				if (object_count_by_thread[__thread_id] >= 1)
+				if (object_count_by_thread[__thread_id] >= 100)
 				{
 					LOCK(_write_lock);
 					fw_output.Write(results_by_thread[__thread_id]);

@@ -10,7 +10,6 @@ static vector<int> object_count_by_thread;
 static File_IO::File_Writer fw_output;
 static File_IO::File_Writer fw_mm_sp_summary;
 static File_IO::File_Writer fw_mm_sp_details;
-static File_IO::File_Writer fw_debug_ODT;
 
 namespace Batch_Router_Components
 {
