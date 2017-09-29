@@ -19,6 +19,15 @@
 
 namespace Scenario_Components
 {
+	namespace Types
+	{
+		struct ScenarioData
+		{
+			rapidjson::Document document;
+			std::map<std::string, std::string> key_paths;
+		};
+	}
+
 	namespace Prototypes
 	{
 		prototype struct Scenario ADD_DEBUG_INFO
@@ -433,13 +442,40 @@ namespace Scenario_Components
 				cav_wtp_model_file<string>((string)"");
 			}
 
+			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)
+			{
+				if (obj.IsObject())  //check if object
+				{
+					for (rapidjson::Value::ConstMemberIterator itr = obj.MemberBegin(); itr != obj.MemberEnd(); ++itr)    //iterate through object   
+					{
+						const rapidjson::Value& objName = obj[itr->name.GetString()]; //make object value
+						if (itr->value.IsObject())
+						{
+							std::string new_path;
+							if (path == "")
+								new_path = itr->name.GetString();
+							else
+								new_path = path + std::string("/") + itr->name.GetString();
+								
+							get_KV_paths(key_paths, objName, new_path, indent + 1); //if couldn't find in object, enter object and repeat process recursively 
+						}
+						else
+						{
+							std::string key = itr->name.GetString();
+							//std::cout << "path to " << key << "=" << path << std::endl;
+							key_paths[key] = path;
+						}
+					}
+				}
+			}
+
 			template<typename TargetType> void read_scenario_data(const char* filename)
 			{
 				// set the base values
 				default_static_initializer();
 
 				// now see if there are config file changes
-				rapidjson::Document document;
+				Scenario_Components::Types::ScenarioData document;
 
 				if (!parse_option_file(document, filename))
 					THROW_EXCEPTION("Scenario file '" << filename << "' was not able to be opened.");
@@ -448,7 +484,7 @@ namespace Scenario_Components
 				// set start time
 				std::string start_time_in_string;
 				int start_time;
-				if (set_parameter<std::string>(document, "", "starting_time_hh_mm", start_time_in_string))
+				if (set_parameter<std::string>(document, "starting_time_hh_mm", start_time_in_string))
 				{
 					start_time_in_string += ":00";
 					start_time = convert_hhmmss_to_seconds(start_time_in_string);
@@ -461,7 +497,7 @@ namespace Scenario_Components
 				// set end time
 				std::string end_time_in_string;
 				int end_time;
-				if(set_parameter<std::string>(document, "", "ending_time_hh_mm", end_time_in_string))
+				if(set_parameter<std::string>(document, "ending_time_hh_mm", end_time_in_string))
 				{
 					end_time_in_string += ":00";
 					end_time = convert_hhmmss_to_seconds(end_time_in_string);
@@ -473,45 +509,49 @@ namespace Scenario_Components
 
 				//===============================================
 				// set interval length
-				set_parameter<int>(document, "", "simulation_interval_length_in_second", simulation_interval_length<int &>());
+				set_parameter<int>(document, "simulation_interval_length_in_second", simulation_interval_length<int &>());
 
 				//===============================================
 				// set the demand reduction factor, used to reduce the demand read from the database
-				set_parameter<double>(document, "", "demand_reduction_factor", demand_reduction_factor<double &>());
-				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>();
+				set_parameter<double>(document, "demand_reduction_factor", demand_reduction_factor<double &>());
+				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>() << endl;
 
 				//===============================================
 				// set sim_interval per assignment interval
 				int assignment_intervals;
-				set_parameter<int>(document, "", "num_simulation_intervals_per_assignment_interval", assignment_intervals);
-				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				if (set_parameter<int>(document, "num_simulation_intervals_per_assignment_interval", assignment_intervals))
+				{
+					assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				}
 
 				//===============================================
 				// set assignment mode
 				std::string assignment_mode_string;
-				set_parameter<std::string>(document, "", "assignment_mode", assignment_mode_string);
-				if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+				if (set_parameter<std::string>(document, "assignment_mode", assignment_mode_string))
 				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
-				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else
-				{
-					cout << "Assignment mode not supported" << endl;
-					assert(false);
+					if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else
+					{
+						cout << "Assignment mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
 				// If left to false, then we can route to an activity location on a link using either DIR (i.e. left hand turns into activity location ) [RECOMMENDED]
-				set_parameter<bool>(document, "", "use_link_based_routing", use_link_based_routing<bool &>());
+				set_parameter<bool>(document, "use_link_based_routing", use_link_based_routing<bool &>());
 
 				//===============================================
 				// set rng type
 				std::string rng_type_string;
-				if(set_parameter<std::string>(document, "", "rng_type", rng_type_string))
+				if(set_parameter<std::string>(document, "rng_type", rng_type_string))
 				{
 					if (rng_type_string.compare("DETERMINISTIC") == 0)
 					{
@@ -531,93 +571,47 @@ namespace Scenario_Components
 				//===============================================
 				// set merging mode
 				std::string merging_mode_string;
-				set_parameter<std::string>(document, "", "merging_mode", merging_mode_string);
-				if (merging_mode_string.compare("DRIVING_RULE") == 0)
+				if (set_parameter<std::string>(document, "merging_mode", merging_mode_string))
 				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
-				}
-				else
-				{
-					cout << "Merging mode not supported" << endl;
-					assert(false);
+					if (merging_mode_string.compare("DRIVING_RULE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
+					}
+					else
+					{
+						cout << "Merging mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				//===============================================
 				// set control parameters
-				set_parameter<unsigned long>(document, "", "seed", iseed<unsigned long &>());
-				set_parameter<int>(document, "", "node_control_flag", intersection_control_flag<int &>());
-				set_parameter<bool>(document, "", "ramp_metering_flag", ramp_metering_flag<bool &>());
-				set_parameter<int>(document, "", "demand_od_flag", demand_od_flag<int &>());
-				set_parameter<int>(document, "", "snapshot_period", snapshot_period<int &>());
+				set_parameter<unsigned long>(document, "seed", iseed<unsigned long &>());
+				set_parameter<int>(document, "node_control_flag", intersection_control_flag<int &>());
+				set_parameter<bool>(document, "ramp_metering_flag", ramp_metering_flag<bool &>());
+				set_parameter<int>(document, "demand_od_flag", demand_od_flag<int &>());
+				set_parameter<int>(document, "snapshot_period", snapshot_period<int &>());
 
-				//===============================================
-				// tile imagery parameters
-				if (set_parameter<std::string>(document, "", "tile_imagery_file", tile_imagery_file<std::string &>()))
-				{
-					use_tile_imagery<bool>(true);
-					set_parameter<int>(document, "", "tile_imagery_alpha_level", tile_imagery_alpha_level<int &>());
-				}
-				else
-				{
-					use_tile_imagery<bool>(false);
-				}
-
-				set_parameter<bool>(document, "", "color_cars_randomly", color_cars_randomly<bool &>());
-
-				//===============================================
-				// Demand model parameters 
-				set_parameter<bool>(document, "", "write_activity_output", this->template write_activity_output<bool &>());
-				set_parameter<bool>(document, "", "aggregate_routing", this->template aggregate_routing<bool &>());
-				set_parameter<bool>(document, "", "do_planner_routing", this->template do_planner_routing<bool &>());
-				set_parameter<bool>(document, "", "write_demand_to_database", this->template write_demand_to_database<bool &>());
-				set_parameter<bool>(document, "", "read_demand_from_database", this->template read_demand_from_database<bool &>());
-				set_parameter<bool>(document, "", "read_population_from_database", this->template read_population_from_database<bool &>());
-				set_parameter<double>(document, "", "cav_market_penetration", this->template cav_market_penetration<double &>());
-				set_parameter<double>(document, "", "cav_vott_adjustment", this->template cav_vott_adjustment<double &>());
-
-				//=======================================================================================================================================================
-				// Vehicle Choice Model parameters
-				// Start time model parameters
-				set_parameter<std::string>(document, "", "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
-				set_parameter<double>(document, "", "automation_cost", this->template automation_cost<double &>());
-
-
-				//=======================================================================================================================================================
-				// PopSyn parameters
-				set_parameter<double>(document, "", "percent_to_synthesize", this->template percent_to_synthesize<double &>());
-				set_parameter<double>(document, "", "ipf_tolerance", this->template ipf_tolerance<double &>());
-				set_parameter<int>(document, "", "marginal_tolerance", this->template marginal_tolerance<int &>());
-				set_parameter<int>(document, "", "maximum_iterations", this->template maximum_iterations<int &>());
-				set_parameter<bool>(document, "", "write_marginal_output", this->template write_marginal_output<bool &>());
-				set_parameter<bool>(document, "", "write_full_output", this->template write_full_output<bool &>());
-				set_parameter<std::string>(document, "", "popsyn_control_file", this->template popsyn_control_file_name<std::string &>());
-
-				// Start time model parameters
-				set_parameter<std::string>(document, "", "activity_start_time_model_file_name", this->template activity_start_time_model_file_name<std::string &>());
-				set_parameter<bool>(document, "", "write_visualizer_snapshot", this->template write_visualizer_snapshot<bool &>());
-
-				//===============================================
-				// set control parameters
-				if (!set_parameter<std::string>(document, "", "database_name", database_name<std::string &>()))
+				if (!set_parameter<std::string>(document, "database_name", database_name<std::string &>()))
 				{
 					THROW_EXCEPTION("ERROR: Input database name required.");
 				}
 
-				set_parameter<std::string>(document, "", "historical_results_database_name", historical_results_database_name<std::string &>());
+				set_parameter<std::string>(document, "historical_results_database_name", historical_results_database_name<std::string &>());
 
-				if (set_parameter<std::string>(document, "", "input_popsyn_database_name", input_popsyn_database_name<std::string &>()))
+				if (set_parameter<std::string>(document, "input_popsyn_database_name", input_popsyn_database_name<std::string &>()))
 				{
 					this->read_population_from_database(true);
 				}
@@ -648,34 +642,81 @@ namespace Scenario_Components
 				operation_time_in_seconds<double>(0.0);
 				output_time_in_seconds<double>(0.0);
 
+				//===============================================
+				// tile imagery parameters
+				if (set_parameter<std::string>(document, "tile_imagery_file", tile_imagery_file<std::string &>()))
+				{
+					use_tile_imagery<bool>(true);
+					set_parameter<int>(document, "tile_imagery_alpha_level", tile_imagery_alpha_level<int &>());
+				}
+				else
+				{
+					use_tile_imagery<bool>(false);
+				}
+
+				set_parameter<bool>(document, "color_cars_randomly", color_cars_randomly<bool &>());
+
+				//===============================================
+				// Demand model parameters 
+				set_parameter<bool>(document, "write_activity_output", this->template write_activity_output<bool &>());
+				set_parameter<bool>(document, "aggregate_routing", this->template aggregate_routing<bool &>());
+				set_parameter<bool>(document, "do_planner_routing", this->template do_planner_routing<bool &>());
+				set_parameter<bool>(document, "write_demand_to_database", this->template write_demand_to_database<bool &>());
+				set_parameter<bool>(document, "read_demand_from_database", this->template read_demand_from_database<bool &>());
+				set_parameter<bool>(document, "read_population_from_database", this->template read_population_from_database<bool &>());
+				set_parameter<double>(document, "cav_market_penetration", this->template cav_market_penetration<double &>());
+				set_parameter<double>(document, "cav_vott_adjustment", this->template cav_vott_adjustment<double &>());
+
+				//=======================================================================================================================================================
+				// Vehicle Choice Model parameters
+				// Start time model parameters
+				set_parameter<std::string>(document, "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
+				set_parameter<double>(document, "automation_cost", this->template automation_cost<double &>());
+
+
+				//=======================================================================================================================================================
+				// PopSyn parameters
+				set_parameter<double>(document, "percent_to_synthesize", this->template percent_to_synthesize<double &>());
+				set_parameter<double>(document, "ipf_tolerance", this->template ipf_tolerance<double &>());
+				set_parameter<int>(document, "marginal_tolerance", this->template marginal_tolerance<int &>());
+				set_parameter<int>(document, "maximum_iterations", this->template maximum_iterations<int &>());
+				set_parameter<bool>(document, "write_marginal_output", this->template write_marginal_output<bool &>());
+				set_parameter<bool>(document, "write_full_output", this->template write_full_output<bool &>());
+				set_parameter<std::string>(document, "popsyn_control_file", this->template popsyn_control_file_name<std::string &>());
+
+				// Start time model parameters
+				set_parameter<std::string>(document, "activity_start_time_model_file_name", this->template activity_start_time_model_file_name<std::string &>());
+				set_parameter<bool>(document, "write_visualizer_snapshot", this->template write_visualizer_snapshot<bool &>());
+
+
 				// set I/O parameters		
-				set_parameter<bool>(document, "", "count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool &>());
-				set_parameter<std::string>(document, "", "output_dir_name", output_dir_name<std::string &>());
-				set_parameter<bool>(document, "", "write_db_input_to_files", write_db_input_to_files<bool &>());
-				set_parameter<bool>(document, "", "run_simulation_for_db_input", run_simulation_for_db_input<bool &>());
-				set_parameter<bool>(document, "", "write_node_control_state", write_node_control_state<bool &>());
-				set_parameter<bool>(document, "", "write_network_link_flow", write_network_link_flow<bool &>());
-				set_parameter<bool>(document, "", "write_network_link_turn_time", write_network_link_turn_time<bool &>());
-				set_parameter<bool>(document, "", "write_output_summary", write_output_summary<bool &>());
-				set_parameter<bool>(document, "", "output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool &>());
-				set_parameter<bool>(document, "", "output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool &>());
-				set_parameter<bool>(document, "", "output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool &>());
-				set_parameter<bool>(document, "", "write_network_snapshots", write_network_snapshots<bool &>());
-				set_parameter<bool>(document, "", "read_network_snapshots", read_network_snapshots<bool &>());
-				set_parameter<bool>(document, "", "routing_with_snapshots", routing_with_snapshots<bool &>());
-				set_parameter<std::string>(document, "", "input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<std::string &>());
+				set_parameter<bool>(document, "count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool &>());
+				set_parameter<std::string>(document, "output_dir_name", output_dir_name<std::string &>());
+				set_parameter<bool>(document, "write_db_input_to_files", write_db_input_to_files<bool &>());
+				set_parameter<bool>(document, "run_simulation_for_db_input", run_simulation_for_db_input<bool &>());
+				set_parameter<bool>(document, "write_node_control_state", write_node_control_state<bool &>());
+				set_parameter<bool>(document, "write_network_link_flow", write_network_link_flow<bool &>());
+				set_parameter<bool>(document, "write_network_link_turn_time", write_network_link_turn_time<bool &>());
+				set_parameter<bool>(document, "write_output_summary", write_output_summary<bool &>());
+				set_parameter<bool>(document, "output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "write_network_snapshots", write_network_snapshots<bool &>());
+				set_parameter<bool>(document, "read_network_snapshots", read_network_snapshots<bool &>());
+				set_parameter<bool>(document, "routing_with_snapshots", routing_with_snapshots<bool &>());
+				set_parameter<std::string>(document, "input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<std::string &>());
 
 				// read capacity adjustments 
-				set_parameter<double>(document, "", "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
-				set_parameter<double>(document, "", "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
-				set_parameter<bool>(document, "", "simulate_cacc", simulate_cacc<bool &>());
-				set_parameter<double>(document, "", "flexible_work_percentage", flexible_work_percentage<double &>());
+				set_parameter<double>(document, "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
+				set_parameter<double>(document, "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
+				set_parameter<bool>(document, "simulate_cacc", simulate_cacc<bool &>());
+				set_parameter<double>(document, "flexible_work_percentage", flexible_work_percentage<double &>());
 
 				//===============================================
 				// Vehicle trajectory tracking parameters
-				set_parameter<bool>(document, "", "write_vehicle_trajectory", write_vehicle_trajectory<bool &>());
-				set_parameter<double>(document, "", "vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double &>());
-				if (set_parameter<std::string>(document, "", "vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<std::string &>()))
+				set_parameter<bool>(document, "write_vehicle_trajectory", write_vehicle_trajectory<bool &>());
+				set_parameter<double>(document, "vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double &>());
+				if (set_parameter<std::string>(document, "vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<std::string &>()))
 				{
 					vehicle_trajectory_sample_rate<double>(0.0);
 					use_vehicle_tracking_list<bool>(true);
@@ -696,15 +737,15 @@ namespace Scenario_Components
 				}
 
 				// GET NETWORK SKIMMING PARAMETERS
-				set_parameter<bool>(document, "", "write_skim_tables", this->template write_skim_tables<bool &>());
-				set_parameter<bool>(document, "", "read_skim_tables", this->template read_skim_tables<bool &>());
-				set_parameter<std::string>(document, "", "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
-				if (set_parameter<std::vector<int>>(document, "", "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
+				set_parameter<bool>(document, "write_skim_tables", this->template write_skim_tables<bool &>());
+				set_parameter<bool>(document, "read_skim_tables", this->template read_skim_tables<bool &>());
+				set_parameter<std::string>(document, "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
+				if (set_parameter<std::vector<int>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
 				{
 					use_skim_intervals<bool>(true);
 					do_skimming<bool>(true);
@@ -712,7 +753,7 @@ namespace Scenario_Components
 				else
 				{
 					use_skim_intervals<bool>(false);
-					if (set_parameter<int>(document, "", "skim_interval_length_minutes", this->template skim_interval_length_minutes<int &>()))
+					if (set_parameter<int>(document, "skim_interval_length_minutes", this->template skim_interval_length_minutes<int &>()))
 					{
 						do_skimming<bool>(true);
 					}
@@ -726,53 +767,53 @@ namespace Scenario_Components
 					}
 				}
 
-				set_parameter<bool>(document, "", "compare_with_historic_moe", compare_with_historic_moe<bool &>());
-				set_parameter<std::string>(document, "", "historic_network_moe_file_path_name", historic_network_moe_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "historic_link_moe_file_path_name", historic_link_moe_file_path_name<std::string &>());
-				set_parameter<bool>(document, "", "read_normal_day_link_moe", read_normal_day_link_moe<bool &>());
-				set_parameter<std::string>(document, "", "normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<std::string &>());
-				set_parameter<std::string>(document, "", "historic_demand_moe_directory", historic_demand_moe_directory<std::string &>());
-				set_parameter<bool>(document, "", "output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool &>());
-				set_parameter<bool>(document, "", "output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool &>());
-				set_parameter<bool>(document, "", "output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool &>());
-				set_parameter<bool>(document, "", "output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool &>());
-				set_parameter<bool>(document, "", "load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool &>());
-				set_parameter<std::string>(document, "", "analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<std::string &>());
+				set_parameter<bool>(document, "compare_with_historic_moe", compare_with_historic_moe<bool &>());
+				set_parameter<std::string>(document, "historic_network_moe_file_path_name", historic_network_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "historic_link_moe_file_path_name", historic_link_moe_file_path_name<std::string &>());
+				set_parameter<bool>(document, "read_normal_day_link_moe", read_normal_day_link_moe<bool &>());
+				set_parameter<std::string>(document, "normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "historic_demand_moe_directory", historic_demand_moe_directory<std::string &>());
+				set_parameter<bool>(document, "output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool &>());
+				set_parameter<std::string>(document, "analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<std::string &>());
 
 				//if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
-				set_parameter<bool>(document, "", "write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool &>());
-				set_parameter<int>(document, "", "vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int &>());
-				set_parameter<bool>(document, "", "use_tmc", use_tmc<bool &>());
-				set_parameter<bool>(document, "", "use_network_events", use_network_events<bool &>());
-				set_parameter<bool>(document, "", "jam_density_constraints_enforced", jam_density_constraints_enforced<bool &>());
-				set_parameter<bool>(document, "", "maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool &>());
-				set_parameter<bool>(document, "", "vehicle_taking_action", vehicle_taking_action<bool &>());
+				set_parameter<bool>(document, "write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool &>());
+				set_parameter<int>(document, "vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int &>());
+				set_parameter<bool>(document, "use_tmc", use_tmc<bool &>());
+				set_parameter<bool>(document, "use_network_events", use_network_events<bool &>());
+				set_parameter<bool>(document, "jam_density_constraints_enforced", jam_density_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "vehicle_taking_action", vehicle_taking_action<bool &>());
 
 				///enroute switching pretrip_informed_market_share
-				set_parameter<double>(document, "", "pretrip_informed_market_share", pretrip_informed_market_share<double &>());
-				set_parameter<double>(document, "", "realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double &>());
-				set_parameter<double>(document, "", "information_compliance_rate_mean", information_compliance_rate_mean<double &>());
-				set_parameter<double>(document, "", "information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double &>());
-				set_parameter<double>(document, "", "relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double &>());
-				set_parameter<double>(document, "", "minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double &>()); // in minutes
-				set_parameter<double>(document, "", "minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double &>()); // in minutes
-				set_parameter<bool>(document, "", "enroute_switching_enabled", enroute_switching_enabled<bool &>());
-				set_parameter<bool>(document, "", "use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool &>());
-				set_parameter<double>(document, "", "minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double &>());
-				set_parameter<double>(document, "", "minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double &>());
-				set_parameter<bool>(document, "", "enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool &>());
-				set_parameter<bool>(document, "", "multimodal_network_input", multimodal_network_input<bool &>());
-				set_parameter<double>(document, "", "enroute_excessive_delay_factor", enroute_excessive_delay_factor<double &>());
-				set_parameter<double>(document, "", "minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double &>());
-				set_parameter<bool>(document, "", "time_dependent_routing", time_dependent_routing<bool &>());
-				set_parameter<double>(document, "", "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
-				set_parameter<double>(document, "", "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
-				set_parameter<double>(document, "", "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
-				set_parameter<bool>(document, "", "multimodal_routing", multimodal_routing<bool &>());
-				set_parameter<double>(document, "", "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
-				set_parameter<bool>(document, "", "calculate_realtime_moe", calculate_realtime_moe<bool &>());
+				set_parameter<double>(document, "pretrip_informed_market_share", pretrip_informed_market_share<double &>());
+				set_parameter<double>(document, "realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double &>());
+				set_parameter<double>(document, "information_compliance_rate_mean", information_compliance_rate_mean<double &>());
+				set_parameter<double>(document, "information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double &>());
+				set_parameter<double>(document, "relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double &>());
+				set_parameter<double>(document, "minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double &>()); // in minutes
+				set_parameter<double>(document, "minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double &>()); // in minutes
+				set_parameter<bool>(document, "enroute_switching_enabled", enroute_switching_enabled<bool &>());
+				set_parameter<bool>(document, "use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool &>());
+				set_parameter<double>(document, "minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double &>());
+				set_parameter<double>(document, "minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool &>());
+				set_parameter<bool>(document, "multimodal_network_input", multimodal_network_input<bool &>());
+				set_parameter<double>(document, "enroute_excessive_delay_factor", enroute_excessive_delay_factor<double &>());
+				set_parameter<double>(document, "minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "time_dependent_routing", time_dependent_routing<bool &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
+				set_parameter<bool>(document, "multimodal_routing", multimodal_routing<bool &>());
+				set_parameter<double>(document, "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
+				set_parameter<bool>(document, "calculate_realtime_moe", calculate_realtime_moe<bool &>());
 				
-				if (set_parameter<std::string>(document, "", "buildings_geometry_file", buildings_geometry_file<std::string &>()))
+				if (set_parameter<std::string>(document, "buildings_geometry_file", buildings_geometry_file<std::string &>()))
 				{
 					use_buildings(true);
 				}
@@ -782,11 +823,11 @@ namespace Scenario_Components
 					buildings_geometry_file<string&>()="";
 				}
 
-				set_parameter<std::string>(document, "", "mode_choice_model_file", mode_choice_model_file<std::string &>());
-				set_parameter<std::string>(document, "", "destination_choice_model_file", destination_choice_model_file<std::string &>());
-				set_parameter<std::string>(document, "", "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
-				set_parameter<std::string>(document, "", "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
-				set_parameter<std::string>(document, "", "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
+				set_parameter<std::string>(document, "mode_choice_model_file", mode_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "destination_choice_model_file", destination_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
+				set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1540,7 +1581,8 @@ namespace Scenario_Components
 				return pos;
 			}
 
-			bool parse_option_file(rapidjson::Document& document, std::string option_file)
+			//bool parse_option_file(rapidjson::Document& document, std::string option_file)
+			bool parse_option_file(Scenario_Components::Types::ScenarioData& scenario, std::string option_file)
 			{
 				bool ret_val = true;
 
@@ -1563,9 +1605,9 @@ namespace Scenario_Components
 				rapidjson::IStreamWrapper isw(ifs);
 
 				// Parse and check for errors
-				if (document.ParseStream(isw).HasParseError())
+				if (scenario.document.ParseStream(isw).HasParseError())
 				{
-					ret_val = print_error_msg(document, option_file);
+					ret_val = print_error_msg(scenario.document, option_file);
 
 					// Find size of file
 					std::streamoff json_len;
@@ -1590,7 +1632,7 @@ namespace Scenario_Components
 						{
 							size_t half_len = (size_t)(0.5*(float)print_len);
 							int start_index, line_index;
-							size_t parse_offset = document.GetErrorOffset();
+							size_t parse_offset = scenario.document.GetErrorOffset();
 
 							// determine start index for printing
 							if (parse_offset < half_len)
@@ -1621,11 +1663,13 @@ namespace Scenario_Components
 					return ret_val;
 				}
 
-				if (!document.IsObject())
+				if (!scenario.document.IsObject())
 				{
 					cout << "ERROR: \'" << option_file << "\' is not a valid option file" << endl;
 					return false;
 				}
+
+				get_KV_paths(scenario.key_paths, scenario.document, "");
 
 				return true;
 			}
@@ -1650,7 +1694,19 @@ namespace Scenario_Components
 			}
 
 			template <class T>
+			bool set_parameter(Scenario_Components::Types::ScenarioData& scenario, const std::string& key, T& parameter)
+			{
+				std::string section;
+				rapidjson::Document& document = scenario.document;
 
+				std::map<std::string, std::string>::iterator it = scenario.key_paths.find(key);
+				if (it != scenario.key_paths.end())
+					section = it->second;
+
+				return set_parameter<T>(document, section, key, parameter);
+			}
+				
+			template <class T>
 			bool set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, T& parameter)
 			{
 				rapidjson::Value* value;
@@ -1666,7 +1722,7 @@ namespace Scenario_Components
 					value = rapidjson::Pointer(char_key).Get(document);
 					if (!value)
 					{
-						cout << "Unable to locate key \'" << char_key << "\'" << endl;
+						cout << "Unable to locate key \'" << key << "\'" << endl;
 						return false;
 					}
 				}
@@ -1682,7 +1738,7 @@ namespace Scenario_Components
 					}
 
 					// check if first section is not found
-					cout << "section token 0 is " << section_tokens[0] << endl;
+					//cout << "section token 0 is " << section_tokens[0] << endl;
 					value = rapidjson::Pointer(section_tokens[0].c_str()).Get(document);
 					if (!value)
 					{
@@ -1697,7 +1753,7 @@ namespace Scenario_Components
 					// loop for each token element
 					for (unsigned i = 1; i < section_tokens.size(); ++i)
 					{
-						cout << section_tokens[i] << endl;
+						//cout << section_tokens[i] << endl;
 
 						// check if next section is not found
 						value = rapidjson::Pointer(section_tokens[i].c_str()).Get(*value);
@@ -1715,7 +1771,7 @@ namespace Scenario_Components
 						value = rapidjson::Pointer(char_key).Get(*value);
 						if (!value)
 						{
-							cout << "Unable to locate key \'" << char_key << "\' from \'" << section << "\'" << endl;
+							cout << "Unable to locate key \'" << key << "\' from \'" << section << "\'" << endl;
 							return false;
 						}
 					}

@@ -228,7 +228,7 @@ namespace Routing_Components
 				default_static_initializer();
 
 				// now see if there are config file changes
-				rapidjson::Document document;
+				Scenario_Components::Types::ScenarioData document;
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file for multimodal_routing was not specified" << endl;
@@ -239,23 +239,18 @@ namespace Routing_Components
 				if (!scenario->parse_option_file(document, option_file))
 					return false;
 
-				// check that model is defined if it is requested through scenario
-				if (!document.HasMember("multimodal_routing")) THROW_EXCEPTION("ERROR: multimodal_routing parameter not found in '" << option_file << "', but specified in scenario.json.");
-
-				string section = "multimodal_routing";
-
-				scenario->set_parameter(document, section, "transferPenalty", _transferPenalty);
-				scenario->set_parameter(document, section, "waitWeight", _waitWeight);
-				scenario->set_parameter(document, section, "walkWeight", _walkWeight);
-				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
-				scenario->set_parameter(document, section, "carWeight", _carWeight);
-				scenario->set_parameter(document, section, "scanThreshold", _scanThreshold);
-				scenario->set_parameter(document, section, "costThreshold", _costThreshold);
-				scenario->set_parameter(document, section, "waitThreshold", _waitThreshold);
-				scenario->set_parameter(document, section, "walkThreshold", _walkThreshold);
-				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
-				scenario->set_parameter(document, section, "debug_route", _debug_route);
-				scenario->set_parameter(document, section, "multimodal_dijkstra", _multimodal_dijkstra);
+				scenario->set_parameter(document, "transferPenalty", _transferPenalty);
+				scenario->set_parameter(document, "waitWeight", _waitWeight);
+				scenario->set_parameter(document, "walkWeight", _walkWeight);
+				scenario->set_parameter(document, "ivtWeight", _ivtWeight);
+				scenario->set_parameter(document, "carWeight", _carWeight);
+				scenario->set_parameter(document, "scanThreshold", _scanThreshold);
+				scenario->set_parameter(document, "costThreshold", _costThreshold);
+				scenario->set_parameter(document, "waitThreshold", _waitThreshold);
+				scenario->set_parameter(document, "walkThreshold", _walkThreshold);
+				scenario->set_parameter(document, "walkSpeed", _walkSpeed);
+				scenario->set_parameter(document, "debug_route", _debug_route);
+				scenario->set_parameter(document, "multimodal_dijkstra", _multimodal_dijkstra);
 
 				std::ofstream sp_file;
 				std::ofstream res_file;
@@ -309,6 +304,7 @@ namespace Routing_Components
 				_walkThreshold = 5000;
 				_walkSpeed = 1.38889;
 				_debug_route = false;
+				_multimodal_dijkstra = false;
 			}
 
 			#pragma region static parameters declaration		
