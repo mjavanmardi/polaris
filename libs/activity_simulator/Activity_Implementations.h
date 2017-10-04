@@ -1459,21 +1459,22 @@ namespace Activity_Components
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 
-				Time_Minutes duration; 	
+				//TODO: this is already handled in the start-time planner for routine acts....
+				//Time_Minutes duration; 	
 	
-				if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
-				{
-					duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
-				}
-				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
-				{
-					duration = 60.0 * 7.0;
-				}
-				else
-				{
-					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
-				}
-				pthis->template Duration<Time_Minutes>(duration);
+				//if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
+				//{
+				//	duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
+				//}
+				//else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				//{
+				//	duration = 60.0 * 7.0;
+				//}
+				//else
+				//{
+				//	THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
+				//}
+				//pthis->template Duration<Time_Minutes>(duration);
 
 			}
 

@@ -504,7 +504,7 @@ namespace Link_Components
 			float capacity_adjustment = 0;
 
 
-			if (((_Scenario_Interface*)_global_scenario)->template simulate_cacc<double>() && _num_vehicles_on_link/*_link_origin_vehicle_queue.size()*/ > 0)
+			if (((_Scenario_Interface*)_global_scenario)->template simulate_cacc<bool>() && _num_vehicles_on_link/*_link_origin_vehicle_queue.size()*/ > 0)
 			{
 				float n_veh = 0.0;
 				// - not used - _Vehicle_Interface* vehicle;
@@ -526,7 +526,7 @@ namespace Link_Components
 				//TODO: JOSH*** add fitted capacity change curve from Shladover paper, based on link CACC ratio - replacing what Vadim had here......
 				//capacity_adjustment = 0.1*n_cacc;
 				// used continuously updated CACC count in place of the for loop above
-				capacity_adjustment_factor = 1.0 + 1.0121*pow(min<float>((float)_cacc_count / (float)_num_vehicles_on_link,1.0f), 2.4697);
+				capacity_adjustment_factor = 1.0 + ((_Scenario_Interface*)_global_scenario)->template cacc_capacity_adjustment_alpha<double>() * pow(min<float>((float)_cacc_count / (float)_num_vehicles_on_link,1.0f), ((_Scenario_Interface*)_global_scenario)->template cacc_capacity_adjustment_beta<double>());
 			}
 			//_cacc_count = 0;
 
@@ -707,7 +707,12 @@ namespace Link_Components
 				int arrival_time = mp->template arrived_time<Time_Seconds>();
 				float travel_time = float((arrival_time - departure_time) / 60.0f);
 				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
-				((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
+
+				//TODO: not sure why we would need the model to update the ttime distribution when this could be done from the sql results.....
+				if (((_Scenario_Interface*)_global_scenario)->template write_ttime_distribution_from_network_model<bool>())
+				{
+					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
+				}
 
 				// decrement the in-network vehicles counter
 				if (((_Scenario_Interface*)_global_scenario)->template count_integrated_in_network_vehicles_only<bool>())

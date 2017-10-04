@@ -74,8 +74,35 @@ namespace polaris
 				float ttime_accumulation = 0;
 				float ttime_step = connection->turn_moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
-				if (t > ttime_step)
+
+				// interpolate between current and next time step
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
+
+				if (t1_weight < 0.5) // closer to next time step
+				{
+					float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+					t = t2*(1 - t1_weight) + t1*t1_weight;
+				}
+				else // closer to previous time step
+				{
+					float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time - ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+					t = t1*(1 - t1_weight) + t2*t1_weight;
+				}
+				
+				// if the travel time is longer than the current timestep, get the expected travel time at the estimated link departure time and interpolate between (to capture cases where the travel time is growing rapidly
+				if (t > ttime_step/t1_weight)
+				{
+					float t3 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + t) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+					t = (t + t3)*0.5;
+				}
+				
+
+				
+
+				//TODO: replace this accumulation step, which requires a lot of lookups, with an interpolation between travel time at the arrival on the link and travel time at the expected departure....
+				/*if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
@@ -87,7 +114,7 @@ namespace polaris
 
 					}
 				}
-				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);*/
 
 				
 

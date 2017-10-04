@@ -50,6 +50,8 @@ namespace Scenario_Components
 			// CAV SIMULATION VARIABLES
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
+			m_data(double, cacc_capacity_adjustment_alpha, NONE, NONE);
+			m_data(double, cacc_capacity_adjustment_beta, NONE, NONE);
 			m_data(double, simulate_cacc,NONE,NONE);
 			m_data(double, automation_cost, NONE, NONE);
 			m_data(double, vehicle_techchoice_beta_past_crashes, NONE, NONE);

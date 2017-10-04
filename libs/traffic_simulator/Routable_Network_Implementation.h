@@ -57,7 +57,11 @@ namespace Routing_Components
 			layer_id += _first_layer_id;
 
 			//TODO: changed this to >= since it seemed to be running past the end of the data - check with michael to verify
-			if(layer_id < _first_layer_id || layer_id >= ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id))
+			if (layer_id < _first_layer_id)
+			{
+				layer_id = _first_layer_id;
+			}
+			else if(layer_id >= ((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id))
 			{
 				int max_id = (int)((_layer_data.size()/_layer_size)*_layer_step+_first_layer_id);
 

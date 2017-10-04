@@ -60,6 +60,8 @@ namespace Scenario_Components
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
+			accessor(cacc_capacity_adjustment_alpha, NONE, NONE);
+			accessor(cacc_capacity_adjustment_beta, NONE, NONE);
 			accessor(simulate_cacc, NONE, NONE);
 			accessor(cav_market_penetration, NONE, NONE);
 			accessor(cav_vott_adjustment, NONE, NONE);
@@ -533,6 +535,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
 				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
 				if (cfgReader.getParameter("simulate_cacc", simulate_cacc<bool*>()) != PARAMETER_FOUND)simulate_cacc<bool>(false);
+				if (cfgReader.getParameter("cacc_capacity_adjustment_alpha", cacc_capacity_adjustment_alpha<double*>()) != PARAMETER_FOUND)cacc_capacity_adjustment_alpha<double>(1.0121);
+				if (cfgReader.getParameter("cacc_capacity_adjustment_beta", cacc_capacity_adjustment_beta<double*>()) != PARAMETER_FOUND)cacc_capacity_adjustment_beta<double>(2.4697);
 				
 				if (cfgReader.getParameter("flexible_work_percentage", flexible_work_percentage<double*>()) != PARAMETER_FOUND)flexible_work_percentage<double>(0.12);
 

@@ -78,7 +78,6 @@ namespace Person_Components
 				
 				return true;
 			}
-
 			static void print_parameters()
 			{
 				cout << "Telecommute_Choice_Implementation parameters" << endl;
@@ -117,8 +116,7 @@ namespace Person_Components
 			}
 
 			//==============================================================================================================================
-			// PARAMETER DECLARATIONS
-			//--------------------------------------------------
+			#pragma region parameter declarations
 			// Zero-inflation paramaters
 			m_static_data(float, Z_CONSTANT, NONE, NONE);
 			m_static_data(float, Z_MALE, NONE, NONE);
@@ -156,6 +154,7 @@ namespace Person_Components
 			m_static_data(float, T_C2, NONE, NONE);
 			m_static_data(float, T_C3, NONE, NONE);
 			m_static_data(float, T_RHO, NONE, NONE);
+			#pragma endregion
 
 			static void default_static_initializer()
 			{
@@ -195,6 +194,7 @@ namespace Person_Components
 			
 			//===========================================================================================================================================
 			// Interface definitions	
+			#pragma region object-specific type-defs...
 			typedef Prototypes::Person<typename type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_static_properties_itf;
 			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
@@ -212,7 +212,7 @@ namespace Person_Components
 			typedef Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)>  _Zone_Interface;
 			typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(zone_ids_container), int> _Zone_Ids_Interface;
-			
+			#pragma endregion
 
 			Person_Components::Types::TELECOMMUTE_FREQUENCY Telecommute_Choice()
 			{
