@@ -229,7 +229,7 @@ namespace Routing_Components
 				default_static_initializer();
 
 				// now see if there are config file changes
-				rapidjson::Document document;
+				Scenario_Components::Types::ScenarioData document;
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file for multimodal_routing was not specified" << endl;
@@ -240,8 +240,18 @@ namespace Routing_Components
 				if (!scenario->parse_option_file(document, option_file))
 					return false;
 
-				// check that model is defined if it is requested through scenario
-				if (!document.HasMember("multimodal_routing")) THROW_EXCEPTION("ERROR: multimodal_routing parameter not found in '" << option_file << "', but specified in scenario.json.");
+				scenario->set_parameter(document, "transferPenalty", _transferPenalty);
+				scenario->set_parameter(document, "waitWeight", _waitWeight);
+				scenario->set_parameter(document, "walkWeight", _walkWeight);
+				scenario->set_parameter(document, "ivtWeight", _ivtWeight);
+				scenario->set_parameter(document, "carWeight", _carWeight);
+				scenario->set_parameter(document, "scanThreshold", _scanThreshold);
+				scenario->set_parameter(document, "costThreshold", _costThreshold);
+				scenario->set_parameter(document, "waitThreshold", _waitThreshold);
+				scenario->set_parameter(document, "walkThreshold", _walkThreshold);
+				scenario->set_parameter(document, "walkSpeed", _walkSpeed);
+				scenario->set_parameter(document, "debug_route", _debug_route);
+				scenario->set_parameter(document, "multimodal_dijkstra", _multimodal_dijkstra);
 
 				string section = "multimodal_routing";
 
