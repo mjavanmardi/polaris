@@ -281,6 +281,24 @@ namespace Routing_Components
 						_movement_plan->summary_string(summary_paragraph);
 					//}
 				}
+
+				path_container.clear();
+				//cost of traversing each of the edges
+				cost_container.clear();
+				out_type.clear();
+				out_trip.clear();
+				out_seq.clear();
+				out_time.clear();
+				out_arr_time.clear();
+				out_wait_time.clear();
+				out_walk_time.clear();
+				out_ivt_time.clear();
+				out_car_time.clear();
+				out_wait_count.clear();
+				out_transfer_pen.clear();
+				out_heur_cost.clear();
+				summary_paragraph = "";
+				detail_paragraph = "";
 			}
 
 		};
