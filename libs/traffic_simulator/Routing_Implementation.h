@@ -299,9 +299,6 @@ namespace Routing_Components
 				out_heur_cost.clear();
 				summary_paragraph = "";
 				detail_paragraph = "";
-
-
-				cout << "Astar done" << endl;
 			}
 
 		};

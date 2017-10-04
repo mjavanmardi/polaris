@@ -252,22 +252,7 @@ namespace Routing_Components
 				scenario->set_parameter(document, "walkSpeed", _walkSpeed);
 				scenario->set_parameter(document, "debug_route", _debug_route);
 				scenario->set_parameter(document, "multimodal_dijkstra", _multimodal_dijkstra);
-
-				string section = "multimodal_routing";
-
-				scenario->set_parameter(document, section, "transferPenalty", _transferPenalty);
-				scenario->set_parameter(document, section, "waitWeight", _waitWeight);
-				scenario->set_parameter(document, section, "walkWeight", _walkWeight);
-				scenario->set_parameter(document, section, "ivtWeight", _ivtWeight);
-				scenario->set_parameter(document, section, "carWeight", _carWeight);
-				scenario->set_parameter(document, section, "scanThreshold", _scanThreshold);
-				scenario->set_parameter(document, section, "costThreshold", _costThreshold);
-				scenario->set_parameter(document, section, "waitThreshold", _waitThreshold);
-				scenario->set_parameter(document, section, "walkThreshold", _walkThreshold);
-				scenario->set_parameter(document, section, "walkSpeed", _walkSpeed);
-				scenario->set_parameter(document, section, "debug_route", _debug_route);
-				scenario->set_parameter(document, section, "multimodal_dijkstra", _multimodal_dijkstra);
-				
+								
 				return true;
 			}
 
