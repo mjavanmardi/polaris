@@ -518,11 +518,10 @@ namespace Scenario_Components
 
 				//===============================================
 				// set sim_interval per assignment interval
-				int assignment_intervals;
-				if (set_parameter<int>(document, "num_simulation_intervals_per_assignment_interval", assignment_intervals))
-				{
-					assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
-				}
+				int assignment_intervals = num_simulation_intervals_per_assignment_interval<int>();
+				set_parameter<int>(document, "num_simulation_intervals_per_assignment_interval", assignment_intervals);
+				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				
 
 				//===============================================
 				// set assignment mode
