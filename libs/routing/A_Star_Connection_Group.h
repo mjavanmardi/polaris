@@ -241,7 +241,7 @@ namespace polaris
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
-						waitTime = 0.0;
+						//waitTime = 0.0;
 					}
 				}
 
@@ -403,7 +403,7 @@ namespace polaris
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
-						waitTime = 0.0;
+						//waitTime = 0.0;
 					}
 				}
 				
