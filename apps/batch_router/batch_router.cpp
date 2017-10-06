@@ -377,7 +377,10 @@ int main(int argc,char** argv)
 	}
 
 	// WRITE results
-	fw_output.Open("routed_results.txt");
+	stringstream output_filename("");
+	output_filename << scenario->template output_dir_name<string>();
+	output_filename << "routed_results.dat";
+	fw_mm_sp_details.Open(output_filename.str());
 
 	bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 	if (debug_route)

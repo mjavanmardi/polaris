@@ -23,15 +23,11 @@ namespace polaris
 	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph )
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
-		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
-		Network_Interface* net = (Network_Interface*)_global_network; 
-		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 		
 		int graph_id = start_ids.front().graph_id;
 
 		char myLine[2000];
-		std::deque< base_edge_type* > modified_edges;		
+		std::deque< base_edge_type* > modified_edges;
 		boost::intrusive::multiset< base_edge_type > open_set;
 
 		std::vector<base_edge_type*> starts;
@@ -90,21 +86,6 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			//if (origin_loc_id == 1227 && destination_loc_id == 7643 && start_time == 0)
-			//{
-
-			//	stringstream debug_content("");
-			//	int came_from_id = 0;
-			//	if (current->_came_from != nullptr)
-			//	{
-			//		base_edge_type* temp_prev = (base_edge_type*)current->came_from();
-			//		came_from_id = temp_prev->_edge_id;
-			//	}
-			//	debug_content << origin_loc_id << "\t" << destination_loc_id << "\t" << start_time << "\t" << scanCount << "\t" << current->_edge_id << "\t" << came_from_id << "\t" << current->_cost << "\t" << current->_estimated_cost_origin_destination << "\t" << current->_cost_from_origin << endl;
-			//	//cout << debug_content.str();
-			//	fw_debug_ODT.Write_NoDelim(debug_content);
-			//}
-			
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
 				success = true;
@@ -124,7 +105,6 @@ namespace polaris
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
 		}
-
 		
 		global_edge_id global;
 		global.graph_id = graph_id;
@@ -572,22 +552,6 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 
-			//if (origin_loc_id == 1227 && destination_loc_id == 7643)
-			//{
-
-			//	stringstream debug_content("");
-			//	int came_from_id = 0;
-			//	if (current->_came_from != nullptr)
-			//	{
-			//		base_edge_type* temp_prev = (base_edge_type*)current->came_from();
-			//		came_from_id = temp_prev->_edge_id;
-			//	}
-			//	debug_content << origin_loc_id << "\t" << destination_loc_id << "\t" << start_time << "\t" << scanCount << "\t" << current->_edge_id << "\t" << came_from_id << "\t" << current->_cost << "\t" << current->_estimated_cost_origin_destination << "\t" << current->_cost_from_origin << endl;
-			//	//cout << debug_content.str();
-			//	fw_debug_ODT.Write_NoDelim(debug_content);
-			//}
-
-
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
 				success = true;
@@ -606,20 +570,12 @@ namespace polaris
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
-
 		}
-
-		//TODO: remove when done testing
-		/*if (debug_route)
-		{
-			int test = 1;
-		}*/
-
 		
 		global_edge_id global;
 		global.graph_id = graph_id;
 
-		float total_cost = 0.0f;
+		float total_cost = FLT_MAX;
 
 		if(success)
 		{
@@ -682,6 +638,7 @@ namespace polaris
 			}
 		}
 
+		//since we used the graph stracture to store algorithm instance specific information, we need to reset the graph to te initial state
 		for(auto itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
 			(*itr)->reset();
@@ -973,7 +930,7 @@ namespace polaris
 				out_type.push_back(current->_edge_type);
 				out_seq.push_back(current->_came_on_seq_index);
 
-				_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
+				_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 				
 				out_time.push_back(current->_time_from_origin); 
 				out_arr_time.push_back(current->_time_label);

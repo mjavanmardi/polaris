@@ -156,7 +156,9 @@ namespace Routing_Components
 
 			t_data(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time);
 			t_data(std::vector<int>, index_along_trip_at_upstream_node);
+			t_data(std::vector<int>, trip_to_unique_pattern_index);
 			t_data(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns);
+			t_data(std::vector<bool>, unique_pattern_scanned);
 
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
@@ -743,6 +745,7 @@ namespace Routing_Components
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost_temp = current_link->template travel_time<float>();
+						input_multimodal_edge._source_link = current_link;
 						
 						int zone_index = current_link->_zone_index;
 						input_multimodal_edge._zone = zone_index;
@@ -757,6 +760,8 @@ namespace Routing_Components
 								input_multimodal_edge._trips_by_dep_time.push_back(current_trip);
 								int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
 								input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
+								int my_pattern_loc = current_link->_trip_to_unique_pattern_index.at(my_itr);
+								input_multimodal_edge._trip_to_unique_pattern_index.push_back(my_pattern_loc);
 
 								float temp_travel_time = current_trip->_arrival_seconds.at(my_index + 1) - current_trip->_arrival_seconds.at(my_index);
 								if (temp_travel_time < min_travel_time)
@@ -783,6 +788,7 @@ namespace Routing_Components
 						{
 							_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
 							input_multimodal_edge._unique_patterns.push_back(current_pattern);
+							input_multimodal_edge._unique_pattern_scanned.push_back(false);
 						}
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -851,7 +857,9 @@ namespace Routing_Components
 						input_multimodal_edge._connection_groups.clear();
 						input_multimodal_edge._trips_by_dep_time.clear();
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
+						input_multimodal_edge._trip_to_unique_pattern_index.clear();
 						input_multimodal_edge._unique_patterns.clear();
+						input_multimodal_edge._unique_pattern_scanned.clear();
 					//}
 				}								
 
@@ -1037,7 +1045,8 @@ namespace Routing_Components
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 				
-				float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+				//float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();

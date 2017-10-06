@@ -96,11 +96,8 @@ namespace polaris
 				int dest_ctr = 0;
 				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 				{
-					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
-					global_edge_id destination_g;
-					destination_g.graph_id = 1;
-					destination_g.edge_id = itr_destination->_edge_id;
-					_Link_Interface* destination_link = net->template get_link_ptr<typename MasterType::link_type>(destination_g.edge_id);
+					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);					
+					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
 
 					float temp_cost = destination_link->_dijkstra_cost[current->_zone];
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);

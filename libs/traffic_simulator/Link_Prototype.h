@@ -104,6 +104,7 @@ namespace Link_Components
 			accessor(trips_by_dep_time, NONE, NONE);
 			accessor(index_along_trip_at_upstream_node, NONE, NONE);
 			accessor(unique_patterns, NONE, NONE);	
+			accessor(trip_to_unique_pattern_index, NONE, NONE);			
 			accessor(dijkstra_cost, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 

@@ -1359,33 +1359,36 @@ namespace Network_Components
 							std::istringstream ss(TripsByDepTime);
 							std::string sub_string;
 							int mySeq;
+							int pattern_ctr_1 = 0;
 
 							while (std::getline(ss, sub_string, '|'))
 							{
 								_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[sub_string];
-
+								
 								if (link_trip)
 								{
 									link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
 									_Transit_Pattern_Interface* link_pattern = link_trip->_pattern;
 									bool pattern_add = true;
 
-									int my_itr = 0;
+									int pattern_ctr_2 = 0;
 									for (auto itr = link->_unique_patterns.begin(); itr != link->_unique_patterns.end(); ++itr)
 									{
-										_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(my_itr);
-
+										_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(pattern_ctr_2);
 										if (my_pattern == link_pattern)
 										{
 											pattern_add = false;
+											link->template trip_to_unique_pattern_index<std::vector<int>&>().push_back(pattern_ctr_2);
 											break;
 										}
-										++my_itr;
+										++pattern_ctr_2;
 									}
 
 									if (pattern_add)
 									{
 										link->template unique_patterns<_Transit_Patterns_Container_Interface&>().push_back(link_pattern);
+										link->template trip_to_unique_pattern_index<std::vector<int>&>().push_back(pattern_ctr_1);
+										++pattern_ctr_1;
 									}
 								}
 								else

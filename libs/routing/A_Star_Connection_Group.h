@@ -202,15 +202,12 @@ namespace polaris
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 				
 			//if (current_neighbor->in_closed_set()) return;
-
-			std::map<int, bool> pattern_scanned;
-
+			
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
-			{
-				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
-				pattern_scanned[next_pattern->_uuid] = false;
+			{				
+				current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
 			}
 			
 			int trips_ctr = 0;
@@ -223,10 +220,11 @@ namespace polaris
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*) next_trip->_pattern;
+				int unique_pattern_loc = current_neighbor->_trip_to_unique_pattern_index[trips_ctr];
 
 				++trips_ctr;
 
-				if (pattern_scanned[next_pattern->_uuid])
+				if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
 				{
 					continue;
 				}
@@ -241,7 +239,6 @@ namespace polaris
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
-						//waitTime = 0.0;
 					}
 				}
 
@@ -257,7 +254,7 @@ namespace polaris
 					return;
 				}
 				
-				pattern_scanned[next_pattern->_uuid] = true;
+				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 				++patterns_ctr;
 
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
@@ -368,9 +365,8 @@ namespace polaris
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
-			{
-				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
-				pattern_scanned[next_pattern->_uuid] = false;
+			{				
+				current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
 			}
 
 			int trips_ctr = 0;
@@ -383,10 +379,11 @@ namespace polaris
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)next_trip->_pattern;
+				int unique_pattern_loc = current_neighbor->_trip_to_unique_pattern_index[trips_ctr];
 
 				++trips_ctr;
 
-				if (pattern_scanned[next_pattern->_uuid])
+				if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
 				{
 					continue;
 				}
@@ -403,7 +400,6 @@ namespace polaris
 					if (current_trip->_uuid == next_trip->_uuid)
 					{
 						wait_binary = 0;
-						//waitTime = 0.0;
 					}
 				}
 				
@@ -418,7 +414,7 @@ namespace polaris
 					return;
 				}
 
-				pattern_scanned[next_pattern->_uuid] = true;
+				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 				++patterns_ctr;
 				
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;

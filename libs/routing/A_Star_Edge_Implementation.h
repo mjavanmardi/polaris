@@ -10,7 +10,7 @@ namespace polaris
 	{
 		typedef MasterType Master_Type;
 
-		Base_Edge_A_Star():_x(0.0f),_y(0.0f),_cost_from_origin(FLT_MAX / 2.0f),_time_label(0.0f),
+		Base_Edge_A_Star():_x(0.0f),_y(0.0f),_source_link(nullptr),_cost_from_origin(FLT_MAX / 2.0f),_time_label(0.0f),
 					 _estimated_cost_origin_destination(FLT_MAX / 2.0f),_marked_for_reset(false),_in_closed_set(false),_in_open_set(false),
 					 _begin_connection_groups(nullptr),_end_connection_groups(nullptr),_came_from(nullptr),_edge_id(-1),
 					_cost(0.0f),_time_cost(0.0f),_distance_to_transit(FLT_MAX / 2.0f),_touch_transit(false) {}
@@ -33,6 +33,7 @@ namespace polaris
 
 		t_data(float, x);
 		t_data(float, y);
+		t_data(typename MasterType::link_type*, source_link);
 
 		t_data(float, cost);
 		t_data(float, time_cost);
