@@ -102,12 +102,22 @@ namespace Intersection_Components
 
 			// basic intersection
 			accessor(uuid, NONE, NONE);
+			accessor(dbid, NONE, NONE);
 			accessor(internal_id, NONE, NONE);
 			accessor(x_position, NONE, NONE);
 			accessor(y_position, NONE, NONE);
 			accessor(z_position, NONE, NONE);
+			accessor(agency, NONE, NONE);
+			accessor(street, NONE, NONE);
+			accessor(name, NONE, NONE);
+			accessor(description, NONE, NONE);
 			accessor(inbound_links, NONE, NONE);
 			accessor(outbound_links, NONE, NONE);
+			accessor(zone, NONE, NONE);
+			/*accessor(inbound_walk_links, NONE, NONE);
+			accessor(outbound_walk_links, NONE, NONE);
+			accessor(inbound_transit_links, NONE, NONE);
+			accessor(outbound_transit_links, NONE, NONE);*/
 			accessor(intersection_type, NONE, NONE);
 			accessor(network_reference, NONE, NONE);
 

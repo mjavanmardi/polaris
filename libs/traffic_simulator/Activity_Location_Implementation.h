@@ -23,6 +23,10 @@ namespace Activity_Location_Components
 
 			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, destination_links, NONE, NONE);
 
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, origin_walk_links, NONE, NONE);
+
+			m_container(std::vector<Link_Components::Prototypes::Link<typename MasterType::link_type>*>, destination_walk_links, NONE, NONE);
+
 			m_container(std::vector<float>, origin_link_choice_cdfs, NONE, NONE);
 
 			m_container(std::vector<float>, destination_link_choice_cdfs, NONE, NONE);

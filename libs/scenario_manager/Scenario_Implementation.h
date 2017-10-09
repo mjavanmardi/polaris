@@ -50,9 +50,10 @@ namespace Scenario_Components
 			// CAV SIMULATION VARIABLES
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
+
+			m_data(bool, simulate_cacc,NONE,NONE);  // ***SD*** change from double based on read_scenario_data
 			m_data(double, cacc_capacity_adjustment_alpha, NONE, NONE);
 			m_data(double, cacc_capacity_adjustment_beta, NONE, NONE);
-			m_data(double, simulate_cacc,NONE,NONE);
 			m_data(double, automation_cost, NONE, NONE);
 			m_data(double, vehicle_techchoice_beta_past_crashes, NONE, NONE);
 			m_data(double, vehicle_techchoice_beta_smartphone, NONE, NONE);
@@ -141,7 +142,7 @@ namespace Scenario_Components
 			m_data(string, output_highway_cost_skim_file_path_name, NONE, NONE);
 			m_data(string, input_transit_skim_file_path_name, NONE, NONE);
 			m_data(string, output_transit_skim_file_path_name, NONE, NONE);
-			m_container(IntArray, skim_interval_endpoint_minutes, NONE, NONE);
+			m_container(std::vector<int>, skim_interval_endpoint_minutes, NONE, NONE);
 			m_data(int, skim_interval_length_minutes, NONE, NONE);
 			m_data(bool, do_skimming, NONE, NONE);
 			m_data(bool, use_skim_intervals, NONE, NONE);
@@ -152,6 +153,17 @@ namespace Scenario_Components
 			m_data(double, time_dependent_routing_weight_factor, NONE, NONE);
 
 			m_data(string, timing_choice_model_file, NONE, NONE);
+			m_data(double, multimodal_routing_weight_shape, NONE, NONE);
+			m_data(double, multimodal_routing_weight_scale, NONE, NONE);
+			m_data(double, multimodal_routing_weight_factor, NONE, NONE);
+
+			/*m_data(double, transferPenalty, NONE, NONE);
+			m_data(double, waitWeight, NONE, NONE);
+			m_data(double, walkWeight, NONE, NONE);
+			m_data(double, ivtWeight, NONE, NONE);
+			m_data(double, carWeight, NONE, NONE);*/
+
+			m_data(string, activity_start_time_model_file_name, NONE, NONE);
 
 			m_data(string, vehicle_distribution_file_name, NONE, NONE);
 
@@ -357,6 +369,7 @@ namespace Scenario_Components
 			m_data(string, destination_choice_model_file, NONE, NONE);
 			m_data(string, telecommute_choice_model_file, NONE, NONE);
 			m_data(string, cav_wtp_model_file, NONE, NONE);
+			m_data(string, multimodal_routing_model_file, NONE, NONE);
 		};
 	}
 

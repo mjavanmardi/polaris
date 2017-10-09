@@ -51,8 +51,10 @@
 	"vehicle_taking_action" : false,
 	"node_control_flag" : 1,
 	"merging_mode" : "PROPORTION_TO_DEMAND",
+	"multimodal_routing" : true,
 	"mode_choice_model_file" : "TestModeChoiceModel.json",
 	"destination_choice_model_file" : "TestDestinationChoiceModel.json",
 	"telecommute_choice_model_file" : "TestTelecommuteChoiceModel.json",
-	"cav_wtp_model_file" : "TestCAVWTPModel.json"
+	"cav_wtp_model_file" : "TestCAVWTPModel.json",	
+	"multimodal_routing_model_file" : "MultiModalRoutingModel.json"
 }

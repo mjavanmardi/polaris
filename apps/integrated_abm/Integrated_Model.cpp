@@ -82,6 +82,9 @@ struct MasterType
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> movement_type;
 
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> turn_movement_type;
+	typedef Transit_Route_Components::Implementations::Transit_Route_Implementation<M> transit_route_type;
+	typedef Transit_Pattern_Components::Implementations::Transit_Pattern_Implementation<M> transit_pattern_type;
+	typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<M> transit_vehicle_trip_type;
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
@@ -225,17 +228,27 @@ struct MasterType
 	typedef TYPELIST_3(/*link_control_type,depot_type,*/advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+	#pragma endregion
 
-
+	//==============================================================================================
+	#pragma region ROUTING Types
+	//----------------------------------------------------------------------------------------------
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+	typedef Multi_Modal_Tree_Agent_Implementation<MasterType> multi_modal_tree_agent_type;
+	typedef Walk_to_Transit_Tree_Agent_Implementation<MasterType> walk_to_transit_tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
-	
+
+	typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, multimodal_edge_type> multimodal_graph_type;
+	typedef Routing_Components::Types::multimodal_to_multimodal multimodal_to_multimodal_type;
+	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;	
+
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
 	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
@@ -280,6 +293,18 @@ bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 		return false;
 	}
 	MasterType::vehicle_technology_chooser_type::print_parameters();
+
+	return true;
+}
+
+bool InitializeMultiModalRoutingParameters(MasterType::scenario_type* scenario)
+{
+	if (!MasterType::routable_network_type::static_initialize(scenario->multimodal_routing_model_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize Multimodal Routing parameters." << endl;
+		return false;
+	}
+	MasterType::routable_network_type::print_parameters();
 
 	return true;
 }
@@ -404,6 +429,7 @@ int main(int argc,char** argv)
 			outfile << "\t\"time_dependent_routing_weight_factor\" : 1," << endl;
 			outfile << "\t\"time_dependent_routing_weight_scale\" : 1000," << endl;
 			outfile << "\t\"time_dependent_routing_weight_shape\" : 2," << endl;
+			outfile << "\t\"multimodal_routing\" : false," << endl;
 			outfile << "\t\"use_link_based_routing\" : false," << endl;
 			outfile << "\t\"use_network_events\" : false," << endl;
 			outfile << "\t\"use_realtime_travel_time_for_enroute_switching\" : false," << endl;
@@ -480,21 +506,24 @@ int main(int argc,char** argv)
 	_Scenario_Interface* scenario = (_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
+	cout << "reading scenario data..." << endl;
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
+
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
 	GLOBALS::Normal_RNG.Initialize();
 	GLOBALS::Uniform_RNG.Initialize();
-	int seed = scenario->iseed<int>();
+	unsigned long seed = scenario->iseed<unsigned long>();
 	if (seed != 0)
 	{
-		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
-		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+		GLOBALS::Normal_RNG.Set_Seed<unsigned long>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<unsigned long>(seed);
 	}
 	else
 	{
-		GLOBALS::Normal_RNG.Set_Seed<int>();
-		GLOBALS::Uniform_RNG.Set_Seed<int>();
+		GLOBALS::Normal_RNG.Set_Seed<unsigned long>();
+		GLOBALS::Uniform_RNG.Set_Seed<unsigned long>();
 	}
 
 
@@ -518,8 +547,7 @@ int main(int argc,char** argv)
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 
-	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
+	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
 
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
@@ -722,7 +750,7 @@ int main(int argc,char** argv)
 
 	// Initialize all choice model parameters
 	if (!InitializeChoiceModelParameters(scenario)) return 1;
-
+	
 	// Initialize start time model
 	//MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
 

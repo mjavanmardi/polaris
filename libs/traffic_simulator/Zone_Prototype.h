@@ -35,6 +35,13 @@ namespace Zone_Components
 			accessor(origin_activity_locations, NONE, NONE);
 			accessor(destination_activity_locations, NONE, NONE);
 
+			//For A* star Dijkstra skimming
+			accessor(origin_links, NONE, NONE);
+			accessor(destination_links, NONE, NONE);
+			accessor(origin_walk_links, NONE, NONE);
+			accessor(destination_walk_links, NONE, NONE);
+			//For A* star Dijkstra skimming
+
 			accessor(home_locations, NONE, NONE);
 			accessor(work_locations, NONE, NONE);
 			accessor(discretionary_locations, NONE, NONE);

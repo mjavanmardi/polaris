@@ -692,13 +692,17 @@ namespace Vehicle_Components
 					int inbound_link_id = route_link->template uuid<int>();
 					int outbound_link_id = next_route_link->template uuid<int>();
 
-					typename MasterType::network_type::long_hash_key_type long_hash_key;
-					long_hash_key.inbound_link_id = inbound_link_id;
-					long_hash_key.outbound_link_id = outbound_link_id;
-					typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-					_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
-					float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
-					current_travel_time += link_turn_travel_time;
+					//TODO: Omer fix later!
+					if (route_link->_link_type != Link_Components::Types::Link_Type_Keys::WALK && route_link->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && next_route_link->_link_type != Link_Components::Types::Link_Type_Keys::WALK && next_route_link->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+					{
+						typename MasterType::network_type::long_hash_key_type long_hash_key;
+						long_hash_key.inbound_link_id = inbound_link_id;
+						long_hash_key.outbound_link_id = outbound_link_id;
+						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+						float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
+						current_travel_time += link_turn_travel_time;
+					}					
 				}
 			}
 
@@ -944,7 +948,7 @@ namespace Vehicle_Components
 
 			if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 			{
-				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, path_container, cumulative_cost_container);
+				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container);
 			}
 			else
 			{

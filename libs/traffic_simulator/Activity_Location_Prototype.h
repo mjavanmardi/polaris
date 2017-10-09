@@ -37,6 +37,8 @@ namespace Activity_Location_Components
 
 			accessor(origin_links, NONE, NONE);
 			accessor(destination_links, NONE, NONE);
+			accessor(origin_walk_links, NONE, NONE);
+			accessor(destination_walk_links, NONE, NONE);
 			accessor(origin_link_choice_cdfs, NONE, NONE);
 			accessor(destination_link_choice_cdfs, NONE, NONE);
 			accessor(zone, NONE, NONE);

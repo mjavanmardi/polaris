@@ -1,6 +1,5 @@
 #pragma once
-#include "cfg_reader.h"
-//#include "Traffic_Simulator_Includes.h"
+//#include "Scenario_Manager_Includes.h"
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -9,6 +8,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/pointer.h>
 
 //TODO: put back in?
 //#include "../File_IO/network_scenario_data.h"
@@ -19,11 +19,22 @@
 
 namespace Scenario_Components
 {
+	namespace Types
+	{
+		struct ScenarioData
+		{
+			rapidjson::Document document;
+			std::map<std::string, std::string> key_paths;
+		};
+	}
+
 	namespace Prototypes
 	{
 		prototype struct Scenario ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
+
+			typedef std::vector<int> IntArray;
 
 			accessor(output_results_database_name, NONE, NONE);
 			accessor(output_demand_database_name, NONE, NONE);
@@ -233,6 +244,17 @@ namespace Scenario_Components
 			accessor(time_dependent_routing_weight_factor, NONE, NONE);
 			accessor(normal_day_link_moe_file_path_name, NONE, NONE);
 
+			accessor(multimodal_routing, NONE, NONE);
+			accessor(multimodal_routing_weight_shape, NONE, NONE);
+			accessor(multimodal_routing_weight_scale, NONE, NONE);
+			accessor(multimodal_routing_weight_factor, NONE, NONE);
+
+			/*accessor(transferPenalty, NONE, NONE);
+			accessor(waitWeight, NONE, NONE);
+			accessor(walkWeight, NONE, NONE);
+			accessor(ivtWeight, NONE, NONE);
+			accessor(carWeight, NONE, NONE);*/
+
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
 			accessor(output_link_moe_for_simulation_interval, NONE, NONE);
@@ -300,21 +322,171 @@ namespace Scenario_Components
 			accessor(telecommute_choice_model_file, NONE, NONE);
 			accessor(cav_wtp_model_file, NONE, NONE);
 			accessor(timing_choice_model_file, NONE, NONE);
+			accessor(multimodal_routing_model_file, NONE, NONE);
 
+			void default_static_initializer()
+			{
+				simulation_start_time<int>(0);
+				simulation_end_time<int>(172800);
+				simulation_interval_length<int>(6);
+				demand_reduction_factor<double>(1.0);
+				num_simulation_intervals_per_assignment_interval<int>(50);
+				assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
+				use_link_based_routing<bool>(false);
+				rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
+				merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
+				iseed<unsigned long>(0.0);
+				intersection_control_flag<int>(0);
+				ramp_metering_flag<bool>(false);
+				demand_od_flag<int>(1);
+				snapshot_period<int>(300);
+				database_name<string>((string)"");
+				historical_results_database_name<string>((string)"");
+				input_popsyn_database_name<string>((string)"");
+				tile_imagery_file<string>((string)"");
+				tile_imagery_alpha_level<int>(255);
+				color_cars_randomly<bool>(false);
+				write_activity_output<bool>(false);
+				aggregate_routing<bool>(false);
+				do_planner_routing<bool>(false);
+				write_demand_to_database<bool>(false);
+				read_demand_from_database<bool>(false);
+				read_population_from_database<bool>(false);
+				cav_market_penetration<double>(0.0);
+				cav_vott_adjustment<double>(1.0);
+				vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
+				automation_cost<double>(FLT_MAX);
+				percent_to_synthesize<double>(1.0);
+				ipf_tolerance<double>(0.01);
+				marginal_tolerance<int>(5);
+				maximum_iterations<int>(100);
+				write_marginal_output<bool>(false);
+				write_full_output<bool>(false);
+				popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
+				activity_start_time_model_file_name<string>((string)"start_time_duration_data_new.txt");
+				write_visualizer_snapshot<bool>(false);
+				count_integrated_in_network_vehicles_only<bool>(false);
+				output_dir_name<string>((string)"");
+				write_db_input_to_files<bool>(false);
+				run_simulation_for_db_input<bool>(true);
+				write_node_control_state<bool>(false);
+				write_network_link_flow<bool>(false);
+				write_network_link_turn_time<bool>(false);
+				write_output_summary<bool>(true);
+				output_link_moe_for_simulation_interval<bool>(false);
+				output_turn_movement_moe_for_simulation_interval<bool>(false);
+				output_network_moe_for_simulation_interval<bool>(false);
+				write_network_snapshots<bool>(false);
+				read_network_snapshots<bool>(false);
+				routing_with_snapshots<bool>(false);
+				input_network_snapshots_file_path_name<string>((string)"input_network_snapshots");
+				capacity_adjustment_highway<double>(1.0);
+				capacity_adjustment_arterial<double>(1.0);
+				simulate_cacc<bool>(false);
+				flexible_work_percentage<double>(0.12);
+				write_vehicle_trajectory<bool>(false);
+				vehicle_trajectory_sample_rate<double>(1.0);
+				vehicle_tracking_list_file_name<string>("");
+				write_skim_tables<bool>(false);
+				read_skim_tables<bool>(false);
+				input_highway_skim_file_path_name<string>((string)"");
+				output_highway_skim_file_path_name<string>((string)"highway_skim_file_out.txt");
+				input_highway_cost_skim_file_path_name<string>((string)"");
+				output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
+				input_transit_skim_file_path_name<string>((string)"");
+				output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
+				skim_interval_endpoint_minutes<int>(0);
+				skim_interval_length_minutes<int>(1440);
+				compare_with_historic_moe<bool>(false);
+				historic_network_moe_file_path_name<string>((string)"historic_realtime_moe_network.csv");
+				historic_link_moe_file_path_name<string>((string)"historic_moe_link.csv");
+				read_normal_day_link_moe<bool>(false);
+				normal_day_link_moe_file_path_name<string>((string)"normal_day_moe_link.csv");
+				historic_demand_moe_directory<string>((string)"");
+				output_link_moe_for_assignment_interval<bool>(false);
+				output_turn_movement_moe_for_assignment_interval<bool>(false);
+				output_network_moe_for_assignment_interval<bool>(false);
+				output_analzye_link_group_moe_for_assignment_interval<bool>(false);
+				load_analyze_link_groups_from_file<bool>(false);
+				analyze_link_groups_file_path_name<string>((string)"analyze_link_groups");
+				write_ttime_distribution_from_network_model<bool>(false);
+				vehicle_trajectory_output_threshold<int>(-1);
+				use_tmc<bool>(false);
+				use_network_events<bool>(false);
+				jam_density_constraints_enforced<bool>(true);
+				maximum_flow_rate_constraints_enforced<bool>(true);
+				vehicle_taking_action<bool>(false);
+				pretrip_informed_market_share<double>(0.5);
+				realtime_informed_vehicle_market_share<double>(0.5);
+				information_compliance_rate_mean<double>(1.0);
+				information_compliance_rate_standard_deviation<double>(0.5);
+				relative_indifference_band_route_choice_mean<double>(0.1);
+				minimum_travel_time_saving_mean<double>(1.0);
+				minimum_travel_time_saving_standard_deviation<double>(1.0);
+				enroute_switching_enabled<bool>(true);
+				use_realtime_travel_time_for_enroute_switching<bool>(false);
+				minimum_delay_ratio_for_enroute_switching<double>(3.0);
+				minimum_delay_seconds_for_enroute_switching<double>(300.0);
+				enroute_switching_on_excessive_delay<bool>(true);
+				multimodal_network_input<bool>(false);
+				enroute_excessive_delay_factor<double>(1.0);
+				minimum_seconds_from_arrival_for_enroute_switching<double>(300.0);
+				time_dependent_routing<bool>(false);
+				time_dependent_routing_weight_shape<double>(2.0);
+				time_dependent_routing_weight_scale<double>(1000.0);
+				time_dependent_routing_weight_factor<double>(1.0);
+				accident_event_duration_reduction<double>(1.0);
+				calculate_realtime_moe<bool>(true);
+				buildings_geometry_file<string>((string)"");
+				mode_choice_model_file<string>((string)"");
+				destination_choice_model_file<string>((string)"");
+				telecommute_choice_model_file<string>((string)"");
+				cav_wtp_model_file<string>((string)"");
+			}
+
+			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)
+			{
+				if (obj.IsObject())  //check if object
+				{
+					for (rapidjson::Value::ConstMemberIterator itr = obj.MemberBegin(); itr != obj.MemberEnd(); ++itr)    //iterate through object   
+					{
+						const rapidjson::Value& objName = obj[itr->name.GetString()]; //make object value
+						if (itr->value.IsObject())
+						{
+							std::string new_path;
+							if (path == "")
+								new_path = itr->name.GetString();
+							else
+								new_path = path + std::string("/") + itr->name.GetString();
+								
+							get_KV_paths(key_paths, objName, new_path, indent + 1); //if couldn't find in object, enter object and repeat process recursively 
+						}
+						else
+						{
+							std::string key = itr->name.GetString();
+							//std::cout << "path to " << key << "=" << path << std::endl;
+							key_paths[key] = path;
+						}
+					}
+				}
+			}
 
 			template<typename TargetType> void read_scenario_data(const char* filename)
 			{
-				CfgReader cfgReader;
-				const char* path = filename;
-				bool result = cfgReader.initialize(path);
+				// set the base values
+				default_static_initializer();
 
-				if (!result) THROW_EXCEPTION("Scenario file '"<<filename<<"' was not able to be opened.");
-				
+				// now see if there are config file changes
+				Scenario_Components::Types::ScenarioData document;
+
+				if (!parse_option_file(document, filename))
+					THROW_EXCEPTION("Scenario file '" << filename << "' was not able to be opened.");
+
 				//===============================================
 				// set start time
-				string start_time_in_string;
+				std::string start_time_in_string;
 				int start_time;
-				if (cfgReader.getParameter("starting_time_hh_mm", &start_time_in_string) == PARAMETER_FOUND)
+				if (set_parameter<std::string>(document, "starting_time_hh_mm", start_time_in_string))
 				{
 					start_time_in_string += ":00";
 					start_time = convert_hhmmss_to_seconds(start_time_in_string);
@@ -322,179 +494,138 @@ namespace Scenario_Components
 				}
 				else start_time = 0;
 				simulation_start_time<int>(start_time);
-				
+
 				//===============================================
-				// set start time
-				string end_time_in_string;
+				// set end time
+				std::string end_time_in_string;
 				int end_time;
-				if (cfgReader.getParameter("ending_time_hh_mm", &end_time_in_string) == PARAMETER_FOUND)
+				if(set_parameter<std::string>(document, "ending_time_hh_mm", end_time_in_string))
 				{
 					end_time_in_string += ":00";
 					end_time = convert_hhmmss_to_seconds(end_time_in_string);
 				}
-				else end_time = 60*60*24*2;
+				else end_time = 60 * 60 * 24 * 2;
 				simulation_end_time<int>(end_time);
 
 				planning_horizon<int>(end_time - start_time);
 
 				//===============================================
 				// set interval length
-				if (cfgReader.getParameter("simulation_interval_length_in_second", simulation_interval_length<int*>()) != PARAMETER_FOUND) simulation_interval_length<int>(6);
-
+				set_parameter<int>(document, "simulation_interval_length_in_second", simulation_interval_length<int &>());
 
 				//===============================================
 				// set the demand reduction factor, used to reduce the demand read from the database
-				if (cfgReader.getParameter("demand_reduction_factor", demand_reduction_factor<double*>()) != PARAMETER_FOUND) demand_reduction_factor<double>(1.0);
-				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>();
+				set_parameter<double>(document, "demand_reduction_factor", demand_reduction_factor<double &>());
+				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>() << endl;
 
 				//===============================================
 				// set sim_interval per assignment interval
-				int assignment_intervals;
-				if (cfgReader.getParameter("num_simulation_intervals_per_assignment_interval", &assignment_intervals) != PARAMETER_FOUND) assignment_intervals = 50;
+				int assignment_intervals = num_simulation_intervals_per_assignment_interval<int>();
+				set_parameter<int>(document, "num_simulation_intervals_per_assignment_interval", assignment_intervals);
 				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				
 
 				//===============================================
 				// set assignment mode
-				string assignment_mode_string;
-				if (cfgReader.getParameter("assignment_mode", &assignment_mode_string) != PARAMETER_FOUND) assignment_mode_string = "ONE_SHOT_ASSIGNMENT_SIMULATION_MODE";
-				if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+				std::string assignment_mode_string;
+				if (set_parameter<std::string>(document, "assignment_mode", assignment_mode_string))
 				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
-				{
-					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
-				}
-				else
-				{
-					cout << "Assignment mode not supported" << endl;
-					assert(false);
+					if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
+					{
+						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
+					}
+					else
+					{
+						cout << "Assignment mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
 				// If left to false, then we can route to an activity location on a link using either DIR (i.e. left hand turns into activity location ) [RECOMMENDED]
-				if (cfgReader.getParameter("use_link_based_routing", use_link_based_routing<bool*>())!= PARAMETER_FOUND) use_link_based_routing<bool>(false);
+				set_parameter<bool>(document, "use_link_based_routing", use_link_based_routing<bool &>());
 
 				//===============================================
 				// set rng type
-				string rng_type_string;
-				if (cfgReader.getParameter("rng_type", &rng_type_string) != PARAMETER_FOUND) rng_type_string = "DETERMINISTIC";
-				if (rng_type_string.compare("DETERMINISTIC") == 0)
+				std::string rng_type_string;
+				if(set_parameter<std::string>(document, "rng_type", rng_type_string))
 				{
-					rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
-				}
-				else if (rng_type_string.compare("RANDOM") == 0)
-				{
-					rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::RANDOM);
-				}
-				else
-				{
-					cout << "Rng type not supported" << endl;
-					assert(false);
+					if (rng_type_string.compare("DETERMINISTIC") == 0)
+					{
+						rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
+					}
+					else if (rng_type_string.compare("RANDOM") == 0)
+					{
+						rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::RANDOM);
+					}
+					else
+					{
+						cout << "Rng type not supported" << endl;
+						assert(false);
+					}
 				}
 
 				//===============================================
 				// set merging mode
-				string merging_mode_string;
-				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_DEMAND";
-				if (merging_mode_string.compare("DRIVING_RULE") == 0)
+				std::string merging_mode_string;
+				if (set_parameter<std::string>(document, "merging_mode", merging_mode_string))
 				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
-				}
-				else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
-				{
-					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
-				}
-				else
-				{
-					cout << "Merging mode not supported" << endl;
-					assert(false);
+					if (merging_mode_string.compare("DRIVING_RULE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
+					}
+					else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
+					{
+						merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
+					}
+					else
+					{
+						cout << "Merging mode not supported" << endl;
+						assert(false);
+					}
 				}
 
 				//===============================================
 				// set control parameters
-				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0);
-				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
-				if (cfgReader.getParameter("ramp_metering_flag", ramp_metering_flag<bool*>())!= PARAMETER_FOUND) ramp_metering_flag<bool>(false);
-				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
-				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
+				set_parameter<unsigned long>(document, "seed", iseed<unsigned long &>());
+				set_parameter<int>(document, "node_control_flag", intersection_control_flag<int &>());
+				set_parameter<bool>(document, "ramp_metering_flag", ramp_metering_flag<bool &>());
+				set_parameter<int>(document, "demand_od_flag", demand_od_flag<int &>());
+				set_parameter<int>(document, "snapshot_period", snapshot_period<int &>());
 
-				//===============================================
-				// tile imagery parameters
-				if (cfgReader.getParameter("tile_imagery_file", tile_imagery_file<string*>())!= PARAMETER_FOUND)
+				if (!set_parameter<std::string>(document, "database_name", database_name<std::string &>()))
 				{
-					use_tile_imagery<bool>(false);
-					tile_imagery_file<string>("");
-				}
-				else
-				{
-					use_tile_imagery<bool>(true);
-					if (cfgReader.getParameter("tile_imagery_alpha_level", tile_imagery_alpha_level<int*>())!= PARAMETER_FOUND) tile_imagery_alpha_level<int>(255);
+					THROW_EXCEPTION("ERROR: Input database name required.");
 				}
 
-				if (cfgReader.getParameter("color_cars_randomly", color_cars_randomly<bool*>())!= PARAMETER_FOUND) color_cars_randomly(false);
+				set_parameter<std::string>(document, "historical_results_database_name", historical_results_database_name<std::string &>());
 
-				//===============================================
-				// Demand model parameters 
-				if (cfgReader.getParameter("write_activity_output", this->template write_activity_output<bool*>()) != PARAMETER_FOUND) this->template write_activity_output<bool>(false);
-				if (cfgReader.getParameter("aggregate_routing", this->template aggregate_routing<bool*>()) != PARAMETER_FOUND) this->template aggregate_routing<bool>(false);
-				if (cfgReader.getParameter("do_planner_routing", this->template do_planner_routing<bool*>()) != PARAMETER_FOUND) this->template do_planner_routing<bool>(false);		
-				if (cfgReader.getParameter("write_demand_to_database", this->template write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->template write_demand_to_database<bool>(false);
-				if (cfgReader.getParameter("read_demand_from_database", this->template read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->template read_demand_from_database<bool>(false);
-				if (cfgReader.getParameter("read_population_from_database", this->template read_population_from_database<bool*>()) != PARAMETER_FOUND) this->template read_population_from_database<bool>(false);
-				if (cfgReader.getParameter("cav_market_penetration", this->template cav_market_penetration<double*>()) != PARAMETER_FOUND) this->template cav_market_penetration<double>(0.0);
-				if (cfgReader.getParameter("cav_vott_adjustment", this->template cav_vott_adjustment<double*>()) != PARAMETER_FOUND) this->template cav_vott_adjustment<double>(1.0);
-
-				//=======================================================================================================================================================
-				// Vehicle Choice Model parameters
-				// Start time model parameters
-				if (cfgReader.getParameter("vehicle_distribution_file_name", this->template vehicle_distribution_file_name<string*>()) != PARAMETER_FOUND) this->template vehicle_distribution_file_name<string>((string)"vehicle_distribution.txt");
-				if (cfgReader.getParameter("automation_cost", this->template automation_cost<double*>()) != PARAMETER_FOUND) this->template automation_cost<double>(FLT_MAX);
-
-
-				//=======================================================================================================================================================
-				// PopSyn parameters
-				if (cfgReader.getParameter("percent_to_synthesize", this->template percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->template percent_to_synthesize<double>(1.0);
-				if (cfgReader.getParameter("ipf_tolerance", this->template ipf_tolerance<double*>()) != PARAMETER_FOUND) this->template ipf_tolerance<double>(0.01);
-				if (cfgReader.getParameter("marginal_tolerance", this->template marginal_tolerance<int*>()) != PARAMETER_FOUND) this->template marginal_tolerance<int>(5);
-				if (cfgReader.getParameter("maximum_iterations", this->template maximum_iterations<int*>()) != PARAMETER_FOUND) this->template maximum_iterations<int>(100);
-				if (cfgReader.getParameter("write_marginal_output", this->template write_marginal_output<bool*>()) != PARAMETER_FOUND) this->template write_marginal_output<bool>(false);
-				if (cfgReader.getParameter("write_full_output", this->template write_full_output<bool*>()) != PARAMETER_FOUND) this->template write_full_output<bool>(false);
-				string popsyn_control_string;
-				if (cfgReader.getParameter("popsyn_control_file", this->template popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->template popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
-
-				if (cfgReader.getParameter("write_visualizer_snapshot", this->template write_visualizer_snapshot<bool*>()) != PARAMETER_FOUND) this->template write_visualizer_snapshot<bool>(false);
-
-
-				//===============================================
-				// set control parameters
-				
-				if (cfgReader.getParameter("database_name", database_name<string*>())!= PARAMETER_FOUND) THROW_EXCEPTION("ERROR: Input database name required.")
-				if (cfgReader.getParameter("historical_results_database_name", historical_results_database_name<string*>())!= PARAMETER_FOUND) historical_results_database_name<std::string>("");
-				if (cfgReader.getParameter("input_popsyn_database_name", input_popsyn_database_name<string*>())!= PARAMETER_FOUND)
-				{
-					input_popsyn_database_name<std::string>("");
-					this->read_population_from_database(false);
-				}
-				else
+				if (set_parameter<std::string>(document, "input_popsyn_database_name", input_popsyn_database_name<std::string &>()))
 				{
 					this->read_population_from_database(true);
 				}
-				
+				else
+				{
+					this->read_population_from_database(false);
+				}
 
 
-				num_simulation_intervals<int>(planning_horizon<int>()/simulation_interval_length<int>());
-				num_assignment_intervals<int>(planning_horizon<int>()/assignment_interval_length<int>());
-				num_simulation_intervals_per_assignment_interval<int>(assignment_interval_length<int>()/simulation_interval_length<int>());
-				
+				num_simulation_intervals<int>(planning_horizon<int>() / simulation_interval_length<int>());
+				num_assignment_intervals<int>(planning_horizon<int>() / assignment_interval_length<int>());
+				num_simulation_intervals_per_assignment_interval<int>(assignment_interval_length<int>() / simulation_interval_length<int>());
+
 
 				//typedef typename ComponentType::output_writer_type OutputWriterType;
 				//output_writer<OutputWriterType&>().open("Output.log");
@@ -508,75 +639,128 @@ namespace Scenario_Components
 				network_in_system_vehicles<int>(0.0);
 
 				assignment_time_in_seconds<double>(0.0);
-			    simulation_time_in_seconds<double>(0.0);
-			    operation_time_in_seconds<double>(0.0);
-			    output_time_in_seconds<double>(0.0);
+				simulation_time_in_seconds<double>(0.0);
+				operation_time_in_seconds<double>(0.0);
+				output_time_in_seconds<double>(0.0);
+
+				//===============================================
+				// tile imagery parameters
+				if (set_parameter<std::string>(document, "tile_imagery_file", tile_imagery_file<std::string &>()))
+				{
+					use_tile_imagery<bool>(true);
+					set_parameter<int>(document, "tile_imagery_alpha_level", tile_imagery_alpha_level<int &>());
+				}
+				else
+				{
+					use_tile_imagery<bool>(false);
+				}
+
+				set_parameter<bool>(document, "color_cars_randomly", color_cars_randomly<bool &>());
+
+				//===============================================
+				// Demand model parameters 
+				set_parameter<bool>(document, "write_activity_output", this->template write_activity_output<bool &>());
+				set_parameter<bool>(document, "aggregate_routing", this->template aggregate_routing<bool &>());
+				set_parameter<bool>(document, "do_planner_routing", this->template do_planner_routing<bool &>());
+				set_parameter<bool>(document, "write_demand_to_database", this->template write_demand_to_database<bool &>());
+				set_parameter<bool>(document, "read_demand_from_database", this->template read_demand_from_database<bool &>());
+				set_parameter<bool>(document, "read_population_from_database", this->template read_population_from_database<bool &>());
+				set_parameter<double>(document, "cav_market_penetration", this->template cav_market_penetration<double &>());
+				set_parameter<double>(document, "cav_vott_adjustment", this->template cav_vott_adjustment<double &>());
+
+				//=======================================================================================================================================================
+				// Vehicle Choice Model parameters
+				// Start time model parameters
+				set_parameter<std::string>(document, "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
+				set_parameter<double>(document, "automation_cost", this->template automation_cost<double &>());
+
+
+				//=======================================================================================================================================================
+				// PopSyn parameters
+				set_parameter<double>(document, "percent_to_synthesize", this->template percent_to_synthesize<double &>());
+				set_parameter<double>(document, "ipf_tolerance", this->template ipf_tolerance<double &>());
+				set_parameter<int>(document, "marginal_tolerance", this->template marginal_tolerance<int &>());
+				set_parameter<int>(document, "maximum_iterations", this->template maximum_iterations<int &>());
+				set_parameter<bool>(document, "write_marginal_output", this->template write_marginal_output<bool &>());
+				set_parameter<bool>(document, "write_full_output", this->template write_full_output<bool &>());
+				set_parameter<std::string>(document, "popsyn_control_file", this->template popsyn_control_file_name<std::string &>());
+
+				// Start time model parameters
+				set_parameter<std::string>(document, "activity_start_time_model_file_name", this->template activity_start_time_model_file_name<std::string &>());
+				set_parameter<bool>(document, "write_visualizer_snapshot", this->template write_visualizer_snapshot<bool &>());
+
 
 				// set I/O parameters		
-				if (cfgReader.getParameter("count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool*>())!= PARAMETER_FOUND) count_integrated_in_network_vehicles_only<bool>(false);
+				set_parameter<bool>(document, "count_integrated_in_network_vehicles_only", count_integrated_in_network_vehicles_only<bool &>());
+				set_parameter<std::string>(document, "output_dir_name", output_dir_name<std::string &>());
+				set_parameter<bool>(document, "write_db_input_to_files", write_db_input_to_files<bool &>());
+				set_parameter<bool>(document, "run_simulation_for_db_input", run_simulation_for_db_input<bool &>());
+				set_parameter<bool>(document, "write_node_control_state", write_node_control_state<bool &>());
+				set_parameter<bool>(document, "write_network_link_flow", write_network_link_flow<bool &>());
+				set_parameter<bool>(document, "write_network_link_turn_time", write_network_link_turn_time<bool &>());
+				set_parameter<bool>(document, "write_output_summary", write_output_summary<bool &>());
+				set_parameter<bool>(document, "output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool &>());
+				set_parameter<bool>(document, "write_network_snapshots", write_network_snapshots<bool &>());
+				set_parameter<bool>(document, "read_network_snapshots", read_network_snapshots<bool &>());
+				set_parameter<bool>(document, "routing_with_snapshots", routing_with_snapshots<bool &>());
+				set_parameter<std::string>(document, "input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<std::string &>());
 
-				if (cfgReader.getParameter("output_dir_name", output_dir_name<string*>())!= PARAMETER_FOUND) output_dir_name<string>("");
-				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
-				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
-				if (cfgReader.getParameter("write_node_control_state", write_node_control_state<bool*>())!= PARAMETER_FOUND) write_node_control_state<bool>(false);
-				if (cfgReader.getParameter("write_network_link_flow", write_network_link_flow<bool*>())!= PARAMETER_FOUND) write_network_link_flow<bool>(false);
-				if (cfgReader.getParameter("write_network_link_turn_time", write_network_link_turn_time<bool*>())!= PARAMETER_FOUND) write_network_link_turn_time<bool>(false);
-				if (cfgReader.getParameter("write_output_summary", write_output_summary<bool*>())!= PARAMETER_FOUND) write_output_summary<bool>(true);
-				if (cfgReader.getParameter("output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_simulation_interval<bool>(false);
-				if (cfgReader.getParameter("output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_simulation_interval<bool>(false);
-				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
-				if (cfgReader.getParameter("write_network_snapshots", write_network_snapshots<bool*>())!= PARAMETER_FOUND) write_network_snapshots<bool>(false);
-				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
-				if (cfgReader.getParameter("routing_with_snapshots", routing_with_snapshots<bool*>())!= PARAMETER_FOUND) routing_with_snapshots<bool>(false);
-
-				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
-				
 				// read capacity adjustments 
-				if (cfgReader.getParameter("capacity_adjustment_highway", capacity_adjustment_highway<double*>()) != PARAMETER_FOUND)capacity_adjustment_highway<double>(1.0);
-				if (cfgReader.getParameter("capacity_adjustment_arterial", capacity_adjustment_arterial<double*>()) != PARAMETER_FOUND)capacity_adjustment_arterial<double>(1.0);
-				if (cfgReader.getParameter("simulate_cacc", simulate_cacc<bool*>()) != PARAMETER_FOUND)simulate_cacc<bool>(false);
-				if (cfgReader.getParameter("cacc_capacity_adjustment_alpha", cacc_capacity_adjustment_alpha<double*>()) != PARAMETER_FOUND)cacc_capacity_adjustment_alpha<double>(1.0121);
-				if (cfgReader.getParameter("cacc_capacity_adjustment_beta", cacc_capacity_adjustment_beta<double*>()) != PARAMETER_FOUND)cacc_capacity_adjustment_beta<double>(2.4697);
-				
-				if (cfgReader.getParameter("flexible_work_percentage", flexible_work_percentage<double*>()) != PARAMETER_FOUND)flexible_work_percentage<double>(0.12);
+				set_parameter<double>(document, "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
+				set_parameter<double>(document, "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
+				set_parameter<bool>(document, "simulate_cacc", simulate_cacc<bool &>());
+				set_parameter<double>(document, "cacc_capacity_adjustment_alpha", cacc_capacity_adjustment_alpha<double &>());
+				set_parameter<double>(document, "cacc_capacity_adjustment_beta", cacc_capacity_adjustment_beta<double &>());
+				set_parameter<double>(document, "flexible_work_percentage", flexible_work_percentage<double &>());
 
 				//===============================================
 				// Vehicle trajectory tracking parameters
-				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
-				if (cfgReader.getParameter("vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double*>())!= PARAMETER_FOUND) vehicle_trajectory_sample_rate<double>(1.0);
-				if (cfgReader.getParameter("vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<string*>())!= PARAMETER_FOUND)
-				{
-					use_vehicle_tracking_list<bool>(false);
-				}
-				else
+				set_parameter<bool>(document, "write_vehicle_trajectory", write_vehicle_trajectory<bool &>());
+				set_parameter<double>(document, "vehicle_trajectory_sample_rate", vehicle_trajectory_sample_rate<double &>());
+				if (set_parameter<std::string>(document, "vehicle_tracking_list_file_name", vehicle_tracking_list_file_name<std::string &>()))
 				{
 					vehicle_trajectory_sample_rate<double>(0.0);
 					use_vehicle_tracking_list<bool>(true);
 					File_IO::File_Reader fr;
-					fr.Open(this->vehicle_tracking_list_file_name<string>(),false);
+					fr.Open(this->vehicle_tracking_list_file_name<string>(), false);
 					while (fr.Read())
 					{
 						int vehid = 0;
-						fr.Get_Data<int>(vehid,0);
+						fr.Get_Data<int>(vehid, 0);
 						std::unordered_set<int>::iterator itr = vehicle_tracking_list<std::unordered_set<int>&>().find(vehid);
 						if (itr == vehicle_tracking_list<std::unordered_set<int>&>().end()) this->vehicle_tracking_list<std::unordered_set<int>&>().insert(vehid);
 					}
-					cout <<endl<<"Tracking "<<vehicle_tracking_list<std::unordered_set<int>&>().size()<<" vehicles."<<endl;
+					cout << endl << "Tracking " << vehicle_tracking_list<std::unordered_set<int>&>().size() << " vehicles." << endl;
+				}
+				else
+				{
+					use_vehicle_tracking_list<bool>(false);
 				}
 
 				// GET NETWORK SKIMMING PARAMETERS
-				if (cfgReader.getParameter("write_skim_tables", this->template write_skim_tables<bool*>()) != PARAMETER_FOUND) this->template write_skim_tables<bool>(false);
-				if (cfgReader.getParameter("read_skim_tables", this->template read_skim_tables<bool*>()) != PARAMETER_FOUND) this->template read_skim_tables<bool>(false);
-				if (cfgReader.getParameter("input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_highway_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_highway_skim_file_path_name<string>((string)"highway_skim_file_out.txt");
-				if (cfgReader.getParameter("input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_highway_cost_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
-				if (cfgReader.getParameter("input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template input_transit_skim_file_path_name<string>((string)"");
-				if (cfgReader.getParameter("output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->template output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
-				if (cfgReader.getParameter("skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<IntArray*>()) != PARAMETER_FOUND)
+				set_parameter<bool>(document, "write_skim_tables", this->template write_skim_tables<bool &>());
+				set_parameter<bool>(document, "read_skim_tables", this->template read_skim_tables<bool &>());
+				set_parameter<std::string>(document, "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
+				if (set_parameter<std::vector<int>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
+				{
+					use_skim_intervals<bool>(true);
+					do_skimming<bool>(true);
+				}
+				else
 				{
 					use_skim_intervals<bool>(false);
-					if (cfgReader.getParameter("skim_interval_length_minutes", this->template skim_interval_length_minutes<int*>()) != PARAMETER_FOUND) skim_interval_length_minutes<int>(1440.0);
+					if (set_parameter<int>(document, "skim_interval_length_minutes", this->template skim_interval_length_minutes<int &>()))
+					{
+						do_skimming<bool>(true);
+					}
+					else
 					{
 						//do_skimming<bool>(false);
 						//if (this->template write_skim_tables<bool>())
@@ -584,78 +768,69 @@ namespace Scenario_Components
 						//	THROW_EXCEPTION("ERROR: the 'write_skim_tables' parameters has been set to true, but no skim interval has been defined.  Use the 'skim_interval_endpoint_minutes' (endpoint of each interval) or 'skim_interval_length_minutes' (fixed lenght for all intervals) keywords to specify the skim intervals.");
 						//}
 					}
-					do_skimming<bool>(true);
 				}
-				else
-				{
-					use_skim_intervals<bool>(true);
-					do_skimming<bool>(true);
-				}
-				
 
-				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
-				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
-				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
-				if (cfgReader.getParameter("read_normal_day_link_moe", read_normal_day_link_moe<bool*>())!= PARAMETER_FOUND) read_normal_day_link_moe<bool>(false);
-				if (cfgReader.getParameter("normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) normal_day_link_moe_file_path_name<string>("normal_day_moe_link.csv");
-				if (cfgReader.getParameter("historic_demand_moe_directory", historic_demand_moe_directory<string*>())!= PARAMETER_FOUND) historic_demand_moe_directory<string>("");
-
-				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_analzye_link_group_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool*>())!= PARAMETER_FOUND) load_analyze_link_groups_from_file<bool>(false);
-				if (cfgReader.getParameter("analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<string*>())!= PARAMETER_FOUND) analyze_link_groups_file_path_name<string>("analyze_link_groups");
+				set_parameter<bool>(document, "compare_with_historic_moe", compare_with_historic_moe<bool &>());
+				set_parameter<std::string>(document, "historic_network_moe_file_path_name", historic_network_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "historic_link_moe_file_path_name", historic_link_moe_file_path_name<std::string &>());
+				set_parameter<bool>(document, "read_normal_day_link_moe", read_normal_day_link_moe<bool &>());
+				set_parameter<std::string>(document, "normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<std::string &>());
+				set_parameter<std::string>(document, "historic_demand_moe_directory", historic_demand_moe_directory<std::string &>());
+				set_parameter<bool>(document, "output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool &>());
+				set_parameter<bool>(document, "load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool &>());
+				set_parameter<std::string>(document, "analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<std::string &>());
 
 				//if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
-				if (cfgReader.getParameter("write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool*>())!= PARAMETER_FOUND) write_ttime_distribution_from_network_model<bool>(false);
-				if (cfgReader.getParameter("vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int*>())!= PARAMETER_FOUND) vehicle_trajectory_output_threshold<int>(-1.0);
-
-				if (cfgReader.getParameter("use_tmc", use_tmc<bool*>())!= PARAMETER_FOUND) use_tmc<bool>(false);
-				if (cfgReader.getParameter("use_network_events", use_network_events<bool*>())!= PARAMETER_FOUND) use_network_events<bool>(false);
-
-				if (cfgReader.getParameter("jam_density_constraints_enforced", jam_density_constraints_enforced<bool*>())!= PARAMETER_FOUND) jam_density_constraints_enforced<bool>(true);
-				if (cfgReader.getParameter("maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool*>())!= PARAMETER_FOUND) maximum_flow_rate_constraints_enforced<bool>(true);
-				if (cfgReader.getParameter("vehicle_taking_action", vehicle_taking_action<bool*>())!= PARAMETER_FOUND) vehicle_taking_action<bool>(false);
+				set_parameter<bool>(document, "write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool &>());
+				set_parameter<int>(document, "vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int &>());
+				set_parameter<bool>(document, "use_tmc", use_tmc<bool &>());
+				set_parameter<bool>(document, "use_network_events", use_network_events<bool &>());
+				set_parameter<bool>(document, "jam_density_constraints_enforced", jam_density_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "maximum_flow_rate_constraints_enforced", maximum_flow_rate_constraints_enforced<bool &>());
+				set_parameter<bool>(document, "vehicle_taking_action", vehicle_taking_action<bool &>());
 
 				///enroute switching pretrip_informed_market_share
-				if (cfgReader.getParameter("pretrip_informed_market_share", pretrip_informed_market_share<double*>())!= PARAMETER_FOUND) pretrip_informed_market_share<double>(0.5);
-				if (cfgReader.getParameter("realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double*>())!= PARAMETER_FOUND) realtime_informed_vehicle_market_share<double>(0.5);
-				if (cfgReader.getParameter("information_compliance_rate_mean", information_compliance_rate_mean<double*>())!= PARAMETER_FOUND) information_compliance_rate_mean<double>(1.0);
-				if (cfgReader.getParameter("information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double*>())!= PARAMETER_FOUND) information_compliance_rate_standard_deviation<double>(0.5);
-				if (cfgReader.getParameter("relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double*>())!= PARAMETER_FOUND) relative_indifference_band_route_choice_mean<double>(0.1);
-				if (cfgReader.getParameter("minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_mean<double>(1.0); // in minutes
-				if (cfgReader.getParameter("minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_standard_deviation<double>(1.0); // in minutes
-				if (cfgReader.getParameter("enroute_switching_enabled", enroute_switching_enabled<bool*>())!= PARAMETER_FOUND) enroute_switching_enabled<bool>(true); 
-				if (cfgReader.getParameter("use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool*>())!= PARAMETER_FOUND) use_realtime_travel_time_for_enroute_switching<bool>(false);
-				if (cfgReader.getParameter("minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_delay_ratio_for_enroute_switching<double>(3.0f);
-				if (cfgReader.getParameter("minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_delay_seconds_for_enroute_switching<double>(300.0f);
-				if (cfgReader.getParameter("enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool*>())!= PARAMETER_FOUND) enroute_switching_on_excessive_delay<bool>(true);
-				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
-				if (cfgReader.getParameter("enroute_excessive_delay_factor", enroute_excessive_delay_factor<double*>())!= PARAMETER_FOUND) enroute_excessive_delay_factor<double>(1.0);
-				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(300.0f);
-
-				if (cfgReader.getParameter("time_dependent_routing", time_dependent_routing<bool*>())!= PARAMETER_FOUND) time_dependent_routing<bool>(false);
-				if (cfgReader.getParameter("time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_shape<double>(2.0);
-				if (cfgReader.getParameter("time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double*>())!= PARAMETER_FOUND) time_dependent_routing_weight_scale<double>(1000.0);
-				if (cfgReader.getParameter("time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double*>()) != PARAMETER_FOUND) time_dependent_routing_weight_factor<double>(1.0);
+				set_parameter<double>(document, "pretrip_informed_market_share", pretrip_informed_market_share<double &>());
+				set_parameter<double>(document, "realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double &>());
+				set_parameter<double>(document, "information_compliance_rate_mean", information_compliance_rate_mean<double &>());
+				set_parameter<double>(document, "information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double &>());
+				set_parameter<double>(document, "relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double &>());
+				set_parameter<double>(document, "minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double &>()); // in minutes
+				set_parameter<double>(document, "minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double &>()); // in minutes
+				set_parameter<bool>(document, "enroute_switching_enabled", enroute_switching_enabled<bool &>());
+				set_parameter<bool>(document, "use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool &>());
+				set_parameter<double>(document, "minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double &>());
+				set_parameter<double>(document, "minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool &>());
+				set_parameter<bool>(document, "multimodal_network_input", multimodal_network_input<bool &>());
+				set_parameter<double>(document, "enroute_excessive_delay_factor", enroute_excessive_delay_factor<double &>());
+				set_parameter<double>(document, "minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double &>());
+				set_parameter<bool>(document, "time_dependent_routing", time_dependent_routing<bool &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_shape", time_dependent_routing_weight_shape<double &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_scale", time_dependent_routing_weight_scale<double &>());
+				set_parameter<double>(document, "time_dependent_routing_weight_factor", time_dependent_routing_weight_factor<double &>());
+				set_parameter<bool>(document, "multimodal_routing", multimodal_routing<bool &>());
+				set_parameter<double>(document, "accident_event_duration_reduction", accident_event_duration_reduction<double &>());
+				set_parameter<bool>(document, "calculate_realtime_moe", calculate_realtime_moe<bool &>());
 				
-				if (cfgReader.getParameter("accident_event_duration_reduction", accident_event_duration_reduction<double*>())!= PARAMETER_FOUND) accident_event_duration_reduction<double>(1.0);
-				
-
-				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
-				
-				if (cfgReader.getParameter("buildings_geometry_file", buildings_geometry_file<string*>())!= PARAMETER_FOUND)
+				if (set_parameter<std::string>(document, "buildings_geometry_file", buildings_geometry_file<std::string &>()))
+				{
+					use_buildings(true);
+				}
+				else
 				{
 					use_buildings(false);
 					buildings_geometry_file<string&>()="";
 				}
-				else use_buildings(true);
 
-				if (cfgReader.getParameter("mode_choice_model_file",			mode_choice_model_file<string*>()) != PARAMETER_FOUND)			mode_choice_model_file<string>("");
-				if (cfgReader.getParameter("destination_choice_model_file",		destination_choice_model_file<string*>()) != PARAMETER_FOUND)	destination_choice_model_file<string>("");
-				if (cfgReader.getParameter("telecommute_choice_model_file",		telecommute_choice_model_file<string*>()) != PARAMETER_FOUND)	telecommute_choice_model_file<string>("");
-				if (cfgReader.getParameter("cav_wtp_model_file",				cav_wtp_model_file<string*>()) != PARAMETER_FOUND)				cav_wtp_model_file<string>("");
+				set_parameter<std::string>(document, "mode_choice_model_file", mode_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "destination_choice_model_file", destination_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
+				set_parameter<std::string>(document, "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
+				set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
 				if (cfgReader.getParameter("timing_choice_model_file",			timing_choice_model_file<string*>()) != PARAMETER_FOUND)		timing_choice_model_file<string>("");
 
 				//output_dir_name<string&>() = "";
@@ -1292,24 +1467,137 @@ namespace Scenario_Components
 				return assignment_interval_length<int>();
 			}
 
-			int getParameter(const char *parameterName, int *paramValue);
-			int getParameter(const char *parameterName, double *paramValue);
-			int getParameter(const char *parameterName, std::string *paramValue);
-			int getParameter(const char *parameterName, bool *paramValue);
-			int getParameter(const char *parameterName, IntArray *parameter);
-			int getParameter(const char *parameterName, DoubleArray *parameter);
-			int getParameter(const char *parameterName, StringArray *parameter);
-			int getParameter(const char *parameterName, BoolArray *parameter);
-			int getParameter(const char *parameterName, unsigned long *paramValue);
-
-			bool parse_option_file(rapidjson::Document& document, std::string option_file)
+			bool print_error_msg(rapidjson::Document& document, std::string json_file)
 			{
+				// Get the parse error and offset
+				rapidjson::ParseErrorCode parse_error = document.GetParseError();
+				size_t parse_offset = document.GetErrorOffset();
+
+				cout << "ERROR: ";
+
+				if (parse_error == rapidjson::kParseErrorDocumentEmpty)   // Empty document
+				{
+					cout << "JSON file \'" << json_file << "\'" << " is empty" << endl;
+					return false;
+				}
+
+				switch (parse_error)
+				{
+				case (rapidjson::kParseErrorDocumentRootNotSingular):
+					cout << "JSON roots error";
+					break;
+				case (rapidjson::kParseErrorValueInvalid):
+					cout << "Invalid value";
+					break;
+				case (rapidjson::kParseErrorObjectMissName):
+					cout << "Object member is missing a name";
+					break;
+				case (rapidjson::kParseErrorObjectMissColon):
+					cout << "Object member is missing a colon after name";
+					break;
+				case (rapidjson::kParseErrorObjectMissCommaOrCurlyBracket):
+					cout << "Object member is missing a comma or \'}\'";
+					break;
+				case (rapidjson::kParseErrorArrayMissCommaOrSquareBracket):
+					cout << "Array element is missing a comma or \']\'";
+					break;
+				case (rapidjson::kParseErrorStringUnicodeEscapeInvalidHex):
+					cout << "String has incorrect hex digit after escape";
+					break;
+				case (rapidjson::kParseErrorStringUnicodeSurrogateInvalid):
+					cout << "String has an invalid surrogate pair";
+					break;
+				case (rapidjson::kParseErrorStringEscapeInvalid):
+					cout << "String has an invalid escape character";
+					break;
+				case (rapidjson::kParseErrorStringMissQuotationMark):
+					cout << "String is missing a closing quotation mark";
+					break;
+				case (rapidjson::kParseErrorStringInvalidEncoding):
+					cout << "String has invalid encoding";
+					break;
+				case (rapidjson::kParseErrorNumberTooBig):
+					cout << "Number is too big to be stored as double";
+					break;
+				case (rapidjson::kParseErrorNumberMissFraction):
+					cout << "Number is missing the fraction part";
+					break;
+				case (rapidjson::kParseErrorNumberMissExponent):
+					cout << "Number is missing the exponent part";
+					break;
+				case (rapidjson::kParseErrorTermination):
+					cout << "Rapid JSON parsing terminated";
+					break;
+				case (rapidjson::kParseErrorUnspecificSyntaxError):
+					cout << "Unspecific syntax error";
+					break;
+				default:
+					cout << "Unknown";
+				}
+				cout << " starting at " << parse_offset << endl;
+
+				return false;
+			}
+
+			int find_line_begin(std::ifstream& json_string, int start_pos)
+			{
+				int pos = start_pos;
+				const int move_size = 5;
+				char buffer[move_size];
+
+				// Look for the beginning of the line that includes the given position
+				while (true)
+				{
+					// Move back from prev_pos
+					pos -= move_size;
+
+					// Check that position is a positive value
+					if (pos > 0)
+					{
+						json_string.seekg(pos);
+
+						// Read bytes
+						json_string.read(buffer, move_size);
+
+						// Look for a newline byte, which terminates previous line
+						int eol_pos;
+						for (eol_pos = sizeof(buffer) - 1; eol_pos >= 0; --eol_pos)
+						{
+							if (buffer[eol_pos] == '\n')
+							{
+								break;
+							}
+						}
+
+						// If found newline or got to beginning of file - done looking
+						if (eol_pos >= 0 || pos < move_size)
+						{
+							pos += eol_pos + 1;
+							break;
+						}
+					}
+					else
+					{
+						pos = 0;
+						break;
+					}
+				}
+				return pos;
+			}
+
+			//bool parse_option_file(rapidjson::Document& document, std::string option_file)
+			bool parse_option_file(Scenario_Components::Types::ScenarioData& scenario, std::string option_file)
+			{
+				bool ret_val = true;
+
+				// Check file name exists
 				if (option_file.length() < 1)
 				{
 					cout << "Warning: option file was not specified" << endl;
 					return true;
 				}
 
+				// Open JSON file
 				std::ifstream ifs(option_file);
 				if (!ifs.good())
 				{
@@ -1317,75 +1605,295 @@ namespace Scenario_Components
 					return false;
 				}
 
+				// Convert std::ifstream to RapidJSON input stream
 				rapidjson::IStreamWrapper isw(ifs);
-				if (document.ParseStream(isw).HasParseError())
-				{
-					cout << "ERROR: unbale to parse \'" << option_file << "\'" << endl;
-					cout << "\nError(offset " << (unsigned)document.GetErrorOffset() << "): " << rapidjson::GetParseError_En(document.GetParseError()) << endl;
 
-					return false;
+				// Parse and check for errors
+				if (scenario.document.ParseStream(isw).HasParseError())
+				{
+					ret_val = print_error_msg(scenario.document, option_file);
+
+					// Find size of file
+					std::streamoff json_len;
+					ifs.clear();
+					ifs.seekg(0, ifs.end);
+					json_len = ifs.tellg();
+
+					// check if file has content
+					if (json_len > 0)
+					{
+						// print text around error location
+						int print_len = 40;
+						std::string json_string;
+						json_string.resize(print_len);
+
+						// check if file length is less than amount to print
+						if (json_len < print_len)
+						{
+							ifs.seekg(0, ifs.beg);
+						}
+						else
+						{
+							size_t half_len = (size_t)(0.5*(float)print_len);
+							int start_index, line_index;
+							size_t parse_offset = scenario.document.GetErrorOffset();
+
+							// determine start index for printing
+							if (parse_offset < half_len)
+							{
+								line_index = 0;
+							}
+							else if (parse_offset > (json_len - half_len))
+							{
+								start_index = (int)json_len - print_len;
+								ifs.seekg(start_index);
+								line_index = find_line_begin(ifs, start_index);
+							}
+							else
+							{
+								start_index = parse_offset - half_len;
+								ifs.seekg(start_index);
+								line_index = find_line_begin(ifs, start_index);
+							}
+							ifs.seekg(line_index);
+						}
+						// print
+						for (int cntr = 0; cntr < 3; cntr++)
+						{
+							std::getline(ifs, json_string);
+							cout << json_string << endl;
+						}
+					}
+					return ret_val;
 				}
 
-				if (!document.IsObject())
+				if (!scenario.document.IsObject())
 				{
 					cout << "ERROR: \'" << option_file << "\' is not a valid option file" << endl;
 					return false;
 				}
 
+				get_KV_paths(scenario.key_paths, scenario.document, "");
+
 				return true;
 			}
 
-			template<typename ParamType> void set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, ParamType& parameter)
+			std::vector<std::string> split_section(const char *str, char c = '/')
 			{
-				static_assert(false, "ParamType not supported");
-			}
-			template<> void set_parameter<double>(rapidjson::Document& document, const std::string& section, const std::string& key, double& parameter)
-			{
-				if (!check_parameter(document, section, key)) return;
+				std::vector<std::string> result;
 
-				if (!document[section.c_str()][key.c_str()].IsDouble())
+				do
 				{
-					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
-					return;
+					const char* begin = str;
+
+					while (*str != c && *str)
+					{
+						str++;
+					}
+
+					result.push_back(std::string(begin, str));
+				} while (0 != *str++);
+
+				return result;
+			}
+
+			template <class T>
+			bool set_parameter(Scenario_Components::Types::ScenarioData& scenario, const std::string& key, T& parameter)
+			{
+				std::string section;
+				rapidjson::Document& document = scenario.document;
+
+				std::map<std::string, std::string>::iterator it = scenario.key_paths.find(key);
+				if (it != scenario.key_paths.end())
+					section = it->second;
+
+				return set_parameter<T>(document, section, key, parameter);
+			}
+				
+			template <class T>
+			bool set_parameter(rapidjson::Document& document, const std::string& section, const std::string& key, T& parameter)
+			{
+				rapidjson::Value* value;
+
+				// add "/" in front of key for Pointer
+				std::string str_key = "/" + key;
+				const char* char_key = str_key.c_str();
+
+				// if section is not defined then use key
+				if (section.compare("") == 0)
+				{
+					// check if key value is not found
+					value = rapidjson::Pointer(char_key).Get(document);
+					if (!value)
+					{
+						cout << "Unable to locate key \'" << key << "\'" << endl;
+						return false;
+					}
+				}
+				else
+				{
+					std::vector<string> section_tokens;
+					section_tokens = split_section(section.c_str(), '/');
+
+					// add "/" to each token for Pointer
+					for (auto& element : section_tokens)
+					{
+						element = "/" + element;
+					}
+
+					// check if first section is not found
+					//cout << "section token 0 is " << section_tokens[0] << endl;
+					value = rapidjson::Pointer(section_tokens[0].c_str()).Get(document);
+					if (!value)
+					{
+						cout << "Unable to locate section \'" << section_tokens[0] << "\'";
+						if (section_tokens.size() > 0)
+						{
+							cout << " from \'" << section << "\'" << endl;
+						}
+						return false;
+					}
+
+					// loop for each token element
+					for (unsigned i = 1; i < section_tokens.size(); ++i)
+					{
+						//cout << section_tokens[i] << endl;
+
+						// check if next section is not found
+						value = rapidjson::Pointer(section_tokens[i].c_str()).Get(*value);
+						if (!value)
+						{
+							cout << "Unable to locate sub section \'" << section_tokens[i] << "\' from \'" << section << "\'" << endl;
+							return false;
+						}
+					}
+
+					// if key is defined
+					if (key.compare("") != 0)
+					{
+						// check if key value is not found
+						value = rapidjson::Pointer(char_key).Get(*value);
+						if (!value)
+						{
+							cout << "Unable to locate key \'" << key << "\' from \'" << section << "\'" << endl;
+							return false;
+						}
+					}
 				}
 
-				parameter = document[section.c_str()][key.c_str()].GetDouble();
+				// get parameter
+				return set_parameter(*value, parameter);
 			}
-			template<> void set_parameter<float>(rapidjson::Document& document, const std::string& section, const std::string& key, float& parameter)
+
+			bool set_parameter(rapidjson::Value& value, std::string& parameter)
 			{
-				if (!check_parameter(document, section, key)) return;
-
-				if (!document[section.c_str()][key.c_str()].IsDouble())
+				if (value.IsString())
 				{
-					cout << "Key \'" << key << "\' is not set as a double value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
-					return;
+					parameter = value.GetString();
 				}
+				else
+				{
+					cout << "Value is not set as string value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
+			}
 
-				parameter = document[section.c_str()][key.c_str()].GetDouble();
+			bool set_parameter(rapidjson::Value& value, int& parameter)
+			{
+				if (value.IsInt())
+				{
+					parameter = value.GetInt();
+				}
+				else
+				{
+					cout << "Value is not set as integer value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
+			}
+
+			bool set_parameter(rapidjson::Value& value, unsigned long& parameter)
+			{
+				if (value.IsUint64())
+				{
+					parameter = value.GetUint64();
+				}
+				else
+				{
+					cout << "Value is not set as unsigned long value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
 			}
 			template<> void set_parameter<string>(rapidjson::Document& document, const std::string& section, const std::string& key, string& parameter)
 			{
 				if (!check_parameter(document, section, key)) return;
 
-				if (!document[section.c_str()][key.c_str()].IsString())
-				{
-					cout << "Key \'" << key << "\' is not set as a string value. (" << document[section.c_str()][key.c_str()].GetString() << ")" << endl;
-					return;
-				}
-
-				parameter = document[section.c_str()][key.c_str()].GetString();
-			}
-			bool check_parameter(rapidjson::Document& document, const std::string& section, const std::string& key)
+			bool set_parameter(rapidjson::Value& value, double& parameter)
 			{
-				if (!document.HasMember(section.c_str()))
+				if (value.IsDouble())
 				{
-					cout << "Parameter \'" << section << "/" << key << "\' not specified. Unable to locate section \'" << section << "\'" << endl;
+					parameter = value.GetDouble();
+				}
+				else if (value.IsFloat())
+				{
+					parameter = (double)value.GetFloat();
+				}
+				else if (value.IsInt())
+				{
+					parameter = (double)value.GetInt();
+				}
+				else
+				{
+					cout << "Value is not set as double value. (" << value.GetString() << ")" << endl;
 					return false;
 				}
+				return true;
+			}
 
-				if (!document[section.c_str()].HasMember(key.c_str()))
+			bool set_parameter(rapidjson::Value& value, float& parameter)
+			{
+				if (value.IsFloat())
 				{
-					cout << "Parameter \'" << section << "/" << key << "\' not specified" << endl;
+					parameter = value.GetFloat();
+				}
+				else if (value.IsInt())
+				{
+					parameter = (float)value.GetInt();
+				}
+				else
+				{
+					cout << "Value is not set as float value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
+			}
+
+			bool set_parameter(rapidjson::Value& value, bool& parameter)
+			{
+				if (value.IsBool())
+				{
+					parameter = value.GetBool();
+				}
+				else
+				{
+					cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
+			}
+
+			bool set_parameter(rapidjson::Value& value, std::vector<int>& parameter)
+			{
+				if (value.IsArray())
+				{
+					for(rapidjson::SizeType i=0; i<value.Size(); ++i)
+						parameter.push_back(value[i].GetInt());
+				}
+				else
+				{
+					cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
 					return false;
 				}
 				return true;

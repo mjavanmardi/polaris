@@ -67,6 +67,12 @@ namespace Network_Components
 			m_container(std::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
 
 			m_container(std::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_route_type*>, transit_routes_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_pattern_type*>, transit_patterns_container, NONE, NONE);
+
+			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, transit_vehicle_trips_container, NONE, NONE);
 			//m_container(std::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
 
 			//TODO:ROUTING
@@ -1052,19 +1058,44 @@ namespace Network_Components
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 				typename _Links_Container_Interface::iterator links_itr;
+				
 				_max_free_flow_speed = -1.0;			
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
 				{			
 					_Link_Interface* link = (_Link_Interface*)(*links_itr);
-					float free_flow_speed = (float) ((5280.0) * link->template free_flow_speed<float>()/3600.0); // feet per second
-					float link_travel_time = float (link->template length<float>() / free_flow_speed);
+					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
+					{		
+						float free_flow_speed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+						free_flow_speed = 3.28084 * free_flow_speed; // feet per second
+						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to feet
+						
+						// Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
+						
+						link_travel_time = max((float)1.0, link_travel_time);
+
+						link->template travel_time<float>(link_travel_time);
+					}
+					else if (facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+					{
+						//TODO: Omer fix later!
+						float link_travel_time = 1;
+						link->template travel_time<float>(link_travel_time);
+					}
+					else
+					{ 
+						float free_flow_speed = (float) ((5280.0) * link->template free_flow_speed<float>()/3600.0); // feet per second
+						float link_travel_time = float (link->template length<float>() / free_flow_speed);
 					
-					_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
+						_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
 
-					link_travel_time = max((float)1.0,link_travel_time);
+						link_travel_time = max((float)1.0,link_travel_time);
 
-					link->template travel_time<float>(link_travel_time);
-					//link->template num_lanes<float>(link_travel_time);
+						link->template travel_time<float>(link_travel_time);
+						//link->template num_lanes<float>(link_travel_time);
+					}
+
 				}
 		
 				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(turn_movements_container)::value_type>::type>  _Turn_Movement_Interface;
@@ -1096,7 +1127,11 @@ namespace Network_Components
 			void construct_routable_networks()
 			{
 				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+				/*typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
+				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
+				typename _Links_Container_Interface::iterator links_itr;*/
+				bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
@@ -1110,6 +1145,11 @@ namespace Network_Components
 
 				routable_network->template construct_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
 
+				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>())
+				{
+					routable_network->template construct_routable_multimodal_network<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);					
+				}
+				
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
@@ -1118,6 +1158,14 @@ namespace Network_Components
 
 				routable_network->finalize();
 
+				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && multimodal_dijkstra )
+				{					
+
+					routable_network->compute_dijkstra_transit_distance<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this); 
+					
+					routable_network->compute_dijkstra_network_tree<typename MasterType::network_type>((Network<typename MasterType::network_type>*)this);
+
+				}
 
 				for(uint i=1;i<num_sim_threads();i++)
 				{
