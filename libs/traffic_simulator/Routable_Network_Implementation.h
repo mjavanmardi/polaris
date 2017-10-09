@@ -620,18 +620,30 @@ namespace Routing_Components
 				start.edge_id = origin;
 				start.graph_id = _static_network_graph_id;
 				
-				//global_edge_id end;
-
-				//end.edge_id = destination;
-				//end.graph_id = _static_network_graph_id;
-
 				float routed_time = A_Star_Tree<MT,typename MT::tree_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,0,cost_container);
+
+				return routed_time;
+			}
+
+			float compute_time_dependent_network_tree(unsigned int origin, std::vector<float>& cost_container)
+			{
+				Routable_Agent<typename MT::tree_agent_type> proxy_agent;
+
+				global_edge_id start;
+
+				start.edge_id = origin;
+				start.graph_id = _time_dependent_network_graph_id;
+
+				float routed_time = A_Star_Tree<MT, typename MT::tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, 0, cost_container);
 
 				return routed_time;
 			}
 
 			void update_edge_turn_cost(unsigned int edge_id,float edge_cost,unsigned int outbound_turn_index,float turn_cost)
 			{
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+
+				if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>()) // static network
 				{
 					global_edge_id edge_lookup;
 
@@ -673,10 +685,6 @@ namespace Routing_Components
 						connection_group = connection_group->Next_Connection_Group();
 					}
 				}
-
-
-				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
-
 
 				if(((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{

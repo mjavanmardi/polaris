@@ -337,7 +337,7 @@ namespace polaris
 		global_edge_id global;
 		global.graph_id = 0;
 
-		float total_cost = 0.0f;
+		float total_cost = FLT_MAX;
 
 		if(success)
 		{
