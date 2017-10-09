@@ -831,7 +831,7 @@ namespace Scenario_Components
 				set_parameter<std::string>(document, "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
 				set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
-				if (cfgReader.getParameter("timing_choice_model_file",			timing_choice_model_file<string*>()) != PARAMETER_FOUND)		timing_choice_model_file<string>("");
+				set_parameter<std::string>(document, "timing_choice_model_file", timing_choice_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -1826,9 +1826,6 @@ namespace Scenario_Components
 				}
 				return true;
 			}
-			template<> void set_parameter<string>(rapidjson::Document& document, const std::string& section, const std::string& key, string& parameter)
-			{
-				if (!check_parameter(document, section, key)) return;
 
 			bool set_parameter(rapidjson::Value& value, double& parameter)
 			{

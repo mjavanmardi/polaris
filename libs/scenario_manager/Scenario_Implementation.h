@@ -153,6 +153,8 @@ namespace Scenario_Components
 			m_data(double, time_dependent_routing_weight_factor, NONE, NONE);
 
 			m_data(string, timing_choice_model_file, NONE, NONE);
+
+			m_data(bool, multimodal_routing, NONE, NONE);
 			m_data(double, multimodal_routing_weight_shape, NONE, NONE);
 			m_data(double, multimodal_routing_weight_scale, NONE, NONE);
 			m_data(double, multimodal_routing_weight_factor, NONE, NONE);

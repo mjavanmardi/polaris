@@ -448,7 +448,7 @@ namespace Person_Components
 				default_static_initializer();
 
 				// now see if there are config file changes
-				rapidjson::Document document;
+				Scenario_Components::Types::ScenarioData document;
 				//std::string option_file = reinterpret_cast<_Scenario_Interface*>(_global_scenario)->template telecommute_choice_implementation_param_file<string>();
 				if (option_file.length() < 1)
 				{
@@ -462,84 +462,84 @@ namespace Person_Components
 					return false;
 
 				// check that model is defined if it is requested through scenario
-				if (!document.HasMember("Activity_Timing_Choice_Model")) THROW_EXCEPTION("ERROR: Activity_Timing_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
+				if (!document.document.HasMember("Activity_Timing_Choice_Model")) THROW_EXCEPTION("ERROR: Activity_Timing_Choice_Model parameter not found in '" << option_file << "', but specified in scenarion.json.");
 
 
 				string section = "Activity_Timing_Choice_Model";
 
 				// get the parameters...
 				#pragma region
-				scenario->set_parameter(document, section, "START_DURATION_DISTRIBUTION_FILE", _START_DURATION_DISTRIBUTION_FILE);
-				scenario->set_parameter(document, section, "S_AMPEAK_AGE_60", _S_AMPEAK_AGE_60);
-				scenario->set_parameter(document, section, "S_AMPEAK_HH_WORKERS", _S_AMPEAK_HH_WORKERS);
-				scenario->set_parameter(document, section, "S_AMPEAK_FLEX_START", _S_AMPEAK_FLEX_START);
-				scenario->set_parameter(document, section, "S_AMPEAK_FLEX_DURATION", _S_AMPEAK_FLEX_DURATION);
-				scenario->set_parameter(document, section, "S_AMPEAK_PARTY_JOINT", _S_AMPEAK_PARTY_JOINT);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_CONSTANT", _S_AMOFFPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_WORK_PARTTIME", _S_AMOFFPEAK_WORK_PARTTIME);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_STUDENT_FULLTIME", _S_AMOFFPEAK_STUDENT_FULLTIME);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_MODE_PASSENGER", _S_AMOFFPEAK_MODE_PASSENGER);
-				scenario->set_parameter(document, section, "S_PMOFFPEAK_CONSTANT", _S_PMOFFPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "S_PMOFFPEAK_INCOME_LOW", _S_PMOFFPEAK_INCOME_LOW);
-				scenario->set_parameter(document, section, "S_PMOFFPEAK_MODE_TRANSIT", _S_PMOFFPEAK_MODE_TRANSIT);
-				scenario->set_parameter(document, section, "S_PMPEAK_CONSTANT", _S_PMPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "S_PMPEAK_WORK_FULLTIME", _S_PMPEAK_WORK_FULLTIME);
-				scenario->set_parameter(document, section, "S_PMPEAK_INCOME_HIGH", _S_PMPEAK_INCOME_HIGH);
-				scenario->set_parameter(document, section, "S_PMPEAK_HH_WORKERS", _S_PMPEAK_HH_WORKERS);
-				scenario->set_parameter(document, section, "S_PMPEAK_FLEX_START", _S_PMPEAK_FLEX_START);
-				scenario->set_parameter(document, section, "S_EVENING_CONSTANT", _S_EVENING_CONSTANT);
-				scenario->set_parameter(document, section, "S_EVENING_TELEWORK", _S_EVENING_TELEWORK);
-				scenario->set_parameter(document, section, "S_EVENING_INCOME_LOW", _S_EVENING_INCOME_LOW);
-				scenario->set_parameter(document, section, "S_EVENING_DEGREE_COLLEGE", _S_EVENING_DEGREE_COLLEGE);
-				scenario->set_parameter(document, section, "S_AMPEAK_TT", _S_AMPEAK_TT);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_OCCUPANCY", _S_AMOFFPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_TTV", _S_AMOFFPEAK_TTV);
-				scenario->set_parameter(document, section, "S_AMOFFPEAK_TT", _S_AMOFFPEAK_TT);
-				scenario->set_parameter(document, section, "S_PMOFFPEAK_OCCUPANCY", _S_PMOFFPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "S_PMOFFPEAK_TT", _S_PMOFFPEAK_TT);
-				scenario->set_parameter(document, section, "S_PMPEAK_OCCUPANCY", _S_PMPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "S_PMPEAK_TT", _S_PMPEAK_TT);
-				scenario->set_parameter(document, section, "S_EVENING_TT", _S_EVENING_TT);
+				scenario->set_parameter<string>(document, "START_DURATION_DISTRIBUTION_FILE", _START_DURATION_DISTRIBUTION_FILE);
+				scenario->set_parameter<float>(document, "S_AMPEAK_AGE_60", _S_AMPEAK_AGE_60);
+				scenario->set_parameter<float>(document, "S_AMPEAK_HH_WORKERS", _S_AMPEAK_HH_WORKERS);
+				scenario->set_parameter<float>(document, "S_AMPEAK_FLEX_START", _S_AMPEAK_FLEX_START);
+				scenario->set_parameter<float>(document, "S_AMPEAK_FLEX_DURATION", _S_AMPEAK_FLEX_DURATION);
+				scenario->set_parameter<float>(document, "S_AMPEAK_PARTY_JOINT", _S_AMPEAK_PARTY_JOINT);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_CONSTANT", _S_AMOFFPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_WORK_PARTTIME", _S_AMOFFPEAK_WORK_PARTTIME);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_STUDENT_FULLTIME", _S_AMOFFPEAK_STUDENT_FULLTIME);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_MODE_PASSENGER", _S_AMOFFPEAK_MODE_PASSENGER);
+				scenario->set_parameter<float>(document, "S_PMOFFPEAK_CONSTANT", _S_PMOFFPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "S_PMOFFPEAK_INCOME_LOW", _S_PMOFFPEAK_INCOME_LOW);
+				scenario->set_parameter<float>(document, "S_PMOFFPEAK_MODE_TRANSIT", _S_PMOFFPEAK_MODE_TRANSIT);
+				scenario->set_parameter<float>(document, "S_PMPEAK_CONSTANT", _S_PMPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "S_PMPEAK_WORK_FULLTIME", _S_PMPEAK_WORK_FULLTIME);
+				scenario->set_parameter<float>(document, "S_PMPEAK_INCOME_HIGH", _S_PMPEAK_INCOME_HIGH);
+				scenario->set_parameter<float>(document, "S_PMPEAK_HH_WORKERS", _S_PMPEAK_HH_WORKERS);
+				scenario->set_parameter<float>(document, "S_PMPEAK_FLEX_START", _S_PMPEAK_FLEX_START);
+				scenario->set_parameter<float>(document, "S_EVENING_CONSTANT", _S_EVENING_CONSTANT);
+				scenario->set_parameter<float>(document, "S_EVENING_TELEWORK", _S_EVENING_TELEWORK);
+				scenario->set_parameter<float>(document, "S_EVENING_INCOME_LOW", _S_EVENING_INCOME_LOW);
+				scenario->set_parameter<float>(document, "S_EVENING_DEGREE_COLLEGE", _S_EVENING_DEGREE_COLLEGE);
+				scenario->set_parameter<float>(document, "S_AMPEAK_TT", _S_AMPEAK_TT);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_OCCUPANCY", _S_AMOFFPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_TTV", _S_AMOFFPEAK_TTV);
+				scenario->set_parameter<float>(document, "S_AMOFFPEAK_TT", _S_AMOFFPEAK_TT);
+				scenario->set_parameter<float>(document, "S_PMOFFPEAK_OCCUPANCY", _S_PMOFFPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "S_PMOFFPEAK_TT", _S_PMOFFPEAK_TT);
+				scenario->set_parameter<float>(document, "S_PMPEAK_OCCUPANCY", _S_PMPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "S_PMPEAK_TT", _S_PMPEAK_TT);
+				scenario->set_parameter<float>(document, "S_EVENING_TT", _S_EVENING_TT);
 
-				scenario->set_parameter(document, section, "D_AMPEAK_CONSTANT", _D_AMPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "D_AMPEAK_FLEX_DURATION", _D_AMPEAK_FLEX_DURATION);
-				scenario->set_parameter(document, section, "D_AMPEAK_TELEWORK", _D_AMPEAK_TELEWORK);
-				scenario->set_parameter(document, section, "D_AMPEAK_WORK_FULLTIME", _D_AMPEAK_WORK_FULLTIME);
-				scenario->set_parameter(document, section, "D_AMPEAK_OCCUPANCY", _D_AMPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_CONSTANT", _D_AMOFFPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_TELEWORK", _D_AMOFFPEAK_TELEWORK);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_INCOME_HIGH", _D_AMOFFPEAK_INCOME_HIGH);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_MODE_AUTO", _D_AMOFFPEAK_MODE_AUTO);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_WORK_FULLTIME", _D_AMOFFPEAK_WORK_FULLTIME);
-				scenario->set_parameter(document, section, "D_AMOFFPEAK_OCCUPANCY", _D_AMOFFPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "D_PMOFFPEAK_CONSTANT", _D_PMOFFPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "D_PMOFFPEAK_HH_SIZE", _D_PMOFFPEAK_HH_SIZE);
-				scenario->set_parameter(document, section, "D_PMOFFPEAK_MODE_PASSENGER", _D_PMOFFPEAK_MODE_PASSENGER);
-				scenario->set_parameter(document, section, "D_PMOFFPEAK_AGE_18_24", _D_PMOFFPEAK_AGE_18_24);
-				scenario->set_parameter(document, section, "D_PMOFFPEAK_OCCUPANCY", _D_PMOFFPEAK_OCCUPANCY);
-				scenario->set_parameter(document, section, "D_PMPEAK_CONSTANT", _D_PMPEAK_CONSTANT);
-				scenario->set_parameter(document, section, "D_PMPEAK_PARTY_ALONE", _D_PMPEAK_PARTY_ALONE);
-				scenario->set_parameter(document, section, "D_PMPEAK_AGE_60", _D_PMPEAK_AGE_60);
-				scenario->set_parameter(document, section, "D_EVENING_CONSTANT", _D_EVENING_CONSTANT);
-				scenario->set_parameter(document, section, "D_EVENING_WORK_FULLTIME", _D_EVENING_WORK_FULLTIME);
-				scenario->set_parameter(document, section, "D_EVENING_MODE_TRANSIT", _D_EVENING_MODE_TRANSIT);
-				scenario->set_parameter(document, section, "D_EVENING_AGE_60", _D_EVENING_AGE_60);
-				scenario->set_parameter(document, section, "D_NIGHT_INCOME_HIGH", _D_NIGHT_INCOME_HIGH);
-				scenario->set_parameter(document, section, "D_NIGHT_LOCATION_SUBURBS", _D_NIGHT_LOCATION_SUBURBS);
+				scenario->set_parameter<float>(document, "D_AMPEAK_CONSTANT", _D_AMPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "D_AMPEAK_FLEX_DURATION", _D_AMPEAK_FLEX_DURATION);
+				scenario->set_parameter<float>(document, "D_AMPEAK_TELEWORK", _D_AMPEAK_TELEWORK);
+				scenario->set_parameter<float>(document, "D_AMPEAK_WORK_FULLTIME", _D_AMPEAK_WORK_FULLTIME);
+				scenario->set_parameter<float>(document, "D_AMPEAK_OCCUPANCY", _D_AMPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_CONSTANT", _D_AMOFFPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_TELEWORK", _D_AMOFFPEAK_TELEWORK);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_INCOME_HIGH", _D_AMOFFPEAK_INCOME_HIGH);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_MODE_AUTO", _D_AMOFFPEAK_MODE_AUTO);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_WORK_FULLTIME", _D_AMOFFPEAK_WORK_FULLTIME);
+				scenario->set_parameter<float>(document, "D_AMOFFPEAK_OCCUPANCY", _D_AMOFFPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "D_PMOFFPEAK_CONSTANT", _D_PMOFFPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "D_PMOFFPEAK_HH_SIZE", _D_PMOFFPEAK_HH_SIZE);
+				scenario->set_parameter<float>(document, "D_PMOFFPEAK_MODE_PASSENGER", _D_PMOFFPEAK_MODE_PASSENGER);
+				scenario->set_parameter<float>(document, "D_PMOFFPEAK_AGE_18_24", _D_PMOFFPEAK_AGE_18_24);
+				scenario->set_parameter<float>(document, "D_PMOFFPEAK_OCCUPANCY", _D_PMOFFPEAK_OCCUPANCY);
+				scenario->set_parameter<float>(document, "D_PMPEAK_CONSTANT", _D_PMPEAK_CONSTANT);
+				scenario->set_parameter<float>(document, "D_PMPEAK_PARTY_ALONE", _D_PMPEAK_PARTY_ALONE);
+				scenario->set_parameter<float>(document, "D_PMPEAK_AGE_60", _D_PMPEAK_AGE_60);
+				scenario->set_parameter<float>(document, "D_EVENING_CONSTANT", _D_EVENING_CONSTANT);
+				scenario->set_parameter<float>(document, "D_EVENING_WORK_FULLTIME", _D_EVENING_WORK_FULLTIME);
+				scenario->set_parameter<float>(document, "D_EVENING_MODE_TRANSIT", _D_EVENING_MODE_TRANSIT);
+				scenario->set_parameter<float>(document, "D_EVENING_AGE_60", _D_EVENING_AGE_60);
+				scenario->set_parameter<float>(document, "D_NIGHT_INCOME_HIGH", _D_NIGHT_INCOME_HIGH);
+				scenario->set_parameter<float>(document, "D_NIGHT_LOCATION_SUBURBS", _D_NIGHT_LOCATION_SUBURBS);
 
-				scenario->set_parameter(document, section, "THETA_AMPEAK", _THETA_AMPEAK);
-				scenario->set_parameter(document, section, "THETA_AMOFFPEAK", _THETA_AMOFFPEAK);
-				scenario->set_parameter(document, section, "THETA_PMOFFPEAK", _THETA_PMOFFPEAK);
-				scenario->set_parameter(document, section, "THETA_PMPEAK", _THETA_PMPEAK);
-				scenario->set_parameter(document, section, "THETA_EVENING", _THETA_EVENING);
-				scenario->set_parameter(document, section, "THETA_NIGHT", _THETA_NIGHT);
+				scenario->set_parameter<float>(document, "THETA_AMPEAK", _THETA_AMPEAK);
+				scenario->set_parameter<float>(document, "THETA_AMOFFPEAK", _THETA_AMOFFPEAK);
+				scenario->set_parameter<float>(document, "THETA_PMOFFPEAK", _THETA_PMOFFPEAK);
+				scenario->set_parameter<float>(document, "THETA_PMPEAK", _THETA_PMPEAK);
+				scenario->set_parameter<float>(document, "THETA_EVENING", _THETA_EVENING);
+				scenario->set_parameter<float>(document, "THETA_NIGHT", _THETA_NIGHT);
 
-				scenario->set_parameter(document, section, "SIGMA_AMPEAK", _SIGMA_AMPEAK);
-				scenario->set_parameter(document, section, "SIGMA_AMOFFPEAK", _SIGMA_AMOFFPEAK);
-				scenario->set_parameter(document, section, "SIGMA_PMOFFPEAK", _SIGMA_PMOFFPEAK);
-				scenario->set_parameter(document, section, "SIGMA_PMPEAK", _SIGMA_PMPEAK);
-				scenario->set_parameter(document, section, "SIGMA_EVENING", _SIGMA_EVENING);
-				scenario->set_parameter(document, section, "SIGMA_NIGHT", _SIGMA_NIGHT);
+				scenario->set_parameter<float>(document, "SIGMA_AMPEAK", _SIGMA_AMPEAK);
+				scenario->set_parameter<float>(document, "SIGMA_AMOFFPEAK", _SIGMA_AMOFFPEAK);
+				scenario->set_parameter<float>(document, "SIGMA_PMOFFPEAK", _SIGMA_PMOFFPEAK);
+				scenario->set_parameter<float>(document, "SIGMA_PMPEAK", _SIGMA_PMPEAK);
+				scenario->set_parameter<float>(document, "SIGMA_EVENING", _SIGMA_EVENING);
+				scenario->set_parameter<float>(document, "SIGMA_NIGHT", _SIGMA_NIGHT);
 				#pragma endregion
 
 				// fill in the default start-duration distribution
