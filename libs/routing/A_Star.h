@@ -368,9 +368,8 @@ namespace polaris
 		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(graph_id);
 		for (auto itr = edges->begin(); itr != edges->end(); itr++)
 		{
-			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;						
-			current_g.edge_id = current->_edge_id;
-			_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(current_g.edge_id);			
+			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
+			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
 			current_link->_dijkstra_cost[zone_index] = current->_cost_from_origin;
 		}
 

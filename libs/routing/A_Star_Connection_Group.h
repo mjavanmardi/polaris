@@ -205,16 +205,16 @@ namespace polaris
 			
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
+			std::vector<bool> unique_pattern_scanned;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{				
-				current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
+				unique_pattern_scanned[patterns_ctr] = false;
 			}
 			
 			int trips_ctr = 0;
 			patterns_ctr = 0;
 
-			int trips_by_dep_time_size = current_neighbor->_trips_by_dep_time.size();
-			
+			int trips_by_dep_time_size = current_neighbor->_trips_by_dep_time.size();			
 			while (trips_ctr < trips_by_dep_time_size && patterns_ctr <= unique_patterns_size)
 			{						
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
@@ -223,11 +223,6 @@ namespace polaris
 				int unique_pattern_loc = current_neighbor->_trip_to_unique_pattern_index[trips_ctr];
 
 				++trips_ctr;
-
-				if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
-				{
-					continue;
-				}
 
 				int wait_binary = 1;											
 				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
@@ -242,9 +237,16 @@ namespace polaris
 				{
 					return;
 				}
-				
-				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
-				++patterns_ctr;
+
+				if (unique_pattern_scanned[unique_pattern_loc])
+				{
+					continue;
+				}
+				else 
+				{
+					unique_pattern_scanned[unique_pattern_loc] = true;
+					++patterns_ctr;
+				}
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
@@ -361,17 +363,18 @@ namespace polaris
 			
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
+			std::vector<bool> unique_pattern_scanned;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
 			{				
 				current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
+				unique_pattern_scanned.push_back(false);
 			}
 
 			int trips_ctr = 0;
 			patterns_ctr = 0;
 
 			int trips_by_dep_time_size = current_neighbor->_trips_by_dep_time.size();
-
-			while (trips_ctr < trips_by_dep_time_size && patterns_ctr <= unique_patterns_size)
+			while (trips_ctr < trips_by_dep_time_size && patterns_ctr < unique_patterns_size)
 			{
 				_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)current_neighbor->_trips_by_dep_time[trips_ctr];
 				int mySeq = current_neighbor->_index_along_trip_at_upstream_node[trips_ctr];
@@ -380,14 +383,9 @@ namespace polaris
 
 				++trips_ctr;
 
-				if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
-				{
-					continue;
-				}
-
 				int wait_binary = 1;
 				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
-								
+
 				if (waitTime < 0.0)
 				{
 					continue;
@@ -399,8 +397,16 @@ namespace polaris
 					return;
 				}
 
-				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
-				++patterns_ctr;
+				//if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
+				if (unique_pattern_scanned[unique_pattern_loc])
+				{
+					continue;
+				}
+				else
+				{
+					unique_pattern_scanned[unique_pattern_loc] = true;
+					++patterns_ctr;
+				}
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
