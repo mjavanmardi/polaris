@@ -88,6 +88,8 @@ namespace Person_Components
 			template<typename TargetType> void Initialize();
 			template<typename ActivityType> void Update_Current_Activity(ActivityType current_act);
 
+			static m_data(_lock, update_lock, NONE, NONE);
+
 			// scheduling features - move to Person_Scheduler eventually
 			//template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			//{
@@ -146,12 +148,12 @@ namespace Person_Components
 		
 			
 			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/));
-			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType, check(TargetType, is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/));
+			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, bool delete_activity=true, requires(TargetType, check(TargetType, is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/));
 
 			static bool comparer(typename MasterType::activity_type* act1, typename MasterType::activity_type* act2);
 			
 			template<typename TargetType> TargetType Sort_Activity_Schedule();
-
+			template<typename TimeType> float Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end);
 
 			//=======================================================================================================
 			//
@@ -668,8 +670,9 @@ namespace Person_Components
 		template<typename TargetType>
 		void General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Resolve_At_Home_Timing_Conflict(TargetType current_activity, TargetType previous_activity)
 		{
-				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef General_Person_Scheduler_Implementation<MasterType, InheritanceList> BaseType;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 			Activity_Plan* act = (Activity_Plan*)current_activity;
 			Activity_Plan* prev_act = (Activity_Plan*)previous_activity;
@@ -704,7 +707,16 @@ namespace Person_Components
 			// get maximum end time of current activity given departure time for next activity
 			new_end = act->template Start_Time<Time_Seconds>() - ttime;
 
-			prev_act->template End_Time<Time_Seconds>(new_end, false);
+			if (new_end < prev_act->Start_Time<Time_Seconds>())
+			{
+				//LOCK(BaseType::_update_lock);
+				//cout << endl;
+				//cout << "New end, prev_act_start, new_act_start, ttime, orig, dest" << endl;
+				//cout << new_end << ", " << prev_act->Start_Time<Time_Seconds>() << "," << start << "," << ttime << "," << prev_loc->zone<_Zone_Interface*>()->uuid<int>() << "," << loc->zone<_Zone_Interface*>()->uuid<int>() << endl;
+				this->template Remove_Activity_Plan<Activity_Plan*>(act, true);
+				//UNLOCK(BaseType::_update_lock);
+			}
+			else prev_act->template End_Time<Time_Seconds>(new_end, false);
 		}
 
 		// Adding activities and movements to the planning schedules
@@ -858,7 +870,7 @@ namespace Person_Components
 
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType>
-		void General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Remove_Activity_Plan(TargetType activity_plan, requires(TargetType, check(TargetType, is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+		void General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Remove_Activity_Plan(TargetType activity_plan, bool delete_activity=true, requires(TargetType, check(TargetType, is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 		{
 				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
 				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
@@ -888,7 +900,7 @@ namespace Person_Components
 				}
 			}
 			// Free the activity using interface
-			act->template Free_Activity<NT>();
+			if (delete_activity) act->template Free_Activity<NT>();
 		}
 		//template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, requires(TargetType,check(TargetType,is_pointer)/* && check(strip_modifiers(TargetType),Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 		//{
@@ -937,6 +949,50 @@ namespace Person_Components
 
 		}
 
+		template<typename MasterType, typename InheritanceList>
+		template<typename TimeType>
+		float General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end)
+		{
+			if (range_end <= range_start) return 0.0;
+
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+
+			Time_Minutes start = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Minutes>(range_start);
+			Time_Minutes end   = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Minutes>(range_end);
+			Time_Minutes eval_time = start;
+
+			Time_Minutes occupied_time = 0.0;
+
+			Activity_Plan* prev = previous_activity_plan<Time_Minutes,Activity_Plan*>(start);
+			if (prev->End_Time<Time_Minutes>() > start && prev->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY) occupied_time = occupied_time + prev->End_Time<Time_Minutes>() - start;
+
+			Activity_Plan* next = next_activity_plan<Time_Minutes, Activity_Plan*>(start);
+
+
+			while (next != nullptr)
+			{
+				if (next->Start_Time<Time_Minutes>() > end) break; // no more possible activities occupying time in range
+
+				 // ignore at home activities other than work
+				if (next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
+				{
+					if (next->End_Time<Time_Minutes>() > end)
+					{
+						occupied_time = occupied_time + (end - next->Start_Time<Time_Minutes>());
+						break;
+					}
+					else occupied_time = occupied_time + next->Duration<Time_Minutes>();
+				}
+				//TODO: move to next activity, break if it is the same as previous (this happens due to an error in the scheduler which sets activity end times before the start times -> look into it...
+				prev = next;
+				next = next_activity_plan<Time_Minutes, Activity_Plan*>(next->End_Time<Time_Minutes>());
+				if (prev == next) break;
+			}
+
+			return occupied_time / (end - start);
+
+		}
 
 		//=======================================================================================================
 		//
@@ -1072,6 +1128,8 @@ namespace Person_Components
 
 
 		}
+
+		template<typename MasterType, typename InheritanceList> _lock General_Person_Scheduler_Implementation<MasterType, InheritanceList>::_update_lock;
 
 	}
 

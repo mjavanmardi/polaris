@@ -374,7 +374,17 @@ namespace Routing_Components
 
 				_travel_times_to_link_container.clear();
 
-				routable_network->compute_static_network_tree(origin_id,_travel_times_to_link_container);
+				//routable_network->compute_static_network_tree(origin_id,_travel_times_to_link_container);
+
+				typedef Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type> _Scenario_Interface;
+				if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
+				{
+					routable_network->compute_static_network_tree(origin_id, _travel_times_to_link_container);
+				}
+				else
+				{
+					routable_network->compute_time_dependent_network_tree(origin_id, _travel_times_to_link_container);
+				}
 			}
 		};
 

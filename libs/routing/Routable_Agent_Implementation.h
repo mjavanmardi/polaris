@@ -136,15 +136,42 @@ namespace polaris
 				int sim_time = iteration();
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
-				float ttime_accumulation = 0;
-				float ttime_step = current->moe_data()->layer_step<float>();
-				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
-				if (t > ttime_step)
+				//float ttime_accumulation = 0;
+				//float ttime_step = connection->turn_moe_data()->layer_step<float>();
+				//ttime_step = ttime_step - current_time % (int)ttime_step;
+
+				// interpolate between current and next time step
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
+
+				//if (t1_weight < 0.5) // closer to next time step
+				//{
+				//	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = t2*(1 - t1_weight) + t1*t1_weight;
+				//}
+				//else // closer to previous time step
+				//{
+				//	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time - ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = t1*(1 - t1_weight) + t2*t1_weight;
+				//}
+				//
+				//// if the travel time is longer than the current timestep, get the expected travel time at the estimated link departure time and interpolate between (to capture cases where the travel time is growing rapidly
+				//if (t > ttime_step/t1_weight)
+				//{
+				//	float t3 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + t) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = (t + t3)*0.5;
+				//}
+				//
+				t = t1;
+				
+
+				//TODO: replace this accumulation step, which requires a lot of lookups, with an interpolation between travel time at the arrival on the link and travel time at the expected departure....
+				/*if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
-					ttime_step = current->moe_data()->layer_step<float>();
+					ttime_step = connection->turn_moe_data()->layer_step<float>();
 					while (t - ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
@@ -152,7 +179,7 @@ namespace polaris
 
 					}
 				}
-				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);*/
 
 				
 
@@ -212,15 +239,49 @@ namespace polaris
 				int sim_time = iteration();
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
+				//float ttime_accumulation = 0;
+				//float ttime_step = connection->turn_moe_data()->layer_step<float>();
+				//ttime_step = ttime_step - current_time % (int)ttime_step;
+
+				// interpolate between current and next time step
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
+
+				//if (t1_weight < 0.5) // closer to next time step
+				//{
+				//	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = t2*(1 - t1_weight) + t1*t1_weight;
+				//}
+				//else // closer to previous time step
+				//{
+				//	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time - ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = t1*(1 - t1_weight) + t2*t1_weight;
+				//}
+				//
+				//// if the travel time is longer than the current timestep, get the expected travel time at the estimated link departure time and interpolate between (to capture cases where the travel time is growing rapidly
+				//if (t > ttime_step/t1_weight)
+				//{
+				//	float t3 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + t) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//	t = (t + t3)*0.5;
+				//}
+				//
+				t = t1;
+
+
+				//TODO: replace this accumulation step, which requires a lot of lookups, with an interpolation between travel time at the arrival on the link and travel time at the expected departure....
+				/*
+
+				// get historical time cost - update if traveler will be on link for multiple time periods
 				float ttime_accumulation = 0;
-				float ttime_step = current->moe_data()->layer_step<float>();
+				float ttime_step = connection->turn_moe_data()->layer_step<float>();
 				ttime_step = ttime_step - current_time % (int)ttime_step;
 				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				if (t > ttime_step)
 				{
 					ttime_accumulation += ttime_step;
 					t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
-					ttime_step = current->moe_data()->layer_step<float>();
+					ttime_step = connection->turn_moe_data()->layer_step<float>();
 					while (t - ttime_accumulation > ttime_step)
 					{
 						ttime_accumulation += ttime_step;
@@ -229,7 +290,7 @@ namespace polaris
 					}
 				}
 				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
-
+				*/
 
 
 				// updates to handle mixing of historical and real-time info in cost function
@@ -360,10 +421,212 @@ namespace polaris
 			return current->_cost + connection->_cost;
 		}
 
+		float cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
+		{
+			// moe lookup - switched from link-based (moe_ptr) to turn-based (turn_moe_ptr) - testing.....
+			int current_time = current->time_label();
+			//float* moe_ptr = current->moe_ptr();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
+
+			if (turn_moe_ptr /*moe_ptr*/ != nullptr)
+			{
+				int sim_time = iteration();
+
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				//float ttime_accumulation = 0;
+				//float ttime_step = connection->turn_moe_data()->layer_step<float>();
+				//ttime_step = ttime_step - current_time % (int)ttime_step;
+
+				// interpolate between current and next time step
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
+
+																														  //if (t1_weight < 0.5) // closer to next time step
+																														  //{
+																														  //	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = t2*(1 - t1_weight) + t1*t1_weight;
+																														  //}
+																														  //else // closer to previous time step
+																														  //{
+																														  //	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time - ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = t1*(1 - t1_weight) + t2*t1_weight;
+																														  //}
+																														  //
+																														  //// if the travel time is longer than the current timestep, get the expected travel time at the estimated link departure time and interpolate between (to capture cases where the travel time is growing rapidly
+																														  //if (t > ttime_step/t1_weight)
+																														  //{
+																														  //	float t3 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + t) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = (t + t3)*0.5;
+																														  //}
+																														  //
+				t = t1;
+
+
+				//TODO: replace this accumulation step, which requires a lot of lookups, with an interpolation between travel time at the arrival on the link and travel time at the expected departure....
+				/*if (t > ttime_step)
+				{
+				ttime_accumulation += ttime_step;
+				t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+				ttime_step = connection->turn_moe_data()->layer_step<float>();
+				while (t - ttime_accumulation > ttime_step)
+				{
+				ttime_accumulation += ttime_step;
+				t = current->_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+
+				}
+				}
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);*/
+
+
+
+				// updates to handle mixing of historical and real-time info in cost function
+				float time_cost_current = current->_cost + connection->_cost;
+
+				int t_diff = abs(current_time - iteration());
+
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+
+				float time_cost = w*time_cost_current + (1 - w)*t;
+
+
+				if (neighbor->_is_highway)
+				{
+					return time_cost*.95f;
+				}
+				else
+				{
+
+					return time_cost;
+				}
+			}
+			else
+			{
+
+				if (neighbor->_is_highway)
+				{
+					//cout << "is highway" << endl;
+					return (current->_cost + connection->_cost)*.95f;
+				}
+				else
+				{
+					//cout << "is not highway" << endl;
+					return current->_cost + connection->_cost;
+				}
+
+			}
+		}
+
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
 			return current->_time_cost + connection->_time_cost;
+		}
+
+		float time_cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
+		{
+			// moe lookup
+			int current_time = current->time_label();
+			float* turn_moe_ptr = connection->turn_moe_ptr();
+
+			if (turn_moe_ptr != nullptr)
+			{
+				int sim_time = iteration();
+
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				//float ttime_accumulation = 0;
+				//float ttime_step = connection->turn_moe_data()->layer_step<float>();
+				//ttime_step = ttime_step - current_time % (int)ttime_step;
+
+				// interpolate between current and next time step
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
+
+																														  //if (t1_weight < 0.5) // closer to next time step
+																														  //{
+																														  //	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = t2*(1 - t1_weight) + t1*t1_weight;
+																														  //}
+																														  //else // closer to previous time step
+																														  //{
+																														  //	float t2 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time - ttime_step / t1_weight) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = t1*(1 - t1_weight) + t2*t1_weight;
+																														  //}
+																														  //
+																														  //// if the travel time is longer than the current timestep, get the expected travel time at the estimated link departure time and interpolate between (to capture cases where the travel time is growing rapidly
+																														  //if (t > ttime_step/t1_weight)
+																														  //{
+																														  //	float t3 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + t) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+																														  //	t = (t + t3)*0.5;
+																														  //}
+																														  //
+				t = t1;
+
+
+				//TODO: replace this accumulation step, which requires a lot of lookups, with an interpolation between travel time at the arrival on the link and travel time at the expected departure....
+				/*
+
+				// get historical time cost - update if traveler will be on link for multiple time periods
+				float ttime_accumulation = 0;
+				float ttime_step = connection->turn_moe_data()->layer_step<float>();
+				ttime_step = ttime_step - current_time % (int)ttime_step;
+				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				if (t > ttime_step)
+				{
+				ttime_accumulation += ttime_step;
+				t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+				ttime_step = connection->turn_moe_data()->layer_step<float>();
+				while (t - ttime_accumulation > ttime_step)
+				{
+				ttime_accumulation += ttime_step;
+				t = current->_time_cost + connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation);
+
+				}
+				}
+				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+				*/
+
+
+				// updates to handle mixing of historical and real-time info in cost function
+				float time_cost_current = current->_time_cost + connection->_time_cost;
+
+				int t_diff = abs(current_time - iteration());
+
+				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
+				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+
+				float time_cost = w*time_cost_current + (1 - w)*t;
+
+
+				if (neighbor->_is_highway)
+				{
+					return time_cost*.95f;
+				}
+				else
+				{
+
+					return time_cost;
+				}
+			}
+			else
+			{
+
+				if (neighbor->_is_highway)
+				{
+					//cout << "is highway" << endl;
+					return (current->_time_cost + connection->_time_cost)*.95f;
+				}
+				else
+				{
+					//cout << "is not highway" << endl;
+					return current->_time_cost + connection->_time_cost;
+				}
+
+			}
 		}
 
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>

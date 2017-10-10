@@ -18,7 +18,7 @@ namespace polaris
 
 #ifdef _DEBUG
 	#define ENABLE_MESSAGES
-	//#define ENABLE_WARNINGS
+	#define ENABLE_WARNINGS
 	#define ENABLE_DEBUG_MESSAGES
 #endif
 	#define ENABLE_EXCEPTIONS

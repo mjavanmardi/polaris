@@ -546,7 +546,7 @@ namespace Network_Skimming_Components
 				// Extract zone ID information from the input origin/destination type (either location or zone)
 				int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(origin);
 
-				// Do a lookup to make sure the zone is in the network (may be able to remove this)
+				//TODO: remove when done test.  Do a lookup to make sure the zone is in the network (may be able to remove this)
 				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
 				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->template uuid<int>()<<","<<origin->template internal_id<int>());
 
@@ -779,80 +779,12 @@ namespace Network_Skimming_Components
 			{
 				// call implementation initializer
 				this_component()->template Initialize<TargetType>();
-
-				// set the network reference
-				//typedef Prototypes::LOS<typename remove_pointer< typename get_type_of(skim_table)::value_type>::type> los_value_itf;
-				//typedef Multidimensional_Random_Access_Array< typename get_type_of(skim_table),los_value_itf*> skim_table_itf;
-
-				//typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-				//typedef Prototypes::Network_Skimming<typename get_type_of(skim_reference)> skimmer_itf;
-				//network_itf* network = this->network_reference<network_itf*>();
-				//skimmer_itf* skim = this->skim_reference<skimmer_itf*>();
-				//
-				//// create the LOS container
-				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type> zone_itf;
-				//typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
-
-				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
-				//typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
-
-				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename location_itf::get_type_of(origin_links)::value_type>::type> link_itf;
-				//typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links),link_itf*> links_itf;
-
-				//typedef (origin_map_itf,origin_item_itf,typename skimmer_itf::get_type_of(origin_node_to_zone_map), Pair_Associative_Container,Prototypes::Location_To_Zone_Map_Item);
-				//origin_map_itf* origin_map = skim->template origin_node_to_zone_map<origin_map_itf*>();
-				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
-				//typename origin_map_itf::iterator orig_itr = origin_map->begin();
-				//locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
-		
-				//// create the LOS matrix
-				//typedef matrix<los_value_itf*>::size_type size_t;
-				//skim_table_itf* los = this->skim_table<skim_table_itf*>();
-				//los->resize(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), 0);
 			}			
 
 			template<typename TargetType> void Initialize(TargetType initial_data, requires(TargetType,check(TargetType, is_pointer)))
 			{
-				//cout << endl << "Initializing skim table at iteration - " << iteration();
-
-
 				// call implementation initializer
 				this_component()->template Initialize<TargetType>(initial_data);
-
-				// set the network reference
-				//typedef Multidimensional_Random_Access_Array<typename get_type_of(skim_table),typename get_type_of(skim_table)::value_type> skim_table_itf;
-				//typedef Prototypes::LOS<typename remove_pointer< typename get_type_of(skim_table)::value_type>::type> los_value_itf;
-				//typedef Multidimensional_Random_Access_Array< typename get_type_of(skim_table),los_value_itf*> skim_table_itf;
-
-				//typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
-				//typedef Prototypes::Network_Skimming<typename get_type_of(skim_reference)> skimmer_itf;
-				//network_itf* network = this->network_reference<network_itf*>();
-				//skimmer_itf* skim = this->skim_reference<skimmer_itf*>();
-				//
-				//// create the LOS container
-				//typedef Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type> zone_itf;
-				//typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container),zone_itf*> zones_itf;
-
-				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
-				//typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
-
-				//typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename location_itf::get_type_of(origin_links)::value_type>::type> link_itf;
-				//typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links),link_itf*> links_itf;
-
-				//typedef (origin_map_itf,origin_item_itf,typename skimmer_itf::get_type_of(origin_node_to_zone_map), Pair_Associative_Container,Prototypes::Location_To_Zone_Map_Item);
-				////typedef (destination_map_itf,destination_item_itf,skimmer_itf::get_type_of(destination_node_to_zone_map), Pair_Associative_Container,Prototypes::Location_To_Zone_Map_Item);
-				//origin_map_itf* origin_map = skim->template origin_node_to_zone_map<origin_map_itf*>();
-				////destination_map_itf* destination_map = skim->destination_node_to_zone_map<destination_map_itf*>();		
-				//zones_itf* zones_container = network->template zones_container<zones_itf*>();
-				//typename origin_map_itf::iterator orig_itr = origin_map->begin();
-				////destination_map_itf::iterator dest_itr = destination_map->begin();
-				//locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
-		
-				// create the LOS matrix
-				//typedef matrix<los_value_itf*>::size_type size_t;
-				//skim_table_itf* los = this->skim_table<skim_table_itf*>();
-				//los->Copy(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), (los_value_itf*)initial_data);
-
 			}	
 
 			template<typename TargetType> bool Process_Skims()

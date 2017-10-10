@@ -71,6 +71,8 @@ namespace Scenario_Components
 			// capacity adjustments by facility type
 			accessor(capacity_adjustment_highway, NONE, NONE);
 			accessor(capacity_adjustment_arterial, NONE, NONE);
+			accessor(cacc_capacity_adjustment_alpha, NONE, NONE);
+			accessor(cacc_capacity_adjustment_beta, NONE, NONE);
 			accessor(simulate_cacc, NONE, NONE);
 			accessor(cav_market_penetration, NONE, NONE);
 			accessor(cav_vott_adjustment, NONE, NONE);
@@ -179,8 +181,7 @@ namespace Scenario_Components
 			accessor(write_demand_to_database, NONE, NONE);			//
 			accessor(read_demand_from_database, NONE, NONE);		// 
 			accessor(read_population_from_database, NONE, NONE);	// run model with pre-existing synthetic population *must reference <db>-Popsyn.sqlite database
-			accessor(activity_start_time_model_file_name,NONE,NONE);
-
+			
 			accessor(flexible_work_percentage, NONE, NONE);
 			//===============================================
 			// Vehicle Choice parameters
@@ -320,6 +321,7 @@ namespace Scenario_Components
 			accessor(destination_choice_model_file, NONE, NONE);
 			accessor(telecommute_choice_model_file, NONE, NONE);
 			accessor(cav_wtp_model_file, NONE, NONE);
+			accessor(timing_choice_model_file, NONE, NONE);
 			accessor(multimodal_routing_model_file, NONE, NONE);
 
 			void default_static_initializer()
@@ -709,6 +711,8 @@ namespace Scenario_Components
 				set_parameter<double>(document, "capacity_adjustment_highway", capacity_adjustment_highway<double &>());
 				set_parameter<double>(document, "capacity_adjustment_arterial", capacity_adjustment_arterial<double &>());
 				set_parameter<bool>(document, "simulate_cacc", simulate_cacc<bool &>());
+				set_parameter<double>(document, "cacc_capacity_adjustment_alpha", cacc_capacity_adjustment_alpha<double &>());
+				set_parameter<double>(document, "cacc_capacity_adjustment_beta", cacc_capacity_adjustment_beta<double &>());
 				set_parameter<double>(document, "flexible_work_percentage", flexible_work_percentage<double &>());
 
 				//===============================================
@@ -827,6 +831,7 @@ namespace Scenario_Components
 				set_parameter<std::string>(document, "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
 				set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
+				set_parameter<std::string>(document, "timing_choice_model_file", timing_choice_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

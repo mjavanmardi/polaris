@@ -262,6 +262,7 @@ namespace Activity_Components
 			{
 				if (value < this->template Start_Time<TargetType>())
 				{
+					//TODO: CHANGE back to throw exception after testing
 					THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
 				}
 				else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
@@ -1208,7 +1209,8 @@ namespace Activity_Components
 
 			// get the combined start time and duration
 			_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
-			pair<Time_Seconds, Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<ComponentType*, Time_Seconds>(this);
+			//pair<Time_Seconds, Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<ComponentType*, Time_Seconds>(this);
+			pair<Time_Seconds, Time_Seconds> start_and_duration = timing_planner->template Timing_Choice<ComponentType*, Time_Seconds>(this);
 
 			// make sure start time is not prior to current iteration
 			Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds, Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
@@ -1457,21 +1459,22 @@ namespace Activity_Components
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 
-				Time_Minutes duration; 	
+				//TODO: this is already handled in the start-time planner for routine acts....
+				//Time_Minutes duration; 	
 	
-				if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
-				{
-					duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
-				}
-				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
-				{
-					duration = 60.0 * 7.0;
-				}
-				else
-				{
-					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
-				}
-				pthis->template Duration<Time_Minutes>(duration);
+				//if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
+				//{
+				//	duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
+				//}
+				//else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				//{
+				//	duration = 60.0 * 7.0;
+				//}
+				//else
+				//{
+				//	THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
+				//}
+				//pthis->template Duration<Time_Minutes>(duration);
 
 			}
 

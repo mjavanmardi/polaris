@@ -275,6 +275,12 @@ bool InitializeChoiceModelParameters(MasterType::scenario_type* scenario)
 	}
 	MasterType::person_destination_choice_option_type::print_parameters();
 
+	if (!MasterType::activity_timing_chooser_type::static_initialize(scenario->template timing_choice_model_file<string>()))
+	{
+		cout << "ERROR: Unable to initialize Timing Choice Model parameters." << endl;
+		return false;
+	}
+
 	if (!MasterType::telecommute_chooser_type::static_initialize(scenario->template telecommute_choice_model_file<string>()))
 	{
 		cout << "ERROR: Unable to initialize Telecommute Choice Model parameters." << endl;
@@ -747,7 +753,7 @@ int main(int argc,char** argv)
 	if (!InitializeChoiceModelParameters(scenario)) return 1;
 	
 	// Initialize start time model
-	MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
+	//MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	
 
 	// Initialize person properties with average activity frequency and duration
 	MasterType::person_properties_type::Static_Initializer();

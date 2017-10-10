@@ -179,6 +179,16 @@ namespace Network_Components
 
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
 				ReturnType ret_value = skim->template Get_TTime<LocationType, ModeType, TimeType, ReturnType>(Origin, Destination, Mode_Indicator, Start_Time);
+
+				//TODO: remove when done testing - Check for bad ttime values - set maximum travel time returned from skimmer to 3 hours, if skim time is longer than this use euclidean distance divided by 15mph
+				if (ret_value > GLOBALS::Time_Converter.Convert_Value<Time_Hours, ReturnType>(3.0))
+				{
+					//cout << "WARNING: Travel time value is bad...";
+					typedef Network_Skimming_Components::Prototypes::LOS<typename MasterType::los_value_type> LOS_itf;
+
+					LOS_itf* los = skim->template Get_LOS<LocationType, TimeType, LOS_itf*>(Origin, Destination, Start_Time);
+					return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los->auto_distance<Basic_Units::Length_Variables::Miles>() / 15.0);
+				}
 				
 				return ret_value;
 			}
@@ -208,6 +218,37 @@ namespace Network_Components
 				//assert_check(ReturnType, Zone_Components::Concepts::Is_Zone_Prototype, "Origin/Destination must be specified as a zone_prototype.");
 				//assert_check(LocationType, Activity_Location_Components::Concepts::Is_Activity_Location_Prototype, " Or Origin/Destination must be specified as an activity_location_prototype.");
 			}
+
+			/// returns a pair consisting of average travel time over the range (in units of TimeType) and the travel time variability index as a float
+			template<typename LocationType, typename ModeType, typename TimeType, typename ReturnType> pair<ReturnType,float> Get_TTime_Statistics(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, TimeType Start_Range, TimeType End_Range,
+				requires(ReturnType, check(ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			{
+				typedef Network_Skimming_Components::Prototypes::Network_Skimming<typename get_type_of(skimming_faculty)> _skim_interface;
+				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
+
+				ReturnType avg_ttime = 0.0;
+				ReturnType max_ttime = 0.0;
+				ReturnType min_ttime = FLT_MAX;
+				float ttime_var = 0.0;
+				float count = 0.0;
+
+				Time_Hours t = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Hours>(Start_Range);
+				Time_Hours end = GLOBALS::Time_Converter.Convert_Value<TimeType, Time_Hours>(End_Range);
+
+				while (t < end)
+				{
+					ReturnType cur = skim->template Get_TTime<LocationType, ModeType, TimeType, ReturnType>(Origin, Destination, Mode_Indicator, t);
+					avg_ttime = avg_ttime + cur;
+					count += 1.0;
+					if (cur < min_ttime) min_ttime = cur;
+					if (cur > max_ttime) max_ttime = cur;
+					t = t + 1.0;
+				}
+				
+				return pair<ReturnType,float>(avg_ttime / count, (max_ttime - min_ttime) / (avg_ttime/count));
+			}
+
+
 
 			template<typename LocationType, typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<ReturnLocationType>& available_set, LocationType origin, TimeType start_time, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward = true,
 				requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))

@@ -92,8 +92,14 @@ namespace Zone_Components
 			accessor(avg_distance, NONE, NONE);
 			accessor(min_ovtt_transit, NONE, NONE);
 			//accessor(avg_ttime_auto_to_transit_accessible_zones, NONE, NONE);
-			accessor(avg_ttime_auto_peak, NONE, NONE);
+			accessor(avg_ttime_auto_ampeak, NONE, NONE);
+			accessor(avg_ttime_auto_pmpeak, NONE, NONE);
 			accessor(avg_ttime_auto_offpeak, NONE, NONE);
+			accessor(avg_ttime_auto_night, NONE, NONE);
+			accessor(avg_ttime_var_auto_ampeak, NONE, NONE);
+			accessor(avg_ttime_var_auto_pmpeak, NONE, NONE);
+			accessor(avg_ttime_var_auto_offpeak, NONE, NONE);
+			accessor(avg_ttime_var_auto_night, NONE, NONE);
 
 			accessor(zone_is_available, NONE, NONE);
 			accessor(graphical_zone_group, NONE, NONE);

@@ -1897,6 +1897,11 @@ namespace Person_Components
 				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
 				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
+				//----------------------------------------------------------------------
+				// Get the mode of the activity, if not yet planned, assume 9AM
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
+				if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
 
 				// Get preceding and following activities based on start time, otherwise assume plan a new tour starting and ending at home
 				Current_Activity_type prev_act, next_act;
@@ -1948,8 +1953,12 @@ namespace Person_Components
 					// Use half the available time to stratify the zone choices
 					if (restrict_choice_set)
 					{
+						Time_Minutes min_avail_time = network->Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes, Time_Minutes>(prev_loc, next_loc, mode, start_time) + 5.0;
 						avail_time = max_end - min_start - _Current_Activity->template Duration<Time_Minutes>();
-						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;
+						// if there is no time available between previous and next activity, use the travel time from previous to next location as the available time (i.e. search for stops along the travel route, more or less....) - add 5 minutes slack time...
+						if (avail_time < min_avail_time) avail_time = min_avail_time;
+
+						if (avail_time <= TTIME_SPLIT*2.0) TTIME_SPLIT = avail_time / 2.0;	
 					}
 				}
 				else
@@ -1965,11 +1974,7 @@ namespace Person_Components
 				if (prev_loc == nullptr) prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 				if (next_loc == nullptr) next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
-				//----------------------------------------------------------------------
-				// Get the mode of the activity, if not yet planned, assume 9AM
-				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
-				if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
-
+				
 				Activity_Components::Types::ACTIVITY_TYPES act_type = _Current_Activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
 

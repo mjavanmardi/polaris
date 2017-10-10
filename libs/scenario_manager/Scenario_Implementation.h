@@ -50,7 +50,10 @@ namespace Scenario_Components
 			// CAV SIMULATION VARIABLES
 			m_data(double, capacity_adjustment_highway,NONE,NONE);
 			m_data(double, capacity_adjustment_arterial,NONE,NONE);
+
 			m_data(bool, simulate_cacc,NONE,NONE);  // ***SD*** change from double based on read_scenario_data
+			m_data(double, cacc_capacity_adjustment_alpha, NONE, NONE);
+			m_data(double, cacc_capacity_adjustment_beta, NONE, NONE);
 			m_data(double, automation_cost, NONE, NONE);
 			m_data(double, vehicle_techchoice_beta_past_crashes, NONE, NONE);
 			m_data(double, vehicle_techchoice_beta_smartphone, NONE, NONE);
@@ -148,6 +151,8 @@ namespace Scenario_Components
 			m_data(double, time_dependent_routing_weight_shape, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_scale, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_factor, NONE, NONE);
+
+			m_data(string, timing_choice_model_file, NONE, NONE);
 
 			m_data(bool, multimodal_routing, NONE, NONE);
 			m_data(double, multimodal_routing_weight_shape, NONE, NONE);

@@ -179,20 +179,20 @@ namespace Household_Components
 					std::getline(linestream, pt_type_txt, '\t');
 					linestream >> prob;
 
-					if(veh_class_txt == "Compact")			veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;			
-					else if ( veh_class_txt == "Midsize")		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MID_SIZE;
-					else if ( veh_class_txt == "Midsize SUV")	veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
-					else if ( veh_class_txt == "Small SUV")		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_COMPACT;
-					else if ( veh_class_txt == "Pickup")		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;
-					else    								veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
+					if (veh_class_txt == "Compact" || veh_class_txt == "COMPACT" || veh_class_txt == "compact")						veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
+					else if (veh_class_txt == "Midsize" || veh_class_txt == "MIDSIZE" || veh_class_txt == "midsize")				veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MID_SIZE;
+					else if ( veh_class_txt == "Midsize SUV" || veh_class_txt == "MIDSIZE SUV" || veh_class_txt == "midsize SUV")	veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
+					else if ( veh_class_txt == "Small SUV" || veh_class_txt == "SMALL SUV" || veh_class_txt == "small SUV")			veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_COMPACT;
+					else if ( veh_class_txt == "Pickup" || veh_class_txt == "PICKUP" || veh_class_txt == "pickup")					veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;
+					else    																										veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
 					
-					if(pt_type_txt ==  "PHEV")				pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::PHEV;
-					else if (pt_type_txt == "HEV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::HEV;				
-					else if (pt_type_txt == "ICE")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
-					else if (pt_type_txt == "LSEV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;				
-					else if (pt_type_txt == "EV")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;				
-					else if (pt_type_txt == "H2")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::FCEV;				
-					else 									pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;	
+					if(pt_type_txt ==  "PHEV" || pt_type_txt == "phev")				pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::PHEV;
+					else if (pt_type_txt == "HEV" || pt_type_txt == "hev")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::HEV;
+					else if (pt_type_txt == "ICE" || pt_type_txt == "ice")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
+					else if (pt_type_txt == "LSEV" || pt_type_txt == "lsev")		pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
+					else if (pt_type_txt == "EV" || pt_type_txt == "ev")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
+					else if (pt_type_txt == "H2" || pt_type_txt == "h2")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::FCEV;
+					else 															pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;	
 
 					// find your vehicle characteristics pointer given the above information...
 					vehicle_characteristics_interface* veh_char = nullptr;
