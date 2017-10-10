@@ -229,20 +229,9 @@ namespace polaris
 					continue;
 				}
 
-				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;			
-
 				int wait_binary = 1;											
 				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
-				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-				{
-					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;					
-					if (current_trip->_uuid == next_trip->_uuid)
-					{
-						wait_binary = 0;
-					}
-				}
-
-				
+								
 				if (waitTime < 0)
 				{
 					continue;
@@ -256,6 +245,16 @@ namespace polaris
 				
 				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 				++patterns_ctr;
+
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					if (current_trip->_uuid == next_trip->_uuid)
+					{
+						wait_binary = 0;
+					}
+				}
 
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
@@ -359,9 +358,7 @@ namespace polaris
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 			
 			//if (current_neighbor->in_closed_set()) return;
-
-			std::map<int, bool> pattern_scanned;
-
+			
 			int unique_patterns_size = current_neighbor->_unique_patterns.size();
 			int patterns_ctr;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
@@ -388,21 +385,9 @@ namespace polaris
 					continue;
 				}
 
-				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
-
 				int wait_binary = 1;
 				float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
-
-				_Transit_Vehicle_Trip_Interface* current_trip = nullptr;
-				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-				{
-					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
-					if (current_trip->_uuid == next_trip->_uuid)
-					{
-						wait_binary = 0;
-					}
-				}
-				
+								
 				if (waitTime < 0.0)
 				{
 					continue;
@@ -416,6 +401,16 @@ namespace polaris
 
 				current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 				++patterns_ctr;
+
+				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
+				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+					if (current_trip->_uuid == next_trip->_uuid)
+					{
+						wait_binary = 0;
+					}
+				}
 				
 				int WaitingCount = current->_wait_count_from_origin + wait_binary;
 

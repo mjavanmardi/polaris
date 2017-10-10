@@ -380,7 +380,7 @@ int main(int argc,char** argv)
 	stringstream output_filename("");
 	output_filename << scenario->template output_dir_name<string>();
 	output_filename << "routed_results.dat";
-	fw_mm_sp_details.Open(output_filename.str());
+	fw_output.Open(output_filename.str());
 
 	bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 	if (debug_route)
@@ -420,6 +420,7 @@ int main(int argc,char** argv)
 		
 	fw_mm_sp_details.Close();
 	fw_mm_sp_summary.Close();
+	fw_output.Close();
 	cout << "Finished! Press 'Any' key" << endl;
 
 }
