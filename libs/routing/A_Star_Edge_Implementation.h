@@ -38,10 +38,12 @@ namespace polaris
 		t_data(float, cost);
 		t_data(float, time_cost);
 		t_data(float, time_cost_temp);
+		//TODO OMER Chenage this later to link properties start
 		t_data(float, min_multi_modal_cost);
 		t_data(float, walk_length);
 		t_data(float, distance_to_transit);
 		t_data(bool, touch_transit);
+		//TODO OMER Chenage this later to link properties end
 
 		t_data(float, cost_from_origin);
 		t_data(float, time_from_origin);

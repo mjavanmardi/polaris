@@ -210,6 +210,16 @@ namespace polaris
 
 				copy_edge->begin_connection_groups( (Anonymous_Connection_Group<Master_Type,base_edge_type>*)(((long long*)current_edge->begin_connection_groups())+address_deviation) );
 				copy_edge->end_connection_groups( (Anonymous_Connection_Group<Master_Type,base_edge_type>*)(((long long*)current_edge->end_connection_groups())+address_deviation) );
+				
+				/*if (_graph_id == 1)
+				{
+					
+					if (((MasterType::multimodal_edge_type*)copy_edge)->_unique_pattern_scanned.size())
+					{
+						((MasterType::multimodal_edge_type*)copy_edge)->_unique_pattern_scanned.clear();
+						((MasterType::multimodal_edge_type*)copy_edge)->_unique_pattern_scanned[0] = true;
+					}
+				}*/
 
 				copy_edge->begin_connection_groups()->Unlink_Edges();
 			}

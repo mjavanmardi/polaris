@@ -162,7 +162,7 @@ namespace Routing_Components
 			t_data(std::vector<int>, index_along_trip_at_upstream_node);
 			t_data(std::vector<int>, trip_to_unique_pattern_index);
 			t_data(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns);
-			t_data(std::vector<bool>, unique_pattern_scanned);
+			//t_data(std::vector<bool>, unique_pattern_scanned);
 
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
 
@@ -792,7 +792,7 @@ namespace Routing_Components
 						{
 							_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
 							input_multimodal_edge._unique_patterns.push_back(current_pattern);
-							input_multimodal_edge._unique_pattern_scanned.push_back(false);
+							//input_multimodal_edge._unique_pattern_scanned.push_back(false);
 						}
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -863,7 +863,7 @@ namespace Routing_Components
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
 						input_multimodal_edge._trip_to_unique_pattern_index.clear();
 						input_multimodal_edge._unique_patterns.clear();
-						input_multimodal_edge._unique_pattern_scanned.clear();
+						//input_multimodal_edge._unique_pattern_scanned.clear();
 					//}
 				}								
 

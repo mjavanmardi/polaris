@@ -207,8 +207,9 @@ namespace polaris
 			int patterns_ctr;
 			std::vector<bool> unique_pattern_scanned;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
-			{				
-				unique_pattern_scanned[patterns_ctr] = false;
+			{		
+				unique_pattern_scanned.push_back(false);
+				//current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
 			}
 			
 			int trips_ctr = 0;
@@ -238,12 +239,14 @@ namespace polaris
 					return;
 				}
 
+				//if (current_neighbor->_unique_pattern_scanned[unique_pattern_loc])
 				if (unique_pattern_scanned[unique_pattern_loc])
 				{
 					continue;
 				}
 				else 
 				{
+					//current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 					unique_pattern_scanned[unique_pattern_loc] = true;
 					++patterns_ctr;
 				}
@@ -365,9 +368,9 @@ namespace polaris
 			int patterns_ctr;
 			std::vector<bool> unique_pattern_scanned;
 			for (patterns_ctr = 0; patterns_ctr < unique_patterns_size; patterns_ctr++)
-			{				
-				current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
+			{
 				unique_pattern_scanned.push_back(false);
+				//current_neighbor->_unique_pattern_scanned[patterns_ctr] = false;
 			}
 
 			int trips_ctr = 0;
@@ -404,6 +407,7 @@ namespace polaris
 				}
 				else
 				{
+					//current_neighbor->_unique_pattern_scanned[unique_pattern_loc] = true;
 					unique_pattern_scanned[unique_pattern_loc] = true;
 					++patterns_ctr;
 				}
