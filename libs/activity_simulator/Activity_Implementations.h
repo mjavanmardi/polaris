@@ -117,7 +117,7 @@ namespace Activity_Components
 			// End time feature
 			template<typename TargetType> TargetType End_Time();
 			template<typename TargetType> void End_Time(TargetType value, bool maintain_duration);
-// TODO: does not compile
+
 			// departure time feature - set by route_handler, =0 before the route is planned
 			template<typename TargetType, requires(TargetType, check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value))> 
 			TargetType Departure_Time();
@@ -131,75 +131,12 @@ namespace Activity_Components
 			m_data(Revision,Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Deletion_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
-			//m_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			//m_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			//m_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			//m_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			//m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-			//m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
-
 			bool Location_Is_Planned(){return (_Location_Planning_Time._iteration >= (int)END && _Location_Planning_Time._sub_iteration >= (int)END);}
 			bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration >= (int)END && _Mode_Planning_Time._sub_iteration >= (int)END);}
 			bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration >= (int)END && _Duration_Planning_Time._sub_iteration >= (int)END);}
 			bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time._iteration >= (int)END && _Involved_Persons_Planning_Time._sub_iteration >= (int)END);}
 			bool Start_Is_Planned(){return (_Start_Time_Planning_Time._iteration >= (int)END && _Start_Time_Planning_Time._sub_iteration >= (int)END);}
 			bool Route_Is_Planned(){return (_Route_Planning_Time._iteration >=(int)END && _Route_Planning_Time._sub_iteration >= (int)END);}
-
-			// Basic Activity Events - Plan route and add to schedule
-			//template<typename TargetType> void Initialize(TargetType act_type)
-			//{
-			//	this_itf* pthis = static_cast<this_itf*>(this);
-			//	pthis->Activity_Type<TargetType>(act_type);
-			//	pthis->Duration<Time_Seconds>(END);
-			//	pthis->Start_Time<Time_Seconds>(END);
-			//	pthis->Location<_activity_location_itf*>(nullptr);
-			//	pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-			//	pthis->movement_plan<_movement_plan_itf*>(nullptr);
-
-			//	// initialize the deletion revision - updated when the Free_Activity event fires
-			//	Set_Attribute_Planning_Times(END);
-
-			//	Revision &delete_time = this->Deletion_Time<  Revision&>();
-			//	delete_time._iteration = END;
-			//	delete_time._sub_iteration = END;
-			//}
-
-			//template<typename TargetType> void Copy(TargetType activity)
-			//{
-			//	this_itf* obj = static_cast<this_itf*>(activity);
-			//	this_itf* pthis = static_cast<this_itf*>(this);
-
-			//	pthis->is_valid(obj->is_valid<bool>());
-			//	pthis->Parent_Planner(obj->Parent_Planner<Parent_Planner_type>());
-
-			//	// allocate movement plan
-			//	pthis->Activity_Plan_ID(obj->Activity_Plan_ID<int>());
-			//	pthis->Activity_Type(obj->Activity_Type<Types::ACTIVITY_TYPES>());
-
-			//	pthis->Location_Flexibility(obj->Location_Flexibility<Types::FLEXIBILITY_VALUES>());
-			//	pthis->Mode_Flexibility(obj->Mode_Flexibility<Types::FLEXIBILITY_VALUES>());
-			//	pthis->Start_Time_Flexibility(obj->Start_Time_Flexibility<Types::FLEXIBILITY_VALUES>());
-			//	pthis->Duration_Flexibility(obj->Duration_Flexibility<Types::FLEXIBILITY_VALUES>());
-			//	pthis->Involved_Persons_Flexibility(obj->Involved_Persons_Flexibility<Types::FLEXIBILITY_VALUES>());
-
-			//	pthis->Location<_activity_location_itf*>(obj->template Location<_activity_location_itf*>());
-			//	pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(obj->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
-			//	pthis->Start_Time(obj->template Start_Time<Time_Seconds>());
-			//	pthis->Duration(obj->template Duration<Time_Seconds>());
-
-			//	for (auto itr = obj->template Involved_Persons_Container<Involved_Persons_Container_type&>().begin(); itr != obj->template Involved_Persons_Container<Involved_Persons_Container_type&>().end(); ++itr)
-			//	{
-			//		_Involved_Persons_Container.push_back(*itr);
-			//	}
-			//	
-			//	pthis->Location_Planning_Time(obj->template Location_Planning_Time<Revision>());
-			//	pthis->Mode_Planning_Time(obj->template Mode_Planning_Time<Revision>());
-			//	pthis->Start_Time_Planning_Time(obj->template Start_Time_Planning_Time<Revision>());
-			//	pthis->Duration_Planning_Time(obj->template Duration_Planning_Time<Revision>());
-			//	pthis->Involved_Persons_Planning_Time(obj->template Involved_Persons_Planning_Time<Revision>());
-			//	pthis->Route_Planning_Time(obj->template Route_Planning_Time<Revision>());
-			//	pthis->Deletion_Time(obj->template Deletion_Time<Revision>());
-			//}
 
 			template<typename TargetType> void Copy(TargetType activity);
 
@@ -269,7 +206,6 @@ namespace Activity_Components
 			}
 		}
 		
-		// TODO: does not compile
 		// departure time feature - set by route_handler, =0 before the route is planned
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType, requires(TargetType, check(strip_modifiers(TargetType), Basic_Units::Concepts::Is_Time_Value))>
@@ -290,7 +226,6 @@ namespace Activity_Components
 		template<typename TargetType>
 		void Basic_Activity_Plan_Implementation<MasterType, InheritanceList>::Copy(TargetType activity)
 		{
-			//this_itf* obj = static_cast<this_itf*>(activity);
 			this_itf* pthis = static_cast<this_itf*>(this);
 
 			pthis->is_valid(activity->is_valid<bool>());
@@ -607,69 +542,6 @@ namespace Activity_Components
 				// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
 				move->template departed_time<Simulation_Timestep_Increment>(depart);
 			}
-			/*// continue if a valid movement is specified
-			if (orig != nullptr && dest != nullptr)
-			{
-			// If the trip is valid, assign to a movement plan and add to the schedule
-			if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
-			{
-			// add attributes to plan
-			move->template origin<_activity_location_itf*>(orig);
-			move->template destination<_activity_location_itf*>(dest);
-			move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
-			move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
-
-			if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
-			{
-			_link_itf* o_link =move->template origin<_link_itf*>();
-			_link_itf* d_link =move->template destination<_link_itf*>();
-			THROW_EXCEPTION("ERROR: cannot route trip as orig or dest links do not have valid turn movements: orig_link="<<o_link->dbid<int>() << ", dir="<<o_link->direction<int>()<<" : dest_link="<< d_link->dbid<int>()<<", dir="<<o_link->direction<int>());
-			return;
-			}
-
-
-			// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
-			Simulation_Timestep_Increment start = this->Start_Time<Simulation_Timestep_Increment>();
-			Simulation_Timestep_Increment ttime;
-			if (orig == dest) ttime = 0;
-			else ttime = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Simulation_Timestep_Increment,Simulation_Timestep_Increment>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
-			this->Expected_Travel_Time<Simulation_Timestep_Increment>(ttime);
-
-			// recalculate the departure time based on new estimated travel time
-			Simulation_Timestep_Increment depart =  start - ttime;
-			// unless the activity is a return home activity, in which case, use the fixed departure time
-			if (activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
-			{
-			_home_activity_itf* home_activity = static_cast<_home_activity_itf*>(activity);
-			depart = home_activity->template Fixed_Departure<Simulation_Timestep_Increment>();
-			}
-
-			// make sure not departure before minimum allowed
-			if (depart < min_departure)
-			{
-			depart = min_departure+1;
-
-			if (depart + ttime > (END)*2.0)
-			{
-			THROW_WARNING("Bad start time, depart="<<depart<<", ttime="<<ttime);
-			}
-			this->Start_Time<Simulation_Timestep_Increment>(depart + ttime);
-			}
-
-			// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
-			move->template departed_time<Simulation_Timestep_Increment>(depart);
-			}
-			else
-			{
-			move->template origin<_activity_location_itf*>(orig);
-			move->template destination<_activity_location_itf*>(dest);
-			THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
-			}
-			}
-			else
-			{
-			THROW_WARNING("Null origin or destination values specified");
-			}*/
 		}
 		
 		template<typename MasterType, typename InheritanceList>
@@ -796,12 +668,6 @@ namespace Activity_Components
 			typedef Pair_Associative_Container< typename _network_itf::get_type_of(zones_container)> _zones_container_itf;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_zones_container_itf)>  _zone_itf;
 
-			//typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-			//typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
-
-			//typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
-			//typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 			member_component_and_feature_accessor(Activity_Planning_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>)
@@ -809,15 +675,10 @@ namespace Activity_Components
 			// Activity attribute planning properties		
 			m_data(Types::PLAN_HORIZON_VALUES, Activity_Plan_Horizon, NONE, NONE);
 			m_data(Types::PLAN_HORIZON_VALUES, Location_Plan_Horizon, NONE, NONE);
-			//m_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, NONE, NONE);
 			m_data(Types::PLAN_HORIZON_VALUES, Mode_Plan_Horizon, NONE, NONE);
-			//m_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, NONE, NONE);
 			m_data(Types::PLAN_HORIZON_VALUES, Start_Time_Plan_Horizon, NONE, NONE);
-			//m_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility, NONE, NONE);
 			m_data(Types::PLAN_HORIZON_VALUES, Duration_Plan_Horizon, NONE, NONE);
-			//m_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility, NONE, NONE);
 			m_data(Types::PLAN_HORIZON_VALUES, Involved_Persons_Plan_Horizon, NONE, NONE);
-			//m_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility, NONE, NONE);
 
 			template<typename TargetType> void Set_Meta_Attributes();
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType, check_2(TargetType, Simulation_Timestep_Increment, is_same)));
@@ -1147,17 +1008,6 @@ namespace Activity_Components
 				// Delete the activity from schedule if no location chosen
 				//pthis->template Free_Activity<NT>();
 				scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
-
-				/*dest = home_loc;
-				bthis->template Location<_activity_location_itf*>(dest);*/
-				//----------------------------------------------------------------
-				// Print to log file
-				//stringstream s;
-				//s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
-				//s << "," << dest<<endl;
-				//cout << s.str();
-				//planner->template Write_To_Log<stringstream&>(s);
-				//----------------------------------------------------------------
 			}
 		}
 		
@@ -1165,13 +1015,6 @@ namespace Activity_Components
 		template<typename TargetType>
 		void ADAPTS_Activity_Plan_Implementation<MasterType, InheritanceList>::Mode_Planning_Event_Handler()
 		{
-			//====================================================================
-			// Simplified mode choice model, based only on the expected travel time by auto
-			// And 3 activity types.  Distributions of auto share by travel time were
-			// estimated from CMAP travel tracker survey and are applied here.
-			// If the time to travel for the activity is not known, 12pm is assumed (for skim time lookup)
-			// If the locaion has not been planned we cannot estimate an approximate time and the average mode share is used
-			//--------------------------------------------------------------------
 			base_type* bthis = (base_type*)this;
 			this_itf* pthis = (this_itf*)this;
 
@@ -1400,9 +1243,9 @@ namespace Activity_Components
 				{
 					//----------------------------------------------------------------
 					// Print to log file
-					stringstream s;
-					s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
-					s << "," <<orig << ", " <<dest<<endl;
+					//stringstream s;
+					//s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
+					//s << "," <<orig << ", " <<dest<<endl;
 					//base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 					return;
@@ -1417,9 +1260,9 @@ namespace Activity_Components
 				{
 					//----------------------------------------------------------------
 					// Print to log file
-					stringstream s;
-					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
-					s << "," <<orig << ", " <<dest<<endl;
+					//stringstream s;
+					//s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
+					//s << "," <<orig << ", " <<dest<<endl;
 					//base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
@@ -1427,13 +1270,6 @@ namespace Activity_Components
 
 			template<typename TargetType> void Mode_Planning_Event_Handler()
 			{
-				//====================================================================
-				// Simplified mode choice model, based only on the expected travel time by auto
-				// And 3 activity types.  Distributions of auto share by travel time were
-				// estimated from CMAP travel tracker survey and are applied here.
-				// If the time to travel for the activity is not known, 12pm is assumed (for skim time lookup)
-				// If the locaion has not been planned we cannot estimate an approximate time and the average mode share is used
-				//--------------------------------------------------------------------
 				base_type* bthis = (base_type*)this;
 				this_itf* pthis = (this_itf*)this;
 
@@ -1451,31 +1287,6 @@ namespace Activity_Components
 
 			template<typename TargetType> void Duration_Planning_Event_Handler()
 			{
-				using namespace Activity_Components::Types;
-
-				this_itf* pthis = (this_itf*)this;
-				base_type* bthis = (base_type*)this;
-
-				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
-				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
-
-				//TODO: this is already handled in the start-time planner for routine acts....
-				//Time_Minutes duration; 	
-	
-				//if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == PART_TIME_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
-				//{
-				//	duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
-				//}
-				//else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
-				//{
-				//	duration = 60.0 * 7.0;
-				//}
-				//else
-				//{
-				//	THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
-				//}
-				//pthis->template Duration<Time_Minutes>(duration);
-
 			}
 
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()

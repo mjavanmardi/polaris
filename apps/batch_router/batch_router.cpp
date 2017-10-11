@@ -451,7 +451,6 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Open(scenario.full_name());
 	fw.Write_Line("{");
 	fw.Write_Line("\t\"output_dir_name\" : \"batch_router\",");
-	fw.Write_Line("\t\"io_source_flag\" : \"ODB_IO_SOURCE\",");
 	stringstream s("");
 	s<<"\t\"database_name\" : \""<<database_name<<"\",";
 	fw.Write_Line(s);

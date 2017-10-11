@@ -14,13 +14,22 @@ namespace Person_Components
 		//==================================================================================
 		/// Class to temporarily define activity conflicts
 		//----------------------------------------------------------------------------------
-		implementation struct Activity_Conflict : public Polaris_Component<MasterType,INHERIT(Activity_Conflict),NT>
+		implementation struct Activity_Conflict : public Polaris_Component<MasterType,INHERIT(Activity_Conflict),Data_Object>
 		{
 			// The newly added activity
-			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, original_activity, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, conflicting_activity, NONE, NONE);
 
 			// The originally scheduled activities
-			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, conflicting_activity, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, prior_activity, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, original_activity1, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, original_activity2, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, following_activity, NONE, NONE);
+			//								 ____________
+			//								| Confl. Act |
+			//								|------------|
+			//	 ___________	 ___________V_		 ____V________		 _____________
+			//  | Prior Act |	| Orig. Act 1 |		| Orig. Act 2 |		| Follow. Act |
+			//	 -----------	 -------------		 -------------		 -------------
 
 			Types::CONFLICT_TYPES conflict_type;
 
@@ -437,8 +446,8 @@ namespace Person_Components
 		template<typename TargetType>
 		bool General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
 		{
-				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 			bool at_home_activity_modified = false;
 
@@ -1005,13 +1014,16 @@ namespace Person_Components
 		template<typename ActivityItfType>
 		bool General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Identify_Conflicts(ActivityItfType current_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
 		{
-				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 			Activity_Plan* current = (Activity_Plan*)current_activity;
 			Activity_Plan* previous = previous_activity_plan<Activity_Plan*, Activity_Plan*>(current);
+			Activity_Plan* prev_prev = nullptr;
 			Activity_Plan* next = next_activity_plan<Activity_Plan*, Activity_Plan*>(current);
 			Activity_Plan* next_next = nullptr;
+
+			// if previous activity conflicts current activity
 
 			// if the following activity is still within the current activity, get the next following activity
 			if (next->template End_Time<Time_Seconds>() < current->template End_Time<Time_Seconds>())
@@ -1030,8 +1042,8 @@ namespace Person_Components
 		template<typename ActivityItfType>
 		bool General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Define_Conflict(ActivityItfType conflicting_activity, ActivityItfType original_activity, std::vector<Activity_Conflict<MT>>& conflict_list)
 		{
-				typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
-				typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
 
 			// no conflict if original_activity doesn't exist
 			if (original_activity == nullptr) return false;
