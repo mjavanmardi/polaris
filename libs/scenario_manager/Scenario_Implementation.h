@@ -29,8 +29,6 @@ namespace Scenario_Components
 			m_data(int, intersection_control_flag, NONE, NONE);
 			m_data(bool, ramp_metering_flag, NONE, NONE);
 
-			m_data(int, demand_od_flag, NONE, NONE);
-			m_data(int, assignment_mode, NONE, NONE);
 			m_data(unsigned long, iseed, NONE, NONE);
 
 

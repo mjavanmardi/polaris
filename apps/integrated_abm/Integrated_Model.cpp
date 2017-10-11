@@ -342,7 +342,6 @@ int main(int argc,char** argv)
 			outfile << "\t\"activity_start_time_model_file_name\" : \"start_time_duration_data_new.txt\"," << endl;
 			outfile << "\t\"aggregate_routing\" : false," << endl;
 			outfile << "\t\"analyze_link_groups_file_path_name\" : \"analyze_link_groups\"," << endl;
-			outfile << "\t\"assignment_mode\" :  \"ONE_SHOT_ASSIGNMENT_SIMULATION_MODE\"," << endl;
 			outfile << "\t\"automation_cost\" : 9999999999999," << endl;
 			outfile << "\t\"buildings_geometry_file\" : \"\"," << endl;
 			outfile << "\t\"calculate_realtime_moe\" : true," << endl;
@@ -355,7 +354,6 @@ int main(int argc,char** argv)
 			outfile << "\t\"compare_with_historic_moe\" : false," << endl;
 			outfile << "\t\"count_integrated_in_network_vehicles_only\" : false," << endl;
 			outfile << "\t\"database_name\" : \"\"," << endl;
-			outfile << "\t\"demand_od_flag\" : 1," << endl;
 			outfile << "\t\"demand_reduction_factor\" : 1," << endl;
 			outfile << "\t\"destination_choice_model_file\" : \"\"," << endl;
 			outfile << "\t\"do_planner_routing\" : false," << endl;

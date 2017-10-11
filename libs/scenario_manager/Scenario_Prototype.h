@@ -57,10 +57,7 @@ namespace Scenario_Components
 			accessor(num_assignment_intervals, NONE, NONE);
 			accessor(num_simulation_intervals_per_assignment_interval, NONE, NONE);
 
-			accessor(assignment_mode, NONE, NONE);
 			accessor(iseed, NONE, NONE);
-						
-			accessor(demand_od_flag, NONE, NONE);
 			
 			accessor(demand_reduction_factor, NONE, NONE);
 
@@ -331,14 +328,12 @@ namespace Scenario_Components
 				simulation_interval_length<int>(6);
 				demand_reduction_factor<double>(1.0);
 				num_simulation_intervals_per_assignment_interval<int>(50);
-				assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
 				use_link_based_routing<bool>(false);
 				rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
 				merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
 				iseed<unsigned long>(0.0);
 				intersection_control_flag<int>(0);
 				ramp_metering_flag<bool>(false);
-				demand_od_flag<int>(1);
 				snapshot_period<int>(300);
 				database_name<string>((string)"");
 				historical_results_database_name<string>((string)"");
@@ -442,6 +437,8 @@ namespace Scenario_Components
 				destination_choice_model_file<string>((string)"");
 				telecommute_choice_model_file<string>((string)"");
 				cav_wtp_model_file<string>((string)"");
+				cacc_capacity_adjustment_alpha<double>(1.0121);
+				cacc_capacity_adjustment_beta<double>(2.4697);
 			}
 
 			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)
@@ -525,26 +522,6 @@ namespace Scenario_Components
 				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
 				
 
-				//===============================================
-				// set assignment mode
-				std::string assignment_mode_string;
-				if (set_parameter<std::string>(document, "assignment_mode", assignment_mode_string))
-				{
-					if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
-					{
-						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
-					}
-					else if (assignment_mode_string.compare("ITERATIVE_ASSIGNMENT_SIMULATION_MODE") == 0)
-					{
-						assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ITERATIVE_ASSIGNMENT_SIMULATION_MODE);
-					}
-					else
-					{
-						cout << "Assignment mode not supported" << endl;
-						assert(false);
-					}
-				}
-
 				// Flag for link-based routing: defaults to false.  Set to true if want to restrict routing to activity locations to the link+dir defined in database
 				// If left to false, then we can route to an activity location on a link using either DIR (i.e. left hand turns into activity location ) [RECOMMENDED]
 				set_parameter<bool>(document, "use_link_based_routing", use_link_based_routing<bool &>());
@@ -602,7 +579,6 @@ namespace Scenario_Components
 				set_parameter<unsigned long>(document, "seed", iseed<unsigned long &>());
 				set_parameter<int>(document, "node_control_flag", intersection_control_flag<int &>());
 				set_parameter<bool>(document, "ramp_metering_flag", ramp_metering_flag<bool &>());
-				set_parameter<int>(document, "demand_od_flag", demand_od_flag<int &>());
 				set_parameter<int>(document, "snapshot_period", snapshot_period<int &>());
 
 				if (!set_parameter<std::string>(document, "database_name", database_name<std::string &>()))
@@ -830,7 +806,8 @@ namespace Scenario_Components
 				set_parameter<std::string>(document, "destination_choice_model_file", destination_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "telecommute_choice_model_file", telecommute_choice_model_file<std::string &>());
 				set_parameter<std::string>(document, "cav_wtp_model_file", cav_wtp_model_file<std::string &>());
-				set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
+
+				if (multimodal_routing<bool>()) set_parameter<std::string>(document, "multimodal_routing_model_file", multimodal_routing_model_file<std::string &>());
 				set_parameter<std::string>(document, "timing_choice_model_file", timing_choice_model_file<std::string &>());
 
 				//output_dir_name<string&>() = "";

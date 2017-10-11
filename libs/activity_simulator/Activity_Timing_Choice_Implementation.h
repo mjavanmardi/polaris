@@ -429,15 +429,15 @@ namespace Person_Components
 					if (_start_time_container[act_type].find((int)start) == _start_time_container[act_type].end()) _start_time_container[act_type].insert(start_record_type((int)start, cum_prob));
 				}
 				
-				//copy primary work into work_at_home
-				for (map_type::iterator itr = _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
-				{
-					_start_time_duration_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
-				}
-				for (start_map_type::iterator itr = _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
-				{
-					_start_time_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
-				}
+				//copy primary work into work_at_home - replace with actual distribution
+				//for (map_type::iterator itr = _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_duration_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
+				//{
+				//	_start_time_duration_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
+				//}
+				//for (start_map_type::iterator itr = _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].begin(); itr != _start_time_container[Activity_Components::Types::PRIMARY_WORK_ACTIVITY].end(); ++itr)
+				//{
+				//	_start_time_container[Activity_Components::Types::WORK_AT_HOME_ACTIVITY].insert(*itr);
+				//}
 
 				//evaluate
 			}
