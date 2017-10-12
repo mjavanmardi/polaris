@@ -170,12 +170,11 @@ namespace Link_Components
 		//==================================================================================================================
 		/// Transit-Related Members
 		//------------------------------------------------------------------------------------------------------------------
-
-			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, trips_by_dep_time, NONE, NONE);
-			m_container(std::vector<int>, index_along_trip_at_upstream_node, NONE, NONE);
+						
 			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
-			m_container(std::vector<int>, trip_to_unique_pattern_index, NONE, NONE);
+			m_container(std::vector<int>, index_along_pattern_at_upstream_node, NONE, NONE);
 			m_container(std::vector<float>, dijkstra_cost, NONE, NONE);
+
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -277,7 +276,7 @@ namespace Link_Components
 			m_prototype(Null_Prototype, typename MasterType::link_sensor_type, link_sensor, NONE, NONE);
 
 
-			typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<type_of(trips_by_dep_time)> _Transit_Vehicle_Trip_Interface;
+			typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename MasterType::transit_vehicle_trip_type> _Transit_Vehicle_Trip_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;

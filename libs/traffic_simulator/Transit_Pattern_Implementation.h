@@ -36,6 +36,7 @@ namespace Transit_Pattern_Components
 			m_container(std::vector<typename MasterType::intersection_type*>, pattern_stops, NONE, NONE);
 			m_container(std::vector<typename MasterType::link_type*>, pattern_links, NONE, NONE);
 			m_container(std::vector<int>, pattern_edge_ids, NONE, NONE);
+			m_container(std::vector<typename MasterType::transit_vehicle_trip_type*>, pattern_trips, NONE, NONE);
 
 
 			/*typedef Transit_Route_Components::Prototypes::Transit_Route<type_of(route)> _Transit_Route_Interface;

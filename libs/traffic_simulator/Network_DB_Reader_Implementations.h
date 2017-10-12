@@ -444,7 +444,28 @@ namespace Network_Components
 								exit(0);
 							}
 						}
+
 						++my_itr;
+					}
+
+					_Transit_Pattern_Interface* myPattern = transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>();
+					int trip_loc = 0;
+					if (myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().size())
+					{
+						for (auto itr = myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().begin(); itr != myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().end(); ++itr)
+						{
+							_Transit_Vehicle_Trip_Interface* myTrip = myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().at(trip_loc);
+							if (transit_vehicle_trip->_departure_seconds[0] < myTrip->_departure_seconds[0])
+							{
+								break;
+							}
+							trip_loc++;
+						}
+						myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().insert(myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().begin() + trip_loc, transit_vehicle_trip);
+					}
+					else
+					{
+						myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().push_back(transit_vehicle_trip);
 					}
 
 
@@ -1354,125 +1375,7 @@ namespace Network_Components
 
 							link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 							link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-							const string& TripsByDepTime = db_itr->getTriplist();
-							std::istringstream ss(TripsByDepTime);
-							std::string sub_string;
-							int mySeq;
-							int pattern_ctr_1 = 0;
-
-							while (std::getline(ss, sub_string, '|'))
-							{
-								_Transit_Vehicle_Trip_Interface* link_trip = (_Transit_Vehicle_Trip_Interface*)net_io_maps.transit_vehicle_trip_id_to_ptr[sub_string];
-								
-								if (link_trip)
-								{
-									link->template trips_by_dep_time<_Transit_Vehicle_Trips_Container_Interface&>().push_back(link_trip);
-									_Transit_Pattern_Interface* link_pattern = link_trip->_pattern;
-									bool pattern_add = true;
-
-									int pattern_ctr_2 = 0;
-									for (auto itr = link->_unique_patterns.begin(); itr != link->_unique_patterns.end(); ++itr)
-									{
-										_Transit_Pattern_Interface* my_pattern = (_Transit_Pattern_Interface*)link->_unique_patterns.at(pattern_ctr_2);
-										if (my_pattern == link_pattern)
-										{
-											pattern_add = false;
-											link->template trip_to_unique_pattern_index<std::vector<int>&>().push_back(pattern_ctr_2);
-											break;
-										}
-										++pattern_ctr_2;
-									}
-
-									if (pattern_add)
-									{
-										link->template unique_patterns<_Transit_Patterns_Container_Interface&>().push_back(link_pattern);
-										link->template trip_to_unique_pattern_index<std::vector<int>&>().push_back(pattern_ctr_1);
-										++pattern_ctr_1;
-									}
-								}
-								else
-								{
-									cout << "The link " << link->_dbid << " points to a non-existing trip: " << sub_string << endl;
-									system("pause");
-									exit(0);
-								}
-
-							}
-
-							const string& IndexAlongTripOfStopA = db_itr->getIndexlist();
-							ss.clear();
-							ss.str(IndexAlongTripOfStopA);
-
-							while (std::getline(ss, sub_string, '|'))
-							{
-								mySeq = stoi(sub_string);
-								link->template index_along_trip_at_upstream_node<std::vector<int>&>().push_back(mySeq);
-							}
-
-							if (link->_trips_by_dep_time.size() != link->_index_along_trip_at_upstream_node.size())
-							{
-								cout << "Inconsistency between number of trips and trip indices on a link!" << endl;
-								cout << "Link ID: " << link->_dbid << endl;
-								cout << "Trip sequence size of the link: " << link->_trips_by_dep_time.size() << endl;
-								cout << "Trip sequence indices size of the trip: " << link->_index_along_trip_at_upstream_node.size() << endl;
-								system("pause");
-								exit(0);
-							}
-
-							int my_itr = 0;
-							for (auto itr = link->_trips_by_dep_time.begin(); itr != link->_trips_by_dep_time.end(); ++itr)
-							{
-								int temp_seq = link->_index_along_trip_at_upstream_node.at(my_itr);
-
-								int temp_stop1 = link->_upstream_intersection->_uuid;
-								int temp_stop2 = link->_trips_by_dep_time.at(my_itr)->_pattern->_pattern_stops.at(temp_seq)->_uuid;
-								int temp_trip = link->_trips_by_dep_time.at(my_itr)->_uuid;
-								int temp_pattern = link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid;
-
-								if (temp_stop1 != temp_stop2)
-								{
-									cout << "Link's upstream node does not match the stop ID of the trip!" << endl;
-									cout << "Link ID: " << link->_dbid << endl;
-									cout << "Trip's sequence by departure time (0 start) on link: " << my_itr << endl;
-									cout << "Trip ID: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
-									cout << "Pattern ID: " << link->_trips_by_dep_time.at(my_itr)->_pattern->_uuid << endl;
-									cout << "Claimed sequence number of the upstream node along the trip: " << temp_seq << endl;
-									cout << "Link's upstream node ID: " << temp_stop1 << endl;
-									cout << "Node ID along the trip at " << temp_seq << " is: " << temp_stop2 << endl;
-									system("pause");
-									exit(0);
-								}
-
-								if (my_itr + 1 < link->_trips_by_dep_time.size())
-								{
-
-									int temp_seq1 = link->_index_along_trip_at_upstream_node.at(my_itr);
-									int temp_seq2 = link->_index_along_trip_at_upstream_node.at(my_itr + 1);
-
-									int temp_time1 = link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1);
-									int temp_time2 = link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2);
-
-									if (link->_trips_by_dep_time.at(my_itr)->_departure_seconds.at(temp_seq1) > link->_trips_by_dep_time.at(my_itr + 1)->_departure_seconds.at(temp_seq2))
-									{
-										cout << "Trips on the link are not ordered by departure time!" << endl;
-										cout << "Link ID: " << link->_dbid << endl;
-										cout << "Trip ID_1: " << link->_trips_by_dep_time.at(my_itr)->_uuid << endl;
-										cout << "Trip ID_2: " << link->_trips_by_dep_time.at(my_itr + 1)->_uuid << endl;
-										cout << "Trip 1's sequence by departure time (0 start) on link: " << my_itr << endl;
-										cout << "Trip 2's sequence by departure time (0 start) on link: " << my_itr + 1 << endl;
-										cout << "Sequence number of the upstream node along the trip 1: " << temp_seq1 << endl;
-										cout << "Sequence number of the upstream node along the trip 2: " << temp_seq2 << endl;
-										cout << "Departure time from the upstream node of trip 1: " << temp_time1 << endl;
-										cout << "Departure time from the upstream node of trip 2: " << temp_time2 << endl;
-										system("pause");
-										exit(0);
-										//
-									}
-								}
-								++my_itr;
-							}
-
+							
 							links_container_ptr->push_back(link);
 
 							typename id_to_links_type::iterator links_itr;
@@ -1973,7 +1876,7 @@ namespace Network_Components
 				//Adding pattern links using pattern stops
 				if (_scenario_reference->template multimodal_routing<bool>())
 				{
-					cout << "Adding pattern links using pattern stops" << endl;
+					cout << "Generating link/stop-pattern-sequence matches" << endl;
 
 					typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 					typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
@@ -2003,6 +1906,10 @@ namespace Network_Components
 								if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
 									pattern->_pattern_links.push_back(out_link);
+
+									out_link->_unique_patterns.push_back(pattern);
+									out_link->_index_along_pattern_at_upstream_node.push_back(stops_itr);
+									
 								}
 							}
 						}

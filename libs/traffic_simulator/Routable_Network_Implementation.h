@@ -162,6 +162,8 @@ namespace Routing_Components
 			t_data(std::vector<int>, index_along_trip_at_upstream_node);
 			t_data(std::vector<int>, trip_to_unique_pattern_index);
 			t_data(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns);
+			t_data(std::vector<int>, index_along_pattern_at_upstream_node);
+			
 			//t_data(std::vector<bool>, unique_pattern_scanned);
 
 			t_data(Link_Components::Types::Link_Type_Keys, edge_type);
@@ -758,22 +760,25 @@ namespace Routing_Components
 						{
 							int my_itr = 0;
 							float min_travel_time = FLT_MAX / 2.0f;
-							for (auto trips_itr = current_link->_trips_by_dep_time.begin(); trips_itr != current_link->_trips_by_dep_time.end(); ++trips_itr)
-							{
-								_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-								input_multimodal_edge._trips_by_dep_time.push_back(current_trip);
-								int my_index = current_link->_index_along_trip_at_upstream_node.at(my_itr);
-								input_multimodal_edge._index_along_trip_at_upstream_node.push_back(my_index);
-								int my_pattern_loc = current_link->_trip_to_unique_pattern_index.at(my_itr);
-								input_multimodal_edge._trip_to_unique_pattern_index.push_back(my_pattern_loc);
 
-								float temp_travel_time = current_trip->_arrival_seconds.at(my_index + 1) - current_trip->_arrival_seconds.at(my_index);
-								if (temp_travel_time < min_travel_time)
+							for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
+							{
+								_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+								input_multimodal_edge._unique_patterns.push_back(current_pattern);
+								int mySeq = current_link->_index_along_pattern_at_upstream_node[my_itr];
+								input_multimodal_edge._index_along_pattern_at_upstream_node.push_back(mySeq);
+								for (auto trips_itr = current_pattern->_pattern_trips.begin(); trips_itr != current_pattern->_pattern_trips.end(); ++trips_itr)
 								{
-									min_travel_time = temp_travel_time;
+									_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+									float temp_travel_time = current_trip->_arrival_seconds.at(mySeq + 1) - current_trip->_arrival_seconds.at(mySeq);
+									if (temp_travel_time < min_travel_time)
+									{
+										min_travel_time = temp_travel_time;
+									}
 								}
 								my_itr++;
 							}
+
 							input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
 						}
@@ -786,14 +791,7 @@ namespace Routing_Components
 						{
 							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
-						}						
-
-						for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
-						{
-							_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
-							input_multimodal_edge._unique_patterns.push_back(current_pattern);
-							//input_multimodal_edge._unique_pattern_scanned.push_back(false);
-						}
+						}								
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
 						{
@@ -863,6 +861,7 @@ namespace Routing_Components
 						input_multimodal_edge._index_along_trip_at_upstream_node.clear();
 						input_multimodal_edge._trip_to_unique_pattern_index.clear();
 						input_multimodal_edge._unique_patterns.clear();
+						input_multimodal_edge._index_along_pattern_at_upstream_node.clear();
 						//input_multimodal_edge._unique_pattern_scanned.clear();
 					//}
 				}								
