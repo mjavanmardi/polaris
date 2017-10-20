@@ -42,7 +42,10 @@ namespace polaris
 
 			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
 
-			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+			//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float cost_from_origin = current->cost_from_origin() + time_cost_between;
 
 			if( cost_from_origin < current_neighbor->cost_from_origin() )
 			{
@@ -51,7 +54,7 @@ namespace polaris
 					routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
 				}
 
-				float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				//float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				float time_from_origin = current->time_from_origin() + time_cost_between;
 
 				if(!current_neighbor->marked_for_reset())
@@ -130,7 +133,10 @@ namespace polaris
 
 			if (current_neighbor->in_closed_set()) return;
 
-			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+			//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float cost_from_origin = current->cost_from_origin() + time_cost_between;
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{
@@ -176,7 +182,7 @@ namespace polaris
 				}
 				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
-					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
+ 					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
 				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK)
 				//else
@@ -470,10 +476,10 @@ namespace polaris
 			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 			
-			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost_temp;
+			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 
-			if (current->_walk_time_from_origin + current_neighbor->_time_cost_temp > walkThreshold_Time)
+			if (current->_walk_time_from_origin + current_neighbor->_time_cost > walkThreshold_Time)
 			//if (current->_walk_time_from_origin + current_neighbor->_time_cost > walkThreshold_Time)
 			{
 				return;
@@ -483,7 +489,7 @@ namespace polaris
 			{	
 				current_neighbor->cost_from_origin(cost_from_origin);
 
-				float time_cost_between = current_neighbor->_time_cost_temp;
+				float time_cost_between = current_neighbor->_time_cost;
 				//float time_cost_between = current_neighbor->_time_cost;
 				current_neighbor->time_from_origin(current->time_from_origin() + time_cost_between);
 				current_neighbor->time_label(current->time_label() + time_cost_between);					
@@ -607,13 +613,16 @@ namespace polaris
 
 			A_Star_Edge<current_edge_type>* current_edge = (A_Star_Edge<current_edge_type>*)current;
 
-			float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+
+			//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float cost_from_origin = current->cost_from_origin() + time_cost_between;
 
 			if( cost_from_origin < current_neighbor->cost_from_origin() )
 			{
 				if( current_neighbor->in_open_set() ) routing_data.open_set->erase( routing_data.open_set->iterator_to( *((base_edge_type*)current_neighbor)  ) );
 
-				float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+				//float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				float time_from_origin = current->time_from_origin() + time_cost_between;
 
 				if(!current_neighbor->marked_for_reset())

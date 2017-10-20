@@ -490,7 +490,9 @@ namespace Routing_Components
 						input_time_dependent_edge._edge_id = current_link->template uuid<unsigned int>();
 
 						input_time_dependent_edge._cost = current_link->template travel_time<float>();
+						input_time_dependent_edge._cost_backup = current_link->template travel_time<float>();
 						input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
+						input_time_dependent_edge._time_cost_backup = current_link->template travel_time<float>();
 
 												
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -620,7 +622,9 @@ namespace Routing_Components
 						input_static_edge._edge_id = current_link->template uuid<unsigned int>();
 
 						input_static_edge._cost = current_link->template travel_time<float>();
+						input_static_edge._cost_backup = current_link->template travel_time<float>();
 						input_static_edge._time_cost = current_link->template travel_time<float>();
+						input_static_edge._time_cost_backup = current_link->template travel_time<float>();
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
 						{
@@ -749,8 +753,9 @@ namespace Routing_Components
 						input_multimodal_edge._edge_type = current_link->_link_type;
 
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
+						input_multimodal_edge._cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
-						input_multimodal_edge._time_cost_temp = current_link->template travel_time<float>();
+						input_multimodal_edge._time_cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._source_link = current_link;
 						
 						int zone_index = current_link->_zone_index;

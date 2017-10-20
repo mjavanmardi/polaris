@@ -36,8 +36,9 @@ namespace polaris
 		t_data(typename MasterType::link_type*, source_link);
 
 		t_data(float, cost);
+		t_data(float, cost_backup);
 		t_data(float, time_cost);
-		t_data(float, time_cost_temp);
+		t_data(float, time_cost_backup);
 		//TODO OMER Chenage this later to link properties start
 		t_data(float, min_multi_modal_cost);
 		t_data(float, walk_length);
