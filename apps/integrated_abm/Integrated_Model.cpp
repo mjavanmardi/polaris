@@ -696,8 +696,8 @@ int main(int argc,char** argv)
 	if (scenario->do_skimming<bool>())
 	{
 		cout << "Initializing network skims..." <<endl;
-		typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/> _network_skim_itf;
-		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type/*_Network_Interface::get_type_of(skimming_faculty)*/>();
+		typedef Network_Skimming_Components::Prototypes::Network_Skimming<MasterType::network_skim_type> _network_skim_itf;
+		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<MasterType::network_skim_type>();
 
 
 
@@ -710,12 +710,12 @@ int main(int argc,char** argv)
 			if (!skimmer->transit_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_transit_skim_file_path_name<string>().c_str()))
 			{
 				skimmer->read_transit<bool>(false);
-				cout << "Error: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
+				cout << "WARNING: input binary transit skim file '" << scenario->input_transit_skim_file_path_name<string>() << "' not found.  Transit mode set to unavailable.";
 			}
 			if (!skimmer->highway_cost_input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_highway_cost_skim_file_path_name<string>().c_str())) 
 			{
 				skimmer->read_highway_cost<bool>(false);
-				cout << "Error: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
+				cout << "WARNING: input binary highway cost skim file '" << scenario->input_highway_cost_skim_file_path_name<string>() << "' not found. Highway tolls and parking cost set to 0.";
 			}
 		}
 		else

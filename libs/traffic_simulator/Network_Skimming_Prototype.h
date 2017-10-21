@@ -579,59 +579,6 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
-			//template<typename LocationType, typename TimeType, typename ModeType, typename ReturnLocationType> void Get_Locations_Within_Range(std::vector<Pair<float,ReturnLocationType>>& available_set, int& avail_index_low, int& avail_index_high, LocationType origin, TimeType start_time, TimeType min_time, TimeType max_time, ModeType mode_indicator, bool search_forward=true, requires(ReturnLocationType, check(ReturnLocationType, is_pointer)))
-			//{
-			//	available_set.clear();
-
-			//	// create the references to network items and create the std::lists of origins/destination to route from/to
-			//	typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;		
-			//	typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			//	typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
-
-			//	network_itf* network = this->template network_reference<network_itf*>();
-			//	zones_itf* zones = network->template zones_container<zones_itf*>();
-			//	typename zones_itf::iterator zone_itr;
-
-			//	// convert the ids to indices
-			//	zone_itf *orig_zone;
-
-			//	// Extract zone ID information from the input origin/destination type (either location or zone)
-			//	int Origin_Zone_ID = this->template Get_Zone_ID<LocationType>(origin);
-
-			//	// Do a lookup to make sure the zone is in the network (may be able to remove this)
-			//	if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = (zone_itf *)(zone_itr->second);}
-			//	else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found for Origin uuid,internal_id: " << origin->template uuid<int>()<<","<<origin->template internal_id<int>());
-
-			//	//============================================================
-			//	// Transferred code here from former mode_skim_prototype
-			//	//-------------------------------------------------------------------
-			//	typedef Random_Access_Sequence<typename get_type_of(skims_by_time_container)> _skim_container_itf;
-			//	typedef Prototypes::Skim_Table<get_component_type(get_type_of(skims_by_time_container))> _skim_itf;
-
-			//	//typedef (_skim_container_itf, _skim_itf,typename get_type_of(skims_by_time_container),Random_Access_Sequence,Prototypes::Skim_Table);
-			//	_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
-			//	typename _skim_container_itf::iterator itr = skims->begin();
-			//	_skim_itf* skim_table;
-
-			//	// get only the HH:MM:SS portion of requested time if Time > 1 day
-			//	int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(start_time))/24);
-			//	typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
-			//	typename TimeType remain = start_time - rounded;
-			//	
-			//	// go to skim table for requested time period
-			//	for (; itr != skims->end(); ++itr)
-			//	{
-			//		skim_table = *itr;
-			//		if (skim_table->template end_time<TimeType>() > remain)
-			//		{
-			//			////
-			//			skim_table->Get_Locations_Within_Range<TimeType,ModeType,ReturnLocationType>(available_set,orig_zone->template internal_id<int>(),min_time,max_time, mode_indicator, search_forward);
-			//			
-			//			return;
-			//		}
-			//	}
-			//}
-
 
 			template<typename TargetType> bool Update_LOS()
 			{
@@ -654,6 +601,10 @@ namespace Network_Skimming_Components
 						if (iteration() > 0 || scenario->template read_skim_tables<bool>())	break;
 					}
 				}
+
+				// we know the initial skim update is done or read is done by here, so now update the accessibilities
+				if (iteration()==0) this->Update_Zone_Accessibilities<TargetType>();
+
 				return true;
 			}
 			template<typename TargetType> void Write_LOS()
@@ -672,54 +623,10 @@ namespace Network_Skimming_Components
 					}
 				}
 			}
-
-// TODO: this does not compile
-//			template<typename TargetType> static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
-//			{
-////				File_IO::Binary_File_Reader infile;
-//				infile.Open(infilename);
-//
-//				ofstream outfile;
-//				outfile.open(outfilename);
-//
-//				//===========================================================================
-//				// Read Header
-//				int num_modes, num_zones, update_increment;
-//				infile.template Read_Value<int>(num_modes);
-//				infile.template Read_Value<int>(num_zones);
-//				infile.template Read_Value<int>(update_increment);
-//
-//				//===========================================================================
-//				// create the skim_table time periods, for basic create only a single time period skim_table
-//				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
-//				{
-//					float* data = new float[num_zones*num_zones];
-//
-//
-//
-//					infile.template Read_Array<float>(data, num_zones*num_zones);
-//
-//
-//					boost::container::vector<float> temp(data,data+num_zones*num_zones);
-//
-//
-//					outfile << "Skim table for time period starting at: " << start<<endl;
-//
-//					for (int i=0; i< num_zones; i++)
-//					{
-//						for (int j=0; j< num_zones; j++)
-//						{
-//							outfile << data[i*(num_zones)+j] << ",";
-//						}
-//						outfile << endl;
-//					}
-//					cout <<endl<< "finished period "<<start<<endl;
-//					outfile << endl;
-//				}
-//
-//				infile.Close();
-//				outfile.close();
-//			}
+			template<typename TargetType> void Update_Zone_Accessibilities()
+			{
+				this_component()->Update_Zone_Accessibilities<TargetType>();
+			}
 
 			template<typename TargetType> void Read_Binary_Headers(int& num_modes, int& num_zones, TargetType intervals, bool perform_checks)
 			{

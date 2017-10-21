@@ -540,6 +540,54 @@ namespace Person_Components
 				scenario->set_parameter<float>(document, "SIGMA_PMPEAK", _SIGMA_PMPEAK);
 				scenario->set_parameter<float>(document, "SIGMA_EVENING", _SIGMA_EVENING);
 				scenario->set_parameter<float>(document, "SIGMA_NIGHT", _SIGMA_NIGHT);
+
+				scenario->set_parameter<float>(document, "C_NIGHT_EAT_OUT_ACTIVITY", _C_NIGHT_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_SOCIAL_ACTIVITY", _C_NIGHT_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_MAJOR_SHOPPING_ACTIVITY", _C_NIGHT_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_OTHER_SHOPPING_ACTIVITY", _C_NIGHT_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_PERSONAL_BUSINESS_ACTIVITY", _C_NIGHT_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_LEISURE_ACTIVITY", _C_NIGHT_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+				scenario->set_parameter<float>(document, "C_AMPEAK_EAT_OUT_ACTIVITY", _C_AMPEAK_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_SOCIAL_ACTIVITY", _C_AMPEAK_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_MAJOR_SHOPPING_ACTIVITY", _C_AMPEAK_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_OTHER_SHOPPING_ACTIVITY", _C_AMPEAK_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_LEISURE_ACTIVITY", _C_AMPEAK_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_EAT_OUT_ACTIVITY", _C_AMOFFPEAK_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SOCIAL_ACTIVITY", _C_AMOFFPEAK_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY", _C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY", _C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_LEISURE_ACTIVITY", _C_AMOFFPEAK_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_EAT_OUT_ACTIVITY", _C_PMOFFPEAK_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SOCIAL_ACTIVITY", _C_PMOFFPEAK_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY", _C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY", _C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_LEISURE_ACTIVITY", _C_PMOFFPEAK_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+				scenario->set_parameter<float>(document, "C_PMPEAK_EAT_OUT_ACTIVITY", _C_PMPEAK_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_SOCIAL_ACTIVITY", _C_PMPEAK_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_MAJOR_SHOPPING_ACTIVITY", _C_PMPEAK_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_OTHER_SHOPPING_ACTIVITY", _C_PMPEAK_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_LEISURE_ACTIVITY", _C_PMPEAK_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+
+				scenario->set_parameter<float>(document, "C_EVENING_EAT_OUT_ACTIVITY", _C_EVENING_EAT_OUT_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_SOCIAL_ACTIVITY", _C_EVENING_SOCIAL_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_MAJOR_SHOPPING_ACTIVITY", _C_EVENING_MAJOR_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_OTHER_SHOPPING_ACTIVITY", _C_EVENING_OTHER_SHOPPING_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_PERSONAL_BUSINESS_ACTIVITY", _C_EVENING_PERSONAL_BUSINESS_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_LEISURE_ACTIVITY", _C_EVENING_LEISURE_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY);
 				#pragma endregion
 
 				// fill in the default start-duration distribution
