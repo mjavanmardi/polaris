@@ -494,7 +494,7 @@ namespace Person_Components
 			//=======================================================================
 			// find maximum end time of the new activity
 			Time_Seconds end_max;
-			_Activity_Location_Interface* next_loc = nullptr;
+			_Activity_Location_Interface* next_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 			if (next_act == nullptr) end_max = END;
 			else
 			{
@@ -504,7 +504,7 @@ namespace Person_Components
 					next_loc = next_act->template Location<_Activity_Location_Interface*>();
 					ttime_next = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(loc, next_loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, end);
 				}
-				else ttime_next = 20.0 * 60.0;
+				ttime_next = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(loc, next_loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, end);
 
 				// get maximum end time of current activity given departure time for next activity
 				end_max = next_act->template Start_Time<Time_Seconds>() - ttime_next;
@@ -513,7 +513,7 @@ namespace Person_Components
 			//=======================================================================
 			// find minimum start time of the new activity
 			Time_Seconds start_min;
-			_Activity_Location_Interface* prev_loc = nullptr;
+			_Activity_Location_Interface* prev_loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 			if (prev_act == nullptr) start_min = iteration() + 1;
 			else
 			{
@@ -528,9 +528,8 @@ namespace Person_Components
 				if (prev_act->Location_Is_Planned())
 				{
 					prev_loc = prev_act->template Location<_Activity_Location_Interface*>();
-					ttime_prev = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(prev_loc, loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
 				}
-				else ttime_prev = 20.0 * 60.0;
+				ttime_prev = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(prev_loc, loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
 
 				// get maximum end time of current activity given departure time for next activity
 				start_min = prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>() + ttime_prev;
@@ -545,9 +544,15 @@ namespace Person_Components
 			// check for insertion conflicts - does not work with the current start_min/end_max setup
 			// Currently valid for original acts longer than 2 hours, where the conflicting act starts at least ttime + min_duration (300s) into the original act, 
 			// and ends ttime+min_duration before the end of the original act
+			// Update so that the inserted activities shift the competing acts..... JA - 10/24/17
 			if (prev_act != nullptr)
 			{
-				if (prev_act->template Duration<Time_Hours>() > 2.0 && prev_act->template Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->template Start_Time<Time_Seconds>() && prev_act->template End_Time<Time_Seconds>() >= act->template End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
+				// can't split schoolchild activities....
+				if (prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::SCHOOL_ACTIVITY)
+				{
+
+				}
+				else if (prev_act->template Duration<Time_Hours>() > 2.0 && prev_act->template Start_Time<Time_Seconds>() + ttime_prev + 300.0 < act->template Start_Time<Time_Seconds>() && prev_act->template End_Time<Time_Seconds>() >= act->template End_Time<Time_Seconds>() + ttime_prev + 300.0 && prev_act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() != Activity_Components::Types::AT_HOME_ACTIVITY)
 				{
 					_Planner_Interface* planner = _Parent_Person->Planning_Faculty<_Planner_Interface*>();
 					_Generator_Interface* generator = planner->template Activity_Generation_Faculty<_Generator_Interface*>();
@@ -573,37 +578,54 @@ namespace Person_Components
 
 					Time_Seconds ttime_new = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(loc, prev_loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, new_act->template Start_Time<Time_Seconds>());
 
+					// update estimated travel time
+					end_max = end_max + ttime_next;
+					ttime_next = network->template Get_TTime<_Activity_Location_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(prev_loc, next_loc, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, end);
+					end_max = end_max - ttime_next;
+					start_min = start_min + ttime_new;
+					available_time = end_max - start_min;
+
 					//update the start and end constraints to account for the new split time
-					start_min = prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>() + ttime_prev;
+					start_min = prev_act->template End_Time<Time_Seconds>() + ttime_prev;
 					end_max = new_act->template Start_Time<Time_Seconds>() - ttime_new;
 				}
 			}
 
 
 			// 1. simple conflict, fits without shortening
-			if (available_time > end - start)
+			if (available_time > act->Duration<Time_Seconds>())
 			{
-				if (start < start_min) act->template Start_Time<Time_Seconds>(start_min); // move forward in time
-				if (end > end_max) act->template Start_Time<Time_Seconds>(start - (end - end_max)); // move backward in time
-																									// update the movement plans of surrounding activities
-				if (update_movement_plans)
+				// complete the activity insertion action
+				if (new_act != nullptr)
 				{
-					// No need to resolve conflicts for return home activities, these are scheduled on-the-fly and should always fit
-					if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+					//just shift the 2nd half of the activity later as the following gap accomodates it
+					new_act->End_Time<Time_Seconds>(act->template End_Time<Time_Seconds>() + act->Duration<Time_Seconds>(), false);
+				}
+				// otherwise place new activity in the existing gap
+				else
+				{
+					if (start < start_min) act->template Start_Time<Time_Seconds>(start_min); // move forward in time
+					if (end > end_max) act->template Start_Time<Time_Seconds>(start - (end - end_max)); // move backward in time
+																										// update the movement plans of surrounding activities
+					if (update_movement_plans)
 					{
-						//RLW%%% - YIKES! At_Home_Activity_Plan* at_home_act = static_cast<At_Home_Activity_Plan*>(act);
-						At_Home_Activity_Plan* at_home_act = (At_Home_Activity_Plan*)act;
-						act->template Start_Time<Time_Seconds>(at_home_act->template Fixed_Departure<Time_Seconds>() + ttime_prev);
-					}
-					else
-					{
-						move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev); //act->template Expected_Travel_Time<Time_Seconds>());
-					}
-					// update the following movement plan to account for new travel time
-					if (next_act != nullptr && next_move != nullptr)
-					{
-						next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->template destination<_Activity_Location_Interface*>());
-						next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
+						// No need to resolve conflicts for return home activities, these are scheduled on-the-fly and should always fit
+						if (act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY)
+						{
+							//RLW%%% - YIKES! At_Home_Activity_Plan* at_home_act = static_cast<At_Home_Activity_Plan*>(act);
+							At_Home_Activity_Plan* at_home_act = (At_Home_Activity_Plan*)act;
+							act->template Start_Time<Time_Seconds>(at_home_act->template Fixed_Departure<Time_Seconds>() + ttime_prev);
+						}
+						else
+						{
+							move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - ttime_prev); //act->template Expected_Travel_Time<Time_Seconds>());
+						}
+						// update the following movement plan to account for new travel time
+						if (next_act != nullptr && next_move != nullptr)
+						{
+							next_move->template Update_Locations<_Activity_Location_Interface*>(loc, next_move->template destination<_Activity_Location_Interface*>());
+							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
+						}
 					}
 				}
 				return true;

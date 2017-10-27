@@ -147,21 +147,6 @@ namespace Person_Components
 				float rand2 = rand * (p_range_end - p_range_start) + p_range_start;
 				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].lower_bound(rand2);
 
-				/*int iter = 0;
-				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
-				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
-				while (itr->second.first < start || itr->second.first >= end)
-				{
-					rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
-					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
-					++iter;
-					if (iter >= 100)
-					{
-						THROW_WARNING("Warning, could not find a start time value within given range: random start time has been selected.");
-						break;
-					}
-				}*/
-
 				// make sure valid entry is found
 				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end())
 				{
@@ -304,18 +289,21 @@ namespace Person_Components
 				Activity_Components::Types::ACTIVITY_TYPES act_type = act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 				float D_EO = act_type == Activity_Components::Types::EAT_OUT_ACTIVITY? 1.0 : 0.0;
 				float D_S = act_type == Activity_Components::Types::SOCIAL_ACTIVITY ? 1.0 : 0.0;
-				float D_MS = act_type == Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY || act_type == Activity_Components::Types::OTHER_SHOPPING_ACTIVITY ? 1.0 : 0.0;
+				float D_MS = act_type == Activity_Components::Types::MAJOR_SHOPPING_ACTIVITY ? 1.0 : 0.0;
 				float D_OS = act_type == Activity_Components::Types::OTHER_SHOPPING_ACTIVITY ? 1.0 : 0.0;
-				float D_PB = act_type == Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY || act_type == Activity_Components::Types::HEALTHCARE_ACTIVITY || act_type == Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY || act_type == Activity_Components::Types::ERRANDS_ACTIVITY ? 1.0 : 0.0;
+				float D_SV = act_type == Activity_Components::Types::SERVICE_VEHICLE_ACTIVITY ? 1.0 : 0.0;
+				float D_HC = act_type == Activity_Components::Types::HEALTHCARE_ACTIVITY? 1.0 : 0.0;
+				float D_E = act_type == Activity_Components::Types::ERRANDS_ACTIVITY ? 1.0 : 0.0;
+				float D_PB = act_type == Activity_Components::Types::PERSONAL_BUSINESS_ACTIVITY ? 1.0 : 0.0;
 				float D_L = act_type == Activity_Components::Types::LEISURE_ACTIVITY || act_type == Activity_Components::Types::RECREATION_ACTIVITY ? 1.0 : 0.0;
 				float D_RC = act_type == Activity_Components::Types::RELIGIOUS_OR_CIVIC_ACTIVITY ? 1.0 : 0.0;;
 
-				float U_am_peak =	 _C_AMPEAK_EAT_OUT_ACTIVITY * D_EO	  + _C_AMPEAK_SOCIAL_ACTIVITY * D_S		+ _C_AMPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_AMPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY *	D_PB + _C_AMPEAK_LEISURE_ACTIVITY * D_L		+ _C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
-				float U_am_offpeak = _C_AMOFFPEAK_EAT_OUT_ACTIVITY * D_EO + _C_AMOFFPEAK_SOCIAL_ACTIVITY * D_S	+ _C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS + _C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY * D_PB + _C_AMOFFPEAK_LEISURE_ACTIVITY * D_L	+ _C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
-				float U_pm_offpeak = _C_PMOFFPEAK_EAT_OUT_ACTIVITY * D_EO + _C_PMOFFPEAK_SOCIAL_ACTIVITY * D_S	+ _C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS + _C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY * D_PB + _C_PMOFFPEAK_LEISURE_ACTIVITY * D_L	+ _C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
-				float U_pm_peak =	 _C_PMPEAK_EAT_OUT_ACTIVITY * D_EO	  + _C_PMPEAK_SOCIAL_ACTIVITY * D_S		+ _C_PMPEAK_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_PMPEAK_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY *	D_PB + _C_PMPEAK_LEISURE_ACTIVITY * D_L		+ _C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
-				float U_evening =	 _C_EVENING_EAT_OUT_ACTIVITY * D_EO	  + _C_EVENING_SOCIAL_ACTIVITY  * D_S	+ _C_EVENING_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_EVENING_OTHER_SHOPPING_ACTIVITY * D_OS		+ _C_EVENING_PERSONAL_BUSINESS_ACTIVITY *D_PB	 + _C_EVENING_LEISURE_ACTIVITY * D_L	+ _C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
-				float U_night =		 _C_NIGHT_EAT_OUT_ACTIVITY * D_EO	  +	_C_NIGHT_SOCIAL_ACTIVITY  * D_S		+ _C_NIGHT_MAJOR_SHOPPING_ACTIVITY * D_MS	  + _C_NIGHT_OTHER_SHOPPING_ACTIVITY * D_OS			+ _C_NIGHT_PERSONAL_BUSINESS_ACTIVITY *D_PB		 + _C_NIGHT_LEISURE_ACTIVITY * D_L		+ _C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY * D_RC;
+				float U_am_peak =	 _C_AMPEAK_EAT_OUT * D_EO	 + _C_AMPEAK_SOCIAL * D_S		+ _C_AMPEAK_SHOP_MAJOR * D_MS	  + _C_AMPEAK_SHOP_OTHER * D_OS		+ _C_AMPEAK_PERSONAL *	D_PB	+ _C_AMPEAK_LEISURE * D_L	 + _C_AMPEAK_RELIGIOUS * D_RC	 + _C_AMPEAK_SERVICE * D_SV		+ _C_AMPEAK_HEALTHCARE * D_HC	 + _C_AMPEAK_ERRANDS * D_E;
+				float U_am_offpeak = _C_AMOFFPEAK_EAT_OUT * D_EO + _C_AMOFFPEAK_SOCIAL * D_S	+ _C_AMOFFPEAK_SHOP_MAJOR * D_MS  + _C_AMOFFPEAK_SHOP_OTHER * D_OS  + _C_AMOFFPEAK_PERSONAL * D_PB  + _C_AMOFFPEAK_LEISURE * D_L + _C_AMOFFPEAK_RELIGIOUS * D_RC + _C_AMOFFPEAK_SERVICE * D_SV	+ _C_AMOFFPEAK_HEALTHCARE * D_HC + _C_AMOFFPEAK_ERRANDS * D_E;
+				float U_pm_offpeak = _C_PMOFFPEAK_EAT_OUT * D_EO + _C_PMOFFPEAK_SOCIAL * D_S	+ _C_PMOFFPEAK_SHOP_MAJOR * D_MS  + _C_PMOFFPEAK_SHOP_OTHER * D_OS	+ _C_PMOFFPEAK_PERSONAL * D_PB  + _C_PMOFFPEAK_LEISURE * D_L + _C_PMOFFPEAK_RELIGIOUS * D_RC + _C_PMOFFPEAK_SERVICE * D_SV	+ _C_PMOFFPEAK_HEALTHCARE * D_HC + _C_PMOFFPEAK_ERRANDS * D_E;
+				float U_pm_peak =	 _C_PMPEAK_EAT_OUT * D_EO	 + _C_PMPEAK_SOCIAL * D_S		+ _C_PMPEAK_SHOP_MAJOR * D_MS	  + _C_PMPEAK_SHOP_OTHER * D_OS		+ _C_PMPEAK_PERSONAL *	D_PB	+ _C_PMPEAK_LEISURE * D_L	 + _C_PMPEAK_RELIGIOUS * D_RC	 + _C_PMPEAK_SERVICE * D_SV		+ _C_PMPEAK_HEALTHCARE * D_HC	 + _C_PMPEAK_ERRANDS * D_E;
+				float U_evening =	 _C_EVENING_EAT_OUT * D_EO	 + _C_EVENING_SOCIAL  * D_S		+ _C_EVENING_SHOP_MAJOR * D_MS	  + _C_EVENING_SHOP_OTHER * D_OS	+ _C_EVENING_PERSONAL *D_PB		+ _C_EVENING_LEISURE * D_L	 + _C_EVENING_RELIGIOUS * D_RC	 + _C_EVENING_SERVICE * D_SV	+ _C_EVENING_HEALTHCARE * D_HC	 + _C_EVENING_ERRANDS * D_E;
+				float U_night =		 _C_NIGHT_EAT_OUT * D_EO	 + _C_NIGHT_SOCIAL  * D_S		+ _C_NIGHT_SHOP_MAJOR * D_MS	  + _C_NIGHT_SHOP_OTHER * D_OS		+ _C_NIGHT_PERSONAL *D_PB		+ _C_NIGHT_LEISURE * D_L	 + _C_NIGHT_RELIGIOUS * D_RC	 + _C_NIGHT_SERVICE * D_SV		+ _C_NIGHT_HEALTHCARE * D_HC	 + _C_NIGHT_HEALTHCARE * D_E;
 	
 				U_am_peak += _S_AMPEAK_AGE_60*Age_60 + _S_AMPEAK_HH_WORKERS*Workers + _S_AMPEAK_FLEX_START*Flex_start + _S_AMPEAK_FLEX_DURATION*Flex_duration + _S_AMPEAK_PARTY_JOINT*Party_joint;
 				U_am_offpeak += _S_AMOFFPEAK_CONSTANT + _S_AMOFFPEAK_WORK_PARTTIME*Work_parttime + _S_AMOFFPEAK_STUDENT_FULLTIME*Student_fulltime + _S_AMOFFPEAK_MODE_PASSENGER*Mode_passenger;
@@ -541,53 +529,72 @@ namespace Person_Components
 				scenario->set_parameter<float>(document, "SIGMA_EVENING", _SIGMA_EVENING);
 				scenario->set_parameter<float>(document, "SIGMA_NIGHT", _SIGMA_NIGHT);
 
-				scenario->set_parameter<float>(document, "C_NIGHT_EAT_OUT_ACTIVITY", _C_NIGHT_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_SOCIAL_ACTIVITY", _C_NIGHT_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_MAJOR_SHOPPING_ACTIVITY", _C_NIGHT_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_OTHER_SHOPPING_ACTIVITY", _C_NIGHT_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_PERSONAL_BUSINESS_ACTIVITY", _C_NIGHT_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_LEISURE_ACTIVITY", _C_NIGHT_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_NIGHT_EAT_OUT", _C_NIGHT_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_NIGHT_ERRANDS", _C_NIGHT_ERRANDS);
+				scenario->set_parameter<float>(document, "C_NIGHT_HEALTHCARE", _C_NIGHT_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_NIGHT_LEISURE", _C_NIGHT_LEISURE);
+				scenario->set_parameter<float>(document, "C_NIGHT_PERSONAL", _C_NIGHT_PERSONAL);
+				scenario->set_parameter<float>(document, "C_NIGHT_RELIGIOUS", _C_NIGHT_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_NIGHT_SERVICE", _C_NIGHT_SERVICE);
+				scenario->set_parameter<float>(document, "C_NIGHT_SHOP_MAJOR", _C_NIGHT_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_NIGHT_SHOP_OTHER", _C_NIGHT_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_NIGHT_SOCIAL", _C_NIGHT_SOCIAL);
 
-				scenario->set_parameter<float>(document, "C_AMPEAK_EAT_OUT_ACTIVITY", _C_AMPEAK_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_SOCIAL_ACTIVITY", _C_AMPEAK_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_MAJOR_SHOPPING_ACTIVITY", _C_AMPEAK_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_OTHER_SHOPPING_ACTIVITY", _C_AMPEAK_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_LEISURE_ACTIVITY", _C_AMPEAK_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMPEAK_EAT_OUT", _C_AMPEAK_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_AMPEAK_ERRANDS", _C_AMPEAK_ERRANDS);
+				scenario->set_parameter<float>(document, "C_AMPEAK_HEALTHCARE", _C_AMPEAK_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_AMPEAK_LEISURE", _C_AMPEAK_LEISURE);
+				scenario->set_parameter<float>(document, "C_AMPEAK_PERSONAL", _C_AMPEAK_PERSONAL);
+				scenario->set_parameter<float>(document, "C_AMPEAK_RELIGIOUS", _C_AMPEAK_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_AMPEAK_SERVICE", _C_AMPEAK_SERVICE);
+				scenario->set_parameter<float>(document, "C_AMPEAK_SHOP_MAJOR", _C_AMPEAK_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_AMPEAK_SHOP_OTHER", _C_AMPEAK_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_AMPEAK_SOCIAL", _C_AMPEAK_SOCIAL);
 
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_EAT_OUT_ACTIVITY", _C_AMOFFPEAK_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SOCIAL_ACTIVITY", _C_AMOFFPEAK_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY", _C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY", _C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_LEISURE_ACTIVITY", _C_AMOFFPEAK_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_EAT_OUT", _C_AMOFFPEAK_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_ERRANDS", _C_AMOFFPEAK_ERRANDS);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_HEALTHCARE", _C_AMOFFPEAK_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_LEISURE", _C_AMOFFPEAK_LEISURE);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_PERSONAL", _C_AMOFFPEAK_PERSONAL);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_RELIGIOUS", _C_AMOFFPEAK_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SERVICE", _C_AMOFFPEAK_SERVICE);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SHOP_MAJOR", _C_AMOFFPEAK_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SHOP_OTHER", _C_AMOFFPEAK_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_AMOFFPEAK_SOCIAL", _C_AMOFFPEAK_SOCIAL);
 
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_EAT_OUT_ACTIVITY", _C_PMOFFPEAK_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SOCIAL_ACTIVITY", _C_PMOFFPEAK_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY", _C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY", _C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_LEISURE_ACTIVITY", _C_PMOFFPEAK_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_EAT_OUT", _C_PMOFFPEAK_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_ERRANDS", _C_PMOFFPEAK_ERRANDS);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_HEALTHCARE", _C_PMOFFPEAK_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_LEISURE", _C_PMOFFPEAK_LEISURE);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_PERSONAL", _C_PMOFFPEAK_PERSONAL);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_RELIGIOUS", _C_PMOFFPEAK_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SERVICE", _C_PMOFFPEAK_SERVICE);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SHOP_MAJOR", _C_PMOFFPEAK_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SHOP_OTHER", _C_PMOFFPEAK_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_PMOFFPEAK_SOCIAL", _C_PMOFFPEAK_SOCIAL);
 
-				scenario->set_parameter<float>(document, "C_PMPEAK_EAT_OUT_ACTIVITY", _C_PMPEAK_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_SOCIAL_ACTIVITY", _C_PMPEAK_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_MAJOR_SHOPPING_ACTIVITY", _C_PMPEAK_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_OTHER_SHOPPING_ACTIVITY", _C_PMPEAK_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY", _C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_LEISURE_ACTIVITY", _C_PMPEAK_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_PMPEAK_EAT_OUT", _C_PMPEAK_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_PMPEAK_ERRANDS", _C_PMPEAK_ERRANDS);
+				scenario->set_parameter<float>(document, "C_PMPEAK_HEALTHCARE", _C_PMPEAK_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_PMPEAK_LEISURE", _C_PMPEAK_LEISURE);
+				scenario->set_parameter<float>(document, "C_PMPEAK_PERSONAL", _C_PMPEAK_PERSONAL);
+				scenario->set_parameter<float>(document, "C_PMPEAK_RELIGIOUS", _C_PMPEAK_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_PMPEAK_SERVICE", _C_PMPEAK_SERVICE);
+				scenario->set_parameter<float>(document, "C_PMPEAK_SHOP_MAJOR", _C_PMPEAK_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_PMPEAK_SHOP_OTHER", _C_PMPEAK_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_PMPEAK_SOCIAL", _C_PMPEAK_SOCIAL);
 
-				scenario->set_parameter<float>(document, "C_EVENING_EAT_OUT_ACTIVITY", _C_EVENING_EAT_OUT_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_SOCIAL_ACTIVITY", _C_EVENING_SOCIAL_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_MAJOR_SHOPPING_ACTIVITY", _C_EVENING_MAJOR_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_OTHER_SHOPPING_ACTIVITY", _C_EVENING_OTHER_SHOPPING_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_PERSONAL_BUSINESS_ACTIVITY", _C_EVENING_PERSONAL_BUSINESS_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_LEISURE_ACTIVITY", _C_EVENING_LEISURE_ACTIVITY);
-				scenario->set_parameter<float>(document, "C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY", _C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY);
+				scenario->set_parameter<float>(document, "C_EVENING_EAT_OUT", _C_EVENING_EAT_OUT);
+				scenario->set_parameter<float>(document, "C_EVENING_ERRANDS", _C_EVENING_ERRANDS);
+				scenario->set_parameter<float>(document, "C_EVENING_HEALTHCARE", _C_EVENING_HEALTHCARE);
+				scenario->set_parameter<float>(document, "C_EVENING_LEISURE", _C_EVENING_LEISURE);
+				scenario->set_parameter<float>(document, "C_EVENING_PERSONAL", _C_EVENING_PERSONAL);
+				scenario->set_parameter<float>(document, "C_EVENING_RELIGIOUS", _C_EVENING_RELIGIOUS);
+				scenario->set_parameter<float>(document, "C_EVENING_SERVICE", _C_EVENING_SERVICE);
+				scenario->set_parameter<float>(document, "C_EVENING_SHOP_MAJOR", _C_EVENING_SHOP_MAJOR);
+				scenario->set_parameter<float>(document, "C_EVENING_SHOP_OTHER", _C_EVENING_SHOP_OTHER);
+				scenario->set_parameter<float>(document, "C_EVENING_SOCIAL", _C_EVENING_SOCIAL);
+
 				#pragma endregion
 
 				// fill in the default start-duration distribution
@@ -800,48 +807,72 @@ namespace Person_Components
 			m_static_data(float, SIGMA_EVENING, NONE, NONE);
 			m_static_data(float, SIGMA_NIGHT, NONE, NONE);
 			// CALIBRATION PARAMETERS
-			m_static_data(float, C_NIGHT_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_EAT_OUT_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_SOCIAL_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_MAJOR_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_OTHER_SHOPPING_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_PERSONAL_BUSINESS_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_LEISURE_ACTIVITY, NONE, NONE);
-			m_static_data(float, C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY, NONE, NONE);
+			m_static_data(float, C_NIGHT_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_NIGHT_ERRANDS, NONE, NONE);
+			m_static_data(float, C_NIGHT_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_NIGHT_LEISURE, NONE, NONE);
+			m_static_data(float, C_NIGHT_PERSONAL, NONE, NONE);
+			m_static_data(float, C_NIGHT_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_NIGHT_SERVICE, NONE, NONE);
+			m_static_data(float, C_NIGHT_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_NIGHT_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_NIGHT_SOCIAL, NONE, NONE);
+
+			m_static_data(float, C_AMPEAK_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_AMPEAK_ERRANDS, NONE, NONE);
+			m_static_data(float, C_AMPEAK_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_AMPEAK_LEISURE, NONE, NONE);
+			m_static_data(float, C_AMPEAK_PERSONAL, NONE, NONE);
+			m_static_data(float, C_AMPEAK_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_AMPEAK_SERVICE, NONE, NONE);
+			m_static_data(float, C_AMPEAK_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_AMPEAK_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_AMPEAK_SOCIAL, NONE, NONE);
+
+			m_static_data(float, C_AMOFFPEAK_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_ERRANDS, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_LEISURE, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_PERSONAL, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_SERVICE, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_AMOFFPEAK_SOCIAL, NONE, NONE);
+
+			m_static_data(float, C_PMOFFPEAK_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_ERRANDS, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_LEISURE, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_PERSONAL, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_SERVICE, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_PMOFFPEAK_SOCIAL, NONE, NONE);
+
+			m_static_data(float, C_PMPEAK_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_PMPEAK_ERRANDS, NONE, NONE);
+			m_static_data(float, C_PMPEAK_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_PMPEAK_LEISURE, NONE, NONE);
+			m_static_data(float, C_PMPEAK_PERSONAL, NONE, NONE);
+			m_static_data(float, C_PMPEAK_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_PMPEAK_SERVICE, NONE, NONE);
+			m_static_data(float, C_PMPEAK_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_PMPEAK_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_PMPEAK_SOCIAL, NONE, NONE);
+
+			m_static_data(float, C_EVENING_EAT_OUT, NONE, NONE);
+			m_static_data(float, C_EVENING_ERRANDS, NONE, NONE);
+			m_static_data(float, C_EVENING_HEALTHCARE, NONE, NONE);
+			m_static_data(float, C_EVENING_LEISURE, NONE, NONE);
+			m_static_data(float, C_EVENING_PERSONAL, NONE, NONE);
+			m_static_data(float, C_EVENING_RELIGIOUS, NONE, NONE);
+			m_static_data(float, C_EVENING_SERVICE, NONE, NONE);
+			m_static_data(float, C_EVENING_SHOP_MAJOR, NONE, NONE);
+			m_static_data(float, C_EVENING_SHOP_OTHER, NONE, NONE);
+			m_static_data(float, C_EVENING_SOCIAL, NONE, NONE);
+
 
 			#pragma endregion
 			static void default_static_initializer()
@@ -920,53 +951,72 @@ namespace Person_Components
 
 
 				// CALIBRATION PARAMS
-				_C_NIGHT_EAT_OUT_ACTIVITY = 2.61059606720439;
-				_C_NIGHT_SOCIAL_ACTIVITY = 6.98700764856677;
-				_C_NIGHT_MAJOR_SHOPPING_ACTIVITY = -3.04589869582877;
-				_C_NIGHT_OTHER_SHOPPING_ACTIVITY = 14.4675887869341;
-				_C_NIGHT_PERSONAL_BUSINESS_ACTIVITY = 6.19204064493498;
-				_C_NIGHT_LEISURE_ACTIVITY = 5.22978952120311;
-				_C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY = 1.29043965022455;
+				_C_NIGHT_EAT_OUT = -3.12694632113796;
+				_C_NIGHT_ERRANDS = -3.44407422305627;
+				_C_NIGHT_HEALTHCARE = -1.28205652276763;
+				_C_NIGHT_LEISURE = -1.53490849191797;
+				_C_NIGHT_PERSONAL = -1.34346697253566;
+				_C_NIGHT_RELIGIOUS = -3.74398676752423;
+				_C_NIGHT_SERVICE = -1.43187562408295;
+				_C_NIGHT_SHOP_MAJOR = -2.33172092157761;
+				_C_NIGHT_SHOP_OTHER = 0;
+				_C_NIGHT_SOCIAL = -0.660770385486421;
 
-				_C_AMPEAK_EAT_OUT_ACTIVITY = 3.74971721416919;
-				_C_AMPEAK_SOCIAL_ACTIVITY = 4.12153758642278;
-				_C_AMPEAK_MAJOR_SHOPPING_ACTIVITY = 2.87623756528352;
-				_C_AMPEAK_OTHER_SHOPPING_ACTIVITY = 9.12986388828419;
-				_C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY = 4.31657785577272;
-				_C_AMPEAK_LEISURE_ACTIVITY = 4.15654954891012;
-				_C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 4.09986826521304;
+				_C_AMPEAK_EAT_OUT = 3.97020887563833;
+				_C_AMPEAK_ERRANDS = 4.87668567153226;
+				_C_AMPEAK_HEALTHCARE = 4.9377490746509;
+				_C_AMPEAK_LEISURE = 4.47433951433636;
+				_C_AMPEAK_PERSONAL = 4.97700930539339;
+				_C_AMPEAK_RELIGIOUS = 4.37213915392682;
+				_C_AMPEAK_SERVICE = 4.92984247855131;
+				_C_AMPEAK_SHOP_MAJOR = 3.0756460885362;
+				_C_AMPEAK_SHOP_OTHER = 9.72892205895322;
+				_C_AMPEAK_SOCIAL = 3.95663034994127;
 
-				_C_AMOFFPEAK_EAT_OUT_ACTIVITY = 11.331718935833;
-				_C_AMOFFPEAK_SOCIAL_ACTIVITY = 11.7664566926882;
-				_C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = 12.0934757525265;
-				_C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY = 8.78159267310069;
-				_C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = 12.1356466602979;
-				_C_AMOFFPEAK_LEISURE_ACTIVITY = 12.0079277768501;
-				_C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 11.0542186913043;
+				_C_AMOFFPEAK_EAT_OUT = 11.4859127366759;
+				_C_AMOFFPEAK_ERRANDS = 12.008092682098;
+				_C_AMOFFPEAK_HEALTHCARE = 12.0046385381348;
+				_C_AMOFFPEAK_LEISURE = 11.3398914425211;
+				_C_AMOFFPEAK_PERSONAL = 11.8866214020506;
+				_C_AMOFFPEAK_RELIGIOUS = 10.5029918365044;
+				_C_AMOFFPEAK_SERVICE = 11.7343560690209;
+				_C_AMOFFPEAK_SHOP_MAJOR = 12.1786434337633;
+				_C_AMOFFPEAK_SHOP_OTHER = 8.91994786190489;
+				_C_AMOFFPEAK_SOCIAL = 11.2659075121519;
 
-				_C_PMOFFPEAK_EAT_OUT_ACTIVITY = 8.30801000730919;
-				_C_PMOFFPEAK_SOCIAL_ACTIVITY = 7.79734725904626;
-				_C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY = 8.83601808851042;
-				_C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY = 8.66499856916522;
-				_C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY = 8.10043980112096;
-				_C_PMOFFPEAK_LEISURE_ACTIVITY = 6.99350342514512;
-				_C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 6.59312958980496;
+				_C_PMOFFPEAK_EAT_OUT = 7.55932725968039;
+				_C_PMOFFPEAK_ERRANDS = 7.98160439978601;
+				_C_PMOFFPEAK_HEALTHCARE = 7.92787921452366;
+				_C_PMOFFPEAK_LEISURE = 7.10667787949132;
+				_C_PMOFFPEAK_PERSONAL = 7.89099583077787;
+				_C_PMOFFPEAK_RELIGIOUS = 6.32374399905219;
+				_C_PMOFFPEAK_SERVICE = 7.96791741595753;
+				_C_PMOFFPEAK_SHOP_MAJOR = 8.50739656321298;
+				_C_PMOFFPEAK_SHOP_OTHER = 8.77905165512241;
+				_C_PMOFFPEAK_SOCIAL = 7.6821015019714;
 
-				_C_PMPEAK_EAT_OUT_ACTIVITY = 8.94357322024723;
-				_C_PMPEAK_SOCIAL_ACTIVITY = 8.34256878541166;
-				_C_PMPEAK_MAJOR_SHOPPING_ACTIVITY = 9.21056324724484;
-				_C_PMPEAK_OTHER_SHOPPING_ACTIVITY = 9.06804560100913;
-				_C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY = 8.45537889023645;
-				_C_PMPEAK_LEISURE_ACTIVITY = 8.49209511098696;
-				_C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY = 8.59599163870728;
+				_C_PMPEAK_EAT_OUT = 6.72984773267349;
+				_C_PMPEAK_ERRANDS = 6.48159006838561;
+				_C_PMPEAK_HEALTHCARE = 6.39784116813467;
+				_C_PMPEAK_LEISURE = 6.75009714515824;
+				_C_PMPEAK_PERSONAL = 6.63611483586088;
+				_C_PMPEAK_RELIGIOUS = 6.7677573137143;
+				_C_PMPEAK_SERVICE = 6.63734112358556;
+				_C_PMPEAK_SHOP_MAJOR = 6.81224683913958;
+				_C_PMPEAK_SHOP_OTHER = 8.96824541011475;
+				_C_PMPEAK_SOCIAL = 6.97768658765496;
 
-				_C_EVENING_EAT_OUT_ACTIVITY = 3.12114894459854;
-				_C_EVENING_SOCIAL_ACTIVITY = 3.77645741628581;
-				_C_EVENING_MAJOR_SHOPPING_ACTIVITY = 2.7159448813639;
-				_C_EVENING_OTHER_SHOPPING_ACTIVITY = 9.10898595252838;
-				_C_EVENING_PERSONAL_BUSINESS_ACTIVITY = 2.47001185979996;
-				_C_EVENING_LEISURE_ACTIVITY = 2.52539693300196;
-				_C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY = 3.24576153255019;
+				_C_EVENING_EAT_OUT = 2.59451249468704;
+				_C_EVENING_ERRANDS = 2.09637136734585;
+				_C_EVENING_HEALTHCARE = -5.86182461458635;
+				_C_EVENING_LEISURE = 2.38682794537265;
+				_C_EVENING_PERSONAL = 1.91120506600004;
+				_C_EVENING_RELIGIOUS = 1.55892034075034;
+				_C_EVENING_SERVICE = 2.45468535867371;
+				_C_EVENING_SHOP_MAJOR = 2.46033404889411;
+				_C_EVENING_SHOP_OTHER = 8.46520577531026;
+				_C_EVENING_SOCIAL = 3.28001195153374;
+
 			}
 		};
 
@@ -1050,53 +1100,72 @@ namespace Person_Components
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_EVENING);
 		define_static_member_variable(Activity_Timing_Chooser_Implementation, SIGMA_NIGHT);
 		// Calibration parameters
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_NIGHT_SOCIAL);
 
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMPEAK_SOCIAL);
 
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_AMOFFPEAK_SOCIAL);
 
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMOFFPEAK_SOCIAL);
 
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_PMPEAK_SOCIAL);
 
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_EAT_OUT_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SOCIAL_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_MAJOR_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_OTHER_SHOPPING_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_PERSONAL_BUSINESS_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_LEISURE_ACTIVITY);
-		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_RELIGIOUS_OR_CIVIC_ACTIVITY);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_EAT_OUT);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_ERRANDS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_HEALTHCARE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_LEISURE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_PERSONAL);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_RELIGIOUS);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SERVICE);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SHOP_MAJOR);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SHOP_OTHER);
+		define_static_member_variable(Activity_Timing_Chooser_Implementation, C_EVENING_SOCIAL);
+
 
 
 		#pragma endregion
