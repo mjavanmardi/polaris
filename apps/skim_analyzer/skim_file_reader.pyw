@@ -734,6 +734,7 @@ parser.add_argument('-i5_auto_distance_file',default='', help='Input transit ski
 parser.add_argument('-zone_id_to_index_file', default = '', help='Map of zone ids to zone indexes. Required for skim file creation from csv files.')
 parser.add_argument('-i6_highway_ttime_files',nargs='*', help='Input csv file, required if read_from_csv to be true and no i*_transit files are specified.  One csv file for each skim time interval, with each row in "O,D,ttime" format.')
 parser.add_argument('-i7_highway_intervals',nargs='*',type=int, help='Defines the end times of the skim intervals for which the -i6_highway_ttime_files were created, one interval per file required.')
+parser.add_argument('-define_intervals',action='store_true', help='Flag to indicate that the intervals defined in auto_skim_fil will be altered to those defined in i7_highway_intervals.')
 
 args = parser.parse_args()
 

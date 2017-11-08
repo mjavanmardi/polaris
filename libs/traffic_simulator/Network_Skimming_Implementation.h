@@ -227,6 +227,7 @@ namespace Network_Skimming_Components
 				typedef typename matrix<typename MasterType::los_value_type*>::size_type size_t;
 
 				// copy old values into temporary and reset the current values to zero
+				float new_skim_weight = scenario->skim_averaging_factor<float>();
 				matrix<float> los_old;
 				//if (scenario->template read_skim_tables<bool>())
 				//{
@@ -305,7 +306,7 @@ namespace Network_Skimming_Components
 							float dev = time_old > 0.0 ? (time-time_old)/time_old : 0.0;
 							if (dev > max_dev) max_dev = dev;
 							float tmp = ((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>();
-							tmp += (0.75 * time+ 0.25 * time_old)*weight;
+							tmp += (new_skim_weight * time+ (1.0-new_skim_weight) * time_old)*weight;
 							((los_value_itf*)((*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]))->template auto_ttime<typename skimmer_itf::Component_Type::Stored_Time_Type>(tmp);
 						}
 						// otherwise, just add current weighted value
@@ -612,35 +613,36 @@ namespace Network_Skimming_Components
 
 				// set up the update intervals
 				this->_current_increment_index=0;
-				if (!scenario->template use_skim_intervals<bool>())
+				if (scenario->template use_skim_intervals_from_previous<bool>())
 				{
-					// Get interval length from the scenario
-					Simulation_Timestep_Increment increment = Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes,Simulation_Timestep_Increment>((Time_Minutes)scenario->template skim_interval_length_minutes<int>()));
-					
-					// Add endpoints to the endpoint list based on interval length
-					for (Simulation_Timestep_Increment start = 0; start + increment < END-1; start = start + increment)
-					{
-						//DEBUG_MESSAGE("Adding skim interval @ " <<Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start+increment)));
-						this->_update_interval_endpoints.push_back(Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(start+increment)));
-					}
-					// Add the END endpoint if not added above
-					if (this->_update_interval_endpoints.back() != Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)))
-					{
-						//DEBUG_MESSAGE("Adding skim interval @ " <<Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)));
-						this->_update_interval_endpoints.push_back(Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1)));
-					}
-					//pthis->template update_increment<Time_Minutes>();
+
 				}
-				else
+				else if (scenario->template use_skim_intervals<bool>())
 				{
 					std::vector<int>* intervals = scenario->template skim_interval_endpoint_minutes<std::vector<int>*>();
 					for (std::vector<int>::iterator itr = intervals->begin(); itr != intervals->end(); ++itr)
 					{
 						this->_update_interval_endpoints.push_back(*itr);
 					}
-					if (this->_update_interval_endpoints.back() != GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1))
+					if (this->_update_interval_endpoints.back() != Round<int,float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment, Time_Minutes>(END - 1)))
 					{
-						this->_update_interval_endpoints.push_back(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,Time_Minutes>(END-1));
+						this->_update_interval_endpoints.push_back(Round<int, float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment, Time_Minutes>(END - 1)));
+					}
+				}
+				else
+				{
+					// Get interval length from the scenario
+					Simulation_Timestep_Increment increment = Round<int, float>(GLOBALS::Time_Converter.Convert_Value<Time_Minutes, Simulation_Timestep_Increment>((Time_Minutes)scenario->template skim_interval_length_minutes<int>()));
+
+					// Add endpoints to the endpoint list based on interval length
+					for (Simulation_Timestep_Increment start = 0; start + increment < END - 1; start = start + increment)
+					{
+						this->_update_interval_endpoints.push_back(Round<int, float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment, Time_Minutes>(start + increment)));
+					}
+					// Add the END endpoint if not added above
+					if (this->_update_interval_endpoints.back() != Round<int, float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment, Time_Minutes>(END - 1)))
+					{
+						this->_update_interval_endpoints.push_back(Round<int, float>(GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment, Time_Minutes>(END - 1)));
 					}
 				}
 
@@ -868,7 +870,7 @@ namespace Network_Skimming_Components
 						for (int i =0; i < num_zones*num_zones; ++i)
 						{
 							typename MasterType::los_value_type* temp_los = Allocate<typename MasterType::los_value_type>();
-							((los_value_itf*)temp_los)->template auto_ttime<Stored_Time_Type>(0.0f);
+							((los_value_itf*)temp_los)->template auto_ttime<Time_Hours>(temp_invariant_los_array[i]->auto_distance<Miles>()/30.0f);
 							((los_value_itf*)temp_los)->template LOS_time_invariant<typename MasterType::los_invariant_value_type*>(temp_invariant_los_array[i]);
 							temp_los_array[i] = temp_los;
 						}
@@ -915,8 +917,8 @@ namespace Network_Skimming_Components
 				}
 
 				//===========================================================================
-				// Calculate accessibilities for each zone based on initial skims
-				Update_Zone_Accessibilities<TargetType>();
+				// Calculate accessibilities for each zone based on initial skims - move until after the initial update is done.
+				//Update_Zone_Accessibilities<TargetType>();
 			
 			}
 
@@ -1150,6 +1152,10 @@ namespace Network_Skimming_Components
 
 			void Read_Binary_Headers_V1(int& num_modes, int& num_zones, update_interval_endpoints_type* return_intervals=nullptr, bool perform_checks=true)
 			{
+				// get scenario interface
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
 				//=======================================
 				// READ HIGHWAY HEADER
 				//---------------------------------------
@@ -1194,6 +1200,8 @@ namespace Network_Skimming_Components
 					int endpoint;
 					_highway_input_file.template Read_Value<int>(endpoint);
 					intervals.push_back(endpoint);
+					
+					if (scenario->use_skim_intervals_from_previous<bool>()) _update_interval_endpoints.push_back(endpoint);
 				}
 				_highway_input_file.template Read_Array<char>(tag,4);
 				if (strcmp(tag,"EINT")!=0) THROW_EXCEPTION("ERROR: End intervals tag 'EINT' missing from binary file, possible versioning issue.");

@@ -734,13 +734,13 @@ namespace Person_Components
 				float emp_srv = zone->template employment_services<double>()/1000.0;
 				float emp_ret = zone->template employment_retail<double>()/1000.0;
 
-				// I don't think these need to be divided by 1000
-				float thetag = zone->template accessibility_employment_government<double>();// / 1000.0;
-				float thetam = zone->template accessibility_employment_manufacturing<double>();
-				float thetar = zone->template accessibility_employment_retail<double>();
-				float thetas = zone->template accessibility_employment_services<double>();
-				float thetai = zone->template accessibility_employment_industrial<double>();
-				float thetao = zone->template accessibility_employment_other<double>();
+				// These need to be divided by 1000 to match employees above, as per the paper
+				float thetag = zone->template accessibility_employment_government<double>() / 1000.0;// ;
+				float thetam = zone->template accessibility_employment_manufacturing<double>() / 1000.0;
+				float thetar = zone->template accessibility_employment_retail<double>() / 1000.0;
+				float thetas = zone->template accessibility_employment_services<double>() / 1000.0;
+				float thetai = zone->template accessibility_employment_industrial<double>() / 1000.0;
+				float thetao = zone->template accessibility_employment_other<double>() / 1000.0;
 
 				if (_activity_type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || _activity_type == Activity_Components::Types::ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY)
 				{
@@ -2000,7 +2000,16 @@ namespace Person_Components
 					_Zone_Interface* zone = (_Zone_Interface*)(*z_itr);
 					if (zone->template employment_total<int>() > EMP_SPLIT) available_zones[2].push_back(zone);
 					else available_zones[3].push_back(zone);
-				}				
+				}	
+
+				//---------------------------------------------
+				// If no zones are available add the current location as the only option
+				if (available_zones[0].size() + available_zones[1].size() + available_zones[2].size() + available_zones[3].size() == 0)
+				{
+					Create_New_Choice_Option(choice_set, choice_model, prev_loc->zone<_Zone_Interface*>(), act_type, prev_loc, next_loc, 1.0/*,avail_time<1440*/);
+					return;
+				}
+
 
 				//----------------------------------------------------------------------
 				// Next, select zones to choose from each strata
@@ -2012,7 +2021,7 @@ namespace Person_Components
 					{
 						for (z_itr = available_zones[i].begin(); z_itr != available_zones[i].end(); ++z_itr)
 						{
-							Create_New_Choice_Option(choice_set,choice_model,(_Zone_Interface*)(*z_itr),act_type,prev_loc,next_loc,1.0/*,avail_time<1440*/);
+							Create_New_Choice_Option(choice_set,choice_model, (_Zone_Interface*)(*z_itr), act_type,prev_loc,next_loc,1.0/*,avail_time<1440*/);
 						}
 					}
 					// otherwise, pick randomly from the available zones

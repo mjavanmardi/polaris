@@ -157,3 +157,4 @@ $RECYCLE.BIN/
 .DS_Store
 /libs/activity_simulator/Activity_Simulator_Types.h
 *.bak
+/data/test_city/test-Result.sqlite

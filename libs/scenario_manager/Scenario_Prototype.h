@@ -230,6 +230,8 @@ namespace Scenario_Components
 			accessor(skim_interval_length_minutes, NONE, NONE);
 			accessor(do_skimming, NONE, NONE);
 			accessor(use_skim_intervals, NONE, NONE);
+			accessor(use_skim_intervals_from_previous, NONE, NONE);
+			accessor(skim_averaging_factor, NONE, NONE); // factor to weight current skim when updating skim matrices -> defaults to 1.0 (no use of the previous skim info)
 
 			accessor(compare_with_historic_moe, NONE, NONE);
 			accessor(historic_network_moe_file_path_name, NONE, NONE);
@@ -391,6 +393,7 @@ namespace Scenario_Components
 				input_transit_skim_file_path_name<string>((string)"");
 				output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
 				skim_interval_endpoint_minutes<int>(0);
+				skim_averaging_factor<double>(0.5);
 				skim_interval_length_minutes<int>(1440);
 				compare_with_historic_moe<bool>(false);
 				historic_network_moe_file_path_name<string>((string)"historic_realtime_moe_network.csv");
@@ -427,8 +430,8 @@ namespace Scenario_Components
 				enroute_excessive_delay_factor<double>(1.0);
 				minimum_seconds_from_arrival_for_enroute_switching<double>(300.0);
 				time_dependent_routing<bool>(false);
-				time_dependent_routing_weight_shape<double>(2.0);
-				time_dependent_routing_weight_scale<double>(1000.0);
+				time_dependent_routing_weight_shape<double>(2.5);
+				time_dependent_routing_weight_scale<double>(1800.0);
 				time_dependent_routing_weight_factor<double>(1.0);
 				accident_event_duration_reduction<double>(1.0);
 				calculate_realtime_moe<bool>(true);
@@ -717,16 +720,26 @@ namespace Scenario_Components
 
 				// GET NETWORK SKIMMING PARAMETERS
 				set_parameter<bool>(document, "write_skim_tables", this->template write_skim_tables<bool &>());
-				set_parameter<bool>(document, "read_skim_tables", this->template read_skim_tables<bool &>());
+
 				set_parameter<std::string>(document, "input_highway_skim_file_path_name", this->template input_highway_skim_file_path_name<std::string &>());
 				set_parameter<std::string>(document, "output_highway_skim_file_path_name", this->template output_highway_skim_file_path_name<std::string &>());
 				set_parameter<std::string>(document, "input_highway_cost_skim_file_path_name", this->template input_highway_cost_skim_file_path_name<std::string &>());
 				set_parameter<std::string>(document, "output_highway_cost_skim_file_path_name", this->template output_highway_cost_skim_file_path_name<std::string &>());
 				set_parameter<std::string>(document, "input_transit_skim_file_path_name", this->template input_transit_skim_file_path_name<std::string &>());
 				set_parameter<std::string>(document, "output_transit_skim_file_path_name", this->template output_transit_skim_file_path_name<std::string &>());
-				if (set_parameter<std::vector<int>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
+
+				// If we are reading skim tables, use the intervals defined in that previous skim file, as it is required to be he same
+				set_parameter<bool>(document, "read_skim_tables", this->template read_skim_tables<bool &>());
+				set_parameter<double>(document, "skim_averaging_factor", this->template skim_averaging_factor<double &>());
+				if (this->template read_skim_tables<bool>())
+				{
+					use_skim_intervals_from_previous<bool>(true);
+					do_skimming<bool>(true);
+				}
+				else if (set_parameter<std::vector<int>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
 				{
 					use_skim_intervals<bool>(true);
+					use_skim_intervals_from_previous<bool>(false);
 					do_skimming<bool>(true);
 				}
 				else
