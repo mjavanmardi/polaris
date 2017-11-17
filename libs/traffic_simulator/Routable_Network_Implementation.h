@@ -1147,7 +1147,7 @@ namespace Routing_Components
 
 			}
 
-			void compute_dijkstra_transit_distance(Network<typename MasterType::network_type>* source_network)
+			void compute_walk_distance_to_transit(Network<typename MasterType::network_type>* source_network)
 			{
 				cout << "Constructing the walking distance tree to closest transit for better A* filtering..." << endl;
 
@@ -1182,12 +1182,11 @@ namespace Routing_Components
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{
-						
-						global_edge_id start;
-						start.edge_id = link->_uuid;
-						start.graph_id = _multimodal_network_graph_id;						
-						starts.push_back(start);
+					{						
+						global_edge_id in_edge_g;
+						in_edge_g.edge_id = link->_uuid;
+						in_edge_g.graph_id = _multimodal_network_graph_id;
+						starts.push_back(in_edge_g);
 
 						Link_Container_Interface::iterator out_links_itr;
 						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
@@ -1195,14 +1194,9 @@ namespace Routing_Components
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{
-								global_edge_id end;
-								end.edge_id = link->_uuid;
-								end.graph_id = _multimodal_network_graph_id;
-
-								A_Star_Edge<base_edge_type>* end_edge;
-								end_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(end);
-								end_edge->_touch_transit = true;
+							{								
+								A_Star_Edge<base_edge_type>* in_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(in_edge_g);
+								in_edge->_touch_transit = true;
 								break;
 							}
 						}
@@ -1216,6 +1210,84 @@ namespace Routing_Components
 					
 					float routed_time = Dijkstra_Walk<MT, typename MT::walk_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, debug_route);
 					
+
+					if (my_itr % 10000 == 0) cout << "\tLink Counter:\t" << my_itr << endl;
+					++my_itr;
+				}
+
+
+			}
+
+			void compute_drive_fft_to_transit(Network<typename MasterType::network_type>* source_network)
+			{
+				cout << "Constructing the free flow drive time tree to closest transit for better A* filtering..." << endl;
+
+				Routable_Agent<typename MT::drive_to_transit_tree_agent_type> proxy_agent;
+
+				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
+				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+
+				typedef Network<typename MasterType::network_type> Network_Interface;
+
+				typedef Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+
+				Network_Interface* network = source_network;
+
+				Link_Container_Interface::iterator link_itr;
+				Link_Container_Interface* links = network->links_container<Link_Container_Interface*>();
+
+				std::vector<global_edge_id> starts;
+
+				for (link_itr = links->begin(); link_itr != links->end(); link_itr++)
+				{
+					Link_Interface* link = (Link_Interface*)(*link_itr);
+
+					Intersection_Interface* down_node = link->_downstream_intersection;
+					Link_Container_Interface& outbound_links = down_node->template outbound_links<Link_Container_Interface&>();
+
+					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+					if (facility_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || facility_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+					{
+						global_edge_id in_edge_g;
+						in_edge_g.edge_id = link->_uuid;
+						in_edge_g.graph_id = _multimodal_network_graph_id;
+						A_Star_Edge<base_edge_type>* in_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(in_edge_g);
+						
+						starts.push_back(in_edge_g);
+
+						Link_Container_Interface::iterator out_links_itr;
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+							
+							global_edge_id out_edge_g;
+							out_edge_g.edge_id = outbound_link->_uuid;
+							out_edge_g.graph_id = _multimodal_network_graph_id;							
+							A_Star_Edge<base_edge_type>* out_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(out_edge_g);							
+							
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && out_edge->_touch_transit)
+							{								
+								in_edge->_touch_transit = true;
+								break;
+							}
+						}
+					}
+				}
+
+				int my_itr = 0;
+				for (auto orig_itr = starts.begin(); orig_itr != starts.end(); orig_itr++)
+				{
+					global_edge_id start = global_edge_id(*orig_itr);
+
+					float routed_time = Dijkstra_Drive<MT, typename MT::drive_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, debug_route);
+
 
 					if (my_itr % 10000 == 0) cout << "\tLink Counter:\t" << my_itr << endl;
 					++my_itr;

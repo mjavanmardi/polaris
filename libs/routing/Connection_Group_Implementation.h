@@ -98,6 +98,11 @@ namespace polaris
 		{
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::walk_to_transit_tree_agent_type>*)agent, (current_edge_type*)current, routing_data);
 		};
+
+		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::drive_to_transit_tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		{
+			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::drive_to_transit_tree_agent_type>*)agent, (current_edge_type*)current, routing_data);
+		};
 		
 		//virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::time_dependent_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		//{

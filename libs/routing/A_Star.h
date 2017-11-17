@@ -437,7 +437,7 @@ namespace polaris
 		A_Star_Edge<base_edge_type>* start;		
 		start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 
-		start->distance_to_transit(FLT_MAX / 2.0f);
+		start->walk_distance_to_transit(FLT_MAX / 2.0f);
 		start->cost_from_origin(start->_walk_length);
 
 		float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -489,7 +489,7 @@ namespace polaris
 		
 		if (success)
 		{
-			start->_distance_to_transit = current->_cost_from_origin;
+			start->_walk_distance_to_transit = current->_cost_from_origin;
 			if (debug_route)
 			{
 				perf_file << "success\tscanScount:\t" << scanCount;
@@ -504,6 +504,112 @@ namespace polaris
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}		
+
+		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
+		{
+			(*itr)->reset();
+		}
+
+		return total_cost;
+	}
+
+	template<typename MasterType, typename AgentType, typename GraphPoolType>
+	static float Dijkstra_Drive(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, bool debug_route = false)
+	{
+		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
+
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
+
+		std::ofstream perf_file;
+		std::string myParagraph;
+		Counter A_Star_Time;
+		if (debug_route)
+		{
+			stringstream perf_filename("");
+			perf_filename << _scenario_reference->template output_dir_name<string>();
+			perf_filename << "drive_perf_output.dat";
+			perf_file.open(perf_filename.str(), std::ofstream::out | std::ofstream::app);
+
+			A_Star_Time.Start();
+		}
+
+		std::deque< base_edge_type* > modified_edges;
+		boost::intrusive::multiset< base_edge_type > open_set;
+
+		A_Star_Edge<base_edge_type>* start;
+		start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
+
+		start->drive_fft_to_transit(FLT_MAX / 2.0f);
+		start->cost_from_origin(start->_time_cost);
+
+		float initial_estimated_cost_origin_destination = start->cost_from_origin();
+
+		start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
+
+		open_set.insert(*((base_edge_type*)start));
+		if (!start->marked_for_reset())
+		{
+			modified_edges.push_back((base_edge_type*)start);
+			start->marked_for_reset(true);
+		}
+
+		Routing_Data<base_edge_type> routing_data;
+		routing_data.modified_edges = &modified_edges;
+		routing_data.open_set = &open_set;
+		routing_data.start_edge = start;
+
+		bool success = false;
+		int scanCount = 0;
+		A_Star_Edge<base_edge_type>* current;
+		while (open_set.size())
+		{
+			current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
+			++scanCount;
+
+			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
+
+			if (current->_touch_transit)
+			{
+				success = true;
+				break;
+			}
+
+			current->in_open_set(false);
+			current->in_closed_set(true);
+
+			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
+			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
+
+			while (connection_set_iterator != connection_set_end)
+			{
+				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+			}
+
+		}
+
+		float total_cost = 0;
+
+		if (success)
+		{
+			start->_drive_fft_to_transit = current->_cost_from_origin;
+			if (debug_route)
+			{
+				perf_file << "success\tscanScount:\t" << scanCount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
+			}
+		}
+		else
+		{
+			if (debug_route)
+			{
+				perf_file << "fail\tscanScount:\t" << scanCount;
+				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
+			}
+		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
 		{
@@ -678,11 +784,6 @@ namespace polaris
 				modified_edges.push_back((base_edge_type*)start);
 				start->marked_for_reset(true);
 			}
-						
-			/*if (start->_distance_to_transit > walkThreshold  && initial_estimated_cost_origin_destination >  walkWeight * walkThreshold_Time)
-			{
-				early_break = true;
-			}*/
 		}
 
 		bool success = false;

@@ -101,9 +101,15 @@ namespace Routing_Components
 			}
 
 			template<typename Source_Network_Type>
-			void compute_dijkstra_transit_distance(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			void compute_walk_distance_to_transit(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				return this_component()->compute_dijkstra_transit_distance(source_network);
+				return this_component()->compute_walk_distance_to_transit(source_network);
+			}
+
+			template<typename Source_Network_Type>
+			void compute_drive_fft_to_transit(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			{
+				return this_component()->compute_drive_fft_to_transit(source_network);
 			}
 			
 			void initialize()

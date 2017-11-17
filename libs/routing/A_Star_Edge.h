@@ -53,8 +53,11 @@ namespace polaris
 		float time_label(){ return this_component()->time_label(); }
 		void time_label(float value){ this_component()->time_label(value); }
 
-		float distance_to_transit() { return this_component()->distance_to_transit(); }
-		void distance_to_transit(float value) { this_component()->distance_to_transit(value); }
+		float walk_distance_to_transit() { return this_component()->walk_distance_to_transit(); }
+		void walk_distance_to_transit(float value) { this_component()->walk_distance_to_transit(value); }
+
+		float drive_fft_to_transit() { return this_component()->drive_fft_to_transit(); }
+		void drive_fft_to_transit(float value) { this_component()->drive_fft_to_transit(value); }
 
 		bool touch_transit() { return this_component()->touch_transit(); }
 		void touch_transit(bool value) { this_component()->touch_transit(value); }
