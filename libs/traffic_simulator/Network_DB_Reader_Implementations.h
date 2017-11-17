@@ -2035,7 +2035,12 @@ namespace Network_Components
 
 						int zone_index = zone->template internal_id<int>();
 						link->_zone_index = zone_index;
-						link->_dijkstra_cost.resize(zone_count);
+						link->_heur_cost_to_dest.resize(zone_count);
+						for (int zone_ctr = 0; zone_ctr < zone_count; zone_ctr++)
+						{
+							link->_heur_cost_to_dest[zone_ctr] = FLT_MAX / 2.0f;
+						}
+
 					}
 				}
 			}

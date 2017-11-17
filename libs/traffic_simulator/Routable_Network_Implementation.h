@@ -176,7 +176,6 @@ namespace Routing_Components
 			t_data(int, wait_count_from_origin);
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
-			t_data(int, zone);
 
 			static t_data(Layered_Data_Array<float>*, moe_data);
 			static t_data(float, ttime_weight_shape);
@@ -758,9 +757,6 @@ namespace Routing_Components
 						input_multimodal_edge._time_cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._source_link = current_link;
 						
-						int zone_index = current_link->_zone_index;
-						input_multimodal_edge._zone = zone_index;
-
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
 							int my_itr = 0;
@@ -784,18 +780,36 @@ namespace Routing_Components
 								my_itr++;
 							}
 
-							input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
+							current_link->_min_multi_modal_cost = ivtWeight * min_travel_time;
+							current_link->_walk_length = FLT_MAX / 2.0f;
+							current_link->_drive_time = FLT_MAX / 2.0f;
+							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
+							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							/*input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
+							input_multimodal_edge._drive_time = FLT_MAX / 2.0f;*/
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
+							current_link->_min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
+							current_link->_walk_length = 0.3048 * current_link->template length<float>(); //in meters
+							current_link->_drive_time = FLT_MAX / 2.0f;
+							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
+							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							//input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
+							//input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
+							//input_multimodal_edge._drive_time = FLT_MAX / 2.0f;
 						}
 						else
 						{
-							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
+							current_link->_min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
+							current_link->_walk_length = FLT_MAX / 2.0f;
+							current_link->_drive_time = current_link->template travel_time<float>();
+							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
+							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							/*input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
+							input_multimodal_edge._drive_time = current_link->template travel_time<float>();*/
 						}								
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -1194,9 +1208,8 @@ namespace Routing_Components
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{								
-								A_Star_Edge<base_edge_type>* in_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(in_edge_g);
-								in_edge->_touch_transit = true;
+							{							
+								link->_touch_transit = true;
 								break;
 							}
 						}
@@ -1266,15 +1279,10 @@ namespace Routing_Components
 						{
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
-							
-							global_edge_id out_edge_g;
-							out_edge_g.edge_id = outbound_link->_uuid;
-							out_edge_g.graph_id = _multimodal_network_graph_id;							
-							A_Star_Edge<base_edge_type>* out_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(out_edge_g);							
-							
-							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && out_edge->_touch_transit)
+													
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->_touch_transit)
 							{								
-								in_edge->_touch_transit = true;
+								link->_touch_transit = true;
 								break;
 							}
 						}

@@ -98,8 +98,9 @@ namespace polaris
 				{
 					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);					
 					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
+					_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 
-					float temp_cost = destination_link->_dijkstra_cost[current->_zone];
+					float temp_cost = destination_link->_heur_cost_to_dest[current_link->_zone_index];
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}
@@ -678,6 +679,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Multi_Modal_Tree_Agent_Implementation
 	{			
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -698,13 +705,17 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_min_multi_modal_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_min_multi_modal_cost;
+			//return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_min_multi_modal_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_min_multi_modal_cost;
+			//return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -714,6 +725,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Walk_to_Transit_Tree_Agent_Implementation
 	{
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -744,13 +761,17 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_walk_length;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_walk_length;
+			//return neighbor->_walk_length;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return neighbor->_walk_length;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_walk_length;
+			//return neighbor->_walk_length;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -760,6 +781,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Drive_to_Transit_Tree_Agent_Implementation
 	{
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -790,13 +817,17 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return connection->_time_cost + neighbor->_time_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return connection->_time_cost + neighbor_link->_drive_time;
+			//return connection->_time_cost + neighbor->_drive_time;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return connection->_time_cost + neighbor->_time_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return connection->_time_cost + neighbor_link->_drive_time;
+			//return connection->_time_cost + neighbor->_drive_time;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
