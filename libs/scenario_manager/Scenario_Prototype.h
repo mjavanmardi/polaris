@@ -1,5 +1,4 @@
 #pragma once
-//#include "Scenario_Manager_Includes.h"
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -9,13 +8,6 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/pointer.h>
-
-//TODO: put back in?
-//#include "../File_IO/network_scenario_data.h"
-
-
-
-
 
 namespace Scenario_Components
 {
@@ -392,7 +384,7 @@ namespace Scenario_Components
 				output_highway_cost_skim_file_path_name<string>((string)"highway_cost_skim_file_out.txt");
 				input_transit_skim_file_path_name<string>((string)"");
 				output_transit_skim_file_path_name<string>((string)"transit_skim_file_out.txt");
-				skim_interval_endpoint_minutes<int>(0);
+				skim_interval_endpoint_minutes<float>(0.0);
 				skim_averaging_factor<double>(0.5);
 				skim_interval_length_minutes<int>(1440);
 				compare_with_historic_moe<bool>(false);
@@ -736,7 +728,7 @@ namespace Scenario_Components
 					use_skim_intervals_from_previous<bool>(true);
 					do_skimming<bool>(true);
 				}
-				else if (set_parameter<std::vector<int>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<int>&>()))
+				else if (set_parameter<std::vector<float>>(document, "skim_interval_endpoint_minutes", this->template skim_interval_endpoint_minutes<std::vector<float>&>()))
 				{
 					use_skim_intervals<bool>(true);
 					use_skim_intervals_from_previous<bool>(false);
@@ -1880,7 +1872,22 @@ namespace Scenario_Components
 				}
 				else
 				{
-					cout << "Value is not set as bool value. (" << value.GetString() << ")" << endl;
+					cout << "Value is not set as Array value. (" << value.GetString() << ")" << endl;
+					return false;
+				}
+				return true;
+			}
+
+			bool set_parameter(rapidjson::Value& value, std::vector<float>& parameter)
+			{
+				if (value.IsArray())
+				{
+					for (rapidjson::SizeType i = 0; i<value.Size(); ++i)
+						parameter.push_back((float)value[i].GetDouble());
+				}
+				else
+				{
+					cout << "Value is not set as Array value. (" << value.GetString() << ")" << endl;
 					return false;
 				}
 				return true;

@@ -140,7 +140,7 @@ namespace Scenario_Components
 			m_data(string, output_highway_cost_skim_file_path_name, NONE, NONE);
 			m_data(string, input_transit_skim_file_path_name, NONE, NONE);
 			m_data(string, output_transit_skim_file_path_name, NONE, NONE);
-			m_container(std::vector<int>, skim_interval_endpoint_minutes, NONE, NONE);
+			m_container(std::vector<float>, skim_interval_endpoint_minutes, NONE, NONE);
 			m_data(int, skim_interval_length_minutes, NONE, NONE);
 			m_data(bool, do_skimming, NONE, NONE);
 			m_data(bool, use_skim_intervals, NONE, NONE);
