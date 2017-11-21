@@ -481,7 +481,37 @@ namespace Person_Components
 				double TRAN_COST = los->transit_fare<Dollars>();
 				double TRAN_COST_M = TRAN_COST * m_inc;
 				double TRAN_COST_H = TRAN_COST * h_inc;
-				double TRAN_OVTT = los->transit_walk_access_time<Time_Minutes>();
+								
+				
+				_Links_Container_Interface* origin_walk_links = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template origin_walk_links<_Links_Container_Interface*>();
+				float walk_distance_to_transit = 0;
+				int org_ctr = 0;
+				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+				{
+					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+				double TRAN_OVTT = walk_distance_to_transit/(walkSpeed*60.0); // meters/(meters per second *60)
+				//double TRAN_OVTT = los->transit_walk_access_time<Time_Minutes>();
+				
+				if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
+				{
+					_Links_Container_Interface* origin_links = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template origin_links<_Links_Container_Interface*>();
+					float drive_fft_to_transit = 0;
+					org_ctr = 0;
+					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+					{
+						_Link_Interface* origin_link = (_Link_Interface*)(*itr);
+						float temp_time = origin_link->_drive_fft_to_transit;
+						drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
+						org_ctr++;
+					}
+
+					TRAN_OVTT = drive_fft_to_transit/60.0; //seconds to minutes
+				}
 				double GENDER = properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::GENDER::MALE ? 1.0 : 0.0;
 				double VEHPERLIC = hh_properties->Number_of_workers<double>() > 0 ? hh_properties->Number_of_vehicles<double>() / hh_properties->Number_of_workers<double>() : 0.0;
 				double AGE65 = properties->Age<int>() >= 65 ? 1.0 : 0.0;
@@ -500,7 +530,8 @@ namespace Person_Components
 					if (_Mode_Chooser->to_work_school<bool>())
 					{
 						if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)		utility = this->_HBW_ASC_N_AUTO + this->_HBW_B_peak_auto * PEAK + this->_HBW_B_cost * AUTO_COST + this->_HBW_B_cost_minc * AUTO_COST_M + this->_HBW_B_cost_hinc * AUTO_COST_H;
-						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)		utility = this->_HBW_ASC_TRAN + this->_HBW_B_waittime_tran * TRAN_WAIT + this->_HBW_B_over65_tran * AGE65 + this->_HBW_B_ttime_tran * TRAN_IVTTr + this->_HBW_B_vehavail_tran * VEHPERLIC + this->_HBW_B_cost * TRAN_COST + this->_HBW_B_cost_minc * TRAN_COST_M + this->_HBW_B_ovttime_tran * TRAN_OVTT + this->_HBW_B_cost_hinc * TRAN_COST_H;
+						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_HBW_ASC_TRAN + this->_HBW_B_waittime_tran * TRAN_WAIT + this->_HBW_B_over65_tran * AGE65 + this->_HBW_B_ttime_tran * TRAN_IVTTr + this->_HBW_B_vehavail_tran * VEHPERLIC + this->_HBW_B_cost * TRAN_COST + this->_HBW_B_cost_minc * TRAN_COST_M + this->_HBW_B_ovttime_tran * TRAN_OVTT + this->_HBW_B_cost_hinc * TRAN_COST_H;
+						/*else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_HBW_ASC_TRAN + this->_HBW_B_waittime_tran * TRAN_WAIT + this->_HBW_B_over65_tran * AGE65 + this->_HBW_B_ttime_tran * TRAN_IVTTr + this->_HBW_B_vehavail_tran * VEHPERLIC + this->_HBW_B_cost * TRAN_COST + this->_HBW_B_cost_minc * TRAN_COST_M + this->_HBW_B_ovttime_tran * TRAN_OVTT + this->_HBW_B_cost_hinc * TRAN_COST_H;*/
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)	utility = this->_HBW_ASC_TAXI + this->_HBW_ASC_N_AUTO + this->_HBW_B_cost * TAXI_COST + this->_HBW_B_vehavail_taxi * VEHPERLIC + this->_HBW_B_cost_minc * TAXI_COST_M + this->_HBW_B_male_taxi * GENDER + this->_HBW_B_cost_hinc * TAXI_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) utility = this->_HBW_ASC_BIKE + this->_HBW_B_dens_bike * POP_DENS + this->_HBW_ASC_N_NM + this->_HBW_B_ttime_bike * BIKE_TTr + this->_HBW_B_male_nm * GENDER + this->_HBW_B_vehavail_nm * VEHPERLIC;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = this->_HBW_ASC_N_NM + this->_HBW_B_dens_walk * POP_DENS + this->_HBW_B_ttime_walk * WALK_TTr + this->_HBW_ASC_WALK + this->_HBW_B_male_nm * GENDER + this->_HBW_B_vehavail_nm * VEHPERLIC;
@@ -514,7 +545,8 @@ namespace Person_Components
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) utility = this->_HBO_ASC_BIKE + _HBO_B_dens_bike * POP_DENS + _HBO_ASC_N_NM * ONE + _HBO_B_ttime_bike * BIKE_TTr + _HBO_B_male_nm * GENDER + _HBO_B_vehavail_nm * VEHPERLIC;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)		utility = _HBO_ASC_N_AUTO * ONE + _HBO_B_over65_pass * AGE65 + _HBO_B_cbd_pa * IN_CBD + _HBO_B_notalone_pass * NOTALONE + _HBO_B_vehavail_pass * VEHPERLIC + _HBO_B_u18_pass * AGEU18 + _HBO_B_cost * PASS_COST + _HBO_B_cost_minc * PASS_COST_M + _HBO_B_cost_hinc * PASS_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)	utility = _HBO_ASC_TAXI * ONE + _HBO_ASC_N_AUTO * ONE + _HBO_B_cost * TAXI_COST + _HBO_B_vehavail_taxi * VEHPERLIC + _HBO_B_cost_minc * TAXI_COST_M + _HBO_B_male_taxi * GENDER + _HBO_B_cost_hinc * TAXI_COST_H;
-						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)		utility = this->_HBO_ASC_TRAN + _HBO_B_waittime_tran * TRAN_WAIT + _HBO_B_over65_tran * AGE65 + _HBO_B_ttime_tran * TRAN_IVTTr + _HBO_B_vehavail_tran * VEHPERLIC + _HBO_B_cost * TRAN_COST + _HBO_B_cost_minc * TRAN_COST_M + _HBO_B_ovttime_tran * TRAN_OVTT + _HBO_B_cost_hinc * TRAN_COST_H;
+						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_HBO_ASC_TRAN + _HBO_B_waittime_tran * TRAN_WAIT + _HBO_B_over65_tran * AGE65 + _HBO_B_ttime_tran * TRAN_IVTTr + _HBO_B_vehavail_tran * VEHPERLIC + _HBO_B_cost * TRAN_COST + _HBO_B_cost_minc * TRAN_COST_M + _HBO_B_ovttime_tran * TRAN_OVTT + _HBO_B_cost_hinc * TRAN_COST_H;
+						/*else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_HBO_ASC_TRAN + _HBO_B_waittime_tran * TRAN_WAIT + _HBO_B_over65_tran * AGE65 + _HBO_B_ttime_tran * TRAN_IVTTr + _HBO_B_vehavail_tran * VEHPERLIC + _HBO_B_cost * TRAN_COST + _HBO_B_cost_minc * TRAN_COST_M + _HBO_B_ovttime_tran * TRAN_OVTT + _HBO_B_cost_hinc * TRAN_COST_H;*/
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = _HBO_ASC_N_NM * ONE + _HBO_B_dens_walk * POP_DENS + _HBO_B_ttime_walk * WALK_TTr + _HBO_ASC_WALK * ONE + _HBO_B_male_nm * GENDER + _HBO_B_vehavail_nm * VEHPERLIC;
 						else THROW_EXCEPTION("UNKNOWN MODE TYPE.")
 					}
@@ -528,7 +560,8 @@ namespace Person_Components
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) utility = this->_NHB_ASC_BIKE + _NHB_B_dens_bike * POP_DENS + _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_ttime_bike * BIKE_TTr + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)		utility = _NHB_ASC_N_AUTO * ONE + _NHB_B_over65_pass * AGE65 + _NHB_B_cbd_pa * IN_CBD + _NHB_B_notalone_pass * NOTALONE + _NHB_ASC_PASS * ONE + _NHB_B_vehavail_pass * VEHPERLIC + _NHB_B_cost * PASS_COST + _NHB_B_cost_minc * PASS_COST_M + _NHB_B_cost_hinc * PASS_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)	utility = _NHB_ASC_TAXI * ONE + _NHB_ASC_N_AUTO * ONE + _NHB_B_cost * TAXI_COST + _NHB_B_vehavail_taxi * VEHPERLIC + _NHB_B_cost_minc * TAXI_COST_M + _NHB_B_male_taxi * GENDER + _NHB_B_cost_hinc * TAXI_COST_H;
-						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;
+						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;
+						/*else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;*/
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_dens_walk * POP_DENS + _NHB_B_ttime_walk * WALK_TTr + ComponentType::_NHB_ASC_WALK * ONE + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
 						else THROW_EXCEPTION("UNKNOWN MODE TYPE.")
 					}
@@ -540,7 +573,8 @@ namespace Person_Components
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) utility = this->_NHB_ASC_BIKE + _NHB_B_dens_bike * POP_DENS + _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_ttime_bike * BIKE_TTr + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)		utility = _NHB_ASC_N_AUTO * ONE + _NHB_B_over65_pass * AGE65 + _NHB_B_cbd_pa * IN_CBD + _NHB_B_notalone_pass * NOTALONE + _NHB_ASC_PASS * ONE + _NHB_B_vehavail_pass * VEHPERLIC + _NHB_B_cost * PASS_COST + _NHB_B_cost_minc * PASS_COST_M + _NHB_B_cost_hinc * PASS_COST_H;
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)	utility = _NHB_ASC_TAXI * ONE + _NHB_ASC_N_AUTO * ONE + _NHB_B_cost * TAXI_COST + _NHB_B_vehavail_taxi * VEHPERLIC + _NHB_B_cost_minc * TAXI_COST_M + _NHB_B_male_taxi * GENDER + _NHB_B_cost_hinc * TAXI_COST_H;
-						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;
+						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;
+						/*else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)		utility = this->_NHB_ASC_TRAN + _NHB_B_waittime_tran * TRAN_WAIT + _NHB_B_ttime_tran * TRAN_IVTTr + _NHB_B_cost * TRAN_COST + _NHB_B_cost_minc * TRAN_COST_M + _NHB_B_ovttime_tran * TRAN_OVTT + _NHB_B_cost_hinc * TRAN_COST_H;*/
 						else if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)	utility = _NHB_B_cbd_nm * IN_CBD + _NHB_ASC_N_NM * ONE + _NHB_B_dens_walk * POP_DENS + _NHB_B_ttime_walk * WALK_TTr + _NHB_ASC_WALK * ONE + _NHB_B_male_nm * GENDER + _NHB_B_vehavail_nm * VEHPERLIC;
 						else THROW_EXCEPTION("UNKNOWN MODE TYPE.")
 					}
@@ -861,6 +895,7 @@ namespace Person_Components
 				_Mode_Choice_Option_Interface* taxi_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				_Mode_Choice_Option_Interface* hov_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				_Mode_Choice_Option_Interface* transit_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
+				_Mode_Choice_Option_Interface* pnr_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				_Mode_Choice_Option_Interface* nm_nest = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				_Mode_Choice_Option_Interface* walk_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				_Mode_Choice_Option_Interface* bike_choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
@@ -891,12 +926,54 @@ namespace Person_Components
 				//============================================================================================
 				// TRANSIT NEST
 				//TODO: OMER - replace this check with the djikstra-based feasibility check with reasonable cutoffs
-				if (_los->transit_ttime<Time_Minutes>() < 1440.0)
+				
+				/*if (_los->transit_ttime<Time_Minutes>() < 1440.0)
+				{
+					transit_choice->Mode_Chooser(this);
+					transit_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)transit_choice);
+				}*/
+				
+				//Obtain walk threshold in meters
+				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				walkThreshold = walkThreshold / 5.0;
+				//Obtain walking distance to the closest transit stop
+
+				_Links_Container_Interface* origin_walk_links = _previous_location->template origin_walk_links<_Links_Container_Interface*>();
+				float walk_distance_to_transit = 0;				
+				int org_ctr = 0;
+				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+				{
+					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+
+				_Links_Container_Interface* origin_links = _previous_location->template origin_links<_Links_Container_Interface*>();
+				float drive_fft_to_transit = 0;
+				org_ctr = 0;
+				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+				{
+					_Link_Interface* origin_link = (_Link_Interface*)(*itr);
+					float temp_time = origin_link->_drive_fft_to_transit;
+					drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+				
+				if (walk_distance_to_transit < walkThreshold)
 				{
 					transit_choice->Mode_Chooser(this);
 					transit_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)transit_choice);
 				}
+				else if (drive_fft_to_transit < _los->auto_ttime<Time_Seconds>()*0.75)
+				{
+					pnr_choice->Mode_Chooser(this);
+					pnr_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::PARK_AND_RIDE);
+					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)pnr_choice);
+				}
+
 				//============================================================================================
 				// Nonmotorized nest
 				if (_los->auto_distance<Miles>() < 10.0)
@@ -2048,6 +2125,13 @@ namespace Person_Components
 			//choice->auto_available<bool>(auto_available);
 			choice_model->Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
 			mode_options.push_back(choice);
+
+			choice = (_Mode_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
+			choice->Mode_Chooser(this);
+			choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::PARK_AND_RIDE);
+			choice_model->Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)choice);
+			mode_options.push_back(choice);
+
 
 			// Make choice
 			int selected_index = 0;

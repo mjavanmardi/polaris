@@ -187,6 +187,7 @@ namespace Person_Components
 				//----------------------------------
 				float Mode_auto = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 				float Mode_transit = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS;
+				float Mode_pnr = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE;
 				float Mode_passenger = (float)act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV;
 				float Location_CBD = 0.0;
 				float Location_city = 0.0;

@@ -369,27 +369,29 @@ namespace polaris
 				int sim_time = iteration();
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
-				float ttime_accumulation = 0;
+				/*float ttime_accumulation = 0;
 				float ttime_step = current->moe_data()->layer_step<float>();
-				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
-				if (t > ttime_step)
-				{
-					ttime_accumulation += ttime_step;
-					t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
-					//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
-					ttime_step = current->moe_data()->layer_step<float>();
-					while (t - ttime_accumulation > ttime_step)
-					{
-						ttime_accumulation += ttime_step;
-						t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
-						//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				ttime_step = ttime_step - current_time % (int)ttime_step;*/
 
-					}
-				}
-				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//if (t > ttime_step)
+				//{
+				//	ttime_accumulation += ttime_step;
+				//	t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//	//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//	ttime_step = current->moe_data()->layer_step<float>();
+				//	while (t - ttime_accumulation > ttime_step)
+				//	{
+				//		ttime_accumulation += ttime_step;
+				//		t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//		//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
 
+				//	}
+				//}
+				//t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
 
+				t = t1;
 
 				// updates to handle mixing of historical and real-time info in cost function
 				float time_cost_current = connection->_time_cost + neighbor->_time_cost;

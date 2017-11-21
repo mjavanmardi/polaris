@@ -571,8 +571,8 @@ class Activity
 public:
     // Default Constructor
     Activity () {}        
-	Activity (int id_, int seq_num_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_)
-	: id (id_), seq_num(seq_num_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
+	Activity (int id_, int seq_num_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, /*int person_, /*shared_ptr<Trip>*/unsigned long trip_, int origin_id_)
+	: id (id_), seq_num(seq_num_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_), origin_id(origin_id_)
 	{
 	}
 	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_)
@@ -602,6 +602,8 @@ public:
 	void setPerson (const int& person_){person = person_;}*/
 	const unsigned long& getTrip () const {return trip;}
 	void setTrip (const unsigned long& trip_){trip = trip_;}
+	const int& getOrigin_Id() const { return origin_id; }
+	void setOrigin_Id(const int& origin_id_) { origin_id = origin_id_; }
 	//Data Fields
 private:
 	friend class odb::access;
@@ -618,6 +620,7 @@ private:
 	//shared_ptr<Trip> trip;
 	//int person;
 	unsigned long trip;
+	int origin_id;
 };
 
 

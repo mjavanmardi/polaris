@@ -693,6 +693,8 @@ namespace Person_Components
 					act_rec.setMode("BIKE");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
 					act_rec.setMode("SCHOOLBUS");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
+					act_rec.setMode("PARK_AND_RIDE");
 				else
 					act_rec.setMode ("TRANSIT");
 				act_rec.setType (act->Get_Type_String());
@@ -700,6 +702,10 @@ namespace Person_Components
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
+				
+				if (new_origin < 0) act_rec.setOrigin_Id(orig->template uuid<int>());
+				else act_rec.setOrigin_Id(new_origin);
+
 
 				// add trip and activity to the buffer for the current thread
 				//trip_records_buffer[__thread_id].push_back(trip_rec);
