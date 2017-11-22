@@ -657,7 +657,8 @@ namespace polaris
 		unsigned int destination_loc_id,
 		bool debug_route,
 		std::string& summary_paragraph,
-		std::string& detail_paragraph)
+		std::string& detail_paragraph,
+		std::string sub_mode)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -880,10 +881,11 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
+					sub_mode,
 					current->_time_label,
 					current->_cost_from_origin,
 					current->_time_from_origin,
@@ -928,10 +930,11 @@ namespace polaris
 					out_trip.push_back(current_trip->_uuid);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
+							sub_mode,
 							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
@@ -961,10 +964,11 @@ namespace polaris
 					out_trip.push_back(-1);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
+							sub_mode,
 							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
@@ -993,10 +997,11 @@ namespace polaris
 					out_trip.push_back(-1);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
+							sub_mode,
 							route_ctr,
 							current_link->_upstream_intersection->_dbid.c_str(),
 							current_link->_downstream_intersection->_dbid.c_str(),
@@ -1071,10 +1076,11 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
+					sub_mode,
 					864000.0,
 					864000.0,
 					864000.0,

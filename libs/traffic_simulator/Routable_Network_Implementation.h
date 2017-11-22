@@ -990,7 +990,8 @@ namespace Routing_Components
 				unsigned int destination_loc_id, 
 				bool debug_route,
 				std::string& summary_paragraph,
-				std::string& detail_paragraph)
+				std::string& detail_paragraph,
+				std::string sub_mode)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -1027,7 +1028,7 @@ namespace Routing_Components
 				//}
 
 				
-				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
 
 				
 				// update origins/destinations lists in from A_Star results
