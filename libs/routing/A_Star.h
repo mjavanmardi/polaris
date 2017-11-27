@@ -499,7 +499,9 @@ namespace polaris
 			start_link->_walk_distance_to_transit = current->_cost_from_origin;
 			if (debug_route)
 			{
-				perf_file << "success\tscanScount:\t" << scanCount;
+				perf_file << "Link_ID:\t" << start_link->_dbid;
+				perf_file << "\tDistance:\t" << start_link->_walk_distance_to_transit;
+				perf_file << "\tsuccess\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}
@@ -507,6 +509,8 @@ namespace polaris
 		{
 			if (debug_route)
 			{
+				perf_file << "Link_ID:\t" << start_link->_dbid;
+				perf_file << "\tDistance:\t" << start_link->_walk_distance_to_transit; 
 				perf_file << "fail\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -609,6 +613,8 @@ namespace polaris
 			start_link->_drive_fft_to_transit = current->_cost_from_origin;
 			if (debug_route)
 			{
+				perf_file << "Link_ID:\t" << start_link->_dbid;
+				perf_file << "\tDistance:\t" << start_link->_drive_fft_to_transit;
 				perf_file << "success\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -617,6 +623,8 @@ namespace polaris
 		{
 			if (debug_route)
 			{
+				perf_file << "Link_ID:\t" << start_link->_dbid;
+				perf_file << "\tDistance:\t" << start_link->_drive_fft_to_transit;
 				perf_file << "fail\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}

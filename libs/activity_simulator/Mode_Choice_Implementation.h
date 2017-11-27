@@ -949,6 +949,7 @@ namespace Person_Components
 					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
 					org_ctr++;
 				}
+				
 
 				_Links_Container_Interface* origin_links = _previous_location->template origin_links<_Links_Container_Interface*>();
 				float drive_fft_to_transit = 0;
@@ -1059,6 +1060,22 @@ namespace Person_Components
 				// non-licensed drivers always use HOV	
 				Kilometers dist = _los->auto_distance<Kilometers>();
 
+				//Obtain walk threshold in meters
+				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				walkThreshold = walkThreshold / 3.0;
+				//Obtain walking distance to the closest transit stop
+
+				_Links_Container_Interface* origin_walk_links = _previous_location->template origin_walk_links<_Links_Container_Interface*>();
+				float walk_distance_to_transit = 0;
+				int org_ctr = 0;
+				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+				{
+					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+
 				float p_hov = 1.0;
 				float p_bike = 0.0;
 				float p_walk = 0.0;
@@ -1133,6 +1150,16 @@ namespace Person_Components
 						}
 
 					}
+
+					if (walk_distance_to_transit >= walkThreshold)
+					{
+						float p_hov_walk_bike = p_hov + p_walk + p_bike;
+						p_hov = p_hov / p_hov_walk_bike;
+						p_walk = p_walk / p_hov_walk_bike;
+						p_bike = p_bike / p_hov_walk_bike;
+						p_bus = 0;
+					}
+					
 				}
 
 				Vehicle_Components::Types::Vehicle_Type_Keys selected_mode;
