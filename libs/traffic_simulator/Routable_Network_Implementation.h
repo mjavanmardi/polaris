@@ -125,10 +125,10 @@ namespace Routing_Components
 			t_data(bool,is_highway);
 			t_data(float*,moe_ptr);
 
-			static t_data(Layered_Data_Array<float>*,moe_data);
-			static t_data(float, ttime_weight_shape);
-			static t_data(float, ttime_weight_scale);
-			static t_data(float, ttime_weight_factor);
+			t_static_data(Layered_Data_Array<float>*,moe_data);
+			t_static_data(float, ttime_weight_shape);
+			t_static_data(float, ttime_weight_scale);
+			t_static_data(float, ttime_weight_factor);
 		};
 		
 		template<typename MasterType>
@@ -147,7 +147,7 @@ namespace Routing_Components
 			t_data(float,time_cost);
 			t_data(float*, turn_moe_ptr);
 
-			static t_data(Layered_Data_Array<float>*, turn_moe_data);
+			t_static_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
 
 		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
@@ -177,10 +177,10 @@ namespace Routing_Components
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
 
-			static t_data(Layered_Data_Array<float>*, moe_data);
-			static t_data(float, ttime_weight_shape);
-			static t_data(float, ttime_weight_scale);
-			static t_data(float, ttime_weight_factor);
+			t_static_data(Layered_Data_Array<float>*, moe_data);
+			t_static_data(float, ttime_weight_shape);
+			t_static_data(float, ttime_weight_scale);
+			t_static_data(float, ttime_weight_factor);
 		};
 
 		template<typename MasterType>
@@ -200,7 +200,7 @@ namespace Routing_Components
 
 			t_data(float, trip_wait_time);
 
-			static t_data(Layered_Data_Array<float>*, turn_moe_data);
+			t_static_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
 
 		Layered_Data_Array<float>* multimodal_to_multimodal::_turn_moe_data;
@@ -224,11 +224,11 @@ namespace Routing_Components
 
 			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
 
-			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
-			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+			m_static_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
+			m_static_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
 
-			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
-			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
+			m_static_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
+			m_static_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
 			
 			static bool static_initialize(const string& option_file)
 			{
@@ -749,7 +749,7 @@ namespace Routing_Components
 						input_multimodal_edge._x = downstream_intersection->template x_position<float>();
 						input_multimodal_edge._y = downstream_intersection->template y_position<float>();
 						input_multimodal_edge._edge_id = current_link->template uuid<unsigned int>();
-						input_multimodal_edge._edge_type = current_link->_link_type;
+						input_multimodal_edge._edge_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
 
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
 						input_multimodal_edge._cost_backup = current_link->template travel_time<float>();
@@ -897,7 +897,7 @@ namespace Routing_Components
 					{
 						Link_Interface* current_link = (Link_Interface*)(*links_itr);
 
-						int edge_id = current_link->_uuid;
+						int edge_id = current_link->uuid<int>();
 
 						pattern->_pattern_edge_ids.push_back(edge_id);
 					}
@@ -1191,7 +1191,7 @@ namespace Routing_Components
 				{
 					Link_Interface* link = (Link_Interface*)(*link_itr);
 
-					Intersection_Interface* down_node = link->_downstream_intersection;
+					Intersection_Interface* down_node = link->downstream_intersection<Intersection_Interface*>();
 					Link_Container_Interface& outbound_links = down_node->template outbound_links<Link_Container_Interface&>();
 
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
@@ -1199,7 +1199,7 @@ namespace Routing_Components
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 					{						
 						global_edge_id in_edge_g;
-						in_edge_g.edge_id = link->_uuid;
+						in_edge_g.edge_id = link->uuid<int>();
 						in_edge_g.graph_id = _multimodal_network_graph_id;
 						starts.push_back(in_edge_g);
 
@@ -1261,7 +1261,7 @@ namespace Routing_Components
 				{
 					Link_Interface* link = (Link_Interface*)(*link_itr);
 
-					Intersection_Interface* down_node = link->_downstream_intersection;
+					Intersection_Interface* down_node = link->downstream_intersection<Intersection_Interface*>();
 					Link_Container_Interface& outbound_links = down_node->template outbound_links<Link_Container_Interface&>();
 
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
@@ -1269,7 +1269,7 @@ namespace Routing_Components
 					if (facility_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || facility_type == Link_Components::Types::Link_Type_Keys::LOCAL)
 					{
 						global_edge_id in_edge_g;
-						in_edge_g.edge_id = link->_uuid;
+						in_edge_g.edge_id = link->uuid<int>();
 						in_edge_g.graph_id = _multimodal_network_graph_id;
 						A_Star_Edge<base_edge_type>* in_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(in_edge_g);
 						

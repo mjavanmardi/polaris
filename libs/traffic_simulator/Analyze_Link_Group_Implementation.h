@@ -49,12 +49,12 @@ namespace Analyze_Link_Group_Components
 					_link_moe_output_file 
 						<< convert_seconds_to_hhmmss(time).c_str() << ","
 						<< time << ","
-						<< link->_uuid << ","
-						<< link->_dbid << ","
-						<< link->_direction << ","
-						<< ((_intersection_component_type*)(link->_upstream_intersection))->_uuid << ","
-						<< ((_intersection_component_type*)(link->_downstream_intersection))->_uuid << ","
-						<< link->_link_type << ","	
+						<< link->uuid<int>() << ","
+						<< link->dbid<int>() << ","
+						<< link->direction<int>() << ","
+						<< link->upstream_intersection<_intersection_component_type*>()->uuid<int>() << ","
+						<< link->downstream_intersection<_intersection_component_type*>()->uuid<int>() << ","
+						<< link->link_type<Link_Components::Types::Link_Type_Keys>() << ","	
 						<< link->link_moe_data.link_travel_time << ","
 						<< link->link_moe_data.link_travel_time_standard_deviation << ","
 						<< link->link_moe_data.link_travel_delay << ","
@@ -71,8 +71,8 @@ namespace Analyze_Link_Group_Components
 						<< link->link_moe_data.link_density_ratio << ","
 						<< link->link_moe_data.link_in_flow_ratio << ","
 						<< link->link_moe_data.link_out_flow_ratio << ","
-						<< link->_link_vht << ","
-						<< link->_link_vmt
+						<< link->link_vht<float>() << ","
+						<< link->link_vmt<float>()
 						<< endl;
 				}
 			}

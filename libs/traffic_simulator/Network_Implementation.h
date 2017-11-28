@@ -869,8 +869,8 @@ namespace Network_Components
 					network_moe_data.network_avg_link_speed_ratio += link_component->link_moe_data.link_speed_ratio;
 					network_moe_data.network_avg_link_travel_time_ratio += link_component->link_moe_data.link_travel_time_ratio;
 
-					_network_vmt += link_component->_link_vmt;
-					_network_vht += link_component->_link_vht;
+					_network_vmt += link_component->link_vmt<float>();
+					_network_vht += link_component->link_vht<float>();
 				}
 			}
 

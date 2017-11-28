@@ -557,7 +557,7 @@ namespace polaris
 
 		Event_Object():Base_Object(){ _next_revision = __revision_omega; }
 
-		Event_Object(size_t component_id,int uuid):Base_Object(component_id,uuid){ _next_revision = __revision_omega; }
+		Event_Object(size_t component_id,int pid):Base_Object(component_id, pid){ _next_revision = __revision_omega; }
 		
 		//----------------------------------------------------------------------------------------------------
 		// Simulation functions

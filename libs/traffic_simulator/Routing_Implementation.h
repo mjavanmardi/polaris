@@ -24,7 +24,7 @@ namespace Routing_Components
 			typedef typename Base_t::Component_Type Component_Type;
 
 			m_prototype(Movement_Plan,typename MasterType::movement_plan_type,movement_plan,NONE,NONE);
-			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
+			m_static_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 			m_data(Simulation_Timestep_Increment, departure_time, NONE, NONE);
 
 			typedef Movement_Plan<type_of(movement_plan)> movement_plan_interface;
@@ -475,7 +475,7 @@ namespace Routing_Components
 								
 								
 				//_Zone_Interface* origin_zone = origin_zone;
-				int origin_zone_index = _origin_zone->_internal_id;
+				int origin_zone_index = _origin_zone->internal_id<int>();
 				Link_Container_Interface* origin_links = _origin_zone->origin_links<Link_Container_Interface*>();
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)

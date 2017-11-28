@@ -12,14 +12,14 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Data_Component_Manager<DataType>::Allocate(int uuid, bool bInPlaceNew)
+	DataType* Data_Component_Manager<DataType>::Allocate(int pid, bool bInPlaceNew)
 	{
 		DataType* return_memory = new DataType();
 		
-		// add information about the uuid
-		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
+		// add information about the pid
+		if(pid !=-1) _object_repository[__thread_id][pid] = return_memory;
 		
-		((DataType*)return_memory)->_uuid = uuid;
+		((DataType*)return_memory)->_pid = pid;
 
 		return return_memory;
 	}

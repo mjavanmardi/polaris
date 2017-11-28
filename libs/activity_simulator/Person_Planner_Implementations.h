@@ -25,8 +25,6 @@ namespace Person_Components
 
 			static void Planning_Event_Controller(ComponentType* _this, Event_Response& response);
 
-			/*static ofstream logs[num_sim_threads()];
-			static m_data(bool, write_activity_files, NONE, NONE);*/
 			template<typename TargetType> void Write_To_Log(TargetType s, requires(TargetType, !check_2(TargetType, string, is_same)));
 			template<typename TargetType> void Write_To_Log(TargetType s, requires(TargetType, check_2(TargetType, string, is_same)));
 

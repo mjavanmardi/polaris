@@ -44,7 +44,7 @@ namespace Movement_Plan_Components
 			typedef Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object> Base_t;
 			typedef typename Base_t::ComponentType ComponentType;
 
-			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
+			m_static_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(std::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
@@ -181,12 +181,12 @@ namespace Movement_Plan_Components
 
 			if (_current_trajectory_index != -1)
 			{
-				_trajectory_container[_current_trajectory_index]->_delayed_time = delayed_time;
+				_trajectory_container[_current_trajectory_index]->delayed_time(delayed_time);
 			}
 
 			((Movement_Plan<ComponentType>*)this)->template advance_trajectory<_Trajectory_Unit_Interface*>();
 			//_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
-			_trajectory_container[_current_trajectory_index]->_enter_time = iteration();
+			_trajectory_container[_current_trajectory_index]->enter_time(iteration());
 		}
 
 		template<typename MasterType, typename InheritanceList>

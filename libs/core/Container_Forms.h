@@ -1128,11 +1128,88 @@ namespace polaris
 			tag_getter_as_available(NAME);\
 			tag_setter_as_available(NAME);
 
+#define m_static_container(CONTAINER_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
+			static CONTAINER_TYPE _##NAME;\
+		public:\
+			typedef CONTAINER_TYPE NAME##_type;\
+			typedef NAME##_type NAME##_accessible_type;\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(&_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)dereference(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(*value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((CONTAINER_TYPE)(&value));}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
+
 	///----------------------------------------------------------------------------------------------------
 	/// m_prototype_container � member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_prototype_container(CONTAINER_TYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+			CONTAINER_TYPE _##NAME;\
+		public:\
+			typedef CONTAINER_TYPE NAME##_type;\
+			typedef NAME##_type NAME##_accessible_type;\
+			typedef COMPONENT_TYPE NAME##_accessible_value_type;\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(&_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)dereference(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(*value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((CONTAINER_TYPE)(&value));}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(CONTAINER_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+
+	#define m_static_prototype_container(CONTAINER_TYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
 			CONTAINER_TYPE _##NAME;\
 		public:\
 			typedef CONTAINER_TYPE NAME##_type;\

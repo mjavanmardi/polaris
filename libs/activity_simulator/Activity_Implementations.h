@@ -40,8 +40,8 @@ namespace Activity_Components
 			// pointer to movement plan associated with activity
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 
-			static m_data(int, Route_Planning_Count, NONE, NONE);
-			//static m_data(_lock, update_lock, NONE, NONE);
+			m_static_data(int, Route_Planning_Count, NONE, NONE);
+			//m_static_data(_lock, update_lock, NONE, NONE);
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -1615,11 +1615,11 @@ namespace Activity_Components
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
 				base_type* base_this = (base_type*)this;
-				base_this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
 		
 				this->_Duration_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
 				this->_Location_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;

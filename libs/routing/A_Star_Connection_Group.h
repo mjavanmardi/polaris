@@ -245,7 +245,7 @@ namespace polaris
 					Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 					if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
-						_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
+						_Transit_Vehicle_Trip_Interface* current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
 						if (current_trip->_uuid == next_trip->_uuid)
 						{
 							wait_binary = 0;
@@ -392,8 +392,8 @@ namespace polaris
 					Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 					if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
-						_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
-						if (current_trip->_uuid == next_trip->_uuid)
+						_Transit_Vehicle_Trip_Interface* current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
+						if (current_trip->uuid<int>() == next_trip->uuid<int>())
 						{
 							wait_binary = 0;
 						}

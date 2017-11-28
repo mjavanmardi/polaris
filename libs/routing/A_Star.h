@@ -499,8 +499,8 @@ namespace polaris
 			start_link->_walk_distance_to_transit = current->_cost_from_origin;
 			if (debug_route)
 			{
-				perf_file << "Link_ID:\t" << start_link->_dbid;
-				perf_file << "\tDistance:\t" << start_link->_walk_distance_to_transit;
+				perf_file << "Link_ID:\t" << start_link->dbid<int>();
+				perf_file << "\tDistance:\t" << start_link->walk_distance_to_transit<float>();
 				perf_file << "\tsuccess\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -509,8 +509,8 @@ namespace polaris
 		{
 			if (debug_route)
 			{
-				perf_file << "Link_ID:\t" << start_link->_dbid;
-				perf_file << "\tDistance:\t" << start_link->_walk_distance_to_transit; 
+				perf_file << "Link_ID:\t" << start_link->dbid<int>();
+				perf_file << "\tDistance:\t" << start_link->walk_distance_to_transit<float>(); 
 				perf_file << "fail\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -536,6 +536,7 @@ namespace polaris
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)> _Intersection_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 		std::ofstream perf_file;
@@ -613,8 +614,8 @@ namespace polaris
 			start_link->_drive_fft_to_transit = current->_cost_from_origin;
 			if (debug_route)
 			{
-				perf_file << "Link_ID:\t" << start_link->_dbid;
-				perf_file << "\tDistance:\t" << start_link->_drive_fft_to_transit;
+				perf_file << "Link_ID:\t" << start_link->dbid<int>();
+				perf_file << "\tDistance:\t" << start_link->drive_fft_to_transit<float>();
 				perf_file << "success\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -623,8 +624,8 @@ namespace polaris
 		{
 			if (debug_route)
 			{
-				perf_file << "Link_ID:\t" << start_link->_dbid;
-				perf_file << "\tDistance:\t" << start_link->_drive_fft_to_transit;
+				perf_file << "Link_ID:\t" << start_link->dbid<int>();
+				perf_file << "\tDistance:\t" << start_link->drive_fft_to_transit<float>();
 				perf_file << "fail\tscanScount:\t" << scanCount;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
@@ -677,6 +678,7 @@ namespace polaris
 
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface; 
+		typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)> _Intersection_Interface;
 		
 		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
@@ -934,8 +936,8 @@ namespace polaris
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
-					current_trip = (_Transit_Vehicle_Trip_Interface*)current->_came_on_trip;
-					out_trip.push_back(current_trip->_uuid);
+					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
+					out_trip.push_back(current_trip->uuid<int>());
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -944,9 +946,9 @@ namespace polaris
 							start_time,
 							sub_mode,
 							route_ctr,
-							current_link->_upstream_intersection->_dbid.c_str(),
-							current_link->_downstream_intersection->_dbid.c_str(),
-							current_trip->_dbid.c_str(),
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_trip->dbid<std::string>().c_str(),
 							current->_came_on_seq_index,
 							"TRANSIT",
 							current->_time_label,
@@ -978,8 +980,8 @@ namespace polaris
 							start_time,
 							sub_mode,
 							route_ctr,
-							current_link->_upstream_intersection->_dbid.c_str(),
-							current_link->_downstream_intersection->_dbid.c_str(),
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
 							"WALK",
 							current->_came_on_seq_index,
 							"WALK",
@@ -1011,8 +1013,8 @@ namespace polaris
 							start_time,
 							sub_mode,
 							route_ctr,
-							current_link->_upstream_intersection->_dbid.c_str(),
-							current_link->_downstream_intersection->_dbid.c_str(),
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
 							"DRIVE",
 							current->_came_on_seq_index,
 							"DRIVE",

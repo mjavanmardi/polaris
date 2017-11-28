@@ -746,7 +746,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Choice models - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
-	MasterType::person_destination_chooser_type::_choice_set_size = 100;
+	MasterType::person_destination_chooser_type::choice_set_size(100);
 
 	// Initialize all choice model parameters
 	if (!InitializeChoiceModelParameters(scenario)) return 1;

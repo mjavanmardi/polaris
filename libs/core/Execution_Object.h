@@ -19,12 +19,12 @@ namespace polaris
 	public:
 		Base_Object():_component_id(-1){}
 		
-		Base_Object(size_t component_id,int uuid): _component_id((unsigned int)component_id),_uuid(uuid){}
+		Base_Object(size_t component_id,int pid): _component_id((unsigned int)component_id),_pid(pid){}
 
 		//virtual void Allocate_Vtable(){}
 
 		unsigned int _component_id;
-		int _uuid;
+		int _pid;
 	private:
 		Base_Object(const Base_Object&);
 		void operator=(const Base_Object&);
@@ -38,7 +38,7 @@ namespace polaris
 	{
 	public:
 		Execution_Object():Base_Object(){ _next_revision = __revision_omega; }
-		Execution_Object(size_t component_id,int uuid):Base_Object(component_id,uuid){ _next_revision = __revision_omega; }
+		Execution_Object(size_t component_id,int pid):Base_Object(component_id, pid){ _next_revision = __revision_omega; }
 		
 		//----------------------------------------------------------------------------------------------------
 		// Simulation functions
