@@ -29,7 +29,7 @@ namespace polaris
 	public:
 		typedef DataType managed_type;
 
-		DataType* Allocate( int uuid = -1, bool bInPlaceNew = true );
+		DataType* Allocate( int pid = -1, bool bInPlaceNew = true );
 		DataType* Allocate_Array( unsigned int num );
 
 		void Free( DataType* ptr );

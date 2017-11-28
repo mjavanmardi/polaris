@@ -100,7 +100,7 @@ namespace polaris
 					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
 					_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 
-					float temp_cost = destination_link->_heur_cost_to_dest[current_link->_zone_index];
+					float temp_cost = destination_link->_heur_cost_to_dest[current_link->zone_index<int>()];
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}

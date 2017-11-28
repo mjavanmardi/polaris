@@ -259,10 +259,10 @@ namespace Network_Event_Components
 			m_data(bool,active, NONE, NONE);
 			m_data(string,notes, NONE, NONE);
 
-			static m_data(std::vector<string>,event_keys, NONE, NONE);
-			static m_prototype(Null_Prototype,typename MasterType::network_event_manager_type,network_event_manager, NONE, NONE);
+			m_static_data(std::vector<string>,event_keys, NONE, NONE);
+			m_static_prototype(Null_Prototype,typename MasterType::network_event_manager_type,network_event_manager, NONE, NONE);
 			
-			static m_data(concat(std::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
+			m_static_data(concat(std::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>

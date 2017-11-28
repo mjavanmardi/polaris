@@ -663,8 +663,8 @@ namespace Link_Components
 				for (auto itr = _outbound_turn_movements.begin(); itr != _outbound_turn_movements.end(); itr++, outbound_turn_index++)
 				{
 					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
-
-					if (turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::LEFT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::THROUGH_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::RIGHT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::U_TURN)
+					Turn_Movement_Components::Types::Turn_Movement_Type_Keys turn_movement_type = turn_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+					if (turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::LEFT_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::THROUGH_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::RIGHT_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::U_TURN)
 					{
 						turn_movement->template update_state<NT>();
 
@@ -1273,7 +1273,7 @@ namespace Link_Components
 			if (_weather_event_to_process)
 			{
 				_weather_event_to_process = false;
-				if (((typename MasterType::weather_network_event_type*)_current_weather_event)->_active)
+				if (((typename MasterType::weather_network_event_type*)_current_weather_event)->active<bool>())
 				{
 					process_weather_event<typename MasterType::weather_network_event_type*>();
 				}
@@ -1287,7 +1287,7 @@ namespace Link_Components
 			if (_accident_event_to_process)
 			{
 				_accident_event_to_process = false;
-				if (((typename MasterType::accident_network_event_type*)_current_accident_event)->_active)
+				if (((typename MasterType::accident_network_event_type*)_current_accident_event)->active<bool>())
 				{
 					process_accident_event<typename MasterType::accident_network_event_type*>();
 				}

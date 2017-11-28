@@ -48,8 +48,8 @@ namespace Person_Components
 
 
 			// static start time and duration lookup container for each activity type
-			static m_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
-			static m_container(concat(std::unordered_map<int, start_map_type>), start_time_container, NONE, NONE); // maps to the probabilities of start times alone, by activity type integer
+			m_static_container(concat(std::unordered_map<int, map_type >), start_time_duration_container, NONE, NONE);
+			m_static_container(concat(std::unordered_map<int, start_map_type>), start_time_container, NONE, NONE); // maps to the probabilities of start times alone, by activity type integer
 			
 
 			//=======================================================================================================
@@ -355,7 +355,7 @@ namespace Person_Components
 
 
 			// Static initialization
-			static m_data(bool, is_initialized, NONE, NONE);
+			m_static_data(bool, is_initialized, NONE, NONE);
 			static void read_distribution()
 			{
 				// make sure this is only run once

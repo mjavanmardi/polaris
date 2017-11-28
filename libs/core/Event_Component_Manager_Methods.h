@@ -52,7 +52,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Event_Component_Manager<DataType>::Allocate(int uuid, bool bInPlaceNew)
+	DataType* Event_Component_Manager<DataType>::Allocate(int pid, bool bInPlaceNew)
 	{
 		// Check whether thread has memory of this type available
 		if( _blocks_with_free_cells[__thread_id].empty() )
@@ -189,11 +189,11 @@ namespace polaris
 		if (bInPlaceNew)
 		{
 			new (return_memory) DataType();
-			((DataType*)return_memory)->_uuid = uuid;
+			((DataType*)return_memory)->_pid = pid;
 		}
 
-		// add information about the uuid
-		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
+		// add information about the pid
+		if(pid !=-1) _object_repository[__thread_id][pid] = return_memory;
 
 		return (DataType*)return_memory;
 	}

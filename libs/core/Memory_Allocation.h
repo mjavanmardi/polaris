@@ -28,14 +28,14 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Allocate(int uuid = -1, bool bInPlaceNew = true)
+	DataType* Allocate(int pid = -1, bool bInPlaceNew = true)
 	{
 #ifdef ENABLE_MEMORY_LOGGING
 		int i=(int)DataType::component_id;
 		int j=thread_id();
 		_type_counter(i,j)+=sizeof(DataType);
 #endif
-		return (DataType*)((DataType::component_manager)->Allocate(uuid, bInPlaceNew));
+		return (DataType*)((DataType::component_manager)->Allocate(pid, bInPlaceNew));
 	}
 
 	template<typename DataType>

@@ -87,7 +87,7 @@ namespace Link_Components
 			float capacity_adjustment_rate;
 			float free_flow_speed_adjustment_rate;
 			float prev_num_lanes = _num_lanes;
-			if (((typename MasterType::accident_network_event_type*)_current_accident_event)->_lanes_closed >= _num_lanes)
+			if (((typename MasterType::accident_network_event_type*)_current_accident_event)->lanes_closed<int>() >= _num_lanes)
 			{
 				capacity_adjustment_rate = 0.01;
 				_num_lanes = 1;
@@ -95,9 +95,9 @@ namespace Link_Components
 			else
 			{
 				int lanes = min(8, _num_lanes);
-				int lanes_closed = min(3, ((typename MasterType::accident_network_event_type*)_current_accident_event)->_lanes_closed);	
+				int lanes_closed = min(3, ((typename MasterType::accident_network_event_type*)_current_accident_event)->lanes_closed<int>());	
 				capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[lanes - 1][lanes_closed + 1];
-				_num_lanes = _num_lanes - ((typename MasterType::accident_network_event_type*)_current_accident_event)->_lanes_closed;
+				_num_lanes = _num_lanes - ((typename MasterType::accident_network_event_type*)_current_accident_event)->lanes_closed<int>();
 			}
 			_lane_adjustment_due_to_accident = prev_num_lanes - _num_lanes;
 			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;

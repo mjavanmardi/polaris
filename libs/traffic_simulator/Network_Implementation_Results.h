@@ -472,9 +472,9 @@ namespace Network_Components
 						_link_component_type* link = (_link_component_type*)(*link_itr);
 						shared_ptr<polaris::io::RealtimeLinkMOE> link_moe_db_record(new polaris::io::RealtimeLinkMOE());
 
-						link_moe_db_record->setLink_Uid(link->_uuid);
-						link_moe_db_record->setLink_Type(link->_link_type);
-						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(link->_length));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
+						link_moe_db_record->setLink_Uid(link->uuid<int>());
+						link_moe_db_record->setLink_Type(link->link_type<Link_Components::Types::Link_Type_Keys>());
+						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(link->length<float>()));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
 						link_moe_db_record->setStart_Time(time);
 						link_moe_db_record->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 						link_moe_db_record->setLink_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(link->realtime_link_moe_data.link_travel_time));					// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
@@ -563,7 +563,7 @@ namespace Network_Components
 						turn_moe_rec->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
 						turn_moe_rec->setInbound_Link_Uid(movement->inbound_link<_Link_Interface*>()->uuid<int>());
 						turn_moe_rec->setOutbound_Link_Uid(movement->outbound_link<_Link_Interface*>()->uuid<int>());
-						turn_moe_rec->setNode_Uid(movement->inbound_link<_Link_Interface*>()->downstream_intersection<_intersection_component_type*>()->_uuid);
+						turn_moe_rec->setNode_Uid(movement->inbound_link<_Link_Interface*>()->downstream_intersection<_intersection_component_type*>()->uuid<int>());
 						turn_moe_rec->setTurn_Penalty(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->realtime_movement_moe_data.turn_penalty));							// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setTurn_Penalty_SD(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->realtime_movement_moe_data.turn_penalty_standard_deviation));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setInbound_Turn_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->realtime_movement_moe_data.inbound_link_turn_time));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
@@ -667,9 +667,9 @@ namespace Network_Components
 						_link_component_type* link = (_link_component_type*)(*link_itr);
 						shared_ptr<polaris::io::LinkMOE> link_moe_db_record(new polaris::io::LinkMOE());
 				
-						link_moe_db_record->setLink_Uid(link->_uuid);
-						link_moe_db_record->setLink_Type(link->_link_type);
-						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet,Meters>(link->_length));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
+						link_moe_db_record->setLink_Uid(link->uuid<int>());
+						link_moe_db_record->setLink_Type(link->link_type<Link_Components::Types::Link_Type_Keys>());
+						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet,Meters>(link->length<float>()));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
 						link_moe_db_record->setStart_Time(time);
 						link_moe_db_record->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 						link_moe_db_record->setLink_Travel_Time(GLOBALS::Convert_Units<Time_Minutes,Time_Seconds>(link->link_moe_data.link_travel_time));					// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
@@ -729,7 +729,7 @@ namespace Network_Components
 						turn_moe_rec->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 						turn_moe_rec->setInbound_Link_Uid(movement->inbound_link<_Link_Interface*>()->uuid<int>());
 						turn_moe_rec->setOutbound_Link_Uid(movement->outbound_link<_Link_Interface*>()->uuid<int>());
-						turn_moe_rec->setNode_Uid(movement->inbound_link<_Link_Interface*>()->downstream_intersection<_intersection_component_type*>()->_uuid);
+						turn_moe_rec->setNode_Uid(movement->inbound_link<_Link_Interface*>()->downstream_intersection<_intersection_component_type*>()->uuid<int>());
 						turn_moe_rec->setTurn_Penalty(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.turn_penalty));							// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setTurn_Penalty_SD(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.turn_penalty_standard_deviation));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setInbound_Turn_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.inbound_link_turn_time));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library

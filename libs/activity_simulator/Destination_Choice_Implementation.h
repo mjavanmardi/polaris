@@ -1611,8 +1611,8 @@ namespace Person_Components
 			m_prototype(Choice_Model_Components::Prototypes::Choice_Model, typename MasterType::mnl_model_type, Choice_Model, NONE, NONE);
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, Current_Activity, NONE, NONE);
 			
-			static m_data(int, choice_set_size, NONE, NONE);
-			static m_data(int, num_strata, NONE, NONE);
+			m_static_data(int, choice_set_size, NONE, NONE);
+			m_static_data(int, num_strata, NONE, NONE);
 
 			// Interface definitions
 			typedef Choice_Model_Components::Prototypes::Choice_Model<typename MasterType::mnl_model_type > _Choice_Model_Interface;

@@ -9,43 +9,6 @@ namespace Household_Components
 {
 	namespace Implementations
 	{
-		//==================================================================================
-		/// Planning classes
-		//----------------------------------------------------------------------------------
-		/*
-		implementation struct Vehicle_Choice_Option : public Choice_Model_Components::Implementations::Choice_Option_Base<MasterType,INHERIT(Vehicle_Choice_Option)>
-		{
-			// Tag as Implementation
-			typedef typename Polaris_Component<MasterType,INHERIT(Vehicle_Choice_Option),Data_Object>::Component_Type ComponentType;
-
-			static m_data(float, BETA, NONE, NONE);
-			
-			//------------------------------------------------------------------------------------------------------------------------------------
-
-			// Feature called from prototype and by Choice_Model
-			virtual double Calculate_Utility()
-			{
-				double utility = -FLT_MAX;
-
-				return utility;				
-			}
-
-			virtual void Print_Utility()
-			{
-				
-			}
-
-			// Local features
-
-		};
-		
-
-		//INITIALIZE Vehicle Choice STATIC PARAMETERS
-		#pragma region Choice option parameters	
-		template<typename MasterType, typename InheritanceList> typename Vehicle_Choice_Option<MasterType, InheritanceList>::type_of(BETA) Vehicle_Choice_Option<MasterType,InheritanceList>::_BETA = 0.0;
-		#pragma endregion
-		*/
-
 		implementation struct Vehicle_Chooser_Implementation : public Polaris_Component<MasterType,INHERIT(Vehicle_Chooser_Implementation),Data_Object>
 		{
 			// Tag as Implementation
@@ -78,7 +41,7 @@ namespace Household_Components
 			typedef pair<vehicle_characteristics_interface*, float> vehicle_probability_pair_type;
 			typedef pair<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_pair_type;
 			typedef std::unordered_map<long long, vector<vehicle_probability_pair_type>> vehicle_distribution_container_type;
-			static m_container(vehicle_distribution_container_type, vehicle_distribution_container, NONE, NONE);
+			m_static_container(vehicle_distribution_container_type, vehicle_distribution_container, NONE, NONE);
 
 			template<typename T> void Initialize(T household)
 			{
@@ -242,7 +205,7 @@ namespace Household_Components
 
 
 			// PARAMETER DECLARATIONS - initialize in the static initializer function using scenario parameters
-			static m_data(bool, is_initialized, NONE, NONE);
+			m_static_data(bool, is_initialized, NONE, NONE);
 			#pragma region static parameters		
 
 			#pragma endregion

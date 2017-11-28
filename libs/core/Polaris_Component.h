@@ -63,12 +63,12 @@ namespace polaris
 	class Polaris_Component : public ObjectType
 	{
 	public:
-		using ObjectType::_uuid;
+		using ObjectType::_pid;
 		using ObjectType::_component_id;
 
-		Polaris_Component(int uuid = -1):ObjectType(component_id,uuid){}
+		Polaris_Component(int pid = -1):ObjectType(component_id, pid){}
 
-		const int uuid(){ return _uuid; }
+		const int pid(){ return _pid; }
 		const size_t Identify() const{return _component_id;}
 
 		typedef MasterType Master_Type;

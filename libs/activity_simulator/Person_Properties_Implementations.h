@@ -23,7 +23,7 @@ namespace Person_Components
 			// static counters
 			static int* Count_Array;
 			static int Count;
-			static m_container(concat(std::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
+			m_static_container(concat(std::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
 			static bool _is_initialized;
 			static void Static_Initializer();
 
