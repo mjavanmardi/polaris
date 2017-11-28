@@ -235,9 +235,9 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold)
+					if (waitTime > waitThreshold*5)
 					{
-						return;
+						break;
 					}
 
 					trip_found = true;
@@ -255,10 +255,15 @@ namespace polaris
 					int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
 					int TransferCount = std::max(WaitingCount - 1, 0);
-					/*if (TransferCount > 0)
+					int nonHomeWait = 0;
+					if (TransferCount > 0)
 					{
 						nonHomeWait = 1;
-					}*/
+						if (waitTime > waitThreshold)
+						{
+							break;
+						}
+					}
 
 					float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 
@@ -382,7 +387,7 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold)
+					if (waitTime > waitThreshold*5)
 					{
 						break;
 					}
@@ -402,10 +407,15 @@ namespace polaris
 					int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
 					int TransferCount = std::max(WaitingCount - 1, 0);
-					/*if (TransferCount > 0)
+					int nonHomeWait = 0;
+					if (TransferCount > 0)
 					{
 						nonHomeWait = 1;
-					}*/
+						if (waitTime > waitThreshold)
+						{
+							break;
+						}
+					}
 
 					float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 
