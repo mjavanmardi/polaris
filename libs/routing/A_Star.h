@@ -715,7 +715,7 @@ namespace polaris
 
 		std::deque< base_edge_type* > modified_edges;
 		boost::intrusive::multiset< base_edge_type > open_set;
-		bool early_break = false;
+		//bool early_break = false;
 
 		std::vector<base_edge_type*> starts;
 		A_Star_Edge<base_edge_type>* start;
@@ -807,13 +807,15 @@ namespace polaris
 		}
 
 		bool success = false;
+		std::string fail_mode;
 		int scanCount = 0;
 		Total_Visit_Time = 0;
 
 		global_edge_id global;
 		global.graph_id = graph_id;
 
-		while (open_set.size() && !early_break)
+		A_Star_Edge<base_edge_type>* current_fail;
+		while (open_set.size() /*&& !early_break*/)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
@@ -846,9 +848,16 @@ namespace polaris
 					);
 				detail_paragraph.insert(0, myLine);
 			}*/
-
-			if (current->_cost_from_origin > costThreshold || scanCount > (int)scanThreshold)
+			
+			current_fail = current;
+			if (current->_cost_from_origin > costThreshold)
 			{
+				//current_fail = current;
+				break;
+			}
+			else if (scanCount > (int)scanThreshold)
+			{
+				//current_fail = current;
 				break;
 			}
 			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
@@ -889,7 +898,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -905,7 +914,8 @@ namespace polaris
 					current->_transfer_pen_from_origin,
 					current->_estimated_cost_origin_destination,
 					scanCount,
-					astar_time);
+					astar_time,
+					"success");
 				summary_paragraph.insert(0,myLine);
 			}
 
@@ -1084,23 +1094,29 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\n",
+				
+				global.edge_id = current_fail->_edge_id;
+
+				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
+				
+				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
 					sub_mode,
-					864000.0,
-					864000.0,
-					864000.0,
-					100,
-					864000.0,
-					864000.0,
-					864000.0,
-					864000.0,
-					864000.0,
-					864000.0,
+					current->_time_label,
+					current->_cost_from_origin,
+					current->_time_from_origin,
+					current->_wait_count_from_origin,
+					current->_wait_time_from_origin,
+					current->_walk_time_from_origin,
+					current->_ivt_time_from_origin,
+					current->_car_time_from_origin,
+					current->_transfer_pen_from_origin,
+					current->_estimated_cost_origin_destination,
 					scanCount,
-					astar_time);
+					astar_time,
+					"fail");
 				summary_paragraph.insert(0, myLine);
 			}
 		}		
