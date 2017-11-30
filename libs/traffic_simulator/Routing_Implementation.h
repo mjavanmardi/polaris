@@ -34,6 +34,8 @@ namespace Routing_Components
 
 
 			typedef Network<typename MasterType::network_type> Network_Interface;
+			typedef Random_Access_Sequence<typename Network_Interface::get_type_of(routable_networks)> Routable_Networks_Container_Interface;
+			typedef Routable_Network<typename get_component_type(Routable_Networks_Container_Interface)> Routable_Network_Interface;
 			typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
 			typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
@@ -85,11 +87,11 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Network is undefined.");
 				}
-				else if(((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				else if(((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size() == 0)
 				{
 					THROW_EXCEPTION("_routable_networks is undefined.");
 				}
-				else if(thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				else if(thread_id() >= ((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size())
 				{
 					THROW_EXCEPTION("_routable_networks is not large enough.");
 				}
@@ -452,11 +454,11 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Network is undefined.");
 				}
-				else if (((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				else if (((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size() == 0)
 				{
 					THROW_EXCEPTION("_routable_networks is undefined.");
 				}
-				else if (thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				else if (thread_id() >= ((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size())
 				{
 					THROW_EXCEPTION("_routable_networks is not large enough.");
 				}	

@@ -693,6 +693,10 @@ namespace Routing_Components
 
 				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
 				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(index_along_pattern_at_upstream_node)> Index_Along_Pattern_Container_Interface;
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(unique_patterns)> Unique_Patterns_Container_Interface;
+
 				typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
 				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
@@ -700,9 +704,12 @@ namespace Routing_Components
 
 				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Pattern_Interface::get_type_of(pattern_trips)> _Patterns_Trips_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Pattern_Interface::get_type_of(pattern_edge_ids)> _Patterns_Edge_Ids_Container_Interface;
 
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Vehicle_Trip_Interface::get_type_of(arrival_seconds)> _Arrival_Seconds_Container_Interface;
 
 				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
@@ -762,16 +769,16 @@ namespace Routing_Components
 							int my_itr = 0;
 							float min_travel_time = FLT_MAX / 2.0f;
 
-							for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
+							for (auto patterns_itr = current_link->unique_patterns<Unique_Patterns_Container_Interface&>().begin(); patterns_itr != current_link->unique_patterns<Unique_Patterns_Container_Interface&>().end(); ++patterns_itr)
 							{
 								_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
 								input_multimodal_edge._unique_patterns.push_back(current_pattern);
-								int mySeq = current_link->_index_along_pattern_at_upstream_node[my_itr];
+								int mySeq = current_link->index_along_pattern_at_upstream_node<Index_Along_Pattern_Container_Interface&>()[my_itr];
 								input_multimodal_edge._index_along_pattern_at_upstream_node.push_back(mySeq);
-								for (auto trips_itr = current_pattern->_pattern_trips.begin(); trips_itr != current_pattern->_pattern_trips.end(); ++trips_itr)
+								for (auto trips_itr = current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().begin(); trips_itr != current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().end(); ++trips_itr)
 								{
 									_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-									float temp_travel_time = current_trip->_arrival_seconds.at(mySeq + 1) - current_trip->_arrival_seconds.at(mySeq);
+									float temp_travel_time = current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq + 1) - current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq);
 									if (temp_travel_time < min_travel_time)
 									{
 										min_travel_time = temp_travel_time;
@@ -780,33 +787,33 @@ namespace Routing_Components
 								my_itr++;
 							}
 
-							current_link->_min_multi_modal_cost = ivtWeight * min_travel_time;
-							current_link->_walk_length = FLT_MAX / 2.0f;
-							current_link->_drive_time = FLT_MAX / 2.0f;
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							current_link->min_multi_modal_cost(ivtWeight * min_travel_time);
+							current_link->walk_length(FLT_MAX / 2.0f);
+							current_link->drive_time(FLT_MAX / 2.0f);
+							current_link->walk_distance_to_transit(FLT_MAX / 2.0f);
+							current_link->drive_fft_to_transit(FLT_MAX / 2.0f);
 							/*input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
 							input_multimodal_edge._drive_time = FLT_MAX / 2.0f;*/
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							current_link->_min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							current_link->_walk_length = 0.3048 * current_link->template length<float>(); //in meters
-							current_link->_drive_time = FLT_MAX / 2.0f;
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							current_link->min_multi_modal_cost(walkWeight*current_link->template travel_time<float>());
+							current_link->walk_length(0.3048 * current_link->template length<float>()); //in meters
+							current_link->drive_time(FLT_MAX / 2.0f);
+							current_link->walk_distance_to_transit(FLT_MAX / 2.0f);
+							current_link->drive_fft_to_transit(FLT_MAX / 2.0f);
 							//input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
 							//input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
 							//input_multimodal_edge._drive_time = FLT_MAX / 2.0f;
 						}
 						else
 						{
-							current_link->_min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							current_link->_walk_length = FLT_MAX / 2.0f;
-							current_link->_drive_time = current_link->template travel_time<float>();
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
+							current_link->min_multi_modal_cost(carWeight*current_link->template travel_time<float>());
+							current_link->walk_length(FLT_MAX / 2.0f);
+							current_link->drive_time(current_link->template travel_time<float>());
+							current_link->walk_distance_to_transit(FLT_MAX / 2.0f);
+							current_link->drive_fft_to_transit(FLT_MAX / 2.0f);
 							/*input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
 							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
 							input_multimodal_edge._drive_time = current_link->template travel_time<float>();*/
@@ -899,7 +906,7 @@ namespace Routing_Components
 
 						int edge_id = current_link->uuid<int>();
 
-						pattern->_pattern_edge_ids.push_back(edge_id);
+						pattern->pattern_edge_ids<_Patterns_Edge_Ids_Container_Interface&>().push_back(edge_id);
 					}
 				}
 				//graph_pool->Link_Graphs();
@@ -1210,7 +1217,7 @@ namespace Routing_Components
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 							{							
-								link->_touch_transit = true;
+								link->touch_transit(true);
 								break;
 							}
 						}
@@ -1281,9 +1288,9 @@ namespace Routing_Components
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 													
-							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->_touch_transit)
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->touch_transit<bool>())
 							{								
-								link->_touch_transit = true;
+								link->touch_transit(true);
 								break;
 							}
 						}

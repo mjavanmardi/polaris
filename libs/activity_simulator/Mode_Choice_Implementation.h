@@ -489,7 +489,7 @@ namespace Person_Components
 				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 				{
 					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
 					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
 					org_ctr++;
 				}
@@ -505,7 +505,7 @@ namespace Person_Components
 					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 					{
 						_Link_Interface* origin_link = (_Link_Interface*)(*itr);
-						float temp_time = origin_link->_drive_fft_to_transit;
+						float temp_time = origin_link->drive_fft_to_transit<float>();
 						drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
 						org_ctr++;
 					}
@@ -945,7 +945,7 @@ namespace Person_Components
 				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 				{
 					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
 					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
 					org_ctr++;
 				}
@@ -957,7 +957,7 @@ namespace Person_Components
 				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 				{
 					_Link_Interface* origin_link = (_Link_Interface*)(*itr);
-					float temp_time = origin_link->_drive_fft_to_transit;
+					float temp_time = origin_link->drive_fft_to_transit<float>();
 					drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
 					org_ctr++;
 				}
@@ -1071,7 +1071,7 @@ namespace Person_Components
 				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 				{
 					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->_walk_distance_to_transit;
+					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
 					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
 					org_ctr++;
 				}

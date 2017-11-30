@@ -174,12 +174,12 @@ namespace Link_Components
 			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
 			m_container(std::vector<int>, index_along_pattern_at_upstream_node, NONE, NONE);
 			m_container(std::vector<float>, heur_cost_to_dest, NONE, NONE);
-			m_container(float, min_multi_modal_cost, NONE, NONE);
-			m_container(float, walk_length, NONE, NONE);
-			m_container(float, walk_distance_to_transit, NONE, NONE);
-			m_container(float, drive_time, NONE, NONE);
-			m_container(float, drive_fft_to_transit, NONE, NONE);
-			m_container(bool, touch_transit, NONE, NONE);
+			m_data(float, min_multi_modal_cost, NONE, NONE);
+			m_data(float, walk_length, NONE, NONE);
+			m_data(float, walk_distance_to_transit, NONE, NONE);
+			m_data(float, drive_time, NONE, NONE);
+			m_data(float, drive_fft_to_transit, NONE, NONE);
+			m_data(bool, touch_transit, NONE, NONE);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
