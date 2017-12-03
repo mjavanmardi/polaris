@@ -101,15 +101,18 @@ namespace polaris
 
 		typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
-		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
-		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-		typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
-		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+		typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+		typedef Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
-		typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
-		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+		typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
+		typedef typename Network_Interface::get_type_of(transit_patterns_container) _Transit_Patterns_Container_Interface;
 
+		typedef typename _Transit_Pattern_Interface::get_type_of(pattern_trips) _Pattern_Trips_Container_Interface;
+		typedef typename _Transit_Vehicle_Trip_Interface::get_type_of(departure_seconds) _Departure_Seconds_Container_Interface;
+		typedef typename _Transit_Vehicle_Trip_Interface::get_type_of(arrival_seconds) _Arrival_Seconds_Container_Interface;
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
@@ -368,18 +371,18 @@ namespace polaris
 				_Transit_Pattern_Interface* next_pattern = (_Transit_Pattern_Interface*)current_neighbor->_unique_patterns[patterns_ctr];
 				int mySeq = current_neighbor->_index_along_pattern_at_upstream_node[patterns_ctr];
 
-				int trips_size = next_pattern->_pattern_trips.size();
+				int trips_size = next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>().size();
 				int trips_ctr = 0;
 				bool trip_found = false;
 
 				while (trips_ctr < trips_size && !trip_found)
 				{
-					_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)next_pattern->_pattern_trips[trips_ctr];
+					_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>()[trips_ctr];
 					
 					++trips_ctr;
 
 					int wait_binary = 1;
-					float waitTime = (float)next_trip->_departure_seconds[mySeq] - current->_time_label;
+					float waitTime = (float)next_trip->departure_seconds<_Departure_Seconds_Container_Interface&>()[mySeq] - current->_time_label;
 
 					if (waitTime < 0.0)
 					{
@@ -422,11 +425,11 @@ namespace polaris
 					float ivtTime;
 					if (wait_binary == 1)
 					{
-						ivtTime = (float)next_trip->_arrival_seconds[mySeq + 1] - (float)next_trip->_departure_seconds[mySeq];
+						ivtTime = (float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1] - (float)next_trip->departure_seconds<_Departure_Seconds_Container_Interface&>()[mySeq];
 					}
 					else
 					{
-						ivtTime = (float)next_trip->_arrival_seconds[mySeq + 1] - current->_time_label;
+						ivtTime = (float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1] - current->_time_label;
 					}
 
 					float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;
@@ -438,7 +441,7 @@ namespace polaris
 						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
 
 						current_neighbor->time_from_origin(time_from_origin);
-						current_neighbor->time_label((float)next_trip->_arrival_seconds[mySeq + 1]);
+						current_neighbor->time_label((float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1]);
 
 						current_neighbor->came_from(current);
 						current_neighbor->_came_on_trip = next_trip;

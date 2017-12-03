@@ -330,6 +330,9 @@ namespace Network_Components
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
+				typedef  Random_Access_Sequence< typename _Transit_Vehicle_Trip_Interface::get_type_of(departure_seconds)> _Trip_Departure_Seconds_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Vehicle_Trip_Interface::get_type_of(arrival_seconds)> _Trip_Arrival_Seconds_Interface;
+
 				_Transit_Vehicle_Trips_Container_Interface* transit_vehicle_trips_container_ptr = _network_reference->template transit_vehicle_trips_container<_Transit_Vehicle_Trips_Container_Interface*>();
 				typename type_of(network_reference)::type_of(transit_vehicle_trips_container)& transit_vehicle_trips_container_monitor = (typename type_of(network_reference)::type_of(transit_vehicle_trips_container)&)(*transit_vehicle_trips_container_ptr);
 
@@ -383,65 +386,65 @@ namespace Network_Components
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
-					if (transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->_departure_seconds.size() ||
-						transit_vehicle_trip->_arrival_seconds.size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->_pattern_stops.size()
+					if (transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().size() ||
+						transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size()
 						)
 					{
 						cout << "Inconsistency between at least two of the following:" << endl;
 						cout << "Number of stops of the pattern; number of arrival times, or departure times of the trip!" << endl;
 						cout << "Trip ID: " << transit_vehicle_trip->uuid<int>() << endl;
 						cout << "Pattern ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->uuid<int>() << endl;
-						cout << "Stop sequence size of the pattern: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->_pattern_stops.size() << endl;
-						cout << "Arrival times sequence size of the trip: " << transit_vehicle_trip->_arrival_seconds.size() << endl;
-						cout << "Departure times sequence size of the trip: " << transit_vehicle_trip->_departure_seconds.size() << endl;
+						cout << "Stop sequence size of the pattern: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size() << endl;
+						cout << "Arrival times sequence size of the trip: " << transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() << endl;
+						cout << "Departure times sequence size of the trip: " << transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().size() << endl;
 						system("pause");
 						exit(0);
 					}
 					
 					int my_itr = 0;
-					for (auto itr = transit_vehicle_trip->_arrival_seconds.begin(); itr != transit_vehicle_trip->_arrival_seconds.end(); ++itr)
+					for (auto itr = transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().begin(); itr != transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().end(); ++itr)
 					{
-						if (transit_vehicle_trip->_arrival_seconds.at(my_itr) > transit_vehicle_trip->_departure_seconds.at(my_itr))
+						if (transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr) > transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr))
 						{
 							cout << "Departure before arrival error!" << endl;
 							cout << "Trip ID: " << transit_vehicle_trip->uuid<int>() << endl;
 							cout << "Pattern ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->uuid<int>() << endl;
 							cout << "Internal sequence number (0 start): " << my_itr << endl;
 							cout << "Stop ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().at(my_itr)->uuid<int>() << endl;
-							cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
-							cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr) << endl;
+							cout << "Arrival: " << transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr) << endl;
+							cout << "Departure: " << transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr) << endl;
 							system("pause");
 							exit(0);
 						}
 
-						if (my_itr + 1 < transit_vehicle_trip->_arrival_seconds.size())
+						if (my_itr + 1 < transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size())
 						{
-							if (transit_vehicle_trip->_arrival_seconds.at(my_itr) >= transit_vehicle_trip->_arrival_seconds.at(my_itr+1))
+							if (transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr) >= transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr+1))
 							{
 								cout << "Arrival sequence timing error!" << endl;
 								cout << "Trip ID: " << transit_vehicle_trip->uuid<int>() << endl;
 								cout << "Pattern ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->uuid<int>() << endl;
 								cout << "Internal sequence number (0 start): " << my_itr << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().at(my_itr)->uuid<int>() << endl;
-								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr) << endl;
+								cout << "Arrival: " << transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr+1 << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().at(my_itr+1)->uuid<int>() << endl;
-								cout << "Arrival: " << transit_vehicle_trip->_arrival_seconds.at(my_itr+1) << endl;
+								cout << "Arrival: " << transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().at(my_itr+1) << endl;
 								system("pause");
 								exit(0);
 							}
 
-							if (transit_vehicle_trip->_departure_seconds.at(my_itr) >= transit_vehicle_trip->_departure_seconds.at(my_itr+1))
+							if (transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr) >= transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr+1))
 							{
 								cout << "Departure sequence timing error!" << endl;
 								cout << "Trip ID: " << transit_vehicle_trip->uuid<int>() << endl;
 								cout << "Pattern ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->uuid<int>() << endl;
 								cout << "Internal sequence number (0 start): " << my_itr << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().at(my_itr)->uuid<int>() << endl;
-								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr) << endl;
+								cout << "Departure: " << transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr) << endl;
 								cout << "Internal sequence number (0 start): " << my_itr + 1 << endl;
 								cout << "Stop ID: " << transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().at(my_itr + 1)->uuid<int>() << endl;
-								cout << "Departure: " << transit_vehicle_trip->_departure_seconds.at(my_itr + 1) << endl;
+								cout << "Departure: " << transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().at(my_itr + 1) << endl;
 								system("pause");
 								exit(0);
 							}
@@ -457,7 +460,7 @@ namespace Network_Components
 						for (auto itr = myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().begin(); itr != myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().end(); ++itr)
 						{
 							_Transit_Vehicle_Trip_Interface* myTrip = myPattern->template pattern_trips<_Transit_Vehicle_Trips_Container_Interface&>().at(trip_loc);
-							if (transit_vehicle_trip->_departure_seconds[0] < myTrip->_departure_seconds[0])
+							if (transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>()[0] < myTrip->departure_seconds<_Trip_Departure_Seconds_Interface&>()[0])
 							{
 								break;
 							}
@@ -1881,7 +1884,12 @@ namespace Network_Components
 					cout << "Generating link/stop-pattern-sequence matches" << endl;
 
 					typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename type_of(network_reference)::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
-					typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+					typedef  typename type_of(network_reference)::get_type_of(transit_patterns_container) _Transit_Patterns_Container_Interface;
+					typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_stops) _Pattern_Stops_Container_Interface;
+					typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
+					typedef  typename _Intersection_Interface::get_type_of(outbound_links) _Outbound_Links_Container_Interface;
+					typedef  typename _Link_Interface::get_type_of(unique_patterns) _Unique_Patterns_Container_Interface;
+					typedef  typename _Link_Interface::get_type_of(index_along_pattern_at_upstream_node) _Index_Along_Pattern_Container_Interface;
 				
 					typename _Transit_Patterns_Container_Interface::iterator patterns_itr;
 					_Transit_Patterns_Container_Interface& patterns = _network_reference->template transit_patterns_container<_Transit_Patterns_Container_Interface&>();
@@ -1890,15 +1898,15 @@ namespace Network_Components
 					{
 						_Transit_Pattern_Interface* pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
 
-						for (int stops_itr = 0; stops_itr < (int)pattern->_pattern_stops.size() - 1; stops_itr++)
+						for (int stops_itr = 0; stops_itr < (int)pattern->pattern_stops<_Pattern_Stops_Container_Interface&>().size() - 1; stops_itr++)
 						{
 
-							_Intersection_Interface* a_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr);
-							_Intersection_Interface* b_Stop = (_Intersection_Interface*)pattern->_pattern_stops.at(stops_itr + 1);
+							_Intersection_Interface* a_Stop = (_Intersection_Interface*)pattern->pattern_stops<_Pattern_Stops_Container_Interface&>().at(stops_itr);
+							_Intersection_Interface* b_Stop = (_Intersection_Interface*)pattern->pattern_stops<_Pattern_Stops_Container_Interface&>().at(stops_itr + 1);
 
-							for (int links_itr = 0; links_itr < (int)a_Stop->_outbound_links.size(); links_itr++)
+							for (int links_itr = 0; links_itr < (int)a_Stop->outbound_links<_Outbound_Links_Container_Interface&>().size(); links_itr++)
 							{
-								_Link_Interface* out_link = (_Link_Interface*)a_Stop->_outbound_links.at(links_itr);
+								_Link_Interface* out_link = (_Link_Interface*)a_Stop->outbound_links<_Outbound_Links_Container_Interface&>().at(links_itr);
 
 								_Intersection_Interface* a_Stop_Candidate = out_link->upstream_intersection<_Intersection_Interface*>();
 								_Intersection_Interface* b_Stop_Candidate = out_link->downstream_intersection<_Intersection_Interface*>();
@@ -1907,10 +1915,10 @@ namespace Network_Components
 
 								if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 								{
-									pattern->_pattern_links.push_back(out_link);
+									pattern->pattern_links<_Pattern_Links_Container_Interface&>().push_back(out_link);
 
-									out_link->_unique_patterns.push_back(pattern);
-									out_link->_index_along_pattern_at_upstream_node.push_back(stops_itr);
+									out_link->unique_patterns<_Unique_Patterns_Container_Interface&>().push_back(pattern);
+									out_link->index_along_pattern_at_upstream_node<_Index_Along_Pattern_Container_Interface&>().push_back(stops_itr);
 									
 								}
 							}
@@ -1933,6 +1941,7 @@ namespace Network_Components
 				typedef Random_Access_Sequence<typename type_of(network_reference)::get_type_of(zone_ids_container),int> _zone_ids_interface;
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename type_of(network_reference)::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+				typedef typename _Link_Interface::get_type_of(heur_cost_to_dest) _Heur_Cost_Container_Interface;
 
 				//%%%RLW - check into this again
 				//typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename type_of(network_reference)::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
@@ -2037,10 +2046,10 @@ namespace Network_Components
 
 						int zone_index = zone->template internal_id<int>();
 						link->zone_index(zone_index);
-						link->_heur_cost_to_dest.resize(zone_count);
+						link->heur_cost_to_dest<_Heur_Cost_Container_Interface&>().resize(zone_count);
 						for (int zone_ctr = 0; zone_ctr < zone_count; zone_ctr++)
 						{
-							link->_heur_cost_to_dest[zone_ctr] = FLT_MAX / 2.0f;
+							link->heur_cost_to_dest<_Heur_Cost_Container_Interface&>()[zone_ctr] = FLT_MAX / 2.0f;
 						}
 
 					}

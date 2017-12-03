@@ -303,6 +303,8 @@ namespace polaris
 
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+
+		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
 		
 		int graph_id = start_ids.front().graph_id;
 
@@ -337,7 +339,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-			start->cost_from_origin(start_link->template min_multi_modal_cost<float>() );
+			start->cost_from_origin(start_link->min_multi_modal_cost<float>());
 			//start->cost_from_origin(start->_min_multi_modal_cost);
 			
 			float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -399,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->_heur_cost_to_dest[zone_index] = current->_cost_from_origin;
+			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -444,7 +446,7 @@ namespace polaris
 		start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 				
 		_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-		start->cost_from_origin(start_link->template walk_length<float>() );
+		start->cost_from_origin(start_link->walk_length<float>());
 		//start->cost_from_origin(start->_walk_length);
 
 		float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -473,7 +475,7 @@ namespace polaris
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
-			if (current_link->template touch_transit<bool>() )
+			if (current_link->touch_transit<bool>())
 			{
 				success = true;
 				break;

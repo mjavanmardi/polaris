@@ -66,8 +66,9 @@ namespace polaris
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 			Network_Interface* net = (Network_Interface*)_global_network;
 
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
-			typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+			typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+			typedef Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+			typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
 
 			if (!multimodal_dijkstra)
 			{
@@ -100,7 +101,7 @@ namespace polaris
 					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
 					_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 
-					float temp_cost = destination_link->_heur_cost_to_dest[current_link->zone_index<int>()];
+					float temp_cost = destination_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[current_link->zone_index<int>()];
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}
