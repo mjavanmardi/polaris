@@ -328,9 +328,9 @@ namespace Activity_Components
 
 				// check if a stop at home will fit prior to activity
 				Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
-				Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(), Vehicle_Components::Types::SOV, start);
-				Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(person->template Home_Location<_activity_location_itf*>(), dest, Vehicle_Components::Types::SOV, start);
-				Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, dest, Vehicle_Components::Types::SOV, start);
+				Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+				Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(person->template Home_Location<_activity_location_itf*>(), dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+				Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
 				// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
 				float min_home_time = min((float)ttime_prev_to_home, (float)ttime_home_to_this);
 				// don't reset origin, however, if this trip is a return-to-home trip
@@ -397,7 +397,7 @@ namespace Activity_Components
 				// If no adults free and not school trip - cancel act
 				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 				// if no adult but is school activity, force trip to transit
-				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
+				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 				// otherwise, assign escort duty to adult
 				else
 				{
@@ -409,7 +409,7 @@ namespace Activity_Components
 			else if (properties->template Age<int>()<10 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 			{
 				// Attempt parent escort for all modes but transit - if fails force to transit
-				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::SCHOOLBUS)
+				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
 				{
 					// get a free adult available for escort
 					//%%%RLW
@@ -418,7 +418,7 @@ namespace Activity_Components
 					// If no adults free and not school trip - cancel act
 					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 					// if no adult but is school activity, force trip to transit
-					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
+					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 					// otherwise, assign escort duty to adult
 					else
 					{
@@ -430,7 +430,7 @@ namespace Activity_Components
 			else if (properties->template Age<int>()<16 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 			{
 				// Attempt parent escort when using HOV - if fails force to transit
-				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
+				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
 				{
 					// get a free adult available for escort
 					_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
@@ -438,7 +438,7 @@ namespace Activity_Components
 					// If no adults free, force trip to transit
 					if (adult == nullptr)
 					{
-						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 					}
 					else
 					{

@@ -780,36 +780,27 @@ namespace Routing_Components
 								my_itr++;
 							}
 
-							current_link->_min_multi_modal_cost = ivtWeight * min_travel_time;
-							current_link->_walk_length = FLT_MAX / 2.0f;
-							current_link->_drive_time = FLT_MAX / 2.0f;
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
-							/*input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
-							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
-							input_multimodal_edge._drive_time = FLT_MAX / 2.0f;*/
+							current_link->template min_multi_modal_cost<float>(ivtWeight * min_travel_time);
+							current_link->template walk_length<float>(FLT_MAX / 2.0f);
+							current_link->template drive_time<float>(FLT_MAX / 2.0f);
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							current_link->_min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							current_link->_walk_length = 0.3048 * current_link->template length<float>(); //in meters
-							current_link->_drive_time = FLT_MAX / 2.0f;
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
-							//input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							//input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
-							//input_multimodal_edge._drive_time = FLT_MAX / 2.0f;
+							current_link->template min_multi_modal_cost<float>(walkWeight*current_link->template travel_time<float>() );
+							current_link->template walk_length<float>(0.3048 * current_link->template length<float>()); //in meters
+							current_link->template drive_time<float>(FLT_MAX / 2.0f);
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}
 						else
 						{
-							current_link->_min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							current_link->_walk_length = FLT_MAX / 2.0f;
-							current_link->_drive_time = current_link->template travel_time<float>();
-							current_link->_walk_distance_to_transit = FLT_MAX / 2.0f;
-							current_link->_drive_fft_to_transit = FLT_MAX / 2.0f;
-							/*input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
-							input_multimodal_edge._drive_time = current_link->template travel_time<float>();*/
+							current_link->template min_multi_modal_cost<float>(carWeight*current_link->template travel_time<float>() );
+							current_link->template walk_length<float>(FLT_MAX / 2.0f);
+							current_link->template drive_time<float>(current_link->template travel_time<float>() );
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}								
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -1210,7 +1201,7 @@ namespace Routing_Components
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 							{							
-								link->_touch_transit = true;
+								link->template touch_transit<bool>(true);
 								break;
 							}
 						}
@@ -1281,9 +1272,9 @@ namespace Routing_Components
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 													
-							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->_touch_transit)
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->template touch_transit<bool>() )
 							{								
-								link->_touch_transit = true;
+								link->template touch_transit<bool>(true);
 								break;
 							}
 						}

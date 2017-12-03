@@ -251,22 +251,22 @@ namespace Person_Components
 				// Known destination, use exact travel time characteristics
 				if (dest_zone != nullptr)
 				{
-					pair<Time_Minutes, float> tts_ampeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 6.0, 9.0);
+					pair<Time_Minutes, float> tts_ampeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 6.0, 9.0);
 					AM_Peak_TT = tts_ampeak.first;
 					AM_Peak_TTV = tts_ampeak.second;
-					pair<Time_Minutes, float> tts_amoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 9.0, 12.0);
+					pair<Time_Minutes, float> tts_amoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 9.0, 12.0);
 					AM_Offpeak_TT = tts_amoff.first;
 					AM_Offpeak_TTV = tts_amoff.second;
-					pair<Time_Minutes, float> tts_pmoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 12.0, 16.0);
+					pair<Time_Minutes, float> tts_pmoff = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 12.0, 16.0);
 					PM_Offpeak_TT = tts_pmoff.first;
 					PM_Offpeak_TTV = tts_pmoff.second;
-					pair<Time_Minutes, float> tts_pmpeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 16.0, 19.0);
+					pair<Time_Minutes, float> tts_pmpeak = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 16.0, 19.0);
 					PM_Peak_TT = tts_pmpeak.first;
 					PM_Peak_TTV = tts_pmpeak.second;
-					pair<Time_Minutes, float> tts_evening = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 19.0, 24.0);
+					pair<Time_Minutes, float> tts_evening = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 19.0, 24.0);
 					Evening_TT = tts_evening.first;
 					Evening_TTV = tts_evening.second;
-					pair<Time_Minutes, float> tts_night = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::SOV, 0.0, 6.0);
+					pair<Time_Minutes, float> tts_night = network->template Get_TTime_Statistics<_Zone_Interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(home_taz, dest_zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 0.0, 6.0);
 					Night_TT = tts_evening.first;
 					Night_TTV = tts_evening.second;
 				}

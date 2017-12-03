@@ -716,7 +716,7 @@ namespace polaris
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
 			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
-			return neighbor_link->_min_multi_modal_cost;
+			return neighbor_link->template min_multi_modal_cost<float>();
 			//return neighbor->_min_multi_modal_cost;
 		}
 
@@ -772,7 +772,7 @@ namespace polaris
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
 			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
-			return neighbor_link->_walk_length;
+			return neighbor_link->template walk_length<float>();
 			//return neighbor->_walk_length;
 		}
 
@@ -828,7 +828,7 @@ namespace polaris
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
 			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
-			return connection->_time_cost + neighbor_link->_drive_time;
+			return connection->_time_cost + neighbor_link->template drive_time<float>();
 			//return connection->_time_cost + neighbor->_drive_time;
 		}
 

@@ -1899,7 +1899,7 @@ namespace Person_Components
 
 				//----------------------------------------------------------------------
 				// Get the mode of the activity, if not yet planned, assume 9AM
-				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 				if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 
@@ -2133,7 +2133,7 @@ namespace Person_Components
 
 				//----------------------------------------------------------------------
 				// Get the mode of the activity, if not yet planned, assume 9AM
-				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::SOV;
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 				if (_Current_Activity!=nullptr)
 				{
 					if (_Current_Activity->Mode_Is_Planned()) mode = _Current_Activity->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();

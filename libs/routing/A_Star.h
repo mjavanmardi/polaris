@@ -337,7 +337,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-			start->cost_from_origin(start_link->_min_multi_modal_cost);
+			start->cost_from_origin(start_link->template min_multi_modal_cost<float>() );
 			//start->cost_from_origin(start->_min_multi_modal_cost);
 			
 			float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -444,7 +444,7 @@ namespace polaris
 		start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 				
 		_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-		start->cost_from_origin(start_link->_walk_length);
+		start->cost_from_origin(start_link->template walk_length<float>() );
 		//start->cost_from_origin(start->_walk_length);
 
 		float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -473,7 +473,7 @@ namespace polaris
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
-			if (current_link->_touch_transit)
+			if (current_link->template touch_transit<bool>() )
 			{
 				success = true;
 				break;
@@ -496,7 +496,7 @@ namespace polaris
 		
 		if (success)
 		{
-			start_link->_walk_distance_to_transit = current->_cost_from_origin;
+			start_link->template walk_distance_to_transit<float>(current->_cost_from_origin);
 			if (debug_route)
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();
@@ -559,7 +559,7 @@ namespace polaris
 		start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
 
 		_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-		start->cost_from_origin(start_link->_drive_time);
+		start->cost_from_origin(start_link->template drive_time<float>() );
 		//start->cost_from_origin(start->_drive_time);
 
 		float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -588,7 +588,7 @@ namespace polaris
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
-			if (current_link->_touch_transit)
+			if (current_link->template touch_transit<bool>())
 			{
 				success = true;
 				break;
@@ -611,7 +611,7 @@ namespace polaris
 
 		if (success)
 		{
-			start_link->_drive_fft_to_transit = current->_cost_from_origin;
+			start_link-> template drive_fft_to_transit<float>(current->_cost_from_origin);
 			if (debug_route)
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();

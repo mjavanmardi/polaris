@@ -651,7 +651,7 @@ namespace Network_Skimming_Components
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
+				//this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 		
 
 				stringstream filename("");
@@ -962,16 +962,16 @@ namespace Network_Skimming_Components
 						if (zone == dzone) continue;
 
 						// get TTime by automobile and transit through skim interface, in minutes
-						Time_Minutes ttime_auto_ampeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 7.5);
-						Time_Minutes ttime_auto_ampeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 6.0);
-						Time_Minutes ttime_auto_offpeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 14.0);
-						Time_Minutes ttime_auto_offpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 12.0);
-						Time_Minutes ttime_auto_pmpeak_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 17.5);
-						Time_Minutes ttime_auto_pmpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 19.0);
-						Time_Minutes ttime_auto_night_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 20.0);
-						Time_Minutes ttime_auto_night_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::SOV, 1.0);
+						Time_Minutes ttime_auto_ampeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 7.5);
+						Time_Minutes ttime_auto_ampeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 6.0);
+						Time_Minutes ttime_auto_offpeak_max = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 14.0);
+						Time_Minutes ttime_auto_offpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 12.0);
+						Time_Minutes ttime_auto_pmpeak_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 17.5);
+						Time_Minutes ttime_auto_pmpeak_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 19.0);
+						Time_Minutes ttime_auto_night_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 20.0);
+						Time_Minutes ttime_auto_night_min = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 1.0);
 
-						Time_Minutes ttime_transit = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
+						Time_Minutes ttime_transit = skim->template Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 						los_value_itf* los_value = skim->Get_LOS<zone_itf*, Time_Minutes, los_value_itf*>(zone, dzone, 9.0);
 						Time_Minutes ovtt_transit = los_value->transit_walk_access_time<Time_Minutes>();
 						Time_Minutes wait_transit = los_value->transit_wait_time<Time_Minutes>();
