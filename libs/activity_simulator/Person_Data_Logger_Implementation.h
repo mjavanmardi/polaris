@@ -695,8 +695,10 @@ namespace Person_Components
 					act_rec.setMode("SCHOOLBUS");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 					act_rec.setMode("PARK_AND_RIDE");
-				else
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 					act_rec.setMode ("TRANSIT");
+				else
+					act_rec.setMode("TRUCK");
 				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());

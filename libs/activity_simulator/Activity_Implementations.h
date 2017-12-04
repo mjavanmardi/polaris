@@ -438,7 +438,29 @@ namespace Activity_Components
 					// If no adults free, force trip to transit
 					if (adult == nullptr)
 					{
-						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
+						//TODO OMER: Change back to bus when done
+						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK);
+
+						//TODO OMER: Delete when done
+						char myLine[2000];
+						std::string bus_mode_paragraph;
+						stringstream bus_mode_stream;
+
+						float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+						walkThreshold = walkThreshold / 3.0;
+
+						sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
+							"Child_Forced",
+							walkThreshold,
+							-1.0,
+							move->template origin<_activity_location_itf*>(),
+							move->template destination<_activity_location_itf*>(),
+							this->template Start_Time<Time_Minutes>(),
+							"TRUCK");
+						bus_mode_paragraph.insert(0, myLine);
+						bus_mode_stream << bus_mode_paragraph;
+						fw_bus_mode.Write_NoDelim(bus_mode_stream);
+
 					}
 					else
 					{

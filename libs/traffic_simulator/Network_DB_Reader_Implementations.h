@@ -582,6 +582,7 @@ namespace Network_Components
 
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(0.0);
+						link->template touch_transit<bool>(false);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
@@ -823,6 +824,7 @@ namespace Network_Components
 
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(1);
+						link->template touch_transit<bool>(false);
 
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
@@ -1083,6 +1085,7 @@ namespace Network_Components
 
 							link->template dbid<int>(db_itr->getLink());
 							link->template direction<int>(0.0);
+							link->template touch_transit<bool>(false);
 
 							/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);*/
@@ -1217,6 +1220,7 @@ namespace Network_Components
 
 							link->template dbid<int>(db_itr->getLink());
 							link->template direction<int>(1);
+							link->template touch_transit<bool>(false);
 
 							/*link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);*/
@@ -1364,6 +1368,7 @@ namespace Network_Components
 
 							link->template dbid<int>(dbid_max);
 							link->template direction<int>(0.0);
+							link->template touch_transit<bool>(false);
 
 							link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_A()->getStop()]);
 							link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.transit_stop_id_to_ptr[db_itr->getNode_B()->getStop()]);

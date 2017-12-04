@@ -35,6 +35,8 @@
 #include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
+//TODO OMER: Delete when done
+static File_IO::File_Writer fw_bus_mode;
 
 struct MasterType
 {
@@ -321,7 +323,7 @@ int main(int argc,char** argv)
 	// Scenario initialization
 	//----------------------------------------------------------------------------------------------------------------------------------
 	string scenario_filename = "scenario.json";
-
+	
 	// command line running
 	if (argc == 2)
 	{
@@ -508,6 +510,17 @@ int main(int argc,char** argv)
 
 	cout << "reading scenario data..." << endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
+
+
+	//TODO OMER: Delete when done
+	stringstream bus_mode_title("");
+	bus_mode_title << "Source\twalkThreshold\twalk_distance_to_transit\tOrigin\tDestination\tDeparture_Time\tMode\n";
+	stringstream bus_mode_filename("");
+	bus_mode_filename << scenario->template output_dir_name<string>();
+	bus_mode_filename << "bus_mode_output.dat";
+	fw_bus_mode.Open(bus_mode_filename.str());
+	fw_bus_mode.Write_NoDelim(bus_mode_title);
+
 
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time

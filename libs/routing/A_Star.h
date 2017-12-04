@@ -475,7 +475,7 @@ namespace polaris
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
-			if (current_link->touch_transit<bool>())
+			if (current_link->template touch_transit<bool>())
 			{
 				success = true;
 				break;

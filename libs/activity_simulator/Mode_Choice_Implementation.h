@@ -1040,7 +1040,26 @@ namespace Person_Components
 
 				if (selected == nullptr) { THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
 				else selected_mode = ((_Mode_Choice_Option_Interface*)selected)->template mode_type<ReturnType>();
+				
+				//TODO OMER: Delete when done
+				if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
+				{
+					char myLine[2000];
+					std::string bus_mode_paragraph;
+					stringstream bus_mode_stream;
 
+					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
+						"Adult",
+						walkThreshold,
+						walk_distance_to_transit,
+						_previous_location->template uuid<unsigned int>(),
+						_destination->template uuid<unsigned int>(),
+						activity->template Start_Time<Time_Minutes>(),
+						"BUS");
+					bus_mode_paragraph.insert(0, myLine);
+					bus_mode_stream << bus_mode_paragraph;
+					fw_bus_mode.Write_NoDelim(bus_mode_stream);
+				}
 
 				//TURN ON TO VALIDATE UTILITY CALCULATION AND RESULTS
 			/*	if (__thread_id == 0) Print_Calculation_Results(choice_model, selected_mode);
@@ -1210,6 +1229,26 @@ namespace Person_Components
 				else if(r < p_hov + p_walk + p_bike) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE;
 				else if (r < p_hov + p_walk + p_bike + p_bus) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::BUS;
 				else selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS;
+
+				//TODO OMER: Delete when done
+				if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
+				{
+					char myLine[2000];
+					std::string bus_mode_paragraph;
+					stringstream bus_mode_stream;
+
+					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
+						"Adult",
+						walkThreshold,
+						walk_distance_to_transit,
+						_previous_location->template uuid<unsigned int>(),
+						_destination->template uuid<unsigned int>(),
+						activity->template Start_Time<Time_Minutes>(),
+						"BUS");
+					bus_mode_paragraph.insert(0, myLine);
+					bus_mode_stream << bus_mode_paragraph;
+					fw_bus_mode.Write_NoDelim(bus_mode_stream);
+				}
 
 				if (_delete_los)
 				{
