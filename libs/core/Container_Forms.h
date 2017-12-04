@@ -1089,8 +1089,9 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// m_container � member creator, type-definition and basic accessors
 	///----------------------------------------------------------------------------------------------------
+#define m_container(CONTAINER_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 		protected:\
-			CONTAINER_TYPE _##NAME;\
+			CONTAINER_TYPE _##NAME; \
 		public:\
 			typedef CONTAINER_TYPE NAME##_type;\
 			typedef NAME##_type NAME##_accessible_type;\
