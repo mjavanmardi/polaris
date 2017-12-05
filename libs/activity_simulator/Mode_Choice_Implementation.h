@@ -974,6 +974,24 @@ namespace Person_Components
 					org_ctr++;
 				}
 				
+				_Links_Container_Interface* destination_walk_links = _destination->template destination_walk_links<_Links_Container_Interface*>();
+				float walk_distance_after_transit;
+				if (destination_walk_links)
+				{
+					walk_distance_after_transit = 0;
+				}
+				else
+				{
+					walk_distance_after_transit = FLT_MAX / 2.0f;
+				}
+				int dst_ctr = 0;
+				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+				{
+					_Link_Interface* destination_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = destination_walk_link->walk_distance_to_transit<float>();
+					walk_distance_after_transit = walk_distance_after_transit + (temp_dist - walk_distance_after_transit) / (dst_ctr + 1);
+					dst_ctr++;
+				}
 
 				_Links_Container_Interface* origin_links = _previous_location->template origin_links<_Links_Container_Interface*>();				
 				float drive_fft_to_transit;
@@ -1000,7 +1018,7 @@ namespace Person_Components
 					transit_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)transit_choice);
 				}
-				else if (drive_fft_to_transit < _los->auto_ttime<Time_Seconds>()*0.75)
+				else if (drive_fft_to_transit < _los->auto_ttime<Time_Seconds>()*0.75 && walk_distance_after_transit < walkThreshold)
 				{
 					pnr_choice->Mode_Chooser(this);
 					pnr_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE);
@@ -1017,17 +1035,19 @@ namespace Person_Components
 					else if (_home_based) nm_nest->inclusive_value_parameter(nm_nest->HBO_NEST_NM<float>());
 					else nm_nest->inclusive_value_parameter(nm_nest->NHB_NEST_NM<float>());
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)nm_nest);
-					// Walk option
-					if (_los->auto_distance<Miles>() < 3.0)
+					// Walk option					
+					
+					//if (_los->auto_distance<Miles>() < 3.0)
+					if (_los->auto_distance<Meters>() < 5.0*walkThreshold)
 					{
 						walk_choice->Mode_Chooser(this);
 						walk_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 						nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)walk_choice);
 					}
 					// Bike option
-					bike_choice->Mode_Chooser(this);
+					/*bike_choice->Mode_Chooser(this);
 					bike_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE);
-					nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)bike_choice);
+					nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)bike_choice);*/
 				}
 
 
@@ -1110,6 +1130,7 @@ namespace Person_Components
 
 				// non-licensed drivers always use HOV	
 				Kilometers dist = _los->auto_distance<Kilometers>();
+				Meters dist_meters = _los->auto_distance<Meters>();
 
 				//Obtain walk threshold in meters
 				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
@@ -1217,6 +1238,14 @@ namespace Person_Components
 						p_walk = p_walk / p_hov_walk_bike;
 						p_bike = p_bike / p_hov_walk_bike;
 						p_bus = 0;
+					}
+
+					if (walk_distance_to_transit >= 3.0*walkThreshold)
+					{
+						p_hov = 1.0;
+						p_walk = 0.0;
+						p_bike = 0.0;
+						p_bus = 0.0;
 					}
 					
 				}
