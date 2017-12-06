@@ -481,53 +481,16 @@ namespace Person_Components
 				double TRAN_COST = los->transit_fare<Dollars>();
 				double TRAN_COST_M = TRAN_COST * m_inc;
 				double TRAN_COST_H = TRAN_COST * h_inc;
-								
 				
-				_Links_Container_Interface* origin_walk_links = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template origin_walk_links<_Links_Container_Interface*>();
-				float walk_distance_to_transit;
-				if (origin_walk_links)
-				{
-					walk_distance_to_transit = 0;
-				}
-				else
-				{
-					walk_distance_to_transit = FLT_MAX / 2.0f;
-				}
-				int org_ctr = 0;
-				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
-				{
-					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
-					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
-					org_ctr++;
-				}
 				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-				double TRAN_OVTT = walk_distance_to_transit/(walkSpeed*60.0); // meters/(meters per second *60)
+				double TRAN_OVTT = (_Mode_Chooser->template walk_distance_to_transit<Meters>() + _Mode_Chooser->template walk_distance_after_transit<Meters>() )/(walkSpeed*60.0); // meters/(meters per second *60)
 				//double TRAN_OVTT = los->transit_walk_access_time<Time_Minutes>();
 				
 				if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 				{
-					_Links_Container_Interface* origin_links = _Mode_Chooser->previous_location<_Activity_Location_Interface*>()->template origin_links<_Links_Container_Interface*>();
-					float drive_fft_to_transit;
-					if (origin_links)
-					{
-						drive_fft_to_transit = 0;
-					}
-					else
-					{
-						drive_fft_to_transit = FLT_MAX / 2.0f;
-					}
-					org_ctr = 0;
-					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
-					{
-						_Link_Interface* origin_link = (_Link_Interface*)(*itr);
-						float temp_time = origin_link->drive_fft_to_transit<float>();
-						drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
-						org_ctr++;
-					}
-
-					TRAN_OVTT = drive_fft_to_transit/60.0; //seconds to minutes
+					TRAN_OVTT = _Mode_Chooser->template drive_fft_to_transit<Time_Minutes>() + _Mode_Chooser->template walk_distance_after_transit<Meters>() / (walkSpeed*60.0); //seconds to minutes
 				}
+
 				double GENDER = properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::GENDER::MALE ? 1.0 : 0.0;
 				double VEHPERLIC = hh_properties->Number_of_workers<double>() > 0 ? hh_properties->Number_of_vehicles<double>() / hh_properties->Number_of_workers<double>() : 0.0;
 				double AGE65 = properties->Age<int>() >= 65 ? 1.0 : 0.0;
@@ -733,6 +696,9 @@ namespace Person_Components
 			m_data(bool, from_work_school, NONE, NONE);
 			m_data(bool, auto_available, NONE, NONE);
 			m_data(bool, to_CBD, NONE, NONE);
+			member_component_and_feature_accessor(walk_distance_to_transit, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			member_component_and_feature_accessor(walk_distance_after_transit, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
+			member_component_and_feature_accessor(drive_fft_to_transit, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 
 			m_data(bool, delete_los, NONE, NONE);
 			m_data(_lock, update_lock, NONE, NONE);
@@ -888,6 +854,71 @@ namespace Person_Components
 					los->auto_distance(origin_zone->avg_distance<Miles>());
 					this->_los = los;
 				}
+
+				//Calculating walking/driving distance from the origin to the closest transit, from the closests transit to destination 
+				_Links_Container_Interface* origin_walk_links = _previous_location->template origin_walk_links<_Links_Container_Interface*>();
+				float walk_distance_to_transit;
+				if (origin_walk_links)
+				{
+					walk_distance_to_transit = 0;
+				}
+				else
+				{
+					walk_distance_to_transit = FLT_MAX / 2.0f;
+				}
+				int org_ctr = 0;
+				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+				{
+					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
+					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+
+				_Links_Container_Interface* destination_walk_links = _destination->template destination_walk_links<_Links_Container_Interface*>();
+				float walk_distance_after_transit;
+				if (destination_walk_links)
+				{
+					walk_distance_after_transit = 0;
+				}
+				else
+				{
+					walk_distance_after_transit = FLT_MAX / 2.0f;
+				}
+				int dst_ctr = 0;
+				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+				{
+					_Link_Interface* destination_walk_link = (_Link_Interface*)(*itr);
+					float temp_dist = destination_walk_link->walk_distance_to_transit<float>();
+					walk_distance_after_transit = walk_distance_after_transit + (temp_dist - walk_distance_after_transit) / (dst_ctr + 1);
+					dst_ctr++;
+				}
+
+				_Links_Container_Interface* origin_links = _previous_location->template origin_links<_Links_Container_Interface*>();
+				float drive_fft_to_transit;
+				if (origin_links)
+				{
+					drive_fft_to_transit = 0;
+				}
+				else
+				{
+					drive_fft_to_transit = FLT_MAX / 2.0f;
+				}
+				org_ctr = 0;
+				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+				{
+					_Link_Interface* origin_link = (_Link_Interface*)(*itr);
+					float temp_time = origin_link->drive_fft_to_transit<float>();
+					drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
+					org_ctr++;
+				}
+
+				this->template walk_distance_to_transit<Meters>(walk_distance_to_transit);
+				this->template walk_distance_after_transit<Meters>(walk_distance_after_transit);
+				this->template drive_fft_to_transit<Time_Seconds>(drive_fft_to_transit);
+				//END Calculating walking/driving distance from the origin to the closest transit, from the closests transit to destination
+
+
 			}
 
 			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity)
@@ -952,73 +983,17 @@ namespace Person_Components
 				
 				//Obtain walk threshold in meters
 				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-				walkThreshold = walkThreshold / 5.0;
+				walkThreshold = walkThreshold / 5.0; //in meters
 				//Obtain walking distance to the closest transit stop
-
-				_Links_Container_Interface* origin_walk_links = _previous_location->template origin_walk_links<_Links_Container_Interface*>();
-				float walk_distance_to_transit;
-				if (origin_walk_links)
-				{
-					walk_distance_to_transit = 0;
-				}
-				else
-				{
-					walk_distance_to_transit = FLT_MAX / 2.0f;
-				}				
-				int org_ctr = 0;
-				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
-				{
-					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
-					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
-					org_ctr++;
-				}
+								
 				
-				_Links_Container_Interface* destination_walk_links = _destination->template destination_walk_links<_Links_Container_Interface*>();
-				float walk_distance_after_transit;
-				if (destination_walk_links)
-				{
-					walk_distance_after_transit = 0;
-				}
-				else
-				{
-					walk_distance_after_transit = FLT_MAX / 2.0f;
-				}
-				int dst_ctr = 0;
-				for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
-				{
-					_Link_Interface* destination_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = destination_walk_link->walk_distance_to_transit<float>();
-					walk_distance_after_transit = walk_distance_after_transit + (temp_dist - walk_distance_after_transit) / (dst_ctr + 1);
-					dst_ctr++;
-				}
-
-				_Links_Container_Interface* origin_links = _previous_location->template origin_links<_Links_Container_Interface*>();				
-				float drive_fft_to_transit;
-				if (origin_links)
-				{
-					drive_fft_to_transit = 0; 
-				}
-				else
-				{
-					drive_fft_to_transit = FLT_MAX / 2.0f;
-				}
-				org_ctr = 0;
-				for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
-				{
-					_Link_Interface* origin_link = (_Link_Interface*)(*itr);
-					float temp_time = origin_link->drive_fft_to_transit<float>();
-					drive_fft_to_transit = drive_fft_to_transit + (temp_time - drive_fft_to_transit) / (org_ctr + 1);
-					org_ctr++;
-				}
-				
-				if (walk_distance_to_transit < walkThreshold)
+				if (walk_distance_to_transit<Meters>() < walkThreshold && walk_distance_after_transit<Meters>() < walkThreshold)
 				{
 					transit_choice->Mode_Chooser(this);
 					transit_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)transit_choice);
 				}
-				else if (drive_fft_to_transit < _los->auto_ttime<Time_Seconds>()*0.75 && walk_distance_after_transit < walkThreshold)
+				else if (drive_fft_to_transit<Time_Seconds>() < _los->auto_ttime<Time_Seconds>()*0.75 && walk_distance_after_transit<Meters>() < walkThreshold)
 				{
 					pnr_choice->Mode_Chooser(this);
 					pnr_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE);
@@ -1071,7 +1046,7 @@ namespace Person_Components
 					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
 						"Adult",
 						walkThreshold,
-						walk_distance_to_transit,
+						walk_distance_to_transit<Meters>(),
 						_previous_location->template uuid<unsigned int>(),
 						_destination->template uuid<unsigned int>(),
 						activity->template Start_Time<Time_Minutes>(),
@@ -1130,32 +1105,11 @@ namespace Person_Components
 
 				// non-licensed drivers always use HOV	
 				Kilometers dist = _los->auto_distance<Kilometers>();
-				Meters dist_meters = _los->auto_distance<Meters>();
 
 				//Obtain walk threshold in meters
 				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
 				walkThreshold = walkThreshold / 3.0;
-				//Obtain walking distance to the closest transit stop
-
-				_Links_Container_Interface* origin_walk_links = _previous_location->template origin_walk_links<_Links_Container_Interface*>();
-				float walk_distance_to_transit;
-				if (origin_walk_links)
-				{
-					walk_distance_to_transit = 0;
-				}
-				else
-				{
-					walk_distance_to_transit = FLT_MAX / 2.0f;
-				}
-				int org_ctr = 0;
-				for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
-				{
-					_Link_Interface* origin_walk_link = (_Link_Interface*)(*itr);
-					float temp_dist = origin_walk_link->walk_distance_to_transit<float>();
-					walk_distance_to_transit = walk_distance_to_transit + (temp_dist - walk_distance_to_transit) / (org_ctr + 1);
-					org_ctr++;
-				}
-
+				
 				float p_hov = 1.0;
 				float p_bike = 0.0;
 				float p_walk = 0.0;
@@ -1231,7 +1185,7 @@ namespace Person_Components
 
 					}
 
-					if (walk_distance_to_transit >= walkThreshold)
+					if (walk_distance_to_transit<Meters>() >= walkThreshold || walk_distance_after_transit<Meters>() >= walkThreshold)
 					{
 						float p_hov_walk_bike = p_hov + p_walk + p_bike;
 						p_hov = p_hov / p_hov_walk_bike;
@@ -1239,8 +1193,9 @@ namespace Person_Components
 						p_bike = p_bike / p_hov_walk_bike;
 						p_bus = 0;
 					}
+					
 
-					if (walk_distance_to_transit >= 3.0*walkThreshold)
+					if (GLOBALS::Length_Converter.Convert_Value<Kilometers, Meters>(dist) >= 3.0*walkThreshold)
 					{
 						p_hov = 1.0;
 						p_walk = 0.0;
@@ -1267,9 +1222,9 @@ namespace Person_Components
 					stringstream bus_mode_stream;
 
 					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
-						"Adult",
+						"Child",
 						walkThreshold,
-						walk_distance_to_transit,
+						walk_distance_to_transit<Meters>(),
 						_previous_location->template uuid<unsigned int>(),
 						_destination->template uuid<unsigned int>(),
 						activity->template Start_Time<Time_Minutes>(),
