@@ -514,7 +514,7 @@ int main(int argc,char** argv)
 
 	//TODO OMER: Delete when done
 	stringstream bus_mode_title("");
-	bus_mode_title << "Source\twalkThreshold\twalk_distance_to_transit\tOrigin\tDestination\tDeparture_Time\tMode\n";
+	bus_mode_title << "Source\twalkThreshold_init\twalk_distance_to_transit\tOrigin\tDestination\tDeparture_Time\tMode\n";
 	stringstream bus_mode_filename("");
 	bus_mode_filename << scenario->template output_dir_name<string>();
 	bus_mode_filename << "bus_mode_output.dat";

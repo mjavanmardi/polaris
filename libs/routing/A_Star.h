@@ -669,7 +669,7 @@ namespace polaris
 		bool debug_route,
 		std::string& summary_paragraph,
 		std::string& detail_paragraph,
-		std::string sub_mode)
+		Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -688,13 +688,18 @@ namespace polaris
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 		
+		//TODO OMER JOSH
+		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+		Meters_Per_Second walkSpeed_mps = walkSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
+		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
+		Meters_Per_Second bikeSpeed_mps = bikeSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
+		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
+
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+		float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
 		float costThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::costThreshold<float>();
-		float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-		float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-		float walkThreshold_Time = walkThreshold / walkSpeed;
 
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
@@ -774,22 +779,36 @@ namespace polaris
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
 			Link_Components::Types::Link_Type_Keys current_type = start_t->_edge_type;
 
-			if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
+			if (current_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
 				start->cost_from_origin(walkWeight*start->_time_cost);
 				start_t->_walk_time_from_origin = start->_time_cost;
+				start_t->_bike_time_from_origin = 0;
 				start_t->_car_time_from_origin = 0;
+				start->time_from_origin(start->_time_cost);
+				start->time_label((float)(start_time + start->_time_cost));
+			}
+			else if (current_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+			{
+				start->cost_from_origin(bike_time_factor*bikeWeight*start->_time_cost);
+				start_t->_walk_time_from_origin = 0;
+				start_t->_bike_time_from_origin = bike_time_factor*start->_time_cost;
+				start_t->_car_time_from_origin = 0;
+				start->time_from_origin(bike_time_factor*start->_time_cost);
+				start->time_label((float)(start_time + bike_time_factor*start->_time_cost));
 			}
 			else
 			{
 				start->cost_from_origin(carWeight*start->_time_cost);
 				start_t->_walk_time_from_origin = 0;
+				start_t->_bike_time_from_origin = 0;
 				start_t->_car_time_from_origin = start->_time_cost;
+				start->time_from_origin(start->_time_cost);
+				start->time_label((float)(start_time + start->_time_cost));
 			}
 			/*start->cost_from_origin(0.0f);
 			start->time_from_origin(0.0f);*/
-			start->time_from_origin(start->_time_cost);
-			start->time_label((float)(start_time + start->_time_cost));			
+					
 
 			start_t->_came_on_seq_index = -1;
 			start_t->_came_on_trip = nullptr;
@@ -880,7 +899,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
+				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool, sub_mode);
 			}
 
 		}
@@ -902,7 +921,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -913,6 +932,7 @@ namespace polaris
 					current->_wait_count_from_origin,
 					current->_wait_time_from_origin,
 					current->_walk_time_from_origin,
+					current->_bike_time_from_origin,
 					current->_ivt_time_from_origin,
 					current->_car_time_from_origin,
 					current->_transfer_pen_from_origin,
@@ -952,7 +972,7 @@ namespace polaris
 					out_trip.push_back(current_trip->uuid<int>());
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -969,6 +989,7 @@ namespace polaris
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
@@ -986,7 +1007,7 @@ namespace polaris
 					out_trip.push_back(-1);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -1003,6 +1024,7 @@ namespace polaris
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
@@ -1019,7 +1041,7 @@ namespace polaris
 					out_trip.push_back(-1);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -1036,6 +1058,7 @@ namespace polaris
 							current->_wait_count_from_origin,
 							current->_wait_time_from_origin,
 							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
 							current->_ivt_time_from_origin,
 							current->_car_time_from_origin,
 							current->_transfer_pen_from_origin,
@@ -1103,7 +1126,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 				
-				sprintf_s(myLine, "%d\t%d\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1114,6 +1137,7 @@ namespace polaris
 					current->_wait_count_from_origin,
 					current->_wait_time_from_origin,
 					current->_walk_time_from_origin,
+					current->_bike_time_from_origin,
 					current->_ivt_time_from_origin,
 					current->_car_time_from_origin,
 					current->_transfer_pen_from_origin,

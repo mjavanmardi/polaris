@@ -239,13 +239,7 @@ namespace Scenario_Components
 			accessor(multimodal_routing_weight_shape, NONE, NONE);
 			accessor(multimodal_routing_weight_scale, NONE, NONE);
 			accessor(multimodal_routing_weight_factor, NONE, NONE);
-
-			/*accessor(transferPenalty, NONE, NONE);
-			accessor(waitWeight, NONE, NONE);
-			accessor(walkWeight, NONE, NONE);
-			accessor(ivtWeight, NONE, NONE);
-			accessor(carWeight, NONE, NONE);*/
-
+			
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
 			accessor(output_link_moe_for_simulation_interval, NONE, NONE);

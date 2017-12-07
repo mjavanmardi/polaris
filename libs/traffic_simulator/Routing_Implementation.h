@@ -196,37 +196,10 @@ namespace Routing_Components
 				std::deque<float> out_heur_cost;
 				std::string summary_paragraph = "";
 				std::string detail_paragraph = "";
-				std::string sub_mode = "";
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
-				if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
-				{
-					sub_mode = "BUS";
-				}
-				else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL)
-				{
-					sub_mode = "RAIL";
-				}
-				else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
-				{
-					sub_mode = "WALK";
-				}
-				else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
-				{
-					sub_mode = "BICYCLE";
-				}
-				else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
-				{
-					sub_mode = "PNR";
-				}
-				else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE)
-				{
-					sub_mode = "KNR";
-				}
-
 				float best_route_time_to_destination = 0.0f;
-
 				
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
@@ -234,11 +207,11 @@ namespace Routing_Components
 					//TODO: Remove when done testing routing execution time
 					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else
 					{
@@ -251,11 +224,11 @@ namespace Routing_Components
 					//TODO: Remove when done testing routing execution time
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else
 					{ 

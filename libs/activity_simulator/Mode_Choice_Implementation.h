@@ -482,13 +482,16 @@ namespace Person_Components
 				double TRAN_COST_M = TRAN_COST * m_inc;
 				double TRAN_COST_H = TRAN_COST * h_inc;
 				
-				float walkSpeed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-				double TRAN_OVTT = (_Mode_Chooser->template walk_distance_to_transit<Meters>() + _Mode_Chooser->template walk_distance_after_transit<Meters>() )/(walkSpeed*60.0); // meters/(meters per second *60)
+				//TODO OMER JOSH
+				Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+				Kilometers_Per_Minute walkSpeed_kpm = walkSpeed_kph / 60; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Kilometers_Per_Minute>(walkSpeed_kph);
+
+				double TRAN_OVTT = (_Mode_Chooser->template walk_distance_to_transit<Kilometers>() + _Mode_Chooser->template walk_distance_after_transit<Kilometers>() ) / walkSpeed_kpm; // meters/(meters per second *60)
 				//double TRAN_OVTT = los->transit_walk_access_time<Time_Minutes>();
 				
 				if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 				{
-					TRAN_OVTT = _Mode_Chooser->template drive_fft_to_transit<Time_Minutes>() + _Mode_Chooser->template walk_distance_after_transit<Meters>() / (walkSpeed*60.0); //seconds to minutes
+					TRAN_OVTT = _Mode_Chooser->template drive_fft_to_transit<Time_Minutes>() + _Mode_Chooser->template walk_distance_after_transit<Kilometers>() / walkSpeed_kpm; //seconds to minutes
 				}
 
 				double GENDER = properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::GENDER::MALE ? 1.0 : 0.0;
@@ -982,18 +985,18 @@ namespace Person_Components
 				}*/
 				
 				//Obtain walk threshold in meters
-				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-				walkThreshold = walkThreshold / 5.0; //in meters
+				Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				Meters walkThreshold_init = walkThreshold / 5.0; //in meters
 				//Obtain walking distance to the closest transit stop
 								
 				
-				if (walk_distance_to_transit<Meters>() < walkThreshold && walk_distance_after_transit<Meters>() < walkThreshold)
+				if (walk_distance_to_transit<Meters>() < walkThreshold_init && walk_distance_after_transit<Meters>() < walkThreshold_init)
 				{
 					transit_choice->Mode_Chooser(this);
 					transit_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)transit_choice);
 				}
-				else if (drive_fft_to_transit<Time_Seconds>() < _los->auto_ttime<Time_Seconds>()*0.75 && walk_distance_after_transit<Meters>() < walkThreshold)
+				else if (drive_fft_to_transit<Time_Seconds>() < _los->auto_ttime<Time_Seconds>()*0.75 && walk_distance_after_transit<Meters>() < walkThreshold_init)
 				{
 					pnr_choice->Mode_Chooser(this);
 					pnr_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE);
@@ -1013,16 +1016,16 @@ namespace Person_Components
 					// Walk option					
 					
 					//if (_los->auto_distance<Miles>() < 3.0)
-					if (_los->auto_distance<Meters>() < 5.0*walkThreshold)
+					if (_los->auto_distance<Meters>() < walkThreshold)
 					{
 						walk_choice->Mode_Chooser(this);
 						walk_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 						nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)walk_choice);
 					}
 					// Bike option
-					/*bike_choice->Mode_Chooser(this);
+					bike_choice->Mode_Chooser(this);
 					bike_choice->template mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE);
-					nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)bike_choice);*/
+					nm_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)bike_choice);
 				}
 
 
@@ -1045,7 +1048,7 @@ namespace Person_Components
 
 					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
 						"Adult",
-						walkThreshold,
+						walkThreshold_init,
 						walk_distance_to_transit<Meters>(),
 						_previous_location->template uuid<unsigned int>(),
 						_destination->template uuid<unsigned int>(),
@@ -1107,8 +1110,8 @@ namespace Person_Components
 				Kilometers dist = _los->auto_distance<Kilometers>();
 
 				//Obtain walk threshold in meters
-				float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-				walkThreshold = walkThreshold / 3.0;
+				Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+				Meters walkThreshold_init = walkThreshold / 5.0;
 				
 				float p_hov = 1.0;
 				float p_bike = 0.0;
@@ -1185,7 +1188,7 @@ namespace Person_Components
 
 					}
 
-					if (walk_distance_to_transit<Meters>() >= walkThreshold || walk_distance_after_transit<Meters>() >= walkThreshold)
+					if (walk_distance_to_transit<Meters>() >= walkThreshold_init || walk_distance_after_transit<Meters>() >= walkThreshold_init)
 					{
 						float p_hov_walk_bike = p_hov + p_walk + p_bike;
 						p_hov = p_hov / p_hov_walk_bike;
@@ -1195,7 +1198,7 @@ namespace Person_Components
 					}
 					
 
-					if (GLOBALS::Length_Converter.Convert_Value<Kilometers, Meters>(dist) >= 3.0*walkThreshold)
+					if (GLOBALS::Length_Converter.Convert_Value<Kilometers, Meters>(dist) >= walkThreshold)
 					{
 						p_hov = 1.0;
 						p_walk = 0.0;
@@ -1223,7 +1226,7 @@ namespace Person_Components
 
 					sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
 						"Child",
-						walkThreshold,
+						walkThreshold_init,
 						walk_distance_to_transit<Meters>(),
 						_previous_location->template uuid<unsigned int>(),
 						_destination->template uuid<unsigned int>(),

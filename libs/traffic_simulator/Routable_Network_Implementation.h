@@ -171,6 +171,7 @@ namespace Routing_Components
 			t_data(float, ivt_time_from_origin);
 			t_data(float, car_time_from_origin);
 			t_data(float, walk_time_from_origin);
+			t_data(float, bike_time_from_origin);
 			t_data(float, wait_time_from_origin);
 			t_data(float, transfer_pen_from_origin);
 			t_data(int, wait_count_from_origin);
@@ -250,6 +251,7 @@ namespace Routing_Components
 				scenario->set_parameter(document, "transferPenalty", _transferPenalty);
 				scenario->set_parameter(document, "waitWeight", _waitWeight);
 				scenario->set_parameter(document, "walkWeight", _walkWeight);
+				scenario->set_parameter(document, "bikeWeight", _bikeWeight);
 				scenario->set_parameter(document, "ivtWeight", _ivtWeight);
 				scenario->set_parameter(document, "carWeight", _carWeight);
 				scenario->set_parameter(document, "scanThreshold", _scanThreshold);
@@ -257,6 +259,8 @@ namespace Routing_Components
 				scenario->set_parameter(document, "waitThreshold", _waitThreshold);
 				scenario->set_parameter(document, "walkThreshold", _walkThreshold);
 				scenario->set_parameter(document, "walkSpeed", _walkSpeed);
+				scenario->set_parameter(document, "bikeThreshold", _bikeThreshold);
+				scenario->set_parameter(document, "bikeSpeed", _bikeSpeed);
 				scenario->set_parameter(document, "debug_route", _debug_route);
 				scenario->set_parameter(document, "multimodal_dijkstra", _multimodal_dijkstra);
 								
@@ -269,37 +273,44 @@ namespace Routing_Components
 				cout << "\ttransferPenalty = " << transferPenalty	<float>() << endl;
 				cout << "\twaitWeight = " << waitWeight		<float>() << endl;
 				cout << "\twalkWeight = " << walkWeight	<float>() << endl;
+				cout << "\tbikeWeight = " << bikeWeight	<float>() << endl;
 				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
 				cout << "\tcarWeight = " << carWeight	<float>() << endl;
 				cout << "\tscanThreshold = " << scanThreshold	<float>() << endl;
 				cout << "\tcostThreshold = " << costThreshold	<float>() << endl;
 				cout << "\twaitThreshold = " << waitThreshold	<float>() << endl;
-				cout << "\twalkThreshold = " << walkThreshold	<float>() << endl;
+				cout << "\twalkThreshold = " << walkThreshold	<Meters>() << endl;
 				cout << "\twalkSpeed = " << walkSpeed	<float>() << endl;
+				cout << "\tbikeThreshold = " << bikeThreshold	<Meters>() << endl;
+				cout << "\tbikeSpeed = " << bikeSpeed	<float>() << endl;
 				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
 				cout << "\tmultimodal_dijkstra = " << multimodal_dijkstra	<bool>() << endl;
 			}
 			
 			static void default_static_initializer()
 			{
-				_transferPenalty = 300;
+				_transferPenalty = 300.0;
 				_waitWeight = 2.0;
 				_walkWeight = 2.0;
-				_ivtWeight = 1.00;
-				_carWeight = 3.00;
-				_scanThreshold = 10000;
-				_costThreshold = 28800.00;
-				_waitThreshold = 3600.00;
-				_walkThreshold = 5000;
-				_walkSpeed = 1.38889;
+				_bikeWeight = 2.0;
+				_ivtWeight = 1.0;
+				_carWeight = 1.5;
+				_scanThreshold = 200000.0;
+				_costThreshold = 28800.0;
+				_waitThreshold = 3600.0;
+				_walkThreshold = 5000.0;
+				_walkSpeed = 5.0;
+				_bikeThreshold = 10000.0;
+				_bikeSpeed = 10.0;
 				_debug_route = false;
-				_multimodal_dijkstra = false;
+				_multimodal_dijkstra = true;
 			}
 
 			#pragma region static parameters declaration		
 			m_static_data(float, transferPenalty, NONE, NONE);
 			m_static_data(float, waitWeight, NONE, NONE);
 			m_static_data(float, walkWeight, NONE, NONE);
+			m_static_data(float, bikeWeight, NONE, NONE);
 			m_static_data(float, ivtWeight, NONE, NONE);
 			m_static_data(float, carWeight, NONE, NONE);
 			m_static_data(float, scanThreshold, NONE, NONE);
@@ -307,6 +318,8 @@ namespace Routing_Components
 			m_static_data(float, waitThreshold, NONE, NONE);
 			m_static_data(float, walkThreshold, NONE, NONE);
 			m_static_data(float, walkSpeed, NONE, NONE);
+			m_static_data(float, bikeThreshold, NONE, NONE);
+			m_static_data(float, bikeSpeed, NONE, NONE);
 			m_static_data(bool, debug_route, NONE, NONE);
 			m_static_data(bool, multimodal_dijkstra, NONE, NONE);
 			#pragma endregion
@@ -745,6 +758,7 @@ namespace Routing_Components
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 					float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+					float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
@@ -796,7 +810,11 @@ namespace Routing_Components
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
 							current_link->template min_multi_modal_cost<float>(walkWeight*current_link->template travel_time<float>() );
-							current_link->template walk_length<float>(0.3048 * current_link->template length<float>()); //in meters
+							
+							Feet walk_length_feet = current_link->template length<float>();
+							Meters walk_length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(walk_length_feet);							
+							current_link->template walk_length<float>(walk_length_meters);
+
 							current_link->template drive_time<float>(FLT_MAX / 2.0f);
 							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
 							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
@@ -989,7 +1007,7 @@ namespace Routing_Components
 				bool debug_route,
 				std::string& summary_paragraph,
 				std::string& detail_paragraph,
-				std::string sub_mode)
+				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -1404,6 +1422,7 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, transferPenalty);
 		define_static_member_variable(Routable_Network_Implementation, waitWeight);
 		define_static_member_variable(Routable_Network_Implementation, walkWeight);
+		define_static_member_variable(Routable_Network_Implementation, bikeWeight);
 		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
 		define_static_member_variable(Routable_Network_Implementation, carWeight);
 		define_static_member_variable(Routable_Network_Implementation, scanThreshold);
@@ -1411,6 +1430,8 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, waitThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkSpeed);
+		define_static_member_variable(Routable_Network_Implementation, bikeThreshold);
+		define_static_member_variable(Routable_Network_Implementation, bikeSpeed);
 		define_static_member_variable(Routable_Network_Implementation, debug_route);
 		define_static_member_variable(Routable_Network_Implementation, multimodal_dijkstra);
 		#pragma endregion

@@ -682,13 +682,13 @@ namespace Person_Components
 				act_rec.setStart_Time (act->template Start_Time<Time_Seconds>());
 				act_rec.setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-					act_rec.setMode ("AUTO");
+					act_rec.setMode("SOV");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
-					act_rec.setMode ("HOV");
+					act_rec.setMode("HOV");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)
 					act_rec.setMode("TAXI");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
-					act_rec.setMode ("WALK");
+					act_rec.setMode("WALK");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 					act_rec.setMode("BIKE");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
@@ -696,11 +696,15 @@ namespace Person_Components
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 					act_rec.setMode("PARK_AND_RIDE");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
-					act_rec.setMode ("TRANSIT");
+					act_rec.setMode("TRANSIT");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK)
 					act_rec.setMode("TRUCK");
 				else
-					act_rec.setMode("FAIL");
+				{
+					stringstream s;
+					s << "FAIL: " << act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					act_rec.setMode(s.str());
+				}
 				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());

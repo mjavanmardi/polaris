@@ -610,7 +610,10 @@ namespace Network_Components
 						//	if(num_lanes <= 3) num_lanes = 4;
 						//}
 
-						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+						Meters length_meters = db_itr->getLength();
+						Feet length_feet = GLOBALS::Length_Converter.Convert_Value<Meters, Feet>(length_meters);
+						link->template length<float>(length_feet);
+						//link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 						/*
 						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL")
@@ -854,7 +857,10 @@ namespace Network_Components
 						//	if(num_lanes <= 3) num_lanes = 4;
 						//}
 
-						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+						Meters length_meters = db_itr->getLength();
+						Feet length_feet = GLOBALS::Length_Converter.Convert_Value<Meters, Feet>(length_meters);
+						link->template length<float>(length_feet);
+						//link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 						
 						/*
 						if(facility_type=="MAJOR" || facility_type=="MINOR" || facility_type=="LOCAL")
@@ -1177,7 +1183,10 @@ namespace Network_Components
 							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
 							link->template zone<int>(zone_id);
 
-							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+							Meters length_meters = db_itr->getLength();
+							Feet length_feet = GLOBALS::Length_Converter.Convert_Value<Meters, Feet>(length_meters);
+							link->template length<float>(length_feet);
+							//link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
@@ -1312,7 +1321,10 @@ namespace Network_Components
 							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
 							link->template zone<int>(zone_id);
 
-							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+							Meters length_meters = db_itr->getLength();
+							Feet length_feet = GLOBALS::Length_Converter.Convert_Value<Meters, Feet>(length_meters);
+							link->template length<float>(length_feet);
+							//link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALK);
 
@@ -1379,7 +1391,10 @@ namespace Network_Components
 							int zone_id = link->template upstream_intersection<_Intersection_Interface*>()->template zone<int>();
 							link->template zone<int>(zone_id);
 
-							link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+							Meters length_meters = db_itr->getLength();
+							Feet length_feet = GLOBALS::Length_Converter.Convert_Value<Meters, Feet>(length_meters);
+							link->template length<float>(length_feet);
+							//link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
 
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
 

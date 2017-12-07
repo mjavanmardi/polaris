@@ -446,12 +446,12 @@ namespace Activity_Components
 						std::string bus_mode_paragraph;
 						stringstream bus_mode_stream;
 
-						float walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-						walkThreshold = walkThreshold / 3.0;
+						Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+						Meters walkThreshold_init = walkThreshold / 5.0;
 
 						sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
 							"Child_Forced",
-							walkThreshold,
+							walkThreshold_init,
 							-1.0,
 							move->template origin<_activity_location_itf*>(),
 							move->template destination<_activity_location_itf*>(),

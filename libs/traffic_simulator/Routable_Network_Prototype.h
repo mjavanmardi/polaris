@@ -74,7 +74,7 @@ namespace Routing_Components
 				bool debug_route,
 				std::string& summary_paragraph,
 				std::string& detail_paragraph,
-				std::string sub_mode)
+				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 			{
 				//TODO: Remove when done testing routing execution time
 				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
