@@ -153,13 +153,20 @@ namespace Demand_Components
 				float demand_percentage= scenario->template demand_reduction_factor<float>();
 
 				cout << "Demand Percentage: " << demand_percentage;
-
+				
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 					// perform demand reduction
 					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() > demand_percentage) continue;
 
 					trip_id = db_itr->getPrimaryKey();
+
+
+					if (counter > 100)
+					{
+						cout << "Limiting the number of trips to 10000 for now!!!" << endl;
+						break;
+					}
 
 
 					if (++counter % 100000 == 0)
@@ -242,6 +249,8 @@ namespace Demand_Components
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+
+					traveler->template Initialize<ComponentType::traveler_type>();
 
 					//TODO:ROUTING_OPERATION
 					//router->template traveler<_Traveler_Interface*>(traveler);

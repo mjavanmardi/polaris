@@ -27,32 +27,39 @@ prototype struct Bus : public ComponentType
 };
 implementation struct bus_implementation : public Polaris_Component<MasterType, INHERIT(bus_implementation), polaris::Execution_Object>
 {
+	static int fixe_sub_it ;
+
 	m_data(int, start_time, NONE, NONE);
 	m_data(int, my_bus_number, NONE, NONE);
 	m_prototype(Driver, typename MasterType::driver_type, my_driver, NONE, NONE);
 
 	void initialize(int start_time, requires(ComponentType,check_2(ComponentType,typename MasterType::bus_type,is_base_of)))
 	{
+		fixe_sub_it = 0;
 		_start_time = start_time;
 		Load_Event<typename MasterType::bus_type>(&do_bus_scheduling, start_time, 1);
 	}
 	static void do_bus_scheduling(typename MasterType::bus_type* _this, Event_Response& response)
 	{	
 		response.next._iteration = iteration() + 5;
-		response.next._sub_iteration = 1;
+		response.next._sub_iteration = fixe_sub_it + 5;
+		fixe_sub_it++;
 		_this->do_bus_stuff();
 	}
 	void do_bus_stuff()
 	{
-		cout << "I am a basic bus. My start time is " << this->_start_time << endl;
+		cout << "I am a basic bus. My start time is " << this->_start_time << "\titeration = " << iteration() << "\tSub_iteration = " << sub_iteration() <<  endl;
 	}
 };
+
+template<typename MasterType, typename InheritanceList> int bus_implementation<MasterType, InheritanceList>::fixe_sub_it = 0;
+
 implementation struct cta_bus_implementation : public bus_implementation<MasterType,INHERIT(cta_bus_implementation)>
-{
+{	
 	typedef true_type cta_bus_type;
 	void do_bus_stuff()
 	{
-		cout << "I am a CTA bus, my driver is "<<_my_driver->name<string>() << endl;
+		cout << "I am a CTA bus, my driver is "<<_my_driver->name<string>() << "\titeration = " << iteration() << "\tSub_iteration = " << sub_iteration() << endl;
 	}
 };
 implementation struct pace_bus_implementation : public bus_implementation<MasterType, INHERIT(pace_bus_implementation)>
@@ -62,6 +69,8 @@ implementation struct pace_bus_implementation : public bus_implementation<Master
 	{
 		cout << "I am a pace bus, my driver is " << _my_driver->name<string>() << endl;
 	}
+
+
 };
 
 
@@ -80,12 +89,16 @@ prototype struct Driver : public ComponentType
 };
 implementation struct driver_implementation : public Polaris_Component<MasterType, INHERIT(driver_implementation), polaris::Execution_Object>
 {
+	static int fixe_sub_it ; 
+	
 	m_data(string, name, NONE, NONE);
 	m_prototype(Bus, typename MasterType::bus_type, my_bus, NONE, NONE);
 	m_prototype(Agency, typename MasterType::agency_type, my_agency, NONE, NONE);
 
 	void initialize(int start_time)
 	{
+		fixe_sub_it = 0;
+
 		cout << "Initializing " << _name << endl;
 
 		this->my_bus(Allocate <typename MasterType::bus_type>());
@@ -98,21 +111,26 @@ implementation struct driver_implementation : public Polaris_Component<MasterTyp
 	}
 	static void Do_driver_event(typename MasterType::driver_type* _this, Event_Response& response)
 	{
-		response.next._iteration = iteration() + 2;
-		response.next._sub_iteration = 0;
+		response.next._iteration = iteration() + 3;
+		response.next._sub_iteration = fixe_sub_it  + 3;
+		fixe_sub_it++;
 		_this->Do_driver_stuff<NT>();
 	}
 	template <typename T> void Do_driver_stuff()
 	{
-		cout << "I am basic driver " << _name << ", the time is " << iteration() << endl;
+		cout << "I am basic driver " << _name << ", the time is " << iteration() << "\titeration = " << iteration() << "\tSub_iteration = " << sub_iteration() << endl;
 	}
 	
 };
+
+template<typename MasterType, typename InheritanceList> int driver_implementation<MasterType, InheritanceList>::fixe_sub_it = 0;
+
+
 implementation struct cta_driver_implementation : public driver_implementation<MasterType,INHERIT(cta_driver_implementation)>
 {
 	template <typename T> void Do_driver_stuff(requires(T, check_2(my_bus_component_type, cta_bus_implementation<MasterType>, is_same)))
 	{
-		cout << "I am CTA driver " << _name << ", the time is " << iteration() << endl;
+		cout << "I am CTA driver " << _name << ", the time is " << iteration() << "\titeration = " << iteration() << "\tSub_iteration = " << sub_iteration() << endl;
 	}
 	template <typename T> void Do_driver_stuff(requires(T, !check_2(my_bus_component_type, cta_bus_implementation<MasterType>, is_same)))
 	{
@@ -124,7 +142,7 @@ implementation struct pace_driver_implementation : public driver_implementation<
 {
 	template <typename T> void Do_driver_stuff(requires(T, check_2(my_bus_component_type, pace_bus_implementation<MasterType>, is_same)))
 	{
-		cout << "I am Pace driver " << _name << ", the time is " << iteration() << endl;
+		cout << "I am Pace driver " << _name << ", the time is " << iteration() << "\titeration = " << iteration() << "\tSub_iteration = " << sub_iteration() << endl;
 	}
 	template <typename T> void Do_driver_stuff(requires(T, !check_2(my_bus_component_type, pace_bus_implementation<MasterType>, is_same)))
 	{
@@ -180,7 +198,7 @@ int main(int argc, char* argv[])
 {
 	// There are several pre-set configurations
     polaris::Simulation_Configuration cfg;
-	cfg.Single_Threaded_Setup(10); // do either single threaded and give iterations, or multi-threaded and also give number of threads
+	cfg.Single_Threaded_Setup(20); // do either single threaded and give iterations, or multi-threaded and also give number of threads
     INITIALIZE_SIMULATION(cfg);
 
 	// Add your own set up code - make sure all execution agents have an event loaded.

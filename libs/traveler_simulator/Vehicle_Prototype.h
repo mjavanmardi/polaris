@@ -94,6 +94,9 @@ namespace Vehicle_Components
 			template<typename TargetType> void initialize(TargetType characteristics, int hh_id);
 			template<typename TargetType> void initialize(int num_vehicles, float* data);
 
+			accessor(Vehicle_Platooning_Faculty, NONE, NONE);
+			template<typename TargetType> void initialize_platooning();
+
 			template<typename PersonItfType> void Assign_To_Person(PersonItfType person_ptr, requires(PersonItfType, check(PersonItfType, is_pointer)));
 			void Unassign_From_Person();
 
@@ -197,6 +200,13 @@ namespace Vehicle_Components
 		void Vehicle<ComponentType>::initialize(int num_vehicles, float* data)
 		{
 			this_component()->template initialize< TargetType>(num_vehicles, data);
+		}
+
+		template<typename ComponentType>
+		template<typename TargetType>
+		void Vehicle<ComponentType>::initialize_platooning()
+		{
+			this_component()->template initialize_platooning< TargetType>();
 		}
 
 		template<typename ComponentType>

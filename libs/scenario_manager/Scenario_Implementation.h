@@ -281,6 +281,8 @@ namespace Scenario_Components
 
 			m_data(double, accident_event_duration_reduction, NONE, NONE);
 
+			m_data(string, platooning_method, NONE, NONE);
+
 			Scenario_Implementation()
 			{
 				UNLOCK(_statistics_update_lock);

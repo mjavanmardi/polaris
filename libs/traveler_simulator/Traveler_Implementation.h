@@ -1,6 +1,8 @@
 #pragma once
 #include "Traveler_Prototype.h"
 
+#include "C:\Mahmoud\Projects\Platooning\polaris\apps\integrated_abm\Coordinated_Platooning.h"
+
 namespace Traveler_Components
 {
 	namespace Types
@@ -55,6 +57,12 @@ namespace Traveler_Components
 				// other stuff than routing
 				this->template Load_Event<ComponentType>(&Initiate_Departure_Conditional,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION);
 			}
+			
+			template<typename TargetType> void Initialize();
+
+			m_prototype(Platoon_Components::Prototypes::Person_Platooning, typename MasterType::person_platooning_type, Platooning_Faculty, NONE, NONE);
+			typedef Platoon_Components::Prototypes::Person_Platooning<type_of(Platooning_Faculty)> Platooning_Faculty_interface;
+
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
@@ -63,6 +71,25 @@ namespace Traveler_Components
 			m_prototype(Vehicle_Components::Prototypes::Vehicle,typename MasterType::vehicle_type, vehicle, NONE, NONE);
 			//m_prototype(Null_Prototype,typename MasterType::plan_type>, plan, NONE, NONE);
 		};
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Traveler_Implementation<MasterType, InheritanceList>::Initialize()
+		{
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+
+			if (scenario->platooning_method<string>() == "coordinated_Jeff")
+			{
+				// Platooning faculty
+				_Platooning_Faculty = (Platooning_Faculty_interface*)Allocate<type_of(Platooning_Faculty)>();
+				//_Platoon_Faculty->template Parent_Person<ComponentType*>(this);
+				_Platooning_Faculty->template Initialize<NULLTYPE>(5 * 60);
+
+				//this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			}
+		}
 	}
 
 }

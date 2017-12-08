@@ -9,6 +9,7 @@
 #include "Activity_Prototype.h"
 
 
+
 namespace Person_Components
 {
 	namespace Implementations
@@ -43,6 +44,7 @@ namespace Person_Components
 			
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location,typename MasterType::activity_location_type, current_location, NONE, NONE);
 
+			
 
 			// quick fix for moving network and scenario handling to the perception class
 			typedef typename type_of(Perception_Faculty)::type_of(Network) network_reference_accessible_type;
@@ -88,6 +90,9 @@ namespace Person_Components
 			typedef Prototypes::Person_Planner<type_of(Planning_Faculty)> Planning_Faculty_interface;
 			typedef Prototypes::Person_Scheduler<type_of(Scheduling_Faculty)> Scheduling_Faculty_interface;
 			typedef Prototypes::Person_Perception<type_of(Perception_Faculty)> Perception_Faculty_interface;
+			
+			
+			
 			typedef Routing_Components::Prototypes::Routing<type_of(router)> router_interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<type_of(vehicle)> vehicle_interface;
 
@@ -218,6 +223,9 @@ namespace Person_Components
 			_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
 			_vehicle = nullptr;
+
+
+
 
 			// Create and Initialize the vehicle		
 			//_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	

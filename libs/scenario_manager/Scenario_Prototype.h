@@ -186,6 +186,13 @@ namespace Scenario_Components
 			accessor(vehicle_distribution_file_name, NONE, NONE);	// file containing the vehicle type distribution by taz
 
 			//===============================================
+			// Platoon information
+			//-----------------------------------------------
+			accessor(platooning_method, NONE, NONE);				// for now just considers coordinated platooning
+			
+
+
+			//===============================================
 			// Popsyn parameters
 			//-----------------------------------------------
 			accessor(percent_to_synthesize, NONE, NONE);			// percent to synthesize 0-1.0, setting to 0 will run only fixed demand
@@ -442,6 +449,8 @@ namespace Scenario_Components
 				cav_wtp_model_file<string>((string)"");
 				cacc_capacity_adjustment_alpha<double>(1.0121);
 				cacc_capacity_adjustment_beta<double>(2.4697);
+
+				platooning_method<string>((string)"");
 			}
 
 			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)
@@ -478,7 +487,7 @@ namespace Scenario_Components
 
 				// now see if there are config file changes
 				Scenario_Components::Types::ScenarioData document;
-
+				
 				if (!parse_option_file(document, filename))
 					THROW_EXCEPTION("Scenario file '" << filename << "' was not able to be opened.");
 
@@ -653,6 +662,9 @@ namespace Scenario_Components
 				set_parameter<std::string>(document, "vehicle_distribution_file_name", this->template vehicle_distribution_file_name<std::string &>());
 				set_parameter<double>(document, "automation_cost", this->template automation_cost<double &>());
 
+				//=======================================================================================================================================================
+				// Platooning Information				
+				set_parameter<std::string>(document, "platooning_method", platooning_method<std::string &>());
 
 				//=======================================================================================================================================================
 				// PopSyn parameters

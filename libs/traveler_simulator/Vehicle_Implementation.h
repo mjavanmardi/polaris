@@ -4,6 +4,9 @@
 #include "Movement_Plan_Prototype.h"
 #include "../repository/RNG_Implementations.h"
 
+#include "C:\Mahmoud\Projects\Platooning\polaris\apps\integrated_abm\Coordinated_Platooning.h"
+
+
 namespace Vehicle_Components
 {
 	namespace Concepts
@@ -40,8 +43,7 @@ namespace Vehicle_Components
 
 			template <typename T> void initialize(T db_itr, requires(T, check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same)));
             template <typename T, requires(T, !check_2(shared_ptr<typename MasterType::vehicle_type_db_rec_type>, T, is_same))>
-			void initialize(T db_itr);
-
+			void initialize(T db_itr);			
 		};
 
 		template<typename MasterType, typename InheritanceList>
@@ -161,6 +163,9 @@ namespace Vehicle_Components
 			m_data(int, last_enroute_switching_route_check_time, NONE, NONE);
 			m_data(int, entry_queue_length, NONE, NONE);
 
+			m_prototype(Platoon_Components::Prototypes::Vehicle_Platooning, typename MasterType::vehicle_platooning_type, Vehicle_Platooning_Faculty, NONE, NONE);
+			typedef Platoon_Components::Prototypes::Vehicle_Platooning<type_of(Vehicle_Platooning_Faculty)> Vehicle_Platooning_Faculty_interface;
+
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
@@ -249,6 +254,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void initialize(TargetType characteristics, int household_id);
 			template<typename TargetType> void initialize();
+			template<typename TargetType> void initialize_platooning();
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination);
 		};
@@ -1166,6 +1172,8 @@ namespace Vehicle_Components
 
 			initialize<NT>();
 
+			initialize_platooning<NT>();
+
 			// create db_pointer
 			_vehicle_ptr = make_shared<polaris::io::Vehicle>();
 			_vehicle_ptr->setHhold(household_id);
@@ -1265,6 +1273,28 @@ namespace Vehicle_Components
 
 		}
 
+		
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Vehicle_Implementation<MasterType, InheritanceList>::initialize_platooning()
+		{
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+
+			if (scenario->platooning_method<string>() == "coordinated_Jeff")
+			{
+			//	// Platooning faculty
+				_Vehicle_Platooning_Faculty = (Vehicle_Platooning_Faculty_interface*)Allocate<type_of(Vehicle_Platooning_Faculty)>();
+			//	//_Platoon_Faculty->template Parent_Person<ComponentType*>(this);
+				_Vehicle_Platooning_Faculty->template Initialize<NULLTYPE>(5 * 60);
+
+			//	//this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			}
+		}
+
+		
+		
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType>
 		void Vehicle_Implementation<MasterType, InheritanceList>::update_eta(float& current_route_time_to_destination)

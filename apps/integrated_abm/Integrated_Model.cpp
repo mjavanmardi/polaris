@@ -35,6 +35,8 @@
 #include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
+#include "Coordinated_Platooning.h"
+
 
 struct MasterType
 {
@@ -118,6 +120,12 @@ struct MasterType
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
+	
+	typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
+	typedef Platoon_Components::Implementations::Coordinated_Platooning_Implementation<M> platooning_type;	
+	typedef Platoon_Components::Implementations::Vehicle_Platooning_Implementation<M> vehicle_platooning_type;
+	
+	
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
@@ -142,6 +150,7 @@ struct MasterType
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	typedef Household_Components::Implementations::UIC_Vehicle_Technology_Chooser_Implementation<M> vehicle_technology_chooser_type;
 	
+	typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
 	typedef Activity_Components::Implementations::Basic_Activity_Plan_Implementation<M> activity_type;
@@ -229,6 +238,7 @@ struct MasterType
 	typedef TYPELIST_3(/*link_control_type,depot_type,*/advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+	
 	#pragma endregion
 
 	//==============================================================================================
@@ -548,6 +558,14 @@ int main(int argc,char** argv)
 
 	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
 
+	if (scenario->platooning_method<string>() == "Coordinated_Jeff")
+	{
+		//typedef Platooning<typename MasterType::platooning_type> _Platooning_Interface;
+		typedef Coordinated_Platooning<typename MasterType::platooning_type> _Coordinated_Platooning_Interface;
+		_Coordinated_Platooning_Interface* platooning = (_Coordinated_Platooning_Interface*)Allocate<typename MasterType::platooning_type>();
+		platooning->Initialize<typename MasterType::platooning_type>(6 * 60);
+	}
+
 	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 
 	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
@@ -769,7 +787,7 @@ int main(int argc,char** argv)
 	{
 		popsyn->Read_From_Database<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 	}
-	else
+	else if (scenario->percent_to_synthesize<double>() > 0)
 	{
 		popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 	}

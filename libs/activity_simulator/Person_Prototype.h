@@ -137,6 +137,8 @@ namespace Prototypes
 		accessor(vehicle, NONE, NONE);
 		accessor(has_done_replanning, NONE, NONE);
 		
+		
+
 		accessor(has_pretrip_information, NONE, NONE);
 
 		// External knowledge accessor
