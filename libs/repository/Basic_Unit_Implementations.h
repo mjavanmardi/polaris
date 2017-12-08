@@ -92,6 +92,7 @@ typedef Basic_Units::Implementations::Currency_Implementation<NT> Basic_Currency
 typedef Basic_Units::Implementations::Length_Implementation<NT> Basic_Length;
 typedef Basic_Units::Implementations::Area_Implementation<NT> Basic_Area;
 typedef Basic_Units::Implementations::Speed_Implementation<NT> Basic_Speed;
+typedef Basic_Units::Implementations::Acceleration_Implementation<NT> Basic_Acceleration;
 
 template<typename Base_Time_Type>
 struct _Simulation_Timer
@@ -133,8 +134,9 @@ static Basic_Units::Prototypes::Currency<Basic_Currency> Currency_Converter;
 static Basic_Units::Prototypes::Length<Basic_Length> Length_Converter;
 static Basic_Units::Prototypes::Area<Basic_Area> Area_Converter;
 static Basic_Units::Prototypes::Speed<Basic_Speed> Speed_Converter;
+static Basic_Units::Prototypes::Acceleration<Basic_Acceleration> Acceleration_Converter;
 
-template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Time_Value) && !check(Output_Unit_Type,Basic_Units::Concepts::Is_Speed_Value)))
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Time_Value) && !check(Output_Unit_Type,Basic_Units::Concepts::Is_Speed_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Acceleration_Value)))
 {
 	return Time_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
@@ -142,7 +144,7 @@ template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type C
 {
 	return Currency_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
-template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Length_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Area_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Speed_Value)))
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Length_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Area_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Speed_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Acceleration_Value)))
 {
 	return Length_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
@@ -150,9 +152,13 @@ template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type C
 {
 	return Area_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
-template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Speed_Value)))
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Speed_Value) && !check(Output_Unit_Type, Basic_Units::Concepts::Is_Acceleration_Value)))
 {
 	return Speed_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
+}
+template<typename Input_Unit_Type, typename Output_Unit_Type> Output_Unit_Type Convert_Units(Input_Unit_Type value, requires(Output_Unit_Type, check(Output_Unit_Type, Basic_Units::Concepts::Is_Acceleration_Value)))
+{
+	return Acceleration_Converter.Convert_Value<Input_Unit_Type, Output_Unit_Type>(value);
 }
 
 }

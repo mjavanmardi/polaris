@@ -178,6 +178,13 @@ struct MasterType
 
 int main(int argc, char* argv[])
 {
+
+	cout << GLOBALS::Convert_Units<Square_Miles, Square_Kilometers>(1.0)<<endl;
+	cout << GLOBALS::Convert_Units<Kilometers_Per_Hour, Miles_Per_Hour>(100.0) << endl;
+	cout << GLOBALS::Convert_Units<Meters_Per_Second_Squared, Feet_Per_Second_Squared>(9.81)<<endl;
+	cout << GLOBALS::Convert_Units<Time_Seconds, Time_Days>(86400.0) << endl << endl;
+
+
 	// There are several pre-set configurations
     polaris::Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(10); // do either single threaded and give iterations, or multi-threaded and also give number of threads
