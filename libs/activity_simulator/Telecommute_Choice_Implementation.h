@@ -158,38 +158,40 @@ namespace Person_Components
 
 			static void default_static_initializer()
 			{
-				_Z_CONSTANT = -0.98;
-				_Z_MALE = 0.26;
-				_Z_INCOME_LOW = -0.64;
-				_Z_EDUC_NO_COLLEGE = -0.67;
-				_Z_WORK_TRIP_DIST = 0.22;
-				_Z_NWORKERS = 0.18;
-				_Z_FLEX_WORK_INDICATOR = 0.89;
-				_Z_OCC_TRANS_UTILITY = -0.24;
-				_Z_OCC_MANAGEMENT = -0.61;
-				_Z_OCC_SERVICE = -0.38;
-				_Z_EMP_DENSITY_OVER_20000 = 0.34;
-				_Z_POP_DENSITY = -0.07;
+				_Z_CONSTANT = 0.0;
+				_Z_MALE = 0.0;
+				_Z_INCOME_LOW = 0.0;
+				_Z_EDUC_NO_COLLEGE = 0.0;
+				_Z_WORK_TRIP_DIST = 0.0;
+				_Z_NWORKERS = 0.0;
+				_Z_FLEX_WORK_INDICATOR = 0.0;
+				_Z_OCC_TRANS_UTILITY = 0.0;
+				_Z_OCC_MANAGEMENT = 0.0;
+				_Z_OCC_SERVICE = 0.0;
+				_Z_EMP_DENSITY_OVER_20000 = 0.0;
+				_Z_POP_DENSITY = 0.0;
 
-				_O_CONSTANT = -0.62;
-				_O_INCOME_MED = 0.49;
-				_O_AGE_35_55 = 0.2;
-				_O_EDUC_GRAD_DEGREE = 0.31;
-				_O_WORK_TRIP_TTIME = 0.23;
-				_O_NVEHICLE = 0.14;
-				_O_FLEX_WORK_INDICATOR = 0.82;
-				_O_OCC_GOVERNMENT = -0.23;
-				_O_OCC_COMMUNICATION = 0.31;
-				_O_OCC_MANUFACTURING = -0.16;
-				_O_EMP_DENSITY_UNDER_3000 = -0.22;
+				_O_CONSTANT = 0.0;
+				_O_INCOME_MED = 0.0;
+				_O_AGE_35_55 = 0.0;
+				_O_EDUC_GRAD_DEGREE = 0.0;
+				_O_WORK_TRIP_TTIME = 0.0;
+				_O_NVEHICLE = 0.0;
+				_O_FLEX_WORK_INDICATOR = 0.0;
+				_O_OCC_GOVERNMENT = 0.0;
+				_O_OCC_COMMUNICATION = 0.0;
+				_O_OCC_MANUFACTURING = 0.0;
+				_O_EMP_DENSITY_UNDER_3000 = 0.0;
 
-				_T_WORK_DURATION = -0.03;
-				_T_VEH_AVAILABLE = -0.11;
-				_T_HH_VEH_OVER_2_INDICATOR = 0.26;
-				_T_C1 = -1.6;
-				_T_C2 = -0.47;
-				_T_C3 = 0.43;
-				_T_RHO = 0.28;
+				_T_WORK_DURATION = 0.0;
+				_T_VEH_AVAILABLE = 0.0;
+				_T_HH_VEH_OVER_2_INDICATOR = 0.0;
+				_T_C1 = 0.0;
+				_T_C2 = 0.0;
+				_T_C3 = 0.0;
+				_T_RHO = 0.0;
+
+
 			}
 			
 			//===========================================================================================================================================
