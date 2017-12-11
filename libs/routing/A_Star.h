@@ -291,7 +291,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route, std::string& summary_paragraph)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, int time_index, bool debug_route, std::string& summary_paragraph)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -339,7 +339,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-			start->cost_from_origin(start_link->min_multi_modal_cost<float>());
+			start->cost_from_origin(start_link->template min_multi_modal_cost<std::vector<float>&>()[time_index]);
 			//start->cost_from_origin(start->_min_multi_modal_cost);
 			
 			float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -372,7 +372,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+				connection_set_iterator = connection_set_iterator->Visit_Tree_Neighbors(agent, current, routing_data, time_index);
 			}
 
 		}			
@@ -401,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index] = current->_cost_from_origin;
+			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index][time_index] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -687,12 +687,11 @@ namespace polaris
 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-		
-		//TODO OMER JOSH
+				
 		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-		Meters_Per_Second walkSpeed_mps = walkSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
+		Meters_Per_Second walkSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
 		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
-		Meters_Per_Second bikeSpeed_mps = bikeSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
+		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
 		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
 
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
@@ -817,7 +816,8 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra);
+			int time_index = floor(start->time_label()/7200.0);
+			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra, sub_mode, time_index);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));

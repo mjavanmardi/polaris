@@ -780,36 +780,43 @@ namespace Routing_Components
 						
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
-							int my_itr = 0;
-							float min_travel_time = FLT_MAX / 2.0f;
-
-							for (auto patterns_itr = current_link->unique_patterns<Unique_Patterns_Container_Interface&>().begin(); patterns_itr != current_link->unique_patterns<Unique_Patterns_Container_Interface&>().end(); ++patterns_itr)
+							for (int time_itr = 0; time_itr < 12; time_itr++)
 							{
-								_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
-								input_multimodal_edge._unique_patterns.push_back(current_pattern);
-								int mySeq = current_link->index_along_pattern_at_upstream_node<Index_Along_Pattern_Container_Interface&>()[my_itr];
-								input_multimodal_edge._index_along_pattern_at_upstream_node.push_back(mySeq);
-								for (auto trips_itr = current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().begin(); trips_itr != current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().end(); ++trips_itr)
-								{
-									_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-									float temp_travel_time = current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq + 1) - current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq);
-									if (temp_travel_time < min_travel_time)
-									{
-										min_travel_time = temp_travel_time;
-									}
-								}
-								my_itr++;
-							}
+								int my_itr = 0;
+								float min_travel_time = FLT_MAX / 2.0f;
 
-							current_link->template min_multi_modal_cost<float>(ivtWeight * min_travel_time);
+								for (auto patterns_itr = current_link->unique_patterns<Unique_Patterns_Container_Interface&>().begin(); patterns_itr != current_link->unique_patterns<Unique_Patterns_Container_Interface&>().end(); ++patterns_itr)
+								{
+									_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
+									input_multimodal_edge._unique_patterns.push_back(current_pattern);
+									int mySeq = current_link->index_along_pattern_at_upstream_node<Index_Along_Pattern_Container_Interface&>()[my_itr];
+									input_multimodal_edge._index_along_pattern_at_upstream_node.push_back(mySeq);
+									for (auto trips_itr = current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().begin(); trips_itr != current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().end(); ++trips_itr)
+									{
+										_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
+										float temp_travel_time = current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq + 1) - current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq);
+										if (temp_travel_time < min_travel_time && current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq) < 7200* (time_itr+1) && current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq) >= 7200 * (time_itr))
+										{
+											min_travel_time = temp_travel_time;
+										}
+									}
+									my_itr++;
+								}
+
+								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(ivtWeight * min_travel_time);
+							}
 							current_link->template walk_length<float>(FLT_MAX / 2.0f);
 							current_link->template drive_time<float>(FLT_MAX / 2.0f);
 							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
 							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
+							
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							current_link->template min_multi_modal_cost<float>(walkWeight*current_link->template travel_time<float>() );
+							for (int time_itr = 0; time_itr < 12; time_itr++)
+							{
+								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(walkWeight*current_link->template travel_time<float>());
+							}
 							
 							Feet walk_length_feet = current_link->template length<float>();
 							Meters walk_length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(walk_length_feet);							
@@ -821,7 +828,10 @@ namespace Routing_Components
 						}
 						else
 						{
-							current_link->template min_multi_modal_cost<float>(carWeight*current_link->template travel_time<float>() );
+							for (int time_itr = 0; time_itr < 12; time_itr++)
+							{
+								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(carWeight*current_link->template travel_time<float>());
+							}
 							current_link->template walk_length<float>(FLT_MAX / 2.0f);
 							current_link->template drive_time<float>(current_link->template travel_time<float>() );
 							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
@@ -1142,15 +1152,19 @@ namespace Routing_Components
 
 				for (auto orig_zone_itr = origin_zones->begin(); orig_zone_itr != origin_zones->end(); orig_zone_itr++)
 				{
-					_Routing_Interface* dijkstra_router = (_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-					_Zone_Interface* origin_zone = (_Zone_Interface*)(orig_zone_itr->second);
-					dijkstra_router->origin_zone(origin_zone);
-					dijkstra_router->template network<_Network_Interface*>(network);
-					dijkstra_router->Schedule_Route_Computation(iteration());
+					for (int time_index = 0; time_index < 12; time_index++)
+					{
+						_Routing_Interface* dijkstra_router = (_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
+						_Zone_Interface* origin_zone = (_Zone_Interface*)(orig_zone_itr->second);
+						dijkstra_router->template origin_zone<_Zone_Interface*>(origin_zone);
+						dijkstra_router->template time_index<int>(time_index);
+						dijkstra_router->template network<_Network_Interface*>(network);
+						dijkstra_router->Schedule_Route_Computation(iteration());
+					}
 				}
 			}
 
-			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route, std::string& summary_paragraph)
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, int time_index, bool debug_route, std::string& summary_paragraph)
 			{		
 				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
 
@@ -1172,7 +1186,7 @@ namespace Routing_Components
 
 				if (!starts.empty())
 				{
-					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route, summary_paragraph);
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, time_index, debug_route, summary_paragraph);
 				}
 
 

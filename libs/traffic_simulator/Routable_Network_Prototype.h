@@ -96,9 +96,9 @@ namespace Routing_Components
 				return this_component()->schedule_dijkstra_network_tree(source_network);
 			}
 
-			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route, std::string& summary_paragraph)
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, int time_index, bool debug_route, std::string& summary_paragraph)
 			{
-				return this_component()->compute_dijkstra_network_tree(origins, zone_index, debug_route, summary_paragraph);
+				return this_component()->compute_dijkstra_network_tree(origins, zone_index, time_index, debug_route, summary_paragraph);
 			}
 
 			template<typename Source_Network_Type>
