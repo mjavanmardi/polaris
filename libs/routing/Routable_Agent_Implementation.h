@@ -68,7 +68,7 @@ namespace polaris
 
 			typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 			typedef Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
-			typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
+			typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link)> _Heuristic_Cost_Container_Interface;
 
 
 			if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
@@ -103,7 +103,7 @@ namespace polaris
 						_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
 						_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 
-						float temp_cost = destination_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[current_link->zone_index<int>()][time_index];
+						float temp_cost = destination_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()[current_link->zone_index<int>()][time_index];
 						cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 						dest_ctr++;
 					}

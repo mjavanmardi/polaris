@@ -304,7 +304,7 @@ namespace polaris
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
+		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link)> _Heuristic_Cost_Container_Interface;
 		
 		int graph_id = start_ids.front().graph_id;
 
@@ -401,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index][time_index] = current->_cost_from_origin;
+			current_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()[zone_index][time_index] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -700,6 +700,8 @@ namespace polaris
 		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
 		float costThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::costThreshold<float>();
 
+		 
+
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
 
 		int graph_id = start_ids.front().graph_id;
@@ -746,6 +748,14 @@ namespace polaris
 			ends.push_back((base_edge_type*)end);
 		}
 		base_edge_type* end_base = (base_edge_type*)end;
+
+		Feet Distance_x = start_base->_x - end_base->_x;
+		Feet Distance_y = start_base->_y - end_base->_y;
+		Feet Euc_Distance_ft = sqrt(Distance_x*Distance_x + Distance_y*Distance_y);
+		Kilometers Euc_Distance_km = GLOBALS::Convert_Units<Feet, Kilometers>(Euc_Distance_ft);
+		float scanThreshold2 = Euc_Distance_km * 2500;
+
+
 
 		/*std::vector<base_edge_type*> tr_ends;
 		A_Star_Edge<base_edge_type>* tr_end;
@@ -873,16 +883,12 @@ namespace polaris
 			}*/
 			
 			current_fail = current;
-			if (current->_cost_from_origin > costThreshold)
+			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
 			{
 				//current_fail = current;
 				break;
 			}
-			else if (scanCount > (int)scanThreshold)
-			{
-				//current_fail = current;
-				break;
-			}
+
 			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
 				success = true;

@@ -780,6 +780,7 @@ namespace Routing_Components
 						
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
+							current_link->template min_multi_modal_cost<std::vector<float>&>().resize(12);
 							for (int time_itr = 0; time_itr < 12; time_itr++)
 							{
 								int my_itr = 0;
@@ -803,7 +804,7 @@ namespace Routing_Components
 									my_itr++;
 								}
 
-								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(ivtWeight * min_travel_time);
+								current_link->template min_multi_modal_cost<std::vector<float>&>()[time_itr] = ivtWeight * min_travel_time;
 							}
 							current_link->template walk_length<float>(FLT_MAX / 2.0f);
 							current_link->template drive_time<float>(FLT_MAX / 2.0f);

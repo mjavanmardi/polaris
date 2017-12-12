@@ -103,7 +103,7 @@ namespace Link_Components
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(unique_patterns, NONE, NONE);	
 			accessor(index_along_pattern_at_upstream_node, NONE, NONE);
-			accessor(heur_cost_to_dest, NONE, NONE);
+			accessor(heur_cost_from_a_zone_to_this_link, NONE, NONE);
 			accessor(min_multi_modal_cost, NONE, NONE);
 			accessor(walk_length, NONE, NONE);
 			accessor(walk_distance_to_transit, NONE, NONE);
