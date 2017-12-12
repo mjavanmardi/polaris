@@ -395,7 +395,7 @@ int main(int argc,char** argv)
 		fw_mm_sp_details.Write(details_title);
 
 		stringstream summary_title("");
-		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tSub_Mode\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time\tSuccess_Status\n";
+		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tSub_Mode\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time\tSuccess_Status\tEuc_Dist_km\n";
 		//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
 		stringstream summary_filename("");
 		summary_filename << scenario->template output_dir_name<string>();
