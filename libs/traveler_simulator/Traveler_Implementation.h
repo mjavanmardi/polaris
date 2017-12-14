@@ -1,7 +1,7 @@
 #pragma once
 #include "Traveler_Prototype.h"
 
-#include "C:\Mahmoud\Projects\Platooning\polaris\apps\integrated_abm\Coordinated_Platooning.h"
+//#include "C:\Mahmoud\Projects\Platooning\polaris\apps\integrated_abm\Coordinated_Platooning.h"
 
 namespace Traveler_Components
 {
@@ -80,15 +80,15 @@ namespace Traveler_Components
 			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 
-			if (scenario->platooning_method<string>() == "coordinated_Jeff")
-			{
+			//if (scenario->platooning_method<string>() == "coordinated_Jeff")
+			//{
 				//// Platooning faculty
 				//_Platooning_Faculty = (Platooning_Faculty_interface*)Allocate<type_of(Platooning_Faculty)>();
 				////_Platoon_Faculty->template Parent_Person<ComponentType*>(this);
 				//_Platooning_Faculty->template Initialize<NULLTYPE>(5 * 60);
 
 				////this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
-			}
+			//}
 		}
 	}
 
