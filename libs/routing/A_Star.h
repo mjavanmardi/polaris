@@ -304,7 +304,7 @@ namespace polaris
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link)> _Heuristic_Cost_Container_Interface;
+		typedef typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link) _Heuristic_Cost_Container_Interface;
 		
 		int graph_id = start_ids.front().graph_id;
 
@@ -401,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()[zone_index][time_index] = current->_cost_from_origin;
+			current_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()(zone_index, time_index) = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -827,6 +827,7 @@ namespace polaris
 			start_t->_transfer_pen_from_origin = 0;
 
 			int time_index = floor(start->time_label()/7200.0);
+			if (time_index > 11) time_index = 11;
 			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra, sub_mode, time_index);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 

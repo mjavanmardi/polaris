@@ -2066,16 +2066,7 @@ namespace Network_Components
 
 						int zone_index = zone->template internal_id<int>();
 						link->zone_index(zone_index);
-						link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>().resize(zone_count);						
-						for (int zone_ctr = 0; zone_ctr < zone_count; zone_ctr++)
-						{
-							link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>()[zone_ctr].resize(12);
-							for (int time_ctr = 0; time_ctr < 12; time_ctr++)
-							{
-								link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>()[zone_ctr][time_ctr] = FLT_MAX / 2.0f;
-							}
-						}
-
+						link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>().resize(zone_count,12, FLT_MAX / 2.0f);
 					}
 				}
 			}

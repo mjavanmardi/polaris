@@ -371,6 +371,7 @@ namespace polaris
 							seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 							int time_index = floor(seq_edge->time_label() / 7200.0);
+							if (time_index > 11) time_index = 11;
 							float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index);
 							seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -430,9 +431,9 @@ namespace polaris
 
 				int trips_size = next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>().size();
 				int trips_ctr = 0;
-				bool trip_found = false;
+				//bool trip_found = false;
 
-				while (trips_ctr < trips_size && !trip_found)
+				while (trips_ctr < trips_size /*&& !trip_found*/)
 				{
 					_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>()[trips_ctr];
 					
@@ -447,12 +448,12 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold*5)
+					if (waitTime > waitThreshold /**5*/)
 					{
 						break;
 					}
 
-					trip_found = true;
+					//trip_found = true;
 
 					Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 					if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
@@ -467,7 +468,7 @@ namespace polaris
 					int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
 					int TransferCount = std::max(WaitingCount - 1, 0);
-					int nonHomeWait = 0;
+					/*int nonHomeWait = 0;
 					if (TransferCount > 0)
 					{
 						nonHomeWait = 1;
@@ -475,7 +476,7 @@ namespace polaris
 						{
 							break;
 						}
-					}
+					}*/
 
 					float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 
@@ -512,6 +513,7 @@ namespace polaris
 						current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
 						int time_index = floor(current_neighbor->time_label() / 7200.0);
+						if (time_index > 11) time_index = 11;
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index);
 						current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -576,6 +578,7 @@ namespace polaris
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 				
 				int time_index = floor(current_neighbor->time_label() / 7200.0);
+				if (time_index > 11) time_index = 11;
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -644,6 +647,7 @@ namespace polaris
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
 				int time_index = floor(current_neighbor->time_label() / 7200.0);
+				if (time_index > 11) time_index = 11;
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -677,6 +681,7 @@ namespace polaris
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
 			int time_index = floor((current->time_label() + time_cost_between) / 7200.0);
+			if (time_index > 11) time_index = 11;
 			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index);
 			if (carWeight*(current->_car_time_from_origin + time_cost_between) > heuristicPortion)
 			{
@@ -701,8 +706,7 @@ namespace polaris
 				current_neighbor->_ivt_time_from_origin = current->_ivt_time_from_origin;
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
-
-				int time_index = floor(current_neighbor->time_label() / 7200.0);
+								
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + heuristicPortion;
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);			
 

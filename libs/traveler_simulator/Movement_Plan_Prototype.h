@@ -498,6 +498,9 @@ namespace Movement_Plan_Components
 			{
 				this_component()->Display_Movement();
 			}
+
+			void set_multimodal_trajectory()
+			{}
 		};
 	}
 }
