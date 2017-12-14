@@ -60,8 +60,8 @@ namespace Traveler_Components
 			
 			template<typename TargetType> void Initialize();
 
-			m_prototype(Platoon_Components::Prototypes::Person_Platooning, typename MasterType::person_platooning_type, Platooning_Faculty, NONE, NONE);
-			typedef Platoon_Components::Prototypes::Person_Platooning<type_of(Platooning_Faculty)> Platooning_Faculty_interface;
+			//m_prototype(Platoon_Components::Prototypes::Person_Platooning, typename MasterType::person_platooning_type, Platooning_Faculty, NONE, NONE);
+			//typedef Platoon_Components::Prototypes::Person_Platooning<type_of(Platooning_Faculty)> Platooning_Faculty_interface;
 
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -82,12 +82,12 @@ namespace Traveler_Components
 
 			if (scenario->platooning_method<string>() == "coordinated_Jeff")
 			{
-				// Platooning faculty
-				_Platooning_Faculty = (Platooning_Faculty_interface*)Allocate<type_of(Platooning_Faculty)>();
-				//_Platoon_Faculty->template Parent_Person<ComponentType*>(this);
-				_Platooning_Faculty->template Initialize<NULLTYPE>(5 * 60);
+				//// Platooning faculty
+				//_Platooning_Faculty = (Platooning_Faculty_interface*)Allocate<type_of(Platooning_Faculty)>();
+				////_Platoon_Faculty->template Parent_Person<ComponentType*>(this);
+				//_Platooning_Faculty->template Initialize<NULLTYPE>(5 * 60);
 
-				//this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+				////this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
 			}
 		}
 	}

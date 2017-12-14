@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Person_Platooning_Implementations.h"
+//#include "Person_Platooning_Implementations.h"
 
 namespace Platoon_Components
 {
@@ -17,7 +17,7 @@ namespace Platoon_Components
 			template<typename TargetType> void Initialize(int start_time);
 
 			//accessor(weather_event_to_process, NONE, NONE);
-			accessor(Person_Platooning_Faculty, NONE, NONE);
+			//accessor(Person_Platooning_Faculty, NONE, NONE);
 
 		};
 

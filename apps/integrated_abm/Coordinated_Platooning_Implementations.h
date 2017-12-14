@@ -9,7 +9,7 @@ namespace Platoon_Components
 	{
 		implementation struct Coordinated_Platooning_Implementation : public Polaris_Component<MasterType, INHERIT(Coordinated_Platooning_Implementation), Execution_Object>
 		{
-			m_prototype(Platoon_Components::Prototypes::Person_Platooning, typename MasterType::person_platooning_type, Person_Platooning_Faculty, NONE, NONE);
+			//m_prototype(Platoon_Components::Prototypes::Person_Platooning, typename MasterType::person_platooning_type, Person_Platooning_Faculty, NONE, NONE);
 			
 			//typedef typename Polaris_Component<MasterType, INHERIT(Coordinated_Platooning_Implementation), Execution_Object>::Component_Type ComponentType;
 			template<typename TargetType> void Initialize(int start_time);

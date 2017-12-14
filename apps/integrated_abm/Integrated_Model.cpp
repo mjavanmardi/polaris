@@ -121,7 +121,7 @@ struct MasterType
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
 	
-	typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
+	//typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
 	typedef Platoon_Components::Implementations::Coordinated_Platooning_Implementation<M> platooning_type;	
 	typedef Platoon_Components::Implementations::Vehicle_Platooning_Implementation<M> vehicle_platooning_type;
 	
@@ -150,7 +150,7 @@ struct MasterType
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	typedef Household_Components::Implementations::UIC_Vehicle_Technology_Chooser_Implementation<M> vehicle_technology_chooser_type;
 	
-	typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
+	//typedef Platoon_Components::Implementations::Person_Platooning_Implementation<M> person_platooning_type;
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
 	typedef Activity_Components::Implementations::Basic_Activity_Plan_Implementation<M> activity_type;
