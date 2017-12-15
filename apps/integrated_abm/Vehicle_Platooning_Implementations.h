@@ -26,7 +26,7 @@ namespace Platoon_Components
 		{
 			int cur_iter = iteration();
 			int cur_sub = sub_iteration();
-			cout << "iteration()\t" << cur_iter <<  "\tsub_iteration()\t" << cur_sub;
+			cout << "iteration(-)\t" << cur_iter <<  "\tsub_iteration(-)\t" << cur_sub << "\n";
 
 			typedef Vehicle_Platooning<ComponentType> _Vehicle_Platooning_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
@@ -34,7 +34,7 @@ namespace Platoon_Components
 			
 			if (1 < 2)
 			{
-				response.next._iteration = 12;
+				response.next._iteration = 600;
 				//_this->
 			}
 			//cout << "test";
