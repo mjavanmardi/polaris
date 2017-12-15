@@ -256,15 +256,14 @@ namespace polaris
 		template<typename AgentType>
 		void Evaluate_Transit_Neighbor_Seq(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data, Graph_Pool<graph_pool_type>* graph_pool, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 		{
-			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
+			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();			
+			
+			float transferPenalty = routing_data.transferPenalty;
+			float waitWeight = routing_data.waitWeight;
+			float ivtWeight = routing_data.ivtWeight;
+			float waitThreshold_Time = routing_data.waitThreshold_Time;
+			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
 
-			float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
-			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
-			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-			float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
-			
-			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
-			
 			//if (current_neighbor->in_closed_set()) return;
 
 			int patterns_size = current_neighbor->_unique_patterns.size();
@@ -409,15 +408,14 @@ namespace polaris
 
 		template<typename AgentType>
 		void Evaluate_Transit_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
-		{
+		{			
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
-
-			float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
-			float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
-			float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
-			float waitThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
-
-			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+			
+			float transferPenalty = routing_data.transferPenalty;
+			float waitWeight = routing_data.waitWeight;
+			float ivtWeight = routing_data.ivtWeight;
+			float waitThreshold_Time = routing_data.waitThreshold_Time;
+			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
 
 			//if (current_neighbor->in_closed_set()) return;
 
@@ -448,7 +446,7 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold /**5*/)
+					if (waitTime > waitThreshold_Time /**5*/)
 					{
 						break;
 					}
@@ -539,17 +537,12 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			//if (current_neighbor->in_closed_set()) return;						
-						
-			float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();		
-			Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
-			Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-			Meters_Per_Second walkSpeed_mps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
-			float walkThreshold_Time = walkThreshold / walkSpeed_mps;
+			float walkWeight = routing_data.walkWeight;
+			float walkThreshold_Time = routing_data.walkThreshold_Time;
+			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
 
-			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+			//if (current_neighbor->in_closed_set()) return;
 
-			
 			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 
@@ -603,20 +596,12 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			//if (current_neighbor->in_closed_set()) return;						
+			float bikeWeight = routing_data.bikeWeight;
+			float bikeThreshold_Time = routing_data.bikeThreshold_Time;
+			float bike_time_factor = routing_data.bike_time_factor;
+			bool multimodal_dijkstra = routing_data.multimodal_dijkstra ;
 
-			Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-			Meters_Per_Second walkSpeed_mps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
-
-			float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeWeight<float>();
-			Meters bikeThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeThreshold<float>();
-			Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
-			Meters_Per_Second bikeSpeed_mps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
-			float bikeThreshold_Time = bikeThreshold / bikeSpeed_mps;
-
-			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
-
-			float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
+			//if (current_neighbor->in_closed_set()) return;		
 
 			float cost_from_origin = current->cost_from_origin() + bike_time_factor*bikeWeight*current_neighbor->_time_cost;
 			//float cost_from_origin = current->cost_from_origin() + bikeWeight*current_neighbor->_time_cost;
@@ -672,11 +657,10 @@ namespace polaris
 		{
 			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-			//if (current_neighbor->in_closed_set()) return;
-						
-			float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();		
+			float carWeight = routing_data.carWeight;
+			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
 
-			bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+			//if (current_neighbor->in_closed_set()) return;			
 			
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 

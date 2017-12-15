@@ -687,22 +687,34 @@ namespace polaris
 
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
-				
-		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-		Meters_Per_Second walkSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
-		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
-		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
-		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
-
+		
+		//Individualizable Parameters
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+		float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+		float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 		float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeWeight<float>();
+		float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
 		float costThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::costThreshold<float>();
-
-		 
-
+		float waitThreshold_Time = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
+		Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+		Meters bikeThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeThreshold<float>();
+		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+		//Conversions
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+		Meters_Per_Second walkSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
+		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
+		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;		
+		float walkThreshold_Time = walkThreshold / walkSpeed_mps;
+		float bikeThreshold_Time = bikeThreshold / bikeSpeed_mps;
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 		int graph_id = start_ids.front().graph_id;
 
@@ -713,12 +725,6 @@ namespace polaris
 		high_resolution_clock::time_point t2;
 
 		float Total_Visit_Time;
-		if (debug_route)
-		{
-			// do route calculation timing for debug routes
-			//A_Star_Time.Start();		
-			
-		}
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
@@ -755,18 +761,6 @@ namespace polaris
 		Kilometers Euc_Distance_km = GLOBALS::Convert_Units<Feet, Kilometers>(Euc_Distance_ft);
 		float scanThreshold2 = Euc_Distance_km * 2500;
 
-
-
-		/*std::vector<base_edge_type*> tr_ends;
-		A_Star_Edge<base_edge_type>* tr_end;
-		for (auto itr = tr_end_ids.begin(); itr != tr_end_ids.end(); ++itr)
-		{
-			tr_end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
-			if (tr_end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
-			tr_ends.push_back((base_edge_type*)tr_end);
-		}*/
-		//base_edge_type* tr_end_base = (base_edge_type*)tr_end;
-
 		Routing_Data<base_edge_type> routing_data;
 
 		routing_data.modified_edges = &modified_edges;
@@ -776,6 +770,29 @@ namespace polaris
 		routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.ends = &ends;
 		routing_data.start_time = start_time;
+
+		//TODO OMER: Check if these additions damages anything
+		//----------------------------------------------------
+		routing_data.transferPenalty = transferPenalty;
+		routing_data.waitWeight = waitWeight;
+		routing_data.walkWeight = walkWeight;
+		routing_data.bikeWeight = bikeWeight;
+		routing_data.ivtWeight = ivtWeight;
+		routing_data.carWeight = carWeight;
+		routing_data.scanThreshold = scanThreshold;
+		routing_data.costThreshold = costThreshold;
+		routing_data.waitThreshold_Time = waitThreshold_Time;
+		routing_data.walkThreshold = walkThreshold;
+		routing_data.walkSpeed_kph = walkSpeed_kph;
+		routing_data.bikeThreshold = bikeThreshold;
+		routing_data.bikeSpeed_kph = bikeSpeed_kph;
+		routing_data.multimodal_dijkstra = multimodal_dijkstra;
+		routing_data.walkSpeed_mps = walkSpeed_mps;
+		routing_data.bikeSpeed_mps = bikeSpeed_mps;
+		routing_data.bike_time_factor = bike_time_factor;
+		routing_data.walkThreshold_Time = walkThreshold_Time;
+		routing_data.bikeThreshold_Time = bikeThreshold_Time;
+		//----------------------------------------------------
 
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
