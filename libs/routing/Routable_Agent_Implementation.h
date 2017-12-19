@@ -61,7 +61,7 @@ namespace polaris
 			return cost;
 		}
 						
-		float estimated_cost_between(typename MT::multimodal_edge_type* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, bool multimodal_dijkstra, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode, int time_index)
+		float estimated_cost_between(typename MT::multimodal_edge_type* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, bool multimodal_dijkstra, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode, int time_index, float walkSpeed_fps, float bikeSpeed_fps)
 		{
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 			Network_Interface* net = (Network_Interface*)_global_network;
@@ -112,9 +112,11 @@ namespace polaris
 			}
 			else if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
 			{
-				Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+				/*Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 
-				Feet_Per_Second walkSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);
+				Feet_Per_Second walkSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);*/
+
+				//float walkSpeed_fps = routing_data.walkSpeed_fps;
 				
 				float cost = 0;
 				int dest_ctr = 0;
@@ -136,9 +138,9 @@ namespace polaris
 			}
 			else if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
-				Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
+				/*Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
 
-				Feet_Per_Second bikeSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);
+				Feet_Per_Second bikeSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);*/				
 				
 				float cost = 0;
 				int dest_ctr = 0;

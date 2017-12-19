@@ -2066,7 +2066,7 @@ namespace Network_Components
 
 						int zone_index = zone->template internal_id<int>();
 						link->zone_index(zone_index);
-						link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>().resize(zone_count,12, FLT_MAX / 2.0f);
+						link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>().resize(zone_count, 1, FLT_MAX / 2.0f);
 					}
 				}
 			}

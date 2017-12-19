@@ -1153,7 +1153,7 @@ namespace Routing_Components
 
 				for (auto orig_zone_itr = origin_zones->begin(); orig_zone_itr != origin_zones->end(); orig_zone_itr++)
 				{
-					for (int time_index = 0; time_index < 12; time_index++)
+					for (int time_index = 0; time_index < 1; time_index++)
 					{
 						_Routing_Interface* dijkstra_router = (_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 						_Zone_Interface* origin_zone = (_Zone_Interface*)(orig_zone_itr->second);
