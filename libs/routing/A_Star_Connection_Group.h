@@ -429,9 +429,9 @@ namespace polaris
 
 				int trips_size = next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>().size();
 				int trips_ctr = 0;
-				//bool trip_found = false;
+				bool trip_found = false;
 
-				while (trips_ctr < trips_size /*&& !trip_found*/)
+				while (trips_ctr < trips_size && !trip_found)
 				{
 					_Transit_Vehicle_Trip_Interface* next_trip = (_Transit_Vehicle_Trip_Interface*)next_pattern->pattern_trips<_Pattern_Trips_Container_Interface&>()[trips_ctr];
 					
@@ -451,7 +451,7 @@ namespace polaris
 						break;
 					}
 
-					//trip_found = true;
+					trip_found = true;
 
 					Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 					if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
