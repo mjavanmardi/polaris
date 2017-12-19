@@ -558,7 +558,7 @@ int main(int argc,char** argv)
 
 	if (!InitializeMultiModalRoutingParameters(scenario)) return 1;
 
-	if (scenario->platooning_method<string>() == "Coordinated_Jeff")
+	if (scenario->platooning_method<string>() == "coordinated_Jeff")
 	{
 		//typedef Platooning<typename MasterType::platooning_type> _Platooning_Interface;
 		typedef Coordinated_Platooning<typename MasterType::platooning_type> _Coordinated_Platooning_Interface;

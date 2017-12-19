@@ -22,6 +22,7 @@ namespace Platoon_Components
 		template<typename TargetType>
 		void Coordinated_Platooning_Implementation<MasterType, InheritanceList>::Initialize(int start_time)
 		{
+			cout << "1- called the Coordinated_Platooning_Event_Controller" << endl;
 			this_component()->template Load_Event<ComponentType>(&Coordinated_Platooning_Event_Controller, start_time, 1);
 
 			
@@ -47,7 +48,6 @@ namespace Platoon_Components
 		{
 			int cur_iter = iteration();
 			int cur_sub = sub_iteration();
-			cout << "called the Coordinated_Platooning_Event_Controller" << endl;
 		}
 
 		//implementation struct Platoon_Data_Implementation : public Polaris_Component<MasterType, INHERIT(Platoon_Data_Implementation), Data_Object>

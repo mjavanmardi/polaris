@@ -35,6 +35,7 @@ namespace Platoon_Components
 			if (1 < 2)
 			{
 				response.next._iteration = cur_iter + 120;
+				_next_revision = 12;
 				//_this->
 			}
 			//cout << "test";
