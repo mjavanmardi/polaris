@@ -778,9 +778,9 @@ namespace Routing_Components
 						input_multimodal_edge._time_cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._source_link = current_link;
 						
+						current_link->template min_multi_modal_cost<std::vector<float>&>().resize(12);
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-						{
-							current_link->template min_multi_modal_cost<std::vector<float>&>().resize(12);
+						{							
 							for (int time_itr = 0; time_itr < 12; time_itr++)
 							{
 								int my_itr = 0;
@@ -816,7 +816,7 @@ namespace Routing_Components
 						{
 							for (int time_itr = 0; time_itr < 12; time_itr++)
 							{
-								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(walkWeight*current_link->template travel_time<float>());
+								current_link->template min_multi_modal_cost<std::vector<float>&>()[time_itr] = (walkWeight*current_link->template travel_time<float>());
 							}
 							
 							Feet walk_length_feet = current_link->template length<float>();
@@ -831,7 +831,7 @@ namespace Routing_Components
 						{
 							for (int time_itr = 0; time_itr < 12; time_itr++)
 							{
-								current_link->template min_multi_modal_cost<std::vector<float>&>().push_back(carWeight*current_link->template travel_time<float>());
+								current_link->template min_multi_modal_cost<std::vector<float>&>()[time_itr] = (carWeight*current_link->template travel_time<float>());
 							}
 							current_link->template walk_length<float>(FLT_MAX / 2.0f);
 							current_link->template drive_time<float>(current_link->template travel_time<float>() );
