@@ -516,9 +516,10 @@ namespace polaris
 						current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 						current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-						int time_index = floor(current_neighbor->time_label() / 86400.0);
+						/*int time_index = floor(current_neighbor->time_label() / 86400.0);
 						if (time_index > 0) time_index = 0;
-						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
+						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);*/
+						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 						current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 						if (!current_neighbor->marked_for_reset())
@@ -551,13 +552,13 @@ namespace polaris
 
 			//if (current_neighbor->in_closed_set()) return;
 
-			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
-			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
-
 			if (current->_walk_time_from_origin + current_neighbor->_time_cost > walkThreshold_Time)
 			{
 				return;
 			}
+
+			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
+			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;			
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{	
@@ -578,9 +579,10 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 				
-				int time_index = floor(current_neighbor->time_label() / 86400.0);
+				/*int time_index = floor(current_neighbor->time_label() / 86400.0);
 				if (time_index > 0) time_index = 0;
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);*/
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
@@ -611,16 +613,14 @@ namespace polaris
 			float walkSpeed_fps = routing_data.walkSpeed_fps;
 			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 
-			//if (current_neighbor->in_closed_set()) return;		
-
-			float cost_from_origin = current->cost_from_origin() + bike_time_factor*bikeWeight*current_neighbor->_time_cost;
-			//float cost_from_origin = current->cost_from_origin() + bikeWeight*current_neighbor->_time_cost;
-
+			//if (current_neighbor->in_closed_set()) return;
 			if (current->_bike_time_from_origin + bike_time_factor*current_neighbor->_time_cost > bikeThreshold_Time)
-				//if (current->_bike_time_from_origin + current_neighbor->_time_cost > bikeThreshold_Time)
 			{
 				return;
 			}
+
+			float cost_from_origin = current->cost_from_origin() + bike_time_factor*bikeWeight*current_neighbor->_time_cost;
+			//float cost_from_origin = current->cost_from_origin() + bikeWeight*current_neighbor->_time_cost;
 
 			if (cost_from_origin < current_neighbor->cost_from_origin())
 			{
@@ -641,9 +641,10 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-				int time_index = floor(current_neighbor->time_label() / 86400.0);
+				/*int time_index = floor(current_neighbor->time_label() / 86400.0);
 				if (time_index > 0) time_index = 0;
-				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);*/
+				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
 				if (!current_neighbor->marked_for_reset())
@@ -676,9 +677,11 @@ namespace polaris
 			
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-			int time_index = floor(current_neighbor->time_label() / 86400.0);
+			/*int time_index = floor(current_neighbor->time_label() / 86400.0);
 			if (time_index > 0) time_index = 0;
-			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
+			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);*/
+			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
+
 			if (carWeight*(current->_car_time_from_origin + time_cost_between) > heuristicPortion)
 			{
 				return;
