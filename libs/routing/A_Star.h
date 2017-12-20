@@ -928,7 +928,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%st%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1134,7 +1134,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 				
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%st%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
