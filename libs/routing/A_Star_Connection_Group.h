@@ -451,7 +451,7 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold_Time /**5*/)
+					if (waitTime > waitThreshold_Time)
 					{
 						break;
 					}
