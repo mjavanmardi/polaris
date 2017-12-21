@@ -398,7 +398,8 @@ namespace Routing_Components
 			typedef typename  Routing_Implementation<MasterType, INHERIT(Dijkstra_for_Heuristics_Implementation)>::Component_Type ComponentType;
 			
 			m_prototype(Zone, typename MasterType::zone_type, origin_zone, NONE, NONE);
-			
+			m_data(int, time_index, NONE, NONE);
+
 			// Events and event handling
 			void Schedule_Route_Computation(Simulation_Timestep_Increment start, Simulation_Timestep_Increment planning_time)
 			{
@@ -451,6 +452,7 @@ namespace Routing_Components
 								
 				//_Zone_Interface* origin_zone = origin_zone;
 				int origin_zone_index = _origin_zone->internal_id<int>();
+				int time_index = _time_index;
 				Link_Container_Interface* origin_links = _origin_zone->origin_links<Link_Container_Interface*>();
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
@@ -461,7 +463,7 @@ namespace Routing_Components
 					origin_ids.push_back(origin_link->template uuid<unsigned int>());
 				}				
 
-				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route, summary_paragraph);
+				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, time_index, debug_route, summary_paragraph);
 
 			}
 		};

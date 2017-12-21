@@ -266,6 +266,7 @@ namespace Person_Components
 				
 				act_record_itf* act = (act_record_itf*)act_record;
 				location_itf* loc = act->template Location<location_itf*>();
+				
 
 				//==========================================================
 				//----------------------------------------------------------
@@ -277,6 +278,16 @@ namespace Person_Components
 
 					Push_To_Demand_Database<TargetType>(act_record, is_executed);
 
+				}
+
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+				movement_itf* move = act->template movement_plan<movement_itf*>();
+				if (scenario->template multimodal_routing<bool>() && Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE ) )
+				{
+					typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
+					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+					output_sp_labels<TargetType>(act_record);
 				}
 
 				if (!is_executed) return;
@@ -718,6 +729,74 @@ namespace Person_Components
 				// add trip and activity to the buffer for the current thread
 				//trip_records_buffer[__thread_id].push_back(trip_rec);
 				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec,act_rec));
+			}
+
+			template<typename TargetType> void output_sp_labels(TargetType act_record)
+			{
+				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_itf::get_type_of(movement_plan)> movement_itf;
+				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
+				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
+
+				act_itf* act = (act_itf*)act_record;
+				movement_itf* move = act->template movement_plan<movement_itf*>();
+				location_itf* orig = move->template origin<location_itf*>();
+				location_itf* dest = move->template destination<location_itf*>();
+				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
+				person_itf* person = planner->template Parent_Person<person_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
+				
+				polaris::io::multimodalSPLabels multimodal_label_record;
+
+				std::string summary_string = move->template summary_string<std::string>();
+
+				std::istringstream ss(summary_string);
+				std::string sub_string;
+
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setOrigin_ID(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setDestination_ID(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setDeparture_Time(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setSub_Mode(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setArrival_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setGen_Cost(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setDuration(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setWait_Count(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setWait_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setWalk_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setBike_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setIVTT(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setCar_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setTransfer_Pen(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setEst_Cost(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setScan_Count(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setaStar_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_label_record.setSuccess_Status(sub_string);
+				std::getline(ss, sub_string, '\n');
+				multimodal_label_record.setEuc_Dist_km(stod(sub_string));
+
 			}
 		};
 	}

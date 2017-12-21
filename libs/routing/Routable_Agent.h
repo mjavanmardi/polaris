@@ -26,7 +26,7 @@ namespace polaris
 		float estimated_cost_between(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations) { return this_component()->estimated_cost_between(current, destinations); }
 
 		template<typename CurrentEdgeType, typename DestinationEdgeType>
-		float estimated_cost_between(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations, bool multimodal_dijkstra) { return this_component()->estimated_cost_between(current, destinations, multimodal_dijkstra); }
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<DestinationEdgeType*>& destinations, bool multimodal_dijkstra, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode, int time_index, float walkSpeed_fps, float bikeSpeed_fps) { return this_component()->estimated_cost_between(current, destinations, multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps); }
 
 		//cost between 2 edges. Can implement different turn movements preferences for an agent, for example if left turns are not prefered, then wehn passed, use very high cost to avoid those movements
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -36,6 +36,8 @@ namespace polaris
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){ return this_component()->time_cost_between(current, neighbor, connection); }	
 
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection, int time_index) { return this_component()->time_cost_between(current, neighbor, connection, time_index); }
 		//update the internal agent's state. For example different agents might have different preferences for number of transit transfers
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){ this_component()->update_label(current, neighbor, connection); }	

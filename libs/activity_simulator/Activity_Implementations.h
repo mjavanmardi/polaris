@@ -200,7 +200,8 @@ namespace Activity_Components
 				if (value < this->template Start_Time<TargetType>())
 				{
 					//TODO: CHANGE back to throw exception after testing
-					THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
+					//TODO Omer: Enable later
+					//THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
 				}
 				else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
 			}

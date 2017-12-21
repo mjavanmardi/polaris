@@ -428,6 +428,7 @@ namespace Scenario_Components
 				cav_wtp_model_file<string>((string)"");
 				cacc_capacity_adjustment_alpha<double>(1.0121);
 				cacc_capacity_adjustment_beta<double>(2.4697);
+				multimodal_routing<bool>(false);
 			}
 
 			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)

@@ -291,7 +291,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route, std::string& summary_paragraph)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, int time_index, bool debug_route, std::string& summary_paragraph)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -304,7 +304,7 @@ namespace polaris
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
+		typedef typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link) _Heuristic_Cost_Container_Interface;
 		
 		int graph_id = start_ids.front().graph_id;
 
@@ -339,7 +339,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-			start->cost_from_origin(start_link->min_multi_modal_cost<float>());
+			start->cost_from_origin(start_link->template min_multi_modal_cost<std::vector<float>&>()[time_index]);
 			//start->cost_from_origin(start->_min_multi_modal_cost);
 			
 			float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -372,7 +372,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
+				connection_set_iterator = connection_set_iterator->Visit_Tree_Neighbors(agent, current, routing_data, time_index);
 			}
 
 		}			
@@ -401,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index] = current->_cost_from_origin;
+			current_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()(zone_index, time_index) = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -688,20 +688,35 @@ namespace polaris
 		typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 		_Scenario_Interface*_scenario_reference = net->scenario_reference<_Scenario_Interface*>();
 		
-		//TODO OMER JOSH
-		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-		Meters_Per_Second walkSpeed_mps = walkSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
-		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
-		Meters_Per_Second bikeSpeed_mps = bikeSpeed_kph * 1000 / 3600; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
-		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
-
+		//Individualizable Parameters
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+		float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+		float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
 		float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 		float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeWeight<float>();
+		float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 		float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 		float scanThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::scanThreshold<float>();
 		float costThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::costThreshold<float>();
-
+		float waitThreshold_Time = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitThreshold<float>();
+		Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+		Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+		Meters bikeThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeThreshold<float>();
+		Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
 		bool multimodal_dijkstra = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::multimodal_dijkstra<bool>();
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+		//Conversions
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+		Meters_Per_Second walkSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
+		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
+		Feet_Per_Second walkSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);
+		Feet_Per_Second bikeSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);
+		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;		
+		float walkThreshold_Time = walkThreshold / walkSpeed_mps;
+		float bikeThreshold_Time = bikeThreshold / bikeSpeed_mps;
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 		int graph_id = start_ids.front().graph_id;
 
@@ -711,13 +726,10 @@ namespace polaris
 		high_resolution_clock::time_point t1;
 		high_resolution_clock::time_point t2;
 
-		float Total_Visit_Time;
-		if (debug_route)
-		{
-			// do route calculation timing for debug routes
-			//A_Star_Time.Start();		
-			
-		}
+		high_resolution_clock::time_point t3;
+		high_resolution_clock::time_point t4;
+
+		__int64 Total_Visit_Time;
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
@@ -748,15 +760,11 @@ namespace polaris
 		}
 		base_edge_type* end_base = (base_edge_type*)end;
 
-		/*std::vector<base_edge_type*> tr_ends;
-		A_Star_Edge<base_edge_type>* tr_end;
-		for (auto itr = tr_end_ids.begin(); itr != tr_end_ids.end(); ++itr)
-		{
-			tr_end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
-			if (tr_end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
-			tr_ends.push_back((base_edge_type*)tr_end);
-		}*/
-		//base_edge_type* tr_end_base = (base_edge_type*)tr_end;
+		Feet Distance_x = start_base->_x - end_base->_x;
+		Feet Distance_y = start_base->_y - end_base->_y;
+		Feet Euc_Distance_ft = sqrt(Distance_x*Distance_x + Distance_y*Distance_y);
+		Kilometers Euc_Distance_km = GLOBALS::Convert_Units<Feet, Kilometers>(Euc_Distance_ft);
+		float scanThreshold2 = Euc_Distance_km * 2500;
 
 		Routing_Data<base_edge_type> routing_data;
 
@@ -767,6 +775,31 @@ namespace polaris
 		routing_data.end_edge = (base_edge_type*)ends.front();
 		routing_data.ends = &ends;
 		routing_data.start_time = start_time;
+
+		//TODO OMER: Check if these additions damages anything
+		//----------------------------------------------------
+		routing_data.transferPenalty = transferPenalty;
+		routing_data.waitWeight = waitWeight;
+		routing_data.walkWeight = walkWeight;
+		routing_data.bikeWeight = bikeWeight;
+		routing_data.ivtWeight = ivtWeight;
+		routing_data.carWeight = carWeight;
+		routing_data.scanThreshold = scanThreshold;
+		routing_data.costThreshold = costThreshold;
+		routing_data.waitThreshold_Time = waitThreshold_Time;
+		routing_data.walkThreshold = walkThreshold;
+		routing_data.walkSpeed_kph = walkSpeed_kph;
+		routing_data.bikeThreshold = bikeThreshold;
+		routing_data.bikeSpeed_kph = bikeSpeed_kph;
+		routing_data.multimodal_dijkstra = multimodal_dijkstra;
+		routing_data.walkSpeed_mps = walkSpeed_mps;
+		routing_data.bikeSpeed_mps = bikeSpeed_mps;
+		routing_data.walkSpeed_fps = walkSpeed_fps;
+		routing_data.bikeSpeed_fps = bikeSpeed_fps;
+		routing_data.bike_time_factor = bike_time_factor;
+		routing_data.walkThreshold_Time = walkThreshold_Time;
+		routing_data.bikeThreshold_Time = bikeThreshold_Time;
+		//----------------------------------------------------
 
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
@@ -817,7 +850,9 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra);
+			int time_index = floor(start->time_label()/86400.0);
+			if (time_index > 0) time_index = 0;
+			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));
@@ -873,16 +908,12 @@ namespace polaris
 			}*/
 			
 			current_fail = current;
-			if (current->_cost_from_origin > costThreshold)
+			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
 			{
 				//current_fail = current;
 				break;
 			}
-			else if (scanCount > (int)scanThreshold)
-			{
-				//current_fail = current;
-				break;
-			}
+
 			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
 				success = true;
@@ -897,11 +928,14 @@ namespace polaris
 			Anonymous_Connection_Group<MasterType, base_edge_type>* connection_set_iterator = current->begin_connection_groups();
 			const Anonymous_Connection_Group<MasterType, base_edge_type>* const connection_set_end = current->end_connection_groups();
 
+			t3 = high_resolution_clock::now();
 			while (connection_set_iterator != connection_set_end)
 			{
 				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool, sub_mode);
 			}
-
+			t4 = high_resolution_clock::now();
+			auto elapsed_time2 = duration_cast<microseconds>(t4 - t3).count();
+			Total_Visit_Time += elapsed_time2;
 		}
 		
 		
@@ -921,7 +955,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%f\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -939,7 +973,9 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
-					"success");
+					"success",
+					Euc_Distance_km,
+					Total_Visit_Time);
 				summary_paragraph.insert(0,myLine);
 			}
 
@@ -1126,7 +1162,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 				
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%f\t%I64d\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1144,7 +1180,9 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
-					"fail");
+					"fail",
+					Euc_Distance_km,
+					Total_Visit_Time);
 				summary_paragraph.insert(0, myLine);
 			}
 		}		

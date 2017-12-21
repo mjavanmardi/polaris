@@ -61,17 +61,63 @@ namespace polaris
 			return cost;
 		}
 						
-		float estimated_cost_between(typename MT::multimodal_edge_type* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, bool multimodal_dijkstra)
+		float estimated_cost_between(typename MT::multimodal_edge_type* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations, bool multimodal_dijkstra, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode, int time_index, float walkSpeed_fps, float bikeSpeed_fps)
 		{
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 			Network_Interface* net = (Network_Interface*)_global_network;
 
 			typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 			typedef Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
-			typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
+			typedef typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link) _Heuristic_Cost_Container_Interface;
 
-			if (!multimodal_dijkstra)
+
+			if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 			{
+				if (!multimodal_dijkstra)
+				{
+					float cost = 0;
+					int dest_ctr = 0;
+					for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+					{
+						Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+						float x_dist = current->_x - itr_destination->_x;
+						x_dist *= x_dist;
+
+						float y_dist = current->_y - itr_destination->_y;
+						y_dist *= y_dist;
+
+						// vehicle speed in fps
+						float temp_cost = sqrt(x_dist + y_dist) / 89.0f;
+						cost = cost + (temp_cost - cost) / (dest_ctr + 1);
+						dest_ctr++;
+					}
+					return cost;
+				}
+				else
+				{
+					float cost = 0;
+					int dest_ctr = 0;
+					for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+					{
+						Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+						_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
+						_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
+
+						float temp_cost = destination_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()(current_link->zone_index<int>(), time_index);
+						cost = cost + (temp_cost - cost) / (dest_ctr + 1);
+						dest_ctr++;
+					}
+					return cost;
+				}
+			}
+			else if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
+			{
+				/*Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+
+				Feet_Per_Second walkSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);*/
+
+				//float walkSpeed_fps = routing_data.walkSpeed_fps;
+				
 				float cost = 0;
 				int dest_ctr = 0;
 				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
@@ -83,31 +129,37 @@ namespace polaris
 					float y_dist = current->_y - itr_destination->_y;
 					y_dist *= y_dist;
 
-
 					// vehicle speed in fps
-					float temp_cost = sqrt(x_dist + y_dist) / 89.0f;
+					float temp_cost = sqrt(x_dist + y_dist) / walkSpeed_fps;
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}
 				return cost;
 			}
-			else
+			else if (sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
+				/*Kilometers_Per_Hour bikeSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeSpeed<float>();
+
+				Feet_Per_Second bikeSpeed_fps = GLOBALS::Speed_Converter.Convert_Value<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);*/				
+				
 				float cost = 0;
 				int dest_ctr = 0;
 				for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
 				{
-					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);					
-					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
-					_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
+					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+					float x_dist = current->_x - itr_destination->_x;
+					x_dist *= x_dist;
 
-					float temp_cost = destination_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[current_link->zone_index<int>()];
+					float y_dist = current->_y - itr_destination->_y;
+					y_dist *= y_dist;
+
+					// vehicle speed in fps
+					float temp_cost = sqrt(x_dist + y_dist) / bikeSpeed_fps;
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}
 				return cost;
 			}
-
 		}
 		
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -714,10 +766,10 @@ namespace polaris
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
-		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection, int time_index)
 		{
 			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
-			return neighbor_link->template min_multi_modal_cost<float>();
+			return neighbor_link->template min_multi_modal_cost<std::vector<float>&>()[time_index];
 			//return neighbor->_min_multi_modal_cost;
 		}
 
