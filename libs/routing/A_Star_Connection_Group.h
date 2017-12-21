@@ -114,55 +114,55 @@ namespace polaris
 		typedef typename _Transit_Vehicle_Trip_Interface::get_type_of(departure_seconds) _Departure_Seconds_Container_Interface;
 		typedef typename _Transit_Vehicle_Trip_Interface::get_type_of(arrival_seconds) _Arrival_Seconds_Container_Interface;
 
-		//template<typename AgentType>
-		//Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
-		//{
-		//	//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
-		//	const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
+		template<typename AgentType>
+		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
+		{
+			//end_forward_edges is a member functon of Connection_Group_Base and returns the end of the current connection group
+			const Connection_Implementation* const end_connection_itr = this->end_forward_edges();
 
-		//	for (Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
-		//	{
-		//		Evaluate_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
-		//	}
+			for (Connection_Implementation* connection_itr = this->forward_edges(); connection_itr != end_connection_itr; ++connection_itr)
+			{
+				Evaluate_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
+			}
 
-		//	return (Anonymous_Connection_Group*)end_connection_itr;
-		//}
+			return (Anonymous_Connection_Group*)end_connection_itr;
+		}
 
-		////basic A* stuff
-		//template<typename AgentType>
-		//void Evaluate_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
-		//{
-		//	A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
+		//basic A* stuff
+		template<typename AgentType>
+		void Evaluate_Neighbor(Routable_Agent<AgentType>* agent, current_edge_type* current, connection_type* connection, Routing_Data<base_edge_type>& routing_data)
+		{
+			A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection->neighbor();
 
-		//	if (current_neighbor->in_closed_set()) return;
+			if (current_neighbor->in_closed_set()) return;
 
-		//	float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-		//	//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-		//	float cost_from_origin = current->cost_from_origin() + time_cost_between;
+			//float cost_from_origin = current->cost_from_origin() + agent->cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			float cost_from_origin = current->cost_from_origin() + time_cost_between;
 
-		//	if (cost_from_origin < current_neighbor->cost_from_origin())
-		//	{
-		//		if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
+			if (cost_from_origin < current_neighbor->cost_from_origin())
+			{
+				if (current_neighbor->in_open_set()) routing_data.open_set->erase(routing_data.open_set->iterator_to(*((base_edge_type*)current_neighbor)));
 
-		//		if (!current_neighbor->marked_for_reset())
-		//		{
-		//			routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
-		//			current_neighbor->marked_for_reset(true);
-		//		}
+				if (!current_neighbor->marked_for_reset())
+				{
+					routing_data.modified_edges->push_back((base_edge_type*)current_neighbor);
+					current_neighbor->marked_for_reset(true);
+				}
 
-		//		current_neighbor->came_from(current);
-		//		current_neighbor->cost_from_origin(cost_from_origin);
-		//		current_neighbor->estimated_cost_origin_destination(cost_from_origin);
+				current_neighbor->came_from(current);
+				current_neighbor->cost_from_origin(cost_from_origin);
+				current_neighbor->estimated_cost_origin_destination(cost_from_origin);
 
-		//		routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
+				routing_data.open_set->insert(*((base_edge_type*)current_neighbor));
 
-		//		current_neighbor->in_open_set(true);
+				current_neighbor->in_open_set(true);
 
-		//		// update the label
-		//		//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
-		//	}
-		//}
+				// update the label
+				//agent->update_label(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
+			}
+		}
 
 
 		template<typename AgentType>
@@ -371,7 +371,7 @@ namespace polaris
 							seq_edge->_car_time_from_origin = current->_car_time_from_origin;
 							seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-							int time_index = floor(seq_edge->time_label() / 7200.0);
+							int time_index = (int)(seq_edge->time_label() / 7200.0);
 							if (time_index > 11) time_index = 11;
 							float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 							seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -516,7 +516,7 @@ namespace polaris
 						current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 						current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
-						int time_index = floor(current_neighbor->time_label() / 7200.0);
+						int time_index = (int)(current_neighbor->time_label() / 7200.0);
 						if (time_index > 11) time_index = 11;
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 						current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -578,7 +578,7 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 				
-				int time_index = floor(current_neighbor->time_label() / 7200.0);
+				int time_index = (int)(current_neighbor->time_label() / 7200.0);
 				if (time_index > 11) time_index = 11;
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -639,7 +639,7 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
-				int time_index = floor(current_neighbor->time_label() / 7200.0);
+				int time_index = (int)(current_neighbor->time_label() / 7200.0);
 				if (time_index > 11) time_index = 11;
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
@@ -674,7 +674,7 @@ namespace polaris
 			
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
-			int time_index = floor((current->time_label() + time_cost_between) / 7200.0);
+			int time_index = (int)((current->time_label() + time_cost_between) / 7200.0);
 			if (time_index > 11) time_index = 11;
 			float heuristicPortion = agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 			if (carWeight*(current->_car_time_from_origin + time_cost_between) > heuristicPortion)

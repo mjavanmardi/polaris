@@ -850,7 +850,7 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			int time_index = floor(start->time_label()/86400.0);
+			int time_index = (int)(start->time_label()/86400.0);
 			if (time_index > 0) time_index = 0;
 			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
