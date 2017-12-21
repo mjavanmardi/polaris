@@ -762,7 +762,10 @@ int main(int argc,char** argv)
 	MasterType::person_destination_chooser_type::choice_set_size(100);
 
 	// Initialize all choice model parameters
-	if (!InitializeChoiceModelParameters(scenario)) return 1;
+	if (!InitializeChoiceModelParameters(scenario))
+	{
+		THROW_EXCEPTION("Ending...");
+	}
 	
 	// Initialize start time model
 	//MasterType::activity_timing_chooser_type::static_initializer(scenario->activity_start_time_model_file_name<string>());	

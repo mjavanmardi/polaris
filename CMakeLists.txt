@@ -317,6 +317,7 @@ else()
 	
 	if (IntegratedModel)
 		add_subdirectory (apps/integrated_abm)
+		add_subdirectory (apps/network_validator)
 	endif()
 
 	if(FixedDemandSimulator)
