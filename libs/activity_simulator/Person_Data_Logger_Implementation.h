@@ -279,6 +279,16 @@ namespace Person_Components
 
 				}
 
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+				movement_itf* move = act->template movement_plan<movement_itf*>();
+				if (scenario->template multimodal_routing<bool>() && Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
+				{
+					typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
+					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+					output_sp_labels<TargetType>(act_record);
+				}
+
 				if (!is_executed) return;
 
 				//----------------------------------------------------------
