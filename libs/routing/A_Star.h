@@ -72,7 +72,7 @@ namespace polaris
 			start->time_label((float)start_time + start->_time_cost);
 			
 
-			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (std::vector<base_edge_type*>)ends);
+			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, ends);
 
 			start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
 		
@@ -752,15 +752,11 @@ namespace polaris
 		}
 		base_edge_type* end_base = (base_edge_type*)end;
 
-		/*std::vector<base_edge_type*> tr_ends;
-		A_Star_Edge<base_edge_type>* tr_end;
-		for (auto itr = tr_end_ids.begin(); itr != tr_end_ids.end(); ++itr)
-		{
-			tr_end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
-			if (tr_end == nullptr) { THROW_WARNING("Destination: " << (*itr).edge_id << " not found in graph!"); return 0.0f; }
-			tr_ends.push_back((base_edge_type*)tr_end);
-		}*/
-		//base_edge_type* tr_end_base = (base_edge_type*)tr_end;
+		Feet Distance_x = start_base->_x - end_base->_x;
+		Feet Distance_y = start_base->_y - end_base->_y;
+		Feet Euc_Distance_ft = sqrt(Distance_x*Distance_x + Distance_y*Distance_y);
+		Kilometers Euc_Distance_km = GLOBALS::Convert_Units<Feet, Kilometers>(Euc_Distance_ft);
+		float scanThreshold2 = Euc_Distance_km * 2500;
 
 		Routing_Data<base_edge_type> routing_data;
 
@@ -821,7 +817,7 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra);
+			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, ends, multimodal_dijkstra);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));
@@ -877,16 +873,12 @@ namespace polaris
 			}*/
 			
 			current_fail = current;
-			if (current->_cost_from_origin > costThreshold)
+			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
 			{
 				//current_fail = current;
 				break;
 			}
-			else if (scanCount > (int)scanThreshold)
-			{
-				//current_fail = current;
-				break;
-			}
+
 			if (agent->at_destination((base_edge_type*)current, ends, &end_base))
 			{
 				success = true;
@@ -928,7 +920,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -946,8 +938,10 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
+					Total_Visit_Time,
 					"success",
-					Total_Visit_Time);
+					Euc_Distance_km
+					);
 				summary_paragraph.insert(0,myLine);
 			}
 
@@ -1134,7 +1128,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 				
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1152,8 +1146,10 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
+					Total_Visit_Time,
 					"fail",
-					Total_Visit_Time);
+					Euc_Distance_km
+					);
 				summary_paragraph.insert(0, myLine);
 			}
 		}		
