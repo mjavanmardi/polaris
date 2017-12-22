@@ -710,6 +710,8 @@ namespace polaris
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
 		Meters_Per_Second walkSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(walkSpeed_kph);
 		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
+		Feet_Per_Second walkSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);
+		Feet_Per_Second bikeSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);
 		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
 		float walkThreshold_Time = walkThreshold / walkSpeed_mps;
 		float bikeThreshold_Time = bikeThreshold / bikeSpeed_mps;
@@ -798,6 +800,8 @@ namespace polaris
 		routing_data.multimodal_dijkstra = multimodal_dijkstra;
 		routing_data.walkSpeed_mps = walkSpeed_mps;
 		routing_data.bikeSpeed_mps = bikeSpeed_mps;
+		routing_data.walkSpeed_fps = walkSpeed_fps;
+		routing_data.bikeSpeed_fps = bikeSpeed_fps;
 		routing_data.bike_time_factor = bike_time_factor;
 		routing_data.walkThreshold_Time = walkThreshold_Time;
 		routing_data.bikeThreshold_Time = bikeThreshold_Time;

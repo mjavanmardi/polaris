@@ -34,6 +34,8 @@ namespace polaris
 		bool multimodal_dijkstra;
 		Meters_Per_Second walkSpeed_mps;
 		Meters_Per_Second bikeSpeed_mps;
+		Feet_Per_Second walkSpeed_fps;
+		Feet_Per_Second bikeSpeed_fps;
 		float bike_time_factor;
 		float walkThreshold_Time;
 		float bikeThreshold_Time;

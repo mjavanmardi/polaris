@@ -213,6 +213,8 @@ namespace polaris
 			float ivtWeight = routing_data.ivtWeight;
 			float waitThreshold_Time = routing_data.waitThreshold_Time;
 			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
+			float walkSpeed_fps = routing_data.walkSpeed_fps;
+			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 			
 			//if (current_neighbor->in_closed_set()) return;
 
@@ -242,7 +244,7 @@ namespace polaris
 					}
 
 					//Since trips are sorted chronologically by departure time, no need to scan beyond this threshold
-					if (waitTime > waitThreshold*5)
+					if (waitTime > waitThreshold_Time)
 					{
 						break;
 					}
@@ -262,7 +264,7 @@ namespace polaris
 					int WaitingCount = current->_wait_count_from_origin + wait_binary;
 
 					int TransferCount = std::max(WaitingCount - 1, 0);
-					int nonHomeWait = 0;
+					/*int nonHomeWait = 0;
 					if (TransferCount > 0)
 					{
 						nonHomeWait = 1;
@@ -270,7 +272,7 @@ namespace polaris
 						{
 							break;
 						}
-					}
+					}*/
 
 					float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 
@@ -364,6 +366,8 @@ namespace polaris
 			float ivtWeight = routing_data.ivtWeight;
 			float waitThreshold_Time = routing_data.waitThreshold_Time;
 			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
+			float walkSpeed_fps = routing_data.walkSpeed_fps;
+			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 
 			//if (current_neighbor->in_closed_set()) return;
 
@@ -386,7 +390,8 @@ namespace polaris
 					++trips_ctr;
 
 					int wait_binary = 1;
-					float waitTime = (float)next_trip->departure_seconds<_Departure_Seconds_Container_Interface&>()[mySeq] - current->_time_label;
+					float departure_time_here = (float)next_trip->departure_seconds<_Departure_Seconds_Container_Interface&>()[mySeq];
+					float waitTime = departure_time_here - current->_time_label;
 
 					if (waitTime < 0.0)
 					{
@@ -427,13 +432,14 @@ namespace polaris
 					float effectiveTransferPen = TransferCount * wait_binary * transferPenalty;
 
 					float ivtTime;
+					float arrival_time_there = (float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1];
 					if (wait_binary == 1)
 					{
-						ivtTime = (float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1] - (float)next_trip->departure_seconds<_Departure_Seconds_Container_Interface&>()[mySeq];
+						ivtTime = arrival_time_there - departure_time_here;
 					}
 					else
 					{
-						ivtTime = (float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1] - current->_time_label;
+						ivtTime = arrival_time_there - current->_time_label;
 					}
 
 					float cost_from_origin = current->cost_from_origin() + waitWeight*wait_binary*waitTime + ivtWeight*ivtTime + effectiveTransferPen;
@@ -445,7 +451,7 @@ namespace polaris
 						float time_from_origin = current->time_from_origin() + wait_binary*waitTime + ivtTime;
 
 						current_neighbor->time_from_origin(time_from_origin);
-						current_neighbor->time_label((float)next_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>()[mySeq + 1]);
+						current_neighbor->time_label(arrival_time_there);
 
 						current_neighbor->came_from(current);
 						current_neighbor->_came_on_trip = next_trip;
@@ -488,6 +494,8 @@ namespace polaris
 			float walkWeight = routing_data.walkWeight;
 			float walkThreshold_Time = routing_data.walkThreshold_Time;
 			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
+			float walkSpeed_fps = routing_data.walkSpeed_fps;
+			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 			
 			float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
 			//float cost_from_origin = current->cost_from_origin() + walkWeight*current_neighbor->_time_cost;
@@ -546,6 +554,8 @@ namespace polaris
 			float bikeThreshold_Time = routing_data.bikeThreshold_Time;
 			float bike_time_factor = routing_data.bike_time_factor;
 			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
+			float walkSpeed_fps = routing_data.walkSpeed_fps;
+			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 
 			float cost_from_origin = current->cost_from_origin() + bike_time_factor*bikeWeight*current_neighbor->_time_cost;
 			//float cost_from_origin = current->cost_from_origin() + bikeWeight*current_neighbor->_time_cost;
@@ -603,6 +613,8 @@ namespace polaris
 						
 			float carWeight = routing_data.carWeight;
 			bool multimodal_dijkstra = routing_data.multimodal_dijkstra;
+			float walkSpeed_fps = routing_data.walkSpeed_fps;
+			float bikeSpeed_fps = routing_data.bikeSpeed_fps;
 			
 			float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 
