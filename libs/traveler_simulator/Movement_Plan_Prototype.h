@@ -501,6 +501,7 @@ namespace Movement_Plan_Components
 
 			void set_multimodal_trajectory()
 			{}
+
 		};
 	}
 }

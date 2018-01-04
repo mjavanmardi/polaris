@@ -84,16 +84,6 @@ namespace polaris
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::tree_agent_type>*)agent,(current_edge_type*)current,routing_data);
 		};
 
-		virtual mAnonymous_Connection_Group* Visit_Tree_Neighbors(Routable_Agent<typename MasterType::multi_modal_tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data, int time_index)
-		{
-			return this_component()->Visit_Tree_Neighbors((Routable_Agent<typename MasterType::multi_modal_tree_agent_type>*)agent, (current_edge_type*)current, routing_data, time_index);
-		};
-
-		virtual mAnonymous_Connection_Group* Visit_Multimodal_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data, void* graph_pool, Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
-		{
-			return this_component()->Visit_Multimodal_Neighbors(agent, (current_edge_type*)current, routing_data, (Graph_Pool<graph_pool_type>*)graph_pool, sub_mode);
-		};
-
 		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::walk_to_transit_tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::walk_to_transit_tree_agent_type>*)agent, (current_edge_type*)current, routing_data);
@@ -102,6 +92,16 @@ namespace polaris
 		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::drive_to_transit_tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
 		{
 			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::drive_to_transit_tree_agent_type>*)agent, (current_edge_type*)current, routing_data);
+		};
+
+		virtual mAnonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::multi_modal_tree_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)
+		{
+			return this_component()->Visit_Neighbors((Routable_Agent<typename MasterType::multi_modal_tree_agent_type>*)agent, (current_edge_type*)current, routing_data);
+		};
+
+		virtual mAnonymous_Connection_Group* Visit_Multimodal_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data, void* graph_pool)
+		{
+			return this_component()->Visit_Multimodal_Neighbors(agent, (current_edge_type*)current, routing_data, (Graph_Pool<graph_pool_type>*)graph_pool);
 		};
 		
 		//virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::time_dependent_agent_type>* agent, void* current, Routing_Data<base_edge_type>& routing_data)

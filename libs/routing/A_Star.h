@@ -72,7 +72,7 @@ namespace polaris
 			start->time_label((float)start_time + start->_time_cost);
 			
 
-			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, (std::vector<base_edge_type*>)ends);
+			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, ends);
 
 			start->estimated_cost_origin_destination( initial_estimated_cost_origin_destination );
 		
@@ -291,7 +291,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, int time_index, bool debug_route, std::string& summary_paragraph)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route, std::string& summary_paragraph)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -304,7 +304,7 @@ namespace polaris
 		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
-		typedef typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link) _Heuristic_Cost_Container_Interface;
+		typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
 		
 		int graph_id = start_ids.front().graph_id;
 
@@ -339,7 +339,7 @@ namespace polaris
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
 
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
-			start->cost_from_origin(start_link->template min_multi_modal_cost<std::vector<float>&>()[time_index]);
+			start->cost_from_origin(start_link->min_multi_modal_cost<float>());
 			//start->cost_from_origin(start->_min_multi_modal_cost);
 			
 			float initial_estimated_cost_origin_destination = start->cost_from_origin();
@@ -372,7 +372,7 @@ namespace polaris
 
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Tree_Neighbors(agent, current, routing_data, time_index);
+				connection_set_iterator = connection_set_iterator->Visit_Neighbors(agent, current, routing_data);
 			}
 
 		}			
@@ -401,7 +401,7 @@ namespace polaris
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)*itr;	
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;	
-			current_link->heur_cost_from_a_zone_to_this_link<_Heuristic_Cost_Container_Interface&>()(zone_index, time_index) = current->_cost_from_origin;
+			current_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[zone_index] = current->_cost_from_origin;
 		}
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)
@@ -712,11 +712,10 @@ namespace polaris
 		Meters_Per_Second bikeSpeed_mps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Meters_Per_Second>(bikeSpeed_kph);
 		Feet_Per_Second walkSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph);
 		Feet_Per_Second bikeSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(bikeSpeed_kph);
-		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;		
+		float bike_time_factor = walkSpeed_mps / bikeSpeed_mps;
 		float walkThreshold_Time = walkThreshold / walkSpeed_mps;
 		float bikeThreshold_Time = bikeThreshold / bikeSpeed_mps;
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 		int graph_id = start_ids.front().graph_id;
 
@@ -730,6 +729,13 @@ namespace polaris
 		high_resolution_clock::time_point t4;
 
 		__int64 Total_Visit_Time;
+
+		if (debug_route)
+		{
+			// do route calculation timing for debug routes
+			//A_Star_Time.Start();		
+			
+		}
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
@@ -799,6 +805,7 @@ namespace polaris
 		routing_data.bike_time_factor = bike_time_factor;
 		routing_data.walkThreshold_Time = walkThreshold_Time;
 		routing_data.bikeThreshold_Time = bikeThreshold_Time;
+		routing_data.sub_mode = sub_mode;
 		//----------------------------------------------------
 
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
@@ -850,9 +857,7 @@ namespace polaris
 			start_t->_ivt_time_from_origin = 0;
 			start_t->_transfer_pen_from_origin = 0;
 
-			int time_index = (int)(start->time_label()/86400.0);
-			if (time_index > 0) time_index = 0;
-			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, (std::vector<base_edge_type*>)ends, multimodal_dijkstra, sub_mode, time_index, walkSpeed_fps, bikeSpeed_fps);
+			float initial_estimated_cost_origin_destination = start->_cost_from_origin + agent->estimated_cost_between((multimodal_edge_type*)start_t, ends, multimodal_dijkstra);
 			start->estimated_cost_origin_destination(initial_estimated_cost_origin_destination);
 
 			open_set.insert(*((base_edge_type*)start));
@@ -931,7 +936,7 @@ namespace polaris
 			t3 = high_resolution_clock::now();
 			while (connection_set_iterator != connection_set_end)
 			{
-				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool, sub_mode);
+				connection_set_iterator = connection_set_iterator->Visit_Multimodal_Neighbors(agent, current, routing_data, graph_pool);
 			}
 			t4 = high_resolution_clock::now();
 			auto elapsed_time2 = duration_cast<microseconds>(t4 - t3).count();
@@ -955,7 +960,7 @@ namespace polaris
 			astar_time = elapsed_time;
 			if (debug_route)
 			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%f\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -973,9 +978,10 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
+					Total_Visit_Time,
 					"success",
-					Euc_Distance_km,
-					Total_Visit_Time);
+					Euc_Distance_km
+					);
 				summary_paragraph.insert(0,myLine);
 			}
 
@@ -1162,7 +1168,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 				
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%s\t%f\t%I64d\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1180,9 +1186,10 @@ namespace polaris
 					current->_estimated_cost_origin_destination,
 					scanCount,
 					astar_time,
+					Total_Visit_Time,
 					"fail",
-					Euc_Distance_km,
-					Total_Visit_Time);
+					Euc_Distance_km
+					);
 				summary_paragraph.insert(0, myLine);
 			}
 		}		
