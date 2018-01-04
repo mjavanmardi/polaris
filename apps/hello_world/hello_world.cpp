@@ -2,10 +2,8 @@
 using namespace std;
 
 #include "Repository.h"
-#include <chrono>
 
 using namespace polaris;
-using namespace std::chrono;
 
 prototype struct Driver;
 prototype struct Bus;
@@ -180,50 +178,6 @@ struct MasterType
 
 int main(int argc, char* argv[])
 {
-	matrix<float> test1;
-	test1.resize(100000, 1, 0.0);
-
-	float Total_Visit_Time;
-
-	high_resolution_clock::time_point t1;
-	high_resolution_clock::time_point t2;
-	high_resolution_clock::time_point t3;
-	high_resolution_clock::time_point t4;
-	__int64 astar_time;
-	__int64 astar_time2;
-
-	//TODO: Remove when done testing routing execution time		
-	t1 = high_resolution_clock::now();
-
-	//time this
-	for (int i = 0; i < test1.num_rows(); i++)
-	{
-		for (int j = 0; j < test1.num_cols(); j++)
-		{
-			test1(i, j) = (float)(i*j);
-			Total_Visit_Time = test1(i, j);
-		}
-	}
-	//end time
-	t2 = high_resolution_clock::now();
-	auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
-	astar_time = elapsed_time;
-
-
-
-	vector<float> test2;
-	for (int i = 0; i < 100000; i++) test2.push_back((float)i*3.0);
-
-	t3 = high_resolution_clock::now();
-	//time this
-	for (int i = 0; i < 100000; i++)
-	{
-		Total_Visit_Time = test2[i];
-	}
-	// end time
-	t4 = high_resolution_clock::now();
-	auto elapsed_time2 = duration_cast<microseconds>(t4 - t3).count();
-	astar_time2 = elapsed_time2;
 
 	cout << GLOBALS::Convert_Units<Square_Miles, Square_Kilometers>(1.0)<<endl;
 	cout << GLOBALS::Convert_Units<Kilometers_Per_Hour, Miles_Per_Hour>(100.0) << endl;

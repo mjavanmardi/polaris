@@ -1961,7 +1961,7 @@ namespace Network_Components
 				typedef Random_Access_Sequence<typename type_of(network_reference)::get_type_of(zone_ids_container),int> _zone_ids_interface;
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename type_of(network_reference)::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 				typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
-				typedef typename _Link_Interface::get_type_of(heur_cost_from_a_zone_to_this_link) _Heur_Cost_Container_Interface;
+				typedef typename _Link_Interface::get_type_of(heur_cost_to_dest) _Heur_Cost_Container_Interface;
 
 				//%%%RLW - check into this again
 				//typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename type_of(network_reference)::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
@@ -2066,7 +2066,12 @@ namespace Network_Components
 
 						int zone_index = zone->template internal_id<int>();
 						link->zone_index(zone_index);
-						link->heur_cost_from_a_zone_to_this_link<_Heur_Cost_Container_Interface&>().resize(zone_count, 12, FLT_MAX / 2.0f);
+						link->heur_cost_to_dest<_Heur_Cost_Container_Interface&>().resize(zone_count);
+						for (int zone_ctr = 0; zone_ctr < zone_count; zone_ctr++)
+						{
+							link->heur_cost_to_dest<_Heur_Cost_Container_Interface&>()[zone_ctr] = FLT_MAX / 2.0f;
+						}
+
 					}
 				}
 			}
