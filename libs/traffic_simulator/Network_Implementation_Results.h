@@ -14,9 +14,9 @@ namespace Network_Components
 	namespace Implementations
 	{
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_vehicle_trajectory()
+		 void Network_Implementation<MasterType,InheritanceList>::write_vehicle_trajectory()
 		{
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
 			typedef  Random_Access_Sequence< type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
@@ -48,15 +48,15 @@ namespace Network_Components
 
 			typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			fstream& vehicle_trajectory_file = scenario_reference<_Scenario_Interface*>()->template vehicle_trajectory_file<fstream&>();
-
+				
 			typename _Links_Container_Interface::iterator link_itr;
 
 			// output link moe to database
 			shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template demand_db_ptr<shared_ptr<odb::database>>();
 			odb::transaction t(db_ptr->begin());
 
-
-			for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+			
+			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 			{
 				_Link_Interface* destination_link = (_Link_Interface*)(*link_itr);
 
@@ -64,18 +64,18 @@ namespace Network_Components
 				if (num_arrived_vehicls_of_a_link > 0)
 				{
 					//output vehicle trajectory
-					while (num_arrived_vehicls_of_a_link)
+					while(num_arrived_vehicls_of_a_link)
 					{
 						// check whether to sampel this vehicle
 						_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
 
 						if (vehicle->write_trajectory())
-						{
+						{	
 							// Fill the PATH DB record
 							shared_ptr<polaris::io::Path> path_db_record(new polaris::io::Path());
 
 							_Movement_Plan_Interface* movement_plan = vehicle->template movement_plan<_Movement_Plan_Interface*>();
-
+							
 							//float travel_time_ratio = travel_time / estimated_travel_time_when_departed;
 							//float trip_length = movement_plan->template route_length<float>();
 							//int entry_time = movement_plan->template entry_time<int>();
@@ -94,7 +94,7 @@ namespace Network_Components
 							path_db_record->setTravel_Time(movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>());
 							path_db_record->setRouted_Time(movement_plan->template estimated_travel_time_when_departed<float>());
 
-
+							
 							_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 							float start = 0;
 							int route_link_counter = 0;
@@ -109,10 +109,10 @@ namespace Network_Components
 
 								int route_link_id = route_link->template uuid<int>();
 								int route_link_enter_time = trajectory_unit->template enter_time<int>();
-								float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());
+								float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());		
 								int route_link_exit_time = /*trajectory_unit->exit_time<int>(); //*/movement_plan->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
 								float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
-
+					
 								if (route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
 								{
 									path_link_record.setLink(route_link->dbid<int>());
@@ -140,7 +140,7 @@ namespace Network_Components
 									//	<<start + route_link->template length<float>()<<","
 									//	<<endl;
 								}
-
+								
 							}
 							db_ptr->persist(path_db_record);
 						}
@@ -158,26 +158,26 @@ namespace Network_Components
 
 		};
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_ttime_distribution()
+		 void Network_Implementation<MasterType,InheritanceList>::write_ttime_distribution()
 		{
-			typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;	
 			typedef Network<typename MasterType::network_type> _Network_Interface;
 
 			fstream& ttime_distribution_file = ((_Scenario_Interface*)_global_scenario)->template ttime_distribution_file<fstream&>();
 			int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
 			ttime_distribution_file << current_time;
-			for (int j = 0; j < (int)ttime_distribution.size(); j++)
+			for (int j=0; j < (int)ttime_distribution.size(); j++)
 			{
-				ttime_distribution_file << "," << ttime_distribution[j];
+				ttime_distribution_file <<","<< ttime_distribution[j];
 			}
 			ttime_distribution_file << endl;
 		}
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_network_link_flow()
+		 void Network_Implementation<MasterType,InheritanceList>::write_network_link_flow()
 		{
 			typedef  Link_Components::Prototypes::Link<typename remove_pointer<typename  type_of(links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
@@ -189,25 +189,25 @@ namespace Network_Components
 			typedef Network<typename MasterType::network_type> _Network_Interface;
 			int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 			int simulation_interval_index = ((_Network_Interface*)this)->template current_simulation_interval_index<int>();
-
+				
 			fstream& network_link_flow_file = scenario_reference<_Scenario_Interface*>()->template network_link_flow_file<fstream&>();
-
+				
 			typename _Links_Container_Interface::iterator link_itr;
-			for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 			{
 				//flow
 				_Link_Interface* link = (_Link_Interface*)(*link_itr);
-				float bwtt = (float)(link->template length<float>() / (link->template backward_wave_speed<float>()*5280.0 / 3600.0)); // in seconds
-				float fftt = (float)(link->template length<float>() / (link->template free_flow_speed<float>()*5280.0 / 3600.0)); //in seconds
+				float bwtt = (float) (link->template length<float>()/(link->template backward_wave_speed<float>()*5280.0/3600.0)); // in seconds
+				float fftt = (float) (link->template length<float>()/(link->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
 
-				int link_fftt_cached_simulation_interval_size = max(1, int(ceil(float(fftt / ((float)simulation_interval_length)))));
-				int link_bwtt_cached_simulation_interval_size = max(1, int(ceil(float(bwtt / ((float)simulation_interval_length)))));
-
+				int link_fftt_cached_simulation_interval_size = max(1, int(ceil(float(fftt/((float)simulation_interval_length)))));
+				int link_bwtt_cached_simulation_interval_size = max(1, int(ceil(float(bwtt/((float)simulation_interval_length)))));
+					
 				network_link_flow_file
-					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) << ","
-					<< link->template uuid<int>() << ","
-					<< link_fftt_cached_simulation_interval_size << ","
-					<< link_bwtt_cached_simulation_interval_size << ","
+					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) <<  ","
+					<< link->template uuid<int>() <<  ","
+					<< link_fftt_cached_simulation_interval_size <<  ","
+					<< link_bwtt_cached_simulation_interval_size <<  ","
 					<< link->template link_origin_cumulative_arrived_vehicles<int>() << ","
 					<< link->template link_origin_cumulative_departed_vehicles<int>() << ","
 					<< link->template link_destination_cumulative_arrived_vehicles<int>() << ","
@@ -216,13 +216,13 @@ namespace Network_Components
 					<< link->template link_downstream_cumulative_arrived_vehicles<int>() << ","
 					<< link->template link_downstream_cumulative_vehicles<int>() << ","
 					<< link->template link_num_vehicles_in_queue<int>()
-					<< endl;
+					<<endl;		
 			}
 		};
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_network_link_turn_time()
+		 void Network_Implementation<MasterType,InheritanceList>::write_network_link_turn_time()
 		{
 			typedef  Link_Components::Prototypes::Link<typename remove_pointer<typename  type_of(links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
@@ -250,27 +250,27 @@ namespace Network_Components
 			{
 				_Turn_Movement_Interface* movement = (_Turn_Movement_Interface*)(*movement_itr);
 				_Link_Interface* link = movement->template inbound_link<_Link_Interface*>();
-
-				float fftt = (float)(movement->template inbound_link<_Link_Interface*>()->template length<float>() / (movement->template inbound_link<_Link_Interface*>()->template free_flow_speed<float>()*5280.0 / 3600.0)); //in seconds
-				int link_fftt_cached_simulation_interval_size = max(1, int(ceil(float(fftt / (simulation_interval_length*1.0)))));
-
-
+					
+				float fftt = (float) (movement->template inbound_link<_Link_Interface*>()->template length<float>()/(movement->template inbound_link<_Link_Interface*>()->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
+				int link_fftt_cached_simulation_interval_size = max(1,int(ceil(float(fftt/(simulation_interval_length*1.0)))));
+					
+					
 				network_link_turn_time_file
-					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) << ","
+					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) <<  ","
 					<< current_starting_time << ","
 					<< movement->template inbound_link<_Link_Interface*>()->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>() << ","
-					<< movement->template uuid<int>() << ","
-					<< movement->template inbound_link<_Link_Interface*>()->template uuid<int>() << ","
-					<< movement->template outbound_link<_Link_Interface*>()->template uuid<int>() << ","
+					<< movement->template uuid<int>() <<  ","
+					<< movement->template inbound_link<_Link_Interface*>()->template uuid<int>() <<  ","
+					<< movement->template outbound_link<_Link_Interface*>()->template uuid<int>() <<  ","
 					<< fftt << ","
 					<< link_fftt_cached_simulation_interval_size*simulation_interval_length << ","
 
 					<< movement->template inbound_link<_Link_Interface*>()->template link_supply<float>() << ","
 					<< movement->template outbound_link<_Link_Interface*>()->template link_supply<float>() << ","
 					<< movement->template inbound_link<_Link_Interface*>()->template link_origin_arrived_vehicles<int>() << ","
-					<< movement->template outbound_link<_Link_Interface*>()->template link_origin_arrived_vehicles<int>() << ","
+					<<movement->template outbound_link<_Link_Interface*>()->template link_origin_arrived_vehicles<int>() << ","
 					<< movement->template inbound_link<_Link_Interface*>()->template link_origin_departed_vehicles<int>() << ","
-					<< movement->template outbound_link<_Link_Interface*>()->template link_origin_departed_vehicles<int>() << ","
+					<<movement->template outbound_link<_Link_Interface*>()->template link_origin_departed_vehicles<int>() << ","
 					<< movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>() << ","
 					<< movement->template green_time<float>() << ","
 					<< movement->template movement_capacity<float>() << ","
@@ -281,15 +281,15 @@ namespace Network_Components
 					//<< movement->template vehicles_container<_Vehicles_Container_Interface&>().size() << ","
 					<< movement->template turn_travel_penalty<float>() << ","
 					<< movement->template forward_link_turn_travel_time<float>()
-					<< endl;
+					<<endl;
 
 			}
 
 		};
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_node_control_state()
+		 void Network_Implementation<MasterType,InheritanceList>::write_node_control_state()
 		{
 
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
@@ -316,7 +316,7 @@ namespace Network_Components
 
 			typedef Network<typename MasterType::network_type> _Network_Interface;
 			typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
-			_Network_Interface* _this_ptr = (_Network_Interface*)this;
+			_Network_Interface* _this_ptr = (_Network_Interface*)this;				
 			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 			fstream& network_node_control_state_file = scenario_reference<_Scenario_Interface*>()->template network_node_control_state_file<fstream&>();
@@ -330,16 +330,16 @@ namespace Network_Components
 				Intersection_Control_Components::Types::Intersection_Type_Keys control_type = current_control_plan->template control_type<Intersection_Control_Components::Types::Intersection_Type_Keys>();
 
 				network_node_control_state_file
-					<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()) << ","
-					<< _this_ptr->template current_simulation_interval_index<int>() << ","
-					<< _this_ptr->template start_of_current_simulation_interval_relative<int>() << ","
-					<< intersection->template uuid<int>() << ","
-					<< current_control_plan->template control_plan_index<int>() << ","
-					<< current_control_plan->template control_type<int>() << ","
-					<< convert_seconds_to_hhmmss(starting_time) << ","
-					<< convert_seconds_to_hhmmss(ending_time) << ","
-					<< current_control_plan->template approach_data_array<_Approaches_Container_Interface&>().size() << ",";
-
+					<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()) <<  ","
+					<< _this_ptr->template current_simulation_interval_index<int>() <<  ","
+					<< _this_ptr->template start_of_current_simulation_interval_relative<int>() <<  ","
+					<< intersection->template uuid<int>() <<  ","
+					<< current_control_plan->template control_plan_index<int>() <<  ","
+					<< current_control_plan->template control_type<int>() <<  ","
+					<< convert_seconds_to_hhmmss(starting_time) <<  ","
+					<< convert_seconds_to_hhmmss(ending_time) <<  ","
+					<< current_control_plan->template approach_data_array<_Approaches_Container_Interface&>().size() <<  ",";
+		
 				if (control_type == Intersection_Control_Components::Types::PRE_TIMED_SIGNAL_CONTROL || control_type == Intersection_Control_Components::Types::ACTUATED_SIGNAL_CONTROL)
 				{
 					int num_phases = (int)current_control_plan->template phase_data_array<_Phases_Container_Interface&>().size();
@@ -350,35 +350,35 @@ namespace Network_Components
 					int cycle_length = cycle_ending_time - cycle_starting_time;
 
 					network_node_control_state_file
-						<< cycle_index << ","
-						<< cycle_length << ","
-						<< convert_seconds_to_hhmmss(cycle_starting_time) << ","
-						<< convert_seconds_to_hhmmss(cycle_ending_time) << ","
+						<< cycle_index <<  ","
+						<< cycle_length <<  ","
+						<< convert_seconds_to_hhmmss(cycle_starting_time) <<  ","
+						<< convert_seconds_to_hhmmss(cycle_ending_time) <<  ","
 						<< num_phases << ",";
 
-					for (int iphase = 0; iphase < num_phases; iphase++)
+					for (int iphase=0;iphase<num_phases;iphase++)
 					{
 						_Phase_Interface* phase = current_control_plan->template phase_data_array<_Phases_Container_Interface&>()[iphase];
 						int green_starting_time = phase->template green_starting_time<int>();
-						int yellow_starting_time = cycle_starting_time + phase->template yellow_starting_time<int>();
+						int yellow_starting_time = cycle_starting_time +  phase->template yellow_starting_time<int>();
 						int red_starting_time = cycle_starting_time + phase->template red_start_time<int>();
 						int phase_end_time = red_starting_time + phase->template all_red_time<int>();
 
 						network_node_control_state_file
-							<< iphase << ","
-							<< convert_seconds_to_hhmmss(green_starting_time) << ","
-							<< convert_seconds_to_hhmmss(yellow_starting_time) << ","
-							<< convert_seconds_to_hhmmss(red_starting_time) << ","
-							<< convert_seconds_to_hhmmss(phase_end_time) << ",";
+							<< iphase <<  ","
+							<< convert_seconds_to_hhmmss(green_starting_time) <<  ","
+							<< convert_seconds_to_hhmmss(yellow_starting_time) <<  ","
+							<< convert_seconds_to_hhmmss(red_starting_time) <<  ","
+							<< convert_seconds_to_hhmmss(phase_end_time) <<  ",";
 					}
 				}
-				network_node_control_state_file << endl;
+				network_node_control_state_file <<endl;
 			}
 		}
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::write_output_summary()
+		 void Network_Implementation<MasterType,InheritanceList>::write_output_summary()
 		{
 
 			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename  type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
@@ -411,37 +411,37 @@ namespace Network_Components
 
 			fstream& output_summary_file = scenario->template output_summary_file<fstream&>();
 
-			_current_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
+            _current_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
 
 			long long totalPhysicalMemory = 0;
 			long long physicalMemoryUsedByProcess = 0;
 			//mem_info(totalPhysicalMemory, physicalMemoryUsedByProcess);
 
-			long elapsed_time = _current_cpu_time_in_seconds - _start_cpu_time_in_seconds;
+            long elapsed_time = _current_cpu_time_in_seconds - _start_cpu_time_in_seconds;
 			output_summary_file
-				<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str() << ","
-				<< scenario->template network_cumulative_loaded_vehicles<int>() << ","
-				<< scenario->template network_cumulative_departed_vehicles<int>() << ","
-				<< scenario->template network_cumulative_arrived_vehicles<int>() << ","
-				<< scenario->template network_in_network_vehicles<int>() << ","
-				<< scenario->template network_cumulative_switched_decisions<int>() << ","
-				<< _network_vmt << ","
-				<< _network_vht_in_network_based << ","
-				<< scenario->template network_average_trip_travel_time<float>() << ","
-				<< scenario->template network_cumulative_switched_decisions_excessive_delay<int>() << ","
-				<< scenario->template network_cumulative_switched_decisions_realtime_informed<int>() << ","
-				<< scenario->template network_cumulative_switched_decisions_ITS_informed<int>() << ","
-				<< convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
-				<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
-				<< getCurrentRSS() / 1000000 << ","
-				//<< physicalMemoryUsedByProcess/1000000 << ","
-				//<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0) << ","
-				<< endl;
+                    << convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str() << ","
+                    << scenario->template network_cumulative_loaded_vehicles<int>() <<  ","
+                    << scenario->template network_cumulative_departed_vehicles<int>() << ","
+                    << scenario->template network_cumulative_arrived_vehicles<int>() << ","
+                    << scenario->template network_in_network_vehicles<int>() << ","
+					<< scenario->template network_cumulative_switched_decisions<int>() << ","
+					<< _network_vmt << ","
+					<< _network_vht_in_network_based << ","
+					<< scenario->template network_average_trip_travel_time<float>() << ","
+					<< scenario->template network_cumulative_switched_decisions_excessive_delay<int>() << ","
+					<< scenario->template network_cumulative_switched_decisions_realtime_informed<int>() << ","
+					<< scenario->template network_cumulative_switched_decisions_ITS_informed<int>() << ","
+                    << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
+					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
+					<< getCurrentRSS()/1000000 << ","
+					//<< physicalMemoryUsedByProcess/1000000 << ","
+					//<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0) << ","
+                    <<endl;
 		}
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::output_moe_for_simulation_interval()
+		 void Network_Implementation<MasterType,InheritanceList>::output_moe_for_simulation_interval()
 		{
 			using namespace polaris::io;
 			typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
@@ -456,7 +456,7 @@ namespace Network_Components
 			int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
 			typedef typename MasterType::intersection_type _intersection_component_type;
 			typedef typename MasterType::link_type _link_component_type;
-
+			
 			if (((_Scenario_Interface*)_global_scenario)->template output_link_moe_for_simulation_interval<bool>())
 			{
 				try
@@ -604,7 +604,7 @@ namespace Network_Components
 			//}
 
 			if (((_Scenario_Interface*)_global_scenario)->template output_network_moe_for_simulation_interval<bool>())
-			{
+			{	
 				// output network moe
 				((_Scenario_Interface*)_global_scenario)->template out_realtime_network_moe_file<fstream&>()
 					<< convert_seconds_to_hhmmss(time).c_str() << ","
@@ -633,9 +633,9 @@ namespace Network_Components
 			}
 		}
 
-		template<typename MasterType, typename InheritanceList>
+		template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType, InheritanceList>::output_moe_for_assignment_interval()
+		void Network_Implementation<MasterType,InheritanceList>::output_moe_for_assignment_interval()
 		{
 			using namespace polaris::io;
 			typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
@@ -648,10 +648,10 @@ namespace Network_Components
 
 			typedef Network<typename MasterType::network_type> _Network_Interface;
 			int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>();
-
+			
 			typedef typename MasterType::link_type _link_component_type;
 			typedef typename MasterType::intersection_type _intersection_component_type;
-
+			
 			if (((_Scenario_Interface*)_global_scenario)->template output_link_moe_for_assignment_interval<bool>())
 			{
 				try
@@ -662,23 +662,23 @@ namespace Network_Components
 
 					typename _Links_Container_Interface::iterator link_itr;
 					LinkMOE link_moe_db_record;
-					for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+					for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 					{
 						_link_component_type* link = (_link_component_type*)(*link_itr);
 						shared_ptr<polaris::io::LinkMOE> link_moe_db_record(new polaris::io::LinkMOE());
-
+				
 						link_moe_db_record->setLink_Uid(link->uuid<int>());
 						link_moe_db_record->setLink_Type(link->link_type<Link_Components::Types::Link_Type_Keys>());
-						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(link->length<float>()));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
+						link_moe_db_record->setLink_Length(GLOBALS::Length_Converter.Convert_Value<Feet,Meters>(link->length<float>()));											// output in SI (m), currently stored internally in feet -> replace eventually with use of units library
 						link_moe_db_record->setStart_Time(time);
 						link_moe_db_record->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
-						link_moe_db_record->setLink_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(link->link_moe_data.link_travel_time));					// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
+						link_moe_db_record->setLink_Travel_Time(GLOBALS::Convert_Units<Time_Minutes,Time_Seconds>(link->link_moe_data.link_travel_time));					// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						link_moe_db_record->setLink_Travel_Time_Standard_Deviation(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(link->link_moe_data.link_travel_time_standard_deviation));
 						link_moe_db_record->setLink_Queue_Length(link->link_moe_data.link_queue_length);
 						link_moe_db_record->setLink_Travel_Delay(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(link->link_moe_data.link_travel_delay));
 						link_moe_db_record->setLink_Travel_Delay_Standard_Deviation(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(link->link_moe_data.link_travel_delay_standard_deviation));
-						link_moe_db_record->setLink_Speed(GLOBALS::Convert_Units<Miles_Per_Hour, Meters_Per_Second>(link->link_moe_data.link_speed));
-						link_moe_db_record->setLink_Density(link->link_moe_data.link_density / GLOBALS::Convert_Units<Miles, Kilometers>(1.0));									// output in SI (veh / km), currently stored internally in Veh / mile -> replace eventually with use of units library
+						link_moe_db_record->setLink_Speed(GLOBALS::Convert_Units<Miles_Per_Hour,Meters_Per_Second>(link->link_moe_data.link_speed));
+						link_moe_db_record->setLink_Density(link->link_moe_data.link_density/GLOBALS::Convert_Units<Miles,Kilometers>(1.0));									// output in SI (veh / km), currently stored internally in Veh / mile -> replace eventually with use of units library
 						link_moe_db_record->setLink_In_Flow_Rate(link->link_moe_data.link_in_flow_rate);
 						link_moe_db_record->setLink_Out_Flow_Rate(link->link_moe_data.link_out_flow_rate);
 						link_moe_db_record->setLink_In_Volume(link->link_moe_data.link_in_volume);
@@ -688,21 +688,21 @@ namespace Network_Components
 						link_moe_db_record->setLink_Out_Flow_Ratio(link->link_moe_data.link_out_flow_ratio);
 						link_moe_db_record->setLink_Density_Ratio(link->link_moe_data.link_density_ratio);
 						link_moe_db_record->setLink_Travel_Time_Ratio(link->link_moe_data.link_travel_time_ratio);
-
+						
 						try
-						{
+						{				
 							db_ptr->persist(link_moe_db_record);
 						}
 						catch (odb::sqlite::database_exception ex)
 						{
-							cout << ex.message() << ". DB error in network implementation results, line 585." << endl;
+							cout << ex.message()<<". DB error in network implementation results, line 585."<<endl;
 						}
 					}
 					t.commit();
 				}
 				catch (odb::sqlite::database_exception ex)
 				{
-					cout << ex.message() << ". DB error in network implementation results, line 585." << endl;
+					cout << ex.message()<<". DB error in network implementation results, line 585."<<endl;
 				}
 			}
 
@@ -734,7 +734,7 @@ namespace Network_Components
 						turn_moe_rec->setTurn_Penalty_SD(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.turn_penalty_standard_deviation));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setInbound_Turn_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.inbound_link_turn_time));		// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
 						turn_moe_rec->setOutbound_Turn_Travel_Time(GLOBALS::Convert_Units<Time_Minutes, Time_Seconds>(movement->movement_moe_data.outbound_link_turn_time));	// output in SI (s), currently stored internally in minutes -> replace eventually with use of units library
-						turn_moe_rec->setTurn_Flow_Rate(movement->movement_moe_data.movement_flow_rate);
+						turn_moe_rec->setTurn_Flow_Rate(movement->movement_moe_data.movement_flow_rate);						
 						db_ptr->persist(turn_moe_rec);
 					}
 					t.commit();
@@ -755,7 +755,7 @@ namespace Network_Components
 
 				typedef  Network_Event_Components::Prototypes::Network_Event< typename _Analyze_Link_Group_Interface::get_type_of(event)> _Network_Event_Interface;
 				typename _Analyze_Link_Groups_Container_Interface::iterator analyze_link_group_itr;
-				for (analyze_link_group_itr = _analyze_link_groups_container.begin(); analyze_link_group_itr != _analyze_link_groups_container.end(); analyze_link_group_itr++)
+				for(analyze_link_group_itr = _analyze_link_groups_container.begin(); analyze_link_group_itr != _analyze_link_groups_container.end(); analyze_link_group_itr++)
 				{
 					_Analyze_Link_Group_Interface* analyze_link_group = (_Analyze_Link_Group_Interface*)(*analyze_link_group_itr);
 					_Network_Event_Interface* event = analyze_link_group->template event<_Network_Event_Interface*>();
@@ -841,18 +841,18 @@ namespace Network_Components
 					<< network_moe_data.network_avg_link_in_flow_ratio << ","
 					<< network_moe_data.network_avg_link_out_flow_ratio << ","
 					<< _network_vmt << ","
-					<< _network_vht_in_network_based
+					<< _network_vht_in_network_based 
 					//<< network_moe_data.assignment_calculation_time << ","
 					//<< network_moe_data.simulation_calculation_time << ","
 					//<< network_moe_data.operation_calculation_time << ","
 					//<< network_moe_data.output_calculation_time 
 					<< endl;
+				}
 			}
-		}
-	
-		template<typename MasterType,typename InheritanceList>
+
+			template<typename MasterType,typename InheritanceList>
 		template<typename TargetType>
-		void Network_Implementation<MasterType,InheritanceList>::read_analyze_link_groups()
+		 void Network_Implementation<MasterType,InheritanceList>::read_analyze_link_groups()
 			{
 				typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
@@ -912,7 +912,6 @@ namespace Network_Components
 					_analyze_link_groups_container.push_back((typename MasterType::analyze_link_group_type*)analyze_link_group);
 				}
 			}
-		
 	}
 }
 

@@ -395,7 +395,7 @@ int main(int argc,char** argv)
 		fw_mm_sp_details.Write(details_title);
 
 		stringstream summary_title("");
-		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tSub_Mode\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time\tSuccess_Status\tEuc_Dist_km\tNeighbor_Visit_Time\n";
+		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tSub_Mode\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time\tNeighbor_Visit_Time\tSuccess_Status\tEuc_Distance\n";
 		//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
 		stringstream summary_filename("");
 		summary_filename << scenario->template output_dir_name<string>();
@@ -462,7 +462,7 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Write_Line("\t\"multimodal_routing\" : true,");
 	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : true,");
+	fw.Write_Line("\t\"time_dependent_routing\" : false,");
 	fw.Write_Line("\t\"write_demand_to_database\" : true\n}");
 	
 	fw.Close();
