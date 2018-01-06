@@ -485,9 +485,10 @@ namespace Person_Components
 				
 				//TODO OMER JOSH
 				Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-				Kilometers_Per_Minute walkSpeed_kpm = walkSpeed_kph / 60; //GLOBALS::Convert_Units<Kilometers_Per_Hour, Kilometers_Per_Minute>(walkSpeed_kph);
+				Kilometers_Per_Minute walkSpeed_kpm = GLOBALS::Convert_Units<Kilometers_Per_Hour, Kilometers_Per_Minute>(walkSpeed_kph);
 
 				double TRAN_OVTT = (_Mode_Chooser->template walk_distance_to_transit<Kilometers>() + _Mode_Chooser->template walk_distance_after_transit<Kilometers>() ) / walkSpeed_kpm; // meters/(meters per second *60)
+				
 				//double TRAN_OVTT = los->transit_walk_access_time<Time_Minutes>();
 				
 				if (this->_mode_type == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
