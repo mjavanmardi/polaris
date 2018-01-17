@@ -49,6 +49,10 @@ namespace Network_Components
 			float network_avg_link_out_flow_ratio;
 			float network_avg_link_density_ratio;
 			float network_avg_link_travel_time_ratio;
+
+			float network_routed_ttime;
+			float network_relative_gap;
+
 		};
 
 		implementation struct Network_Implementation:public Polaris_Component<MasterType,INHERIT(Network_Implementation),Execution_Object>
@@ -240,6 +244,9 @@ namespace Network_Components
 				_out_network_vht_vehicle_based = 0.0;
 				_network_vht_vehicle_based = 0;
 				initialize_moe();
+				network_moe_data.network_routed_ttime = 0.0f;
+				network_moe_data.network_relative_gap = 0.0f;
+
 				initialize_network_agent<TargetType>();
 				int num_epoches = 24*60/5 + 1;
 				ttime_distribution.resize(num_epoches);
@@ -491,9 +498,15 @@ namespace Network_Components
 				network_moe_data.network_avg_link_travel_time = 0.0f;
 				network_moe_data.network_avg_link_travel_time_ratio = 0.0f;
 
+				//TODO: Check - this has been moved to simulation intialization so it is not reset after every assignment interval, as they are cumulative measures
+				/*network_moe_data.network_routed_ttime = 0.0f;
+				network_moe_data.network_relative_gap = 0.0f;*/
+
 				network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>();
 				network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
 				network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
+
+
 			}
 			//agent mostly responsable fr output of results
 			template<typename TargetType> void initialize_network_agent()

@@ -37,7 +37,7 @@ namespace Trip_Components
 			m_prototype(Network_Components::Prototypes::Network,typename MasterType::network_type, network_reference, NONE, NONE);
 
 			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
-			typedef strip_modifiers(router_type) router_interface;
+
 
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location,typename MasterType::activity_location_type, origin, NONE, NONE);
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location,typename MasterType::activity_location_type, destination, NONE, NONE);

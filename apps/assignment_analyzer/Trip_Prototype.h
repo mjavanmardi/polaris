@@ -1,5 +1,6 @@
 #pragma once
-#include "User_Space_Includes.h"
+#include "Traffic_Simulator.h"
+#include "Traveler_Simulator.h"
 #include "Activity_Location_Prototype.h"
 #include "Traffic_Simulator_Concepts.h"
 
@@ -24,7 +25,7 @@ namespace Trip_Components
 
 	namespace Prototypes
 	{
-		prototype struct Assignment_Analyzer
+		prototype struct Assignment_Analyzer ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -96,9 +97,11 @@ namespace Trip_Components
 					for(odb::result<polaris::io::Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 					{
 						trip_id = db_itr->getPrimaryKey();
-						veh_id = db_itr->getHhold()*100 + db_itr->getPerson();
+						
 						int mode = db_itr->getMode();
 						if (mode > 0) continue;
+
+						if (mode == 0) veh_id = db_itr->getVehicle()->getPrimaryKey();
 
 						if (++counter % 100000 == 0) cout << counter << " trips processed" << endl;
 
@@ -300,7 +303,7 @@ namespace Trip_Components
 				movement_plan->template destination<_Activity_Location_Interface*>(dest);
 				movement_plan->template departed_time<Time_Seconds>(departed_time);
 				movement_plan->template initialize_trajectory<NULLTYPE>();
-				movement_plan->template traveler_id(Trip_Id);
+				movement_plan->traveler_id(Trip_Id);
 
 				router->template network<_Network_Interface*>(network);
 				router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);

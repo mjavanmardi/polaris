@@ -882,8 +882,8 @@ class Path
 public:
 	// Default Constructor
 	Path() {}
-	Path(int id_, shared_ptr<Vehicle> vehicle_, /*int origin_zone_, int destination_zone_,*/ int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int routed_time_, int travel_time_, std::vector<link_travel > links_)
-		: id(id_), vehicle(vehicle_), /*origin_zone (origin_zone_), destination_zone (destination_zone_),*/ origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), routed_time(routed_time_), travel_time(travel_time_), links(links_)
+	Path(int id_, int traveler_id_, shared_ptr<Vehicle> vehicle_, /*int origin_zone_, int destination_zone_,*/ int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int routed_time_, int travel_time_, std::vector<link_travel > links_)
+		: id(id_), traveler_id(traveler_id_), vehicle(vehicle_), /*origin_zone (origin_zone_), destination_zone (destination_zone_),*/ origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), routed_time(routed_time_), travel_time(travel_time_), links(links_)
 	{
 	}
 	//Accessors
@@ -895,6 +895,8 @@ public:
 	//void setOrigin_Zone (const int& origin_zone_) {origin_zone = origin_zone_;}
 	//const int& getDestination_Zone () const {return destination_zone;}
 	//void setDestination_Zone (const int& destination_zone_) {destination_zone = destination_zone_;}
+	const int& getTraveler_ID() const { return traveler_id; }
+	void setTraveler_ID(const int& traveler_id_) { traveler_id = traveler_id_; }
 	const int& getOrigin_Activity_Location() const { return origin_activity_location; }
 	void setOrigin_Activity_Location(const int& origin_activity_location_) { origin_activity_location = origin_activity_location_; }
 	const int& getDestination_Activity_Location() const { return destination_activity_location; }
@@ -924,6 +926,7 @@ private:
 	//int origin_zone;
 	//#pragma db not_null
 	//int destination_zone;
+	int traveler_id;
 #pragma db not_null
 	int origin_activity_location;
 #pragma db not_null
