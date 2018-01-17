@@ -462,8 +462,8 @@ class multimodalSPLabels
 public:
 	// Default Constructor
 	multimodalSPLabels() {}
-	multimodalSPLabels(int Origin_ID_, int Destination_ID_, int Departure_Time_, int Sub_Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, std::string Success_Status_, float Euc_Dist_km_)
-		: Origin_ID(Origin_ID_), Destination_ID(Destination_ID_), Departure_Time(Departure_Time_), Sub_Mode(Sub_Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
+	multimodalSPLabels(int Origin_ID_, int Destination_ID_, int Departure_Time_, int Sub_Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, float visit_Time_, std::string Success_Status_, float Euc_Dist_km_)
+		: Origin_ID(Origin_ID_), Destination_ID(Destination_ID_), Departure_Time(Departure_Time_), Sub_Mode(Sub_Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), visit_Time(visit_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
 	{
 	}
 	//Accessors
@@ -501,6 +501,8 @@ public:
 	void setScan_Count(const int& Scan_Count_) { Scan_Count = Scan_Count_; }
 	const float& getaStar_Time() const { return aStar_Time; }
 	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }
+	const float& getvisit_Time() const { return visit_Time; }
+	void setvisit_Time(const float& visit_Time_) { visit_Time = visit_Time_; }
 	const std::string& getSuccess_Status() const { return Success_Status; }
 	void setSuccess_Status(const std::string& Success_Status_) { Success_Status = Success_Status_; }
 	const float& getEuc_Dist_km() const { return Euc_Dist_km; }
@@ -529,6 +531,7 @@ private:
 	float Est_Cost;
 	int Scan_Count;
 	float aStar_Time;
+	float visit_Time;
 	std::string Success_Status;
 	float Euc_Dist_km;
 };
