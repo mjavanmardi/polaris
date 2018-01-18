@@ -73,7 +73,8 @@ namespace Network_Components
 						//============================================================
 						// JA: Added 1/17/18 - use every vehicle for gap calculation
 						// update the network relative gap calculations with the current vehicle
-						network_moe_data.network_relative_gap += abs((movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());
+						/*network_moe_data.network_relative_gap += abs((movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());*/
+						network_moe_data.network_relative_gap += std::max(0.0, (movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());
 						network_moe_data.network_routed_ttime += movement_plan->template estimated_travel_time_when_departed<float>();
 						//===============================================================
 
