@@ -195,12 +195,12 @@ namespace Person_Components
 					// not moving - reassign to walk mode
 					if (move->origin<_Activity_Location_Interface*>() == move->destination<_Activity_Location_Interface*>())
 					{
-						act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::WALK);
+						act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 					}
 
 					//===============================================================================
 					// IF IT IS AN SOV MOVEMENT - do vehicle selection
-					if (act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::SOV)
+					if (act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
 						// get current vehicle (s.b. nullptr if starting at home
 						_Vehicle_Interface* vehicle = parent->vehicle<_Vehicle_Interface*>();			
@@ -219,13 +219,13 @@ namespace Person_Components
 							}
 							else
 							{
-								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
+								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);
 							}
 						}
 						// no vehicle found, can we wait for a short time until a vehicle is available?
 						else
 						{
-							//act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV);
+							//act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);
 
 							// get next vehicle availability time, make sure it is at least in the next movement checking period (so we can ensure that the simulation movements are completed)
 							int next_avail_veh_iter = std::max((float)household->Get_Next_Available_Vehicle_Time<Simulation_Timestep_Increment>(), (float)Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()+1));
@@ -241,7 +241,7 @@ namespace Person_Components
 							// no vehicles available, make it an HOV
 							else
 							{
-								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::HOV); 
+								act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::HOV); 
 
 							}		
 						}

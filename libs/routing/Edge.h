@@ -15,6 +15,32 @@ namespace polaris
 		Base_Edge_Type* end_edge;
 		std::vector< Base_Edge_Type* >* ends;
 		unsigned int start_time;
+
+		//TODO OMER: Check if these additions damages anything
+		//----------------------------------------------------
+		float transferPenalty;
+		float waitWeight;
+		float walkWeight;
+		float bikeWeight;
+		float ivtWeight;
+		float carWeight;
+		float scanThreshold;
+		float costThreshold;
+		float waitThreshold_Time;
+		Meters walkThreshold;
+		Kilometers_Per_Hour walkSpeed_kph;
+		Meters bikeThreshold;
+		Kilometers_Per_Hour bikeSpeed_kph;
+		bool multimodal_dijkstra;
+		Meters_Per_Second walkSpeed_mps;
+		Meters_Per_Second bikeSpeed_mps;
+		Feet_Per_Second walkSpeed_fps;
+		Feet_Per_Second bikeSpeed_fps;
+		float bike_time_factor;
+		float walkThreshold_Time;
+		float bikeThreshold_Time;
+		Vehicle_Components::Types::Vehicle_Type_Keys sub_mode;
+		//----------------------------------------------------
 	};
 
 	template<typename MasterType,typename Base_Edge_Type>

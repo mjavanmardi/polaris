@@ -7,8 +7,8 @@
 #include "Visual_Traffic_Simulator.h"
 #else
 
-#include "Traffic_Simulator/User_Space_with_odb.h"
-#include "Traffic_Simulator/User_Space.h"
-
+#include "Traffic_Simulator.h"
+#include "Traveler_Simulator.h"
+#include "Scenario_Manager.h"
 #endif
 

@@ -497,7 +497,8 @@ namespace Movement_Plan_Components
 			void Display_Movement()
 			{
 				this_component()->Display_Movement();
-			}
+			}			
+
 		};
 	}
 }

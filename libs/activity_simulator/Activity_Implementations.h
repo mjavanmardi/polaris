@@ -40,8 +40,8 @@ namespace Activity_Components
 			// pointer to movement plan associated with activity
 			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
 
-			static m_data(int, Route_Planning_Count, NONE, NONE);
-			//static m_data(_lock, update_lock, NONE, NONE);
+			m_static_data(int, Route_Planning_Count, NONE, NONE);
+			//m_static_data(_lock, update_lock, NONE, NONE);
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -200,7 +200,7 @@ namespace Activity_Components
 				if (value < this->template Start_Time<TargetType>())
 				{
 					//TODO: CHANGE back to throw exception after testing
-					THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
+					//THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
 				}
 				else this->template Duration<TargetType>(value - this->template Start_Time<TargetType>());
 			}
@@ -328,9 +328,9 @@ namespace Activity_Components
 
 				// check if a stop at home will fit prior to activity
 				Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
-				Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(), Vehicle_Components::Types::SOV, start);
-				Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(person->template Home_Location<_activity_location_itf*>(), dest, Vehicle_Components::Types::SOV, start);
-				Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, dest, Vehicle_Components::Types::SOV, start);
+				Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+				Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(person->template Home_Location<_activity_location_itf*>(), dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+				Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Seconds, Time_Seconds>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
 				// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
 				float min_home_time = min((float)ttime_prev_to_home, (float)ttime_home_to_this);
 				// don't reset origin, however, if this trip is a return-to-home trip
@@ -397,7 +397,7 @@ namespace Activity_Components
 				// If no adults free and not school trip - cancel act
 				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 				// if no adult but is school activity, force trip to transit
-				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
+				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 				// otherwise, assign escort duty to adult
 				else
 				{
@@ -409,7 +409,7 @@ namespace Activity_Components
 			else if (properties->template Age<int>()<10 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 			{
 				// Attempt parent escort for all modes but transit - if fails force to transit
-				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::SCHOOLBUS)
+				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
 				{
 					// get a free adult available for escort
 					//%%%RLW
@@ -418,7 +418,7 @@ namespace Activity_Components
 					// If no adults free and not school trip - cancel act
 					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
 					// if no adult but is school activity, force trip to transit
-					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SCHOOLBUS);
+					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 					// otherwise, assign escort duty to adult
 					else
 					{
@@ -430,7 +430,7 @@ namespace Activity_Components
 			else if (properties->template Age<int>()<16 && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::AT_HOME_ACTIVITY)
 			{
 				// Attempt parent escort when using HOV - if fails force to transit
-				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::HOV)
+				if (this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
 				{
 					// get a free adult available for escort
 					_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
@@ -438,7 +438,29 @@ namespace Activity_Components
 					// If no adults free, force trip to transit
 					if (adult == nullptr)
 					{
-						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
+						//TODO OMER: Change back to bus when done
+						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK);
+
+						//TODO OMER: Delete when done
+						char myLine[2000];
+						std::string bus_mode_paragraph;
+						stringstream bus_mode_stream;
+
+						Meters walkThreshold = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkThreshold<float>();
+						Meters walkThreshold_init = walkThreshold / 5.0;
+
+						sprintf_s(myLine, "%s\t%f\t%f\t%d\t%d\t%f\t%s\n",
+							"Child_Forced",
+							walkThreshold_init,
+							-1.0,
+							move->template origin<_activity_location_itf*>(),
+							move->template destination<_activity_location_itf*>(),
+							this->template Start_Time<Time_Minutes>(),
+							"TRUCK");
+						bus_mode_paragraph.insert(0, myLine);
+						bus_mode_stream << bus_mode_paragraph;
+						fw_bus_mode.Write_NoDelim(bus_mode_stream);
+
 					}
 					else
 					{
@@ -715,19 +737,19 @@ namespace Activity_Components
 			ACT1 = 0; ACT2 = 0; ACT3 = 0; ACT4 = 0; ACT5 = 0; Employed = 0; Student = 0; Male = 0; Senior = 0; TELEWORK = 0; ICT_USE = 0;
 			float AvgDur, AvgFreq;
 
-			if (base_this->_Activity_Type == Types::WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == Types::PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == Types::PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == Types::SCHOOL_ACTIVITY || base_this->_Activity_Type == Types::OTHER_WORK_ACTIVITY) ACT1 = 1;
-			else if (base_this->_Activity_Type == Types::HEALTHCARE_ACTIVITY || base_this->_Activity_Type == Types::RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == Types::PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
-			else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == Types::PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == Types::SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
-			else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY || base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
-			else if (base_this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY || base_this->_Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
+			if (this->_Activity_Type == Types::WORK_AT_HOME_ACTIVITY || this->_Activity_Type == Types::PRIMARY_WORK_ACTIVITY || this->_Activity_Type == Types::PART_TIME_WORK_ACTIVITY || this->_Activity_Type == Types::SCHOOL_ACTIVITY || this->_Activity_Type == Types::OTHER_WORK_ACTIVITY) ACT1 = 1;
+			else if (this->_Activity_Type == Types::HEALTHCARE_ACTIVITY || this->_Activity_Type == Types::RELIGIOUS_OR_CIVIC_ACTIVITY || this->_Activity_Type == Types::PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
+			else if (this->_Activity_Type == Types::ERRANDS_ACTIVITY || this->_Activity_Type == Types::PICK_UP_OR_DROP_OFF_ACTIVITY || this->_Activity_Type == Types::SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
+			else if (this->_Activity_Type == Types::LEISURE_ACTIVITY || this->_Activity_Type == Types::EAT_OUT_ACTIVITY || this->_Activity_Type == Types::RECREATION_ACTIVITY || this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
+			else if (this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY || this->_Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
 			if (static_props->template Is_Employed<bool>()) Employed = 1;
 			if (static_props->template Is_Student<bool>()) Student = 1;
 			if (static_props->template Gender<GENDER>() == GENDER::MALE) Male = 1;
 			if (static_props->template Age<int>() >= 65) Senior = 1;
 			//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 			if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-			AvgFreq = properties->template Average_Activity_Frequency<Types::ACTIVITY_TYPES, float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
-			AvgDur = properties->template Average_Activity_Duration<Types::ACTIVITY_TYPES, Time_Days>(base_this->_Activity_Type);
+			AvgFreq = properties->template Average_Activity_Frequency<Types::ACTIVITY_TYPES, float, typename _properties_itf::Component_Type>(this->_Activity_Type);
+			AvgDur = properties->template Average_Activity_Duration<Types::ACTIVITY_TYPES, Time_Days>(this->_Activity_Type);
 
 
 			//===========================================================================================================================
@@ -775,11 +797,11 @@ namespace Activity_Components
 			// Set flexibility values
 			for (int i = 0; i < 2; i++)
 			{
-				if (rand[0] < P_mod[i]) { base_this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999; }
-				if (rand[1] < P_per[i]) { base_this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
-				if (rand[2] < P_loc[i]) { base_this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
-				if (rand[3] < P_tim[i]) { base_this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
-				if (rand[4] < P_dur[i]) { base_this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
+				if (rand[0] < P_mod[i]) { this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999; }
+				if (rand[1] < P_per[i]) { this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
+				if (rand[2] < P_loc[i]) { this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
+				if (rand[3] < P_tim[i]) { this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
+				if (rand[4] < P_dur[i]) { this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
 			}
 
 			// Set results of flexiblity model to use in next models
@@ -910,12 +932,12 @@ namespace Activity_Components
 			// get references to use in model
 			base_type* base_this = (base_type*)this;
 
-			Revision &start = base_this->template Start_Time_Planning_Time<  Revision&>();
-			Revision &dur = base_this->template Duration_Planning_Time<  Revision&>();
-			Revision &loc = base_this->template Location_Planning_Time<  Revision&>();
-			Revision &mode = base_this->template Mode_Planning_Time<  Revision&>();
-			Revision &persons = base_this->template Involved_Persons_Planning_Time<  Revision&>();
-			Revision &route = base_this->template Route_Planning_Time<  Revision&>();
+			Revision &start = this->template Start_Time_Planning_Time<  Revision&>();
+			Revision &dur = this->template Duration_Planning_Time<  Revision&>();
+			Revision &loc = this->template Location_Planning_Time<  Revision&>();
+			Revision &mode = this->template Mode_Planning_Time<  Revision&>();
+			Revision &persons = this->template Involved_Persons_Planning_Time<  Revision&>();
+			Revision &route = this->template Route_Planning_Time<  Revision&>();
 
 
 			// Set revisions based on the plan-horizons for each attribute
@@ -1196,18 +1218,18 @@ namespace Activity_Components
 			{
 				base_type* base_this = (base_type*)this;
 
-				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = 0;
-				base_this->template Duration_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Duration_Planning_Time<  Revision&>()._sub_iteration = 1;
-				base_this->template Location_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Location_Planning_Time<  Revision&>()._sub_iteration = 2;
-				base_this->template Mode_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = 3;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = 4;
-				base_this->template Route_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
-				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = 5;
+				this->template Start_Time_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = 0;
+				this->template Duration_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Duration_Planning_Time<  Revision&>()._sub_iteration = 1;
+				this->template Location_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Location_Planning_Time<  Revision&>()._sub_iteration = 2;
+				this->template Mode_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Mode_Planning_Time<  Revision&>()._sub_iteration = 3;
+				this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = 4;
+				this->template Route_Planning_Time<  Revision&>()._iteration = std::max(iteration()+1, (int)planning_time);
+				this->template Route_Planning_Time<  Revision&>()._sub_iteration = 5;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -1218,7 +1240,7 @@ namespace Activity_Components
 			{
 				this_itf* pthis = (this_itf*)this;
 				base_type* base_this = (base_type*)this;
-				_person_itf* person = base_this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 
 				// Select the location based on the activity type
@@ -1296,7 +1318,7 @@ namespace Activity_Components
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
-				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
@@ -1405,19 +1427,19 @@ namespace Activity_Components
 				ACT1 = 0; ACT2 = 0; ACT3 = 0; ACT4 = 0; ACT5 = 0; Employed = 0; Student = 0; Male = 0; Senior = 0; TELEWORK = 0; ICT_USE = 0;
 				float AvgDur, AvgFreq;
 
-				if (base_this->_Activity_Type == WORK_AT_HOME_ACTIVITY || base_this->_Activity_Type == PRIMARY_WORK_ACTIVITY || base_this->_Activity_Type == PART_TIME_WORK_ACTIVITY || base_this->_Activity_Type == SCHOOL_ACTIVITY || base_this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
-				else if (base_this->_Activity_Type == HEALTHCARE_ACTIVITY || base_this->_Activity_Type == RELIGIOUS_OR_CIVIC_ACTIVITY || base_this->_Activity_Type == PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
-				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
-				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
-				else if (base_this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY ||base_this-> _Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
+				if (this->_Activity_Type == WORK_AT_HOME_ACTIVITY || this->_Activity_Type == PRIMARY_WORK_ACTIVITY || this->_Activity_Type == PART_TIME_WORK_ACTIVITY || this->_Activity_Type == SCHOOL_ACTIVITY || this->_Activity_Type == OTHER_WORK_ACTIVITY) ACT1 = 1;
+				else if (this->_Activity_Type == HEALTHCARE_ACTIVITY || this->_Activity_Type == RELIGIOUS_OR_CIVIC_ACTIVITY || this->_Activity_Type == PERSONAL_BUSINESS_ACTIVITY) ACT2 = 1;
+				else if (this->_Activity_Type == Types::ERRANDS_ACTIVITY || this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
+				else if (this->_Activity_Type == Types::LEISURE_ACTIVITY|| this->_Activity_Type == Types::EAT_OUT_ACTIVITY || this->_Activity_Type == Types::RECREATION_ACTIVITY || this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
+				else if (this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY ||this-> _Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
 				if (static_props->template Is_Employed<bool>()) Employed = 1;
 				if (static_props->template Is_Student<bool>()) Student = 1;
 				if (static_props->template Gender<GENDER>() == GENDER::MALE) Male = 1;
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(base_this->_Activity_Type);
-				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float, typename _properties_itf::Component_Type>(this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -1465,11 +1487,11 @@ namespace Activity_Components
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
 				{
-					if (rand[0] < P_mod[i]) {base_this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
-					if (rand[1] < P_per[i]) {base_this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
-					if (rand[2] < P_loc[i]) {base_this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
-					if (rand[3] < P_tim[i]) {base_this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
-					if (rand[4] < P_dur[i]) {base_this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
+					if (rand[0] < P_mod[i]) { this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
+					if (rand[1] < P_per[i]) { this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
+					if (rand[2] < P_loc[i]) { this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
+					if (rand[3] < P_tim[i]) { this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
+					if (rand[4] < P_dur[i]) { this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
 				}
             
 				// Set results of flexiblity model to use in next models
@@ -1588,18 +1610,18 @@ namespace Activity_Components
 			{
 				base_type* base_this = (base_type*)this;
 
-				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = END+1;
-				base_this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Duration_Planning_Time<  Revision&>()._iteration = END+1;
-				base_this->template Duration_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Location_Planning_Time<  Revision&>()._iteration = END+1;
-				base_this->template Location_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Mode_Planning_Time<  Revision&>()._iteration = END+1;
-				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = END+1;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = END+1;
-				base_this->template Route_Planning_Time<  Revision&>()._iteration = iteration()+1;
-				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = Scenario_Components::Types::ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION;
+				this->template Start_Time_Planning_Time<  Revision&>()._iteration = END+1;
+				this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				this->template Duration_Planning_Time<  Revision&>()._iteration = END+1;
+				this->template Duration_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				this->template Location_Planning_Time<  Revision&>()._iteration = END+1;
+				this->template Location_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				this->template Mode_Planning_Time<  Revision&>()._iteration = END+1;
+				this->template Mode_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = END+1;
+				this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				this->template Route_Planning_Time<  Revision&>()._iteration = iteration()+1;
+				this->template Route_Planning_Time<  Revision&>()._sub_iteration = Scenario_Components::Types::ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -1615,11 +1637,11 @@ namespace Activity_Components
 			template<typename TargetType> void Set_Meta_Attributes()
 			{
 				base_type* base_this = (base_type*)this;
-				base_this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				base_this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
 		
 				this->_Duration_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
 				this->_Location_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;

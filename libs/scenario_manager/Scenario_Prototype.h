@@ -239,13 +239,7 @@ namespace Scenario_Components
 			accessor(multimodal_routing_weight_shape, NONE, NONE);
 			accessor(multimodal_routing_weight_scale, NONE, NONE);
 			accessor(multimodal_routing_weight_factor, NONE, NONE);
-
-			/*accessor(transferPenalty, NONE, NONE);
-			accessor(waitWeight, NONE, NONE);
-			accessor(walkWeight, NONE, NONE);
-			accessor(ivtWeight, NONE, NONE);
-			accessor(carWeight, NONE, NONE);*/
-
+			
 			accessor(historic_demand_moe_directory, NONE, NONE);
 
 			accessor(output_link_moe_for_simulation_interval, NONE, NONE);
@@ -434,6 +428,7 @@ namespace Scenario_Components
 				cav_wtp_model_file<string>((string)"");
 				cacc_capacity_adjustment_alpha<double>(1.0121);
 				cacc_capacity_adjustment_beta<double>(2.4697);
+				multimodal_routing<bool>(false);
 			}
 
 			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)

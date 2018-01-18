@@ -872,8 +872,8 @@ namespace Intersection_Components
 					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
 					
 					_Link_Interface* outbound_link=outbound_inbound_movements->template outbound_link_reference<_Link_Interface*>();
-					_link_component_type* outbound_link_component = (_link_component_type*)((_outbound_inbound_movements_component_type*)(*outbound_inbound_movements_itr))->_outbound_link_reference;
-					outbound_link_component->link_moe_data.link_queue_length += outbound_link_component->_link_num_vehicles_in_queue;
+					_link_component_type* outbound_link_component = outbound_inbound_movements->template outbound_link_reference<_link_component_type*>();
+					outbound_link_component->link_moe_data.link_queue_length += outbound_link_component->link_num_vehicles_in_queue<int>();
 					outbound_link_component->realtime_link_moe_data.link_in_volume = 0.0f;
 					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
 					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
@@ -889,7 +889,7 @@ namespace Intersection_Components
 				{
 					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
 					_Link_Interface* inbound_link=inbound_outbound_movements->template inbound_link_reference<_Link_Interface*>();
-					_link_component_type* inbound_link_component = (_link_component_type*)((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					_link_component_type* inbound_link_component = inbound_outbound_movements->template inbound_link_reference<_link_component_type*>();
 
 					float avg_turn_penalty = 0.0f;
 					int allowed_movement_size = 0;
@@ -903,7 +903,7 @@ namespace Intersection_Components
 					{
 						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_simulation_interval_from_inbound_link<NULLTYPE>();
 						_movement_component_type* outbound_movement_component = (_movement_component_type*)(*outbound_movement_itr);
-						if (outbound_movement_component->_turn_travel_penalty < 0.01f*INFINITY_FLOAT)
+						if (outbound_movement_component->turn_travel_penalty<float>() < 0.01f*INFINITY_FLOAT)
 						{
 							avg_turn_penalty += ((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
 							allowed_movement_size++;
@@ -911,7 +911,7 @@ namespace Intersection_Components
 						num_vehicles_in_link += int(((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>().size());
 					}
 
-					inbound_link_component->link_moe_data.link_density += ((float)num_vehicles_in_link / (inbound_link_component->_length / 5280.0f)) / (float)inbound_link_component->_num_lanes;
+					inbound_link_component->link_moe_data.link_density += ((float)num_vehicles_in_link / (inbound_link_component->length<float>() / 5280.0f)) / inbound_link_component->num_lanes<float>();
 					inbound_link_component->realtime_link_moe_data.num_vehicles_in_link = num_vehicles_in_link;
 					if (allowed_movement_size>0)
 					{
@@ -926,7 +926,7 @@ namespace Intersection_Components
 					//link travel delay in minutes
 					inbound_link_component->realtime_link_moe_data.link_travel_delay = avg_turn_penalty / 60.0f;
 					//link travel time
-					inbound_link_component->realtime_link_moe_data.link_travel_time = (inbound_link_component->_link_fftt + avg_turn_penalty) /60.0f;
+					inbound_link_component->realtime_link_moe_data.link_travel_time = (inbound_link_component->link_fftt<float>() + avg_turn_penalty) /60.0f;
 					inbound_link->template calculate_moe_for_simulation_interval<NULLTYPE>();
 				}
 			}
@@ -951,7 +951,7 @@ namespace Intersection_Components
 				{
 					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
 					_Link_Interface* inbound_link=inbound_outbound_movements->template inbound_link_reference<_Link_Interface*>();
-					_link_component_type* inbound_link_component = (_link_component_type*)((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					_link_component_type* inbound_link_component =((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->inbound_link_reference<_link_component_type*>();
 				
 					float avg_turn_penalty = 0.0f;
 					float avg_turn_penalty_standard_deviation = 0.0f;
@@ -964,7 +964,7 @@ namespace Intersection_Components
 					{
 						_movement_component_type* outbound_movement_component = (_movement_component_type*)(*outbound_movement_itr);
 						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_assignment_interval_from_inbound_link<NULLTYPE>();
-						if (outbound_movement_component->_turn_travel_penalty < 0.01f*INFINITY_FLOAT)
+						if (outbound_movement_component->turn_travel_penalty<float>() < 0.01f*INFINITY_FLOAT)
 						{
 							allowed_movement_size++;
 							avg_turn_penalty += outbound_movement_component->movement_moe_data.turn_penalty;

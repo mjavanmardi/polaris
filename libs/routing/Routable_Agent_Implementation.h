@@ -66,8 +66,9 @@ namespace polaris
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 			Network_Interface* net = (Network_Interface*)_global_network;
 
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
-			typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+			typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+			typedef Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+			typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(heur_cost_to_dest)> _Heuristic_Cost_Container_Interface;
 
 			if (!multimodal_dijkstra)
 			{
@@ -98,8 +99,9 @@ namespace polaris
 				{
 					Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);					
 					_Link_Interface* destination_link = (_Link_Interface*)itr_destination->_source_link;
+					_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
 
-					float temp_cost = destination_link->_dijkstra_cost[current->_zone];
+					float temp_cost = destination_link->heur_cost_to_dest<_Heuristic_Cost_Container_Interface&>()[current_link->zone_index<int>()];
 					cost = cost + (temp_cost - cost) / (dest_ctr + 1);
 					dest_ctr++;
 				}
@@ -115,12 +117,16 @@ namespace polaris
 			{
 				//cout << "is highway" << endl;
 				//return (current->_cost + connection->_cost)*.75f;
-				return (current->_cost + connection->_cost)*.95f;
+				//TODO Omer -> Might want to change it back!
+				//return (current->_cost + connection->_cost)*.95f;
+				return (connection->_cost + neighbor->_cost)*.95f;
 			}
 			else
 			{
 				//cout << "is not highway" << endl;
-				return current->_cost + connection->_cost;
+				//TODO Omer -> Might want to change it back!
+				//return current->_cost + connection->_cost;
+				return (connection->_cost + neighbor->_cost);
 			}
 		}
 
@@ -142,7 +148,10 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//TODO Omer -> Might want to change it back!
+				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_cost;
+				
 				//float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
 				//if (t1_weight < 0.5) // closer to next time step
@@ -184,7 +193,10 @@ namespace polaris
 				
 
 				// updates to handle mixing of historical and real-time info in cost function
-				float time_cost_current = current->_cost + connection->_cost;
+
+				//TODO Omer -> Might want to change it back!
+				//float time_cost_current = current->_cost + connection->_cost;
+				float time_cost_current = connection->_cost + neighbor->_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -211,12 +223,16 @@ namespace polaris
 				if(neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					return (current->_cost + connection->_cost)*.95f;
+					//TODO Omer -> Might want to change it back!
+					//return (current->_cost + connection->_cost)*.95f;
+					return (connection->_cost + neighbor->_cost)*.95f;
 				}
 				else
 				{
 					//cout << "is not highway" << endl;
-					return current->_cost + connection->_cost;
+					//TODO Omer -> Might want to change it back!
+					//return current->_cost + connection->_cost;
+					return connection->_cost + neighbor->_cost;
 				}
 				
 			}
@@ -225,7 +241,9 @@ namespace polaris
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_time_cost + connection->_time_cost;
+			//TODO Omer -> Might want to change it back!
+			//return current->_time_cost + connection->_time_cost;
+			return connection->_time_cost + neighbor->_time_cost;
 		}
 
 		float time_cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
@@ -245,7 +263,10 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//TODO Omer -> Might want to change it back!
+				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost;
+				
 				//float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
 				//if (t1_weight < 0.5) // closer to next time step
@@ -294,7 +315,9 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				float time_cost_current = current->_time_cost + connection->_time_cost;
+				//TODO Omer -> Might want to change it back!
+				//float time_cost_current = current->_time_cost + connection->_time_cost;
+				float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -305,29 +328,33 @@ namespace polaris
 				float time_cost = w*time_cost_current + (1-w)*t;
 
 
-				if(neighbor->_is_highway)
+				/*if(neighbor->_is_highway)
 				{
 					return time_cost*.95f;
 				}
 				else
-				{
+				{*/
 
-					return time_cost;
-				}
+				return time_cost;
+				//}
 			}
 			else
 			{
 
-				if(neighbor->_is_highway)
-				{
-					//cout << "is highway" << endl;
-					return (current->_time_cost + connection->_time_cost)*.95f;
-				}
-				else
-				{
+				//if(neighbor->_is_highway)
+				//{
+				//	//cout << "is highway" << endl;
+				//	//TODO Omer -> Might want to change it back!
+				//	//return (current->_time_cost + connection->_time_cost)*.95f;
+				//	return (connection->_time_cost + neighbor->_time_cost)*.95f;
+				//}
+				//else
+				//{
 					//cout << "is not highway" << endl;
-					return current->_time_cost + connection->_time_cost;
-				}
+					//TODO Omer -> Might want to change it back!
+					//return current->_time_cost + connection->_time_cost;
+				return connection->_time_cost + neighbor->_time_cost;
+				//}
 				
 			}
 		}
@@ -343,32 +370,32 @@ namespace polaris
 				int sim_time = iteration();
 
 				// get historical time cost - update if traveler will be on link for multiple time periods
-				float ttime_accumulation = 0;
+				/*float ttime_accumulation = 0;
 				float ttime_step = current->moe_data()->layer_step<float>();
-				ttime_step = ttime_step - current_time % (int)ttime_step;
-				float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost_temp;
-				//float t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
-				if (t > ttime_step)
-				{
-					ttime_accumulation += ttime_step;
-					t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
-					//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
-					ttime_step = current->moe_data()->layer_step<float>();
-					while (t - ttime_accumulation > ttime_step)
-					{
-						ttime_accumulation += ttime_step;
-						t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost_temp;
-						//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				ttime_step = ttime_step - current_time % (int)ttime_step;*/
 
-					}
-				}
-				t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
+				float t = FLT_MAX;
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//if (t > ttime_step)
+				//{
+				//	ttime_accumulation += ttime_step;
+				//	t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//	//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//	ttime_step = current->moe_data()->layer_step<float>();
+				//	while (t - ttime_accumulation > ttime_step)
+				//	{
+				//		ttime_accumulation += ttime_step;
+				//		t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
+				//		//t = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time + ttime_accumulation) + neighbor->_time_cost;
 
+				//	}
+				//}
+				//t = ttime_accumulation + std::max(t - ttime_accumulation, 0.0f);
 
+				t = t1;
 
 				// updates to handle mixing of historical and real-time info in cost function
-				float time_cost_current = connection->_time_cost + neighbor->_time_cost_temp;
-				//float time_cost_current = connection->_time_cost + neighbor->_time_cost;
+				float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -383,8 +410,7 @@ namespace polaris
 			}
 			else
 			{				
-				return connection->_time_cost + neighbor->_time_cost_temp;
-				//return connection->_time_cost + neighbor->_time_cost;
+				return connection->_time_cost + neighbor->_time_cost;
 			}
 		}
 
@@ -418,7 +444,9 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_cost + connection->_cost;
+			//TODO Omer -> Might want to change it back!
+			//return current->_cost + connection->_cost;
+			return connection->_cost + neighbor->_cost;
 		}
 
 		float cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
@@ -439,7 +467,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//TODO Omer -> Might want to change it back!
+				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
 																														  //if (t1_weight < 0.5) // closer to next time step
@@ -460,6 +489,7 @@ namespace polaris
 																														  //	t = (t + t3)*0.5;
 																														  //}
 																														  //
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_cost;
 				t = t1;
 
 
@@ -481,7 +511,9 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				float time_cost_current = current->_cost + connection->_cost;
+				//TODO Omer -> Might want to change it back!
+				//float time_cost_current = current->_cost + connection->_cost;
+				float time_cost_current = connection->_cost + neighbor->_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -508,12 +540,16 @@ namespace polaris
 				if (neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					return (current->_cost + connection->_cost)*.95f;
+					//TODO Omer -> Might want to change it back!
+					//return (current->_cost + connection->_cost)*.95f;
+					return (connection->_cost + neighbor->_cost)*.95f;
 				}
 				else
 				{
 					//cout << "is not highway" << endl;
-					return current->_cost + connection->_cost;
+					//TODO Omer -> Might want to change it back!
+					//return current->_cost + connection->_cost;
+					return connection->_cost + neighbor->_cost;
 				}
 
 			}
@@ -522,7 +558,9 @@ namespace polaris
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_time_cost + connection->_time_cost;
+			//TODO Omer -> Might want to change it back!
+			//return current->_time_cost + connection->_time_cost;
+			return connection->_time_cost + neighbor->_time_cost;
 		}
 
 		float time_cost_between(typename MT::time_dependent_edge_type* current, typename MT::time_dependent_edge_type* neighbor, typename MT::time_dependent_to_time_dependent_type* connection)
@@ -542,7 +580,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
+				//TODO Omer -> Might want to change it back!
+				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
 																														  //if (t1_weight < 0.5) // closer to next time step
@@ -563,6 +602,7 @@ namespace polaris
 																														  //	t = (t + t3)*0.5;
 																														  //}
 																														  //
+				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost;
 				t = t1;
 
 
@@ -591,7 +631,9 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				float time_cost_current = current->_time_cost + connection->_time_cost;
+				//TODO Omer -> Might want to change it back!
+				//float time_cost_current = current->_time_cost + connection->_time_cost;
+				float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
 				int t_diff = abs(current_time - iteration());
 
@@ -602,29 +644,33 @@ namespace polaris
 				float time_cost = w*time_cost_current + (1 - w)*t;
 
 
-				if (neighbor->_is_highway)
+				/*if (neighbor->_is_highway)
 				{
 					return time_cost*.95f;
 				}
 				else
-				{
+				{*/
 
-					return time_cost;
-				}
+				return time_cost;
+				//}
 			}
 			else
 			{
 
-				if (neighbor->_is_highway)
-				{
-					//cout << "is highway" << endl;
-					return (current->_time_cost + connection->_time_cost)*.95f;
-				}
-				else
-				{
+				//if (neighbor->_is_highway)
+				//{
+				//	//cout << "is highway" << endl;
+				//	//TODO Omer -> Might want to change it back!
+				//	//return (current->_time_cost + connection->_time_cost)*.95f;
+				//	return (connection->_time_cost + neighbor->_time_cost)*.95f;
+				//}
+				//else
+				//{
 					//cout << "is not highway" << endl;
-					return current->_time_cost + connection->_time_cost;
-				}
+					//TODO Omer -> Might want to change it back!
+					//return current->_time_cost + connection->_time_cost;
+				return connection->_time_cost + neighbor->_time_cost;
+				//}
 
 			}
 		}
@@ -636,6 +682,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Multi_Modal_Tree_Agent_Implementation
 	{			
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -656,13 +708,17 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_min_multi_modal_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_min_multi_modal_cost;
+			//return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_min_multi_modal_cost;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->template min_multi_modal_cost<float>();
+			//return neighbor->_min_multi_modal_cost;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
@@ -672,6 +728,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Walk_to_Transit_Tree_Agent_Implementation
 	{
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -702,13 +764,73 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_walk_length;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->_walk_length;
+			//return neighbor->_walk_length;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			return current->_walk_length;
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return neighbor_link->template walk_length<float>();
+			//return neighbor->_walk_length;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
+	};
+
+	template<typename MasterType>
+	struct Drive_to_Transit_Tree_Agent_Implementation
+	{
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+		typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(links_container), _Link_Interface*> _Links_Container_Interface;
+		
+		template<typename CurrentEdgeType, typename ConnectionType>
+		bool process_connection_set(CurrentEdgeType* current)
+		{
+			return true;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
+		{
+			return false;
+		}
+
+		bool at_destination(Base_Edge_A_Star<MasterType>* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
+		{
+			for (auto itr = destinations.begin(); itr != destinations.end(); ++itr)
+			{
+				Base_Edge_A_Star<MasterType>* itr_destination = (Base_Edge_A_Star<MasterType>*)(*itr);
+				if (current->_edge_id == itr_destination->_edge_id) return true;
+			}
+			return false;
+		}
+
+		template<typename CurrentEdgeType>
+		float estimated_cost_between(CurrentEdgeType* current, std::vector<Base_Edge_A_Star<MasterType>*>& destinations)
+		{
+			return 0.0f;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return connection->_time_cost + neighbor_link->_drive_time;
+			//return connection->_time_cost + neighbor->_drive_time;
+		}
+
+		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
+		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
+		{
+			_Link_Interface* neighbor_link = (_Link_Interface*)neighbor->_source_link;
+			return connection->_time_cost + neighbor_link->template drive_time<float>();
+			//return connection->_time_cost + neighbor->_drive_time;
 		}
 
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>

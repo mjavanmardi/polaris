@@ -109,8 +109,6 @@ namespace Advisory_ITS_Components
 			m_data(std::vector<Link_Interface*>,covered_links, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::traffic_management_center_type,traffic_management_center, NONE, NONE);
-
-			//static m_data(std::vector<string>, component_keys, NONE, NONE);
 		};
 
 		//template<typename MasterType,typename InheritanceList>

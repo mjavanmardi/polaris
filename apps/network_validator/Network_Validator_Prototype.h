@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
+#include "Traffic_Simulator_Includes.h"
 #include "Activity_Location_Prototype.h"
 #include "Traffic_Simulator_Concepts.h"
 
@@ -25,7 +25,7 @@ namespace Network_Components
 	namespace Prototypes
 	{
 
-		prototype struct Network_Validator
+		prototype struct Network_Validator : public ComponentType
 		{
 			tag_as_prototype;
 
@@ -75,7 +75,7 @@ namespace Network_Components
 			}
 		};
 
-		prototype struct Network_Validation_Unit
+		prototype struct Network_Validation_Unit : public ComponentType
 		{
 			tag_as_prototype;
 

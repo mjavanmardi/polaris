@@ -59,7 +59,6 @@ namespace Link_Control_Components
 			m_data(bool,shoulder_opened, NONE, NONE);
 
 			//m_prototype(Traffic_Management_Center<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);
-			//static m_data(std::vector<string>, component_keys, NONE, NONE);
 			//m_prototype(Link<typename type_of(MasterType::link)>,covered_link, NONE, NONE);
 		};
 

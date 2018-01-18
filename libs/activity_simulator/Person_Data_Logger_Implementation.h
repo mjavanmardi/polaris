@@ -21,6 +21,8 @@ namespace Person_Components
 			std::vector<string>* output_data_buffer;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
+			std::vector<polaris::io::multimodalSPLabels>* multimodalSPLabels;
+			std::vector<polaris::io::multimodalSPLabels>* multimodalSPLabels_buffer;
 
 
 
@@ -72,6 +74,8 @@ namespace Person_Components
 				//trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
 				activity_records = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 				activity_records_buffer = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
+				multimodalSPLabels = new std::vector<polaris::io::multimodalSPLabels>[num_sim_threads()];
+				multimodalSPLabels_buffer = new std::vector<polaris::io::multimodalSPLabels>[num_sim_threads()];
 
 				expected_ttime = new float[num_sim_threads()];
 				routed_ttime = new float[num_sim_threads()];
@@ -279,6 +283,16 @@ namespace Person_Components
 
 				}
 
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+				movement_itf* move = act->template movement_plan<movement_itf*>();
+				if (scenario->template multimodal_routing<bool>() && Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
+				{
+					/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
+					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;*/
+					set_multimodal_trajectory<TargetType>(move->template summary_string<std::string>());
+				}
+
 				if (!is_executed) return;
 
 				//----------------------------------------------------------
@@ -350,6 +364,11 @@ namespace Person_Components
 					std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* tmp_act = pthis->activity_records_buffer;
 					pthis->activity_records_buffer = pthis->activity_records;
 					pthis->activity_records = tmp_act;
+
+					//OMER mimicking above
+					std::vector<polaris::io::multimodalSPLabels>* tmp_mm = pthis->multimodalSPLabels_buffer;
+					pthis->multimodalSPLabels_buffer = pthis->multimodalSPLabels;
+					pthis->multimodalSPLabels = tmp_mm;
 
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
@@ -682,28 +701,101 @@ namespace Person_Components
 				act_rec.setStart_Time (act->template Start_Time<Time_Seconds>());
 				act_rec.setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-					act_rec.setMode ("AUTO");
+					act_rec.setMode("SOV");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
-					act_rec.setMode ("HOV");
+					act_rec.setMode("HOV");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)
 					act_rec.setMode("TAXI");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
-					act_rec.setMode ("WALK");
+					act_rec.setMode("WALK");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 					act_rec.setMode("BIKE");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
 					act_rec.setMode("SCHOOLBUS");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
+					act_rec.setMode("PARK_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
+					act_rec.setMode("TRANSIT");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK)
+					act_rec.setMode("TRUCK");
 				else
-					act_rec.setMode ("TRANSIT");
+				{
+					stringstream s;
+					s << "FAIL: " << act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					act_rec.setMode(s.str());
+				}
 				act_rec.setType (act->Get_Type_String());
 				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
+				
+				if (new_origin < 0) act_rec.setOrigin_Id(orig->template uuid<int>());
+				else act_rec.setOrigin_Id(new_origin);
+
 
 				// add trip and activity to the buffer for the current thread
 				//trip_records_buffer[__thread_id].push_back(trip_rec);
 				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec,act_rec));
+			}
+
+			template<typename TargetType> void set_multimodal_trajectory(std::string& summary_string)
+			{
+				/*typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
+				odb::transaction t(db_ptr->begin());*/
+				
+				polaris::io::multimodalSPLabels multimodal_labels_record;
+
+				//shared_ptr<polaris::io::multimodalSPLabels> multimodal_labels_record(new polaris::io::multimodalSPLabels());
+
+				std::istringstream ss(summary_string);
+				std::string sub_string;
+
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setOrigin_ID(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setDestination_ID(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setDeparture_Time(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setSub_Mode(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setArrival_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setGen_Cost(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setDuration(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setWait_Count(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setWait_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setWalk_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setBike_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setIVTT(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setCar_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setTransfer_Pen(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setEst_Cost(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setScan_Count(stoi(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setaStar_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setvisit_Time(stod(sub_string));
+				std::getline(ss, sub_string, '\t');
+				multimodal_labels_record.setSuccess_Status(sub_string);
+				std::getline(ss, sub_string, '\n');
+				multimodal_labels_record.setEuc_Dist_km(stod(sub_string));
+
+				multimodalSPLabels_buffer[__thread_id].push_back(multimodal_labels_record);
+				/*db_ptr->persist(multimodal_labels_record);
+				t.commit();*/
 			}
 		};
 	}

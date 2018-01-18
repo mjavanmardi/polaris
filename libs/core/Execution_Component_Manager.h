@@ -114,7 +114,7 @@ namespace polaris
 			_ideal_cell_size = (sizeof(DataType) / __cache_line_size + 1) * __cache_line_size;
 		}
 
-		DataType* Allocate( int uuid = -1, bool bInPlaceNew = true );
+		DataType* Allocate( int pid = -1, bool bInPlaceNew = true );
 		DataType* Allocate_Array( unsigned int num );
 
 		inline void Clean_Up_Thread_Memory( );

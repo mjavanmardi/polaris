@@ -20,6 +20,7 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Vehicle_Characteristics_Implementation<M> vehicle_characteristics_type;
 	typedef Zone_Components::Implementations::Zone_Implementation<M> zone_type;
 
 	typedef Scenario_Components::Implementations::Scenario_Implementation<M> scenario_type;
@@ -27,11 +28,16 @@ struct MasterType
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> movement_type;
 
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<M> turn_movement_type;
+	typedef Transit_Route_Components::Implementations::Transit_Route_Implementation<M> transit_route_type;
+	typedef Transit_Pattern_Components::Implementations::Transit_Pattern_Implementation<M> transit_pattern_type;
+	typedef Transit_Vehicle_Trip_Components::Implementations::Transit_Vehicle_Trip_Implementation<M> transit_vehicle_trip_type;
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
+	typedef Routing_Components::Implementations::Dijkstra_for_Heuristics_Implementation<M> dijkstra_heuristics_routing_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
+	typedef Traveler_Components::Implementations::Traveler_Implementation<M> person_type;
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
@@ -88,13 +94,21 @@ struct MasterType
 
 	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
+	typedef Multi_Modal_Tree_Agent_Implementation<MasterType> multi_modal_tree_agent_type;
+	typedef Walk_to_Transit_Tree_Agent_Implementation<MasterType> walk_to_transit_tree_agent_type;
+	typedef Drive_to_Transit_Tree_Agent_Implementation<MasterType> drive_to_transit_tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
 	typedef Routing_Components::Types::static_to_static static_to_static_type;
 	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
-	
+
+	typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, multimodal_edge_type> multimodal_graph_type;
+	typedef Routing_Components::Types::multimodal_to_multimodal multimodal_to_multimodal_type;
+	typedef Custom_Connection_Group<MasterType, multimodal_graph_type, multimodal_graph_type, multimodal_to_multimodal_type> multimodal_to_multimodal_connection_type;
+
 	typedef Edge_Implementation<Routing_Components::Types::time_dependent_attributes<MasterType>> time_dependent_edge_type;
 	typedef Graph_Implementation<MasterType, NTL, time_dependent_edge_type> time_dependent_graph_type;
 	typedef Routing_Components::Types::time_dependent_to_time_dependent time_dependent_to_time_dependent_type;
@@ -191,31 +205,6 @@ int main(int argc,char** argv)
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//typedef Demand<MasterType::demand_type> _Demand_Interface;
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//cout << "reading demand data..." <<endl;
-	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
-
-	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-
-	if (scenario->ramp_metering_flag<bool>() == true) {
-		cout <<"reading ramp metering data..." << endl;
-		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
-	}
-
-	
-
-#ifdef ANTARES
-	network->set_network_bounds<NULLTYPE>();
-	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
-	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
-	MasterType::vehicle_type::Initialize_Layer();
-	network->initialize_antares_layers<NULLTYPE>();
-	MasterType::link_type::configure_link_moes_layer();
-#endif
 
 	if(scenario->use_network_events<bool>())
 	{
@@ -319,36 +308,6 @@ int main(int argc,char** argv)
 	analyzer->network_reference<_Network_Interface*>(network);
 	analyzer->read_trip_data();
 	
-	// activity location map - link the location id to the actual object pointer
-	//typedef Random_Access_Sequence< _Network_Interface::get_type_of(activity_locations_container)> _Activity_Locations_Container_Interface;
-	//typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(_Activity_Locations_Container_Interface)> _Activity_Location_Interface;
-	//typedef Batch_Router_Components::Prototypes::Routed_Trip<typename MasterType::trip_type> _Trip_Interface;
-
-	//_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();
-	//dense_hash_map<int,_Activity_Location_Interface*> activity_id_to_ptr;
-	//activity_id_to_ptr.set_empty_key(-1);
-	//activity_id_to_ptr.set_deleted_key(-2);
-	//for(_Activity_Locations_Container_Interface::iterator activity_locations_itr=activity_locations.begin();activity_locations_itr!=activity_locations.end();activity_locations_itr++)
-	//{
-	//	_Activity_Location_Interface& activity_location=(_Activity_Location_Interface&)**activity_locations_itr;
-	//	activity_id_to_ptr[activity_location.template uuid<int>()]=&activity_location;
-	//}
-
-	// Read the input data file
-	//File_IO::File_Reader fr;
-	//fr.Open(input_filename,true,",\t");
-	//while (fr.Read())
-	//{
-	//	int trip_id = fr.Get_Int(0);
-	//	string mode = fr.Get_String(1);
-	//	int orig = fr.Get_Int(2);
-	//	int dest = fr.Get_Int(3);
-	//	int time = fr.Get_Int(4);
-
-	//	_Trip_Interface* trip=(_Trip_Interface*)Allocate<typename MasterType::trip_type>();
-	//	trip->Initialize<_Network_Interface*,_Activity_Location_Interface*,Simulation_Timestep_Increment>(trip_id, network,activity_id_to_ptr[orig], activity_id_to_ptr[dest],time);
-	//}
-
 
 	//==================================================================================================================================
 	// Start Simulation

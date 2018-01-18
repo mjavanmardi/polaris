@@ -86,6 +86,7 @@ namespace Link_Components
 			m_data(int, direction, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, num_lanes, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, length, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			//member_component_and_feature_accessor(length, Value, Basic_Units::Prototypes::Length, Basic_Units::Implementations::Length_Implementation<NT>);
 			m_data(float, speed_limit, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, grade, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, name, NONE, NONE);
@@ -173,7 +174,13 @@ namespace Link_Components
 						
 			m_container(std::vector<typename MasterType::transit_pattern_type*>, unique_patterns, NONE, NONE);
 			m_container(std::vector<int>, index_along_pattern_at_upstream_node, NONE, NONE);
-			m_container(std::vector<float>, dijkstra_cost, NONE, NONE);
+			m_container(std::vector<float>, heur_cost_to_dest, NONE, NONE);
+			m_data(float, min_multi_modal_cost, NONE, NONE);
+			m_data(float, walk_length, NONE, NONE);
+			m_data(float, walk_distance_to_transit, NONE, NONE);
+			m_data(float, drive_time, NONE, NONE);
+			m_data(float, drive_fft_to_transit, NONE, NONE);
+			m_data(bool, touch_transit, NONE, NONE);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -657,8 +664,8 @@ namespace Link_Components
 				for (auto itr = _outbound_turn_movements.begin(); itr != _outbound_turn_movements.end(); itr++, outbound_turn_index++)
 				{
 					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
-
-					if (turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::LEFT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::THROUGH_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::RIGHT_TURN || turn_movement->_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::U_TURN)
+					Turn_Movement_Components::Types::Turn_Movement_Type_Keys turn_movement_type = turn_movement->movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>();
+					if (turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::LEFT_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::THROUGH_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::RIGHT_TURN || turn_movement_type == Turn_Movement_Components::Types::Turn_Movement_Type_Keys::U_TURN)
 					{
 						turn_movement->template update_state<NT>();
 
@@ -667,6 +674,10 @@ namespace Link_Components
 						//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 						{
 							float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
+
+							//TODO OMER: Remove efter you're done
+							float myPenalty = cost_update - _link_fftt;
+							float otherPenalty = turn_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
 
 							//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
 							//{
@@ -1267,7 +1278,7 @@ namespace Link_Components
 			if (_weather_event_to_process)
 			{
 				_weather_event_to_process = false;
-				if (((typename MasterType::weather_network_event_type*)_current_weather_event)->_active)
+				if (((typename MasterType::weather_network_event_type*)_current_weather_event)->active<bool>())
 				{
 					process_weather_event<typename MasterType::weather_network_event_type*>();
 				}
@@ -1281,7 +1292,7 @@ namespace Link_Components
 			if (_accident_event_to_process)
 			{
 				_accident_event_to_process = false;
-				if (((typename MasterType::accident_network_event_type*)_current_accident_event)->_active)
+				if (((typename MasterType::accident_network_event_type*)_current_accident_event)->active<bool>())
 				{
 					process_accident_event<typename MasterType::accident_network_event_type*>();
 				}

@@ -35,7 +35,7 @@ namespace Network_Components
 			typedef Network_Validation_Unit<get_component_type(validation_units_type)> validation_unit_itf;
 			typedef Network_Components::Prototypes::Network<type_of(network_reference)> network_itf;
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
@@ -119,13 +119,13 @@ namespace Network_Components
 			m_prototype(Network_Validator,typename MasterType::network_validation_type, network_validator, NONE, NONE);
 
 			m_prototype(Activity_Location_Components::Prototypes::Activity_Location,typename MasterType::activity_location_type, location, NONE, NONE);
-			typedef strip_modifiers(location_type) location_interface;
+//			typedef strip_modifiers(location_type) location_interface;
 
 			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
-			typedef strip_modifiers(router_type) router_interface;
+//			typedef strip_modifiers(router_type) router_interface;
 
 			m_prototype(Movement_Plan,typename router_interface::get_type_of(movement_plan), movement, NONE, NONE);
-			typedef strip_modifiers(movement_type) movement_plan_interface;
+//			typedef strip_modifiers(movement_type) movement_plan_interface;
 
 			m_data(int, current_index,NONE,NONE);
 			m_data(bool, do_as_destination,NONE,NONE);
@@ -146,9 +146,10 @@ namespace Network_Components
 			}
 
 			typedef Prototypes::Network_Validation_Unit<ComponentType> validation_unit_itf;
-			typedef Network_Components::Prototypes::Network<typename strip_modifiers(network_validator_type)::get_type_of(network_reference)> network_itf;		
+			//typedef Network_Components::Prototypes::Network<typename strip_modifiers(network_validator_type)::get_type_of(network_reference)> network_itf;		
+			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> network_itf;
 			typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container)> zones_itf;
-			typedef Zone_Components::Prototypes::Zone<get_component_type(zones_itf)> zone_itf;
+			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_itf)> zone_itf;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 			typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
 			typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;

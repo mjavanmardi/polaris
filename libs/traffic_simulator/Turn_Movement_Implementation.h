@@ -548,7 +548,7 @@ namespace Turn_Movement_Components
 				
 				((_link_component_type*)_outbound_link)->link_moe_data.link_in_volume += (float)_movement_transferred;
 
-				realtime_movement_moe_data.outbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_outbound_link)->_link_fftt / 60.0f;
+				realtime_movement_moe_data.outbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_outbound_link)->link_fftt<float>() / 60.0f;
 			}
 
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link()
@@ -561,7 +561,7 @@ namespace Turn_Movement_Components
 					_tmp_turn_travel_penalty_standard_divation);
 				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
 				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;
-				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->_link_fftt + _tmp_turn_travel_penalty) / 60.0f;
+				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->link_fftt<float>() + _tmp_turn_travel_penalty) / 60.0f;
 				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
 			}
 
@@ -571,13 +571,13 @@ namespace Turn_Movement_Components
 				((_link_component_type*)_inbound_link)->realtime_link_moe_data.link_out_volume += (float)_movement_transferred;
 				((_link_component_type*)_inbound_link)->link_moe_data.link_out_volume += (float)_movement_transferred;
 
-				realtime_movement_moe_data.inbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_inbound_link)->_link_fftt / 60.0f;
+				realtime_movement_moe_data.inbound_link_turn_time = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f + ((_link_component_type*)_inbound_link)->link_fftt<float>() / 60.0f;
 				
 			}
 
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_inbound_link()
 			{
-				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->_link_fftt/60.0f + movement_moe_data.turn_penalty);
+				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->link_fftt<float>()/60.0f + movement_moe_data.turn_penalty);
 			}
 		};
 	}

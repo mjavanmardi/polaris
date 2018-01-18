@@ -1165,17 +1165,17 @@ namespace Basic_Units
 			template<typename TargetType> void Value(TargetType value, requires(TargetType, check(ComponentType, Set_Value_exists) && check(strip_modifiers(TargetType), Concepts::Is_Speed_Value)));
 			template<typename TargetType> void Value(TargetType value, requires(TargetType, !check(ComponentType, Set_Value_exists) || !check(strip_modifiers(TargetType), Concepts::Is_Speed_Value)));
 			
-			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
-			//{
-			//	Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
-			//	Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
-			//	return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
-			//}
-			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
-			//{
-			//	assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
-			//	assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
-			//}
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			{
+				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>() / length_base::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>() / length_base::template Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			}
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			{
+				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
+			}
 		};
 
 		template<typename ComponentType>
@@ -1259,17 +1259,17 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType), Concepts::Is_Speed_Value, "The specified TargetType is not a valid Acceleration data structure, ensure that TargetType has tags: {Acceleration_Type, Length_Type and Time_Type}");
 			}
 			
-			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
-			//{
-			//	Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
-			//	Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
-			//	return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
-			//}
-			//template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
-			//{
-			//	assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
-			//	assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
-			//}
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			{
+				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>()*time_base::template Conversion_Factor<InputType>() / length_base::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>()*time_base::template Conversion_Factor<ReturnType>() / length_base::template Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			}
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			{
+				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
+			}
 		};
 
 

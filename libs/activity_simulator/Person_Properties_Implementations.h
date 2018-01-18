@@ -23,7 +23,7 @@ namespace Person_Components
 			// static counters
 			static int* Count_Array;
 			static int Count;
-			static m_container(concat(std::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
+			m_static_container(concat(std::unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container, NONE, NONE);
 			static bool _is_initialized;
 			static void Static_Initializer();
 
@@ -261,7 +261,7 @@ namespace Person_Components
 			{
 				//zone_interface* zone = (zone_interface*)(z_itr->second);
 				zone_interface* zone = *z_itr;
-				//Time_Minutes t = _Parent_Person->network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(orig, zone, Vehicle_Components::Types::SOV, 9);
+				//Time_Minutes t = _Parent_Person->network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(orig, zone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 9);
 				if (/*t < time_range_to_search &&*/ zone->template school_locations<locations_container_interface*>()->size() > 0)
 				{
 					school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();

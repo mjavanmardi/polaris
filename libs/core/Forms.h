@@ -40,7 +40,7 @@ namespace polaris
 		typedef true_type Is_Prototype;\
 		const int Identify() const {return this_component()->Identify();}\
 		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_id;}\
-		const int uuid(){return this_component()->uuid();}
+		const int pid(){return this_component()->pid();}
 
 	//#define tag_as_prototype\
 	//	typedef ComponentType Component_Type;\
@@ -48,7 +48,7 @@ namespace polaris
 	//	typedef true_type Is_Prototype;\
 	//	const int Identify() const {return this_component()->Identify();}\
 	//	template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_id;}\
-	//	const int uuid(){return this_component()->uuid();}
+	//	const int uuid(){return this_component()->pid();}
 
 	prototype struct Null_Prototype{tag_as_prototype;};
 
@@ -813,6 +813,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
 			DATA_TYPE _##NAME;\
 		public:\
 			typedef DATA_TYPE NAME##_type;\
@@ -855,6 +856,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_static_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
 			static DATA_TYPE _##NAME;\
 		public:\
 			typedef DATA_TYPE NAME##_type;\
@@ -898,9 +900,24 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define t_data(DATA_TYPE,NAME)\
-			DATA_TYPE _##NAME;\
-			typedef DATA_TYPE NAME##_type;\
 		public:\
+			DATA_TYPE _##NAME;\
+		public:\
+			typedef DATA_TYPE NAME##_type;\
+			void NAME(DATA_TYPE set_value)\
+			{\
+				_##NAME = set_value;\
+			}\
+			DATA_TYPE NAME()\
+			{\
+				return _##NAME;\
+			}
+
+	#define t_static_data(DATA_TYPE,NAME)\
+		public:\
+			static DATA_TYPE _##NAME;\
+		public:\
+			typedef DATA_TYPE NAME##_type;\
 			void NAME(DATA_TYPE set_value)\
 			{\
 				_##NAME = set_value;\
@@ -911,9 +928,10 @@ namespace polaris
 			}
 
 	#define t_object(DATA_TYPE,NAME)\
-			DATA_TYPE _##NAME;\
-			typedef DATA_TYPE NAME##_type;\
 		public:\
+			DATA_TYPE _##NAME;\
+		public:\
+			typedef DATA_TYPE NAME##_type;\
 			void NAME(DATA_TYPE& set_value)\
 			{\
 				_##NAME = set_value;\
@@ -1048,7 +1066,37 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define m_prototype(PROTOTYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
 			PROTOTYPE<COMPONENT_TYPE>* _##NAME;\
+		public:\
+			typedef PROTOTYPE<COMPONENT_TYPE>* NAME##_type;\
+			typedef PROTOTYPE<COMPONENT_TYPE> NAME##_interface;\
+			typedef COMPONENT_TYPE NAME##_component_type;\
+			typedef NAME##_component_type NAME##_accessible_type;\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(*_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check_2(TargetType,nullptr_t,is_same)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((PROTOTYPE<COMPONENT_TYPE>*)(&value));}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) || check_2(TargetType,nullptr_t,is_same)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(PROTOTYPE<COMPONENT_TYPE>*)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+			tag_getter_as_available(NAME);\
+			tag_setter_as_available(NAME);
+
+	#define m_static_prototype(PROTOTYPE,COMPONENT_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		protected:\
+			static PROTOTYPE<COMPONENT_TYPE>* _##NAME;\
 		public:\
 			typedef PROTOTYPE<COMPONENT_TYPE>* NAME##_type;\
 			typedef PROTOTYPE<COMPONENT_TYPE> NAME##_interface;\

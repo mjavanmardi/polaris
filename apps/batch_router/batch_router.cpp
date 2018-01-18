@@ -103,6 +103,7 @@ struct MasterType
 	typedef Tree_Agent_Implementation<MasterType> tree_agent_type;
 	typedef Multi_Modal_Tree_Agent_Implementation<MasterType> multi_modal_tree_agent_type;
 	typedef Walk_to_Transit_Tree_Agent_Implementation<MasterType> walk_to_transit_tree_agent_type;
+	typedef Drive_to_Transit_Tree_Agent_Implementation<MasterType> drive_to_transit_tree_agent_type;
 	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
 	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
 	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
@@ -386,7 +387,7 @@ int main(int argc,char** argv)
 	if (debug_route)
 	{
 		stringstream details_title("");
-		details_title << "Origin_ID\tDestination_ID\tDeparture_Time\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime";
+		details_title << "Origin_ID\tDestination_ID\tDeparture_Time\tSub_Mode\tLink_Ctr\tNode_A\tNode_B\tTrip_ID\tSequence\tType\tArr_Time\tGen_Cost\tTime\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time";
 		stringstream details_filename("");
 		details_filename << scenario->template output_dir_name<string>();
 		details_filename << "sp_output.dat";
@@ -394,7 +395,7 @@ int main(int argc,char** argv)
 		fw_mm_sp_details.Write(details_title);
 
 		stringstream summary_title("");
-		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStarTime\n";
+		summary_title << "Thread\tOrigin\tDestination\tDeparture_Time\tSub_Mode\tArrival_Time\tGen_Cost\tDuration\tWait_Count\tWait_Time\tWalk_Time\tBike_Time\tIVTT\tCar_Time\tTransfer_Pen\tEst_Cost\tScan_Count\taStar_Time\tNeighbor_Visit_Time\tSuccess_Status\tEuc_Distance\n";
 		//summary_title << "Origin\tDestination\tDeparture_Time\tArrival_Time\tGen_Cost\tDuration\tEst_Cost\tScan_Count\n";
 		stringstream summary_filename("");
 		summary_filename << scenario->template output_dir_name<string>();
@@ -461,7 +462,7 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Write_Line("\t\"multimodal_routing\" : true,");
 	fw.Write_Line("\t\"multimodal_routing_model_file\" : \"MultiModalRoutingModel.json\",");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : true,");
+	fw.Write_Line("\t\"time_dependent_routing\" : false,");
 	fw.Write_Line("\t\"write_demand_to_database\" : true\n}");
 	
 	fw.Close();

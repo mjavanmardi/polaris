@@ -97,7 +97,7 @@ namespace Person_Components
 			template<typename TargetType> void Initialize();
 			template<typename ActivityType> void Update_Current_Activity(ActivityType current_act);
 
-			static m_data(_lock, update_lock, NONE, NONE);
+			m_static_data(_lock, update_lock, NONE, NONE);
 
 			// scheduling features - move to Person_Scheduler eventually
 			//template<typename TargetType> TargetType current_movement_plan(requires(TargetType,check(TargetType,is_pointer) && check(strip_modifiers(TargetType),Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))

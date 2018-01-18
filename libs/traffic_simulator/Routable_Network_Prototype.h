@@ -73,10 +73,11 @@ namespace Routing_Components
 				unsigned int destination_loc_id,
 				bool debug_route,
 				std::string& summary_paragraph,
-				std::string& detail_paragraph)
+				std::string& detail_paragraph,
+				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 			{
 				//TODO: Remove when done testing routing execution time
-				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
 			}
 
 			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
@@ -101,9 +102,15 @@ namespace Routing_Components
 			}
 
 			template<typename Source_Network_Type>
-			void compute_dijkstra_transit_distance(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			void compute_walk_distance_to_transit(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
 			{
-				return this_component()->compute_dijkstra_transit_distance(source_network);
+				return this_component()->compute_walk_distance_to_transit(source_network);
+			}
+
+			template<typename Source_Network_Type>
+			void compute_drive_fft_to_transit(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)
+			{
+				return this_component()->compute_drive_fft_to_transit(source_network);
 			}
 			
 			void initialize()

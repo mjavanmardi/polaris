@@ -26,19 +26,19 @@ namespace polaris
 	typedef Basic_Units::Time_Variables::Time_Seconds Simulation_Timestep_Increment;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Object_Lookup - look up any object of any type by uuid
+	/// Object_Lookup - look up any object of any type by pid
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Object_Lookup(int uuid)
+	DataType* Object_Lookup(int pid)
 	{
 		bool object_found = false;
 
 		for(unsigned int i=0;i<(num_sim_threads()+1);i++)
 		{
-			if(DataType::component_manager->_object_repository[i].count(uuid))
+			if(DataType::component_manager->_object_repository[i].count(pid))
 			{
-				return (DataType*)DataType::component_manager->_object_repository[i][uuid];
+				return (DataType*)DataType::component_manager->_object_repository[i][pid];
 			}
 		}
 		

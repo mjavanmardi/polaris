@@ -125,10 +125,10 @@ namespace Routing_Components
 			t_data(bool,is_highway);
 			t_data(float*,moe_ptr);
 
-			static t_data(Layered_Data_Array<float>*,moe_data);
-			static t_data(float, ttime_weight_shape);
-			static t_data(float, ttime_weight_scale);
-			static t_data(float, ttime_weight_factor);
+			t_static_data(Layered_Data_Array<float>*,moe_data);
+			t_static_data(float, ttime_weight_shape);
+			t_static_data(float, ttime_weight_scale);
+			t_static_data(float, ttime_weight_factor);
 		};
 		
 		template<typename MasterType>
@@ -147,7 +147,7 @@ namespace Routing_Components
 			t_data(float,time_cost);
 			t_data(float*, turn_moe_ptr);
 
-			static t_data(Layered_Data_Array<float>*, turn_moe_data);
+			t_static_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
 
 		Layered_Data_Array<float>* time_dependent_to_time_dependent::_turn_moe_data;
@@ -171,17 +171,17 @@ namespace Routing_Components
 			t_data(float, ivt_time_from_origin);
 			t_data(float, car_time_from_origin);
 			t_data(float, walk_time_from_origin);
+			t_data(float, bike_time_from_origin);
 			t_data(float, wait_time_from_origin);
 			t_data(float, transfer_pen_from_origin);
 			t_data(int, wait_count_from_origin);
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
-			t_data(int, zone);
 
-			static t_data(Layered_Data_Array<float>*, moe_data);
-			static t_data(float, ttime_weight_shape);
-			static t_data(float, ttime_weight_scale);
-			static t_data(float, ttime_weight_factor);
+			t_static_data(Layered_Data_Array<float>*, moe_data);
+			t_static_data(float, ttime_weight_shape);
+			t_static_data(float, ttime_weight_scale);
+			t_static_data(float, ttime_weight_factor);
 		};
 
 		template<typename MasterType>
@@ -201,7 +201,7 @@ namespace Routing_Components
 
 			t_data(float, trip_wait_time);
 
-			static t_data(Layered_Data_Array<float>*, turn_moe_data);
+			t_static_data(Layered_Data_Array<float>*, turn_moe_data);
 		};
 
 		Layered_Data_Array<float>* multimodal_to_multimodal::_turn_moe_data;
@@ -225,11 +225,11 @@ namespace Routing_Components
 
 			m_data(Graph_Pool<typename MT::graph_pool_type>*,routable_graph_pool,NONE,NONE);
 
-			static m_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
-			static m_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
+			m_static_data(Layered_Data_Array<float>,moe_data,NONE,NONE);
+			m_static_data(concat(std::unordered_map<int,int>),link_id_to_moe_data,NONE,NONE);
 
-			static m_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
-			static m_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
+			m_static_data(Layered_Data_Array<float>, turn_moe_data, NONE, NONE);
+			m_static_data(concat(std::unordered_map<int, int>), turn_id_to_moe_data, NONE, NONE);
 			
 			static bool static_initialize(const string& option_file)
 			{
@@ -251,6 +251,7 @@ namespace Routing_Components
 				scenario->set_parameter(document, "transferPenalty", _transferPenalty);
 				scenario->set_parameter(document, "waitWeight", _waitWeight);
 				scenario->set_parameter(document, "walkWeight", _walkWeight);
+				scenario->set_parameter(document, "bikeWeight", _bikeWeight);
 				scenario->set_parameter(document, "ivtWeight", _ivtWeight);
 				scenario->set_parameter(document, "carWeight", _carWeight);
 				scenario->set_parameter(document, "scanThreshold", _scanThreshold);
@@ -258,6 +259,8 @@ namespace Routing_Components
 				scenario->set_parameter(document, "waitThreshold", _waitThreshold);
 				scenario->set_parameter(document, "walkThreshold", _walkThreshold);
 				scenario->set_parameter(document, "walkSpeed", _walkSpeed);
+				scenario->set_parameter(document, "bikeThreshold", _bikeThreshold);
+				scenario->set_parameter(document, "bikeSpeed", _bikeSpeed);
 				scenario->set_parameter(document, "debug_route", _debug_route);
 				scenario->set_parameter(document, "multimodal_dijkstra", _multimodal_dijkstra);
 								
@@ -270,37 +273,44 @@ namespace Routing_Components
 				cout << "\ttransferPenalty = " << transferPenalty	<float>() << endl;
 				cout << "\twaitWeight = " << waitWeight		<float>() << endl;
 				cout << "\twalkWeight = " << walkWeight	<float>() << endl;
+				cout << "\tbikeWeight = " << bikeWeight	<float>() << endl;
 				cout << "\tivtWeight = " << ivtWeight		<float>() << endl;
 				cout << "\tcarWeight = " << carWeight	<float>() << endl;
 				cout << "\tscanThreshold = " << scanThreshold	<float>() << endl;
 				cout << "\tcostThreshold = " << costThreshold	<float>() << endl;
 				cout << "\twaitThreshold = " << waitThreshold	<float>() << endl;
-				cout << "\twalkThreshold = " << walkThreshold	<float>() << endl;
+				cout << "\twalkThreshold = " << walkThreshold	<Meters>() << endl;
 				cout << "\twalkSpeed = " << walkSpeed	<float>() << endl;
+				cout << "\tbikeThreshold = " << bikeThreshold	<Meters>() << endl;
+				cout << "\tbikeSpeed = " << bikeSpeed	<float>() << endl;
 				cout << "\tdebug_route = " << debug_route	<bool>() << endl;
 				cout << "\tmultimodal_dijkstra = " << multimodal_dijkstra	<bool>() << endl;
 			}
 			
 			static void default_static_initializer()
 			{
-				_transferPenalty = 300;
+				_transferPenalty = 300.0;
 				_waitWeight = 2.0;
 				_walkWeight = 2.0;
-				_ivtWeight = 1.00;
-				_carWeight = 3.00;
-				_scanThreshold = 10000;
-				_costThreshold = 28800.00;
-				_waitThreshold = 3600.00;
-				_walkThreshold = 5000;
-				_walkSpeed = 1.38889;
+				_bikeWeight = 2.0;
+				_ivtWeight = 1.0;
+				_carWeight = 1.5;
+				_scanThreshold = 200000.0;
+				_costThreshold = 28800.0;
+				_waitThreshold = 3600.0;
+				_walkThreshold = 5000.0;
+				_walkSpeed = 5.0;
+				_bikeThreshold = 10000.0;
+				_bikeSpeed = 10.0;
 				_debug_route = false;
-				_multimodal_dijkstra = false;
+				_multimodal_dijkstra = true;
 			}
 
 			#pragma region static parameters declaration		
 			m_static_data(float, transferPenalty, NONE, NONE);
 			m_static_data(float, waitWeight, NONE, NONE);
 			m_static_data(float, walkWeight, NONE, NONE);
+			m_static_data(float, bikeWeight, NONE, NONE);
 			m_static_data(float, ivtWeight, NONE, NONE);
 			m_static_data(float, carWeight, NONE, NONE);
 			m_static_data(float, scanThreshold, NONE, NONE);
@@ -308,6 +318,8 @@ namespace Routing_Components
 			m_static_data(float, waitThreshold, NONE, NONE);
 			m_static_data(float, walkThreshold, NONE, NONE);
 			m_static_data(float, walkSpeed, NONE, NONE);
+			m_static_data(float, bikeThreshold, NONE, NONE);
+			m_static_data(float, bikeSpeed, NONE, NONE);
 			m_static_data(bool, debug_route, NONE, NONE);
 			m_static_data(bool, multimodal_dijkstra, NONE, NONE);
 			#pragma endregion
@@ -490,7 +502,9 @@ namespace Routing_Components
 						input_time_dependent_edge._edge_id = current_link->template uuid<unsigned int>();
 
 						input_time_dependent_edge._cost = current_link->template travel_time<float>();
+						input_time_dependent_edge._cost_backup = current_link->template travel_time<float>();
 						input_time_dependent_edge._time_cost = current_link->template travel_time<float>();
+						input_time_dependent_edge._time_cost_backup = current_link->template travel_time<float>();
 
 												
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -620,7 +634,9 @@ namespace Routing_Components
 						input_static_edge._edge_id = current_link->template uuid<unsigned int>();
 
 						input_static_edge._cost = current_link->template travel_time<float>();
+						input_static_edge._cost_backup = current_link->template travel_time<float>();
 						input_static_edge._time_cost = current_link->template travel_time<float>();
+						input_static_edge._time_cost_backup = current_link->template travel_time<float>();
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
 						{
@@ -690,6 +706,10 @@ namespace Routing_Components
 
 				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
 				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(index_along_pattern_at_upstream_node)> Index_Along_Pattern_Container_Interface;
+				typedef Random_Access_Sequence<typename Link_Interface::get_type_of(unique_patterns)> Unique_Patterns_Container_Interface;
+
 				typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
 				typedef Movement<typename remove_pointer<typename Link_Interface::get_type_of(outbound_turn_movements)::value_type>::type> Turn_Movement_Interface;
@@ -697,9 +717,12 @@ namespace Routing_Components
 
 				typedef  Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_patterns_container), _Transit_Pattern_Interface*> _Transit_Patterns_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Pattern_Interface::get_type_of(pattern_trips)> _Patterns_Trips_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Pattern_Interface::get_type_of(pattern_edge_ids)> _Patterns_Edge_Ids_Container_Interface;
 
 				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 				typedef  Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+				typedef  Random_Access_Sequence< typename _Transit_Vehicle_Trip_Interface::get_type_of(arrival_seconds)> _Arrival_Seconds_Container_Interface;
 
 				typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
 				typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(_Zones_Container_Interface)> _Zone_Interface;
@@ -735,6 +758,7 @@ namespace Routing_Components
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 					float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
+					float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();
 					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
 					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
 
@@ -746,31 +770,29 @@ namespace Routing_Components
 						input_multimodal_edge._x = downstream_intersection->template x_position<float>();
 						input_multimodal_edge._y = downstream_intersection->template y_position<float>();
 						input_multimodal_edge._edge_id = current_link->template uuid<unsigned int>();
-						input_multimodal_edge._edge_type = current_link->_link_type;
+						input_multimodal_edge._edge_type = current_link->link_type<Link_Components::Types::Link_Type_Keys>();
 
 						input_multimodal_edge._cost = current_link->template travel_time<float>();
+						input_multimodal_edge._cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._time_cost = current_link->template travel_time<float>();
-						input_multimodal_edge._time_cost_temp = current_link->template travel_time<float>();
+						input_multimodal_edge._time_cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._source_link = current_link;
 						
-						int zone_index = current_link->_zone_index;
-						input_multimodal_edge._zone = zone_index;
-
 						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 						{
 							int my_itr = 0;
 							float min_travel_time = FLT_MAX / 2.0f;
 
-							for (auto patterns_itr = current_link->_unique_patterns.begin(); patterns_itr != current_link->_unique_patterns.end(); ++patterns_itr)
+							for (auto patterns_itr = current_link->unique_patterns<Unique_Patterns_Container_Interface&>().begin(); patterns_itr != current_link->unique_patterns<Unique_Patterns_Container_Interface&>().end(); ++patterns_itr)
 							{
 								_Transit_Pattern_Interface* current_pattern = (_Transit_Pattern_Interface*)(*patterns_itr);
 								input_multimodal_edge._unique_patterns.push_back(current_pattern);
-								int mySeq = current_link->_index_along_pattern_at_upstream_node[my_itr];
+								int mySeq = current_link->index_along_pattern_at_upstream_node<Index_Along_Pattern_Container_Interface&>()[my_itr];
 								input_multimodal_edge._index_along_pattern_at_upstream_node.push_back(mySeq);
-								for (auto trips_itr = current_pattern->_pattern_trips.begin(); trips_itr != current_pattern->_pattern_trips.end(); ++trips_itr)
+								for (auto trips_itr = current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().begin(); trips_itr != current_pattern->pattern_trips<_Patterns_Trips_Container_Interface&>().end(); ++trips_itr)
 								{
 									_Transit_Vehicle_Trip_Interface* current_trip = (_Transit_Vehicle_Trip_Interface*)(*trips_itr);
-									float temp_travel_time = current_trip->_arrival_seconds.at(mySeq + 1) - current_trip->_arrival_seconds.at(mySeq);
+									float temp_travel_time = current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq + 1) - current_trip->arrival_seconds<_Arrival_Seconds_Container_Interface&>().at(mySeq);
 									if (temp_travel_time < min_travel_time)
 									{
 										min_travel_time = temp_travel_time;
@@ -779,18 +801,31 @@ namespace Routing_Components
 								my_itr++;
 							}
 
-							input_multimodal_edge._min_multi_modal_cost = ivtWeight * min_travel_time;
-							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
+							current_link->template min_multi_modal_cost<float>(ivtWeight * min_travel_time);
+							current_link->template walk_length<float>(FLT_MAX / 2.0f);
+							current_link->template drive_time<float>(FLT_MAX / 2.0f);
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}
 						else if (link_type == Link_Components::Types::Link_Type_Keys::WALK)
 						{
-							input_multimodal_edge._min_multi_modal_cost = walkWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._walk_length = 0.3048 * current_link->template length<float>(); //in meters
+							current_link->template min_multi_modal_cost<float>(walkWeight*current_link->template travel_time<float>() );
+							
+							Feet walk_length_feet = current_link->template length<float>();
+							Meters walk_length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(walk_length_feet);							
+							current_link->template walk_length<float>(walk_length_meters);
+
+							current_link->template drive_time<float>(FLT_MAX / 2.0f);
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}
 						else
 						{
-							input_multimodal_edge._min_multi_modal_cost = carWeight*current_link->template travel_time<float>();
-							input_multimodal_edge._walk_length = FLT_MAX / 2.0f;
+							current_link->template min_multi_modal_cost<float>(carWeight*current_link->template travel_time<float>() );
+							current_link->template walk_length<float>(FLT_MAX / 2.0f);
+							current_link->template drive_time<float>(current_link->template travel_time<float>() );
+							current_link->template walk_distance_to_transit<float>(FLT_MAX / 2.0f);
+							current_link->template drive_fft_to_transit<float>(FLT_MAX / 2.0f);
 						}								
 						
 						if (_link_id_to_moe_data.count(current_link->template uuid<int>()))
@@ -878,9 +913,9 @@ namespace Routing_Components
 					{
 						Link_Interface* current_link = (Link_Interface*)(*links_itr);
 
-						int edge_id = current_link->_uuid;
+						int edge_id = current_link->uuid<int>();
 
-						pattern->_pattern_edge_ids.push_back(edge_id);
+						pattern->pattern_edge_ids<_Patterns_Edge_Ids_Container_Interface&>().push_back(edge_id);
 					}
 				}
 				//graph_pool->Link_Graphs();
@@ -971,7 +1006,8 @@ namespace Routing_Components
 				unsigned int destination_loc_id, 
 				bool debug_route,
 				std::string& summary_paragraph,
-				std::string& detail_paragraph)
+				std::string& detail_paragraph,
+				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
 			{
 				
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
@@ -1008,7 +1044,7 @@ namespace Routing_Components
 				//}
 
 				
-				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+				float routed_time = Multimodal_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, /*tr_ends,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
 
 				
 				// update origins/destinations lists in from A_Star results
@@ -1142,7 +1178,7 @@ namespace Routing_Components
 
 			}
 
-			void compute_dijkstra_transit_distance(Network<typename MasterType::network_type>* source_network)
+			void compute_walk_distance_to_transit(Network<typename MasterType::network_type>* source_network)
 			{
 				cout << "Constructing the walking distance tree to closest transit for better A* filtering..." << endl;
 
@@ -1171,18 +1207,17 @@ namespace Routing_Components
 				{
 					Link_Interface* link = (Link_Interface*)(*link_itr);
 
-					Intersection_Interface* down_node = link->_downstream_intersection;
+					Intersection_Interface* down_node = link->downstream_intersection<Intersection_Interface*>();
 					Link_Container_Interface& outbound_links = down_node->template outbound_links<Link_Container_Interface&>();
 
 					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
-					{
-						
-						global_edge_id start;
-						start.edge_id = link->_uuid;
-						start.graph_id = _multimodal_network_graph_id;						
-						starts.push_back(start);
+					{						
+						global_edge_id in_edge_g;
+						in_edge_g.edge_id = link->uuid<int>();
+						in_edge_g.graph_id = _multimodal_network_graph_id;
+						starts.push_back(in_edge_g);
 
 						Link_Container_Interface::iterator out_links_itr;
 						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
@@ -1190,14 +1225,8 @@ namespace Routing_Components
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
-							{
-								global_edge_id end;
-								end.edge_id = link->_uuid;
-								end.graph_id = _multimodal_network_graph_id;
-
-								A_Star_Edge<base_edge_type>* end_edge;
-								end_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(end);
-								end_edge->_touch_transit = true;
+							{							
+								link->template touch_transit<bool>(true);
 								break;
 							}
 						}
@@ -1211,6 +1240,79 @@ namespace Routing_Components
 					
 					float routed_time = Dijkstra_Walk<MT, typename MT::walk_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, debug_route);
 					
+
+					if (my_itr % 10000 == 0) cout << "\tLink Counter:\t" << my_itr << endl;
+					++my_itr;
+				}
+
+
+			}
+
+			void compute_drive_fft_to_transit(Network<typename MasterType::network_type>* source_network)
+			{
+				cout << "Constructing the free flow drive time tree to closest transit for better A* filtering..." << endl;
+
+				Routable_Agent<typename MT::drive_to_transit_tree_agent_type> proxy_agent;
+
+				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
+				Graph_Pool<typename MT::graph_pool_type>* graph_pool = _routable_graph_pool;
+
+				typedef Network<typename MasterType::network_type> Network_Interface;
+
+				typedef Intersection_Components::Prototypes::Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
+
+				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename Network_Interface::get_type_of(links_container)::value_type>::type> Link_Interface;
+				typedef Random_Access_Sequence<typename Network_Interface::get_type_of(links_container), Link_Interface*> Link_Container_Interface;
+
+				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+
+				Network_Interface* network = source_network;
+
+				Link_Container_Interface::iterator link_itr;
+				Link_Container_Interface* links = network->links_container<Link_Container_Interface*>();
+
+				std::vector<global_edge_id> starts;
+
+				for (link_itr = links->begin(); link_itr != links->end(); link_itr++)
+				{
+					Link_Interface* link = (Link_Interface*)(*link_itr);
+
+					Intersection_Interface* down_node = link->downstream_intersection<Intersection_Interface*>();
+					Link_Container_Interface& outbound_links = down_node->template outbound_links<Link_Container_Interface&>();
+
+					Link_Components::Types::Link_Type_Keys facility_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+					if (facility_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || facility_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+					{
+						global_edge_id in_edge_g;
+						in_edge_g.edge_id = link->uuid<int>();
+						in_edge_g.graph_id = _multimodal_network_graph_id;
+						A_Star_Edge<base_edge_type>* in_edge = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(in_edge_g);
+						
+						starts.push_back(in_edge_g);
+
+						Link_Container_Interface::iterator out_links_itr;
+						for (out_links_itr = outbound_links.begin(); out_links_itr != outbound_links.end(); out_links_itr++)
+						{
+							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
+							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+													
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK && outbound_link->template touch_transit<bool>() )
+							{								
+								link->template touch_transit<bool>(true);
+								break;
+							}
+						}
+					}
+				}
+
+				int my_itr = 0;
+				for (auto orig_itr = starts.begin(); orig_itr != starts.end(); orig_itr++)
+				{
+					global_edge_id start = global_edge_id(*orig_itr);
+
+					float routed_time = Dijkstra_Drive<MT, typename MT::drive_to_transit_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, start, debug_route);
+
 
 					if (my_itr % 10000 == 0) cout << "\tLink Counter:\t" << my_itr << endl;
 					++my_itr;
@@ -1320,6 +1422,7 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, transferPenalty);
 		define_static_member_variable(Routable_Network_Implementation, waitWeight);
 		define_static_member_variable(Routable_Network_Implementation, walkWeight);
+		define_static_member_variable(Routable_Network_Implementation, bikeWeight);
 		define_static_member_variable(Routable_Network_Implementation, ivtWeight);
 		define_static_member_variable(Routable_Network_Implementation, carWeight);
 		define_static_member_variable(Routable_Network_Implementation, scanThreshold);
@@ -1327,6 +1430,8 @@ namespace Routing_Components
 		define_static_member_variable(Routable_Network_Implementation, waitThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkThreshold);
 		define_static_member_variable(Routable_Network_Implementation, walkSpeed);
+		define_static_member_variable(Routable_Network_Implementation, bikeThreshold);
+		define_static_member_variable(Routable_Network_Implementation, bikeSpeed);
 		define_static_member_variable(Routable_Network_Implementation, debug_route);
 		define_static_member_variable(Routable_Network_Implementation, multimodal_dijkstra);
 		#pragma endregion

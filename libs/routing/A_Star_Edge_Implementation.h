@@ -13,7 +13,7 @@ namespace polaris
 		Base_Edge_A_Star():_x(0.0f),_y(0.0f),_source_link(nullptr),_cost_from_origin(FLT_MAX / 2.0f),_time_label(0.0f),
 					 _estimated_cost_origin_destination(FLT_MAX / 2.0f),_marked_for_reset(false),_in_closed_set(false),_in_open_set(false),
 					 _begin_connection_groups(nullptr),_end_connection_groups(nullptr),_came_from(nullptr),_edge_id(-1),
-					_cost(0.0f),_time_cost(0.0f),_distance_to_transit(FLT_MAX / 2.0f),_touch_transit(false) {}
+					_cost(0.0f),_time_cost(0.0f) {}
 
 		typedef Base_Edge_A_Star base_edge_type;
 		typedef Base_Edge_A_Star attribute_type;
@@ -36,15 +36,9 @@ namespace polaris
 		t_data(typename MasterType::link_type*, source_link);
 
 		t_data(float, cost);
+		t_data(float, cost_backup);
 		t_data(float, time_cost);
-		t_data(float, time_cost_temp);
-		//TODO OMER Chenage this later to link properties start
-		t_data(float, min_multi_modal_cost);
-		t_data(float, walk_length);
-		t_data(float, distance_to_transit);
-		t_data(bool, touch_transit);
-		//TODO OMER Chenage this later to link properties end
-
+		t_data(float, time_cost_backup);
 		t_data(float, cost_from_origin);
 		t_data(float, time_from_origin);
 		t_data(float, time_label);		

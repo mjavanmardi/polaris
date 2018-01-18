@@ -24,7 +24,7 @@ namespace Routing_Components
 			typedef typename Base_t::Component_Type Component_Type;
 
 			m_prototype(Movement_Plan,typename MasterType::movement_plan_type,movement_plan,NONE,NONE);
-			static m_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
+			m_static_prototype(Network,typename MasterType::network_type,network,NONE,NONE);
 			m_data(Simulation_Timestep_Increment, departure_time, NONE, NONE);
 
 			typedef Movement_Plan<type_of(movement_plan)> movement_plan_interface;
@@ -34,6 +34,8 @@ namespace Routing_Components
 
 
 			typedef Network<typename MasterType::network_type> Network_Interface;
+			typedef Random_Access_Sequence<typename Network_Interface::get_type_of(routable_networks)> Routable_Networks_Container_Interface;
+			typedef Routable_Network<typename get_component_type(Routable_Networks_Container_Interface)> Routable_Network_Interface;
 			typedef Intersection<typename remove_pointer<typename Network_Interface::get_type_of(intersections_container)::value_type>::type> Intersection_Interface;
 
 			typedef Pair_Associative_Container< typename Network_Interface::get_type_of(zones_container)> _Zones_Container_Interface;
@@ -85,11 +87,11 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Network is undefined.");
 				}
-				else if(((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				else if(((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size() == 0)
 				{
 					THROW_EXCEPTION("_routable_networks is undefined.");
 				}
-				else if(thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				else if(thread_id() >= ((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size())
 				{
 					THROW_EXCEPTION("_routable_networks is not large enough.");
 				}
@@ -194,21 +196,22 @@ namespace Routing_Components
 				std::deque<float> out_heur_cost;
 				std::string summary_paragraph = "";
 				std::string detail_paragraph = "";
-				
-				float best_route_time_to_destination = 0.0f;
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
+				float best_route_time_to_destination = 0.0f;
+				
 				// Call path finder with current list of origin/destination possibilities - list will be trimmed to final od pair in compute_network_path
 				if(!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 				{
 					//TODO: Remove when done testing routing execution time
-					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE) )
+					if(((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE) )
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else
 					{
@@ -219,13 +222,13 @@ namespace Routing_Components
 				else
 				{
 					//TODO: Remove when done testing routing execution time
-					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::RAIL || mode == Vehicle_Components::Types::WALK || mode == Vehicle_Components::Types::BICYCLE))
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !origin_walk_ids.empty() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::PARK_AND_RIDE || mode == Vehicle_Components::Types::KISS_AND_RIDE))
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
 					{
-						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph);
+						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, mode);
 					}
 					else
 					{ 
@@ -244,14 +247,10 @@ namespace Routing_Components
 					_movement_plan->template estimated_time_of_arrival<Simulation_Timestep_Increment>(_movement_plan->template absolute_departure_time<int>() + routed_travel_time);
 					_movement_plan->template estimated_travel_time_when_departed<float>(routed_travel_time);
 					_movement_plan->set_trajectory(path_container, cost_container);
-
-					//TODO: Remove when done testing routing execution time
-					//if (astar_time >= 0)
-					//{
-						_movement_plan->routing_execution_time(astar_time);
-						_movement_plan->summary_string(summary_paragraph);
-						_movement_plan->detail_string(detail_paragraph);
-					//}
+					_movement_plan->routing_execution_time(astar_time);
+					_movement_plan->summary_string(summary_paragraph);
+					_movement_plan->detail_string(detail_paragraph);
+					
 					// update movement plan O/D based on returned routing results
 					Link_Interface* olink = nullptr;
 					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
@@ -424,11 +423,11 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Network is undefined.");
 				}
-				else if (((typename MasterType::network_type*)_network)->_routable_networks.size() == 0)
+				else if (((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size() == 0)
 				{
 					THROW_EXCEPTION("_routable_networks is undefined.");
 				}
-				else if (thread_id() >= ((typename MasterType::network_type*)_network)->_routable_networks.size())
+				else if (thread_id() >= ((typename MasterType::network_type*)_network)->routable_networks<Routable_Networks_Container_Interface&>().size())
 				{
 					THROW_EXCEPTION("_routable_networks is not large enough.");
 				}	
@@ -447,7 +446,7 @@ namespace Routing_Components
 								
 								
 				//_Zone_Interface* origin_zone = origin_zone;
-				int origin_zone_index = _origin_zone->_internal_id;
+				int origin_zone_index = _origin_zone->internal_id<int>();
 				Link_Container_Interface* origin_links = _origin_zone->origin_links<Link_Container_Interface*>();
 
 				// Fill the origin ids list from the origin location (in case there is more than one possible origin link)
