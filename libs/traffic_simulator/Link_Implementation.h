@@ -675,6 +675,10 @@ namespace Link_Components
 						{
 							float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
 
+							//TODO OMER: Remove efter you're done
+							float myPenalty = cost_update - _link_fftt;
+							float otherPenalty = turn_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
+
 							//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
 							//{
 							//	cout << cost_update << endl;
