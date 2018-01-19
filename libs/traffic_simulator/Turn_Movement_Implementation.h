@@ -426,8 +426,12 @@ namespace Turn_Movement_Components
 					float turn_travel_penalty = 0.0;
 					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 					_turn_travel_penalty = turn_travel_penalty;
-					//TODO OMER FIX THAT maybe later
+
+					//=========================================================================================================
+					//TODO: OMER - we are removing the add signal penalty as it should already be accounted for from simulation
 					//add_signal_penalty<TargetType>();
+					//==============================================================================================================
+
 					//TODO:BIG_CHANGE
 					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);

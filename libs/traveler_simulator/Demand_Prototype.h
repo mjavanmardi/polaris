@@ -160,6 +160,12 @@ namespace Demand_Components
 					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() > demand_percentage) continue;
 
 					trip_id = db_itr->getPrimaryKey();
+					
+					//=======================================
+					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
+					int mode_id = db_itr->getMode();
+					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					//=======================================
 
 					//=======================================
 
