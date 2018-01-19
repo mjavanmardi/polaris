@@ -229,7 +229,7 @@ namespace Movement_Plan_Components
 
 					vehicle_trajectory_data->template Initialize<Link_Interface*>( link );
 
-					if (arrival_time_itr != arrival_time_container.begin()) vehicle_trajectory_data->template estimated_link_accepting_time<int>( *(arrival_time_itr /*- 1*/) );
+					if (arrival_time_itr != arrival_time_container.begin()) vehicle_trajectory_data->template estimated_link_accepting_time<int>( *(arrival_time_itr - 1) );
 					else vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);
 
 

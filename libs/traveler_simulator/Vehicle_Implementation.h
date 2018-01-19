@@ -466,7 +466,9 @@ namespace Vehicle_Components
 				int position_index = mp->template current_trajectory_position<int>();
 				_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
 				_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
-				int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+ 				int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+				int diff = 0;
+				float link_ttime = 0;
 
 				// check to make sure that next link in the trajectory is not jammed
 				//_Link_Interface* next_link = mp->next_link<_Link_Interface*>();
@@ -476,15 +478,15 @@ namespace Vehicle_Components
 					_Link_Interface* next_link = next_traj_unit->template link<_Link_Interface*>();
 					int next_routed_travel_time = next_traj_unit->template estimated_link_accepting_time<int>();
 
-					int diff = next_routed_travel_time - routed_travel_time;
+					diff = next_routed_travel_time - routed_travel_time;
 					routed_travel_time = next_routed_travel_time;
 
-					current_travel_time += next_link_travel_time<float>();
-					//if (current_travel_time >= 36000) cout <<"Next link id: " << next_link->template uuid<int>()<<". Next link travel time: " << next_link_travel_time<float>()<<", routed time = "<<diff<<", delay ratio: " << (float)current_travel_time / (float)routed_travel_time<<endl;
+					link_ttime = next_link_travel_time<float>();
+					current_travel_time += link_ttime;
 				}
 
-				float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
-
+				float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0.0f;
+				float observed_link_delay_ratio = diff > 0 ? (float)link_ttime / (float)diff : 0.0f;
 
 				/*
 				{
@@ -563,9 +565,9 @@ namespace Vehicle_Components
 				// - a sufficient amount of time spent delayed
 				// - sufficiently far from their destination in absolute terms
 
-				if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() &&
-					(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() /*&&
-																																										 ( mp->template estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>()*/)
+				if ( (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() &&
+					(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() ) ||
+					observed_link_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>())
 				{
 					//cout << "switched: " << current_travel_time << " vs " << routed_travel_time << endl;
 
