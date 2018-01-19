@@ -280,7 +280,8 @@ namespace Turn_Movement_Components
 						
 				int num_transfer_vehicles_of_turn_movement = (int)transfer_flow_turn_movement;
 				transfer_flow_turn_movement = transfer_flow_turn_movement - num_transfer_vehicles_of_turn_movement;
-				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
+				//TODO OMER: Re-enable the condition later
+				//if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					if(transfer_flow_turn_movement > 0.0)
 					{
