@@ -166,16 +166,7 @@ namespace Demand_Components
 					int mode_id = db_itr->getMode();
 					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
-
-					//=======================================
-
-					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
-
-					int mode_id = db_itr->getMode();
-
-					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
-
-					//=======================================
+						
 
 					if (++counter % 100000 == 0)
 					{
