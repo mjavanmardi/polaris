@@ -997,7 +997,7 @@ namespace Network_Components
 					}
 					else if (facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
-						//TODO: Omer fix later!
+						//TODO Omer fix later!
 						float link_travel_time = 1;
 						link->template travel_time<float>(link_travel_time);
 					}

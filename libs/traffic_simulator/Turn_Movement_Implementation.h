@@ -428,7 +428,7 @@ namespace Turn_Movement_Components
 					_turn_travel_penalty = turn_travel_penalty;
 
 					//=========================================================================================================
-					//TODO: OMER - we are removing the add signal penalty as it should already be accounted for from simulation
+					//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
 					//add_signal_penalty<TargetType>();
 					//==============================================================================================================
 

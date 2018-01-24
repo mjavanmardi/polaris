@@ -577,7 +577,7 @@ namespace Link_Components
 		template<typename TargetType>
 		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 		{
-			//TODO: Omer fix later!
+			//TODO Omer fix later!
 			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
@@ -675,14 +675,9 @@ namespace Link_Components
 						{
 							float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
 
-							//TODO OMER: Remove efter you're done
+							//TODO OMER: Remove after you're done
 							float myPenalty = cost_update - _link_fftt;
 							float otherPenalty = turn_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
-
-							//if(_dbid == 16435 && turn_movement->outbound_link<Link<typename MasterType::link_type>*>()->template dbid<int>() == 85584)
-							//{
-							//	cout << cost_update << endl;
-							//}
 
 							for (auto routable_itr = routable_networks->begin(); routable_itr != routable_networks->end(); routable_itr++)
 							{

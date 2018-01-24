@@ -25,6 +25,7 @@ class Automation_Type;
 class Connectivity_Type;
 class link_travel;
 class Path;
+class multimodalSPLabels;
 
 
 #pragma db object //table("SELECTION")
@@ -945,6 +946,86 @@ private:
 	int travel_time;
 	std::vector<link_travel > links;
 	shared_ptr<Vehicle> vehicle;
+};
+
+#pragma db object
+class multimodalSPLabels
+{
+public:
+	// Default Constructor
+	multimodalSPLabels() {}
+	multimodalSPLabels(int Origin_ID_, int Destination_ID_, int Departure_Time_, int Sub_Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, float visit_Time_, std::string Success_Status_, float Euc_Dist_km_)
+		: Origin_ID(Origin_ID_), Destination_ID(Destination_ID_), Departure_Time(Departure_Time_), Sub_Mode(Sub_Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), visit_Time(visit_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
+	{
+	}
+	//Accessors
+	const int& getOrigin_ID() const { return Origin_ID; }
+	void setOrigin_ID(const int& Origin_ID_) { Origin_ID = Origin_ID_; }
+	const int& getDestination_ID() const { return Destination_ID; }
+	void setDestination_ID(const int& Destination_ID_) { Destination_ID = Destination_ID_; }
+	const int& getDeparture_Time() const { return Departure_Time; }
+	void setDeparture_Time(const int& Departure_Time_) { Departure_Time = Departure_Time_; }
+	const int& getSub_Mode() const { return Sub_Mode; }
+	void setSub_Mode(const int& Sub_Mode_) { Sub_Mode = Sub_Mode_; }
+	const float& getArrival_Time() const { return Arrival_Time; }
+	void setArrival_Time(const float& Arrival_Time_) { Arrival_Time = Arrival_Time_; }
+	const float& getGen_Cost() const { return Gen_Cost; }
+	void setGen_Cost(const float& Gen_Cost_) { Gen_Cost = Gen_Cost_; }
+	const float& getDuration() const { return Duration; }
+	void setDuration(const float& Duration_) { Duration = Duration_; }
+	const int& getWait_Count() const { return Wait_Count; }
+	void setWait_Count(const int& Wait_Count_) { Wait_Count = Wait_Count_; }
+	const float& getWait_Timet() const { return Wait_Time; }
+	void setWait_Time(const float& Wait_Time_) { Wait_Time = Wait_Time_; }
+	const float& getWalk_Time() const { return Walk_Time; }
+	void setWalk_Time(const float& Walk_Time_) { Walk_Time = Walk_Time_; }
+	const float& getBike_Time() const { return Bike_Time; }
+	void setBike_Time(const float& Bike_Time_) { Bike_Time = Bike_Time_; }
+	const float& getIVTT() const { return IVTT; }
+	void setIVTT(const float& IVTT_) { IVTT = IVTT_; }
+	const float& getCar_Time() const { return Car_Time; }
+	void setCar_Time(const float& Car_Time_) { Car_Time = Car_Time_; }
+	const float& getTransfer_Pen() const { return Transfer_Pen; }
+	void setTransfer_Pen(const float& Transfer_Pen_) { Transfer_Pen = Transfer_Pen; }
+	const float& getEst_Cost() const { return Est_Cost; }
+	void setEst_Cost(const float& Est_Cost_) { Est_Cost = Est_Cost_; }
+	const int& getScan_Count() const { return Scan_Count; }
+	void setScan_Count(const int& Scan_Count_) { Scan_Count = Scan_Count_; }
+	const float& getaStar_Time() const { return aStar_Time; }
+	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }
+	const float& getvisit_Time() const { return visit_Time; }
+	void setvisit_Time(const float& visit_Time_) { visit_Time = visit_Time_; }
+	const std::string& getSuccess_Status() const { return Success_Status; }
+	void setSuccess_Status(const std::string& Success_Status_) { Success_Status = Success_Status_; }
+	const float& getEuc_Dist_km() const { return Euc_Dist_km; }
+	void setEuc_Dist_km(const float& Euc_Dist_km_) { Euc_Dist_km = Euc_Dist_km_; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db auto id
+	int id;
+#pragma db not_null
+	int Origin_ID;
+	int Destination_ID;
+	int Departure_Time;
+	int Sub_Mode;
+	float Arrival_Time;
+	float Gen_Cost;
+	float Duration;
+	int Wait_Count;
+	float Wait_Time;
+	float Walk_Time;
+	float Bike_Time;
+	float IVTT;
+	float Car_Time;
+	float Transfer_Pen;
+	float Est_Cost;
+	int Scan_Count;
+	float aStar_Time;
+	float visit_Time;
+	std::string Success_Status;
+	float Euc_Dist_km;
 };
 
 }//end of io namespace

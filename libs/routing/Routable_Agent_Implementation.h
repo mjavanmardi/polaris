@@ -115,16 +115,15 @@ namespace polaris
 		{
 			if(neighbor->_is_highway)
 			{
-				//cout << "is highway" << endl;
-				//return (current->_cost + connection->_cost)*.75f;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//return (current->_cost + connection->_cost)*.95f;
 				return (connection->_cost + neighbor->_cost)*.95f;
 			}
 			else
 			{
-				//cout << "is not highway" << endl;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//return current->_cost + connection->_cost;
 				return (connection->_cost + neighbor->_cost);
 			}
@@ -148,7 +147,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_cost;
 				
@@ -194,7 +194,8 @@ namespace polaris
 
 				// updates to handle mixing of historical and real-time info in cost function
 
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float time_cost_current = current->_cost + connection->_cost;
 				float time_cost_current = connection->_cost + neighbor->_cost;
 
@@ -223,14 +224,16 @@ namespace polaris
 				if(neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					//TODO Omer -> Might want to change it back!
+					//Change made by Omer. We should route using the end-of-link cost
+					//Omer Fall 2017
 					//return (current->_cost + connection->_cost)*.95f;
 					return (connection->_cost + neighbor->_cost)*.95f;
 				}
 				else
 				{
 					//cout << "is not highway" << endl;
-					//TODO Omer -> Might want to change it back!
+					//Change made by Omer. We should route using the end-of-link cost
+					//Omer Fall 2017
 					//return current->_cost + connection->_cost;
 					return connection->_cost + neighbor->_cost;
 				}
@@ -241,7 +244,8 @@ namespace polaris
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			//TODO Omer -> Might want to change it back!
+			//Change made by Omer. We should route using the end-of-link cost
+			//Omer Fall 2017
 			//return current->_time_cost + connection->_time_cost;
 			return connection->_time_cost + neighbor->_time_cost;
 		}
@@ -263,7 +267,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 				float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + neighbor->_time_cost;
 				
@@ -315,7 +320,8 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float time_cost_current = current->_time_cost + connection->_time_cost;
 				float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
@@ -340,21 +346,11 @@ namespace polaris
 			}
 			else
 			{
-
-				//if(neighbor->_is_highway)
-				//{
-				//	//cout << "is highway" << endl;
-				//	//TODO Omer -> Might want to change it back!
-				//	//return (current->_time_cost + connection->_time_cost)*.95f;
-				//	return (connection->_time_cost + neighbor->_time_cost)*.95f;
-				//}
-				//else
-				//{
-					//cout << "is not highway" << endl;
-					//TODO Omer -> Might want to change it back!
-					//return current->_time_cost + connection->_time_cost;
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
+				//return current->_time_cost + connection->_time_cost;
 				return connection->_time_cost + neighbor->_time_cost;
-				//}
+				
 				
 			}
 		}
@@ -444,7 +440,8 @@ namespace polaris
 		template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
 		float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			//TODO Omer -> Might want to change it back!
+			//Change made by Omer. We should route using the end-of-link cost
+			//Omer Fall 2017
 			//return current->_cost + connection->_cost;
 			return connection->_cost + neighbor->_cost;
 		}
@@ -467,7 +464,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
@@ -511,7 +509,8 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float time_cost_current = current->_cost + connection->_cost;
 				float time_cost_current = connection->_cost + neighbor->_cost;
 
@@ -540,14 +539,16 @@ namespace polaris
 				if (neighbor->_is_highway)
 				{
 					//cout << "is highway" << endl;
-					//TODO Omer -> Might want to change it back!
+					//Change made by Omer. We should route using the end-of-link cost
+					//Omer Fall 2017
 					//return (current->_cost + connection->_cost)*.95f;
 					return (connection->_cost + neighbor->_cost)*.95f;
 				}
 				else
 				{
 					//cout << "is not highway" << endl;
-					//TODO Omer -> Might want to change it back!
+					//Change made by Omer. We should route using the end-of-link cost
+					//Omer Fall 2017
 					//return current->_cost + connection->_cost;
 					return connection->_cost + neighbor->_cost;
 				}
@@ -558,7 +559,8 @@ namespace polaris
 		template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
 		float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
 		{
-			//TODO Omer -> Might want to change it back!
+			//Change made by Omer. We should route using the end-of-link cost
+			//Omer Fall 2017
 			//return current->_time_cost + connection->_time_cost;
 			return connection->_time_cost + neighbor->_time_cost;
 		}
@@ -580,7 +582,8 @@ namespace polaris
 
 				// interpolate between current and next time step
 				float t = FLT_MAX;
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float t1 = connection->turn_moe_data()->get_closest_element(turn_moe_ptr, current_time) + current->_cost; // I believe that the edge cost (current->_cost) is always the free flow time, so do not need to lookup historical values
 																														  //float t1_weight = ttime_step / connection->turn_moe_data()->layer_step<float>();
 
@@ -631,7 +634,8 @@ namespace polaris
 
 
 				// updates to handle mixing of historical and real-time info in cost function
-				//TODO Omer -> Might want to change it back!
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
 				//float time_cost_current = current->_time_cost + connection->_time_cost;
 				float time_cost_current = connection->_time_cost + neighbor->_time_cost;
 
@@ -657,18 +661,9 @@ namespace polaris
 			else
 			{
 
-				//if (neighbor->_is_highway)
-				//{
-				//	//cout << "is highway" << endl;
-				//	//TODO Omer -> Might want to change it back!
-				//	//return (current->_time_cost + connection->_time_cost)*.95f;
-				//	return (connection->_time_cost + neighbor->_time_cost)*.95f;
-				//}
-				//else
-				//{
-					//cout << "is not highway" << endl;
-					//TODO Omer -> Might want to change it back!
-					//return current->_time_cost + connection->_time_cost;
+				//Change made by Omer. We should route using the end-of-link cost
+				//Omer Fall 2017
+				//return current->_time_cost + connection->_time_cost;
 				return connection->_time_cost + neighbor->_time_cost;
 				//}
 
