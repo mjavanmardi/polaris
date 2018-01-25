@@ -253,11 +253,12 @@ namespace Demand_Components
 					//router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
 
+					movement_plan->traveler_id(trip_id);
 					movement_plan->template origin<_Link_Interface*>(origin_link);
 					movement_plan->template destination<_Link_Interface*>(destination_link);
 
-					_Activity_Location_Interface* origin_location = origin_link->template activity_locations<_Activity_Locations_Container_Interface&>()[0];
-					_Activity_Location_Interface* destination_location = destination_link->template activity_locations<_Activity_Locations_Container_Interface&>()[0];
+					_Activity_Location_Interface* origin_location = origin_activity_location;
+					_Activity_Location_Interface* destination_location = destination_activity_location;
 					movement_plan->template origin<_Activity_Location_Interface*>(origin_location);
 					movement_plan->template destination<_Activity_Location_Interface*>(destination_location);
 
