@@ -483,7 +483,6 @@ namespace Person_Components
 				double TRAN_COST_M = TRAN_COST * m_inc;
 				double TRAN_COST_H = TRAN_COST * h_inc;
 				
-				//TODO OMER JOSH
 				Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
 				Kilometers_Per_Minute walkSpeed_kpm = GLOBALS::Convert_Units<Kilometers_Per_Hour, Kilometers_Per_Minute>(walkSpeed_kph);
 
@@ -977,8 +976,7 @@ namespace Person_Components
 				auto_nest->template Add_Sub_Choice_Option<_Choice_Option_Interface*>((_Choice_Option_Interface*)hov_choice);			
 				//============================================================================================
 				// TRANSIT NEST
-				//TODO: OMER - replace this check with the djikstra-based feasibility check with reasonable cutoffs
-				
+								
 				/*if (_los->transit_ttime<Time_Minutes>() < 1440.0)
 				{
 					transit_choice->Mode_Chooser(this);

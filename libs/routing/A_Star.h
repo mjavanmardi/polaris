@@ -782,7 +782,7 @@ namespace polaris
 		routing_data.ends = &ends;
 		routing_data.start_time = start_time;
 
-		//TODO OMER: Check if these additions damages anything
+		//Multiomdal Routing Data Added
 		//----------------------------------------------------
 		routing_data.transferPenalty = transferPenalty;
 		routing_data.waitWeight = waitWeight;

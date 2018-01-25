@@ -280,7 +280,8 @@ namespace Turn_Movement_Components
 						
 				int num_transfer_vehicles_of_turn_movement = (int)transfer_flow_turn_movement;
 				transfer_flow_turn_movement = transfer_flow_turn_movement - num_transfer_vehicles_of_turn_movement;
-				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
+				//TODO OMER: Re-enable the condition later
+				//if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					if(transfer_flow_turn_movement > 0.0)
 					{
@@ -427,7 +428,7 @@ namespace Turn_Movement_Components
 					_turn_travel_penalty = turn_travel_penalty;
 
 					//=========================================================================================================
-					//TODO: OMER - we are removing the add signal penalty as it should already be accounted for from simulation
+					//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
 					//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
 					if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0)
 					{

@@ -82,7 +82,7 @@ namespace Person_Components
 				actual_ttime = new float[num_sim_threads()];
 				num_acts_in_interval = new int[num_sim_threads()];
 
-				if (scenario->template write_demand_to_database<bool>())
+				if (scenario->template write_demand_to_database<bool>() || Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>())
 				{
 					string name(scenario->template output_demand_database_name<string&>());
 					try
@@ -373,6 +373,7 @@ namespace Person_Components
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
 					pthis->Write_Data_To_File_Event<NT>();
+					pthis->Write_MM_Summary_To_File_Event<NT>();
 				}
 				//else if (sub_iteration() < (int)num_sim_threads())
 				//{
@@ -506,6 +507,50 @@ namespace Person_Components
 					}
 				}
 			}
+			
+			template<typename TargetType> void Write_MM_Summary_To_File_Event()
+			{
+				for (int i = 0; i< (int)num_sim_threads(); ++i)
+				{
+					
+					if (Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>())
+					{
+						int count = 0;
+
+						try
+						{
+							odb::transaction t(this->_db_ptr->begin());
+
+							// iterate over trip-activity pairs and push to database
+							for (std::vector<polaris::io::multimodalSPLabels>::iterator itr = multimodalSPLabels[i].begin(); itr != multimodalSPLabels[i].end(); ++itr)
+							{
+								polaris::io::multimodalSPLabels& t = *itr;								
+								this->_db_ptr->persist(t);
+								count++;
+							}
+							t.commit();
+						}
+						catch (const odb::exception& e)
+						{
+							cout << e.what() << ". DB error in person_data_logger_implementation, line 493.  count=" << count << endl;
+							polaris::io::multimodalSPLabels p = multimodalSPLabels[i][count];
+
+						}
+						catch (std::exception& e)
+						{
+							cout << e.what() << ". DB error in person_data_logger_implementation, line 499.  count=" << count << endl;
+						}
+						catch (...)
+						{
+							cout << "some other error in database writing" << endl;
+						}
+
+						// erase buffer
+						multimodalSPLabels[i].clear();
+					}
+				}
+			}
+
 			template<typename TargetType> void Write_Summary_Data_To_File()
 			{
 				//for (int i = 0; i < 20; ++i)
