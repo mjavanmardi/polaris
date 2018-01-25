@@ -604,7 +604,7 @@ namespace Intersection_Components
 			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
-			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
+			m_prototype(Intersection_Control_Components::Prototypes::Intersection_Control,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
 
 			typedef typename MasterType::vehicle_type vehicle_type;
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);

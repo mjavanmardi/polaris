@@ -429,7 +429,24 @@ namespace Turn_Movement_Components
 
 					//=========================================================================================================
 					//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
-					//add_signal_penalty<TargetType>();
+					//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
+					if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0)
+					{
+						_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+						typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+						_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+						if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::PRE_TIMED_SIGNAL_CONTROL ||
+							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ACTUATED_SIGNAL_CONTROL ||
+							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ADAPTIVE_SIGNAL_CONTROL)
+						{
+							add_signal_penalty<TargetType>();
+						}
+						if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::TWO_WAY_STOP_SIGN ||
+							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ALL_WAY_STOP_SIGN)
+						{
+							add_sign_penalty<TargetType>();
+						}
+					}
 					//==============================================================================================================
 
 					//TODO:BIG_CHANGE
@@ -440,6 +457,15 @@ namespace Turn_Movement_Components
 
             template<typename TargetType> void add_signal_penalty()
             {
+				typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Intersection_Control_Components::Prototypes::Intersection_Control<_Intersection_Interface::get_type_of(intersection_control)> _Intersection_Control_Interface;
+				typedef Intersection_Control_Components::Prototypes::Control_Plan<_Intersection_Control_Interface::get_type_of(current_control_plan)> _Interscetion_Control_Plan_Interface;
+				
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;		
+				_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+				_Intersection_Control_Interface* signal = itx->intersection_control<_Intersection_Control_Interface*>();
+				_Interscetion_Control_Plan_Interface* signal_control_plan = signal->current_control_plan<_Interscetion_Control_Plan_Interface*>();
+
                 int outbound_link_type = ((_Link_Interface*)_outbound_link)->template link_type<int>();
                 int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
                 bool eligible_for_signal_penalty = false;
@@ -472,13 +498,14 @@ namespace Turn_Movement_Components
 					//float vc = 1.0f;
 
 
-                    float cycle=75; // 75 seconds
-                    float green;
-                    if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
-                    else green=30;
-                    float Du=6.8 * vc - 0.39 * green + 0.35 * cycle - 4.5;
+                    float cycle= signal_control_plan->cycle_length<int>(); // 75 seconds
+
+                    /*if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
+                    else green=30;*/
+
+                    float Du=6.8 * vc - 0.39 * _green_time + 0.35 * cycle - 4.5;
                     Du = max(Du, 0.0f);
-                    float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;
+                    float Di = 2.7 * pow(vc,8) - 7.3 * (_green_time / cycle) + 3.4;
                     Di = max(Di, 0.0f);
                     signal_control_penalty = max(8.0f, Du + Di);
 					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
@@ -486,6 +513,40 @@ namespace Turn_Movement_Components
                 _turn_travel_penalty += signal_control_penalty;
 
             }
+
+			template<typename TargetType> void add_sign_penalty()
+			{
+				int outbound_link_type = ((_Link_Interface*)_outbound_link)->template link_type<int>();
+				int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
+				bool eligible_for_signal_penalty = false;
+				float signal_control_penalty = 0.0;
+				if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || inbound_link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+				{
+					eligible_for_signal_penalty = true;
+				}
+				else
+				{
+					if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ON_RAMP && (outbound_link_type != Link_Components::Types::Link_Type_Keys::FREEWAY && outbound_link_type != Link_Components::Types::Link_Type_Keys::EXPRESSWAY))
+					{
+						eligible_for_signal_penalty = true;
+					}
+					else
+					{
+						eligible_for_signal_penalty = false;
+					}
+				}
+
+				if (!eligible_for_signal_penalty)
+				{
+					signal_control_penalty = 0.0;
+				}
+				else
+				{
+					signal_control_penalty = 6.0f;
+				}
+				_turn_travel_penalty += signal_control_penalty;
+
+			}
 
 
 			template<typename TargetType> void accept_vehicle(void* vehicle)
