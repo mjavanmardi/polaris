@@ -85,6 +85,7 @@ namespace Turn_Movement_Components
 			//----------------------------------------------------------------------------------
 			accessor(vehicles_processed_by_entry_time, NONE, NONE);
 			accessor(turn_delay_by_entry_time, NONE, NONE);
+			accessor(add_delay_by_entry_time, NONE, NONE);
 			//----------------------------------------------------------------------------------
 
 			template<typename TargetType> TargetType pull_vehicle()

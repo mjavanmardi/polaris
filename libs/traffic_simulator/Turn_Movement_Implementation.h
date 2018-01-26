@@ -102,6 +102,7 @@ namespace Turn_Movement_Components
 			//----------------------------------------------------------------------------------
 			m_container(std::vector<int>, vehicles_processed_by_entry_time, NONE, NONE);
 			m_container(std::vector<float>, turn_delay_by_entry_time, NONE, NONE);
+			m_container(std::vector<float>, add_delay_by_entry_time, NONE, NONE);
 			//----------------------------------------------------------------------------------
 
 			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
@@ -342,6 +343,12 @@ namespace Turn_Movement_Components
 
 								// update vehicles currently being delayed by the signal
 								
+								//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+								//----------------------------------------------------------------------------------
+								int assignment_index = current_simulation_interval_index / ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
+								_add_delay_by_entry_time[assignment_index] += ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+								//----------------------------------------------------------------------------------
+
 								for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 								{
 									_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
@@ -596,6 +603,9 @@ namespace Turn_Movement_Components
 
 				_turn_delay_by_entry_time.clear();
 				_turn_delay_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+
+				_add_delay_by_entry_time.clear();
+				_add_delay_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
 				//----------------------------------------------------------------------------------
 
 				int j;
@@ -612,7 +622,7 @@ namespace Turn_Movement_Components
 				{
 					_vehicles_processed_by_entry_time[j] = 0;
 					_turn_delay_by_entry_time[j] = 0.0;
-
+					_add_delay_by_entry_time[j] = 0.0;
 				}
 				//----------------------------------------------------------------------------------
 
@@ -686,11 +696,32 @@ namespace Turn_Movement_Components
 			{
 				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
 
+				/*for (int j = 1; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					if (_add_delay_by_entry_time[j] > 0)
+					{
+						_add_delay_by_entry_time[j] += _add_delay_by_entry_time[j - 1];
+					}
+				}*/
+				
 				for (int j = 0; j < num_of_assignment_intervals_in_a_day; j++)
 				{
 					if (_vehicles_processed_by_entry_time[j] > 0)
 					{
 						_turn_delay_by_entry_time[j] = _turn_delay_by_entry_time[j] / _vehicles_processed_by_entry_time[j];
+						/*_turn_delay_by_entry_time[j] += std::min(_turn_delay_by_entry_time[j],_add_delay_by_entry_time[j]);*/
+						_turn_delay_by_entry_time[j] += _add_delay_by_entry_time[j];
+
+						_turn_delay_by_entry_time[j] += std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j-1]- (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+
+						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
+					}
+					else
+					{
+						_turn_delay_by_entry_time[j] = _add_delay_by_entry_time[j];
+						_turn_delay_by_entry_time[j] += std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+
+						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
 					}
 
 				}
