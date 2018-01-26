@@ -98,6 +98,12 @@ namespace Turn_Movement_Components
 			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
+			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//----------------------------------------------------------------------------------
+			m_container(std::vector<int>, vehicles_processed_by_entry_time, NONE, NONE);
+			m_container(std::vector<float>, turn_delay_by_entry_time, NONE, NONE);
+			//----------------------------------------------------------------------------------
+
 			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
 			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
@@ -370,6 +376,14 @@ namespace Turn_Movement_Components
 					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
+					//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+					//----------------------------------------------------------------------------------
+					int assignment_index = enter_time / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()*((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+					
+					_vehicles_processed_by_entry_time[assignment_index]++;
+					_turn_delay_by_entry_time[assignment_index] += delayed_time;
+					//----------------------------------------------------------------------------------
+
 					//update inbound link state: N(a',L,t)
 					((_Link_Interface*)_inbound_link)->template link_downstream_cumulative_vehicles<int&>()++;
 					((_Link_Interface*)_inbound_link)->template link_downstream_departed_vehicles<int&>()++;
@@ -421,7 +435,7 @@ namespace Turn_Movement_Components
 					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 				}
 
-				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{	
 					float turn_travel_penalty = 0.0;
 					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
@@ -571,8 +585,18 @@ namespace Turn_Movement_Components
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = 0.0;
 
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.clear();
-
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.resize(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				_vehicles_processed_by_entry_time.clear();
+				_vehicles_processed_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+
+				_turn_delay_by_entry_time.clear();
+				_turn_delay_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+				//----------------------------------------------------------------------------------
 
 				int j;
 
@@ -582,6 +606,15 @@ namespace Turn_Movement_Components
 
 				}
 
+				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				for (j = 0; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					_vehicles_processed_by_entry_time[j] = 0;
+					_turn_delay_by_entry_time[j] = 0.0;
+
+				}
+				//----------------------------------------------------------------------------------
 
 				if (_movement_type == Turn_Movement_Components::Types::THROUGH_TURN)
 				{
@@ -646,6 +679,24 @@ namespace Turn_Movement_Components
 			{
 				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->link_fftt<float>()/60.0f + movement_moe_data.turn_penalty);
 			}
+
+			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//----------------------------------------------------------------------------------
+			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link_end()
+			{
+				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				for (int j = 0; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					if (_vehicles_processed_by_entry_time[j] > 0)
+					{
+						_turn_delay_by_entry_time[j] = _turn_delay_by_entry_time[j] / _vehicles_processed_by_entry_time[j];
+					}
+
+				}
+			}
+			//----------------------------------------------------------------------------------
+
 		};
 	}
 }

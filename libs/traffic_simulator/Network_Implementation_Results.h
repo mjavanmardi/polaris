@@ -754,6 +754,58 @@ namespace Network_Components
 				}
 			}
 
+			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//----------------------------------------------------------------------------------
+			if (((_Scenario_Interface*)_global_scenario)->template output_turn_movement_moe_for_assignment_interval<bool>() && ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>() + 1 == ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>())
+			{
+				try
+				{
+					// output link moe to database
+					shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
+					odb::transaction t(db_ptr->begin());
+
+					// output turn movement moe
+					typedef MasterType::turn_movement_type _movement_component_type;
+					typename _Turn_Movements_Container_Interface::iterator movement_itr;
+
+					int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());					
+
+					for (movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+					{
+						for (int j = 0; j < num_of_assignment_intervals_in_a_day; j++)
+						{
+							int start_time = j * ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>() * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+							
+							int end_time = (j + 1) * ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>() * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+							
+							_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+
+							float turn_penalty = movement->turn_delay_by_entry_time<std::vector<float>&>()[j];
+							
+							shared_ptr<polaris::io::TurnMOE_by_entry> turn_moe_rec(new polaris::io::TurnMOE_by_entry());
+
+							turn_moe_rec->setTurn_Uid(movement->uuid<int>());
+							turn_moe_rec->setStart_Time(start_time);
+							turn_moe_rec->setEnd_Time(end_time);
+							turn_moe_rec->setInbound_Link_Uid(movement->inbound_link<_Link_Interface*>()->uuid<int>());
+							turn_moe_rec->setOutbound_Link_Uid(movement->outbound_link<_Link_Interface*>()->uuid<int>());
+							turn_moe_rec->setNode_Uid(movement->inbound_link<_Link_Interface*>()->downstream_intersection<_intersection_component_type*>()->uuid<int>());
+							turn_moe_rec->setTurn_Penalty(turn_penalty);							
+							turn_moe_rec->setInbound_Turn_Travel_Time(movement->inbound_link<_Link_Interface*>()->link_fftt<float>() + turn_penalty);
+							turn_moe_rec->setOutbound_Turn_Travel_Time(movement->outbound_link<_Link_Interface*>()->link_fftt<float>() + turn_penalty);	
+							
+							db_ptr->persist(turn_moe_rec);
+						}
+					}
+					t.commit();
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << ex.message() << ". DB error in network implementation results, line 684." << endl;
+				}
+			}
+			//----------------------------------------------------------------------------------
+
 			//===============================================================================================================
 			//NOT SURE WHAT THIS IS/DOES - JAA
 			//---------------------------------------------------------------------------------------------------------------
