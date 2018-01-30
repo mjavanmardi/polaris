@@ -18,6 +18,7 @@ class Link_Probability;
 class LinkMOE;
 class RealtimeLinkMOE;
 class TurnMOE;
+class TurnMOE_by_entry;
 class RealtimeTurnMOE;
 
 #pragma db object //table("LINK_DELAY")
@@ -399,6 +400,7 @@ private:
 #pragma db object
 class RealtimeLinkMOE : public LinkMOE
 {};
+
 #pragma db object
 class TurnMOE
 {
@@ -455,6 +457,58 @@ private:
 	float turn_flow_rate;
 };
 
+//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+//----------------------------------------------------------------------------------
+#pragma db object
+class TurnMOE_by_entry
+{
+public:
+	// Default Constructor
+	TurnMOE_by_entry() {}
+	TurnMOE_by_entry(int id_, int turn_uid_, int start_time_, int end_time_, int inbound_link_uid_, int outbound_link_uid_, int node_uid_, float turn_penalty_, float inbound_turn_travel_time_, float outbound_turn_travel_time_)
+		: id(id_), turn_uid(turn_uid_), start_time(start_time_), end_time(end_time_), inbound_link_uid(inbound_link_uid_), outbound_link_uid(outbound_link_uid_), node_uid(node_uid_), turn_penalty(turn_penalty_), inbound_turn_travel_time(inbound_turn_travel_time_), outbound_turn_travel_time(outbound_turn_travel_time_)
+	{
+	}
+	//Accessors
+	const int& getId() const { return id; }
+	void setId(const int& id_) { id = id_; }
+	const int& getTurn_Uid() const { return turn_uid; }
+	void setTurn_Uid(const int& turn_uid_) { turn_uid = turn_uid_; }
+	const int& getStart_Time() const { return start_time; }
+	void setStart_Time(const int& start_time_) { start_time = start_time_; }
+	const int& getEnd_Time() const { return end_time; }
+	void setEnd_Time(const int& end_time_) { end_time = end_time_; }
+	const int& getInbound_Link_Uid() const { return inbound_link_uid; }
+	void setInbound_Link_Uid(const int& inbound_link_uid_) { inbound_link_uid = inbound_link_uid_; }
+	const int& getOutbound_Link_Uid() const { return outbound_link_uid; }
+	void setOutbound_Link_Uid(const int& outbound_link_uid_) { outbound_link_uid = outbound_link_uid_; }
+	const int& getNode_Uid() const { return node_uid; }
+	void setNode_Uid(const int& node_uid_) { node_uid = node_uid_; }
+	const float& getTurn_Penalty() const { return turn_penalty; }
+	void setTurn_Penalty(const float& turn_penalty_) { turn_penalty = turn_penalty_; }
+
+	const float& getInbound_Turn_Travel_Time() const { return inbound_turn_travel_time; }
+	void setInbound_Turn_Travel_Time(const float& inbound_turn_travel_time_) { inbound_turn_travel_time = inbound_turn_travel_time_; }
+	const float& getOutbound_Turn_Travel_Time() const { return outbound_turn_travel_time; }
+	void setOutbound_Turn_Travel_Time(const float& outbound_turn_travel_time_) { outbound_turn_travel_time = outbound_turn_travel_time_; }
+
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db auto id
+	int id;
+#pragma db not_null
+	int turn_uid;
+	int start_time;
+	int end_time;
+	int inbound_link_uid;
+	int outbound_link_uid;
+	int node_uid;
+	float turn_penalty;
+	float inbound_turn_travel_time;
+	float outbound_turn_travel_time;
+};
+//----------------------------------------------------------------------------------
 
 #pragma db object
 class RealtimeTurnMOE : public TurnMOE

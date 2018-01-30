@@ -943,6 +943,13 @@ namespace Intersection_Components
 					for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
 					{
 						((_Inbound_Movement_Interface*)(*inbound_movement_itr))->template calculate_moe_for_assignment_interval_from_outbound_link<NULLTYPE>();
+						//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+						//----------------------------------------------------------------------------------
+						if (((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>() + 1 == ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>())
+						{
+							((_Inbound_Movement_Interface*)(*inbound_movement_itr))->template calculate_moe_for_assignment_interval_from_outbound_link_end<NULLTYPE>();
+						}
+						//----------------------------------------------------------------------------------
 					}
 				}
 
@@ -964,6 +971,7 @@ namespace Intersection_Components
 					{
 						_movement_component_type* outbound_movement_component = (_movement_component_type*)(*outbound_movement_itr);
 						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_assignment_interval_from_inbound_link<NULLTYPE>();
+
 						if (outbound_movement_component->turn_travel_penalty<float>() < 0.01f*INFINITY_FLOAT)
 						{
 							allowed_movement_size++;
