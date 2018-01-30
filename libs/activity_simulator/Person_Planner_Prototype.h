@@ -332,10 +332,11 @@ namespace Person_Components
 		{
 			// interfaces	
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Person_Components::Prototypes::Person_Mover< typename Parent_Person_Itf::get_type_of(Moving_Faculty)> Person_Mover_Itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename Parent_Person_Itf::get_type_of(scenario_reference)> Scenario_Itf;
 			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Routing_Itf::get_type_of(movement_plan)> Movement_Itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Person_Mover_Itf::get_type_of(Movement)> Movement_Itf;
 			typedef Activity_Components::Prototypes::Activity_Planner< typename Movement_Itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 			// references

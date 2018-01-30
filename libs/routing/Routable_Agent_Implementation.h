@@ -6,6 +6,12 @@ namespace polaris
 	template<typename MasterType>
 	struct Routable_Agent_Implementation
 	{
+		void Initialize()
+		{
+			_experienced_gap = 1.0;
+		}
+		m_data(float, experienced_gap, NONE, NONE);
+
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -203,7 +209,7 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor() * _experienced_gap;
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 
@@ -329,7 +335,7 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor()* _experienced_gap;
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 
@@ -420,6 +426,9 @@ namespace polaris
 	template<typename MasterType>
 	struct Tree_Agent_Implementation
 	{
+		void Initialize()
+		{
+		}
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current)
 		{
@@ -677,6 +686,10 @@ namespace polaris
 	template<typename MasterType>
 	struct Multi_Modal_Tree_Agent_Implementation
 	{			
+		void Initialize()
+		{
+		}
+
 		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 		Network_Interface* net = (Network_Interface*)_global_network;
 
@@ -723,6 +736,10 @@ namespace polaris
 	template<typename MasterType>
 	struct Walk_to_Transit_Tree_Agent_Implementation
 	{
+		void Initialize()
+		{
+		}
+
 		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 		Network_Interface* net = (Network_Interface*)_global_network;
 
@@ -779,6 +796,10 @@ namespace polaris
 	template<typename MasterType>
 	struct Drive_to_Transit_Tree_Agent_Implementation
 	{
+		void Initialize()
+		{
+		}
+
 		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
 		Network_Interface* net = (Network_Interface*)_global_network;
 
@@ -832,240 +853,4 @@ namespace polaris
 		void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection) {}
 	};
 
-
-	//template<typename MasterType>
-	//struct Time_Dependent_Agent_Implementation
-	//{
-	//	template<typename CurrentEdgeType, typename ConnectionType>
-	//	bool process_connection_set(CurrentEdgeType* current)
-	//	{
-	//		return true;
-	//	}
-
-	//	//template<>
-	//	//bool process_connection_set<typename MasterType::transit_edge,typename MasterType::walk_transfer_type>(typename MasterType::transit_edge* current)
-	//	//{
-	//	//	if(current->_transfers_made < 3) return true;
-	//	//	else return false;
-	//	//}
-
-	//	//template<>
-	//	//bool process_connection_set<typename MasterType::transit_edge,typename MasterType::transfer_at_stop_type>(typename MasterType::transit_edge* current)
-	//	//{
-	//	//	if(current->_transfers_made < 3) return true;
-	//	//	else return false;
-	//	//}
-	//	//
-	//	//template<>
-	//	//bool process_connection_set<typename MasterType::stop_edge,typename MasterType::stop_to_stop_type>(typename MasterType::stop_edge* current)
-	//	//{
-	//	//	if(current->_walk_transfers_made < 2) return true;
-	//	//	else return false;
-	//	//}
-
-	//	bool at_destination(Base_Edge_A_Star<MasterType>* current, Base_Edge_A_Star<MasterType>* destination)
-	//	{
-	//		if(current->_edge_id == destination->_edge_id) return true;
-	//		else return false;
-	//	}
-
-	//	template<typename CurrentEdgeType>
-	//	float estimated_cost_between(CurrentEdgeType* current, Base_Edge_A_Star<MasterType>* destination)
-	//	{
-	//		float x_dist = current->_x - destination->_x;
-	//		x_dist *= x_dist;
-	//		
-	//		float y_dist = current->_y - destination->_y;
-	//		y_dist *= y_dist;
-
-	//		// vehicle speed
-	//		float cost = sqrt(x_dist + y_dist)/89.0f;
-	//		
-	//		return cost;
-	//	}
-
-	//	//template<>
-	//	//float estimated_cost_between<typename MasterType::stop_edge>(typename MasterType::stop_edge* current, Base_Edge_A_Star<MasterType>* destination)
-	//	//{
-	//	//	float x_dist = current->_x - destination->_x;
-	//	//	x_dist *= x_dist;
-	//	//
-	//	//	float y_dist = current->_y - destination->_y;
-	//	//	y_dist *= y_dist;
-
-	//	//	// walk speed
-	//	//	float cost = sqrt(x_dist + y_dist)/1.34f;
-	//	//	
-	//	//	return cost;
-	//	//}
-
-	//	template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
-	//	float cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
-	//	{
-	//		// moe lookup
-	//		int current_time = current->time_label();
-	//		float* moe_ptr = current->moe_ptr();
-
-	//		if(moe_ptr != nullptr)
-	//		{
-	//			float time_cost = current->moe_data()->get_closest_element(moe_ptr,current_time);
-
-	//			if(neighbor->_is_highway)
-	//			{
-	//				//t_pointer(float,moe_ptr);
-	//				//static t_pointer(Layered_Data_Array<float>,moe_data);
-
-	//				return time_cost*.75f;
-	//			}
-	//			else
-	//			{
-
-	//				return time_cost;
-	//			}
-	//		}
-	//		else
-	//		{
-
-	//			if(neighbor->_is_highway)
-	//			{
-	//				return (current->_time_cost + connection->_time_cost)*.75f;
-	//			}
-	//			else
-	//			{
-	//				return current->_time_cost + connection->_time_cost;
-	//			}
-	//			
-	//		}
-	//	}
-
-	//	//template<>
-	//	//float cost_between<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::ride_on_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::ride_on_type* connection)
-	//	//{
-	//	//	return current->_time_cost + connection->_time_cost;
-	//	//}
-	//	//
-	//	//template<>
-	//	//float cost_between<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::transfer_at_stop_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::transfer_at_stop_type* connection)
-	//	//{
-	//	//	// disincentivize these sort of transfers
-	//	//	//const float transfer_penalty = 2.0f;
-	//	//	const float transfer_penalty = 1.0f;
-	//	//	return (current->_time_cost + connection->_time_cost)*transfer_penalty;
-	//	//}
-
-	//	//template<>
-	//	//float cost_between<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::walk_transfer_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::walk_transfer_type* connection)
-	//	//{
-	//	//	// strongly disincentivize these sort of transfers
-	//	//	//const float walk_transfer_penalty = 3.0f;
-	//	//	const float walk_transfer_penalty = 1.0f;
-	//	//	return (current->_time_cost + connection->_time_cost)*walk_transfer_penalty;
-	//	//}
-
-	//	//template<>
-	//	//float cost_between<typename MasterType::transit_edge,typename MasterType::stop_edge,typename MasterType::transit_to_stop_type>(typename MasterType::transit_edge* current, typename MasterType::stop_edge* neighbor, typename MasterType::transit_to_stop_type* connection)
-	//	//{
-	//	//	return current->_time_cost + connection->_time_cost;
-	//	//}
-	//	//
-	//	//template<>
-	//	//float cost_between<typename MasterType::stop_edge,typename MasterType::transit_edge,typename MasterType::stop_to_transit_type>(typename MasterType::stop_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::stop_to_transit_type* connection)
-	//	//{
-	//	//	// have to wait at the stop until the trip leaves
-	//	//	return connection->_departure_time - current->_time_label;
-	//	//}
-
-	//	template<typename CurrentEdgeType, typename NeighborEdgeType, typename ConnectionType>
-	//	float time_cost_between(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection)
-	//	{
-	//		// moe lookup
-	//		int current_time = current->time_label();
-	//		float* moe_ptr = current->moe_ptr();
-
-	//		if(moe_ptr != nullptr)
-	//		{
-	//			float time_cost = current->moe_data()->get_closest_element(moe_ptr,current_time);
-
-	//			if(neighbor->_is_highway)
-	//			{
-	//				//t_pointer(float,moe_ptr);
-	//				//static t_pointer(Layered_Data_Array<float>,moe_data);
-
-	//				return time_cost*.75f;
-	//			}
-	//			else
-	//			{
-
-	//				return time_cost;
-	//			}
-	//		}
-	//		else
-	//		{
-
-	//			if(neighbor->_is_highway)
-	//			{
-	//				return (current->_time_cost + connection->_time_cost)*.75f;
-	//			}
-	//			else
-	//			{
-	//				return current->_time_cost + connection->_time_cost;
-	//			}
-	//			
-	//		}
-	//	}
-
-	//	//template<>
-	//	//float time_cost_between<typename MasterType::stop_edge,typename MasterType::transit_edge,typename MasterType::stop_to_transit_type>(typename MasterType::stop_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::stop_to_transit_type* connection)
-	//	//{
-	//	//	// have to wait at the stop until the trip leaves
-	//	//	return connection->_departure_time - current->_time_label;
-	//	//}
-
-	//	template<typename CurrentEdgeType,typename NeighborEdgeType, typename ConnectionType>
-	//	void update_label(CurrentEdgeType* current, NeighborEdgeType* neighbor, ConnectionType* connection){}
-
-	//	//template<>
-	//	//void update_label<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::ride_on_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::ride_on_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made;
-	//	//}
-	//	//
-	//	//template<>
-	//	//void update_label<typename MasterType::transit_edge,typename MasterType::stop_edge,typename MasterType::transit_to_stop_type>(typename MasterType::transit_edge* current, typename MasterType::stop_edge* neighbor, typename MasterType::transit_to_stop_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made;
-	//	//}
-
-	//	//template<>
-	//	//void update_label<typename MasterType::stop_edge,typename MasterType::transit_edge,typename MasterType::stop_to_transit_type>(typename MasterType::stop_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::stop_to_transit_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made;
-	//	//}
-
-	//	//template<>
-	//	//void update_label<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::transfer_at_stop_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::transfer_at_stop_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made + 1;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made;
-	//	//}
-
-	//	//template<>
-	//	//void update_label<typename MasterType::transit_edge,typename MasterType::transit_edge,typename MasterType::walk_transfer_type>(typename MasterType::transit_edge* current, typename MasterType::transit_edge* neighbor, typename MasterType::walk_transfer_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made + 1;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made;
-	//	//}
-
-	//	//template<>
-	//	//void update_label<typename MasterType::stop_edge,typename MasterType::stop_edge,typename MasterType::stop_to_stop_type>(typename MasterType::stop_edge* current, typename MasterType::stop_edge* neighbor, typename MasterType::stop_to_stop_type* connection)
-	//	//{
-	//	//	neighbor->_transfers_made = current->_transfers_made;
-	//	//	neighbor->_walk_transfers_made = current->_walk_transfers_made + 1;
-	//	//}
-
-	//	t_data(float,wait_horizon);
-	//};
 }

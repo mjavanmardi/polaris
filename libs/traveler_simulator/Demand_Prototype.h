@@ -25,6 +25,9 @@ namespace Demand_Components
 			accessor(first_vehicle_departure_time, NONE, NONE);
 			accessor(last_vehicle_departure_time, NONE, NONE);
 
+			template<typename TargetType> void Initialize();
+			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan);
+
 			template<typename TargetType> void read_vehicle_type_data()
 			{
 				try
@@ -231,8 +234,8 @@ namespace Demand_Components
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
-
 					movement_plan->template network<_Network_Interface*>(network);
+					movement_plan->experienced_gap(db_itr->getGap());
 
 					vehicle->template uuid<int>(++traveler_id_counter);
 					vehicle->template internal_id<int>(traveler_id_counter);
@@ -310,9 +313,19 @@ namespace Demand_Components
 				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType is ill-defined");
 				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
 				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
-			}
-
+			}	
 		};
+
+		template<typename ComponentType>
+		template<typename TargetType> void Demand<ComponentType>::Initialize()
+		{
+			this_component()->Initialize<TargetType>();
+		}
+		template<typename ComponentType>
+		template<typename TargetType> void Demand<ComponentType>::Add_Trip_Record(TargetType movement_plan)
+		{
+			this_component()->Add_Trip_Record<TargetType>(movement_plan);
+		}
 	}
 }
 

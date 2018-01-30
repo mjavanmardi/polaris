@@ -46,54 +46,6 @@ namespace Turn_Movement_Components
 
 			m_data(float, forward_link_turn_travel_time, NONE, NONE);
 			m_data(float, realtime_forward_link_turn_travel_time, NONE, NONE);
-			//TODO:ROUTING
-			//m_container(std::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
-			//m_container(std::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
-
-			//==================================================================================================================
-			// forward_link_turn_travel_time
-			//------------------------------------------------------------------------------------------------------------------
-			//template<typename TargetType>
-			//TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
-			//
-			//template<typename TargetType>
-			//void forward_link_turn_travel_time(TargetType set_value,void* = nullptr)
-			//{
-			//	_forward_link_turn_travel_time = (float)set_value;
-			//	//TODO:ROUTING_OPERATION
-			//	// update replicas
-			//	//typename _Replicas_Container_Interface::iterator replica_itr;
-			//	//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-			//	//{
-			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-			//	//	replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
-			//	//}
-			//}
-			//tag_setter_as_available(forward_link_turn_travel_time);
-			//
-			//float _forward_link_turn_travel_time;
-			//
-			//template<typename TargetType>
-			//TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
-			//template<typename TargetType>
-			//void realtime_forward_link_turn_travel_time(TargetType set_value)
-			//{
-			//	_realtime_forward_link_turn_travel_time = (float)set_value;
-			//	//TODO:ROUTING_OPERATION
-			//	// update replicas
-			//	//typename _Replicas_Container_Interface::iterator replica_itr;
-			//	//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-			//	//{
-			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-			//	//	replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
-			//	//}
-			//}
-			//tag_setter_as_available(realtime_forward_link_turn_travel_time);
-			//float _realtime_forward_link_turn_travel_time;
-
-			//TODO:ROUTING
-			//typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
-			//typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
 
 			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
@@ -414,43 +366,43 @@ namespace Turn_Movement_Components
 
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 
+				//=========================================================================================================
+				//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
+				//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+				if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0 && lnk->current_vehicle_queue<std::vector<typename MasterType::vehicle_type*>&>().size() == 0)
+				{				
+					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+					_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+					if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::PRE_TIMED_SIGNAL_CONTROL ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ACTUATED_SIGNAL_CONTROL ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ADAPTIVE_SIGNAL_CONTROL)
+					{
+						add_signal_penalty<TargetType>();
+					}
+					if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::TWO_WAY_STOP_SIGN ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ALL_WAY_STOP_SIGN)
+					{
+						add_sign_penalty<TargetType>();
+					}
+				}
+
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
-					//TODO:BIG_CHANGE
-					//realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 				}
 
-				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				//==============================================================================================================
+				// UPDATE THE ASSIGNMENT INTERVAL TRAVEL DELAY
+				//TODO: Check - JA, 01/25/18 restored the update to only occur on assignment intervals.....
+				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{	
 					float turn_travel_penalty = 0.0;
 					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 					_turn_travel_penalty = turn_travel_penalty;
 
-					//=========================================================================================================
-					//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
-					//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
-					if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0)
-					{
-						_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
-						typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
-						_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
-						if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::PRE_TIMED_SIGNAL_CONTROL ||
-							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ACTUATED_SIGNAL_CONTROL ||
-							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ADAPTIVE_SIGNAL_CONTROL)
-						{
-							add_signal_penalty<TargetType>();
-						}
-						if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::TWO_WAY_STOP_SIGN ||
-							itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ALL_WAY_STOP_SIGN)
-						{
-							add_sign_penalty<TargetType>();
-						}
-					}
+					
 					//==============================================================================================================
-
-					//TODO:BIG_CHANGE
-					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);
 				}
 			}

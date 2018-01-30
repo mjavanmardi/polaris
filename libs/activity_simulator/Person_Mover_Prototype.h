@@ -265,7 +265,7 @@ namespace Prototypes
 
 		typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef  Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 		Parent_Person_Itf* person = pthis->Parent_Person<Parent_Person_Itf*>();
@@ -287,7 +287,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -356,8 +356,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 		typedef Person_Components::Prototypes::Destination_Chooser< typename planning_itf::get_type_of(Destination_Choice_Faculty)> destination_chooser_itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-		//typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(activity_reference)> activity_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -643,7 +642,7 @@ namespace Prototypes
 		// interfaces
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -677,7 +676,7 @@ namespace Prototypes
 		typedef Household_Components::Prototypes::Household<typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planning_Itf;
 		typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
@@ -713,7 +712,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
@@ -807,7 +806,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planner_Itf;
 		typedef Person_Components::Prototypes::Activity_Generator< typename Planner_Itf::get_type_of(Activity_Generation_Faculty)> Generator_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename network_itf::get_type_of(skimming_faculty)> skim_itf;
@@ -1043,7 +1042,7 @@ namespace Prototypes
 		// interfaces
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 		movement_itf* movements = this->Movement<movement_itf*>();

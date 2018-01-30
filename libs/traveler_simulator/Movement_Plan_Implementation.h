@@ -39,6 +39,10 @@ namespace Movement_Plan_Components
 			_intersection_delay_time = 0.0;
 		}
 
+
+		//=====================================================================
+		// BASIC MOVEMENT PLAN
+		//---------------------------------------------------------------------
 		implementation struct Movement_Plan_Implementation:public Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object>
 		{
 			typedef Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object> Base_t;
@@ -66,8 +70,8 @@ namespace Movement_Plan_Components
 			//m_prototype(Null_Prototype,typename MasterType::zone_type>, origin_zone, NONE, NONE);
 			//m_prototype(Null_Prototype,typename MasterType::zone_type>, destination_zone, NONE, NONE);
 
-			m_prototype(Link,typename MasterType::link_type, origin, NONE, NONE);
-			m_prototype(Link,typename MasterType::link_type, destination, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, origin, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, destination, NONE, NONE);
 
 			member_component_and_feature_accessor(departed_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::template Time_Implementation<NT>);
 			member_component_and_feature_accessor(planning_time,Value,Basic_Units::Prototypes::Time,Basic_Units::Implementations::template Time_Implementation<NT>);
@@ -83,6 +87,7 @@ namespace Movement_Plan_Components
 			m_data(int, entry_time, NONE, NONE);
 			m_data(int, traveler_id, NONE, NONE);
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode, NONE, NONE);
+			m_data(float, experienced_gap, NONE, NONE);
 
 			//TODO: Remove when done testing routing execution time
 			m_data(int, routing_execution_time, NONE, NONE);
@@ -167,8 +172,12 @@ namespace Movement_Plan_Components
 		{
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
+			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
 			_trajectory_container[_current_trajectory_index]->template delayed_time<int>(0.0);
 			this->template arrived_time<Simulation_Timestep_Increment>(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>());
+
+			// write to global demand if turned on
+			((_Demand_Interface*)_global_demand)->Add_Trip_Record(this);
 		}
 
 		template<typename MasterType, typename InheritanceList>
@@ -202,6 +211,12 @@ namespace Movement_Plan_Components
 			cout << "---------------------------------------" << endl;
 		}
 
+		//------ movement plan logging - handle at assignment intervals
+
+
+		//=====================================================================
+		// INTEGRATED MOVEMENT PLAN
+		//---------------------------------------------------------------------
 		implementation struct Integrated_Movement_Plan_Implementation : public Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)>
 		{
 			typedef Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)> Base_Type;
@@ -228,6 +243,10 @@ namespace Movement_Plan_Components
 			}
 		}
 
+
+		//=====================================================================
+		// RECORDING VERSION OF THE MOVEMENT PLAN
+		//---------------------------------------------------------------------
 		implementation struct Movement_Plan_Record_Implementation : public Polaris_Component<MasterType,INHERIT(Movement_Plan_Record_Implementation),Data_Object>
 		{
 			typedef typename Movement_Plan_Implementation<MasterType, INHERIT(Movement_Plan_Record_Implementation)>::Component_Type ComponentType;

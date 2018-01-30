@@ -649,30 +649,6 @@ namespace Vehicle_Components
 		template<typename TargetType>
 		TargetType Vehicle_Implementation<MasterType, InheritanceList>::next_link_travel_time()
 		{
-			//_Movement_Plan_Interface* mp = (_Movement_Plan_Interface*)_movement_plan;
-			//
-			//_Link_Interface* origin_link = mp->template current_link<_Link_Interface*>();
-
-			//int position_index = mp->template current_trajectory_position<int>();
-
-			//_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
-			//_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index+1];
-			//
-			/////calculate travel time of current route
-			//_Link_Interface* route_link = mp->template current_link<_Link_Interface*>();
-			//_Link_Interface* next_route_link = mp->next_link<_Link_Interface*>();
-			//// return 0 if we are at the end of the trajectory
-			//if (next_route_link==nullptr) return 0.0;
-
-			//int inbound_link_id = route_link->template uuid<int>();
-			//int outbound_link_id = next_route_link->template uuid<int>();
-			//typename MasterType::network_type::long_hash_key_type long_hash_key;
-			//long_hash_key.inbound_link_id = inbound_link_id;
-			//long_hash_key.outbound_link_id = outbound_link_id;
-			//typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-			//_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
-			//return regular_movement->template forward_link_turn_travel_time<float>();
-
 			float current_travel_time = 0.0;
 
 			_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
@@ -958,7 +934,7 @@ namespace Vehicle_Components
 			}
 			else
 			{
-				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, false, summary_paragraph);
+				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, _movement_plan->experienced_gap<float>(), false, summary_paragraph);
 			}
 
 
@@ -1016,151 +992,9 @@ namespace Vehicle_Components
 					if (best_route_time_to_destination != current_route_time_to_destination)
 					{
 						THROW_WARNING("eta error, best route time greater than current route time: " << best_route_time_to_destination << "," << current_route_time_to_destination);
-
-						//	_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-						//	
-						//	float cost_sum = 0.0f;
-						//	
-						//	cout << "Routed cost container: " << endl;
-
-						//	for(std::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
-						//	{
-						//		cout << *itr << endl;
-						//	}
-						//	cout << "Routed cost profile: " << endl;
-
-						//	for(std::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
-						//	{
-						//		_Link_Interface* link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
-
-						//		++itr;
-
-						//		if(itr!=path_container.end())
-						//		{
-						//			_Link_Interface* next_link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
-
-						//			//int inbound_link_id = link->template internal_id<int>();
-						//			//int outbound_link_id = next_link->template internal_id<int>();
-						//			int inbound_link_id = link->template uuid<int>();
-						//			int outbound_link_id = next_link->template uuid<int>();
-
-						//			typename MasterType::network_type::long_hash_key_type long_hash_key;
-						//			long_hash_key.inbound_link_id = inbound_link_id;
-						//			long_hash_key.outbound_link_id = outbound_link_id;
-						//			typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-
-						//			cout << link_turn_movement_map.count(long_hash_key.movement_id) << ": " << inbound_link_id << "," << outbound_link_id << "," << endl;
-
-						//			_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
-						//		
-						//			float current = regular_movement->template forward_link_turn_travel_time<float>();
-						//		
-						//			cost_sum+=current;
-
-						//			cout << link->template uuid<int>() << " to " << next_link->template uuid<int>() << "," << cost_sum << "," << current << endl;
-
-						//			cout << regular_movement->inbound_link<_Link_Interface*>()->template uuid<int>() << " to " << regular_movement->outbound_link<_Link_Interface*>()->template uuid<int>() << "," << regular_movement->template forward_link_turn_travel_time<float>() << endl;
-
-						//			cout << "Outbound turn movements summary: " << endl;
-
-						//			std::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<std::vector<typename MasterType::turn_movement_type*>*>();
-
-						//			for(std::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
-						//			{
-						//				Movement<typename MasterType::turn_movement_type>* current_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
-
-						//				cout << current_movement->inbound_link<_Link_Interface*>()->template uuid<int>() << "," << current_movement->outbound_link<_Link_Interface*>()->template uuid<int>() << "," << current_movement->template forward_link_turn_travel_time<float>() << endl;
-						//			}
-						//		}
-						//	}
-
-						//	cost_sum = 0.0f;
-
-						//	cout << "Current cost profile: " << endl;
-						//
-						//	//_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-						//	typename _Trajectory_Container_Interface::iterator itr;
-
-						//	for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
-						//	{
-						//		_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
-						//		_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
-
-						//		if (itr < trajectory.end() - 1)
-						//		{
-						//			_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
-						//			_Link_Interface* next_route_link = next_trajectory_unit->template link<_Link_Interface*>();
-
-						//			//int inbound_link_id = route_link->template internal_id<int>();
-						//			//int outbound_link_id = next_route_link->template internal_id<int>();
-						//			int inbound_link_id = route_link->template uuid<int>();
-						//			int outbound_link_id = next_route_link->template uuid<int>();
-
-						//			typename MasterType::network_type::long_hash_key_type long_hash_key;
-						//			long_hash_key.inbound_link_id = inbound_link_id;
-						//			long_hash_key.outbound_link_id = outbound_link_id;
-						//			typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-						//			_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
-
-						//			float current = regular_movement->template forward_link_turn_travel_time<float>();
-						//		
-						//			cost_sum+=current;
-
-						//			cout << route_link->template uuid<int>() << " to " << next_route_link->template uuid<int>() << "," << cost_sum << "," << current << endl;
-						//		}
-						//	}
 					}
 				}
 			}
-
-			///find a new route using shortest path algorithm
-
-
-			//already commented out
-			////if (routed_travel_time >= 0.0)
-
-			////TODO:ROUTING_OPERATION
-			//if (best_route_time_to_destination >= 0.0)
-			//{	
-			//	
-			//	if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
-			//	{
-			//		THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-			//		THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
-			//	}
-			//	
-			//	typename _Reversed_Path_Container_Interface::iterator itr;
-			//	for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
-			//	{
-			//		_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
-			//		best_route_link_sum += link->template internal_id<int>();
-			//	}
-			//	_Regular_Link_Interface* regular_destination_link = (_Regular_Link_Interface*)(*(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin()));
-			//	_Routable_Link_Interface* routable_destination_link;
-			//	if (use_realtime_travel_time)
-			//	{
-			//		routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
-			//	}
-			//	else
-			//	{
-			//		routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
-			//	}
-
-			//	if (best_route_link_sum != current_route_link_sum_to_destination)
-			//	{
-			//		if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) &&
-			//			best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
-			//		{
-			//			update_enroute_switch_decisions<  TargetType>(cause_for_switching);
-			//			((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
-
-			//			int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
-			//			((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
-			//			int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template absolute_departure_time<int>();
-			//			((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + best_route_time_to_destination);
-			//		}
-			//	}
-			//}
 		}
 
 		template<typename MasterType, typename InheritanceList>

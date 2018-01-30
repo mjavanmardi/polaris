@@ -38,7 +38,7 @@ namespace Activity_Components
 			m_prototype(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
 			// pointer to movement plan associated with activity
-			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::integrated_movement_plan_type, movement_plan, NONE, NONE);
 
 			m_static_data(int, Route_Planning_Count, NONE, NONE);
 			//m_static_data(_lock, update_lock, NONE, NONE);
@@ -81,7 +81,8 @@ namespace Activity_Components
 			typedef Prototypes::Activity_Planner<ComponentType> _activity_plan_itf;
 
 			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container)> _movement_plans_container_itf;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
+			//typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
+			typedef movement_plan_interface _movement_plan_itf;
 
 			
 			//================================================================================================================================================================================================

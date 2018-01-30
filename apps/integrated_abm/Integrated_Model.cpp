@@ -112,8 +112,8 @@ struct MasterType
 
 	typedef Plan_Components::Implementations::Plan_Implementation<M> plan_type;
 
-	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> basic_movement_plan_type;
-	typedef Movement_Plan_Components::Implementations::Integrated_Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Integrated_Movement_Plan_Implementation<M> integrated_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
@@ -679,6 +679,7 @@ int main(int argc,char** argv)
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
+	demand->Initialize<NT>();
 	cout << "reading external demand data..." <<endl;
 	demand->read_vehicle_type_data<NT>();
 	if (scenario->read_demand_from_database<bool>()) demand->read_demand_data<Net_IO_Type>(network_io_maps);

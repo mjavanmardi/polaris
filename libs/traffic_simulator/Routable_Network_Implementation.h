@@ -1057,10 +1057,11 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route, std::string& summary_paragraph)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
+				proxy_agent.experienced_gap(experienced_gap);
 			
 				// get start id list from link id list
 				std::vector<global_edge_id> starts;

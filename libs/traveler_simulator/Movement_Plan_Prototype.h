@@ -60,6 +60,8 @@ namespace Movement_Plan_Components
 			accessor(traveler_id, NONE,NONE);
 			accessor(mode, NONE, NONE);
 
+			accessor(experienced_gap, NONE, NONE);
+
 			//TODO: Remove when done testing routing execution time
 			accessor(routing_execution_time, NONE, NONE);
 			accessor(summary_string, NONE, NONE);

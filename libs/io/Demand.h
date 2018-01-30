@@ -632,11 +632,13 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )  
-	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int tour_, int trip_, double start_, double end_, double duration_, double gap_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )  
+	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), experienced_gap(gap_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
 	//Accessors
+	const int& getId() const { return trip_id; }
+	void setId(const int& id_) { trip_id = id_; }
 	const int& getHhold () const {return hhold;}
 	void setHhold (const int& hhold_){hhold = hhold_;}
 	const shared_ptr<Person> getPerson () const {return person;}
@@ -653,6 +655,8 @@ public:
 	void setEnd (const double& end_){end = end_;}
 	const double& getDuration () const {return duration;}
 	void setDuration (const double& duration_){duration = duration_;}
+	const double& getGap() const { return experienced_gap; }
+	void setGap(const double& gap_) { experienced_gap = gap_; }
 	const int& getOrigin () const {return origin;}
 	void setOrigin (const int& origin_){origin = origin_;}
 	const int& getDestination () const {return destination;}
@@ -688,6 +692,7 @@ private:
 	double start;
 	double end;
 	double duration;
+	double experienced_gap;
 	int origin;
 	int destination;
 	int purpose;
@@ -698,7 +703,6 @@ private:
 	int passengers;
 	int type;
 	int partition;
-	#pragma db not_null
 	shared_ptr<Person> person;
 
 };

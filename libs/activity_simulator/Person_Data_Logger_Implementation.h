@@ -168,7 +168,7 @@ namespace Person_Components
 
 				stringstream s;
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_record_itf;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::integrated_movement_plan_type> movement_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Household_Components::Prototypes::Household<typename MasterType::household_type> household_itf;
