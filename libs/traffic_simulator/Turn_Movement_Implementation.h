@@ -712,14 +712,21 @@ namespace Turn_Movement_Components
 						/*_turn_delay_by_entry_time[j] += std::min(_turn_delay_by_entry_time[j],_add_delay_by_entry_time[j]);*/
 						_turn_delay_by_entry_time[j] += _add_delay_by_entry_time[j];
 
-						_turn_delay_by_entry_time[j] += std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j-1]- (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+						if (j > 0)
+						{						
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*(float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+						}
 
 						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
 					}
 					else
 					{
 						_turn_delay_by_entry_time[j] = _add_delay_by_entry_time[j];
-						_turn_delay_by_entry_time[j] += std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+						
+						if (j > 0)
+						{
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*(float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+						}
 
 						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
 					}
