@@ -24,6 +24,7 @@ namespace Transit_Vehicle_Trip_Components
 			accessor(pattern, NONE, NONE);
 			accessor(arrival_seconds, NONE, NONE);
 			accessor(departure_seconds, NONE, NONE);
+			accessor(people_on_board, NONE, NONE);
 
 			template<typename TargetType> void initialize();
 		};
