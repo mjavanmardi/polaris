@@ -383,7 +383,11 @@ namespace Routing_Components
 				//==============================================================================
 				// ADD TURN MOEs
 				//------------------------------------------------------------------------------
-				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				//result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE_by_entry>::true_expr);
+				//----------------------------------------------------------------------------------
 
 				int turn_id;
 				float turn_delay;
