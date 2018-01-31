@@ -27,6 +27,8 @@ namespace Transit_Vehicle_Trip_Components
 		{
 			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Vehicle_Trip_Implementation), Data_Object>::Component_Type ComponentType;
 
+			typedef Person_Components::Prototypes::Person<typename MasterType::person_type> _Person_Interface;
+
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, dbid, NONE, NONE);
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -35,13 +37,27 @@ namespace Transit_Vehicle_Trip_Components
 			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
 			m_container(std::vector<int>, departure_seconds, NONE, NONE);
 
-			template<typename TargetType> void initialize();
+			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
 
+			template<typename TargetType> void initialize();
+			template<typename TargetType> void advance();
+			template<typename TargetType> void load();
+			template<typename TargetType> void transfer_to_link(TargetType link);
+			template<typename TargetType> void unload();
+			template<typename TargetType> void clear_trajectory();
+			template<typename TargetType> void move_to_next_link();
+			template<typename TargetType> void move_to_origin_link();
 		};
 
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType>
 		void Transit_Vehicle_Trip_Implementation<MasterType, InheritanceList>::initialize()
+		{
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Transit_Vehicle_Trip_Implementation<MasterType, InheritanceList>::load()
 		{
 		}
 	}
