@@ -61,6 +61,11 @@ namespace Scenario_Components
 				ACTIVITY_PLANNING_SUB_ITERATION=20,
 				MOVEMENT_PLANNING_SUB_ITERATION=21,
 			};
+			enum Transit_Sub_Iteration_keys
+			{
+				TRAVELER_ALIGHTING_SUBITERATION = 17,
+
+			};
 			enum RNG_Type_Keys
 			{
 				DETERMINISTIC = 0,
