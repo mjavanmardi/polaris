@@ -278,6 +278,9 @@ namespace Person_Components
 
 					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(), move);
 
+					//TODO: JAA - 1/30/2018 - returning here after movement scheduled in order to ignore multiple moves per timestep.
+					return;
+
 					//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
 					typename Movement_Plans::iterator prev = move_itr++;
 					//movements->erase(prev);
@@ -359,7 +362,7 @@ namespace Person_Components
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time/*,scenario->template read_network_snapshots<bool>()*/);
 				return;
 			}
-			else //if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
+			else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV || scenario->multimodal_routing<bool>()) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
 			{
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>()/*, planning_time,scenario->template read_network_snapshots<bool>()*/);
 			}

@@ -313,7 +313,7 @@ namespace Activity_Components
 			move->template destination_activity_reference<ComponentType*>(static_cast<ComponentType*>(this));
 			move->template network<_network_itf*>(network);
 			//move->traveler_id(person->template uuid<int>());
-			move->traveler_id(person->person_record<shared_ptr<polaris::io::Person>>()->getId());
+			move->traveler_id(person->person_record<shared_ptr<polaris::io::Person>>()->getPerson());
 
 			// Get the origin and destination locations
 			_activity_location_itf* orig;
