@@ -230,7 +230,7 @@ namespace Person_Components
 		void General_Person_Planner_Implementation<MasterType, InheritanceList>::Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
 		{
 			Generation_Time_Increment<Time_Minutes>(END);
-			Planning_Time_Increment<Time_Minutes>(5);
+			Planning_Time_Increment<Time_Minutes>(1.0);
 			Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);
 		}
 
@@ -249,7 +249,7 @@ namespace Person_Components
 		void POLARIS_Person_Planner_Implementation<MasterType, InheritanceList>::Initialize()
 		{
 			base_type::template Generation_Time_Increment<Time_Minutes>(END);
-			base_type::template Planning_Time_Increment<Time_Minutes>(5);
+			base_type::template Planning_Time_Increment<Time_Minutes>(1.0);
 			base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);
 		}
 
