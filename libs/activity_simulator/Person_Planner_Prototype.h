@@ -362,10 +362,11 @@ namespace Person_Components
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time/*,scenario->template read_network_snapshots<bool>()*/);
 				return;
 			}
-			else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV || scenario->multimodal_routing<bool>()) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
-			{
+			//TODO: JAA-2/1/18 - Do routing for all trips; afterwards adjust routed travel times for walk/bike/transit in the person movement planner if not using multimodal routing...
+			//else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV || scenario->multimodal_routing<bool>()) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
+			//{
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>()/*, planning_time,scenario->template read_network_snapshots<bool>()*/);
-			}
+			//}
 
 		}
 

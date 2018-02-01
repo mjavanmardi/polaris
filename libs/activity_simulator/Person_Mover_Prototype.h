@@ -1050,7 +1050,16 @@ namespace Prototypes
 
 		this->Artificial_Movement_Scheduled<bool>(true);
 
-		int arrival_time = iteration() + movements->routed_travel_time<Simulation_Timestep_Increment>();
+		// get adjustment to the routed travel time based on mode type...
+		Vehicle_Components::Types::Vehicle_Type_Keys mode = movements->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+		float ttime_adjust = 1.0;
+		if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) ttime_adjust = 12.0f;
+		else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) ttime_adjust = 3.5f;
+		else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) ttime_adjust = 2.0f; //TODO: replace this with LOS lookup
+
+
+
+		int arrival_time = iteration() + movements->routed_travel_time<Simulation_Timestep_Increment>() * ttime_adjust;
 		//int arrival_time = max((int)act->template Start_Time<Simulation_Timestep_Increment>(), iteration() + 1);
 
 		this->Artificial_Arrival_Time<Simulation_Timestep_Increment>(arrival_time);
