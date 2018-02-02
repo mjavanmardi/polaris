@@ -2136,6 +2136,7 @@ namespace Network_Components
 				{
 					try
 					{
+						int test = db_itr->getLocation();
 						link_id_dir.id=db_itr->getLink()->getLink();
 						link_id_dir.dir=db_itr->getDir();
 
@@ -2530,7 +2531,7 @@ namespace Network_Components
 						}
 						else
 						{
-							code=Activity_Location_Components::Types::LU_NONE;
+							THROW_EXCEPTION("Error: undefined land use code '"<<land_use<<"' found in database.")
 						}
 						activity_location->land_use_type(code);
 
@@ -2591,7 +2592,9 @@ namespace Network_Components
 						loc_id_to_idx_container.insert(pair<int,int>(activity_location->template uuid<int>(),activity_location->template internal_id<int>()));
 						++counter;
 					}
-					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
+					catch (const odb::exception& e){
+						THROW_WARNING(e.what()); e.what(); continue;
+					}
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
 

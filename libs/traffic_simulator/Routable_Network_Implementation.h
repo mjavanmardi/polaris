@@ -1065,7 +1065,7 @@ namespace Routing_Components
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
-				proxy_agent.experienced_gap(experienced_gap);
+				proxy_agent.experienced_gap(max(min(experienced_gap,1.0f),0.00001f));
 			
 				// get start id list from link id list
 				std::vector<global_edge_id> starts;
