@@ -408,6 +408,15 @@ namespace Turn_Movement_Components
 					}
 				}
 
+				//TODO: Omer: 2018.02.20
+				if (t_cached_delay>0)
+				{ 
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay-1] - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+				}
+
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand * 2.0f);
+				//------------------------------------------------------------------------------
+
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
 					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
