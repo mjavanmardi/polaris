@@ -18,6 +18,8 @@ namespace Turn_Movement_Components
 		struct Movement_MOE_Data
 		{
 			float movement_flow_rate; 
+			float movement_flow_rate_prev; //TODO: Omer
+			float intervals_with_demand; //TODO: Omer
 			float turn_penalty;
 			float turn_penalty_standard_deviation;
 			float inbound_link_turn_time;
@@ -415,6 +417,13 @@ namespace Turn_Movement_Components
 				}
 
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand * 2.0f);
+
+				if (movement_moe_data.movement_flow_rate_prev > 0)
+				{
+					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
+				}
+
 				//------------------------------------------------------------------------------
 
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
@@ -605,6 +614,8 @@ namespace Turn_Movement_Components
 				movement_moe_data.outbound_link_turn_time = 0.0f;
 				movement_moe_data.turn_penalty = 0.0f;
 				movement_moe_data.turn_penalty_standard_deviation = 0.0f;
+				movement_moe_data.movement_flow_rate_prev = movement_moe_data.movement_flow_rate; //TODO: Omer
+				movement_moe_data.intervals_with_demand = 0.0f; //TODO: Omer
 				movement_moe_data.movement_flow_rate = 0.0f;
 			}
 
@@ -613,6 +624,13 @@ namespace Turn_Movement_Components
 				realtime_movement_moe_data.turn_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f;
 				realtime_movement_moe_data.movement_flow_rate = (float)_movement_transferred;			
 				((_link_component_type*)_outbound_link)->realtime_link_moe_data.link_in_volume += (float)_movement_transferred;
+
+				//TODO: Omer
+				if (_movement_demand > 0)
+				{
+					movement_moe_data.intervals_with_demand++;
+				}
+				//------------------------------------------------
 
 				movement_moe_data.movement_flow_rate += (float)_movement_transferred;
 				
@@ -633,7 +651,11 @@ namespace Turn_Movement_Components
 				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
 				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;
 				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->link_fftt<float>() + _tmp_turn_travel_penalty) / 60.0f;
-				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
+				//TODO:Omer
+				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (movement_moe_data.intervals_with_demand * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+				//movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
+
+				//------------------------------------------------------------------------------------------------------------------
 			}
 
 			template<typename TargetType> void calculate_moe_for_simulation_interval_from_inbound_link()
@@ -675,7 +697,7 @@ namespace Turn_Movement_Components
 
 						if (j > 0)
 						{						
-							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*(float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 						}
 
 						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
@@ -686,7 +708,7 @@ namespace Turn_Movement_Components
 						
 						if (j > 0)
 						{
-							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*(float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 						}
 
 						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
