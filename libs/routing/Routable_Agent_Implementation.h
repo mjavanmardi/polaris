@@ -205,14 +205,14 @@ namespace polaris
 				//float time_cost_current = current->_cost + connection->_cost;
 				float time_cost_current = connection->_cost + neighbor->_cost;
 
-				int t_diff = abs(current_time - iteration());
+				float t_diff = (float)(abs(current_time - iteration()));
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor() * _experienced_gap;
+				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * _experienced_gap), current->ttime_weight_shape())) * ((1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor());
 
-				float time_cost = w*time_cost_current + (1-w)*t;
-
+				//float time_cost = w*time_cost_current + (1-w)*t;
+				float time_cost = t;
 
 				if(neighbor->_is_highway)
 				{
@@ -335,10 +335,10 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor()* _experienced_gap;
+				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * _experienced_gap), current->ttime_weight_shape())) * ((1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor());
 
-				float time_cost = w*time_cost_current + (1-w)*t;
-
+				//float time_cost = w*time_cost_current + (1-w)*t;
+				float time_cost = t;
 
 				/*if(neighbor->_is_highway)
 				{

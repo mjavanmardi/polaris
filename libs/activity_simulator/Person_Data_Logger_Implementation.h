@@ -703,6 +703,10 @@ namespace Person_Components
 					if (new_destination < 0) trip_rec.setDestination(dest->template uuid<int>());
 					else trip_rec.setDestination(new_destination);
 					trip_rec.setDuration(act->template Duration<Time_Seconds>());
+
+					if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
+					else trip_rec.setGap(0.0f);
+
 					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
 					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
 					trip_rec.setHhold(0);
