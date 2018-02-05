@@ -387,6 +387,10 @@ namespace Turn_Movement_Components
 					t_cached_delay = 0;
 				}
 
+				//------------------------------------------------------------------------------
+				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				//------------------------------------------------------------------------------
+
 				//=========================================================================================================
 				//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
 				//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
@@ -409,7 +413,7 @@ namespace Turn_Movement_Components
 				}
 
 				//TODO: Omer: 2018.02.20
-				if (t_cached_delay>0)
+				/*if (t_cached_delay>0)
 				{ 
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay-1] - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 				}
@@ -420,11 +424,9 @@ namespace Turn_Movement_Components
 				{
 					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
-				}
+				}*/
 
-				//------------------------------------------------------------------------------
-				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
-				//------------------------------------------------------------------------------
+				
 
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
