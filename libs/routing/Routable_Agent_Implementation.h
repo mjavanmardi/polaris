@@ -211,8 +211,7 @@ namespace polaris
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
 				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * _experienced_gap), current->ttime_weight_shape())) * ((1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor());
 
-				//float time_cost = w*time_cost_current + (1-w)*t;
-				float time_cost = t;
+				float time_cost = w*time_cost_current + (1-w)*t;
 
 				if(neighbor->_is_highway)
 				{
@@ -337,8 +336,7 @@ namespace polaris
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
 				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * _experienced_gap), current->ttime_weight_shape())) * ((1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor());
 
-				//float time_cost = w*time_cost_current + (1-w)*t;
-				float time_cost = t;
+				float time_cost = w*time_cost_current + (1-w)*t;
 
 				/*if(neighbor->_is_highway)
 				{
