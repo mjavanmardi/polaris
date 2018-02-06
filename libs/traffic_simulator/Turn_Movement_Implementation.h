@@ -61,9 +61,9 @@ namespace Turn_Movement_Components
 
 			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
-			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, inbound_link, NONE, NONE);
 
-			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, outbound_link, NONE, NONE);
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
@@ -419,7 +419,9 @@ namespace Turn_Movement_Components
 				if (movement_moe_data.movement_flow_rate_prev > 0)
 				{
 					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
-					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
+					//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
+
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = _movement_demand*estimated_per_vehicle_delay;
 				}
 
 				//------------------------------------------------------------------------------
@@ -644,13 +646,23 @@ namespace Turn_Movement_Components
 			{
 				float _tmp_turn_travel_penalty;
 				float _tmp_turn_travel_penalty_standard_divation;
-				::calculate_mean_standard_deviation
+				//TODO: Omer replacing this with what the route is really seeing
+				/*::calculate_mean_standard_deviation
 					(_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array,
 					_tmp_turn_travel_penalty,
 					_tmp_turn_travel_penalty_standard_divation);
 				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
+				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;*/				
+				//TODO: Omer Change the above back to the old one ASAP
+				_tmp_turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				_tmp_turn_travel_penalty_standard_divation = 0.0f;
+				//--------------------------------------------------------------------------------------------------------------------------------------------------------
+				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
 				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;
+				//-------------------------------------------------------------------------------------------------------------------------------------------------------
+				
 				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->link_fftt<float>() + _tmp_turn_travel_penalty) / 60.0f;
+
 				//TODO:Omer
 				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (movement_moe_data.intervals_with_demand * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 				//movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
