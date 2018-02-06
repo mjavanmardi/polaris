@@ -412,7 +412,7 @@ namespace Turn_Movement_Components
 				/*if (t_cached_delay>0)
 				{ 
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay-1] - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
-				}
+				}*/
 
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand * 2.0f);
 
@@ -420,7 +420,7 @@ namespace Turn_Movement_Components
 				{
 					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
-				}*/
+				}
 
 				//------------------------------------------------------------------------------
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;

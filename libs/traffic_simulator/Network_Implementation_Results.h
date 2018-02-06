@@ -64,7 +64,7 @@ namespace Network_Components
 				if (num_arrived_vehicls_of_a_link > 0)
 				{
 					//output vehicle trajectory
-					while(num_arrived_vehicls_of_a_link)
+					while (num_arrived_vehicls_of_a_link)
 					{
 						// check whether to sampel this vehicle
 						_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
@@ -74,8 +74,11 @@ namespace Network_Components
 						// JA: Added 1/17/18 - use every vehicle for gap calculation
 						// update the network relative gap calculations with the current vehicle
 						/*network_moe_data.network_relative_gap += abs((movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());*/
-						network_moe_data.network_relative_gap += std::max(0.0, (movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());
+						if (movement_plan->template arrived_time<Time_Seconds>() > movement_plan->template departed_time<Time_Seconds>() && movement_plan->template departed_time<Time_Seconds>() >= 0.0f && movement_plan->template estimated_travel_time_when_departed<float>() > 0.0f)
+						{
+							network_moe_data.network_relative_gap += std::max(0.0, (movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>()) - movement_plan->template estimated_travel_time_when_departed<float>());
 						network_moe_data.network_routed_ttime += movement_plan->template estimated_travel_time_when_departed<float>();
+						}
 						//===============================================================
 
 						if (vehicle->write_trajectory())
