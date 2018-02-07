@@ -385,8 +385,8 @@ namespace Routing_Components
 				//------------------------------------------------------------------------------
 				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
 				//----------------------------------------------------------------------------------
-				//result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
-				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE_by_entry>::true_expr);
+				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				//result<TurnMOE_by_entry> turn_moe_result = db->template query<TurnMOE_by_entry>(query<TurnMOE_by_entry>::true_expr);
 				//----------------------------------------------------------------------------------
 
 				int turn_id;
