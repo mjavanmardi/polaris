@@ -730,6 +730,7 @@ namespace Person_Components
 					trip_rec.setPriority(0);
 					//				trip_rec.setVehicle(9);
 					trip_rec.setType(1);
+					trip_rec.setPath_id(move->path_id<int>());
 				}
 				else
 				{

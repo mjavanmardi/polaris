@@ -91,6 +91,7 @@ namespace Movement_Plan_Components
 			m_data(float, route_length, NONE, NONE);
 			m_data(int, entry_time, NONE, NONE);
 			m_data(int, traveler_id, NONE, NONE);
+			m_data(int, path_id, NONE, NONE); // update after completed trajectory is pushed to DB
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode, NONE, NONE);
 			m_data(float, experienced_gap, NONE, NONE);
 

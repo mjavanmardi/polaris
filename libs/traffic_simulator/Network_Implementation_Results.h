@@ -153,7 +153,8 @@ namespace Network_Components
 								}
 								
 							}
-							db_ptr->persist(path_db_record);
+							int path_id = db_ptr->persist(path_db_record);
+							movement_plan->path_id(path_id);
 						}
 
 						destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().pop_front();

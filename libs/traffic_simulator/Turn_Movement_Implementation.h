@@ -416,10 +416,11 @@ namespace Turn_Movement_Components
 
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand * 2.0f);
 
-				if (movement_moe_data.movement_flow_rate_prev > 0)
+				// if the current probe vehicle travel time estimate (_outbound_link_arrived....) is greater than the assignment update period, use the delay based on the turn flow rate instead.
+				if (movement_moe_data.movement_flow_rate_prev > 0 && _outbound_link_arrived_time_based_experienced_link_turn_travel_delay > ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()* ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
 				{
 					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
-					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand*estimated_per_vehicle_delay);
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay =_movement_demand*estimated_per_vehicle_delay;
 				}
 
 				//------------------------------------------------------------------------------

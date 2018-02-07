@@ -24,6 +24,7 @@ namespace Demand_Components
 			m_container(std::vector<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 			m_container(std::vector<typename MasterType::vehicle_characteristics_type*>, vehicle_types_container, NONE, NONE);
 
+
 			m_data(int, first_vehicle_departure_time, NONE, NONE);
 			m_data(int, last_vehicle_departure_time, NONE, NONE);
 			m_data(shared_ptr<odb::database>, db_ptr, NONE, NONE);
@@ -39,8 +40,10 @@ namespace Demand_Components
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				// initialize storage arrays
-				trip_records = new std::vector<polaris::io::Trip>[num_sim_threads()];
-				trip_records_buffer = new std::vector<polaris::io::Trip>[num_sim_threads()];
+				movement_plans = new std::vector<typename MasterType::movement_plan_type*>[num_sim_threads()];
+				movement_plans_buffer = new std::vector<typename MasterType::movement_plan_type*>[num_sim_threads()];
+				//trip_records = new std::vector<polaris::io::Trip>[num_sim_threads()];
+				//trip_records_buffer = new std::vector<polaris::io::Trip>[num_sim_threads()];
 
 				if (scenario->template write_demand_to_database<bool>())
 				{
@@ -70,8 +73,11 @@ namespace Demand_Components
 			//==============================================================
 			// TRIP RECORD LOGGING FOR FIXED DEMAND.......
 			//--------------------------------------------------------------
-			std::vector<polaris::io::Trip>* trip_records;
-			std::vector<polaris::io::Trip>* trip_records_buffer;
+
+			std::vector<typename MasterType::movement_plan_type*>* movement_plans;
+			std::vector<typename MasterType::movement_plan_type*>* movement_plans_buffer;
+			//std::vector<polaris::io::Trip>* trip_records;
+			//std::vector<polaris::io::Trip>* trip_records_buffer;
 
 			static void Logging_Event_Controller(ComponentType* _this, Event_Response& response)
 			{
@@ -86,10 +92,12 @@ namespace Demand_Components
 				// swap buffer and current for output strings and trip records
 				if (sub_iteration() == 0)
 				{
-					std::vector<polaris::io::Trip>* tmp = pthis->trip_records_buffer;
-					pthis->trip_records_buffer = pthis->trip_records;
-					pthis->trip_records = tmp;
-
+				//	std::vector<polaris::io::Trip>* tmp = pthis->trip_records_buffer;
+				//	pthis->trip_records_buffer = pthis->trip_records;
+				//	pthis->trip_records = tmp;
+					std::vector<typename MasterType::movement_plan_type*>* tmp = pthis->movement_plans_buffer;
+					pthis->movement_plans_buffer = pthis->movement_plans;
+					pthis->movement_plans = tmp;
 
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
@@ -104,6 +112,9 @@ namespace Demand_Components
 
 			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan)
 			{
+				movement_plans_buffer[__thread_id].push_back(movement_plan);
+
+				/*
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
@@ -148,12 +159,25 @@ namespace Demand_Components
 				trip_rec.setTour(0);
 				trip_rec.setPriority(0);
 				trip_rec.setType(1);
+				trip_rec.setPath_id(move->path_id<int>());
 
 				trip_records_buffer[__thread_id].push_back(trip_rec);
+				*/
 			}
 
 			template<typename TargetType> void Write_Trips_To_Database()
 			{
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+				if (!scenario->template write_demand_to_database<bool>()) return;
+
 				for (int i = 0; i< (int)num_sim_threads(); ++i)
 				{
 					// database write for trips
@@ -168,10 +192,41 @@ namespace Demand_Components
 							odb::transaction t(this->_db_ptr->begin());
 
 							// iterate over trip-activity pairs and push to database
-							for (std::vector<polaris::io::Trip>::iterator itr = trip_records[i].begin(); itr != trip_records[i].end(); ++itr)
+							/*for (std::vector<polaris::io::Trip>::iterator itr = trip_records[i].begin(); itr != trip_records[i].end(); ++itr)
 							{
 								polaris::io::Trip& t = *itr;
 								this->_db_ptr->persist(t);
+								count++;
+							}*/
+							for (std::vector<typename MasterType::movement_plan_type*>::iterator itr = movement_plans[i].begin(); itr != movement_plans[i].end(); ++itr)
+							{
+								movement_itf* move = (movement_itf*)*itr;
+								location_itf* orig = move->template origin<location_itf*>();
+								location_itf* dest = move->template destination<location_itf*>();
+
+								//==============================================================================================
+								// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
+								polaris::io::Trip trip_rec;
+								trip_rec.setConstraint(0);
+								trip_rec.setPerson(0);
+								trip_rec.setTrip(move->traveler_id<int>());
+								trip_rec.setDestination(dest->template uuid<int>());
+								trip_rec.setDuration(0);
+								if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
+								else trip_rec.setGap(0.0f);
+								trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+								trip_rec.setHhold(0);
+								trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+								trip_rec.setOrigin(orig->template uuid<int>());
+								trip_rec.setPartition(move->template routed_travel_time<int>());
+								trip_rec.setPassengers(0);
+								trip_rec.setPurpose(0);
+								trip_rec.setStart(move->template departed_time<Time_Seconds>());
+								trip_rec.setTour(0);
+								trip_rec.setPriority(0);
+								trip_rec.setType(1);
+								trip_rec.setPath_id(move->path_id<int>());
+								this->_db_ptr->persist(trip_rec);
 								count++;
 							}
 							t.commit();
@@ -179,7 +234,7 @@ namespace Demand_Components
 						catch (const odb::exception& e)
 						{
 							cout << e.what() << ". DB error in person_data_logger_implementation, line 493.  count=" << count << endl;
-							polaris::io::Trip p = trip_records[i][count];
+							//polaris::io::Trip p = trip_records[i][count];
 
 						}
 						catch (std::exception& e)
@@ -192,7 +247,8 @@ namespace Demand_Components
 						}
 
 						// erase buffer
-						trip_records[i].clear();
+						//trip_records[i].clear();
+						movement_plans[i].clear();
 					}
 				}
 			}
