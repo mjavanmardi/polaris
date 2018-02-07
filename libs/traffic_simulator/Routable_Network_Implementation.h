@@ -386,7 +386,7 @@ namespace Routing_Components
 				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
 				//----------------------------------------------------------------------------------
 				//result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
-				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE_by_entry>::true_expr);
+				result<TurnMOE_by_entry> turn_moe_result = db->template query<TurnMOE_by_entry>(query<TurnMOE_by_entry>::true_expr + "ORDER BY" + query<TurnMOE_by_entry>::start_time + "," + query<TurnMOE_by_entry>::turn_uid);
 				//----------------------------------------------------------------------------------
 
 				int turn_id;
@@ -396,7 +396,7 @@ namespace Routing_Components
 
 				time_advance = false;
 
-				for (typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
+				for (typename result<TurnMOE_by_entry>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
 				{
 					if (++counter % 100000 == 0) cout << counter << endl;
 
@@ -582,10 +582,9 @@ namespace Routing_Components
 
 				Interactive_Graph<typename MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->template Compile_Graph<Types::time_dependent_attributes<MT>>();
 	
-				//graph_pool->Link_Graphs();
-
-				//TODO: remove when done testing
+				#ifdef _DEBUG
 				this->time_dependent_routable_network_unit_test();
+				#endif
 			}
 
 			void time_dependent_routable_network_unit_test()
