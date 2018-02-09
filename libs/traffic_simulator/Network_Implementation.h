@@ -254,6 +254,11 @@ namespace Network_Components
 				{
 					ttime_distribution[i] = 0;
 				}
+
+				if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>())
+				{					
+					initialize_vehicle_movements_in_transit_network<TargetType>();
+				}
 			}
 
 			template<typename TargetType> void update_ttime_distribution(int ttime)
@@ -877,6 +882,20 @@ namespace Network_Components
 				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
 				{
 					((_Intersection_Interface*)(*intersection_itr))->template initialize_features<ComponentType*>(this_component());
+				}
+			}
+
+
+			template<typename TragetType> void initialize_vehicle_movements_in_transit_network()
+			{
+				typedef  Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer<typename  type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
+				typedef  Random_Access_Sequence< type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
+
+				typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				typename _Transit_Vehicle_Trips_Container_Interface::iterator transit_vehicle_trip_itr;
+				for (transit_vehicle_trip_itr = _transit_vehicle_trips_container.begin(); transit_vehicle_trip_itr != _transit_vehicle_trips_container.end(); transit_vehicle_trip_itr++)
+				{
+					((_Transit_Vehicle_Trip_Interface*)(*transit_vehicle_trip_itr))->template schdeule_vehicle_movements_in_transit_network<ComponentType*>(this_component());
 				}
 			}
 

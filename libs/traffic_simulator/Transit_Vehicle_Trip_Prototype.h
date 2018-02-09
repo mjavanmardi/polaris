@@ -22,11 +22,18 @@ namespace Transit_Vehicle_Trip_Components
 			accessor(uuid, NONE, NONE);
 			accessor(direction, NONE, NONE);
 			accessor(pattern, NONE, NONE);
+			accessor(network_reference, NONE, NONE);
 			accessor(arrival_seconds, NONE, NONE);
 			accessor(departure_seconds, NONE, NONE);
+			
+			//Simulation related
 			accessor(people_on_board, NONE, NONE);
+			accessor(current_position, NONE, NONE);
 
-			template<typename TargetType> void initialize();
+			template<typename TargetType> void schdeule_vehicle_movements_in_transit_network(TargetType param)
+			{
+				this_component()->template schdeule_vehicle_movements_in_transit_network<TargetType>(param);
+			}
 		};
 
 
