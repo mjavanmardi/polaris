@@ -43,6 +43,7 @@ namespace Transit_Vehicle_Trip_Components
 			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
 			m_container(std::vector<int>, departure_seconds, NONE, NONE);
 			m_data(int, number_of_stops, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			
 			//Simulation related
 			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
@@ -105,12 +106,8 @@ namespace Transit_Vehicle_Trip_Components
 				
 				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
 				{
-					_this->board_travelers(); 
-					
-					int position = _this->template current_position<int>();
-					int depart_time = _this->template departure_seconds<std::vector<int>>()[position];
-
-					response.next._iteration = depart_time;
+					_this->board_travelers();
+					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
 						;
 				}
@@ -119,11 +116,7 @@ namespace Transit_Vehicle_Trip_Components
 					)
 				{
 					_this->transit_vehicle_departing();
-
-					int position = _this->template current_position<int>();
-					int arrival_time = _this->template arrival_seconds<std::vector<int>>()[position];
-
-					response.next._iteration = arrival_time;
+					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION;
 				}
 				
@@ -163,11 +156,11 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "0 - I arrived" << endl;
+					trajectory_stream << "0\tI arrived" << endl;
 				}
 				else
 				{
-					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position-1]);
+					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position - 1]);
 					std::string stop_ID = pattern_link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
 
 					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
@@ -175,10 +168,10 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "0 - I arrived" << endl;
+					trajectory_stream << "0\tI arrived" << endl;
 				}
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void alight_travelers()
@@ -204,7 +197,7 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "1 - I am alighting some travelers" << endl;
+					trajectory_stream << "1\tI am alighting some travelers" << endl;
 				}
 				else
 				{
@@ -216,10 +209,10 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "1 - I am alighting all remaining travelers" << endl;
+					trajectory_stream << "1\tI am alighting all remaining travelers" << endl;
 				}
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void rearrange_seats()
@@ -242,9 +235,9 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Time is:\t" << arrival_time << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "2 - I am re-arranging seats" << endl;
+				trajectory_stream << "2\tI am re-arranging seats" << endl;
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void board_travelers()
@@ -267,9 +260,12 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Time is:\t" << arrival_time << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "3 - I am accepting some travelers on board" << endl;
+				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
+				this->template Next_Logging_Time<Simulation_Timestep_Increment>(departure_time);
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void transit_vehicle_departing()
@@ -292,12 +288,14 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Time is:\t" << departure_time << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "4 - I am moving to my next stop" << endl;
+				trajectory_stream << "4\tI am moving to my next stop" << endl;
 
 				position++;
 				this->template current_position<int>(position);
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+				this->template Next_Logging_Time<Simulation_Timestep_Increment>(arrival_time);
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void transit_vehicle_depot()
@@ -320,9 +318,9 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Time is:\t" << depature_time << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "5 - I am going to my depot" << endl;
+				trajectory_stream << "5\tI am going to my depot" << endl;
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 		};

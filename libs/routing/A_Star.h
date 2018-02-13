@@ -652,7 +652,7 @@ namespace polaris
 		std::deque< global_edge_id >& out_path, 
 		std::deque< float >& out_cost, 
 		std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
-		std::deque<int>& out_trip,
+		std::deque<typename MasterType::transit_vehicle_trip_type*>& out_trip,
 		std::deque<int>& out_seq,
 		std::deque<float>& out_time,
 		std::deque<float>& out_arr_time,
@@ -1011,7 +1011,7 @@ namespace polaris
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
-					out_trip.push_back(current_trip->uuid<int>());
+					out_trip.push_back(current_trip);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -1046,7 +1046,7 @@ namespace polaris
 				
 				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
-					out_trip.push_back(-1);
+					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -1080,7 +1080,7 @@ namespace polaris
 
 				else
 				{
-					out_trip.push_back(-1);
+					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",

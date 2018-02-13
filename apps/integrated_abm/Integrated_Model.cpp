@@ -118,6 +118,9 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
+	//TODO: Omer - Multimodal Trajectory
+	typedef Movement_Plan_Components::Implementations::Multimodal_Trajectory_Unit_Implementation<M> multimodal_trajectory_unit_type;
+	//TODO: Omer - Multimodal Trajectory END
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;

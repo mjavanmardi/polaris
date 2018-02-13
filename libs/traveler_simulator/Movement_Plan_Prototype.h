@@ -33,6 +33,41 @@ namespace Movement_Plan_Components
 			}
 		};
 
+		//TODO: Omer - Multimodal Trajectory
+		prototype struct Multimodal_Trajectory_Unit ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+
+			template<typename TargetType> void Initialize(TargetType link_ptr)
+			{
+				this_component()->template Initialize<TargetType>(link_ptr);
+			}
+
+			accessor(link, NONE, NONE);
+			accessor(delayed_time, NONE, NONE);
+			accessor(enter_time, NONE, NONE);
+			accessor(enter_interval_index, NONE, NONE);
+			accessor(estimated_link_accepting_time, NONE, NONE);
+			accessor(intersection_delay_time, NONE, NONE);
+			template<typename TargetType> TargetType exit_time()
+			{
+				return (TargetType)(enter_time<int>() + delayed_time<float>());
+			}
+
+			accessor(estimated_gen_cost, NONE, NONE);
+			accessor(link_mode, NONE, NONE);
+			accessor(transit_vehicle_trip, NONE, NONE);
+			accessor(transit_vehicle_stop_sequence, NONE, NONE);
+			accessor(estimated_arrival_time, NONE, NONE);
+			accessor(estimated_wait_time, NONE, NONE);
+			accessor(estimated_walk_time, NONE, NONE);
+			accessor(estimated_ivt_time, NONE, NONE);
+			accessor(estimated_car_time, NONE, NONE);
+			accessor(estimated_wait_count, NONE, NONE);
+			accessor(estimated_transfer_penalty, NONE, NONE);
+
+		};
+		//TODO: Omer - Multimodal Trajectory END
 
 		prototype struct Movement_Plan ADD_DEBUG_INFO
 		{
@@ -41,7 +76,9 @@ namespace Movement_Plan_Components
 			accessor(network, NONE, NONE);
 
 			accessor(trajectory_container, NONE, NONE);
-
+			//TODO: Omer - Multimodal Trajectory
+			accessor(multimodal_trajectory_container, NONE, NONE);
+			//TODO: Omer - Multimodal Trajectory END
 			accessor(current_trajectory_position, NONE, NONE);
 			accessor(departed_time, NONE, NONE);
 			accessor(arrived_time, NONE, NONE);
@@ -502,6 +539,82 @@ namespace Movement_Plan_Components
 				this_component()->Display_Movement();
 			}			
 
+			//TODO: Omer - Multimodal Trajectory
+			template<typename T>
+			void set_multimodal_trajectory(
+				std::deque< global_edge_id >& out_path,
+				std::deque< float >& out_cost,
+				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
+				T& out_trip,
+				std::deque<int>& out_seq,
+				std::deque<float>& out_time,
+				std::deque<float>& out_arr_time,
+				std::deque<float>& out_wait_time,
+				std::deque<float>& out_walk_time,
+				std::deque<float>& out_ivt_time,
+				std::deque<float>& out_car_time,
+				std::deque<int>& out_wait_count,
+				std::deque<float>& out_transfer_pen)
+			{
+				//TODO: check that this has been correctly translated!
+
+				typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(multimodal_trajectory_container)::value_type>::type>  Multimodal_Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(multimodal_trajectory_container), Multimodal_Trajectory_Unit_Interface*> Multimodal_Trajectory_Container_Interface;
+
+				typedef  Link_Components::Prototypes::Link< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link)> Link_Interface;
+
+				typedef  Network_Components::Prototypes::Network< typename get_type_of(network) > Network_Interface;
+
+
+				Network_Interface* net = network<Network_Interface*>();
+
+
+				Multimodal_Trajectory_Container_Interface& trajectory = multimodal_trajectory_container<Multimodal_Trajectory_Container_Interface&>();
+				//trajectory.clear();
+				clear_trajectory();
+
+				typename std::deque<global_edge_id>::iterator itr;
+				typename std::deque<float>::iterator arrival_time_itr;
+				
+				int other_itr = 0;
+				for (itr = out_path.begin(); itr != out_path.end(); itr++, other_itr++)
+				{
+					Multimodal_Trajectory_Unit_Interface* vehicle_trajectory_data = (Multimodal_Trajectory_Unit_Interface*)Allocate<typename Multimodal_Trajectory_Unit_Interface::Component_Type>();
+
+					Link_Interface* link = net->template get_link_ptr< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link) >(itr->edge_id);
+					//vehicle_trajectory_data->template Initialize<Link_Interface*>(link);
+
+					vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[0]);
+					vehicle_trajectory_data->template link_mode<Link_Components::Types::Link_Type_Keys>(out_type[other_itr]);
+					vehicle_trajectory_data->template transit_vehicle_trip<T*>(out_trip[other_itr]);
+					vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr]);
+					
+					if (other_itr != 0)
+					{
+						vehicle_trajectory_data->template estimated_link_accepting_time<int>(out_time[other_itr-1]);
+					}
+					else
+					{
+						vehicle_trajectory_data->template estimated_link_accepting_time<float>(0.0f);
+					}
+
+					vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr]);
+					vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr]);
+					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr]);
+					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr]);
+					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr]);
+					vehicle_trajectory_data->template estimated_wait_count<int>(out_wait_count[other_itr]);
+					vehicle_trajectory_data->template estimated_transfer_penalty<float>(out_transfer_pen[other_itr]);
+
+					trajectory.push_back(vehicle_trajectory_data);
+				}
+
+				//number_of_switches<int>(0.0);
+				//update_route_length<NT>();
+
+
+
+			}
 		};
 	}
 }
