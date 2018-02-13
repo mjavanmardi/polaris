@@ -391,7 +391,7 @@ namespace Movement_Plan_Components
 				//erase 
 				trajectory.erase(trajectory.begin()+offset,trajectory.end());
 			}
-
+			
 			template<typename TargetType> void update_route_length()
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
@@ -402,7 +402,7 @@ namespace Movement_Plan_Components
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				route_length<float>(0.0);
 				typename _Trajectory_Container_Interface::iterator itr;
-				for (itr = trajectory.begin(); itr != trajectory.end(); itr++)
+				for (itr = trajectory.begin(); itr != trajectory.end()-1; itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data = (_Trajectory_Unit_Interface*)(*itr);
 					route_length<float&>() += vehicle_trajectory_data->template link<_Link_Interface*>()->template length<float>() / 5280.0;
@@ -561,17 +561,18 @@ namespace Movement_Plan_Components
 				typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(multimodal_trajectory_container)::value_type>::type>  Multimodal_Trajectory_Unit_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(multimodal_trajectory_container), Multimodal_Trajectory_Unit_Interface*> Multimodal_Trajectory_Container_Interface;
 
-				typedef  Link_Components::Prototypes::Link< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link)> Link_Interface;
+				typedef Link_Components::Prototypes::Link< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link)> Link_Interface;
 
-				typedef  Network_Components::Prototypes::Network< typename get_type_of(network) > Network_Interface;
+				typedef Network_Components::Prototypes::Network< typename get_type_of(network) > Network_Interface;
 
+				typedef typename Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) Transit_Vehicle_Trip_Interface;
 
 				Network_Interface* net = network<Network_Interface*>();
 
 
 				Multimodal_Trajectory_Container_Interface& trajectory = multimodal_trajectory_container<Multimodal_Trajectory_Container_Interface&>();
 				//trajectory.clear();
-				clear_trajectory();
+				clear_multimodal_trajectory();
 
 				typename std::deque<global_edge_id>::iterator itr;
 				typename std::deque<float>::iterator arrival_time_itr;
@@ -582,39 +583,102 @@ namespace Movement_Plan_Components
 					Multimodal_Trajectory_Unit_Interface* vehicle_trajectory_data = (Multimodal_Trajectory_Unit_Interface*)Allocate<typename Multimodal_Trajectory_Unit_Interface::Component_Type>();
 
 					Link_Interface* link = net->template get_link_ptr< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link) >(itr->edge_id);
-					//vehicle_trajectory_data->template Initialize<Link_Interface*>(link);
-
-					vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[0]);
-					vehicle_trajectory_data->template link_mode<Link_Components::Types::Link_Type_Keys>(out_type[other_itr]);
-					vehicle_trajectory_data->template transit_vehicle_trip<T*>(out_trip[other_itr]);
-					vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr]);
+					vehicle_trajectory_data->template Initialize<Link_Interface*>(link);
 					
-					if (other_itr != 0)
+					Link_Components::Types::Link_Type_Keys mode = out_type[other_itr];
+					vehicle_trajectory_data->template link_mode<Link_Components::Types::Link_Type_Keys>(mode);
+
+					Transit_Vehicle_Trip_Interface* trip = out_trip[other_itr];
+					vehicle_trajectory_data->template transit_vehicle_trip<Transit_Vehicle_Trip_Interface*>(trip);				
+					
+					vehicle_trajectory_data->template estimated_wait_count<int>(out_wait_count[other_itr]);
+					vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr]);
+					vehicle_trajectory_data->template estimated_transfer_penalty<float>(out_transfer_pen[other_itr]);
+
+					if (mode == Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
-						vehicle_trajectory_data->template estimated_link_accepting_time<int>(out_time[other_itr-1]);
+						vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr] - 1);
+						if (vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>() < 0)
+						{
+							assert(false);
+							cout << "Sequence cannot be less than 0 for a transit trip!" << endl;
+						}
+
 					}
 					else
 					{
-						vehicle_trajectory_data->template estimated_link_accepting_time<float>(0.0f);
+						vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr]);
+						if (vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>() != -1)
+						{
+							assert(false);
+							cout << "Sequence must be -1 for active modes!" << endl;
+						}
 					}
 
-					vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr]);
-					vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr]);
-					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr]);
-					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr]);
-					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr]);
-					vehicle_trajectory_data->template estimated_wait_count<int>(out_wait_count[other_itr]);
-					vehicle_trajectory_data->template estimated_transfer_penalty<float>(out_transfer_pen[other_itr]);
+					if (other_itr != 0)
+					{
+						vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[other_itr - 1]);
+						vehicle_trajectory_data->template estimated_link_accepting_time<float>(out_time[other_itr - 1]);
+						vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr - 1]);
+						vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr - 1]);
+						vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr - 1]);
+						vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr - 1]);	
+					}
+					else
+					{
+						vehicle_trajectory_data->template estimated_gen_cost<float>(0.0f);
+						vehicle_trajectory_data->template estimated_link_accepting_time<float>(0.0f);
+						vehicle_trajectory_data->template estimated_arrival_time<float>(departed_time<Time_Seconds>());
+						vehicle_trajectory_data->template estimated_walk_time<float>(0.0f);
+						vehicle_trajectory_data->template estimated_ivt_time<float>(0.0f);
+						vehicle_trajectory_data->template estimated_car_time<float>(0.0f);
+					}
 
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 
-				//number_of_switches<int>(0.0);
-				//update_route_length<NT>();
+				number_of_switches<int>(0.0);
+				update_multimodal_route_length<NT>();
 
 
 
 			}
+						
+			void clear_multimodal_trajectory()
+			{
+				typedef  Random_Access_Sequence< typename get_type_of(multimodal_trajectory_container)> Multimodal_Trajectory_Container_Interface;
+				typedef  Multimodal_Trajectory_Unit<get_component_type(Multimodal_Trajectory_Container_Interface)>  Multimodal_Trajectory_Unit_Interface;
+
+				Multimodal_Trajectory_Container_Interface& trajectory = multimodal_trajectory_container<Multimodal_Trajectory_Container_Interface&>();
+
+				// Free the allocated memory in the trajectory, if exists
+				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
+				{
+					Free<get_component_type(Multimodal_Trajectory_Container_Interface)>(*itr);
+				}
+				trajectory.clear();
+
+				typedef typename Multimodal_Trajectory_Container_Interface::Component_Type multimodal_trajectory_container_type;
+				multimodal_trajectory_container_type().swap((multimodal_trajectory_container_type&)trajectory);
+			}
+
+			template<typename TargetType> void update_multimodal_route_length()
+			{
+				typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+
+				typedef  Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+
+				_Multimodal_Trajectory_Container_Interface& trajectory = multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+				route_length<float>(0.0);
+				typename _Multimodal_Trajectory_Container_Interface::iterator itr;
+				for (itr = trajectory.begin(); itr != trajectory.end()-1; itr++)
+				{
+					_Multimodal_Trajectory_Unit_Interface* vehicle_trajectory_data = (_Multimodal_Trajectory_Unit_Interface*)(*itr);
+					route_length<float&>() += vehicle_trajectory_data->template link<_Link_Interface*>()->template length<float>() / 5280.0;
+				}
+			}
+			//TODO: Omer - Multimodal Trajectory END
 		};
 	}
 }

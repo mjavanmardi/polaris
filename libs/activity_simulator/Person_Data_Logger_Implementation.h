@@ -290,7 +290,7 @@ namespace Person_Components
 					/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
 					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
 					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;*/
-					set_multimodal_trajectory<TargetType>(move->template summary_string<std::string>());
+					write_multimodal_trajectory<TargetType>(move->template summary_string<std::string>());
 				}
 
 				if (!is_executed) return;
@@ -789,7 +789,7 @@ namespace Person_Components
 				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec,act_rec));
 			}
 
-			template<typename TargetType> void set_multimodal_trajectory(std::string& summary_string)
+			template<typename TargetType> void write_multimodal_trajectory(std::string& summary_string)
 			{
 				/*typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();

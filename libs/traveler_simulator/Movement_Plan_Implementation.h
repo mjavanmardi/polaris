@@ -72,7 +72,7 @@ namespace Movement_Plan_Components
 		template<typename TargetType>
 		void Multimodal_Trajectory_Unit_Implementation<MasterType, InheritanceList>::Initialize(TargetType link_val)
 		{
-			_link = (Null_Prototype<typename MasterType::link_type>*)(type_of(link)*)link_val;
+			_link = (Link_Components::Prototypes::Link<typename MasterType::link_type>*)(type_of(link)*)link_val;
 			_enter_time = 0.0;
 			_delayed_time = 0.0;
 			_intersection_delay_time = 0.0;
