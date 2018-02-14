@@ -100,6 +100,13 @@ namespace Prototypes
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event();
 
 		//========================================================
+		// Movement Functionality
+		//--------------------------------------------------------
+		//TODO: Omer Multimodal Movement
+		template<typename TargetType> void Do_Multimodal_Movement();
+		//--------------------------------------------------------
+
+		//========================================================
 		// Basic Forms
 		//--------------------------------------------------------
 		accessor(Parent_Person, NONE, NONE);
@@ -193,6 +200,13 @@ namespace Prototypes
 			response.next._sub_iteration = END;
 
 			pthis->Do_Movement<NT>();
+
+			//TODO: Omer: Multimodal
+			Vehicle_Components::Types::Vehicle_Type_Keys mode = movement->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+			if (((scenario_itf*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+			{
+				pthis->Do_Multimodal_Movement<NT>();
+			}
 
 			if (pthis->Artificial_Movement_Scheduled<bool>() == true)
 			{
@@ -1067,6 +1081,93 @@ namespace Prototypes
 		//((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,arrival_time,0);
 		//load_event(ComponentType,Movement_Conditional,Artificial_Arrival_Event,arrival_time,0,NULLTYPE);
 	}
+
+	//========================================================
+	// Movement Functionality
+	//--------------------------------------------------------
+	//TODO: Omer Multimodal Movement
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::Do_Multimodal_Movement()
+	{
+		// interfaces
+		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+		typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+		typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
+		typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+		typedef Link_Components::Prototypes::Link<get_component_type(links)>  link_itf;
+		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
+		typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+		typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
+
+		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
+		Routing_Itf* itf = person ->template router<Routing_Itf*>();
+		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+		network_itf* network = person->template network_reference<network_itf*>();
+		movement_itf* movements = this->Movement<movement_itf*>();
+		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
+
+		this->Is_Moving(true);
+
+		/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
+		//location_itf* orig = movements->template origin<location_itf*>();
+		//location_itf* dest = movements->template destination<location_itf*>();
+		//zone_itf* dest_zone = dest->template zone<zone_itf*>();
+		//Miles dist = dest->template distance<location_itf*,Miles>(orig);
+		//Miles max_walk_distance = 0;
+		//if (dest_zone->template areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
+		//else if (dest_zone->template areatype<int>() == 2) max_walk_distance = 0.75;	// Downtown
+		//else if (dest_zone->template areatype<int>() == 3) max_walk_distance = 0.33;		// Rest of chicago
+		//else if (dest_zone->template areatype<int>() >= 4 && dest_zone->template areatype<int>() >= 6) max_walk_distance = 0.33; // Suburban
+		//else if (dest_zone->template areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
+		//else max_walk_distance = 0.0;	
+		//if (dist <max_walk_distance) act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
+
+		// If no movement involved - i.e. different activity at same location, do automatic arrival
+		if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())
+		{
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+		else if (movements->template origin<link_itf*>() == movements->template destination<link_itf*>())
+		{
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point.....)
+		else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+		{
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+		// Schedule the routing if the vehicle is not already in the network, otherwise return false
+		else if (movements->template valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
+		{
+			// set the persons location to be the destination
+			person->template current_location<location_itf*>(movements->template destination<location_itf*>());
+
+			// if auto trip, push to network, if not skip (for now)
+			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			{
+				link_itf* origin_link = movements->template origin<link_itf*>();
+				origin_link->push_vehicle_from_origin(vehicle);
+			}
+			// for all other trips - do magic move and arrive at activity
+			else
+			{
+				this->Schedule_Artificial_Arrival_Event<NT>();
+			}
+		}
+		// else, if no valid trajectory, unschedule movement
+		else
+		{
+			THROW_WARNING("Warning: invalid movement trajectory specified.  Trip advanced to end-point without simulation.");
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+	}
+	//TODO: Omer END
 }
 
 }

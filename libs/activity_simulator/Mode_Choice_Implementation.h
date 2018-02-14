@@ -1039,7 +1039,7 @@ namespace Person_Components
 				if (selected == nullptr) { THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
 				else selected_mode = ((_Mode_Choice_Option_Interface*)selected)->template mode_type<ReturnType>();
 				
-				//TODO OMER: Delete when done
+				//TODO: Omer: Delete when done
 				if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 				{
 					char myLine[2000];
@@ -1217,7 +1217,7 @@ namespace Person_Components
 				else if (r < p_hov + p_walk + p_bike + p_bus) selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::BUS;
 				else selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS;
 
-				//TODO OMER: Delete when done
+				//TODO: Omer: Delete when done
 				if (selected_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 				{
 					char myLine[2000];

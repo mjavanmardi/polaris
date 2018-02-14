@@ -52,7 +52,7 @@ namespace Turn_Movement_Components
 			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
-			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 			//----------------------------------------------------------------------------------
 			m_container(std::vector<int>, vehicles_processed_by_entry_time, NONE, NONE);
 			m_container(std::vector<float>, turn_delay_by_entry_time, NONE, NONE);
@@ -241,7 +241,7 @@ namespace Turn_Movement_Components
 						
 				int num_transfer_vehicles_of_turn_movement = (int)transfer_flow_turn_movement;
 				transfer_flow_turn_movement = transfer_flow_turn_movement - num_transfer_vehicles_of_turn_movement;
-				//TODO OMER: Re-enable the condition later
+				//TODO: Omer: Re-enable the condition later
 				//if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					if(transfer_flow_turn_movement > 0.0)
@@ -297,7 +297,7 @@ namespace Turn_Movement_Components
 
 								// update vehicles currently being delayed by the signal
 								
-								//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+								//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 								//----------------------------------------------------------------------------------
 								int assignment_index = current_simulation_interval_index / ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 								_add_delay_by_entry_time[assignment_index] += ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
@@ -337,7 +337,7 @@ namespace Turn_Movement_Components
 					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
-					//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+					//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 					//----------------------------------------------------------------------------------
 					int assignment_index = enter_time / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()*((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
 					
@@ -388,7 +388,7 @@ namespace Turn_Movement_Components
 				}
 
 				//=========================================================================================================
-				//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
+				//TODO: Omer - we are removing the add signal penalty as it should already be accounted for from simulation
 				//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
 				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
 				if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0 && lnk->current_vehicle_queue<std::vector<typename MasterType::vehicle_type*>&>().size() == 0)
@@ -565,7 +565,7 @@ namespace Turn_Movement_Components
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.clear();
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.resize(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
 
-				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 				//----------------------------------------------------------------------------------
 				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
 
@@ -587,7 +587,7 @@ namespace Turn_Movement_Components
 
 				}
 
-				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 				//----------------------------------------------------------------------------------
 				for (j = 0; j < num_of_assignment_intervals_in_a_day; j++)
 				{
@@ -684,7 +684,7 @@ namespace Turn_Movement_Components
 				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->link_fftt<float>()/60.0f + movement_moe_data.turn_penalty);
 			}
 
-			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 			//----------------------------------------------------------------------------------
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link_end()
 			{

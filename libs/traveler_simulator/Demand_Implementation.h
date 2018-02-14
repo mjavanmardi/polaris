@@ -34,6 +34,9 @@ namespace Demand_Components
 
 			typedef typename MasterType::traveler_type traveler_type;
 
+			//TODO: Omer
+			typedef typename MasterType::person_type person_type;
+
 			template<typename TargetType> void Initialize()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;

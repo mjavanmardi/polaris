@@ -383,7 +383,7 @@ namespace Routing_Components
 				//==============================================================================
 				// ADD TURN MOEs
 				//------------------------------------------------------------------------------
-				//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 				//----------------------------------------------------------------------------------
 				//result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
 				result<TurnMOE_by_entry> turn_moe_result = db->template query<TurnMOE_by_entry>(query<TurnMOE_by_entry>::true_expr + "ORDER BY" + query<TurnMOE_by_entry>::start_time + "," + query<TurnMOE_by_entry>::turn_uid);

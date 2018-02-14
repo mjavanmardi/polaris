@@ -457,7 +457,7 @@ private:
 	float turn_flow_rate;
 };
 
-//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 //----------------------------------------------------------------------------------
 #pragma db object
 class TurnMOE_by_entry

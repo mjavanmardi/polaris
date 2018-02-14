@@ -81,7 +81,7 @@ namespace Turn_Movement_Components
 			accessor(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			accessor(outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
-			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 			//----------------------------------------------------------------------------------
 			accessor(vehicles_processed_by_entry_time, NONE, NONE);
 			accessor(turn_delay_by_entry_time, NONE, NONE);
@@ -161,7 +161,7 @@ namespace Turn_Movement_Components
 				this_component()->template calculate_moe_for_assignment_interval_from_inbound_link<TargetType>();
 			}
 
-			//TODO Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
 			//----------------------------------------------------------------------------------
 			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link_end()
 			{

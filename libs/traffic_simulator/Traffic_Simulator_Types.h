@@ -57,13 +57,13 @@ namespace Scenario_Components
 				PRETRIP_ROUTING_SUB_ITERATION,
 				ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION,
 				MOVEMENT_SUB_ITERATION,
-				//TODO OMER: Check if the increasing causes any issues
+				//TODO: Omer: Check if the increasing causes any issues
 				/*ACTIVITY_GENERATION_SUB_ITERATION=19,
 				ACTIVITY_PLANNING_SUB_ITERATION=20,
 				MOVEMENT_PLANNING_SUB_ITERATION=21*/
-				ACTIVITY_GENERATION_SUB_ITERATION = 21,
-				ACTIVITY_PLANNING_SUB_ITERATION = 22,
-				MOVEMENT_PLANNING_SUB_ITERATION = 23,
+				ACTIVITY_GENERATION_SUB_ITERATION = 22,
+				ACTIVITY_PLANNING_SUB_ITERATION = 23,
+				MOVEMENT_PLANNING_SUB_ITERATION = 24,
 				//-------------------------------------------------------
 			};
 			enum Transit_Sub_Iteration_keys

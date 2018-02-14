@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Traveler_Simulator_Includes.h"
+#include "Activity_Simulator_Includes.h"
 //#include "Link_Prototype.h"
 //#include "../File_IO/network_demand_data.h"
 
@@ -98,7 +99,13 @@ namespace Demand_Components
 				typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
 
 				typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
-				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
+
+				//TODO: Omer
+				typedef Person_Components::Prototypes::Person<typename ComponentType::person_type> _Person_Interface;
+
+				//TODO: Omer
+				//typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
+				typedef  Routing_Components::Prototypes::Routing< typename _Person_Interface::get_type_of(router) > _Routing_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 //				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
@@ -116,15 +123,19 @@ namespace Demand_Components
 
 				result<Trip> trip_result=db->template query<Trip>(query<Trip>::true_expr);
 				
-				
-				_Traveler_Interface* traveler;
+				//TODO: Omer
+				//_Traveler_Interface* traveler;
+				_Person_Interface* person;
+
 				_Vehicle_Interface* vehicle;
 
 				_Routing_Interface* router;
 //				_Plan_Interface* plan;
 				_Movement_Plan_Interface* movement_plan;
 				
-				int traveler_id_counter=-1;
+				//TODO: Omer
+				//int traveler_id_counter=-1;
+				int person_id_counter = -1;
 				
 				
 				dense_hash_map<int,_Activity_Location_Interface*> activity_id_to_ptr;
@@ -228,7 +239,10 @@ namespace Demand_Components
 
 					departed_time = departed_time - scenario->template simulation_start_time<int>();
 					
-					traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+					//TODO: Omer
+					//traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+					person = (_Person_Interface*)Allocate<typename ComponentType::person_type>();
+					
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
@@ -237,20 +251,30 @@ namespace Demand_Components
 					movement_plan->template network<_Network_Interface*>(network);
 					movement_plan->experienced_gap(db_itr->getGap());
 
-					vehicle->template uuid<int>(++traveler_id_counter);
-					vehicle->template internal_id<int>(traveler_id_counter);
+					//TODO: Omer
+					//vehicle->template uuid<int>(++traveler_id_counter);
+					vehicle->template uuid<int>(++person_id_counter);
+					//vehicle->template internal_id<int>(traveler_id_counter);
+					vehicle->template internal_id<int>(person_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
-					vehicle->template traveler<_Traveler_Interface*>(traveler);
+					//vehicle->template traveler<_Traveler_Interface*>(traveler);
+					vehicle->template traveler<_Person_Interface*>(person);
 					vehicle->template router<_Routing_Interface*>(router);
 					vehicle->template is_integrated<bool>(db_itr->getType());
 					vehicle->template vehicle_ptr< shared_ptr<polaris::io::Vehicle> >(db_itr->getVehicle());
-					vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), traveler_id_counter);
+					//vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), traveler_id_counter);
+					vehicle->initialize(*(this->vehicle_types_container<_Vehicle_Types_Container_Interface*>()->begin()), person_id_counter);
 					vehicle->is_integrated(false);
 
-					traveler->template uuid<int>(traveler_id_counter);
-					traveler->template internal_id<int>(traveler_id_counter);
-					traveler->template router<_Routing_Interface*>(router);
-					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+					//TODO: Omer
+					//traveler->template uuid<int>(traveler_id_counter);
+					//traveler->template internal_id<int>(traveler_id_counter);
+					//traveler->template router<_Routing_Interface*>(router);
+					//traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+					person->template uuid<int>(person_id_counter);
+					person->template internal_id<int>(person_id_counter);
+					person->template router<_Routing_Interface*>(router);
+					person->template vehicle<_Vehicle_Interface*>(vehicle);
 
 					//TODO:ROUTING_OPERATION
 					//router->template traveler<_Traveler_Interface*>(traveler);
@@ -279,7 +303,9 @@ namespace Demand_Components
 
 					router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
-					traveler->Schedule_New_Departure(departed_time);
+					//TODO: Omer
+					//traveler->Schedule_New_Departure(departed_time);
+					//person->Do_movement();
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
