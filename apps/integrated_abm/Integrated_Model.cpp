@@ -35,8 +35,9 @@
 #include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
-//TODO OMER: Delete when done
+//TODO: OMER: Delete when done
 static File_IO::File_Writer fw_bus_mode;
+static File_IO::File_Writer fw_transit_vehicle_trajectory;
 
 struct MasterType
 {
@@ -117,6 +118,9 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
+	//TODO: Omer - Multimodal Trajectory
+	typedef Movement_Plan_Components::Implementations::Multimodal_Trajectory_Unit_Implementation<M> multimodal_trajectory_unit_type;
+	//TODO: Omer - Multimodal Trajectory END
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Value_Implementation<M> los_value_type;
 	typedef Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<M> los_invariant_value_type;
@@ -512,7 +516,7 @@ int main(int argc,char** argv)
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename.c_str());
 
 
-	//TODO OMER: Delete when done
+	//TODO: OMER: Delete when done
 	stringstream bus_mode_title("");
 	bus_mode_title << "Source\twalkThreshold_init\twalk_distance_to_transit\tOrigin\tDestination\tDeparture_Time\tMode\n";
 	stringstream bus_mode_filename("");
@@ -521,6 +525,11 @@ int main(int argc,char** argv)
 	fw_bus_mode.Open(bus_mode_filename.str());
 	fw_bus_mode.Write_NoDelim(bus_mode_title);
 
+	//TODO: OMER: Delete when done
+	stringstream transit_trip_filename("");
+	transit_trip_filename << scenario->template output_dir_name<string>();
+	transit_trip_filename << "transit_vehicle_trajectory.dat";
+	fw_transit_vehicle_trajectory.Open(transit_trip_filename.str());
 
 	//==================================================================================================================================
 	// Initialize global randon number generators - if seed set to zero or left blank use system time

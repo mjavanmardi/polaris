@@ -39,6 +39,45 @@ namespace Movement_Plan_Components
 			_intersection_delay_time = 0.0;
 		}
 
+		//TODO: Omer - Multimodal Trajectory
+		implementation struct Multimodal_Trajectory_Unit_Implementation :public Polaris_Component<MasterType, INHERIT(Multimodal_Trajectory_Unit_Implementation), Data_Object>
+		{
+			m_data(int, delayed_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, enter_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, enter_interval_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_link_accepting_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, intersection_delay_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
+			m_prototype(Link_Components::Prototypes::Link, typename MasterType::link_type, link, NONE, NONE);
+
+			template<typename TargetType> void Initialize(TargetType link_val);
+
+
+
+			m_data(float, estimated_gen_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(Link_Components::Types::Link_Type_Keys, link_mode, NONE, NONE);
+			m_prototype(Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip, typename MasterType::transit_vehicle_trip_type, transit_vehicle_trip, NONE, NONE);
+			m_data(int, transit_vehicle_stop_sequence, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_arrival_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_wait_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_walk_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_ivt_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_car_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, estimated_wait_count, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_transfer_penalty, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
+		};
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Multimodal_Trajectory_Unit_Implementation<MasterType, InheritanceList>::Initialize(TargetType link_val)
+		{
+			_link = (Link_Components::Prototypes::Link<typename MasterType::link_type>*)(type_of(link)*)link_val;
+			_enter_time = 0.0;
+			_delayed_time = 0.0;
+			_intersection_delay_time = 0.0;
+		}
+		//TODO: Omer - Multimodal Trajectory END
 
 		//=====================================================================
 		// BASIC MOVEMENT PLAN
@@ -58,6 +97,11 @@ namespace Movement_Plan_Components
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(std::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
 			
+			//TODO: Omer - Multimodal Trajectory
+			typedef Implementations::Multimodal_Trajectory_Unit_Implementation<MasterType> multimodal_trajectory_unit_type;
+			m_container(std::vector<multimodal_trajectory_unit_type*>, multimodal_trajectory_container, NONE, NONE);
+			//TODO: Omer - Multimodal Trajectory END
+
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------

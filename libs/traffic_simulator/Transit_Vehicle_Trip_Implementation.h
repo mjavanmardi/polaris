@@ -25,41 +25,306 @@ namespace Transit_Vehicle_Trip_Components
 
 		implementation struct Transit_Vehicle_Trip_Implementation :public Polaris_Component<MasterType, INHERIT(Transit_Vehicle_Trip_Implementation), Execution_Object>
 		{
-			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Vehicle_Trip_Implementation), Data_Object>::Component_Type ComponentType;
+			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Vehicle_Trip_Implementation), Execution_Object>::Component_Type ComponentType;
 
 			typedef Person_Components::Prototypes::Person<typename MasterType::person_type> _Person_Interface;
+			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
+			
 
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(std::string, dbid, NONE, NONE);
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, direction, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_prototype(Transit_Pattern_Components::Prototypes::Transit_Pattern, typename MasterType::transit_pattern_type, pattern, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, network_reference, NONE, NONE);
 			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
 			m_container(std::vector<int>, departure_seconds, NONE, NONE);
-
+			m_data(int, number_of_stops, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			
+			//Simulation related
 			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
+			m_data(int, current_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			//----------------------------------------------------------------------
 
-			template<typename TargetType> void initialize();
-			template<typename TargetType> void advance();
-			template<typename TargetType> void load();
-			template<typename TargetType> void transfer_to_link(TargetType link);
-			template<typename TargetType> void unload();
-			template<typename TargetType> void clear_trajectory();
-			template<typename TargetType> void move_to_next_link();
-			template<typename TargetType> void move_to_origin_link();
+			typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename type_of(network_reference)::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
+			typedef  Random_Access_Sequence< typename type_of(network_reference)::get_type_of(intersections_container), _Intersection_Interface*> _Intersections_Container_Interface;
+
+			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_stops) _Pattern_Stops_Container_Interface;
+			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
+			
+			
+
+			template<typename TargetType> void schdeule_vehicle_movements_in_transit_network(void* network)
+			{
+				_network_reference = (network_reference_type)network;				
+
+				this->template current_position<int>((int)0);
+
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
+
+				this->template Load_Event<ComponentType>(&ComponentType::move_transit_vehicles_in_transit_network_conditional, arrival_time, Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION);
+			}
+
+			static void move_transit_vehicles_in_transit_network_conditional(ComponentType* _this, Event_Response& response) 
+			{
+				if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION)
+				{
+					_this->transit_vehicle_arriving();
+					response.next._iteration = iteration();
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ALIGHTING_SUBITERATION;					
+				}
+				
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ALIGHTING_SUBITERATION)
+				{
+					_this->alight_travelers();
+					
+					int position = _this->template current_position<int>();
+					int number_of_links = _this->template number_of_stops<int>() - 1;
+
+					if (position < number_of_links)
+					{
+						response.next._iteration = iteration();
+						response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_SEATING_SUBITERTION;
+					}
+					else
+					{
+						response.next._iteration = iteration();
+						response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION;
+					}
+				}
+				
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_SEATING_SUBITERTION)
+				{
+					_this->rearrange_seats();
+					response.next._iteration = iteration();
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION;
+				}
+				
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
+				{
+					_this->board_travelers();
+					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
+						;
+				}
+				
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
+					)
+				{
+					_this->transit_vehicle_departing();
+					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION;
+				}
+				
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION
+					)
+				{
+					_this->transit_vehicle_depot();
+					response.next._iteration = END;
+				}
+
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in transit vehicle conditional!" << endl;
+				}
+			}
+
+			void transit_vehicle_arriving()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+
+				if (position < pattern_links.size())
+				{
+					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);			
+					std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+					trajectory_stream << "At position:\t" << position << "\t";
+					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
+					trajectory_stream << "0\tI arrived" << endl;
+				}
+				else
+				{
+					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position - 1]);
+					std::string stop_ID = pattern_link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+					trajectory_stream << "At position:\t" << position << "\t";
+					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
+					trajectory_stream << "0\tI arrived" << endl;
+				}
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
+			void alight_travelers()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+
+
+				if (position < pattern_links.size())
+				{
+					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
+					std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+					trajectory_stream << "At position:\t" << position << "\t";
+					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
+					trajectory_stream << "1\tI am alighting some travelers" << endl;
+				}
+				else
+				{
+					_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position - 1]);
+					std::string stop_ID = pattern_link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+					trajectory_stream << "At position:\t" << position << "\t";
+					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
+					trajectory_stream << "1\tI am alighting all remaining travelers" << endl;
+				}
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
+			void rearrange_seats()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+
+				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
+				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+				trajectory_stream << "At position:\t" << position << "\t";
+				trajectory_stream << "Time is:\t" << arrival_time << "\t";
+				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
+				trajectory_stream << "2\tI am re-arranging seats" << endl;
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
+			void board_travelers()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+
+				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
+				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+				trajectory_stream << "At position:\t" << position << "\t";
+				trajectory_stream << "Time is:\t" << arrival_time << "\t";
+				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
+				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
+
+				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
+				this->template Next_Logging_Time<Simulation_Timestep_Increment>(departure_time);
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
+			void transit_vehicle_departing()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
+
+				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
+				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+				trajectory_stream << "At position:\t" << position << "\t";
+				trajectory_stream << "Time is:\t" << departure_time << "\t";
+				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
+				trajectory_stream << "4\tI am moving to my next stop" << endl;
+
+				position++;
+				this->template current_position<int>(position);
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+				this->template Next_Logging_Time<Simulation_Timestep_Increment>(arrival_time);
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
+			void transit_vehicle_depot()
+			{
+				stringstream trajectory_stream;
+
+				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				std::string pattern_ID = pattern->template dbid<std::string>();
+				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				std::string trip_ID = this->template dbid<std::string>();
+				int position = this->template current_position<int>();
+				int depature_time = this->template departure_seconds<std::vector<int>>()[position];
+				
+				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position - 1]);
+				std::string stop_ID = pattern_link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
+				trajectory_stream << "At position:\t" << position << "\t";
+				trajectory_stream << "Time is:\t" << depature_time << "\t";
+				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
+				trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
+				trajectory_stream << "5\tI am going to my depot" << endl;
+
+				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
+
 		};
 
-		template<typename MasterType, typename InheritanceList>
-		template<typename TargetType>
-		void Transit_Vehicle_Trip_Implementation<MasterType, InheritanceList>::initialize()
-		{
-		}
-
-		template<typename MasterType, typename InheritanceList>
-		template<typename TargetType>
-		void Transit_Vehicle_Trip_Implementation<MasterType, InheritanceList>::load()
-		{
-		}
 	}
 }
 

@@ -305,6 +305,9 @@ namespace Network_Components
 						}
 					}
 
+					int number_of_stops = transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().size();
+					transit_pattern->template number_of_stops<int>(number_of_stops);
+
 					net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()] = transit_pattern;
 					transit_patterns_container_ptr->push_back(transit_pattern);
 					//DO the stop sequence!
@@ -386,8 +389,11 @@ namespace Network_Components
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
+					int number_of_stops = transit_vehicle_trip->template departure_seconds<std::vector<int>&>().size();
+					transit_vehicle_trip->template number_of_stops<int>(number_of_stops);
+
 					if (transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().size() ||
-						transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size()
+						transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size() || transit_vehicle_trip->template number_of_stops<int>() != transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>()->template number_of_stops<int>()
 						)
 					{
 						cout << "Inconsistency between at least two of the following:" << endl;

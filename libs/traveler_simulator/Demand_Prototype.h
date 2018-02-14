@@ -167,7 +167,7 @@ namespace Demand_Components
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
-					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					//if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
 						
 
@@ -264,6 +264,9 @@ namespace Demand_Components
 					_Activity_Location_Interface* destination_location = destination_activity_location;
 					movement_plan->template origin<_Activity_Location_Interface*>(origin_location);
 					movement_plan->template destination<_Activity_Location_Interface*>(destination_location);
+
+					//Vehicle_Components::Types::Vehicle_Type_Keys myMode = mode_id;
+					movement_plan->template mode<int>(mode_id);
 
 					_Zone_Interface* origin_zone = origin_location->template zone<_Zone_Interface*>();
 					_Zone_Interface* destination_zone = destination_location->template zone<_Zone_Interface*>();

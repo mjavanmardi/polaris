@@ -49,6 +49,7 @@ namespace Routing_Components
 			}
 
 			//TODO: Remove when done testing routing execution time
+			template<typename T>
 			float compute_multimodal_network_path(
 				std::vector<unsigned int>& origins,
 				std::vector<unsigned int>& destinations,
@@ -57,7 +58,7 @@ namespace Routing_Components
 				std::deque<global_edge_id>& path_container,
 				std::deque<float>& cost_container,
 				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
-				std::deque<int>& out_trip,
+				T& out_trip,
 				std::deque<int>& out_seq,
 				std::deque<float>& out_time,
 				std::deque<float>& out_arr_time,
