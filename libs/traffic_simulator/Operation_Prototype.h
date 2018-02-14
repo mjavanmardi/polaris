@@ -518,68 +518,108 @@ namespace Operation_Components
 				counter=0;
 				cout << skipped << endl;
 
-				//cout << "Reading Signs" << endl;
-
-				//result<Sign> sign_result=db->template query<Sign>(query<Sign>::true_expr);
-
-				//for(result<Sign>::iterator db_itr=sign_result.begin();db_itr!=sign_result.end();++db_itr)
-				//{
-				//	if(++counter%1000==0) cout << "\t" << counter << endl;
-
-				//	link_id_dir.id=db_itr->getLink()->getLink();
-				//	link_id_dir.dir=db_itr->getDir();
-
-				//	if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir)){ continue;}
 
 
-				//	_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template downstream_intersection<_Intersection_Interface*>();
+				cout << "Reading Signs" << endl;
 
-				//	_Intersection_Control_Interface* intersection_control;
-				//	
-				//	if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
-				//	{
-				//		intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
+				vector<_Intersection_Interface*> intersections_with_signs; // temp storage for intersections with signs to determine final sign type (4-way vs. 2-way)
+				unordered_map<int, int> intersection_approaches_with_signs;
 
-				//		intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
+				result<Sign> sign_result=db->template query<Sign>(query<Sign>::true_expr);
 
-				//		_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
-				//		
-				//		control_plan->template starting_time<int>(0.0);
-				//		control_plan->template ending_time<int>(USHRT_MAX);
-				//		
-				//		control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
-				//		control_plan->template cycle_starting_time<int>(0.0);
-				//		control_plan->template cycle_ending_time<int>(0.0);
-				//		control_plan->template cycle_leftover_time<int>(0.0);
-				//		control_plan->template cycle_index<int>(0.0);
-				//		control_plan->template control_plan_index<int>(0.0);
+				for(result<Sign>::iterator db_itr=sign_result.begin();db_itr!=sign_result.end();++db_itr)
+				{
+					if(++counter%1000==0) cout << "\t" << counter << endl;
 
-				//		intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+					link_id_dir.id=db_itr->getLink()->getLink();
+					link_id_dir.dir=db_itr->getDir();
 
-				//		
-				//		_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+					if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir)){ continue;}
 
-				//		typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
+					_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template downstream_intersection<_Intersection_Interface*>();
+					_Intersection_Control_Interface* intersection_control;
 
-				//		for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
-				//		{
-				//			_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
-				//			_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
+					intersection->template intersection_type<Intersection_Control_Components::Types::Intersection_Type_Keys>(ALL_WAY_STOP_SIGN);
 
-				//			_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
+					// log this interesection in the signs list
+					unordered_map<int, int>::iterator sign_itr;
+					if ((sign_itr = intersection_approaches_with_signs.find(intersection->uuid<int>())) == intersection_approaches_with_signs.end())
+					{
+						intersection_approaches_with_signs.insert(pair<int, int>(intersection->uuid<int>(), 1));
+						intersections_with_signs.push_back(intersection);
+					}
+					else
+					{
+						sign_itr->second++;
+					}
 
-				//			approach->template inbound_link<_Link_Interface*>(link);
-				//			approach->template green_cycle_ratio<int>(0.0);
+					
+					if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
+					{
+						intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
 
-				//			link->template approach<_Approach_Interface*>(approach);
+						intersection_control->template intersection<_Intersection_Interface*>(intersection);
+						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 
-				//			control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
-				//		}
-				//	}
+						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
+						
+						control_plan->template starting_time<int>(0.0);
+						control_plan->template ending_time<int>(END);
+						
+						control_plan->template control_type<int>(Intersection_Control_Components::Types::Intersection_Type_Keys::ALL_WAY_STOP_SIGN);
+						control_plan->template cycle_starting_time<int>(0.0);
+						control_plan->template cycle_ending_time<int>(0.0);
+						control_plan->template cycle_leftover_time<int>(0.0);
+						control_plan->template cycle_index<int>(0.0);
+						control_plan->template control_plan_index<int>(0.0);
 
-				//}
+						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
+
+						
+						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+
+						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
+
+						for(inbound_itr=inbound_outbound_container.begin();inbound_itr!=inbound_outbound_container.end();inbound_itr++)
+						{
+							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
+							_Inbound_Outbound_Interface* inbound_outbound = (_Inbound_Outbound_Interface*)(*inbound_itr);
+
+							_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
+
+							approach->template inbound_link<_Link_Interface*>(link);
+							approach->template green_cycle_ratio<int>(0.0);
+
+							link->template approach<_Approach_Interface*>(approach);
+
+							control_plan->template approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
+						}
+					}
+
+				}
+
+				// check each signed intersection to determine if it is a 2-way or 4-way stop
+				for (vector<_Intersection_Interface*>::iterator itr = intersections_with_signs.begin(); itr != intersections_with_signs.end(); ++itr)
+				{
+					_Intersection_Interface* intersection = *itr;
+
+					// if not all approaches have a sign, change to 2-way stop
+					unordered_map<int, int>::iterator approach_itr = intersection_approaches_with_signs.find(intersection->uuid<int>());
+					if (approach_itr->second != intersection->inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>().size())
+					{
+						intersection->template intersection_type<Intersection_Control_Components::Types::Intersection_Type_Keys>(TWO_WAY_STOP_SIGN);
+						_Intersection_Control_Interface* intersection_control	= intersection->intersection_control<_Intersection_Control_Interface*>();
+						_Control_Plans_Container_Interface& control_plans		= intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>();
+						for (_Control_Plans_Container_Interface::iterator c_itr = control_plans.begin(); c_itr != control_plans.end(); ++c_itr)
+						{
+							(*c_itr)->control_type(Intersection_Control_Components::Types::Intersection_Type_Keys::TWO_WAY_STOP_SIGN);
+						}
+					}
+				}
 				
 				counter=0;
+
+
 
 				cout << "Filling All Unreferenced Intersections With 4 Way Stops" << endl;
 

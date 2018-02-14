@@ -95,7 +95,7 @@ namespace Intersection_Control_Components
 
 		implementation struct Intersection_Control_Implementation:public Polaris_Component<MasterType,INHERIT(Intersection_Control_Implementation),Execution_Object>
 		{
-			m_prototype(Null_Prototype,typename MasterType::intersection_type, intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection,typename MasterType::intersection_type, intersection, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::control_plan_type, current_control_plan, NONE, NONE);
 			m_container(std::vector<typename MasterType::control_plan_type*>, control_plan_data_array, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
