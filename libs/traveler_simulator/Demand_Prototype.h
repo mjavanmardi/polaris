@@ -97,11 +97,11 @@ namespace Demand_Components
 
 				typedef  Vehicle_Components::Prototypes::Vehicle_Characteristics<typename remove_pointer< typename get_type_of(vehicle_types_container)::value_type>::type>  _Vehicle_Type_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(vehicle_types_container), _Vehicle_Type_Interface*> _Vehicle_Types_Container_Interface;
-
-				typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
-
+				
 				//TODO: Omer
+				//typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
 				typedef Person_Components::Prototypes::Person<typename ComponentType::person_type> _Person_Interface;
+				typedef Person_Components::Prototypes::Person_Mover< typename _Person_Interface::get_type_of(Moving_Faculty)> _Movement_Faculty_Interface;
 
 				//TODO: Omer
 				//typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
@@ -126,6 +126,7 @@ namespace Demand_Components
 				//TODO: Omer
 				//_Traveler_Interface* traveler;
 				_Person_Interface* person;
+				_Movement_Faculty_Interface* movement_faculty;
 
 				_Vehicle_Interface* vehicle;
 
@@ -242,6 +243,7 @@ namespace Demand_Components
 					//TODO: Omer
 					//traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					person = (_Person_Interface*)Allocate<typename ComponentType::person_type>();
+					movement_faculty = (_Movement_Faculty_Interface*)Allocate<typename _Person_Interface::get_type_of(Moving_Faculty)>();
 					
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 
@@ -304,6 +306,12 @@ namespace Demand_Components
 					router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
 					//TODO: Omer
+					person->template Moving_Faculty<_Movement_Faculty_Interface*>(movement_faculty);
+					movement_faculty->template Parent_Person<_Person_Interface*>(person);
+					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
+					//person->template Moving_Faculty<typename _Person_Interface::get_type_of(Moving_Faculty)>(movement_faculty);
+
+
 					//traveler->Schedule_New_Departure(departed_time);
 					//person->Do_movement();
 

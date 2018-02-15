@@ -706,13 +706,23 @@ namespace Prototypes
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
-		// Skip routing if the mode is not SOV (remove when transit router is developed - 6/14/17 - Testing multimodal router developmen so commenting out this line below
-		movements->mode(act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
-		//if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
 
-		//=================================================
-		// Do routing at the next timestep for the movement
-		planner->template Schedule_New_Routing<movement_itf*>(iteration() + 1, movements);
+		//TODO: Omer - Everthing is put under if condition to enable routing from demand table
+		if (act != nullptr && planner != nullptr)
+		{
+			// Skip routing if the mode is not SOV (remove when transit router is developed - 6/14/17 - Testing multimodal router developmen so commenting out this line below
+			movements->mode(act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+			//if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
+
+			//=================================================
+			// Do routing at the next timestep for the movement
+			planner->template Schedule_New_Routing<movement_itf*>(iteration() + 1, movements);
+		}
+		else
+		{
+			Routing_Itf* router = person->template router<Routing_Itf*>();
+			router->Schedule_Route_Computation(movements->template departed_time<Simulation_Timestep_Increment>());
+		}
 	}
 
 	//========================================================
