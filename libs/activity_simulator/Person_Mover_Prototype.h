@@ -72,11 +72,10 @@ namespace Prototypes
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event();
 
-		//========================================================
-		// Movement Functionality
-		//--------------------------------------------------------
+		
 		//TODO: Omer Multimodal Movement
 		template<typename TargetType> void Do_Multimodal_Movement();
+		template<typename TargetType> void schdeule_person_movements_in_multimodal_network();
 		//--------------------------------------------------------
 
 		//========================================================
@@ -1096,26 +1095,11 @@ namespace Prototypes
 		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
-		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 		network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
 		this->Is_Moving(true);
-
-		/// CHECK IF THE TRIP CAN SUBSTITUTE WALK MODE FOR SOV BASED ON DISTANCE
-		//location_itf* orig = movements->template origin<location_itf*>();
-		//location_itf* dest = movements->template destination<location_itf*>();
-		//zone_itf* dest_zone = dest->template zone<zone_itf*>();
-		//Miles dist = dest->template distance<location_itf*,Miles>(orig);
-		//Miles max_walk_distance = 0;
-		//if (dest_zone->template areatype<int>() == 1) max_walk_distance = 1.0;			// CBD
-		//else if (dest_zone->template areatype<int>() == 2) max_walk_distance = 0.75;	// Downtown
-		//else if (dest_zone->template areatype<int>() == 3) max_walk_distance = 0.33;		// Rest of chicago
-		//else if (dest_zone->template areatype<int>() >= 4 && dest_zone->template areatype<int>() >= 6) max_walk_distance = 0.33; // Suburban
-		//else if (dest_zone->template areatype<int>() == 7) max_walk_distance = 0.2;	// Exurb
-		//else max_walk_distance = 0.0;	
-		//if (dist <max_walk_distance) act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::WALK);
 
 		// If no movement involved - i.e. different activity at same location, do automatic arrival
 		if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())
@@ -1127,22 +1111,9 @@ namespace Prototypes
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
 		// Schedule the routing if the vehicle is not already in the network, otherwise return false
-		else if (movements->template valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
+		else if (movements->template valid_trajectory<bool>() && (person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::UNLOADED || person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::OUT_NETWORK))
 		{
-			// set the persons location to be the destination
-			person->template current_location<location_itf*>(movements->template destination<location_itf*>());
-
-			// if auto trip, push to network, if not skip (for now)
-			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
-			{
-				link_itf* origin_link = movements->template origin<link_itf*>();
-				origin_link->push_vehicle_from_origin(vehicle);
-			}
-			// for all other trips - do magic move and arrive at activity
-			else
-			{
-				this->Schedule_Artificial_Arrival_Event<NT>();
-			}
+			//this->schdeule_person_movements_in_multimodal_network();
 		}
 		// else, if no valid trajectory, unschedule movement
 		else
@@ -1150,6 +1121,17 @@ namespace Prototypes
 			THROW_WARNING("Warning: invalid movement trajectory specified.  Trip advanced to end-point without simulation.");
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void  Person_Mover<ComponentType>::schdeule_person_movements_in_multimodal_network()
+	{
+		this->template current_position<int>((int)0);
+
+		int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
+
+		this->template Load_Event<ComponentType>(&ComponentType::move_transit_vehicles_in_transit_network_conditional, arrival_time, Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION);
 	}
 	//TODO: Omer END
 }

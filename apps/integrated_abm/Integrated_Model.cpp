@@ -115,6 +115,7 @@ struct MasterType
 
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Integrated_Movement_Plan_Implementation<M> integrated_movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Multimodal_Movement_Plan_Implementation<M> multimodal_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;

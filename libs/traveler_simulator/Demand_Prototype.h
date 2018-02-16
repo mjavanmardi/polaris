@@ -179,7 +179,7 @@ namespace Demand_Components
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
-					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					//if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
 						
 
@@ -303,6 +303,7 @@ namespace Demand_Components
 
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
+					//movement_plan->template initialize_multimodal_trajectory<NULLTYPE>();
 
 					router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
@@ -310,9 +311,6 @@ namespace Demand_Components
 					person->template Moving_Faculty<_Movement_Faculty_Interface*>(movement_faculty);
 					movement_faculty->template Parent_Person<_Person_Interface*>(person);
 					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
-					//person->template Moving_Faculty<typename _Person_Interface::get_type_of(Moving_Faculty)>(movement_faculty);
-
-
 					//traveler->Schedule_New_Departure(departed_time);
 					//person->Do_movement();
 
