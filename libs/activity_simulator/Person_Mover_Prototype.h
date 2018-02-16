@@ -3,7 +3,8 @@
 #include "Activity_Simulator_Includes.h"
 //#include "traffic_simulator\Network_Event_Prototype.h"
 
-
+namespace Person_Components
+{
 namespace Prototypes
 {
 	prototype struct Person_Mover ADD_DEBUG_INFO
@@ -727,9 +728,10 @@ namespace Prototypes
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
 		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
-		network_itf* network = person->template network_reference<network_itf*>();
+		//network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
+		Vehicle_Components::Types::Vehicle_Type_Keys mode = movements->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 		this->Is_Moving(true);
 
@@ -757,7 +759,7 @@ namespace Prototypes
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
 		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point.....)
-		else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+		else if (mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
@@ -768,7 +770,7 @@ namespace Prototypes
 			person->template current_location<location_itf*>(movements->template destination<location_itf*>());
 
 			// if auto trip, push to network, if not skip (for now)
-			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 			{
 				link_itf* origin_link = movements->template origin<link_itf*>();
 				origin_link->push_vehicle_from_origin(vehicle);
@@ -1151,5 +1153,4 @@ namespace Prototypes
 	}
 	//TODO: Omer END
 }
-
 }

@@ -179,7 +179,7 @@ namespace Demand_Components
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
-					//if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
 						
 
@@ -220,7 +220,7 @@ namespace Demand_Components
 					_Activity_Location_Interface* destination_activity_location = activity_id_to_ptr[dst_key];
 					_Link_Interface* origin_link = origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
 					_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
-					if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
+					if (origin_link->template dbid<int>() == destination_link->template dbid<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
 						// No path can be found. Discard the trip
 						continue;
@@ -277,7 +277,7 @@ namespace Demand_Components
 					person->template internal_id<int>(person_id_counter);
 					person->template router<_Routing_Interface*>(router);
 					person->template vehicle<_Vehicle_Interface*>(vehicle);
-					person->template network_reference<_Network_Interface*>(network);
+					//person->template network_reference<_Network_Interface*>(network);
 
 					//TODO:ROUTING_OPERATION
 					//router->template traveler<_Traveler_Interface*>(traveler);
