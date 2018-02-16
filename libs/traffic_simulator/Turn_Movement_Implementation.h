@@ -391,7 +391,7 @@ namespace Turn_Movement_Components
 				//TODO OMER - we are removing the add signal penalty as it should already be accounted for from simulation
 				//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
 				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
-				if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0 && lnk->current_vehicle_queue<std::vector<typename MasterType::vehicle_type*>&>().size() == 0)
+				if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0 && _movement_demand == 0)
 				{				
 					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
 					_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
@@ -435,16 +435,14 @@ namespace Turn_Movement_Components
 				//==============================================================================================================
 				// UPDATE THE ASSIGNMENT INTERVAL TRAVEL DELAY
 				//TODO: Check - JA, 01/25/18 restored the update to only occur on assignment intervals.....
-				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
-				{	
-					float turn_travel_penalty = 0.0;
-					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
-					_turn_travel_penalty = turn_travel_penalty;
+				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				//{	
+					_turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 
 					
 					//==============================================================================================================
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);
-				}
+				//}
 			}
 
             template<typename TargetType> void add_signal_penalty()
@@ -502,12 +500,24 @@ namespace Turn_Movement_Components
                     signal_control_penalty = max(8.0f, Du + Di);
 					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
                 }
-                _turn_travel_penalty += signal_control_penalty;
+
+				//TODO: JA - 18-2-15: add the additional turn penalty from the signal to the experienced travel time (this is only called when no cars have experienced the turn movement, so it will always be 0 before adding the penalty
+				//_turn_travel_penalty += signal_control_penalty;
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += signal_control_penalty;
 
             }
 
 			template<typename TargetType> void add_sign_penalty()
 			{
+				typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Intersection_Control_Components::Prototypes::Intersection_Control<_Intersection_Interface::get_type_of(intersection_control)> _Intersection_Control_Interface;
+				typedef Intersection_Control_Components::Prototypes::Control_Plan<_Intersection_Control_Interface::get_type_of(current_control_plan)> _Interscetion_Control_Plan_Interface;
+
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+				_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+				_Intersection_Control_Interface* signal = itx->intersection_control<_Intersection_Control_Interface*>();
+				_Interscetion_Control_Plan_Interface* signal_control_plan = signal->current_control_plan<_Interscetion_Control_Plan_Interface*>();
+
 				int outbound_link_type = ((_Link_Interface*)_outbound_link)->template link_type<int>();
 				int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
 				bool eligible_for_signal_penalty = false;
@@ -534,10 +544,28 @@ namespace Turn_Movement_Components
 				}
 				else
 				{
-					signal_control_penalty = 6.0f;
-				}
-				_turn_travel_penalty += signal_control_penalty;
+					//float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+					float vc = ((typename MasterType::link_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
 
+					//float vc = 1.0f;
+
+
+					float cycle = signal_control_plan->cycle_length<int>(); // 75 seconds
+
+																			/*if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
+																			else green=30;*/
+
+					float Du = 6.8 * vc - 0.39 * _green_time + 0.35 * cycle - 4.5;
+					Du = max(Du, 0.0f);
+					float Di = 2.7 * pow(vc, 8) - 7.3 * (_green_time / cycle) + 3.4;
+					Di = max(Di, 0.0f);
+					signal_control_penalty = max(8.0f, Du + Di);
+					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
+				}
+
+				//TODO: JA - 18-2-15: add the additional turn penalty from the signal to the experienced travel time (this is only called when no cars have experienced the turn movement, so it will always be 0 before adding the penalty
+				//_turn_travel_penalty += signal_control_penalty;
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += signal_control_penalty;
 			}
 
 

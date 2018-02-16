@@ -10,14 +10,7 @@
 
 namespace Person_Components
 {
-	namespace Types
-	{
-	}
 
-	namespace Concepts
-	{
-	}
-	
 	namespace Prototypes
 	{
 		prototype struct Activity_Generator ADD_DEBUG_INFO

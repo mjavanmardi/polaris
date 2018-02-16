@@ -4,34 +4,6 @@
 //#include "traffic_simulator\Network_Event_Prototype.h"
 
 
-
-namespace Person_Components
-{
-
-namespace Concepts
-{
-	concept struct Is_Person_Mover_Prototype
-	{
-		check_component_accessor_name(Has_Parent_Person,Parent_Person);
-		// TODO: Movement needs to be renamed, conflicts with the template Movement
-		//check_component_accessor_name(Has_Movement, Movement);
-		define_default_check(Has_Parent_Person/* && Has_Movement*/);
-	};
-	concept struct Is_Person_Mover
-	{
-		check_accessor_name(Has_Parent_Person,Parent_Person);
-		// TODO: Movement needs to be renamed, conflicts with the template Movement
-		//check_accessor_name(Has_Movement, Movement);
-		check_concept(is_prototype, Is_Person_Mover_Prototype, T, V);
-		define_default_check(is_prototype || (Has_Parent_Person/* && Has_Movement*/) );
-	};
-}
-
-namespace Types
-{
-
-}
-
 namespace Prototypes
 {
 	prototype struct Person_Mover ADD_DEBUG_INFO

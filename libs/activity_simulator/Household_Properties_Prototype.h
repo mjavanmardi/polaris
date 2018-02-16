@@ -9,28 +9,28 @@
 
 namespace Household_Components
 {
-	namespace Types
-	{
-		// VARIOUS CENSUS ACS FILE CODES (NAME IN FILE given in comments)
+	//namespace Types
+	//{
+	//	// VARIOUS CENSUS ACS FILE CODES (NAME IN FILE given in comments)
 
-		// HOUSEHOLD TYPE
-		enum HHTYPE
-		{
-			OWN_FAMILY_MARRIED=1,
-			OWN_FAMILY_OTHER,
-			OWN_MALE_SINGLE,
-			OWN_MALE_OTHER,
-			OWN_FEMALE_SINGLE,
-			OWN_FEMALE_OTHER,
-			RENT_FAMILY_MARRIED,
-			RENT_FAMILY_OTHER,
-			RENT_MALE_SINGLE,
-			RENT_MALE_OTHER,
-			RENT_FEMALE_SINGLE,
-			RENT_FEMALE_OTHER
-		};
+	//	// HOUSEHOLD TYPE
+	//	enum HHTYPE
+	//	{
+	//		OWN_FAMILY_MARRIED=1,
+	//		OWN_FAMILY_OTHER,
+	//		OWN_MALE_SINGLE,
+	//		OWN_MALE_OTHER,
+	//		OWN_FEMALE_SINGLE,
+	//		OWN_FEMALE_OTHER,
+	//		RENT_FAMILY_MARRIED,
+	//		RENT_FAMILY_OTHER,
+	//		RENT_MALE_SINGLE,
+	//		RENT_MALE_OTHER,
+	//		RENT_FEMALE_SINGLE,
+	//		RENT_FEMALE_OTHER
+	//	};
 
-	}
+	//}
 
 	namespace Concepts
 	{

@@ -7,30 +7,25 @@
 namespace Household_Components
 {
 
-namespace Concepts
-{
-	concept struct Is_Household
-	{
-		check_accessor_name(Has_Initialize_Defined,Initialize);
-		check_accessor_name(Has_Properties_Defined,Properties);
-		check_accessor_name(Has_Planner_Defined,Planning_Faculty);
-		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
-	};
-
-	concept struct Has_Initialize
-	{
-		//%%%RLW TODO: this check fails
-		static const bool value = true;
-		//check_accessor_name(Has_Initialize_Defined,Initialize);
-		//define_default_check(Has_Initialize_Defined);
-	};
-
-}
-
-namespace Types
-{
-
-}
+//namespace Concepts
+//{
+//	concept struct Is_Household
+//	{
+//		check_accessor_name(Has_Initialize_Defined,Initialize);
+//		check_accessor_name(Has_Properties_Defined,Properties);
+//		check_accessor_name(Has_Planner_Defined,Planning_Faculty);
+//		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
+//	};
+//
+//	concept struct Has_Initialize
+//	{
+//		//%%%RLW TODO: this check fails
+//		static const bool value = true;
+//		//check_accessor_name(Has_Initialize_Defined,Initialize);
+//		//define_default_check(Has_Initialize_Defined);
+//	};
+//
+//}
 
 namespace Prototypes
 {

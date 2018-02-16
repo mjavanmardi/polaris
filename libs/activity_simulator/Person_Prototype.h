@@ -21,44 +21,6 @@
 namespace Person_Components
 {
 
-namespace Concepts
-{
-	concept struct Is_Person
-	{
-		check_accessor_name(Has_Initialize_Defined,Initialize);
-		check_accessor_name(Has_Properties_Defined,Properties);
-		check_accessor_name(Has_Planner_Defined,Planning_Faculty);
-		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
-	};
-
-	concept struct Is_Transims_Person
-	{
-		check_concept(Is_Person_Check, Is_Person, T, V);
-		check_typedef_type(Is_Transims_Check,Is_Transims,true_type);
-		define_default_check(Is_Person_Check && Is_Transims_Check);
-	};
-	concept struct Is_CTRAMP_Person
-	{
-		check_concept(Is_Person_Check, Is_Person, T, V);
-		check_typedef_type(Is_CTRAMP_Check,Is_Transims,true_type);
-		define_default_check(Is_Person_Check && Is_CTRAMP_Check);
-	};
-
-	concept struct Has_Initialize
-	{
-		//%%RLW TODO: this check fails
-		static const bool value = true;
-		//check_accessor_name(Has_Initialize_Defined,Initialize);
-		//define_default_check(Has_Initialize_Defined);
-	};
-
-}
-
-namespace Types
-{
-
-}
-
 namespace Prototypes
 {
 	prototype struct Person ADD_DEBUG_INFO

@@ -11,39 +11,6 @@
 
 namespace Person_Components
 {
-	namespace Types
-	{
-		//enum PLANNING_ITERATION_STEP_KEYS
-		//{
-		//	ACTIVITY_GENERATION=19,
-		//	ACTIVITY_PLANNING=20,
-		//	MOVEMENT_PLANNING=21,
-		//};
-	}
-
-	namespace Concepts
-	{
-		concept struct Is_Person_Planner_Prototype
-		{
-			check_component_accessor_name(Has_Parent_Person, Parent_Person);
-			check_component_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
-			check_component_accessor_name(Has_Activity_Plans_Container, Activity_Container);
-			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
-		};
-		concept struct Is_Person_Planner_Component
-		{
-			check_accessor_name(Has_Parent_Person,Parent_Person);
-			check_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
-			check_accessor_name(Has_Activity_Plans_Container, Activity_Container);
-			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
-		};
-		concept struct Is_Person_Planner
-		{
-			check_concept(is_prototype, Is_Person_Planner_Prototype, T, V);
-			check_concept(is_component, Is_Person_Planner_Component, T, V);
-			define_default_check(is_prototype || is_component);
-		};
-	}
 	
 	namespace Prototypes
 	{

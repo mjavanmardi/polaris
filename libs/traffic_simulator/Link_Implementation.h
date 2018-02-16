@@ -672,13 +672,9 @@ namespace Link_Components
 						int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 
 						//TODO: Check - JA, 01/25/18 restored the update to only occur on assignment intervals.....
-						if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
-						{
+						//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+						//{
 							float cost_update = turn_movement->template forward_link_turn_travel_time<float>();
-
-							//TODO OMER: Remove after you're done
-							float myPenalty = cost_update - _link_fftt;
-							float otherPenalty = turn_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
 
 							for (auto routable_itr = routable_networks->begin(); routable_itr != routable_networks->end(); routable_itr++)
 							{
@@ -686,7 +682,7 @@ namespace Link_Components
 
 								current_network->update_edge_turn_cost(_uuid, _link_fftt, outbound_turn_index, cost_update - _link_fftt);
 							}
-						}
+						//}
 					}
 				}
 			}
