@@ -1122,7 +1122,7 @@ namespace Prototypes
 		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
-		//Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 		network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
