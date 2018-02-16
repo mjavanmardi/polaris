@@ -673,7 +673,7 @@ namespace Vehicle_Components
 					Link_Components::Types::Link_Type_Keys link_type = route_link->link_type<Link_Components::Types::Link_Type_Keys>();
 					Link_Components::Types::Link_Type_Keys next_link_type = next_route_link->link_type<Link_Components::Types::Link_Type_Keys>();
 
-					//TODO Omer fix later!
+					//TODO: Omer fix later!
 					if (link_type != Link_Components::Types::Link_Type_Keys::WALK && link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && next_link_type != Link_Components::Types::Link_Type_Keys::WALK && next_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 					{
 						typename MasterType::network_type::long_hash_key_type long_hash_key;

@@ -440,10 +440,10 @@ namespace Activity_Components
 					// If no adults free, force trip to transit
 					if (adult == nullptr)
 					{
-						//TODO OMER: Change back to bus when done
+						//TODO: Omer: Change back to bus when done
 						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK);
 
-						//TODO OMER: Delete when done
+						//TODO: Omer: Delete when done
 						char myLine[2000];
 						std::string bus_mode_paragraph;
 						stringstream bus_mode_stream;

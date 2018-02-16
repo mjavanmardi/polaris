@@ -883,35 +883,6 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			/*if (origin_loc_id == 67 && destination_loc_id == 128)
-			{								
-				global.edge_id = current->_edge_id;
-				_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
-
-				int came_from_id = 0;
-				if (current->_came_from != nullptr)
-				{
-					base_edge_type* temp_prev = (base_edge_type*)current->came_from();
-					came_from_id = temp_prev->_edge_id;
-				}
-				
-
-				sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%d\t%f\t%f\t%f",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					scanCount,
-					current->_edge_id,
-					current_link->_upstream_intersection->_dbid.c_str(),
-					current_link->_downstream_intersection->_dbid.c_str(),
-					came_from_id,
-					current->_cost,
-					current->_estimated_cost_origin_destination,
-					current->_cost_from_origin
-					);
-				detail_paragraph.insert(0, myLine);
-			}*/
-			
 			current_fail = current;
 			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
 			{
