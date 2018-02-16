@@ -277,6 +277,7 @@ namespace Demand_Components
 					person->template internal_id<int>(person_id_counter);
 					person->template router<_Routing_Interface*>(router);
 					person->template vehicle<_Vehicle_Interface*>(vehicle);
+					person->template network_reference<_Network_Interface*>(network);
 
 					//TODO:ROUTING_OPERATION
 					//router->template traveler<_Traveler_Interface*>(traveler);

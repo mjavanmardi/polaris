@@ -199,13 +199,18 @@ namespace Prototypes
 			response.next._iteration = END;
 			response.next._sub_iteration = END;
 
-			pthis->Do_Movement<NT>();
+			
 
 			//TODO: Omer: Multimodal
 			Vehicle_Components::Types::Vehicle_Type_Keys mode = movement->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
 			if (((scenario_itf*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
 			{
 				pthis->Do_Multimodal_Movement<NT>();
+			}
+			else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			{
+				pthis->Do_Movement<NT>();
 			}
 
 			if (pthis->Artificial_Movement_Scheduled<bool>() == true)
@@ -1117,7 +1122,7 @@ namespace Prototypes
 		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
-		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+		//Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 		network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
@@ -1144,11 +1149,6 @@ namespace Prototypes
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
 		else if (movements->template origin<link_itf*>() == movements->template destination<link_itf*>())
-		{
-			this->Schedule_Artificial_Arrival_Event<NT>();
-		}
-		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point.....)
-		else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
