@@ -118,6 +118,9 @@ namespace Prototypes
 		// Database record for this person
 		accessor(person_record, NONE, NONE);
 
+		//TODO:Omer
+		accessor(simulation_status, NONE, NONE);
+
 		void Arrive_At_Destination();
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface

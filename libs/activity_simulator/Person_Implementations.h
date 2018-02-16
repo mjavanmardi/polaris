@@ -78,6 +78,9 @@ namespace Person_Components
 			// Record of completed activities (stores a simplified subset of activity data)
 			m_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
 
+			//TODO:Omer
+			m_data(Person_Components::Types::Movement_Status_Keys, simulation_status, NONE, NONE);
+
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -218,6 +221,9 @@ namespace Person_Components
 			_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
 			_vehicle = nullptr;
+
+			//TODO:Omer
+			_simulation_status = Person_Components::Types::Movement_Status_Keys::UNLOADED;
 
 			// Create and Initialize the vehicle		
 			//_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
