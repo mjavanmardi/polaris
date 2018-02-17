@@ -64,6 +64,7 @@ namespace Demand_Components
 			{
 				int counter = -1;
 				int trip_id = 0;
+				int path_id = -1;
 
 				try
 				{
@@ -106,6 +107,9 @@ namespace Demand_Components
 				//TODO: Omer
 				//typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
 				typedef  Routing_Components::Prototypes::Routing< typename _Person_Interface::get_type_of(router) > _Routing_Interface;
+
+				typedef  Routing_Components::Prototypes::Routable_Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
+				typedef  Prototype_Random_Access_Sequence <typename _Network_Interface::get_type_of(routable_networks), Routing_Components::Prototypes::Routable_Network> _Routable_Networks_Container_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 //				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				//typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
@@ -114,6 +118,9 @@ namespace Demand_Components
 				typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 
 				_Network_Interface* network=network_reference<_Network_Interface*>();
+				_Routable_Networks_Container_Interface* routable_nets = network->template routable_networks <typename _Network_Interface::get_type_of(routable_networks)>();
+				_Routable_Network_Interface* routable_network = routable_nets->at(0);
+
 				_Activity_Locations_Container_Interface& activity_locations = network->template activity_locations_container<_Activity_Locations_Container_Interface&>();
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
@@ -121,7 +128,7 @@ namespace Demand_Components
 
 				transaction t(db->begin());
 
-				result<Trip> trip_result=db->template query<Trip>(query<Trip>::true_expr);
+				
 				
 				//TODO: Omer
 				//_Traveler_Interface* traveler;
@@ -169,19 +176,33 @@ namespace Demand_Components
 
 				cout << "Demand Percentage: " << demand_percentage;
 
-				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
+				// read the paths/path links
+				typedef unordered_map<int, shared_ptr<Path>> trajectory_container_type;
+				typedef trajectory_container_type::iterator trajectory_iterator_type;
+				trajectory_container_type trajectories;
+				result<Path> path_result = db->template query<Path>(query<Path>::true_expr);
+				for (result<Path>::iterator db_itr = path_result.begin(); db_itr != path_result.end(); ++db_itr)
+				{
+					shared_ptr<Path> p (new Path(*db_itr));
+					trajectories.insert(pair<int, shared_ptr<Path>>(db_itr->getId(), p));
+				}
+
+
+				// read the trips
+				result<Trip> trip_result = db->template query<Trip>(query<Trip>::true_expr);
+				for (result<Trip>::iterator db_itr = trip_result.begin(); db_itr != trip_result.end(); ++db_itr)
 				{
 					// perform demand reduction
 					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() > demand_percentage) continue;
 
 					trip_id = db_itr->getPrimaryKey();
-					
+
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
 					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
-						
+
 
 					if (++counter % 100000 == 0)
 					{
@@ -194,22 +215,22 @@ namespace Demand_Components
 						continue;
 					}
 
-					int org_key=db_itr->getOrigin();
+					int org_key = db_itr->getOrigin();
 
-					if(!activity_id_to_ptr.count(org_key))
+					if (!activity_id_to_ptr.count(org_key))
 					{
-						if(++skipped_counter%100000==0)
+						if (++skipped_counter % 100000 == 0)
 						{
 							cout << skipped_counter << " trips skipped" << endl;
 						}
 						continue;
 					}
 
-					int dst_key=db_itr->getDestination();
+					int dst_key = db_itr->getDestination();
 
-					if(!activity_id_to_ptr.count(dst_key))
+					if (!activity_id_to_ptr.count(dst_key))
 					{
-						if(++skipped_counter%100000==0)
+						if (++skipped_counter % 100000 == 0)
 						{
 							cout << skipped_counter << " trips skipped" << endl;
 						}
@@ -220,7 +241,7 @@ namespace Demand_Components
 					_Activity_Location_Interface* destination_activity_location = activity_id_to_ptr[dst_key];
 					_Link_Interface* origin_link = origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
 					_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
-					if (origin_link->template dbid<int>() == destination_link->template dbid<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
+					if (origin_link->template dbid<int>() == destination_link->template dbid<int>() || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
 						// No path can be found. Discard the trip
 						continue;
@@ -239,15 +260,16 @@ namespace Demand_Components
 					assert(activity_id_to_ptr.count(dst_key));
 
 					departed_time = departed_time - scenario->template simulation_start_time<int>();
-					
+
 					//TODO: Omer
 					//traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					person = (_Person_Interface*)Allocate<typename ComponentType::person_type>();
 					movement_faculty = (_Movement_Faculty_Interface*)Allocate<typename _Person_Interface::get_type_of(Moving_Faculty)>();
-					
-					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+					movement_faculty->Parent_Person(person);
 
-					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
+					vehicle = (_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+
+					router = (_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
 					movement_plan->template network<_Network_Interface*>(network);
@@ -277,6 +299,7 @@ namespace Demand_Components
 					person->template internal_id<int>(person_id_counter);
 					person->template router<_Routing_Interface*>(router);
 					person->template vehicle<_Vehicle_Interface*>(vehicle);
+					person->Moving_Faculty(movement_faculty);
 					//person->template network_reference<_Network_Interface*>(network);
 
 					//TODO:ROUTING_OPERATION
@@ -304,22 +327,87 @@ namespace Demand_Components
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
 
-					router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+					//=======================================================================
+					// Fill the movement plan from the PATH table if it was logged,
+					path_id = db_itr->getPath_id();
+					trajectory_iterator_type t_itr = trajectories.find(path_id);
+					if (t_itr != trajectories.end())
+					{
+						shared_ptr<Path> path = t_itr->second;
 
-					//TODO: Omer
-					person->template Moving_Faculty<_Movement_Faculty_Interface*>(movement_faculty);
-					movement_faculty->template Parent_Person<_Person_Interface*>(person);
-					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
-					//person->template Moving_Faculty<typename _Person_Interface::get_type_of(Moving_Faculty)>(movement_faculty);
+						// containers to use in set_trajectory
+						std::deque<global_edge_id> path_container;
+						std::deque<float> cost_container;
 
+						// update the movement plan characteristics
+						movement_plan->valid_trajectory(true);
+						movement_plan->routed_travel_time(path->getTravel_Time());
+						movement_plan->estimated_time_of_arrival(path->getDeparture_Time() + path->getTravel_Time());
+						movement_plan->estimated_travel_time_when_departed(path->getTravel_Time());
+
+						// which graph will we route on???
+						int graph_id = 0;
+						if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>()) graph_id = routable_network->multimodal_network_graph_id<int>();
+						else if (((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>()) graph_id = routable_network->time_dependent_network_graph_id<int>();
+						else graph_id = routable_network->static_network_graph_id<int>();
+
+						// scan all the links
+						const std::vector<link_travel >& trajectory_links = path->getLinks();
+						for (std::vector<link_travel>::const_iterator c_itr = trajectory_links.begin(); c_itr != trajectory_links.end(); ++c_itr)
+						{
+							const link_travel* link = &(*c_itr);
+							global_edge_id edge;
+							edge.edge_id = link->getLink() * 2 + link->getDir();
+							edge.graph_id = graph_id;
+							path_container.push_back(edge);
+							cost_container.push_back(link->getTravel_Time());
+						}
+
+
+						bool ofound, dfound;
+						for (_Links_Container_Interface::iterator o_itr = origin_activity_location->template origin_links<_Links_Container_Interface&>().begin(); o_itr != origin_activity_location->template origin_links<_Links_Container_Interface&>().end(); ++o_itr)
+						{
+							if ((*o_itr)->uuid<int>() == path_container.front().edge_id)
+							{
+								movement_plan->origin(*o_itr);
+								ofound = true;
+								break;
+							}
+						}
+						for (_Links_Container_Interface::iterator d_itr = destination_activity_location->template destination_links<_Links_Container_Interface&>().begin(); d_itr != destination_activity_location->template destination_links<_Links_Container_Interface&>().end(); ++d_itr)
+						{
+							if ((*d_itr)->uuid<int>() == path_container.back().edge_id)
+							{
+								movement_plan->destination(*d_itr);
+								dfound = true;
+								break;
+							}
+						}
+						if (!ofound || !dfound) { THROW_EXCEPTION("ERROR: origin or destination link from trip table could not be matched to path table."); }
+
+						movement_plan->set_trajectory(path_container, cost_container);
+
+						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan, false);
+					}
+
+
+					//===============================================================================
+					// Otherwise, start the router process
+					else
+					{
+						router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+
+						//TODO: Omer
+						person->template Moving_Faculty<_Movement_Faculty_Interface*>(movement_faculty);
+						movement_faculty->template Parent_Person<_Person_Interface*>(person);
+						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
+					}
 
 					//traveler->Schedule_New_Departure(departed_time);
 					//person->Do_movement();
-
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
-					
-
+				
 					//if(traveler_id_counter%10000==0)
 					//{
 					//	cout << "\t" << traveler_id_counter << endl;
