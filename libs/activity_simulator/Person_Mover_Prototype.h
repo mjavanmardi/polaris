@@ -20,11 +20,11 @@ namespace Prototypes
 		//========================================================
 		// Main hook to person planner - called 5 minutes prior to estimated departure
 		//--------------------------------------------------------
-		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 			check(TimeType, Basic_Units::Concepts::Is_Time_Value) &&
 			check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) &&
 			(check(MovementItfType, is_pointer) || check(MovementItfType, is_reference))));
-		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 			!check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value) ||
 			!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) ||
 			(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))));
@@ -208,7 +208,7 @@ namespace Prototypes
 	//--------------------------------------------------------
 	template<typename ComponentType>
 	template<typename TimeType, typename MovementItfType> 
-	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 		check(TimeType, Basic_Units::Concepts::Is_Time_Value) &&
 		check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) &&
 		(check(MovementItfType, is_pointer) || check(MovementItfType, is_reference))))
@@ -216,23 +216,32 @@ namespace Prototypes
 		this->Movement<MovementItfType>(movement);
 		this->Movement_Scheduled<bool>(true);
 
-		// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
 		int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<TimeType>(iteration() + 1);
-		if (departure_time > iteration() + 2)
+
+		if (do_routing)
 		{
-			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION);
-			//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
+			
+			if (departure_time > iteration() + 2)
+			{
+				static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			}
+			else
+			{
+				static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+			}
 		}
 		else
 		{
-			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
-			//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, departure_time, Scenario_Components::Types::MOVEMENT_SUB_ITERATION);
 		}
 	}
 
 	template<typename ComponentType>
 	template<typename TimeType, typename MovementItfType>
-	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing = true, requires(MovementItfType,
 		!check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value) ||
 		!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) ||
 		(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))))
