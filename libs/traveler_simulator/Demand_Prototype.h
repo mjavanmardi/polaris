@@ -335,6 +335,21 @@ namespace Demand_Components
 					{
 						shared_ptr<Path> path = t_itr->second;
 
+						// what was the gap?
+						float gap = 1.0f;
+						if (path->getRouted_Time() > 0.0f) gap = std::max((float)path->getTravel_Time() / (float)path->getRouted_Time() - 1.0f, 0.0f);
+
+						// use the gap to determine if we will follow the same route (more likely for small gaps...)
+						if (GLOBALS::Uniform_RNG.Next_Rand<float>() < gap)
+						{
+							// schedule routing
+							router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+							movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
+							vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
+							continue;
+						}
+
+
 						// containers to use in set_trajectory
 						std::deque<global_edge_id> path_container;
 						std::deque<float> cost_container;
@@ -385,9 +400,10 @@ namespace Demand_Components
 						}
 						if (!ofound || !dfound) { THROW_EXCEPTION("ERROR: origin or destination link from trip table could not be matched to path table."); }
 
+						// schedule moving
 						movement_plan->set_trajectory(path_container, cost_container);
-
 						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan, false);
+						vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 					}
 
 
@@ -396,16 +412,10 @@ namespace Demand_Components
 					else
 					{
 						router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
-
-						//TODO: Omer
-						person->template Moving_Faculty<_Movement_Faculty_Interface*>(movement_faculty);
-						movement_faculty->template Parent_Person<_Person_Interface*>(person);
 						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
+						vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 					}
-
-					//traveler->Schedule_New_Departure(departed_time);
-					//person->Do_movement();
-					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
+					
 
 				
 					//if(traveler_id_counter%10000==0)
