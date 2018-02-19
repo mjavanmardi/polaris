@@ -1095,7 +1095,7 @@ namespace Prototypes
 		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
-		network_itf* network = person->template network_reference<network_itf*>();
+		//network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
@@ -1113,7 +1113,8 @@ namespace Prototypes
 		// Schedule the routing if the vehicle is not already in the network, otherwise return false
 		else if (movements->template valid_trajectory<bool>() && (person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::UNLOADED || person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::OUT_NETWORK))
 		{
-			//this->schdeule_person_movements_in_multimodal_network();
+//			this->schdeule_person_movements_in_multimodal_network();
+			cout << "aa";
 		}
 		// else, if no valid trajectory, unschedule movement
 		else
@@ -1127,11 +1128,11 @@ namespace Prototypes
 	template<typename TargetType>
 	void  Person_Mover<ComponentType>::schdeule_person_movements_in_multimodal_network()
 	{
-		this->template current_position<int>((int)0);
+		//this->template current_position<int>((int)0);
 
-		int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
+		//int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
 
-		this->template Load_Event<ComponentType>(&ComponentType::move_transit_vehicles_in_transit_network_conditional, arrival_time, Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION);
+		//this->template Load_Event<ComponentType>(&ComponentType::move_transit_vehicles_in_transit_network_conditional, arrival_time, Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION);
 	}
 	//TODO: Omer END
 }
