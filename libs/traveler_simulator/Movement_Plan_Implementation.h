@@ -25,8 +25,6 @@ namespace Movement_Plan_Components
 			
 			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, link, NONE, NONE);
 
-			m_prototype(Null_Prototype, typename MasterType::link_type, link, NONE, NONE);
-
 			template<typename TargetType> void Initialize(TargetType link_val);
 
 		};
