@@ -253,7 +253,7 @@ namespace Routing_Components
 					Link_Interface* dlink = nullptr;
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE))
 					{
-						_movement_plan->set_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 						
 						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 						{
@@ -269,7 +269,7 @@ namespace Routing_Components
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
 					{
-						_movement_plan->set_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 
 						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
 						{

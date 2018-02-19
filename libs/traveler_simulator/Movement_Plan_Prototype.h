@@ -80,6 +80,7 @@ namespace Movement_Plan_Components
 			accessor(multimodal_trajectory_container, NONE, NONE);
 			//TODO: Omer - Multimodal Trajectory END
 			accessor(current_trajectory_position, NONE, NONE);
+			accessor(current_multimodal_trajectory_position, NONE, NONE);
 			accessor(departed_time, NONE, NONE);
 			accessor(arrived_time, NONE, NONE);
 			accessor(planning_time, NONE, NONE);
@@ -240,24 +241,6 @@ namespace Movement_Plan_Components
 			void set_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
 				this_component()->set_trajectory(path_container, arrival_time_container);
-			}
-			
-			template<typename T> void set_multimodal_trajectory(
-				std::deque< global_edge_id >& out_path,
-				std::deque< float >& out_cost,
-				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
-				T& out_trip,
-				std::deque<int>& out_seq,
-				std::deque<float>& out_time,
-				std::deque<float>& out_arr_time,
-				std::deque<float>& out_wait_time,
-				std::deque<float>& out_walk_time,
-				std::deque<float>& out_ivt_time,
-				std::deque<float>& out_car_time,
-				std::deque<int>& out_wait_count,
-				std::deque<float>& out_transfer_pen)
-			{
-				this_component()->template set_multimodal_trajectory<T>(out_path, out_cost, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 			}
 
 			void update_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
@@ -468,6 +451,42 @@ namespace Movement_Plan_Components
 			{
 				this_component()->Display_Movement();
 			}		
+			
+			//TODO: Omer
+			//=============================================================================================================================================================================
+			//Multimodal Section===========================================================================================================================================================
+			//=============================================================================================================================================================================
+			template<typename T> void set_multimodal_trajectory(
+				std::deque< global_edge_id >& out_path,
+				std::deque< float >& out_cost,
+				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
+				T& out_trip,
+				std::deque<int>& out_seq,
+				std::deque<float>& out_time,
+				std::deque<float>& out_arr_time,
+				std::deque<float>& out_wait_time,
+				std::deque<float>& out_walk_time,
+				std::deque<float>& out_ivt_time,
+				std::deque<float>& out_car_time,
+				std::deque<int>& out_wait_count,
+				std::deque<float>& out_transfer_pen)
+			{
+				this_component()->template set_multimodal_trajectory<T>(out_path, out_cost, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+			}
+
+			void clear_multimodal_trajectory()
+			{
+				this_component()->template clear_multimodal_trajectory();
+			}
+
+			template<typename TargetType> void update_multimodal_route_length()
+			{
+				this_component()->template update_multimodal_route_length();
+			}
+
+			//=============================================================================================================================================================================
+			//Multimodal Section End=======================================================================================================================================================
+			//=============================================================================================================================================================================
 		};
 	}
 }
