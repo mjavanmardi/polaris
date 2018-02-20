@@ -244,6 +244,9 @@ namespace Person_Components
 					}
 
 					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(), move);
+					// move the scheduled movement out of the movements list
+					// TODO: JAA - 2/19/18 - check to make sure this doesn't blow anything up...
+					movements->erase(move_itr);
 
 					//TODO: JAA - 1/30/2018 - returning here after movement scheduled in order to ignore multiple moves per timestep.
 					return;

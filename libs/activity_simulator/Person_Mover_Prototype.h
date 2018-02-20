@@ -181,7 +181,7 @@ namespace Prototypes
 			{
 				pthis->Do_Multimodal_Movement<NT>();
 			}
-			else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			else
 			{
 				pthis->Do_Movement<NT>();
 			}
