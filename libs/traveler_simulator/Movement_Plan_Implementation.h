@@ -194,6 +194,7 @@ namespace Movement_Plan_Components
 
 			void clear_multimodal_trajectory();
 			template<typename TargetType> void update_multimodal_route_length();
+			template<typename TargetType> void advance_multimodal_trajectory();
 			//=============================================================================================================================================================================
 			//Multimodal Section End-----==================================================================================================================================================
 			//=============================================================================================================================================================================
@@ -601,6 +602,17 @@ namespace Movement_Plan_Components
 				_Multimodal_Trajectory_Unit_Interface* vehicle_trajectory_data = (_Multimodal_Trajectory_Unit_Interface*)(*itr);
 				route_length<float&>() += vehicle_trajectory_data->template link<_Link_Interface*>()->template length<float>() / 5280.0;
 			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		template<typename TargetType>
+		void Movement_Plan_Implementation<MasterType, InheritanceList>::advance_multimodal_trajectory()
+		{
+			typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+			typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+
+
+			current_multimodal_trajectory_position<int&>()++;
 		}
 		//=============================================================================================================================================================================
 		//Multimodal Section End=======================================================================================================================================================

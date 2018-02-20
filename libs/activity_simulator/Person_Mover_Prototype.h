@@ -1122,8 +1122,8 @@ namespace Prototypes
 		// Schedule the routing if the vehicle is not already in the network, otherwise return false
 		else if (movements->template valid_trajectory<bool>() && (person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::UNLOADED || person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::OUT_NETWORK))
 		{
-//			this->schdeule_person_movements_in_multimodal_network();
-			cout << "aa";
+			this->schdeule_person_movements_in_multimodal_network<NT>();
+			
 		}
 		// else, if no valid trajectory, unschedule movement
 		else
@@ -1135,8 +1135,15 @@ namespace Prototypes
 
 	template<typename ComponentType>
 	template<typename TargetType>
-	void  Person_Mover<ComponentType>::schdeule_person_movements_in_multimodal_network()
+	void Person_Mover<ComponentType>::schdeule_person_movements_in_multimodal_network()
 	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename MasterType::trajectory_unit_type> _Multimodal_Trajectory_Unit_Interface;
+
+		cout << "aa";
+		movement_itf* movements = this->Movement<movement_itf*>();
+
+		movements->template advance_multimodal_trajectory<_Multimodal_Trajectory_Unit_Interface*>();
 		//this->template current_position<int>((int)0);
 
 		//int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
