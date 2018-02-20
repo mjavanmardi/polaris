@@ -200,7 +200,7 @@ namespace Demand_Components
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
-					if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					//if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
 
 
@@ -326,6 +326,7 @@ namespace Demand_Components
 
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
+					//movement_plan->template initialize_multimodal_trajectory<NULLTYPE>();
 
 					//=======================================================================
 					// Fill the movement plan from the PATH table if it was logged,

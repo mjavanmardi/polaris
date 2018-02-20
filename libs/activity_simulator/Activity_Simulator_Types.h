@@ -502,5 +502,16 @@ namespace Person_Components
 			TC_WEEKLY,
 			TC_DAILY
 		};
+		//TODO: Omer
+		enum Movement_Status_Keys
+		{
+			UNLOADED = 0,
+			IN_ENTRY_QUEUE,
+			IN_NETWORK,
+			OUT_NETWORK,
+			WALKING,
+			WAITING,
+			ON_BOARD
+		};
 	}
 }

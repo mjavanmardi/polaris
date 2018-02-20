@@ -285,7 +285,7 @@ namespace Routing_Components
 					}
 					else
 					{						
-						_movement_plan->set_trajectory(path_container, cost_container);
+						//_movement_plan->set_trajectory(path_container, cost_container);
 
 						for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 						{
