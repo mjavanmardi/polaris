@@ -608,8 +608,8 @@ namespace Movement_Plan_Components
 		template<typename TargetType>
 		void Movement_Plan_Implementation<MasterType, InheritanceList>::advance_multimodal_trajectory()
 		{
-			typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
-			typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+			typedef  Multimodal_Trajectory_Unit<typename remove_pointer< typename get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+			typedef  Random_Access_Sequence< typename get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 
 
 			current_multimodal_trajectory_position<int&>()++;
