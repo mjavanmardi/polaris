@@ -200,7 +200,7 @@ namespace Demand_Components
 					//=======================================
 					//TODO: re-evaluate later, for now we are throwing out all records in the input database that are not SOV, as it is assumed that all of these will be sov trips for simulation purposes....
 					int mode_id = db_itr->getMode();
-					//if (mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
+					if (!scenario->multimodal_routing<bool>() && mode_id != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) continue;
 					//=======================================
 
 
@@ -332,7 +332,7 @@ namespace Demand_Components
 					// Fill the movement plan from the PATH table if it was logged,
 					path_id = db_itr->getPath_id();
 					trajectory_iterator_type t_itr = trajectories.find(path_id);
-					if (t_itr != trajectories.end())
+					if (t_itr != trajectories.end() && scenario->read_trajectories<bool>())
 					{
 						shared_ptr<Path> path = t_itr->second;
 

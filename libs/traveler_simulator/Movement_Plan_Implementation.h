@@ -295,11 +295,17 @@ namespace Movement_Plan_Components
 		{
 			cout << endl << "---------------------------------------" << endl;
 			cout << "Ptr=" << this << endl;
-			cout << "Departure=" << this->__departed_time._Value << endl;
-			cout << "Origin=" << this->_origin_location << endl;
-			cout << "Destination=" << this->_destination_location << endl;
+			cout << "Traveler_id=" << this->_traveler_id << endl;
+			cout << "Departure=" << this->departed_time<Time_Seconds>() << endl;
+			cout << "Origin_ptr=" << this->_origin_location << endl;
+			if (this->_origin_location != nullptr) cout << "Origin_loc=" << this->_origin_location->uuid<int>() << endl;
+			cout << "Destination_ptr=" << this->_destination_location << endl;
+			if (this->_destination_location != nullptr) cout << "Destination_loc=" << this->_destination_location->uuid<int>() << endl;
 			cout << "Trajectory length=" << this->_trajectory_container.size() << endl;
-			cout << "Plan time=" << this->__planning_time._Value << endl;
+			cout << "Routed time=" << this->routed_travel_time<Time_Seconds>() << endl;
+			cout << "Mode=" << this->_mode << endl;
+			cout << "Integrated? " << this->_is_integrated << endl;
+			cout << "Plan time=" << this->planning_time<Time_Seconds>() << endl;
 			cout << "---------------------------------------" << endl;
 		}
 

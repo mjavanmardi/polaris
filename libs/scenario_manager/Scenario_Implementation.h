@@ -147,6 +147,8 @@ namespace Scenario_Components
 			m_data(bool, use_skim_intervals_from_previous, NONE, NONE);
 			m_data(double, skim_averaging_factor, NONE, NONE);
 
+			m_data(bool, read_trajectories, NONE, NONE);
+
 			m_data(bool, time_dependent_routing, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_shape, NONE, NONE);
 			m_data(double, time_dependent_routing_weight_scale, NONE, NONE);

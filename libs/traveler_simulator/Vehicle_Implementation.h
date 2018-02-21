@@ -398,7 +398,9 @@ namespace Vehicle_Components
 			{
 				static_cast<_Vehicle_Interface*>(this)->template unload<NULLTYPE>();
 				((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
-				cout << "WARNING, empty trajectory for vehicle " << _uuid;
+				cout << "WARNING, empty trajectory for vehicle " << _uuid << endl;
+				mp->Display_Movement();
+				cout << endl;
 				return;
 			}
 			mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);

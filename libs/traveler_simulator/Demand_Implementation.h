@@ -116,56 +116,6 @@ namespace Demand_Components
 			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan)
 			{
 				movement_plans_buffer[__thread_id].push_back(movement_plan);
-
-				/*
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
-				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
-
-				// don't do logging if not specified in scenario
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-
-				if (!scenario->template write_demand_to_database<bool>()) return;
-
-				movement_itf* move = (movement_itf*)movement_plan;
-
-				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
-				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
-
-				location_itf* orig = move->template origin<location_itf*>();
-				location_itf* dest = move->template destination<location_itf*>();
-				
-
-				//==============================================================================================
-				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
-				polaris::io::Trip trip_rec;
-
-				trip_rec.setConstraint(0);
-				trip_rec.setPerson(0);
-				//trip_rec.setTrip(0);
-				trip_rec.setTrip(move->traveler_id<int>());
-				trip_rec.setDestination(dest->template uuid<int>());
-				trip_rec.setDuration(0);
-				if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
-				else trip_rec.setGap(0.0f);
-
-				trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
-				trip_rec.setHhold(0);
-				trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV); 
-				trip_rec.setOrigin(orig->template uuid<int>());
-				trip_rec.setPartition(move->template routed_travel_time<int>());
-				trip_rec.setPassengers(0);
-				trip_rec.setPurpose(0);
-				trip_rec.setStart(move->template departed_time<Time_Seconds>());
-				trip_rec.setTour(0);
-				trip_rec.setPriority(0);
-				trip_rec.setType(1);
-				trip_rec.setPath_id(move->path_id<int>());
-
-				trip_records_buffer[__thread_id].push_back(trip_rec);
-				*/
 			}
 
 			template<typename TargetType> void Write_Trips_To_Database()
