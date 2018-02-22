@@ -79,6 +79,8 @@ namespace Prototypes
 		template<typename TargetType> void schdeule_person_movements_in_multimodal_network();
 		static void move_persons_in_multimodal_network_conditional(ComponentType* _this, Event_Response& response);
 		template<typename TargetType> void teleport_multimodal_person_to_next_link();
+		template<typename TargetType> void person_action_at_beginning_of_link();
+		template<typename TargetType> void person_waiting_at_beginning_of_link();
 		//--------------------------------------------------------
 
 		//========================================================
@@ -1156,7 +1158,7 @@ namespace Prototypes
 		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*) trajectory[position];
 		
 		int next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
-		int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+		int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;
 
 		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 		this->template Next_Sub_Iteration<int>(next_sub);
@@ -1181,18 +1183,15 @@ namespace Prototypes
 		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> activity_itf;
 		
-		if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION)
+		if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION)
 		{
+			pthis->template person_action_at_beginning_of_link<NT>();
 			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
 		}
-		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION)
+		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION)
 		{
-			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
-			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
-		}
-		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_SEATING_SUBITERTION)
-		{
+			pthis->template person_waiting_at_beginning_of_link<NT>();
 			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
 		}
@@ -1202,11 +1201,6 @@ namespace Prototypes
 			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
 		}
 		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_REROUTING_SUBITERATION)
-		{
-			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
-			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
-		}
-		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION)
 		{
 			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
@@ -1222,6 +1216,68 @@ namespace Prototypes
 			assert(false);
 			cout << "Should never reach here in transit multimodal person mover conditional!" << endl;
 		}
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::person_action_at_beginning_of_link()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+		typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+		typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+
+		person_itf* person = this->Parent_Person<person_itf*>();
+		Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
+		Person_Components::Types::Movement_Status_Keys next_status;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+				
+		int current_position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
+
+		_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+
+		Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+		Link_Components::Types::Link_Type_Keys link_mode = trajectory_unit->template link_mode<Link_Components::Types::Link_Type_Keys>();
+
+		if (link_type != link_mode)
+		{
+			assert(false);
+			cout << "Link and trajectory data are inconsistent in terms of mode!" << endl;
+		}
+
+		int next_simulation_time;
+		int next_sub;
+		if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+		{
+			next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
+		}
+		else
+		{
+			if (current_status == ON_BOARD)
+			{
+				next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+				next_status = Person_Components::Types::Movement_Status_Keys::ON_BOARD;
+			}
+			else
+			{
+				next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
+				next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
+			}
+		}
+		
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+		person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 	}
 
 	template<typename ComponentType>
@@ -1248,6 +1304,64 @@ namespace Prototypes
 		this->template Next_Sub_Iteration<int>(next_sub);
 	}
 
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::person_waiting_at_beginning_of_link()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+		typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+		typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+		typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
+		typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
+		typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
+
+		person_itf* person = this->Parent_Person<person_itf*>();
+		Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
+		Person_Components::Types::Movement_Status_Keys next_status;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+
+		int current_position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
+
+		_Link_Interface* person_link = trajectory_unit->template link<_Link_Interface*>();
+		_Transit_Vehicle_Trip_Interface* person_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
+		_Transit_Pattern_Interface* trip_pattern = person_trip->template pattern<_Transit_Pattern_Interface*>();
+		_Pattern_Links_Container_Interface& pattern_links = trip_pattern->template pattern_links<_Pattern_Links_Container_Interface&>();		
+		int transit_vehicle_position = person_trip->template current_position<int>(); 
+		_Link_Interface* vehicle_link;
+		if (transit_vehicle_position >= 0)
+		{
+			vehicle_link = (_Link_Interface*)(pattern_links[transit_vehicle_position]);
+		}
+		else 
+		{
+			vehicle_link = nullptr;
+		}
+		
+		int next_simulation_time;
+		int next_sub;
+		if (vehicle_link == person_link)
+		{
+			next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::ON_BOARD;
+		}
+		else
+		{
+			next_simulation_time = iteration() + 6;
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
+		}
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+		person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+	}
 
 	//TODO: Omer END
 }
