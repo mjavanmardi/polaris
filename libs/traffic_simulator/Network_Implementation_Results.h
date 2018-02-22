@@ -81,81 +81,65 @@ namespace Network_Components
 						}
 						//===============================================================
 
-						if (vehicle->write_trajectory())
-						{	
-							// Fill the PATH DB record
-							shared_ptr<polaris::io::Path> path_db_record(new polaris::io::Path());
-
-							//float travel_time_ratio = travel_time / estimated_travel_time_when_departed;
-							//float trip_length = movement_plan->template route_length<float>();
-							//int entry_time = movement_plan->template entry_time<int>();
-							//int origin_loading_time = trajectory_unit->template enter_time<int>();
-							//int loading_delay = origin_loading_time - entry_time;
-
-							path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
-							path_db_record->setTraveler_ID(movement_plan->traveler_id<int>());
-							//path_db_record->setOrigin_Zone(movement_plan->template origin<_Zone_Interface*>()->template uuid<int>());
-							//path_db_record->setDestination_Zone(movement_plan->template destination<_Zone_Interface*>()->template uuid<int>());
-							path_db_record->setOrigin_Activity_Location(movement_plan->template origin<_Activity_Location_Interface*>()->template uuid<int>());
-							path_db_record->setDestination_Activity_Location(movement_plan->template destination<_Activity_Location_Interface*>()->template uuid<int>());
-							path_db_record->setOrigin_Link(movement_plan->template origin<_Link_Interface*>()->template uuid<int>());
-							path_db_record->setDestination_Link(movement_plan->template destination<_Link_Interface*>()->template uuid<int>());
-							path_db_record->setNum_Links(movement_plan->template trajectory_container<_Trajectory_Container_Interface&>().size());
-							path_db_record->setDeparture_Time(movement_plan->template departed_time<Time_Seconds>());
-							path_db_record->setTravel_Time(movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>());
-							path_db_record->setRouted_Time(movement_plan->template estimated_travel_time_when_departed<float>());
-							
-							
-							_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-							float start = 0;
-							int route_link_counter = 0;
-							for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr, ++route_link_counter)
-							{
-								// FIll the path link DB record for each step of the path
-								polaris::io::link_travel path_link_record;
-
-								//_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajectory_Container_Interface&>()[route_link_counter];
-								_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*link_itr);
-								_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
-
-								int route_link_id = route_link->template uuid<int>();
-								int route_link_enter_time = trajectory_unit->template enter_time<int>();
-								float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());		
-								int route_link_exit_time = /*trajectory_unit->exit_time<int>(); //*/movement_plan->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
-								float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
-					
-								if (route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
-								{
-									path_link_record.setLink(route_link->dbid<int>());
-									path_link_record.setDir(route_link->direction<int>());
-									path_link_record.setEntering_Time(route_link_enter_time);
-									path_link_record.setTravel_Time(route_link_travel_time);
-									path_link_record.setDelayed_Time(route_link_delayed_time);
-									path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
-
-									path_db_record->setLink(path_link_record);
-
-									//vehicle_trajectory_file
-									//	<< vehicle_id << ","
-									//	<<route_link_counter + 1 << ","
-									//	<<(route_link_id - route_link_id%2)/2<< ","
-									//	<<route_link_id%2<< ","
-									//	<<convert_seconds_to_hhmmss(route_link_enter_time) << ","
-									//	<<route_link_travel_time << ","
-									//	//<<route_link_delayed_time << ","
-									//	<<start<<","
-									//	<<route_link->template length<float>()<<","
-									//	<<(route_link->template length<float>()/5280.0)/((route_link_travel_time - trajectory_unit->template intersection_delay_time<float>())/3600.0) << ","
-									//	<<route_link->template free_flow_speed<float>() << ","
-									//	<<trajectory_unit->template intersection_delay_time<float>() << ","
-									//	<<start + route_link->template length<float>()<<","
-									//	<<endl;
-								}
-								
-							}
-							int path_id = db_ptr->persist(path_db_record);
-							movement_plan->path_id(path_id);
-						}
+						//if (vehicle->write_trajectory())
+						//{	
+						//	// Fill the PATH DB record
+						//	shared_ptr<polaris::io::Path> path_db_record(new polaris::io::Path());
+						//
+						//	//float travel_time_ratio = travel_time / estimated_travel_time_when_departed;
+						//	//float trip_length = movement_plan->template route_length<float>();
+						//	//int entry_time = movement_plan->template entry_time<int>();
+						//	//int origin_loading_time = trajectory_unit->template enter_time<int>();
+						//	//int loading_delay = origin_loading_time - entry_time;
+						//
+						//	path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+						//	path_db_record->setTraveler_ID(movement_plan->traveler_id<int>());
+						//	//path_db_record->setOrigin_Zone(movement_plan->template origin<_Zone_Interface*>()->template uuid<int>());
+						//	//path_db_record->setDestination_Zone(movement_plan->template destination<_Zone_Interface*>()->template uuid<int>());
+						//	path_db_record->setOrigin_Activity_Location(movement_plan->template origin<_Activity_Location_Interface*>()->template uuid<int>());
+						//	path_db_record->setDestination_Activity_Location(movement_plan->template destination<_Activity_Location_Interface*>()->template uuid<int>());
+						//	path_db_record->setOrigin_Link(movement_plan->template origin<_Link_Interface*>()->template uuid<int>());
+						//	path_db_record->setDestination_Link(movement_plan->template destination<_Link_Interface*>()->template uuid<int>());
+						//	path_db_record->setNum_Links(movement_plan->template trajectory_container<_Trajectory_Container_Interface&>().size());
+						//	path_db_record->setDeparture_Time(movement_plan->template departed_time<Time_Seconds>());
+						//	path_db_record->setTravel_Time(movement_plan->template arrived_time<Time_Seconds>() - movement_plan->template departed_time<Time_Seconds>());
+						//	path_db_record->setRouted_Time(movement_plan->template estimated_travel_time_when_departed<float>());
+						//	
+						//	
+						//	_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+						//	float start = 0;
+						//	int route_link_counter = 0;
+						//	for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr, ++route_link_counter)
+						//	{
+						//		// FIll the path link DB record for each step of the path
+						//		polaris::io::link_travel path_link_record;
+						//
+						//		//_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajectory_Container_Interface&>()[route_link_counter];
+						//		_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*link_itr);
+						//		_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+						//
+						//		int route_link_id = route_link->template uuid<int>();
+						//		int route_link_enter_time = trajectory_unit->template enter_time<int>();
+						//		float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());		
+						//		int route_link_exit_time = /*trajectory_unit->exit_time<int>(); //*/movement_plan->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+						//		float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
+						//
+						//		if (route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
+						//		{
+						//			path_link_record.setLink(route_link->dbid<int>());
+						//			path_link_record.setDir(route_link->direction<int>());
+						//			path_link_record.setEntering_Time(route_link_enter_time);
+						//			path_link_record.setTravel_Time(route_link_travel_time);
+						//			path_link_record.setDelayed_Time(route_link_delayed_time);
+						//			path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
+						//
+						//			path_db_record->setLink(path_link_record);
+						//		}
+						//		
+						//	}
+						//	int path_id = db_ptr->persist(path_db_record);
+						//	movement_plan->path_id(path_id);
+						//}
 
 						destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().pop_front();
 

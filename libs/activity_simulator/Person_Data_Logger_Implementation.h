@@ -473,12 +473,16 @@ namespace Person_Components
 							// iterate over trip-activity pairs and push to database
 							for (std::vector<pair<polaris::io::Trip,polaris::io::Activity>>::iterator itr = activity_records[i].begin(); itr != activity_records[i].end(); ++itr)
 							{
-								polaris::io::Trip& t = itr->first;
+								polaris::io::Trip& trip = itr->first;
 								polaris::io::Activity& a = itr->second;
+
+								// first, persist the path if it exists...
+								shared_ptr<polaris::io::Path> p = trip.getPath();
+								if (p) this->_db_ptr->persist(p);
 
 								unsigned long t_id;
 								// only write trip if the type is not -1 (i.e. for executed trips)
-								if (t.getType() != -1) t_id = this->_db_ptr->persist(t);
+								if (trip.getType() != -1) t_id = this->_db_ptr->persist(trip);
 
 								else t_id = 0;
 								a.setTrip (t_id);
@@ -675,6 +679,9 @@ namespace Person_Components
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_itf::get_type_of(movement_plan)> movement_itf;
+				typedef Link_Components::Prototypes::Link<typename movement_itf::get_type_of(origin)> _Link_Interface;
+				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+				typedef Random_Access_Sequence< typename movement_itf::get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
 				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
 				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
 				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
@@ -688,15 +695,69 @@ namespace Person_Components
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 				household_itf* hh = person->person_itf::template Household<household_itf*>();
-
+				vehicle_itf* vehicle = person->vehicle<vehicle_itf*>();
 
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
 				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
+				shared_ptr<polaris::io::Path> path_db_record;
+
 				if (is_executed)
 				{
+					//================================================================================
+					// First, add the trajectory if we are writing the vehicle trajectory
+					if (vehicle != nullptr)
+					{
+						if (vehicle->write_trajectory())
+						{
+							// Fill the PATH DB record
+							path_db_record = make_shared<polaris::io::Path>();
+							path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+							path_db_record->setTraveler_ID(move->traveler_id<int>());
+							path_db_record->setOrigin_Activity_Location(move->template origin<location_itf*>()->template uuid<int>());
+							path_db_record->setDestination_Activity_Location(move->template destination<location_itf*>()->template uuid<int>());
+							path_db_record->setOrigin_Link(move->template origin<_Link_Interface*>()->template uuid<int>());
+							path_db_record->setDestination_Link(move->template destination<_Link_Interface*>()->template uuid<int>());
+							path_db_record->setNum_Links(move->template trajectory_container<_Trajectory_Container_Interface&>().size());
+							path_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+							path_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
+							path_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
+
+							_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template trajectory_container<_Trajectory_Container_Interface&>();
+							float start = 0;
+							int route_link_counter = 0;
+							for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr, ++route_link_counter)
+							{
+								// FIll the path link DB record for each step of the path
+								polaris::io::link_travel path_link_record;
+								_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*link_itr);
+								_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+								int route_link_id = route_link->template uuid<int>();
+								int route_link_enter_time = trajectory_unit->template enter_time<int>();
+								float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());
+								int route_link_exit_time = move->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+								float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
+
+								//if (route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
+								//{
+								path_link_record.setLink(route_link->dbid<int>());
+								path_link_record.setDir(route_link->direction<int>());
+								path_link_record.setEntering_Time(route_link_enter_time);
+								path_link_record.setTravel_Time(route_link_travel_time);
+								path_link_record.setDelayed_Time(route_link_delayed_time);
+								path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
+								path_db_record->setLink(path_link_record);
+								//}
+
+							}
+							//int path_id = db_ptr->persist(path_db_record);
+							//movement_plan->path_id(path_id);
+						}
+					}
+					//=END of trajectory writing ====================================================================================
+
 					trip_rec.setConstraint(0);
 					trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
 					trip_rec.setTrip(act->template Activity_Plan_ID<int>());
@@ -707,30 +768,25 @@ namespace Person_Components
 					if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
 					else trip_rec.setGap(0.0f);
 
-					//trip_rec.setEnd(act->template End_Time<Time_Seconds>());
 					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
 					trip_rec.setHhold(0);
 					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
-						//trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-						trip_rec.setVehicle(person->vehicle<vehicle_itf*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+						trip_rec.setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 					}
-					trip_rec.setMode(act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>()); //TODO - changed so that trip record in demand database uses the same mode codes as the activity table so it is consistent throughout code
-					/*else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV) trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::HOV);
-					else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
-					else trip_rec.setMode(3);*/
+					trip_rec.setMode(act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>()); 
 					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
 					else trip_rec.setOrigin(new_origin);
 					trip_rec.setPartition(move->template routed_travel_time<int>());
 					trip_rec.setPassengers(0);
 					trip_rec.setPurpose(0);
-					//trip_rec.setStart(act->template Start_Time<Time_Seconds>());
 					trip_rec.setStart(move->template departed_time<Time_Seconds>());
 					trip_rec.setTour(0);
 					trip_rec.setPriority(0);
-					//				trip_rec.setVehicle(9);
 					trip_rec.setType(1);
-					trip_rec.setPath_id(move->path_id<int>());
+					trip_rec.setPath(path_db_record);
+					
+					//= END of trip writing ===============================================================================
 				}
 				else
 				{

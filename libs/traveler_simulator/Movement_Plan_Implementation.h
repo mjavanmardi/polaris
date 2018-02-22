@@ -144,7 +144,7 @@ namespace Movement_Plan_Components
 			TargetType absolute_departure_time();
 			tag_getter_as_available(absolute_departure_time);
 
-			void arrive_to_destination();
+			void arrive_to_destination(bool write_trajectory);
 
 			template<typename TargetType> void transfer_to_next_link(int delayed_time);
 
@@ -260,7 +260,7 @@ namespace Movement_Plan_Components
 		}
 
 		template<typename MasterType, typename InheritanceList>
-		void Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination()
+		void Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination(bool write_trajectory)
 		{
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
@@ -269,7 +269,7 @@ namespace Movement_Plan_Components
 			this->template arrived_time<Simulation_Timestep_Increment>(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>());
 
 			// write to global demand if turned on
-			((_Demand_Interface*)_global_demand)->Add_Trip_Record(this);
+			((_Demand_Interface*)_global_demand)->Add_Trip_Record(this, write_trajectory);
 		}
 
 		template<typename MasterType, typename InheritanceList>
@@ -633,11 +633,11 @@ namespace Movement_Plan_Components
 			typedef typename Base_Type::Component_Type ComponentType;
 
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
-			void arrive_to_destination();
+			void arrive_to_destination(bool write_trajectory);
 		};
 		
 		template<typename MasterType, typename InheritanceList>
-		void Integrated_Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination()
+		void Integrated_Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination(bool write_trajectory)
 		{
 			Base_Type* bthis = (Base_Type*)this;
 

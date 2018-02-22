@@ -27,7 +27,7 @@ namespace Demand_Components
 			accessor(last_vehicle_departure_time, NONE, NONE);
 
 			template<typename TargetType> void Initialize();
-			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan);
+			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan, bool write_trajectory);
 
 			template<typename TargetType> void read_vehicle_type_data()
 			{
@@ -176,16 +176,16 @@ namespace Demand_Components
 
 				cout << "Demand Percentage: " << demand_percentage;
 
-				// read the paths/path links
-				typedef unordered_map<int, shared_ptr<Path>> trajectory_container_type;
-				typedef trajectory_container_type::iterator trajectory_iterator_type;
-				trajectory_container_type trajectories;
-				result<Path> path_result = db->template query<Path>(query<Path>::true_expr);
-				for (result<Path>::iterator db_itr = path_result.begin(); db_itr != path_result.end(); ++db_itr)
-				{
-					shared_ptr<Path> p (new Path(*db_itr));
-					trajectories.insert(pair<int, shared_ptr<Path>>(db_itr->getId(), p));
-				}
+				//// read the paths/path links
+				//typedef unordered_map<int, shared_ptr<Path>> trajectory_container_type;
+				//typedef trajectory_container_type::iterator trajectory_iterator_type;
+				//trajectory_container_type trajectories;
+				//result<Path> path_result = db->template query<Path>(query<Path>::true_expr);
+				//for (result<Path>::iterator db_itr = path_result.begin(); db_itr != path_result.end(); ++db_itr)
+				//{
+				//	shared_ptr<Path> p (new Path(*db_itr));
+				//	trajectories.insert(pair<int, shared_ptr<Path>>(db_itr->getId(), p));
+				//}
 
 
 				// read the trips
@@ -330,11 +330,13 @@ namespace Demand_Components
 
 					//=======================================================================
 					// Fill the movement plan from the PATH table if it was logged,
-					path_id = db_itr->getPath_id();
-					trajectory_iterator_type t_itr = trajectories.find(path_id);
-					if (t_itr != trajectories.end() && scenario->read_trajectories<bool>())
+					shared_ptr<Path> path = db_itr->getPath();
+
+					/*path_id = db_itr->getPath_id();
+					trajectory_iterator_type t_itr = trajectories.find(path_id);*/
+					if (path && scenario->read_trajectories<bool>())
 					{
-						shared_ptr<Path> path = t_itr->second;
+						//shared_ptr<Path> path = t_itr->second;
 
 						// what was the gap?
 						float gap = 1.0f;
@@ -459,9 +461,9 @@ namespace Demand_Components
 			this_component()->Initialize<TargetType>();
 		}
 		template<typename ComponentType>
-		template<typename TargetType> void Demand<ComponentType>::Add_Trip_Record(TargetType movement_plan)
+		template<typename TargetType> void Demand<ComponentType>::Add_Trip_Record(TargetType movement_plan, bool write_trajectory)
 		{
-			this_component()->Add_Trip_Record<TargetType>(movement_plan);
+			this_component()->Add_Trip_Record<TargetType>(movement_plan, write_trajectory);
 		}
 	}
 }

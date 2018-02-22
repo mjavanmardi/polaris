@@ -632,8 +632,8 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, int path_id_, int tour_, int trip_, double start_, double end_, double duration_, double gap_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )  
-	: hhold (hhold_), person (person_), path_id(path_id_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), experienced_gap(gap_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, shared_ptr<Path> path_, int tour_, int trip_, double start_, double end_, double duration_, double gap_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )
+	: hhold (hhold_), person (person_), path(path_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), experienced_gap(gap_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
 	//Accessors
@@ -645,8 +645,8 @@ public:
 	void setPerson (const shared_ptr<Person> person_) {person = person_;}
 	/*const int& getPerson () const {return person;}
 	void setPerson (const int& person_){person = person_;}*/
-	const int& getPath_id() const { return path_id; }
-	void setPath_id(const int& path_id_) { path_id = path_id_; }
+	const shared_ptr<Path> getPath() const { return path; }
+	void setPath(shared_ptr<Path> path_) { path = path_; }
 	const int& getTour () const {return tour;}
 	void setTour (const int& tour_){tour = tour_;}
 	const int& getTrip () const {return trip;}
@@ -688,7 +688,7 @@ private:
 	#pragma db id auto
 	unsigned long trip_id;
 	int hhold;
-	int path_id;
+	shared_ptr<Path> path;
 	//int person;
 	int tour;
 	int trip;
