@@ -43,7 +43,7 @@ namespace Transit_Vehicle_Trip_Components
 			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
 			m_container(std::vector<int>, departure_seconds, NONE, NONE);
 			m_data(int, number_of_stops, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(Next_Simulation_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			
 			//Simulation related
 			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
@@ -62,7 +62,7 @@ namespace Transit_Vehicle_Trip_Components
 			{
 				_network_reference = (network_reference_type)network;				
 
-				this->template current_position<int>((int)0);
+				this->template current_position<int>((int)-1);
 
 				int arrival_time = this->template arrival_seconds<std::vector<int>>()[0];
 
@@ -75,10 +75,10 @@ namespace Transit_Vehicle_Trip_Components
 				{
 					_this->transit_vehicle_arriving();
 					response.next._iteration = iteration();
-					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ALIGHTING_SUBITERATION;					
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;					
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ALIGHTING_SUBITERATION)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION)
 				{
 					_this->alight_travelers();
 					
@@ -107,21 +107,19 @@ namespace Transit_Vehicle_Trip_Components
 				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
 				{
 					_this->board_travelers();
-					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._iteration = _this->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
 						;
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
-					)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION)
 				{
 					_this->transit_vehicle_departing();
-					response.next._iteration = _this->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._iteration = _this->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION;
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION
-					)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION)
 				{
 					_this->transit_vehicle_depot();
 					response.next._iteration = END;
@@ -144,6 +142,8 @@ namespace Transit_Vehicle_Trip_Components
 
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
+				position++;
+				this->template current_position<int>(position);
 				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
 
 				if (position < pattern_links.size())
@@ -263,7 +263,7 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
 
 				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
-				this->template Next_Logging_Time<Simulation_Timestep_Increment>(departure_time);
+				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(departure_time);
 
 				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
@@ -290,10 +290,9 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
 				trajectory_stream << "4\tI am moving to my next stop" << endl;
 
-				position++;
-				this->template current_position<int>(position);
-				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
-				this->template Next_Logging_Time<Simulation_Timestep_Increment>(arrival_time);
+				//this->template current_position<int>(position);
+				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position + 1];
+				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(arrival_time);
 
 				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}

@@ -505,11 +505,10 @@ namespace Person_Components
 		//TODO: Omer
 		enum Movement_Status_Keys
 		{
-			UNLOADED = 0,
-			IN_ENTRY_QUEUE,
-			IN_NETWORK,
+			UNLOADED = 0,			
 			OUT_NETWORK,
 			WALKING,
+			DRIVING,
 			WAITING,
 			ON_BOARD
 		};
