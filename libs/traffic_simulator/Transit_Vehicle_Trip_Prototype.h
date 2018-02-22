@@ -29,6 +29,7 @@ namespace Transit_Vehicle_Trip_Components
 			
 			//Simulation related
 			accessor(people_on_board, NONE, NONE);
+			accessor(people_seated, NONE, NONE);
 			accessor(current_position, NONE, NONE);
 
 			template<typename TargetType> void schdeule_vehicle_movements_in_transit_network(TargetType param)

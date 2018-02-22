@@ -47,6 +47,7 @@ namespace Transit_Vehicle_Trip_Components
 			
 			//Simulation related
 			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
+			m_container(std::vector<_Person_Interface*>, people_seated, NONE, NONE);
 			m_data(int, current_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			//----------------------------------------------------------------------
 
@@ -75,12 +76,12 @@ namespace Transit_Vehicle_Trip_Components
 				{
 					_this->transit_vehicle_arriving();
 					response.next._iteration = iteration();
-					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;					
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ALIGHTING_SUBITERATION;
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ALIGHTING_SUBITERATION)
 				{
-					_this->alight_travelers();
+					_this->transit_vehicle_alight_travelers();
 					
 					int position = _this->template current_position<int>();
 					int number_of_links = _this->template number_of_stops<int>() - 1;
@@ -88,7 +89,7 @@ namespace Transit_Vehicle_Trip_Components
 					if (position < number_of_links)
 					{
 						response.next._iteration = iteration();
-						response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_SEATING_SUBITERTION;
+						response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_BOARDING_SUBITERATION;
 					}
 					else
 					{
@@ -97,19 +98,11 @@ namespace Transit_Vehicle_Trip_Components
 					}
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_SEATING_SUBITERTION)
-				{
-					_this->rearrange_seats();
-					response.next._iteration = iteration();
-					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION;
-				}
-				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_BOARDING_SUBITERTION)
 				{
 					_this->board_travelers();
 					response.next._iteration = _this->template Next_Simulation_Time<Simulation_Timestep_Increment>();
-					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION
-						;
+					response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION;
 				}
 				
 				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPARTING_SUBITERATION)
@@ -171,10 +164,10 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "0\tI arrived" << endl;
 				}
 
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
-			void alight_travelers()
+			void transit_vehicle_alight_travelers()
 			{
 				stringstream trajectory_stream;
 
