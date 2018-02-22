@@ -144,6 +144,8 @@ struct MasterType
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	typedef Household_Components::Implementations::UIC_Vehicle_Technology_Chooser_Implementation<M> vehicle_technology_chooser_type;
 	
+	typedef Household_Components::Implementations::IntraHousehold_AV_Assignment_Implementation<M> intrahousehold_av_assignment_type;
+
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
 	typedef Activity_Components::Implementations::Basic_Activity_Plan_Implementation<M> activity_type;

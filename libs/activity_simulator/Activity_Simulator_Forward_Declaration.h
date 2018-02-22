@@ -182,6 +182,7 @@ namespace Household_Components {
 		template<typename ComponentType> struct Household_Properties;
 		prototype struct Vehicle_Chooser;
 		prototype struct Vehicle_Technology_Chooser;
+		
 	}
 };
 

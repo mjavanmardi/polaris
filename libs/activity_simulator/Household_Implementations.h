@@ -29,6 +29,9 @@ namespace Household_Components
 			m_prototype(Household_Components::Prototypes::Household_Properties, typename MasterType::household_properties_type, Properties, NONE,NONE);
 			m_prototype(Household_Components::Prototypes::Household_Properties,typename MasterType::household_static_properties_type, Static_Properties, NONE, NONE);
 			m_prototype(Household_Components::Prototypes::Vehicle_Chooser, typename MasterType::vehicle_chooser_type, Vehicle_Chooser, NONE, NONE);
+
+			m_prototype(Household_Components::Prototypes::IntraHousehold_AV_Assignment, typename MasterType::intrahousehold_av_assignment_type, IntraHousehold_AV_Assignment, NONE, NONE);
+			
 			
 			// Physical world elements
 			m_prototype(Network_Components::Prototypes::Network, typename MasterType::network_type, network_reference, NONE, NONE);
@@ -71,7 +74,10 @@ namespace Household_Components
 				_Vehicle_Chooser = (Vehicle_Chooser_type)Allocate<type_of(Vehicle_Chooser)>();
 				_Vehicle_Chooser->Initialize<ComponentType*>(this);
 				//_Vehicle_Chooser->Parent_Household<ComponentType*>(this);
-					
+
+				_IntraHousehold_AV_Assignment = (IntraHousehold_AV_Assignment_type)Allocate<type_of(IntraHousehold_AV_Assignment)>();
+				_IntraHousehold_AV_Assignment->Initialize<ComponentType*>(this);
+
 				// Add basic traveler properties							
 				this->template uuid<int>(id);
 				this->template internal_id<int>(id);
