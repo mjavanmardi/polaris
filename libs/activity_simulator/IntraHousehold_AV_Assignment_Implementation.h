@@ -1,12 +1,9 @@
 #pragma once
 
-
 #pragma push_macro("check")
 #undef check
 #include "gurobi_c++.h"
 #pragma pop_macro("check")
-
-
 
 
 #include <numeric>
@@ -157,7 +154,7 @@ namespace Household_Components
 			void Add_Absolute(map<string, GRBVar>& grb_Vars, GRBModel& model, _activity_itf& activity, string strVarName, double value, GRBVar& var, GRBLinExpr& Obj_LinExpr, string strActID)
 			{				
 				string varName = strVarName + "_" + strActID + "_abs";				
-				GRBVar new_var1 = model.addVar(0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, varName);
+				GRBVar new_var1 = model.addVar(0, 1440.0, 0.0, GRB_CONTINUOUS, varName);
 				grb_Vars.insert(std::pair<string, GRBVar>(varName, new_var1));
 
 				varName = strVarName + "_" + strActID + "_absBi";
@@ -165,11 +162,11 @@ namespace Household_Components
 				grb_Vars.insert(std::pair<string, GRBVar>(varName, new_var2));
 
 				varName = strVarName + "_" + strActID + "_absI1";
-				GRBVar new_var3 = model.addVar(-2000.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, varName);
+				GRBVar new_var3 = model.addVar(0, 1440.0, 0.0, GRB_CONTINUOUS, varName);
 				grb_Vars.insert(std::pair<string, GRBVar>(varName, new_var3));
 
 				varName = strVarName + "_" + strActID + "_absI2";
-				GRBVar new_var4 = model.addVar(-2000.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, varName);
+				GRBVar new_var4 = model.addVar(0, 1440.0, 0.0, GRB_CONTINUOUS, varName);
 				grb_Vars.insert(std::pair<string, GRBVar>(varName, new_var4));
 
 				//p <= M*y and n <= M * (1 - y) w
@@ -366,8 +363,8 @@ namespace Household_Components
 														double start_ub = per1_activity-> template Start_Time<Time_Minutes>().Value + min_start_flex;
 
 														//constraint duration of activity
-														double duration_lb = max(5.0, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
-														double duration_ub = max(5.0, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>() + min_dur_flex);
+														double duration_lb = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
+														double duration_ub = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value + min_dur_flex);
 
 														strVarName = "start_" + per1_strActID;
 														//GRBVar start = model.addVar(start_lb, start_ub, 0.0, GRB_CONTINUOUS, strVarName);
@@ -1263,24 +1260,8 @@ namespace Household_Components
 						//void Generate_Activities_File(map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
 						Generate_Activities_File(grb_Vars, act_ID_map);
 						Generate_Trips_File(grb_Vars, act_ID_map);
-
-						//ofstream myfile;
-						//myfile.open("c:\\Mahmoud\\results.txt");
-						////x.get(GRB_StringAttr_VarName) << " "
-						////x.get(GRB_DoubleAttr_X) << endl;
-						//for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
-						//{
-						//	if (it->first.substr(0, 5) == "t_AV_")
-						//	{
-						//		if (it->second.get(GRB_DoubleAttr_X) > 0.00001)
-						//			myfile << it->first << "\t" << it->second.get(GRB_DoubleAttr_X) << endl;
-						//	}
-						//	else if ((it->first.find("start_") != string::npos|| it->first.find("end_") != string::npos || it->first.find("duration_") != string::npos) && it->first.find("abs") == string::npos)
-						//	{
-						//		myfile << it->first << "\t" << it->second.get(GRB_DoubleAttr_X) <<  endl;
-						//	}
-						//}
-						//myfile.close();
+						//Generate_Results_File(grb_Vars, act_ID_map);
+						Generate_Results2_File(model);
 					}
 					else if (status_code == GRB_INFEASIBLE)
 					{
@@ -1434,22 +1415,79 @@ namespace Household_Components
 				myfile << file_content.rdbuf();
 				myfile.close();
 			}
+
+			void Generate_Results_File(map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
+			{
+				auto HHID = this->_Parent_Household->uuid<long long>();
+
+				ofstream myfile;
+				myfile.open("c:\\Mahmoud\\results_" + to_string(HHID) + ".txt");
+				//x.get(GRB_StringAttr_VarName) << " "
+				//x.get(GRB_DoubleAttr_X) << endl;
+				for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
+				{
+					//if (it->first.substr(0, 5) == "t_AV_")
+					//{
+					//	if (it->second.get(GRB_DoubleAttr_X) > 0.00001)
+					//		myfile << it->first << "\t" << it->second.get(GRB_DoubleAttr_X) << endl;
+					//}
+					//else 
+					if ((it->first.find("start_") != string::npos || it->first.find("end_") != string::npos || it->first.find("duration_") != string::npos) && it->first.find("abs") == string::npos)
+					{
+						myfile << it->first << "\t" << it->second.get(GRB_DoubleAttr_X) << endl;
+					}
+				}
+				myfile.close();
+			}
+
+			void Generate_Results2_File(GRBModel& model)
+			{
+				auto HHID = this->_Parent_Household->uuid<long long>();
+
+				ofstream myfile;
+				myfile.open("c:\\Mahmoud\\results2_" + to_string(HHID) + ".txt");
+				//x.get(GRB_StringAttr_VarName) << " "
+				//x.get(GRB_DoubleAttr_X) << endl;
+				int numvars = model.get(GRB_IntAttr_NumVars);
+				GRBVar *vars = 0;
+				vars = model.getVars();
+				for (int j = 0; j < numvars; j++) 
+				{
+					GRBVar v = vars[j];
+					double x = v.get(GRB_DoubleAttr_X);
+					//if (x != 0.0) 
+					{
+						myfile  << v.get(GRB_StringAttr_VarName) << "\t" << x << endl;
+					}
+				}
+				//for (auto it = model. .begin(); it != grb_Vars.end(); it++)
+				//{
+				//	if ((it->first.find("start_") != string::npos || it->first.find("end_") != string::npos || it->first.find("duration_") != string::npos) && it->first.find("abs") == string::npos)
+				//	{
+				//		myfile << it->first << "\t" << it->second.get(GRB_DoubleAttr_X) << endl;
+				//	}
+				//}
+
+				myfile.close();
+			}
+
+
 	};
 		//template<typename MasterType, typename InheritanceList> typename IntraHousehold_AV_Assignment_Implementation <MasterType, InheritanceList>::type_of(is_initialized) IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::_is_initialized = false;
 		
 		//template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_travel_time = 1;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_act_dur = 1;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_act_dur = 5;
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_start_flex = 15;
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_dur_flex = 15;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -5.0;				//fixed cost of each AV in the system
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -0.5 / 60.0;		//$0.5 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_energy = -5.0 / 60.0;		//Cost of AV : $5 per hour(0.0833 per minute)
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -0.0;				//fixed cost of each AV in the system
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -0.0 / 60.0;		//$0.5 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_energy = -0.0 / 60.0;		//Cost of AV : $5 per hour(0.0833 per minute)
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_vot = -10 / 60.0;				//Person time cost : $10 / hr($0.167 / min) When changes to the activity start and duration is made
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_fixed = -20.00;			//#cost of taxi : $2
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -240.0 / 60;	//#$24 per hour($0.4 per minute)
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -1.0 / 60.0;		//  #$1 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -5 / 100;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -0.0 / 60.0;		//  #$1 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -0 / 100;
 
 	}
 }
