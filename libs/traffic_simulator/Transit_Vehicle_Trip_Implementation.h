@@ -46,8 +46,8 @@ namespace Transit_Vehicle_Trip_Components
 			member_component_and_feature_accessor(Next_Simulation_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			
 			//Simulation related
-			m_container(std::vector<_Person_Interface*>, people_on_board, NONE, NONE);
-			m_container(std::vector<_Person_Interface*>, people_seated, NONE, NONE);
+			m_container(std::list<_Person_Interface*>, people_standing, NONE, NONE);
+			m_container(std::list<_Person_Interface*>, people_seated, NONE, NONE);			
 			m_data(int, current_position, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			//----------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ namespace Transit_Vehicle_Trip_Components
 					}
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_BOARDING_SUBITERTION)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION)
 				{
 					_this->board_travelers();
 					response.next._iteration = _this->template Next_Simulation_Time<Simulation_Timestep_Increment>();

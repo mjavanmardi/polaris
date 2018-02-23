@@ -78,8 +78,6 @@ namespace Person_Components
 			// Record of completed activities (stores a simplified subset of activity data)
 			m_container(std::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
 
-			//TODO:Omer
-			m_data(Person_Components::Types::Movement_Status_Keys, simulation_status, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
@@ -110,7 +108,13 @@ namespace Person_Components
 			typedef Back_Insertion_Sequence< type_of(Activity_Record_Container)> Activity_Records;
 			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Records)> Activity_Record;
 			
-			
+
+			//TODO:Omer
+			typedef std::list<typename get_type_of(ComponentType)>::iterator queue_iterator;
+			m_data(Person_Components::Types::Movement_Status_Keys, simulation_status, NONE, NONE);
+			m_data(queue_iterator*, position_in_vehicle_standing_queue, NONE, NONE);
+			m_data(queue_iterator*, position_in_vehicle_seated_queue, NONE, NONE);
+
 			//=======================================================================================================================================================================
 			// FEATURES
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------

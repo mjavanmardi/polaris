@@ -120,6 +120,8 @@ namespace Prototypes
 
 		//TODO:Omer
 		accessor(simulation_status, NONE, NONE);
+		accessor(position_in_vehicle_standing_queue, NONE, NONE);
+		accessor(position_in_vehicle_seated_queue, NONE, NONE);
 
 		void Arrive_At_Destination();
 
