@@ -1268,12 +1268,21 @@ namespace Prototypes
 			//If the person is on board they it means they are alighting
 			if (current_status == ON_BOARD)
 			{				
-				this->template person_alighting_transit_vehicle<NT>();				
+				this->template person_alighting_transit_vehicle<NT>();
+				//Next simulation time is the current time
+				next_simulation_time = iteration();
+				//Next subiteration is moving
+				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+				//Traveler status is walking
+				next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
 			}
 			else
 			{
-				next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+				//Next simulation time is the current time
+				next_simulation_time = iteration();
+				//Next subiteration is moving
 				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+				//Traveler status is walking
 				next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
 			}
 		}
@@ -1308,6 +1317,12 @@ namespace Prototypes
 				else
 				{
 					this->template person_alighting_transit_vehicle<NT>();
+					//Next simulation time is the current time
+					next_simulation_time = iteration();
+					//Next subiteration is waiting for another transit
+					next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
+					//Traveler status is walking
+					next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
 				}
 			}
 			//Else means they have to wait
@@ -1519,7 +1534,7 @@ namespace Prototypes
 		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
 		//Get the person's position along the trajectory
 		int current_position = movement->template current_multimodal_trajectory_position<int>();
-		//Get the trajectory members at that position
+		//Get the trajectory members at the previous position
 		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position-1];
 		//Get the transit vehicle trip to be boarded
 		_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
@@ -1531,18 +1546,7 @@ namespace Prototypes
 		//Erase the person from the queue
 		people_standing->erase(position_in_vehicle_standing_queue);
 		//Check the size
-		int queue_size = people_standing->size();
-		//Next simulation time is the current time
-		int next_simulation_time = iteration();
-		//Next subiteration is moving (with the vehicle now)
-		int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;
-		//Traveler status is now on board!
-		next_status = Person_Components::Types::Movement_Status_Keys::WALKING;		
-
-		//Set the values
-		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
-		this->template Next_Sub_Iteration<int>(next_sub);
-		person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+		int queue_size = people_standing->size();		
 	}
 	//TODO: Omer END
 }
