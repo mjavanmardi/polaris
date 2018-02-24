@@ -110,10 +110,10 @@ namespace Person_Components
 			
 
 			//TODO:Omer
-			typedef std::list<typename get_type_of(ComponentType)>::iterator queue_iterator;
+			typedef typename std::list<this_itf*>::iterator queue_iterator;
 			m_data(Person_Components::Types::Movement_Status_Keys, simulation_status, NONE, NONE);
-			m_data(queue_iterator*, position_in_vehicle_standing_queue, NONE, NONE);
-			m_data(queue_iterator*, position_in_vehicle_seated_queue, NONE, NONE);
+			m_data(queue_iterator, position_in_vehicle_standing_queue, NONE, NONE);
+			m_data(queue_iterator, position_in_vehicle_seated_queue, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// FEATURES

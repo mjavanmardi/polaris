@@ -72,6 +72,9 @@ namespace Transit_Vehicle_Trip_Components
 
 			static void move_transit_vehicles_in_transit_network_conditional(ComponentType* _this, Event_Response& response) 
 			{
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
+
 				if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ARRIVING_SUBITERATION)
 				{
 					_this->transit_vehicle_arriving();
@@ -98,7 +101,7 @@ namespace Transit_Vehicle_Trip_Components
 					}
 				}
 				
-				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION)
+				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_BOARDING_SUBITERATION)
 				{
 					_this->board_travelers();
 					response.next._iteration = _this->template Next_Simulation_Time<Simulation_Timestep_Increment>();
