@@ -438,6 +438,8 @@ namespace Network_Components
 
 			static void End_Iteration_Conditional(ComponentType* _this,Event_Response& response)
 			{
+				int cur_iter = iteration();
+
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION)
 				{
@@ -582,6 +584,12 @@ namespace Network_Components
 				((typename MasterType::network_type*)this)->template calculate_moe<NULLTYPE>();
 				//((typename MasterType::network_type*)this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)this)->template printResults<NULLTYPE>();
+
+				if (iteration() + _this_ptr->template scenario_reference<_Scenario_Interface*>()->simulation_interval_length<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
+				{
+					//TODO: JAA - 2/24/18: as it says below...
+					cout << "PRINT ALL THE STUCK CARS.....";
+				}
 			}
 
 			//template<typename TargetType> void add_in_network_to_VHT()

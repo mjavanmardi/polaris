@@ -15,7 +15,7 @@ namespace Intersection_Control_Components
 	{
 		implementation struct Phase_Movement_Implementation:public Polaris_Component<MasterType,INHERIT(Phase_Movement_Implementation),Data_Object>
 		{
-			m_prototype(Null_Prototype,typename MasterType::movement_type, movement, NONE, NONE);
+			m_prototype(Turn_Movement_Components::Prototypes::Movement,typename MasterType::movement_type, movement, NONE, NONE);
 			m_data(Intersection_Control_Components::Types::Movement_Priority_Type_Keys, movement_priority_type, NONE, NONE);
 		};
 
