@@ -28,10 +28,15 @@ namespace Transit_Vehicle_Trip_Components
 			typedef typename Polaris_Component<MasterType, INHERIT(Transit_Vehicle_Trip_Implementation), Execution_Object>::Component_Type ComponentType;
 
 			typedef Person_Components::Prototypes::Person<typename MasterType::person_type> _Person_Interface;
+			typedef Person_Components::Prototypes::Person_Mover<typename _Person_Interface::get_type_of(Moving_Faculty)> _Person_Mover_Interface;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename _Person_Mover_Interface::get_type_of(Movement)> _Movement_Interface;
+			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename _Movement_Interface::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+			typedef  Random_Access_Sequence< typename _Movement_Interface::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
+			typedef typename std::list<_Person_Interface*>::iterator queue_iterator;
 			
 
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -84,7 +89,7 @@ namespace Transit_Vehicle_Trip_Components
 				
 				else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_ALIGHTING_SUBITERATION)
 				{
-					_this->transit_vehicle_alight_travelers();
+					_this->alight_travelers();
 					
 					int position = _this->template current_position<int>();
 					int number_of_links = _this->template number_of_stops<int>() - 1;
@@ -170,7 +175,7 @@ namespace Transit_Vehicle_Trip_Components
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
-			void transit_vehicle_alight_travelers()
+			void alight_travelers()
 			{
 				stringstream trajectory_stream;
 
@@ -238,18 +243,38 @@ namespace Transit_Vehicle_Trip_Components
 
 			void board_travelers()
 			{
-				stringstream trajectory_stream;
+				stringstream trajectory_stream;				
 
+				//Get the pattern of transit vehicle trip
 				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
+				//Get the pattern ID
 				std::string pattern_ID = pattern->template dbid<std::string>();
+				//Get the pattern links
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
 
+				//Get the trip ID
 				std::string trip_ID = this->template dbid<std::string>();
+				//Get vehicle's position
 				int position = this->template current_position<int>();
+				//Get the arrival time
 				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
 
+				//Get the current link
 				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
+				//Get the stop ID
 				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
+
+				//Get the list of people standing in the vehicle
+				std::list<_Person_Interface*>* people_standing = this->template people_standing<std::list<_Person_Interface*>*>();
+				//Get the list of people seated in the vehicle
+				std::list<_Person_Interface*>* people_seated = this->template people_seated<std::list<_Person_Interface*>*>();
+				//Get the list of people waiting at the stop
+				std::list<_Person_Interface*>* people_waiting = pattern_link->template people_waiting<std::list<_Person_Interface*>*>();
+
+				//Get the departure time
+				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
+				//Set the next response time
+				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(departure_time);
 
 				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 				trajectory_stream << "At position:\t" << position << "\t";
@@ -258,8 +283,55 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
 				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
 
-				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
-				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(departure_time);
+				//Loop over the people waiting in the link
+				queue_iterator position_in_link_waiting_queue;
+				for (position_in_link_waiting_queue = people_waiting->begin(); position_in_link_waiting_queue != people_waiting->end(); ++position_in_link_waiting_queue)
+				{
+					//Get the person
+					_Person_Interface* person = (_Person_Interface*) *position_in_link_waiting_queue;
+					//Get the movement faculty
+					_Person_Mover_Interface* person_mover = person->template Moving_Faculty<_Person_Mover_Interface*>();
+					//Get the movement plan
+					_Movement_Interface* movement = person_mover->Movement<_Movement_Interface*>();
+					//Get the current position of person
+					int person_position = movement->template current_multimodal_trajectory_position<int>();
+					//Get the planned trajectory
+					_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+					//Get the trajectory members at that position
+					_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[person_position];
+					//Get the transit vehicle trip to be boarded
+					ComponentType* person_vehicle_trip = trajectory_unit->template transit_vehicle_trip<ComponentType*>();
+
+					//Check if the person is waiting for this vehicle
+					if (person_vehicle_trip == this)
+					{
+						if (people_standing->size() < 25)
+						{
+							person_mover->template person_boarded_transit_vehicle<NT>(departure_time);
+							//push the person into the standing people list
+							people_seated->push_back(person);
+							//get the person's position in the list
+							queue_iterator position_in_vehicle_seated_queue = --people_seated->end();
+							//set the person's position as a person property
+							person->position_in_vehicle_seated_queue(position_in_vehicle_seated_queue);
+							//update the person's status
+							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_SEATED);
+						}
+						else if (people_standing->size() < 25)
+						{
+							person_mover->template person_boarded_transit_vehicle<NT>(departure_time);
+							//push the person into the seated people list
+							people_standing->push_back(person);
+							//get the person's position in the list
+							queue_iterator position_in_vehicle_standing_queue = --people_standing->end();
+							//set the person's position as a person property
+							person->position_in_vehicle_standing_queue(position_in_vehicle_standing_queue);
+							//update the person's status
+							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_STANDING);
+						}
+					}
+
+				}
 
 				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}

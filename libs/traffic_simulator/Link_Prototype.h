@@ -110,6 +110,7 @@ namespace Link_Components
 			accessor(drive_time, NONE, NONE);
 			accessor(drive_fft_to_transit, NONE, NONE);
 			accessor(touch_transit, NONE, NONE);
+			accessor(people_waiting, NONE, NONE);
 
 			//------------------------------------------------------------------------------------------------------------------
 

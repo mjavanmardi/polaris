@@ -114,6 +114,7 @@ namespace Person_Components
 			m_data(Person_Components::Types::Movement_Status_Keys, simulation_status, NONE, NONE);
 			m_data(queue_iterator, position_in_vehicle_standing_queue, NONE, NONE);
 			m_data(queue_iterator, position_in_vehicle_seated_queue, NONE, NONE);
+			m_data(queue_iterator, position_in_link_waiting_queue, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// FEATURES

@@ -76,7 +76,9 @@ namespace Link_Components
 		{
 			 
 			typedef typename Polaris_Component<MasterType,INHERIT(Link_Implementation),Execution_Object>::Component_Type ComponentType;
-			
+			//TODO: Omer
+			typedef Person_Components::Prototypes::Person<typename MasterType::person_type> _Person_Interface;
+
 		//==================================================================================================================
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -181,6 +183,7 @@ namespace Link_Components
 			m_data(float, drive_time, NONE, NONE);
 			m_data(float, drive_fft_to_transit, NONE, NONE);
 			m_data(bool, touch_transit, NONE, NONE);
+			m_container(std::list<_Person_Interface*>, people_waiting, NONE, NONE);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members

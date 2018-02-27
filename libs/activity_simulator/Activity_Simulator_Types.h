@@ -510,7 +510,9 @@ namespace Person_Components
 			WALKING,
 			DRIVING,
 			WAITING,
-			ON_BOARD
+			ON_BOARD_SEATED,
+			ON_BOARD_STANDING,
+			REROUTING
 		};
 	}
 }
