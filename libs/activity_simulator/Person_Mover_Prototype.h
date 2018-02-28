@@ -1239,8 +1239,7 @@ namespace Person_Components
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
 			//Get their status
-			Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
-			Person_Components::Types::Movement_Status_Keys next_status;
+			Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();			
 			//Get the movement plan
 			movement_itf* movement = this->Movement<movement_itf*>();
 			//Get the planned trajectory
@@ -1251,6 +1250,8 @@ namespace Person_Components
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
 			//Get the link at that position
 			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the destination link
+			_Link_Interface* destination_link = movement->template destination<_Link_Interface*>();
 			//Get the link mode from two different sources
 			Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 			Link_Components::Types::Link_Type_Keys link_mode = trajectory_unit->template link_mode<Link_Components::Types::Link_Type_Keys>();
@@ -1263,8 +1264,23 @@ namespace Person_Components
 
 			int next_simulation_time;
 			int next_sub;
+			Person_Components::Types::Movement_Status_Keys next_status;
+			//Check if the person has arrived at their destination
+			if (link == destination_link)
+			{
+				next_simulation_time = END;
+				//Next subiteration is moving
+				next_sub = END;
+				//Traveler status is walking
+				next_status = Person_Components::Types::Movement_Status_Keys::OUT_NETWORK;
+
+				//Set the values
+				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+				this->template Next_Sub_Iteration<int>(next_sub);
+				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+			}
 			//If the mode is non-transit person can walk/bike/drive freely
-			if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
 				//If the person is on board they it means they are alighting
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
@@ -1286,6 +1302,11 @@ namespace Person_Components
 					//Traveler status is walking
 					next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
 				}
+
+				//Set the values
+				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+				this->template Next_Sub_Iteration<int>(next_sub);
+				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 			}
 			//Else means the mode is transit.
 			else
@@ -1298,17 +1319,15 @@ namespace Person_Components
 				_Pattern_Links_Container_Interface& pattern_links = trip_pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
 				//Get the current position of the transit vehicle
 				int transit_vehicle_position = transit_vehicle_trip->template current_position<int>();
-				//Get the unique patterns on the traveler's link
-				std::vector<_Transit_Pattern_Interface*>& unique_patterns = link->template unique_patterns<std::vector<_Transit_Pattern_Interface*>&>();
 						
 				//If they are already on board 
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
 				{
-					//Get the link of the transit vehicle trip at its current position
-					_Link_Interface* vehicle_link = (_Link_Interface*)(pattern_links[transit_vehicle_position]);
+					//Get the person's current trip
+					_Transit_Vehicle_Trip_Interface* current_transit_vehicle = (_Transit_Vehicle_Trip_Interface*)(person->template current_transit_vehicle<_Transit_Vehicle_Trip_Interface*>());
 
 					//If the person will stay onboard they just move freely in the transit vehicle
-					if (vehicle_link == link)
+					if (current_transit_vehicle == transit_vehicle_trip)
 					{
 						//Next simulation time is the vehicle departure time
 						next_simulation_time = transit_vehicle_trip->template departure_seconds<std::vector<int>>()[transit_vehicle_position];
@@ -1316,63 +1335,25 @@ namespace Person_Components
 						next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
 						//Traveler status will be current_status
 						next_status = current_status;
+						//Set the values
+						this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+						this->template Next_Sub_Iteration<int>(next_sub);
+						person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 					}
-					//Otherwise they are alighting
+					//Otherwise they are alighting and will wait for their next vehicle
 					else
 					{
 						this->template person_alighting_transit_vehicle<NT>();
-						//Next simulation time is the current time
-						next_simulation_time = iteration();
-						//Next subiteration is waiting for another transit
-						next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
-						//Traveler status will be current_status
-						next_status = current_status;
+						this->template person_waiting_at_beginning_of_link<NT>();
 					}
 				}
-				//Else means they have to wait
+				//Else means they have to wait for the current vehicle
 				else
-				{
-					int pattern_ctr = 0;
-					int index_along_pattern_at_upstream_node = -1;
-					int anticipated_vehicle_arrival_time;
-				
-					//Get this link's position along the pattern
-					for (auto pattern_itr = unique_patterns.begin(); pattern_itr != unique_patterns.end(); pattern_itr++)
-					{
-						if (trip_pattern == *pattern_itr)
-						{
-							index_along_pattern_at_upstream_node = link->template index_along_pattern_at_upstream_node<std::vector<int>&>()[pattern_ctr];
-							break;
-						}
-						pattern_ctr++;
-					}
-
-					//Get the anticipated_vehicle_arrival_time at that link
-					if (index_along_pattern_at_upstream_node >= 0)
-					{
-						anticipated_vehicle_arrival_time = transit_vehicle_trip->template arrival_seconds<std::vector<int>&>()[index_along_pattern_at_upstream_node];
-					}
-					else
-					{
-						assert(false);
-						cout << "The traveler is supposed to find a valid pattern!" << endl;
-					}			
-				
+				{			
 					this->template person_waiting_at_beginning_of_link<NT>();
-				
-					//Next simulation time is anticipated_vehicle_arrival_time plus ten minutes
-					next_simulation_time = anticipated_vehicle_arrival_time + 600;
-					//Next subiteration is rerouting in case the vehicle does not arrive within 10 minutes of schedule
-					next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_REROUTING_SUBITERATION;
-					//Traveler status will be waiting
-					next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
 				}
 			}		
 
-			//Set the values
-			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
-			this->template Next_Sub_Iteration<int>(next_sub);
-			person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 		}
 
 		template<typename ComponentType>
@@ -1416,10 +1397,10 @@ namespace Person_Components
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
-			typedef typename std::list<person_itf*>::iterator queue_iterator;
+			typedef typename std::list<person_itf*>::iterator queue_iterator_type;
 
 			//Get the person
-			person_itf* person = this->Parent_Person<person_itf*>();		
+			person_itf* person = this->Parent_Person<person_itf*>();
 			//Get the movement plan
 			movement_itf* movement = this->Movement<movement_itf*>();
 			//Get the planned trajectory
@@ -1429,33 +1410,103 @@ namespace Person_Components
 			//Get the trajectory members at that position
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
 			//Get the link at that position
-			_Link_Interface* person_link = trajectory_unit->template link<_Link_Interface*>();
-		
-			//Get the standing people list in the transit vehicle
-			std::list<person_itf*>* people_waiting = person_link->template people_waiting<std::list<person_itf*>*>();
-			queue_iterator position_in_link_waiting_queue;
+			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the transit vehicle trip
+			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
+			//Get the pattern of that trip
+			_Transit_Pattern_Interface* trip_pattern = transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>();
+			//Get the links of that pattern
+			_Pattern_Links_Container_Interface& pattern_links = trip_pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+			//Get the current position of the transit vehicle
+			int transit_vehicle_position = transit_vehicle_trip->template current_position<int>();
+			//Get the unique patterns on the traveler's link
+			std::vector<_Transit_Pattern_Interface*>& unique_patterns = link->template unique_patterns<std::vector<_Transit_Pattern_Interface*>&>();
+					
+			int pattern_ctr = 0;
+			int index_along_pattern_at_upstream_node = -1;
+			int anticipated_vehicle_arrival_time;
+			//Get this link's position along the transit pattern
+			for (auto pattern_itr = unique_patterns.begin(); pattern_itr != unique_patterns.end(); pattern_itr++)
+			{
+				if (trip_pattern == *pattern_itr)
+				{
+					index_along_pattern_at_upstream_node = link->template index_along_pattern_at_upstream_node<std::vector<int>&>()[pattern_ctr];
+					break;
+				}
+				pattern_ctr++;
+			}
 
+			//Get the anticipated_vehicle_arrival_time at that link
+			if (index_along_pattern_at_upstream_node >= 0)
+			{
+				anticipated_vehicle_arrival_time = transit_vehicle_trip->template arrival_seconds<std::vector<int>&>()[index_along_pattern_at_upstream_node];
+			}
+			else
+			{
+				assert(false);
+				cout << "The traveler is supposed to find a valid pattern!" << endl;
+			}
+
+			//Get the list of people waiting at the beginning of that link
+			std::list<person_itf*>* people_waiting = link->template people_waiting<std::list<person_itf*>*>();
 			//push the person into the standing people list
 			people_waiting->push_back(person);
-			//get the person's position in the list
-			position_in_link_waiting_queue = --people_waiting->end();
+			//Get the position in the queue
+			queue_iterator_type position_in_link_waiting_queue = --people_waiting->end();
 			//set the person's position as a person property
 			person->position_in_link_waiting_queue(position_in_link_waiting_queue);
+
+			//Next simulation time is anticipated_vehicle_arrival_time plus ten minutes
+			int next_simulation_time = anticipated_vehicle_arrival_time + 600;
+			//Next subiteration is rerouting in case the vehicle does not arrive within 10 minutes of schedule
+			int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_REROUTING_SUBITERATION;
+			//Traveler status will be waiting
+			Person_Components::Types::Movement_Status_Keys next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
+
+			//Set the values
+			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+			this->template Next_Sub_Iteration<int>(next_sub);
+			person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 		}	
 
 		template<typename ComponentType>
 		template<typename TargetType>
 		void Person_Mover<ComponentType>::person_boarded_transit_vehicle(int next_simulation_time)
 		{
-			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;		
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+			typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
+			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
+			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
+			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
+
+			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
-		
+			//Get their status
+			Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
+			//Get the movement plan
+			movement_itf* movement = this->Movement<movement_itf*>();
+			//Get the planned trajectory
+			_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+			//Get the person's position along the trajectory
+			int current_position = movement->template current_multimodal_trajectory_position<int>();
+			//Get the trajectory members at that position
+			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
+			// Get the transit vehicle trip
+			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();			
+			//Set the person's current vehicle to the boarded vehicle
+			person->template current_transit_vehicle<_Transit_Vehicle_Trip_Interface*>(transit_vehicle_trip);
 			//int next_simulation_time = iteration();
 			int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
 
+			//Set the values
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
 
+			//Schedule departure event for person
 			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&move_persons_in_multimodal_network_conditional, next_simulation_time, next_sub);		
 		}
 
@@ -1472,7 +1523,7 @@ namespace Person_Components
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
-			typedef typename std::list<person_itf*>::iterator queue_iterator;
+			typedef typename std::list<person_itf*>::iterator queue_iterator_type;
 
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
@@ -1494,9 +1545,11 @@ namespace Person_Components
 			{//Get the standing people list in the transit vehicle
 				std::list<person_itf*>* people_seated = transit_vehicle_trip->template people_seated<std::list<person_itf*>*>();
 				//Get the person's position in the standin queue
-				queue_iterator position_in_vehicle_seated_queue = person->template position_in_vehicle_seated_queue<queue_iterator>();
+				queue_iterator_type position_in_vehicle_seated_queue = person->template position_in_vehicle_seated_queue<queue_iterator_type>();
 				//Erase the person from the queue
 				people_seated->erase(position_in_vehicle_seated_queue);
+				//Set the waiting standing position of the person to null
+				person->position_in_vehicle_seated_queue(people_seated->end());
 				//Check the size
 				int queue_size = people_seated->size();
 			}
@@ -1504,9 +1557,11 @@ namespace Person_Components
 			{//Get the standing people list in the transit vehicle
 				std::list<person_itf*>* people_standing = transit_vehicle_trip->template people_standing<std::list<person_itf*>*>();
 				//Get the person's position in the standin queue
-				queue_iterator position_in_vehicle_standing_queue = person->template position_in_vehicle_standing_queue<queue_iterator>();
+				queue_iterator_type position_in_vehicle_standing_queue = person->template position_in_vehicle_standing_queue<queue_iterator_type>();
 				//Erase the person from the queue
 				people_standing->erase(position_in_vehicle_standing_queue);
+				//Set the waiting standing position of the person to null
+				person->position_in_vehicle_standing_queue(people_standing->end());
 				//Check the size
 				int queue_size = people_standing->size();
 			}

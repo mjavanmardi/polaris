@@ -36,7 +36,7 @@ namespace Transit_Vehicle_Trip_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef typename std::list<_Person_Interface*>::iterator queue_iterator;
+			typedef typename std::list<_Person_Interface*>::iterator queue_iterator_type;
 			
 
 			m_data(int, internal_id, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -213,33 +213,34 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "1\tI am alighting all remaining travelers" << endl;
 				}
 
+				//Get the list of people standing in the vehicle
+				std::list<_Person_Interface*>* people_standing = this->template people_standing<std::list<_Person_Interface*>*>();
+				//Get the list of people seated in the vehicle
+				std::list<_Person_Interface*>* people_seated = this->template people_seated<std::list<_Person_Interface*>*>();
+
+				queue_iterator_type position_in_vehicle_seated_queue;
+				queue_iterator_type position_in_vehicle_standing_queue = people_standing->begin();
+				//Loop over the standing list
+				while (people_seated->size() < 1 && position_in_vehicle_standing_queue != people_standing->end())
+				{					
+					//Get the person
+					_Person_Interface* person = (_Person_Interface*)*position_in_vehicle_standing_queue;
+					//Delete person from the standing queue and increment the iterator
+					people_standing->erase(position_in_vehicle_standing_queue++);
+					//Set the waiting standing position of the person to null
+					person->position_in_vehicle_standing_queue(people_standing->end());
+					//Push the person into the seated people list
+					people_seated->push_back(person);
+					//Get the person's position in the list
+					queue_iterator_type position_in_vehicle_seated_queue = --people_seated->end();
+					//Set the person's position as a person property
+					person->position_in_vehicle_seated_queue(position_in_vehicle_seated_queue);
+					//Update the person's status
+					person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_SEATED);
+				}
+
 				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
-			}
-
-			void rearrange_seats()
-			{
-				stringstream trajectory_stream;
-
-				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
-				std::string pattern_ID = pattern->template dbid<std::string>();
-				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
-
-				std::string trip_ID = this->template dbid<std::string>();
-				int position = this->template current_position<int>();
-				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
-
-				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
-				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
-
-				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
-				trajectory_stream << "At position:\t" << position << "\t";
-				trajectory_stream << "Time is:\t" << arrival_time << "\t";
-				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
-				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "2\tI am re-arranging seats" << endl;
-
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
-			}
+			}			
 
 			void board_travelers()
 			{
@@ -284,8 +285,8 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
 
 				//Loop over the people waiting in the link
-				queue_iterator position_in_link_waiting_queue;
-				for (position_in_link_waiting_queue = people_waiting->begin(); position_in_link_waiting_queue != people_waiting->end(); ++position_in_link_waiting_queue)
+				queue_iterator_type position_in_link_waiting_queue = people_waiting->begin();
+				while (position_in_link_waiting_queue != people_waiting->end())
 				{
 					//Get the person
 					_Person_Interface* person = (_Person_Interface*) *position_in_link_waiting_queue;
@@ -305,29 +306,43 @@ namespace Transit_Vehicle_Trip_Components
 					//Check if the person is waiting for this vehicle
 					if (person_vehicle_trip == this)
 					{
-						if (people_standing->size() < 25)
+						if (people_seated->size() < 0)
 						{
+							//Delete person from the waiting queue and increment the iterator
+							people_waiting->erase(position_in_link_waiting_queue++);
+							//Set the waiting queue position of the person to null
+							person->position_in_link_waiting_queue(people_waiting->end());
+							//Call the related person function
 							person_mover->template person_boarded_transit_vehicle<NT>(departure_time);
-							//push the person into the standing people list
+							//Push the person into the seated people list
 							people_seated->push_back(person);
-							//get the person's position in the list
-							queue_iterator position_in_vehicle_seated_queue = --people_seated->end();
-							//set the person's position as a person property
+							//Get the person's position in the list
+							queue_iterator_type position_in_vehicle_seated_queue = --people_seated->end();
+							//Set the person's position as a person property
 							person->position_in_vehicle_seated_queue(position_in_vehicle_seated_queue);
-							//update the person's status
+							//Update the person's status
 							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_SEATED);
 						}
 						else if (people_standing->size() < 25)
 						{
+							//Delete person from the waiting queue and increment the iterator
+							people_waiting->erase(position_in_link_waiting_queue++);	
+							//Set the waiting queue position of the person to null
+							person->position_in_link_waiting_queue(people_waiting->end());
+							//Call the related person function
 							person_mover->template person_boarded_transit_vehicle<NT>(departure_time);
-							//push the person into the seated people list
+							//Push the person into the seated people list
 							people_standing->push_back(person);
-							//get the person's position in the list
-							queue_iterator position_in_vehicle_standing_queue = --people_standing->end();
-							//set the person's position as a person property
+							//Get the person's position in the list
+							queue_iterator_type position_in_vehicle_standing_queue = --people_standing->end();
+							//Set the person's position as a person property
 							person->position_in_vehicle_standing_queue(position_in_vehicle_standing_queue);
-							//update the person's status
+							//Update the person's status
 							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_STANDING);
+						}
+						else
+						{
+							position_in_link_waiting_queue++;
 						}
 					}
 
