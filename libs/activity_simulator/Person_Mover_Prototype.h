@@ -1198,16 +1198,16 @@ namespace Person_Components
 				response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
 			}
-			else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
-			{
-				//pthis->template person_boarding_transit_vehicle<NT>();
-				response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
-				response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
-			}
 			else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_REROUTING_SUBITERATION)
 			{
-				response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
-				response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+				//TODO: Omer
+				stringstream trajectory_stream;
+				trajectory_stream << "help this poor soul" << endl;
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				response.next._iteration = END;
+				response.next._sub_iteration = END;
+				//response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+				//response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
 			}
 			else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION)
 			{
@@ -1230,11 +1230,16 @@ namespace Person_Components
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)>  _Intersection_Interface;
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
 			typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
+			stringstream trajectory_stream;
+
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
 
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
@@ -1262,6 +1267,15 @@ namespace Person_Components
 				cout << "Link and trajectory data are inconsistent in terms of mode!" << endl;
 			}
 
+			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
+			trajectory_stream << "At position:\t" << current_position << "\t";
+			trajectory_stream << "Time is:\t" << trajectory_unit->estimated_arrival_time<int>() << "\t";
+			trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+			trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
+			trajectory_stream << "Mode is:\t" << link_type << "\t";
+			trajectory_stream << "Node is:\t" << link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << "\t";
+			trajectory_stream << "I just arrived here ";
+
 			int next_simulation_time;
 			int next_sub;
 			Person_Components::Types::Movement_Status_Keys next_status;
@@ -1278,13 +1292,17 @@ namespace Person_Components
 				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 				this->template Next_Sub_Iteration<int>(next_sub);
 				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+				trajectory_stream << "and this is my destination!" << endl;
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 			//If the mode is non-transit person can walk/bike/drive freely
 			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
 			{
 				//If the person is on board they it means they are alighting
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
-				{				
+				{
+					trajectory_stream << "and will alight my trip to start walking/driving." << endl;
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 					this->template person_alighting_transit_vehicle<NT>();
 					//Next simulation time is the current time
 					next_simulation_time = iteration();
@@ -1295,6 +1313,8 @@ namespace Person_Components
 				}
 				else
 				{
+					trajectory_stream << "and will continue moving." << endl; 
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 					//Next simulation time is the current time
 					next_simulation_time = iteration();
 					//Next subiteration is moving
@@ -1329,6 +1349,8 @@ namespace Person_Components
 					//If the person will stay onboard they just move freely in the transit vehicle
 					if (current_transit_vehicle == transit_vehicle_trip)
 					{
+						trajectory_stream << "and will move in my vehicle with trip ID:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 						//Next simulation time is the vehicle departure time
 						next_simulation_time = transit_vehicle_trip->template departure_seconds<std::vector<int>>()[transit_vehicle_position];
 						//Next subiteration is moving
@@ -1343,6 +1365,8 @@ namespace Person_Components
 					//Otherwise they are alighting and will wait for their next vehicle
 					else
 					{
+						trajectory_stream << "and will alight the following trip:\t" << current_transit_vehicle->template dbid<std::string>() << "\t to wait for another trip:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 						this->template person_alighting_transit_vehicle<NT>();
 						this->template person_waiting_at_beginning_of_link<NT>();
 					}
@@ -1350,10 +1374,12 @@ namespace Person_Components
 				//Else means they have to wait for the current vehicle
 				else
 				{			
+					trajectory_stream << "and will wait for my trip:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 					this->template person_waiting_at_beginning_of_link<NT>();
 				}
 			}		
-
+			
 		}
 
 		template<typename ComponentType>
@@ -1363,7 +1389,16 @@ namespace Person_Components
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)>  _Intersection_Interface;
+			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+			stringstream trajectory_stream;
 
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
+
+			//Get the person
+			person_itf* person = this->Parent_Person<person_itf*>();
 			//Get the movement plan
 			movement_itf* movement = this->Movement<movement_itf*>();
 			//Get the planned trajectory
@@ -1374,14 +1409,28 @@ namespace Person_Components
 			int position = movement->template current_multimodal_trajectory_position<int>();
 			//Get the trajectory members at that position
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[position];
+			//Get the link at that position
+			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the link mode
+			Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 			//Next simulation time is the arrival time at that new position
 			int next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
 			//Next subiteration is arriving at the next link
 			int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;
 
+			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
+			trajectory_stream << "Will move to position:\t" << position << "\t";
+			trajectory_stream << "Will arive there at:\t" << trajectory_unit->estimated_arrival_time<int>() << "\t";
+			trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+			trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
+			trajectory_stream << "Next mode is:\t" << link_type << "\t";
+			trajectory_stream << "Next node is:\t" << link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << endl;
+
 			//Set the values
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
+
+			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 		}
 		
 		template<typename ComponentType>
@@ -1392,12 +1441,17 @@ namespace Person_Components
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)>  _Intersection_Interface;
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
 			typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
 			typedef typename std::list<person_itf*>::iterator queue_iterator_type;
+			stringstream trajectory_stream;
+
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
 
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
@@ -1411,6 +1465,8 @@ namespace Person_Components
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
 			//Get the link at that position
 			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the link mode
+			Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
 			//Get the transit vehicle trip
 			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
 			//Get the pattern of that trip
@@ -1456,6 +1512,16 @@ namespace Person_Components
 			//set the person's position as a person property
 			person->position_in_link_waiting_queue(position_in_link_waiting_queue);
 
+			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
+			trajectory_stream << "At position:\t" << current_position << "\t";
+			trajectory_stream << "Time is:\t" << trajectory_unit->estimated_arrival_time<int>() << "\t";
+			trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+			trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
+			trajectory_stream << "Mode is:\t" << link_type << "\t";
+			trajectory_stream << "Node is:\t" << link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << "\t";
+			trajectory_stream << "I am waiting for trip:\t" << transit_vehicle_trip->template dbid<std::string>() << "\t";
+			trajectory_stream << "Hoping to board it at:\t" << anticipated_vehicle_arrival_time << endl;
+
 			//Next simulation time is anticipated_vehicle_arrival_time plus ten minutes
 			int next_simulation_time = anticipated_vehicle_arrival_time + 600;
 			//Next subiteration is rerouting in case the vehicle does not arrive within 10 minutes of schedule
@@ -1467,6 +1533,8 @@ namespace Person_Components
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
 			person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+
+			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 		}	
 
 		template<typename ComponentType>
@@ -1477,11 +1545,16 @@ namespace Person_Components
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)>  _Intersection_Interface;
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
 			typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
+			stringstream trajectory_stream;
+
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
 
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
@@ -1496,7 +1569,12 @@ namespace Person_Components
 			//Get the trajectory members at that position
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
 			// Get the transit vehicle trip
-			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();			
+			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();		
+			//Get the link at that position
+			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the link mode
+			Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
 			//Set the person's current vehicle to the boarded vehicle
 			person->template current_transit_vehicle<_Transit_Vehicle_Trip_Interface*>(transit_vehicle_trip);
 			//int next_simulation_time = iteration();
@@ -1506,8 +1584,19 @@ namespace Person_Components
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
 
+			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
+			trajectory_stream << "At position:\t" << current_position << "\t";
+			trajectory_stream << "Time is:\t" << trajectory_unit->estimated_arrival_time<int>() << "\t";
+			trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+			trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
+			trajectory_stream << "Mode is:\t" << link_type << "\t";
+			trajectory_stream << "Node is:\t" << link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << "\t";
+			trajectory_stream << "I have boarded trip:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
+
 			//Schedule departure event for person
 			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&move_persons_in_multimodal_network_conditional, next_simulation_time, next_sub);		
+
+			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 		}
 
 		template<typename ComponentType>
@@ -1518,12 +1607,17 @@ namespace Person_Components
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename _Link_Interface::get_type_of(upstream_intersection)>  _Intersection_Interface;
 			typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
 			typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
 			typedef typename std::list<person_itf*>::iterator queue_iterator_type;
+			stringstream trajectory_stream;
+			
+			int cur_iter = iteration();
+			int cur_sub = sub_iteration();
 
 			//Get the person
 			person_itf* person = this->Parent_Person<person_itf*>();
@@ -1538,8 +1632,21 @@ namespace Person_Components
 			int current_position = movement->template current_multimodal_trajectory_position<int>();
 			//Get the trajectory members at the previous position
 			_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position-1];
-			//Get the transit vehicle trip to be boarded
+			//Get the transit vehicle trip to be alighted
 			_Transit_Vehicle_Trip_Interface* transit_vehicle_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
+			//Get the link at that position
+			_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+			//Get the link mode
+			Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
+			trajectory_stream << "At position:\t" << current_position << "\t";
+			trajectory_stream << "Time is:\t" << trajectory_unit->estimated_arrival_time<int>() << "\t";
+			trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+			trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
+			trajectory_stream << "Mode is:\t" << link_type << "\t";
+			trajectory_stream << "Node is:\t" << link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << "\t";
+			trajectory_stream << "I alighted from trip\t" << transit_vehicle_trip->template dbid<std::string>();
 
 			if (current_status == ON_BOARD_SEATED)
 			{//Get the standing people list in the transit vehicle
@@ -1552,6 +1659,7 @@ namespace Person_Components
 				person->position_in_vehicle_seated_queue(people_seated->end());
 				//Check the size
 				int queue_size = people_seated->size();
+				trajectory_stream << "\t and I was seated" << endl;
 			}
 			else if (current_status == ON_BOARD_STANDING)
 			{//Get the standing people list in the transit vehicle
@@ -1564,8 +1672,10 @@ namespace Person_Components
 				person->position_in_vehicle_standing_queue(people_standing->end());
 				//Check the size
 				int queue_size = people_standing->size();
+				trajectory_stream << "\t and I was standing" << endl;
 			}
 
+			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 		}
 		//TODO: Omer END
 	}

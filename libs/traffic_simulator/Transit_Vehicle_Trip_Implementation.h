@@ -141,6 +141,9 @@ namespace Transit_Vehicle_Trip_Components
 				std::string pattern_ID = pattern->template dbid<std::string>();
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
 
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
+
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
 				position++;
@@ -155,9 +158,11 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 					trajectory_stream << "At position:\t" << position << "\t";
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+					trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "0\tI arrived" << endl;
+					trajectory_stream << "I arrived" << endl;
 				}
 				else
 				{
@@ -167,9 +172,11 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 					trajectory_stream << "At position:\t" << position << "\t";
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+					trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "0\tI arrived" << endl;
+					trajectory_stream << "I arrived" << endl;
 				}
 
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
@@ -182,6 +189,9 @@ namespace Transit_Vehicle_Trip_Components
 				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
 				std::string pattern_ID = pattern->template dbid<std::string>();
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
 
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
@@ -196,9 +206,11 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 					trajectory_stream << "At position:\t" << position << "\t";
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+					trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "1\tI am alighting some travelers" << endl;
+					trajectory_stream << "I am rearranging seats! Persons who got a seat are:";
 				}
 				else
 				{
@@ -208,9 +220,11 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 					trajectory_stream << "At position:\t" << position << "\t";
 					trajectory_stream << "Time is:\t" << arrival_time << "\t";
+					trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+					trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 					trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 					trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-					trajectory_stream << "1\tI am alighting all remaining travelers" << endl;
+					trajectory_stream << "I am checking for drunk people! Persons who are kicked out are:";
 				}
 
 				//Get the list of people standing in the vehicle
@@ -221,7 +235,7 @@ namespace Transit_Vehicle_Trip_Components
 				queue_iterator_type position_in_vehicle_seated_queue;
 				queue_iterator_type position_in_vehicle_standing_queue = people_standing->begin();
 				//Loop over the standing list
-				while (people_seated->size() < 1 && position_in_vehicle_standing_queue != people_standing->end())
+				while (people_seated->size() < 2 && position_in_vehicle_standing_queue != people_standing->end())
 				{					
 					//Get the person
 					_Person_Interface* person = (_Person_Interface*)*position_in_vehicle_standing_queue;
@@ -237,9 +251,12 @@ namespace Transit_Vehicle_Trip_Components
 					person->position_in_vehicle_seated_queue(position_in_vehicle_seated_queue);
 					//Update the person's status
 					person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_SEATED);
+					//Report the person
+					trajectory_stream << "\t" << person->template uuid<int>();
 				}
 
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				trajectory_stream << endl;
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}			
 
 			void board_travelers()
@@ -252,6 +269,9 @@ namespace Transit_Vehicle_Trip_Components
 				std::string pattern_ID = pattern->template dbid<std::string>();
 				//Get the pattern links
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
 
 				//Get the trip ID
 				std::string trip_ID = this->template dbid<std::string>();
@@ -280,9 +300,11 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 				trajectory_stream << "At position:\t" << position << "\t";
 				trajectory_stream << "Time is:\t" << arrival_time << "\t";
+				trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+				trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "3\tI am accepting some travelers on board" << endl;
+				trajectory_stream << "I am accepting some travelers on board:";
 
 				//Loop over the people waiting in the link
 				queue_iterator_type position_in_link_waiting_queue = people_waiting->begin();
@@ -306,7 +328,7 @@ namespace Transit_Vehicle_Trip_Components
 					//Check if the person is waiting for this vehicle
 					if (person_vehicle_trip == this)
 					{
-						if (people_seated->size() < 0)
+						if (people_seated->size() < 2)
 						{
 							//Delete person from the waiting queue and increment the iterator
 							people_waiting->erase(position_in_link_waiting_queue++);
@@ -322,8 +344,10 @@ namespace Transit_Vehicle_Trip_Components
 							person->position_in_vehicle_seated_queue(position_in_vehicle_seated_queue);
 							//Update the person's status
 							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_SEATED);
+							//Report the person
+							trajectory_stream << "\tSIT\t" << person->template uuid<int>();
 						}
-						else if (people_standing->size() < 25)
+						else if (people_standing->size() < 2)
 						{
 							//Delete person from the waiting queue and increment the iterator
 							people_waiting->erase(position_in_link_waiting_queue++);	
@@ -339,16 +363,23 @@ namespace Transit_Vehicle_Trip_Components
 							person->position_in_vehicle_standing_queue(position_in_vehicle_standing_queue);
 							//Update the person's status
 							person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(Person_Components::Types::Movement_Status_Keys::ON_BOARD_STANDING);
+							//Report the person
+							trajectory_stream << "\tSTAND\t" << person->template uuid<int>();
 						}
 						else
 						{
 							position_in_link_waiting_queue++;
 						}
 					}
+					else
+					{
+						position_in_link_waiting_queue++;
+					}
 
 				}
 
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				trajectory_stream << endl;
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void transit_vehicle_departing()
@@ -358,6 +389,9 @@ namespace Transit_Vehicle_Trip_Components
 				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
 				std::string pattern_ID = pattern->template dbid<std::string>();
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
 
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
@@ -369,15 +403,48 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 				trajectory_stream << "At position:\t" << position << "\t";
 				trajectory_stream << "Time is:\t" << departure_time << "\t";
+				trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+				trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "4\tI am moving to my next stop" << endl;
+				trajectory_stream << "I am moving to my next stop:" << "\t";
 
 				//this->template current_position<int>(position);
 				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position + 1];
 				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(arrival_time);
 
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				//Get the list of people standing in the vehicle
+				std::list<_Person_Interface*>* people_standing = this->template people_standing<std::list<_Person_Interface*>*>();
+				//Get the list of people seated in the vehicle
+				std::list<_Person_Interface*>* people_seated = this->template people_seated<std::list<_Person_Interface*>*>();
+
+				trajectory_stream << "There are:\t" << people_seated->size() << "\tpeople seated:";
+
+				//Write out the seated people
+				queue_iterator_type position_in_vehicle_seated_queue = people_seated->begin();
+				while (position_in_vehicle_seated_queue != people_seated->end())
+				{
+					//Get the person
+					_Person_Interface* person = (_Person_Interface*)*position_in_vehicle_seated_queue;
+					//Report the person
+					trajectory_stream << "\t" << person->template uuid<int>();
+					position_in_vehicle_seated_queue++;
+				}
+
+				trajectory_stream << "\tand:\t" << people_standing->size() << "\tpeople standing:";
+				//Write out the standing people
+				queue_iterator_type position_in_vehicle_standing_queue = people_standing->begin();
+				while (position_in_vehicle_standing_queue != people_standing->end())
+				{
+					//Get the person
+					_Person_Interface* person = (_Person_Interface*)*position_in_vehicle_standing_queue;
+					//Report the person
+					trajectory_stream << "\t" << person->template uuid<int>();
+					position_in_vehicle_standing_queue++;
+				}
+				trajectory_stream << endl;
+
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 			void transit_vehicle_depot()
@@ -387,6 +454,9 @@ namespace Transit_Vehicle_Trip_Components
 				_Transit_Pattern_Interface* pattern = this->template pattern<_Transit_Pattern_Interface*>();
 				std::string pattern_ID = pattern->template dbid<std::string>();
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
+
+				int cur_iter = iteration();
+				int cur_sub = sub_iteration();
 
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
@@ -398,11 +468,13 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "I am trip:\t" << trip_ID << "\t";
 				trajectory_stream << "At position:\t" << position << "\t";
 				trajectory_stream << "Time is:\t" << depature_time << "\t";
+				trajectory_stream << "Simulation time is:\t" << cur_iter << "\t";
+				trajectory_stream << "Subiteration is:\t" << cur_sub << "\t";
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
-				trajectory_stream << "5\tI am going to my depot" << endl;
+				trajectory_stream << "I am going to my depot" << endl;
 
-				//fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
 		};
