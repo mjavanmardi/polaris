@@ -89,7 +89,7 @@ namespace Movement_Plan_Components
 		{
 			Movement_Plan_Implementation()
 			{
-				int test = 1;
+				_experienced_gap = 1.0f;
 			}
 			typedef Polaris_Component<MasterType, INHERIT(Movement_Plan_Implementation), Data_Object> Base_t;
 			typedef typename Base_t::ComponentType ComponentType;

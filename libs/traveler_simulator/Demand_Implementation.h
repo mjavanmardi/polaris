@@ -90,24 +90,38 @@ namespace Demand_Components
 				_Interface* this_ptr = (_Interface*)_this;
 				this_type* pthis = (this_type*)_this;
 
+				int iter = iteration();
+				int subiter = sub_iteration();
+
 				// set next planning time for other functions to use
-				pthis->template Next_Logging_Time<Simulation_Timestep_Increment>(iteration() + pthis->template Logging_Interval<Simulation_Timestep_Increment>());
+				if (iteration() >= END - 2)
+				{
+					pthis->template Next_Logging_Time<Simulation_Timestep_Increment>(END);
+				}
+				else if (iteration() + pthis->template Logging_Interval<Simulation_Timestep_Increment>() < END - 2)
+				{
+					pthis->template Next_Logging_Time<Simulation_Timestep_Increment>(iteration() + pthis->template Logging_Interval<Simulation_Timestep_Increment>());
+				}
+				else
+				{
+					pthis->template Next_Logging_Time<Simulation_Timestep_Increment>(END-2);
+				}
 
 				// swap buffer and current for output strings and trip records
-				if (sub_iteration() == 0)
+				if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::OUTPUT_WRITING_SUB_ITERATION)
 				{
 					movement_plans_vector_type* tmp = pthis->movement_plans_buffer;
 					pthis->movement_plans_buffer = pthis->movement_plans;
 					pthis->movement_plans = tmp;
 
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
-					response.next._sub_iteration = 0;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::OUTPUT_WRITING_SUB_ITERATION;
 					pthis->Write_Trips_To_Database<NT>();
 				}
 				else
 				{
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
-					response.next._sub_iteration = 0;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::OUTPUT_WRITING_SUB_ITERATION;;
 				}
 			}
 
