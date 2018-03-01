@@ -39,7 +39,7 @@ namespace polaris
 		float bike_time_factor;
 		float walkThreshold_Time;
 		float bikeThreshold_Time;
-		Vehicle_Components::Types::Vehicle_Type_Keys sub_mode;
+		Vehicle_Components::Types::Vehicle_Type_Keys mode;
 		//----------------------------------------------------
 	};
 

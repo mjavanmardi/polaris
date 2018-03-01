@@ -62,6 +62,7 @@ namespace Movement_Plan_Components
 			m_data(float, estimated_arrival_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_wait_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_walk_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_bike_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_ivt_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_car_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, estimated_wait_count, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -139,6 +140,7 @@ namespace Movement_Plan_Components
 
 			//TODO: Remove when done testing routing execution time
 			m_data(int, routing_execution_time, NONE, NONE);
+			m_data(int, routing_scan_count, NONE, NONE);
 
 			template<typename TargetType>
 			TargetType absolute_departure_time();
@@ -187,6 +189,7 @@ namespace Movement_Plan_Components
 				std::deque<float>& out_arr_time,
 				std::deque<float>& out_wait_time,
 				std::deque<float>& out_walk_time,
+				std::deque<float>& out_bike_time,
 				std::deque<float>& out_ivt_time,
 				std::deque<float>& out_car_time,
 				std::deque<int>& out_wait_count,
@@ -482,6 +485,7 @@ namespace Movement_Plan_Components
 			std::deque<float>& out_arr_time,
 			std::deque<float>& out_wait_time,
 			std::deque<float>& out_walk_time,
+			std::deque<float>& out_bike_time,
 			std::deque<float>& out_ivt_time,
 			std::deque<float>& out_car_time,
 			std::deque<int>& out_wait_count,
@@ -552,6 +556,7 @@ namespace Movement_Plan_Components
 					vehicle_trajectory_data->template estimated_link_accepting_time<float>(out_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_bike_time<float>(out_walk_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr - 1]);
 				}
@@ -561,6 +566,7 @@ namespace Movement_Plan_Components
 					vehicle_trajectory_data->template estimated_link_accepting_time<float>(0.0f);
 					vehicle_trajectory_data->template estimated_arrival_time<float>(departed_time<Time_Seconds>());
 					vehicle_trajectory_data->template estimated_walk_time<float>(0.0f);
+					vehicle_trajectory_data->template estimated_bike_time<float>(0.0f);
 					vehicle_trajectory_data->template estimated_ivt_time<float>(0.0f);
 					vehicle_trajectory_data->template estimated_car_time<float>(0.0f);
 				}

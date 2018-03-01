@@ -961,19 +961,29 @@ class multimodalSPLabels
 public:
 	// Default Constructor
 	multimodalSPLabels() {}
-	multimodalSPLabels(int Origin_ID_, int Destination_ID_, int Departure_Time_, int Sub_Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, float visit_Time_, std::string Success_Status_, float Euc_Dist_km_)
-		: Origin_ID(Origin_ID_), Destination_ID(Destination_ID_), Departure_Time(Departure_Time_), Sub_Mode(Sub_Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), visit_Time(visit_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
+	multimodalSPLabels(int id_, int traveler_id_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, float visit_Time_, std::string Success_Status_, float Euc_Dist_km_)
+		: id(id_), traveler_id(traveler_id_), origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), Mode(Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), visit_Time(visit_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
 	{
 	}
 	//Accessors
-	const int& getOrigin_ID() const { return Origin_ID; }
-	void setOrigin_ID(const int& Origin_ID_) { Origin_ID = Origin_ID_; }
-	const int& getDestination_ID() const { return Destination_ID; }
-	void setDestination_ID(const int& Destination_ID_) { Destination_ID = Destination_ID_; }
-	const int& getDeparture_Time() const { return Departure_Time; }
-	void setDeparture_Time(const int& Departure_Time_) { Departure_Time = Departure_Time_; }
-	const int& getSub_Mode() const { return Sub_Mode; }
-	void setSub_Mode(const int& Sub_Mode_) { Sub_Mode = Sub_Mode_; }
+	const int& getId() const { return id; }
+	void setId(const int& id_) { id = id_; }	
+	const int& getTraveler_ID() const { return traveler_id; }
+	void setTraveler_ID(const int& traveler_id_) { traveler_id = traveler_id_; }
+	const int& getOrigin_Activity_Location() const { return origin_activity_location; }
+	void setOrigin_Activity_Location(const int& origin_activity_location_) { origin_activity_location = origin_activity_location_; }
+	const int& getDestination_Activity_Location() const { return destination_activity_location; }
+	void setDestination_Activity_Location(const int& destination_activity_location_) { destination_activity_location = destination_activity_location_; }
+	const int& getOrigin_Link() const { return origin_link; }
+	void setOrigin_Link(const int& origin_link_) { origin_link = origin_link_; }
+	const int& getDestination_Link() const { return destination_link; }
+	void setDestination_Link(const int& destination_link_) { destination_link = destination_link_; }
+	const int& getNum_Links() const { return num_links; }
+	void setNum_Links(const int& num_links_) { num_links = num_links_; }
+	const int& getDeparture_Time() const { return departure_time; }
+	void setDeparture_Time(const int& departure_time_) { departure_time = departure_time_; }
+	const int& getMode() const { return Mode; }
+	void setMode(const int& Mode_) { Mode = Mode_; }
 	const float& getArrival_Time() const { return Arrival_Time; }
 	void setArrival_Time(const float& Arrival_Time_) { Arrival_Time = Arrival_Time_; }
 	const float& getGen_Cost() const { return Gen_Cost; }
@@ -1013,10 +1023,24 @@ private:
 #pragma db auto id
 	int id;
 #pragma db not_null
-	int Origin_ID;
-	int Destination_ID;
-	int Departure_Time;
-	int Sub_Mode;
+	//#pragma db not_null
+	//int origin_zone;
+	//#pragma db not_null
+	//int destination_zone;
+	int traveler_id;
+#pragma db not_null
+	int origin_activity_location;
+#pragma db not_null
+	int destination_activity_location;
+#pragma db not_null
+	int origin_link;
+#pragma db not_null
+	int destination_link;
+#pragma db not_null
+	int num_links;
+#pragma db not_null
+	int departure_time;
+	int Mode;
 	float Arrival_Time;
 	float Gen_Cost;
 	float Duration;

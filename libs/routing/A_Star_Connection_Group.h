@@ -177,22 +177,22 @@ namespace polaris
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
 				A_Star_Edge<neighbor_edge_type>* current_neighbor = (A_Star_Edge<neighbor_edge_type>*)connection_itr->neighbor();
 				Link_Components::Types::Link_Type_Keys current_neighbor_type = current_neighbor->_edge_type;
-				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode = routing_data.sub_mode;
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = routing_data.mode;
 
-				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT && sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
+				if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::TRANSIT && mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 				{
 					//Evaluate_Transit_Neighbor_Seq<AgentType>(agent, current, connection_itr, routing_data, graph_pool);
 					Evaluate_Transit_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
-				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK && mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 				{
  					Evaluate_Walk_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
-				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+				else if (current_neighbor_type == Link_Components::Types::Link_Type_Keys::WALK && mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 				{
 					Evaluate_Bike_Neighbor<AgentType>(agent, current, connection_itr, routing_data);
 				}
-				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK && sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
+				else if (current_type != Link_Components::Types::Link_Type_Keys::TRANSIT && current_type != Link_Components::Types::Link_Type_Keys::WALK && mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 				//else
 				{
 					Evaluate_Drive_Neighbor<AgentType>(agent, current, connection_itr, routing_data);

@@ -1236,6 +1236,7 @@ namespace Person_Components
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
 			typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
+			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
 			stringstream trajectory_stream;
 
 			int cur_iter = iteration();
@@ -1294,6 +1295,9 @@ namespace Person_Components
 				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 				trajectory_stream << "and this is my destination!" << endl;
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+
+				bool write_trajectory = true;
+				//((_Demand_Interface*)_global_demand)->Add_Trip_Record(movement, write_trajectory);
 			}
 			//If the mode is non-transit person can walk/bike/drive freely
 			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)

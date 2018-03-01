@@ -86,11 +86,11 @@ namespace polaris
 		}
 		
 		bool success = false;
-		int scanCount = 0;
+		int scan_count = 0;
 		while( open_set.size() )
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
+			++scan_count;
 			
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
@@ -132,7 +132,7 @@ namespace polaris
 					current->_cost_from_origin,
 					current->_time_from_origin,
 					current->_estimated_cost_origin_destination,
-					scanCount);
+					scan_count);
 				summary_paragraph.insert(0, myLine);
 			}
 
@@ -187,7 +187,7 @@ namespace polaris
 					864000.0,
 					864000.0,
 					864000.0,
-					scanCount);
+					scan_count);
 				summary_paragraph.insert(0, myLine);
 			}
 		}
@@ -356,11 +356,11 @@ namespace polaris
 		}
 
 		bool success = false;
-		int scanCount = 0;
+		int scan_count = 0;
 		while (open_set.size())
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
+			++scan_count;
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 
@@ -387,7 +387,7 @@ namespace polaris
 				"zone:",
 				zone,
 				"scanScount:",
-				scanCount,
+				scan_count,
 				"Router run-time (ms):",
 				perf_time
 				);
@@ -466,12 +466,12 @@ namespace polaris
 		routing_data.start_edge = start;
 
 		bool success = false;
-		int scanCount = 0;
+		int scan_count = 0;
 		A_Star_Edge<base_edge_type>* current;
 		while (open_set.size())
 		{
 			current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
+			++scan_count;
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
@@ -503,7 +503,7 @@ namespace polaris
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();
 				perf_file << "\tDistance:\t" << start_link->walk_distance_to_transit<float>();
-				perf_file << "\tsuccess\tscanScount:\t" << scanCount;
+				perf_file << "\tsuccess\tscanScount:\t" << scan_count;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}
@@ -513,7 +513,7 @@ namespace polaris
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();
 				perf_file << "\tDistance:\t" << start_link->walk_distance_to_transit<float>(); 
-				perf_file << "fail\tscanScount:\t" << scanCount;
+				perf_file << "fail\tscanScount:\t" << scan_count;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}		
@@ -581,12 +581,12 @@ namespace polaris
 		routing_data.start_edge = start;
 
 		bool success = false;
-		int scanCount = 0;
+		int scan_count = 0;
 		A_Star_Edge<base_edge_type>* current;
 		while (open_set.size())
 		{
 			current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
+			++scan_count;
 
 			open_set.erase(open_set.iterator_to(*((base_edge_type*)current)));
 			_Link_Interface* current_link = (_Link_Interface*)current->_source_link;
@@ -618,7 +618,7 @@ namespace polaris
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();
 				perf_file << "\tDistance:\t" << start_link->drive_fft_to_transit<float>();
-				perf_file << "success\tscanScount:\t" << scanCount;
+				perf_file << "success\tscanScount:\t" << scan_count;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}
@@ -628,7 +628,7 @@ namespace polaris
 			{
 				perf_file << "Link_ID:\t" << start_link->dbid<int>();
 				perf_file << "\tDistance:\t" << start_link->drive_fft_to_transit<float>();
-				perf_file << "fail\tscanScount:\t" << scanCount;
+				perf_file << "fail\tscanScount:\t" << scan_count;
 				perf_file << "\tRouter run-time (ms):\t" << A_Star_Time.Stop() << endl;
 			}
 		}
@@ -658,18 +658,17 @@ namespace polaris
 		std::deque<float>& out_arr_time,
 		std::deque<float>& out_wait_time,
 		std::deque<float>& out_walk_time,
+		std::deque<float>& out_bike_time,
 		std::deque<float>& out_ivt_time,
 		std::deque<float>& out_car_time,
 		std::deque<int>& out_wait_count,
 		std::deque<float>& out_transfer_pen,
 		std::deque<float>& out_heur_cost,	
 		__int64& astar_time, 
-		unsigned int origin_loc_id,
-		unsigned int destination_loc_id,
-		bool debug_route,
-		std::string& summary_paragraph,
-		std::string& detail_paragraph,
-		Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
+		int scan_count,
+		Vehicle_Components::Types::Vehicle_Type_Keys mode,
+		bool debug_route
+		)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		typedef Edge_Implementation<Routing_Components::Types::multimodal_attributes<MasterType>> multimodal_edge_type;
@@ -805,7 +804,7 @@ namespace polaris
 		routing_data.bike_time_factor = bike_time_factor;
 		routing_data.walkThreshold_Time = walkThreshold_Time;
 		routing_data.bikeThreshold_Time = bikeThreshold_Time;
-		routing_data.sub_mode = sub_mode;
+		routing_data.mode = mode;
 		//----------------------------------------------------
 
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
@@ -819,7 +818,7 @@ namespace polaris
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
 			Link_Components::Types::Link_Type_Keys current_type = start_t->_edge_type;
 
-			if (current_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+			if (current_type == Link_Components::Types::Link_Type_Keys::WALK && mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
 				start->cost_from_origin(walkWeight*start->_time_cost);
 				start_t->_walk_time_from_origin = start->_time_cost;
@@ -828,7 +827,7 @@ namespace polaris
 				start->time_from_origin(start->_time_cost);
 				start->time_label((float)(start_time + start->_time_cost));
 			}
-			else if (current_type == Link_Components::Types::Link_Type_Keys::WALK && sub_mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+			else if (current_type == Link_Components::Types::Link_Type_Keys::WALK && mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
 				start->cost_from_origin(bike_time_factor*bikeWeight*start->_time_cost);
 				start_t->_walk_time_from_origin = 0;
@@ -871,7 +870,7 @@ namespace polaris
 
 		bool success = false;
 		std::string fail_mode;
-		int scanCount = 0;
+		scan_count = 0;
 		Total_Visit_Time = 0;
 
 		global_edge_id global;
@@ -881,10 +880,10 @@ namespace polaris
 		while (open_set.size() /*&& !early_break*/)
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
-			++scanCount;
+			++scan_count;
 			
 			current_fail = current;
-			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
+			if (current->_cost_from_origin > costThreshold || scan_count >= (int)scanThreshold || scan_count >= (int)scanThreshold2)
 			{
 				//current_fail = current;
 				break;
@@ -929,33 +928,7 @@ namespace polaris
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			astar_time = elapsed_time;
-			if (debug_route)
-			{										
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					sub_mode,
-					current->_time_label,
-					current->_cost_from_origin,
-					current->_time_from_origin,
-					current->_wait_count_from_origin,
-					current->_wait_time_from_origin,
-					current->_walk_time_from_origin,
-					current->_bike_time_from_origin,
-					current->_ivt_time_from_origin,
-					current->_car_time_from_origin,
-					current->_transfer_pen_from_origin,
-					current->_estimated_cost_origin_destination,
-					scanCount,
-					astar_time,
-					Total_Visit_Time,
-					"success",
-					Euc_Distance_km
-					);
-				summary_paragraph.insert(0,myLine);
-			}
-
+			
 			int route_ctr = 0;
 			while (current != nullptr)
 			{
@@ -973,6 +946,7 @@ namespace polaris
 				out_wait_count.push_back(current->_wait_count_from_origin);
 				out_wait_time.push_back(current->_wait_time_from_origin);
 				out_walk_time.push_back(current->_walk_time_from_origin);
+				out_bike_time.push_back(current->_bike_time_from_origin);
 				out_ivt_time.push_back(current->_ivt_time_from_origin);
 				out_car_time.push_back(current->_car_time_from_origin);
 				out_transfer_pen.push_back(current->_transfer_pen_from_origin);
@@ -982,105 +956,11 @@ namespace polaris
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
-					out_trip.push_back(current_trip);
-					if (debug_route)
-					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
-							origin_loc_id,
-							destination_loc_id,
-							start_time,
-							sub_mode,
-							route_ctr,
-							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							current_trip->dbid<std::string>().c_str(),
-							current->_came_on_seq_index,
-							"TRANSIT",
-							current->_time_label,
-							current->_cost_from_origin,
-							current->_time_from_origin,
-							current->_wait_count_from_origin,
-							current->_wait_time_from_origin,
-							current->_walk_time_from_origin,
-							current->_bike_time_from_origin,
-							current->_ivt_time_from_origin,
-							current->_car_time_from_origin,
-							current->_transfer_pen_from_origin,
-							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
-							scanCount,
-							astar_time);
-						detail_paragraph.insert(0, myLine);
-					}				
-
-					
+					out_trip.push_back(current_trip);					
 				}
-				
-				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
-				{
-					out_trip.push_back(nullptr);
-					if (debug_route)
-					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
-							origin_loc_id,
-							destination_loc_id,
-							start_time,
-							sub_mode,
-							route_ctr,
-							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							"WALK",
-							current->_came_on_seq_index,
-							"WALK",
-							current->_time_label,
-							current->_cost_from_origin,
-							current->_time_from_origin,
-							current->_wait_count_from_origin,
-							current->_wait_time_from_origin,
-							current->_walk_time_from_origin,
-							current->_bike_time_from_origin,
-							current->_ivt_time_from_origin,
-							current->_car_time_from_origin,
-							current->_transfer_pen_from_origin,
-							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
-							scanCount,
-							astar_time);
-						detail_paragraph.insert(0, myLine);
-					}
-
-				}	
-
 				else
 				{
 					out_trip.push_back(nullptr);
-					if (debug_route)
-					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
-							origin_loc_id,
-							destination_loc_id,
-							start_time,
-							sub_mode,
-							route_ctr,
-							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
-							"DRIVE",
-							current->_came_on_seq_index,
-							"DRIVE",
-							current->_time_label,
-							current->_cost_from_origin,
-							current->_time_from_origin,
-							current->_wait_count_from_origin,
-							current->_wait_time_from_origin,
-							current->_walk_time_from_origin,
-							current->_bike_time_from_origin,
-							current->_ivt_time_from_origin,
-							current->_car_time_from_origin,
-							current->_transfer_pen_from_origin,
-							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
-							scanCount,
-							astar_time);
-						detail_paragraph.insert(0, myLine);
-					}
-
 				}
 
 				current = (multimodal_edge_type*)current->came_from();
@@ -1097,6 +977,7 @@ namespace polaris
 			std::reverse(out_wait_count.begin(), out_wait_count.end());
 			std::reverse(out_wait_time.begin(), out_wait_time.end());
 			std::reverse(out_walk_time.begin(), out_walk_time.end());
+			std::reverse(out_bike_time.begin(), out_bike_time.end());
 			std::reverse(out_ivt_time.begin(), out_ivt_time.end());
 			std::reverse(out_car_time.begin(), out_car_time.end());
 			std::reverse(out_transfer_pen.begin(), out_transfer_pen.end());
@@ -1130,39 +1011,7 @@ namespace polaris
 
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
-			astar_time = elapsed_time;
-
-			if (debug_route)
-			{
-				
-				global.edge_id = current_fail->_edge_id;
-
-				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
-				
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					sub_mode,
-					current->_time_label,
-					current->_cost_from_origin,
-					current->_time_from_origin,
-					current->_wait_count_from_origin,
-					current->_wait_time_from_origin,
-					current->_walk_time_from_origin,
-					current->_bike_time_from_origin,
-					current->_ivt_time_from_origin,
-					current->_car_time_from_origin,
-					current->_transfer_pen_from_origin,
-					current->_estimated_cost_origin_destination,
-					scanCount,
-					astar_time,
-					Total_Visit_Time,
-					"fail",
-					Euc_Distance_km
-					);
-				summary_paragraph.insert(0, myLine);
-			}
+			astar_time = elapsed_time;			
 		}		
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)

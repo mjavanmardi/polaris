@@ -61,6 +61,7 @@ namespace Movement_Plan_Components
 			accessor(estimated_arrival_time, NONE, NONE);
 			accessor(estimated_wait_time, NONE, NONE);
 			accessor(estimated_walk_time, NONE, NONE);
+			accessor(estimated_bike_time, NONE, NONE);
 			accessor(estimated_ivt_time, NONE, NONE);
 			accessor(estimated_car_time, NONE, NONE);
 			accessor(estimated_wait_count, NONE, NONE);
@@ -103,6 +104,7 @@ namespace Movement_Plan_Components
 
 			//TODO: Remove when done testing routing execution time
 			accessor(routing_execution_time, NONE, NONE);
+			accessor(routing_scan_count, NONE, NONE);
 			accessor(summary_string, NONE, NONE);
 			accessor(detail_string, NONE, NONE);
 
@@ -466,12 +468,13 @@ namespace Movement_Plan_Components
 				std::deque<float>& out_arr_time,
 				std::deque<float>& out_wait_time,
 				std::deque<float>& out_walk_time,
+				std::deque<float>& out_bike_time,
 				std::deque<float>& out_ivt_time,
 				std::deque<float>& out_car_time,
 				std::deque<int>& out_wait_count,
 				std::deque<float>& out_transfer_pen)
 			{
-				this_component()->template set_multimodal_trajectory<T>(out_path, out_cost, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+				this_component()->template set_multimodal_trajectory<T>(out_path, out_cost, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 			}
 
 			void clear_multimodal_trajectory()

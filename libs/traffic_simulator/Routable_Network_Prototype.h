@@ -64,21 +64,20 @@ namespace Routing_Components
 				std::deque<float>& out_arr_time,
 				std::deque<float>& out_wait_time,
 				std::deque<float>& out_walk_time,
+				std::deque<float>& out_bike_time,
 				std::deque<float>& out_ivt_time,
 				std::deque<float>& out_car_time,
 				std::deque<int>& out_wait_count,
 				std::deque<float>& out_transfer_pen,
 				std::deque<float>& out_heur_cost,
 				__int64& astar_time,
-				unsigned int origin_loc_id,
-				unsigned int destination_loc_id,
-				bool debug_route,
-				std::string& summary_paragraph,
-				std::string& detail_paragraph,
-				Vehicle_Components::Types::Vehicle_Type_Keys sub_mode)
+				int scan_count,
+				Vehicle_Components::Types::Vehicle_Type_Keys mode,
+				bool debug_route
+				)
 			{
 				//TODO: Remove when done testing routing execution time
-				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, origin_loc_id, destination_loc_id, debug_route, summary_paragraph, detail_paragraph, sub_mode);
+				return this_component()->compute_multimodal_network_path(origins, destinations, /*tr_destinations,*/ start_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, scan_count, mode, debug_route);
 			}
 
 			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route, std::string& summary_paragraph)
