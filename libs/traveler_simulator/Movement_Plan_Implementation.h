@@ -198,6 +198,7 @@ namespace Movement_Plan_Components
 			void clear_multimodal_trajectory();
 			template<typename TargetType> void update_multimodal_route_length();
 			template<typename TargetType> void advance_multimodal_trajectory();
+			void arrive_to_mm_destination(bool write_trajectory);
 			//=============================================================================================================================================================================
 			//Multimodal Section End-----==================================================================================================================================================
 			//=============================================================================================================================================================================
@@ -625,6 +626,19 @@ namespace Movement_Plan_Components
 
 
 			current_multimodal_trajectory_position<int&>()++;
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_mm_destination(bool write_trajectory)
+		{
+
+			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
+			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
+			//_multimodal_trajectory_container[_current_trajectory_index]->template delayed_time<int>(0.0);
+			this->template arrived_time<Simulation_Timestep_Increment>(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>());
+
+			// write to global demand if turned on
+			((_Demand_Interface*)_global_demand)->Add_Trip_Record(this, write_trajectory);
 		}
 		//=============================================================================================================================================================================
 		//Multimodal Section End=======================================================================================================================================================

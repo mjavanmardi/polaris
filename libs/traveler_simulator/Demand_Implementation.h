@@ -102,7 +102,8 @@ namespace Demand_Components
 
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
-					pthis->Write_Trips_To_Database<NT>();
+					//TODO: OMER comment back in
+					//pthis->Write_Trips_To_Database<NT>();
 					//TODO: OMER 
 					pthis->Write_MM_Trips_To_Database<NT>();
 				}
@@ -115,7 +116,7 @@ namespace Demand_Components
 
 			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan, bool write_trajectory)
 			{
-				movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type(static_cast<movement_plan_type*>(movement_plan),write_trajectory));
+				movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan),write_trajectory));
 			}
 
 			template<typename TargetType> void Write_Trips_To_Database()

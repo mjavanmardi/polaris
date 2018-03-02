@@ -1297,7 +1297,7 @@ namespace Person_Components
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 
 				bool write_trajectory = true;
-				//((_Demand_Interface*)_global_demand)->Add_Trip_Record(movement, write_trajectory);
+				movement->arrive_to_mm_destination(write_trajectory);
 			}
 			//If the mode is non-transit person can walk/bike/drive freely
 			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
