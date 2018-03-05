@@ -655,6 +655,24 @@ namespace Movement_Plan_Components
 
 
 		//=====================================================================
+		// ROUTER-ONLY MOVEMENT PLAN - use for batch router, etc.
+		//---------------------------------------------------------------------
+		implementation struct Router_Movement_Plan_Implementation : public Movement_Plan_Implementation<MasterType, INHERIT(Router_Movement_Plan_Implementation)>
+		{
+			typedef Movement_Plan_Implementation<MasterType, INHERIT(Router_Movement_Plan_Implementation)> Base_Type;
+			typedef typename Base_Type::Component_Type ComponentType;
+
+			void arrive_to_destination(bool write_trajectory);
+		};
+
+		template<typename MasterType, typename InheritanceList>
+		void Router_Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination(bool write_trajectory)
+		{
+			// doesn't do anything since this version is used for router only applications....
+			return;
+		}
+
+		//=====================================================================
 		// RECORDING VERSION OF THE MOVEMENT PLAN
 		//---------------------------------------------------------------------
 		implementation struct Movement_Plan_Record_Implementation : public Polaris_Component<MasterType,INHERIT(Movement_Plan_Record_Implementation),Data_Object>

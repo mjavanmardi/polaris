@@ -56,8 +56,8 @@ struct MasterType
 
 	typedef Plan_Components::Implementations::Plan_Implementation<M> plan_type;
 
-	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> movement_plan_type;
-	//typedef Movement_Plan_Components::Implementations::Integrated_Movement_Plan_Implementation<M> integrated_movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Router_Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Router_Movement_Plan_Implementation<M> integrated_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
@@ -388,7 +388,7 @@ int main(int argc,char** argv)
 	output_filename << "routed_results.dat";
 	fw_output.Open(output_filename.str());
 
-	bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
+	bool debug_route = true; //Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
 	if (debug_route)
 	{
 		stringstream details_title("");

@@ -78,6 +78,8 @@ namespace Scenario_Components
 			//=================================================================================
 			// FILENAMES
 
+			m_data(string, vehicle_distribution_file_name, NONE, NONE);
+
 			m_data(string, input_dir_name, NONE, NONE);
 			m_data(string, output_dir_name, NONE, NONE);
 				
@@ -162,8 +164,6 @@ namespace Scenario_Components
 			m_data(double, multimodal_routing_weight_factor, NONE, NONE);
 			
 			m_data(string, activity_start_time_model_file_name, NONE, NONE);
-
-			m_data(string, vehicle_distribution_file_name, NONE, NONE);
 
 			m_data(double, percent_to_synthesize, NONE, NONE);
 			m_data(double, ipf_tolerance, NONE, NONE);
