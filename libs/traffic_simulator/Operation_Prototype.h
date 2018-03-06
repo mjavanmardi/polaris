@@ -520,6 +520,22 @@ namespace Operation_Components
 
 
 
+				//=========================================================================
+				// Validate signal plans to make sure no movements have been skipped
+				cout << "Validating signals" << endl;
+				bool valid_control = true;
+				stringstream error_string("");
+				for (_Intersections_Container_Interface::iterator intersection_itr = intersections_container.begin(); intersection_itr != intersections_container.end(); ++intersection_itr)
+				{
+					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersection_itr);
+					if (!intersection->Validate_Control(error_string)) valid_control = false;
+				}
+				if (!valid_control)
+				{
+					THROW_EXCEPTION(error_string.str())
+				}
+
+
 				cout << "Reading Signs" << endl;
 
 				vector<_Intersection_Interface*> intersections_with_signs; // temp storage for intersections with signs to determine final sign type (4-way vs. 2-way)
@@ -695,8 +711,7 @@ namespace Operation_Components
 				}
 			}
 
-
-			// template<typename TargetType> void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)
+			/*// template<typename TargetType> void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)
 			// {
 				// typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;
 				// typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename _Network_Interface::get_type_of(intersections_container)::value_type>::type>  _Intersection_Interface;
@@ -838,9 +853,7 @@ namespace Operation_Components
 					// operation_data.turn_movement_green_time_array[p] = movement->template green_time<int>();
 					// operation_data.link_green_cycle_ratio_array[p] = movement->template inbound_link_green_cycle_ratio<float>();
 				// }
-			// }
-
-
+			// }*/
 		};
 	}
 }

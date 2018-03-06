@@ -96,6 +96,7 @@ namespace Vehicle_Components
 			else if (strcmp(class_str, "WAGON_COMPACT") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_COMPACT;
 			else if (strcmp(class_str, "WAGON_MID_SIZE") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_MID_SIZE;
 			else if (strcmp(class_str, "WAGON_FULL_SIZE") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_FULL_SIZE;
+			else if (strcmp(class_str, "SUV_COMPACT") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_COMPACT;
 			else if (strcmp(class_str, "SUV_MID_SIZE") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
 			else if (strcmp(class_str, "SUV_FULL_SIZE") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_FULL_SIZE;
 			else if (strcmp(class_str, "TRUCK_MID_SIZE") == 0) vclass = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;

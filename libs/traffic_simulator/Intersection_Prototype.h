@@ -316,6 +316,11 @@ namespace Intersection_Components
 			{
 				this_component()->template update_in_network_vehicle_vht<TargetType>();
 			}
+
+			bool Validate_Control(stringstream& err_string)
+			{
+				return this_component()->Validate_Control(err_string);
+			}
 		};
 	}
 }

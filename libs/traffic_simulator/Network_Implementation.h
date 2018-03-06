@@ -438,6 +438,8 @@ namespace Network_Components
 
 			static void End_Iteration_Conditional(ComponentType* _this,Event_Response& response)
 			{
+				int cur_iter = iteration();
+
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION)
 				{
@@ -569,6 +571,12 @@ namespace Network_Components
 			void End_Iteration_Handler()
 			{
 				typedef Network<typename MasterType::network_type> _Network_Interface;
+				typedef Random_Access_Sequence< typename _Network_Interface::get_type_of(links_container)> _Links_Container_Interface;
+				typedef Link_Components::Prototypes::Link<get_component_type(_Links_Container_Interface)> _Link_Interface;
+				typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(link_origin_vehicle_queue)> _Origin_Vehicles_Interface;
+				typedef Random_Access_Sequence<typename _Link_Interface::get_type_of(current_vehicle_queue)> _Current_Vehicles_Interface;
+				typedef Vehicle_Components::Prototypes::Vehicle<get_component_type(_Origin_Vehicles_Interface)> _Vehicle_Interface;
+
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
@@ -582,6 +590,26 @@ namespace Network_Components
 				((typename MasterType::network_type*)this)->template calculate_moe<NULLTYPE>();
 				//((typename MasterType::network_type*)this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)this)->template printResults<NULLTYPE>();
+
+				int iter = iteration();
+				int subiter = sub_iteration();
+
+				if (iteration() + _this_ptr->template scenario_reference<_Scenario_Interface*>()->simulation_interval_length<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
+				{
+					//TODO: JAA - 2/24/18: as it says below...
+					cout << "PRINTING ALL THE STUCK CARS.....";
+
+					for (_Links_Container_Interface::iterator link_itr = _links_container.begin(); link_itr != _links_container.end(); ++link_itr)
+					{
+						_Link_Interface* link = (_Link_Interface*)(*link_itr);
+						_Origin_Vehicles_Interface* origin_queue = link->link_origin_vehicle_queue<_Origin_Vehicles_Interface*>();
+						_Current_Vehicles_Interface* current_queue = link->current_vehicle_queue<_Current_Vehicles_Interface*>();
+
+						// unload all vehicles in the origin and current queues
+						for (_Origin_Vehicles_Interface::iterator v_itr = origin_queue->begin(); v_itr != origin_queue->end(); ++v_itr) (*v_itr)->unload<NT>();
+						for (_Current_Vehicles_Interface::iterator v_itr = current_queue->begin(); v_itr != current_queue->end(); ++v_itr) (*v_itr)->unload<NT>();
+					}
+				}
 			}
 
 			//template<typename TargetType> void add_in_network_to_VHT()

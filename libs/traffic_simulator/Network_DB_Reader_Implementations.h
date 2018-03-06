@@ -2138,11 +2138,12 @@ namespace Network_Components
 				int skipped_counter=0;
 				_Link_Interface* link;
 
+				int test = -1;
 				for(typename result<Location>::iterator db_itr = location_result.begin (); db_itr != location_result.end (); ++db_itr)
 				{
 					try
 					{
-						int test = db_itr->getLocation();
+						test = db_itr->getLocation();
 						link_id_dir.id=db_itr->getLink()->getLink();
 						link_id_dir.dir=db_itr->getDir();
 
