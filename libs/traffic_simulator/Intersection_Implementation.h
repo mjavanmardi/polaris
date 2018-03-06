@@ -1179,7 +1179,7 @@ namespace Intersection_Components
 				typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(turn_movements_container), _Movement_Interface*> _Movements_Container_Interface;
 				typedef  Intersection_Control_Components::Prototypes::Approach<typename remove_pointer< typename _Control_Plan_Interface::get_type_of(approach_data_array)::value_type>::type>  _Approach_Interface;
 				typedef  Random_Access_Sequence< typename _Control_Plan_Interface::get_type_of(approach_data_array), _Approach_Interface*> _Approaches_Container_Interface;
-
+				
 				_Intersection_Control_Interface* intersection_control = this->intersection_control<_Intersection_Control_Interface*>();
 
 				// skip if this is not a controlled intersection
@@ -1198,6 +1198,12 @@ namespace Intersection_Components
 						// this is the movement to search for in the control plan
 						_Outbound_Movement_Interface* movement = (_Outbound_Movement_Interface*)(*mvmt_itr);
 						bool mvmt_valid = true;
+
+						//Check if the movement has a transit or walk link
+						if (movement->template inbound_link<_Link_Interface*>()->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::Link_Type_Keys::WALK || movement->template inbound_link<_Link_Interface*>()->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::Link_Type_Keys::TRANSIT || movement->template outbound_link<_Link_Interface*>()->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::Link_Type_Keys::WALK || movement->template outbound_link<_Link_Interface*>()->template link_type<Link_Components::Types::Link_Type_Keys>() == Link_Components::Types::Link_Type_Keys::TRANSIT)
+						{
+							continue;
+						}
 
 						//validate each control time period
 						_Control_Plans_Container_Interface& control_plans = intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>();
