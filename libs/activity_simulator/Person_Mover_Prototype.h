@@ -1226,7 +1226,9 @@ namespace Person_Components
 		template<typename TargetType>
 		void Person_Mover<ComponentType>::person_action_at_beginning_of_link()
 		{
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+			//typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf; 
+			typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::movement_plan_type> movement_itf;
+			typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::integrated_movement_plan_type> integrated_movement_itf;
 			typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 			typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 			typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
@@ -1297,7 +1299,16 @@ namespace Person_Components
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 
 				bool write_trajectory = true;
-				movement->arrive_to_mm_destination(write_trajectory);
+				//Check if the movement is basic or integrated
+				if (movement->template is_integrated<bool>())
+				{
+					((integrated_movement_itf*) movement)->arrive_to_mm_destination(write_trajectory);
+				}
+				else
+				{
+					//movement<basic_movement_itf*>()->arrive_to_mm_destination(write_trajectory);
+					movement->arrive_to_mm_destination(write_trajectory);
+				}
 			}
 			//If the mode is non-transit person can walk/bike/drive freely
 			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
