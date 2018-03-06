@@ -243,6 +243,8 @@ namespace Person_Components
 						return;
 					}
 
+					//TODO: Omer
+					move->template is_integrated<bool>(true);
 					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(), move);
 					// move the scheduled movement out of the movements list
 					// TODO: JAA - 2/19/18 - check to make sure this doesn't blow anything up...

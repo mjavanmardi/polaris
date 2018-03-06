@@ -273,7 +273,7 @@ namespace Routing_Components
 					{
 						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 
-						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+						for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 						{
 							Link_Interface* link = (Link_Interface*)(*itr);
 							if (link->template uuid<unsigned int>() == origin_ids.front()) olink = link;
@@ -303,7 +303,7 @@ namespace Routing_Components
 					}
 
 					_movement_plan->routing_execution_time(astar_time);
-					_movement_plan->routing_scan_count(astar_time);
+					_movement_plan->routing_scan_count(scan_count);
 					_movement_plan->summary_string(summary_paragraph);
 					_movement_plan->detail_string(detail_paragraph);
 					

@@ -557,7 +557,7 @@ namespace Movement_Plan_Components
 					vehicle_trajectory_data->template estimated_link_accepting_time<float>(out_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_bike_time<float>(out_walk_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_bike_time<float>(out_bike_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr - 1]);
 				}
@@ -654,10 +654,28 @@ namespace Movement_Plan_Components
 
 			m_prototype(Activity_Components::Prototypes::Activity_Planner, typename MasterType::activity_type, destination_activity_reference, NONE, NONE);
 			void arrive_to_destination(bool write_trajectory);
+			void arrive_to_mm_destination(bool write_trajectory);
 		};
 		
 		template<typename MasterType, typename InheritanceList>
 		void Integrated_Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_destination(bool write_trajectory)
+		{
+			Base_Type* bthis = (Base_Type*)this;
+
+			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
+			//bthis->_trajectory_container[bthis->_current_trajectory_index]->_delayed_time = 0.0;
+			bthis->template arrived_time<Simulation_Timestep_Increment>(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>());
+
+			if (Base_Type::_is_integrated && this->_destination_activity_reference != nullptr)
+			{
+				Simulation_Timestep_Increment ttime = bthis->template arrived_time<Simulation_Timestep_Increment>() - bthis->template departed_time<Simulation_Timestep_Increment>();
+				this->_destination_activity_reference->template Actual_Travel_Time<Simulation_Timestep_Increment>(ttime);
+				this->_destination_activity_reference->Arrive_At_Activity();
+			}
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Integrated_Movement_Plan_Implementation<MasterType, InheritanceList>::arrive_to_mm_destination(bool write_trajectory)
 		{
 			Base_Type* bthis = (Base_Type*)this;
 

@@ -22,8 +22,8 @@ namespace Person_Components
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records;
 			std::vector<pair<polaris::io::Trip,polaris::io::Activity>>* activity_records_buffer;
 			//TODO: Omer
-			std::vector<polaris::io::multimodalSPLabels>* multimodalSPLabels;
-			std::vector<polaris::io::multimodalSPLabels>* multimodalSPLabels_buffer;
+			//std::vector<pair<polaris::io::Trip, polaris::io::Activity>>* multimodal_activity_records;
+			//std::vector<pair<polaris::io::Trip, polaris::io::Activity>>* multimodal_activity_records_buffer;
 
 
 
@@ -76,8 +76,8 @@ namespace Person_Components
 				activity_records = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 				activity_records_buffer = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 				//TODO: Omer
-				multimodalSPLabels = new std::vector<polaris::io::multimodalSPLabels>[num_sim_threads()];
-				multimodalSPLabels_buffer = new std::vector<polaris::io::multimodalSPLabels>[num_sim_threads()];
+				//multimodal_activity_records = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
+				//multimodal_activity_records_buffer = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
 
 				expected_ttime = new float[num_sim_threads()];
 				routed_ttime = new float[num_sim_threads()];
@@ -280,20 +280,22 @@ namespace Person_Components
 					typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
 					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
 					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+					typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+					movement_itf* move = act->template movement_plan<movement_itf*>();
 
-					Push_To_Demand_Database<TargetType>(act_record, is_executed);
+					if (scenario->template multimodal_routing<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
+					{
+						/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
+						typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
+						typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;*/
+						Push_To_MM_Demand_Database<TargetType>(act_record, is_executed);
+					}
+					else
+					{
+						Push_To_Demand_Database<TargetType>(act_record, is_executed);
+					}
 
-				}
-
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
-				movement_itf* move = act->template movement_plan<movement_itf*>();
-				if (scenario->template multimodal_routing<bool>() && Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
-				{
-					/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
-					typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
-					typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;*/
-					write_multimodal_trajectory<TargetType>(move->template summary_string<std::string>());
-				}
+				}		
 
 				if (!is_executed) return;
 
@@ -368,15 +370,13 @@ namespace Person_Components
 					pthis->activity_records = tmp_act;
 
 					//TODO: OMER mimicking above
-					std::vector<polaris::io::multimodalSPLabels>* tmp_mm = pthis->multimodalSPLabels_buffer;
-					pthis->multimodalSPLabels_buffer = pthis->multimodalSPLabels;
-					pthis->multimodalSPLabels = tmp_mm;
+					/*std::vector<pair<polaris::io::Trip, polaris::io::Activity>>* multimodal_tmp_act = pthis->multimodal_activity_records_buffer;
+					pthis->multimodal_activity_records_buffer = pthis->multimodal_activity_records;
+					pthis->multimodal_activity_records = multimodal_tmp_act;*/
 
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
 					pthis->Write_Data_To_File_Event<NT>();
-					//TODO: OMER 
-					pthis->Write_MM_Summary_To_File_Event<NT>();
 				}
 				//else if (sub_iteration() < (int)num_sim_threads())
 				//{
@@ -479,9 +479,18 @@ namespace Person_Components
 								polaris::io::Trip& trip = itr->first;
 								polaris::io::Activity& a = itr->second;
 
+								std::string mode = a.getMode();
 								// first, persist the path if it exists...
-								shared_ptr<polaris::io::Path> p = trip.getPath();
-								if (p) this->_db_ptr->persist(p);
+								if (scenario->template multimodal_routing<bool>() && (mode == "WALK" || mode == "BIKE" || mode == "PARK_AND_RIDE" || mode == "TRANSIT"))
+								{
+									shared_ptr<polaris::io::Path_Multimodal> p = trip.getPathMultimodal();
+									if (p) this->_db_ptr->persist(p);
+								}
+								else
+								{
+									shared_ptr<polaris::io::Path> p = trip.getPath();
+									if (p) this->_db_ptr->persist(p);
+								}
 
 								unsigned long t_id;
 								// only write trip if the type is not -1 (i.e. for executed trips)
@@ -515,50 +524,6 @@ namespace Person_Components
 				}
 			}
 			
-			//TODO: Omer
-			template<typename TargetType> void Write_MM_Summary_To_File_Event()
-			{
-				for (int i = 0; i< (int)num_sim_threads(); ++i)
-				{
-					
-					if (Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>())
-					{
-						int count = 0;
-
-						try
-						{
-							odb::transaction t(this->_db_ptr->begin());
-
-							// iterate over trip-activity pairs and push to database
-							for (std::vector<polaris::io::multimodalSPLabels>::iterator itr = multimodalSPLabels[i].begin(); itr != multimodalSPLabels[i].end(); ++itr)
-							{
-								polaris::io::multimodalSPLabels& t = *itr;								
-								this->_db_ptr->persist(t);
-								count++;
-							}
-							t.commit();
-						}
-						catch (const odb::exception& e)
-						{
-							cout << e.what() << ". DB error in person_data_logger_implementation, line 493.  count=" << count << endl;
-							polaris::io::multimodalSPLabels p = multimodalSPLabels[i][count];
-
-						}
-						catch (std::exception& e)
-						{
-							cout << e.what() << ". DB error in person_data_logger_implementation, line 499.  count=" << count << endl;
-						}
-						catch (...)
-						{
-							cout << "some other error in database writing" << endl;
-						}
-
-						// erase buffer
-						multimodalSPLabels[i].clear();
-					}
-				}
-			}
-
 			template<typename TargetType> void Write_Summary_Data_To_File()
 			{
 				//for (int i = 0; i < 20; ++i)
@@ -849,64 +814,191 @@ namespace Person_Components
 				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec,act_rec));
 			}
 
-			template<typename TargetType> void write_multimodal_trajectory(std::string& summary_string)
+			template<typename TargetType> void Push_To_MM_Demand_Database(TargetType act_record, bool is_executed, int new_origin = -1, int new_destination = -1)
 			{
-				/*typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
-				odb::transaction t(db_ptr->begin());*/
-				
-				//polaris::io::multimodalSPLabels multimodal_labels_record;
+				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_itf::get_type_of(movement_plan)> movement_itf;
+				typedef Link_Components::Prototypes::Link<typename movement_itf::get_type_of(origin)> _Link_Interface;
+				typedef Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+				typedef Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
+				typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+				typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
+				//typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
+				//typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
 
-				////shared_ptr<polaris::io::multimodalSPLabels> multimodal_labels_record(new polaris::io::multimodalSPLabels());
+				act_itf* act = (act_itf*)act_record;
+				movement_itf* move = act->template movement_plan<movement_itf*>();
+				location_itf* orig = move->template origin<location_itf*>();
+				location_itf* dest = move->template destination<location_itf*>();
+				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
+				person_itf* person = planner->template Parent_Person<person_itf*>();
+				household_itf* hh = person->person_itf::template Household<household_itf*>();
+				//vehicle_itf* vehicle = person->vehicle<vehicle_itf*>();
 
-				//std::istringstream ss(summary_string);
-				//std::string sub_string;
+				//==============================================================================================
+				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
+				//shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
+				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
+				polaris::io::Trip trip_rec;
+				shared_ptr<polaris::io::Path_Multimodal> path_mm_db_record;
 
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setOrigin_ID(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setDestination_ID(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setDeparture_Time(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setSub_Mode(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setArrival_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setGen_Cost(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setDuration(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setWait_Count(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setWait_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setWalk_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setBike_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setIVTT(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setCar_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setTransfer_Pen(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setEst_Cost(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setScan_Count(stoi(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setaStar_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setvisit_Time(stod(sub_string));
-				//std::getline(ss, sub_string, '\t');
-				//multimodal_labels_record.setSuccess_Status(sub_string);
-				//std::getline(ss, sub_string, '\n');
-				//multimodal_labels_record.setEuc_Dist_km(stod(sub_string));
+				if (is_executed)
+				{
+					//================================================================================
+					// First, add the trajectory if we are writing the vehicle trajectory
+					_Multimodal_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+					if (trajectory.size()>0)
+					{
+						//if (vehicle->write_trajectory())
+						//{
+							// Fill the PATH DB record
+							path_mm_db_record = make_shared<polaris::io::Path_Multimodal>();
+							//path_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+							path_mm_db_record->setTraveler_ID(move->traveler_id<int>());
+							path_mm_db_record->setOrigin_Activity_Location(move->template origin<location_itf*>()->template uuid<int>());
+							path_mm_db_record->setDestination_Activity_Location(move->template destination<location_itf*>()->template uuid<int>());
+							path_mm_db_record->setOrigin_Link(move->template origin<_Link_Interface*>()->template uuid<int>());
+							path_mm_db_record->setDestination_Link(move->template destination<_Link_Interface*>()->template uuid<int>());
+							path_mm_db_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
+							path_mm_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+							//path_mm_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
+							//path_mm_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
+							path_mm_db_record->setMode(move->template mode<int>());
 
-				//multimodalSPLabels_buffer[__thread_id].push_back(multimodal_labels_record);
-				/*db_ptr->persist(multimodal_labels_record);
-				t.commit();*/
-			}
+							
+							auto link_itr = --trajectory.end();
+							_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
+
+							path_mm_db_record->setArrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+							path_mm_db_record->setGen_Cost(trajectory_unit->template estimated_gen_cost<float>());
+							path_mm_db_record->setDuration(trajectory_unit->template estimated_link_accepting_time<float>());
+							path_mm_db_record->setWait_Count(trajectory_unit->template estimated_wait_count<int>());
+							path_mm_db_record->setWait_Time(trajectory_unit->template estimated_wait_time<float>());
+							path_mm_db_record->setWalk_Time(trajectory_unit->template estimated_walk_time<float>());
+							path_mm_db_record->setBike_Time(trajectory_unit->template estimated_bike_time<float>());
+							path_mm_db_record->setIVTT(trajectory_unit->template estimated_ivt_time<float>());
+							path_mm_db_record->setCar_Time(trajectory_unit->template estimated_car_time<float>());
+							path_mm_db_record->setTransfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
+							path_mm_db_record->setScan_Count(move->template routing_scan_count<int>());
+							path_mm_db_record->setaStar_Time(move->template routing_execution_time<float>());
+
+							//float start = 0;
+							//int route_link_counter = 0;
+							//for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr, ++route_link_counter)
+							//{
+							//	// FIll the path link DB record for each step of the path
+							//	polaris::io::link_travel path_link_record;
+							//	_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*link_itr);
+							//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+							//	int route_link_id = route_link->template uuid<int>();
+							//	int route_link_enter_time = trajectory_unit->template enter_time<int>();
+							//	float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());
+							//	int route_link_exit_time = move->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+							//	float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
+
+							//	//if (route_link->template link_type<Link_Components::Types::Link_Type_Keys>() != Link_Components::Types::EXTERNAL)
+							//	//{
+							//	path_link_record.setLink(route_link->dbid<int>());
+							//	path_link_record.setDir(route_link->direction<int>());
+							//	path_link_record.setEntering_Time(route_link_enter_time);
+							//	path_link_record.setTravel_Time(route_link_travel_time);
+							//	path_link_record.setDelayed_Time(route_link_delayed_time);
+							//	path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
+							//	path_db_record->setLink(path_link_record);
+							//	//}
+
+							//}
+							//int path_id = db_ptr->persist(path_db_record);
+							//movement_plan->path_id(path_id);
+						//}
+					}
+					//=END of trajectory writing ====================================================================================
+
+					trip_rec.setConstraint(0);
+					trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
+					trip_rec.setTrip(act->template Activity_Plan_ID<int>());
+					if (new_destination < 0) trip_rec.setDestination(dest->template uuid<int>());
+					else trip_rec.setDestination(new_destination);
+					trip_rec.setDuration(act->template Duration<Time_Seconds>());
+
+					if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
+					else trip_rec.setGap(0.0f);
+
+					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec.setHhold(0);					
+					trip_rec.setMode(act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
+					else trip_rec.setOrigin(new_origin);
+					trip_rec.setPartition(move->template routed_travel_time<int>());
+					trip_rec.setPassengers(0);
+					trip_rec.setPurpose(0);
+					trip_rec.setStart(move->template departed_time<Time_Seconds>());
+					trip_rec.setTour(0);
+					trip_rec.setPriority(0);
+					trip_rec.setType(1);
+					trip_rec.setPathMultimodal(path_mm_db_record);
+
+					//= END of trip writing ===============================================================================
+				}
+				else
+				{
+					trip_rec.setType(-1); // use this to flag a null trip when writing to database
+				}
+
+
+				//==============================================================================================
+				// create activity record
+				//shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
+				//polaris::io::Activity* act_rec = new polaris::io::Activity();
+				polaris::io::Activity act_rec;
+				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
+				if (new_destination<0)
+					act_rec.setLocation_Id(dest->template uuid<int>());
+				else
+					act_rec.setLocation_Id(new_destination);
+				act_rec.setStart_Time(act->template Start_Time<Time_Seconds>());
+				act_rec.setDuration(act->template Duration<Time_Seconds>());
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+					act_rec.setMode("SOV");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
+					act_rec.setMode("HOV");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TAXI)
+					act_rec.setMode("TAXI");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK)
+					act_rec.setMode("WALK");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+					act_rec.setMode("BIKE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS)
+					act_rec.setMode("SCHOOLBUS");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
+					act_rec.setMode("PARK_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
+					act_rec.setMode("TRANSIT");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK)
+					act_rec.setMode("TRUCK");
+				else
+				{
+					stringstream s;
+					s << "FAIL: " << act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+					act_rec.setMode(s.str());
+				}
+				act_rec.setType(act->Get_Type_String());
+				//act_rec.setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
+				act_rec.setPerson(person->template person_record<shared_ptr<polaris::io::Person>>());
+				//act_rec.setTrip (trip_rec);	
+				act_rec.setTrip(0/*trip_rec->getTrip_Id()*/);
+
+				if (new_origin < 0) act_rec.setOrigin_Id(orig->template uuid<int>());
+				else act_rec.setOrigin_Id(new_origin);
+
+
+				// add trip and activity to the buffer for the current thread
+				//trip_records_buffer[__thread_id].push_back(trip_rec);
+				activity_records_buffer[__thread_id].push_back(make_pair(trip_rec, act_rec));
+			}			
 		};
 	}
 }

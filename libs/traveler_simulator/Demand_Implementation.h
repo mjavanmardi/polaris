@@ -48,6 +48,8 @@ namespace Demand_Components
 				// initialize storage arrays
 				movement_plans = new movement_plans_vector_type[num_sim_threads()];
 				movement_plans_buffer = new movement_plans_vector_type[num_sim_threads()];
+				multimodal_movement_plans = new movement_plans_vector_type[num_sim_threads()];
+				multimodal_movement_plans_buffer = new movement_plans_vector_type[num_sim_threads()];
 				//trip_records = new std::vector<polaris::io::Trip>[num_sim_threads()];
 				//trip_records_buffer = new std::vector<polaris::io::Trip>[num_sim_threads()];
 
@@ -81,7 +83,9 @@ namespace Demand_Components
 			//--------------------------------------------------------------
 
 			movement_plans_vector_type* movement_plans;
-			movement_plans_vector_type* movement_plans_buffer;
+			movement_plans_vector_type* movement_plans_buffer; 
+			movement_plans_vector_type* multimodal_movement_plans;
+			movement_plans_vector_type* multimodal_movement_plans_buffer;
 
 			static void Logging_Event_Controller(ComponentType* _this, Event_Response& response)
 			{
@@ -100,11 +104,14 @@ namespace Demand_Components
 					pthis->movement_plans_buffer = pthis->movement_plans;
 					pthis->movement_plans = tmp;
 
+					movement_plans_vector_type* multimodal_tmp = pthis->multimodal_movement_plans_buffer;
+					pthis->multimodal_movement_plans_buffer = pthis->multimodal_movement_plans;
+					pthis->multimodal_movement_plans = multimodal_tmp;
+
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = 0;
-					//TODO: OMER comment back in
-					//pthis->Write_Trips_To_Database<NT>();
-					//TODO: OMER 
+					
+					pthis->Write_Trips_To_Database<NT>();					 
 					pthis->Write_MM_Trips_To_Database<NT>();
 				}
 				else
@@ -116,7 +123,17 @@ namespace Demand_Components
 
 			template<typename TargetType> void Add_Trip_Record(TargetType movement_plan, bool write_trajectory)
 			{
-				movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan),write_trajectory));
+				//Get the mode
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = movement_plan->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				//Check the mode for multimodal buffer
+				if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE)
+				{
+					multimodal_movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan), write_trajectory));
+				}
+				else
+				{
+					movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan), write_trajectory));
+				}
 			}
 
 			template<typename TargetType> void Write_Trips_To_Database()
@@ -294,9 +311,9 @@ namespace Demand_Components
 							this->_db_ptr->persist(t);
 							count++;
 							}*/
-							for (movement_plans_vector_type::iterator itr = movement_plans[i].begin(); itr != movement_plans[i].end(); ++itr)
+							for (movement_plans_vector_type::iterator itr = multimodal_movement_plans[i].begin(); itr != multimodal_movement_plans[i].end(); ++itr)
 							{
-								shared_ptr<polaris::io::multimodalSPLabels> multimodal_labels_record;
+								shared_ptr<polaris::io::Path_Multimodal> path_mm_db_record;
 
 								movement_itf* move = (movement_itf*)itr->first;
 								location_itf* orig = move->template origin<location_itf*>();
@@ -308,41 +325,37 @@ namespace Demand_Components
 								if (write_trajectory)
 								{
 									// Fill the PATH DB record
-									multimodal_labels_record = make_shared<polaris::io::multimodalSPLabels>();
-									//multimodal_labels_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
+									path_mm_db_record = make_shared<polaris::io::Path_Multimodal>();
+									//path_mm_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 									
-									multimodal_labels_record->setTraveler_ID(move->traveler_id<int>());									
-									multimodal_labels_record->setOrigin_Activity_Location(move->template origin<location_itf*>()->template uuid<int>());
-									multimodal_labels_record->setDestination_Activity_Location(move->template destination<location_itf*>()->template uuid<int>());
-									multimodal_labels_record->setOrigin_Link(move->template origin<link_itf*>()->template uuid<int>());
-									multimodal_labels_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
-									multimodal_labels_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
-									multimodal_labels_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
-									//multimodal_labels_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
-									//multimodal_labels_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
-									multimodal_labels_record->setMode(move->template mode<int>());
+									path_mm_db_record->setTraveler_ID(move->traveler_id<int>());									
+									path_mm_db_record->setOrigin_Activity_Location(move->template origin<location_itf*>()->template uuid<int>());
+									path_mm_db_record->setDestination_Activity_Location(move->template destination<location_itf*>()->template uuid<int>());
+									path_mm_db_record->setOrigin_Link(move->template origin<link_itf*>()->template uuid<int>());
+									path_mm_db_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
+									path_mm_db_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
+									path_mm_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+									//path_mm_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
+									//path_mm_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
+									path_mm_db_record->setMode(move->template mode<int>());
 
 
 									_Multimodal_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
 									auto link_itr = --trajectory.end();
 									_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
 
-									multimodal_labels_record->setArrival_Time(trajectory_unit->template estimated_arrival_time<float>());
-									multimodal_labels_record->setGen_Cost(trajectory_unit->template estimated_gen_cost<float>());
-									multimodal_labels_record->setDuration(trajectory_unit->template estimated_link_accepting_time<float>());
-									multimodal_labels_record->setWait_Count(trajectory_unit->template estimated_wait_count<int>());
-									multimodal_labels_record->setWait_Time(trajectory_unit->template estimated_wait_time<float>());
-									multimodal_labels_record->setWalk_Time(trajectory_unit->template estimated_walk_time<float>());
-									multimodal_labels_record->setBike_Time(trajectory_unit->template estimated_bike_time<float>());
-									multimodal_labels_record->setIVTT(trajectory_unit->template estimated_ivt_time<float>());
-									multimodal_labels_record->setCar_Time(trajectory_unit->template estimated_car_time<float>());
-									multimodal_labels_record->setTransfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
-									multimodal_labels_record->setEst_Cost(-1.0f);
-									multimodal_labels_record->setScan_Count(move->template routing_scan_count<int>());
-									multimodal_labels_record->setaStar_Time(move->template routing_execution_time<float>());
-									multimodal_labels_record->setvisit_Time(-1.0f);
-									multimodal_labels_record->setSuccess_Status("success");
-									multimodal_labels_record->setEuc_Dist_km(-1.0f);
+									path_mm_db_record->setArrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+									path_mm_db_record->setGen_Cost(trajectory_unit->template estimated_gen_cost<float>());
+									path_mm_db_record->setDuration(trajectory_unit->template estimated_link_accepting_time<float>());
+									path_mm_db_record->setWait_Count(trajectory_unit->template estimated_wait_count<int>());
+									path_mm_db_record->setWait_Time(trajectory_unit->template estimated_wait_time<float>());
+									path_mm_db_record->setWalk_Time(trajectory_unit->template estimated_walk_time<float>());
+									path_mm_db_record->setBike_Time(trajectory_unit->template estimated_bike_time<float>());
+									path_mm_db_record->setIVTT(trajectory_unit->template estimated_ivt_time<float>());
+									path_mm_db_record->setCar_Time(trajectory_unit->template estimated_car_time<float>());
+									path_mm_db_record->setTransfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
+									path_mm_db_record->setScan_Count(move->template routing_scan_count<int>());
+									path_mm_db_record->setaStar_Time(move->template routing_execution_time<float>());
 
 									//float start = 0;
 									//int route_link_counter = 0;
@@ -364,11 +377,11 @@ namespace Demand_Components
 									//	path_link_record.setTravel_Time(route_link_travel_time);
 									//	path_link_record.setDelayed_Time(route_link_delayed_time);
 									//	path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
-									//	multimodal_labels_record->setLink(path_link_record);
+									//	path_mm_db_record->setLink(path_link_record);
 									//}
 								}
 
-								if (multimodal_labels_record) this->_db_ptr->persist(multimodal_labels_record);
+								if (path_mm_db_record) this->_db_ptr->persist(path_mm_db_record);
 
 								//==============================================================================================
 								// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
@@ -391,7 +404,7 @@ namespace Demand_Components
 								trip_rec.setTour(0);
 								trip_rec.setPriority(0);
 								trip_rec.setType(1);
-								//trip_rec.setPath(path_db_record);
+								trip_rec.setPathMultimodal(path_mm_db_record);
 								this->_db_ptr->persist(trip_rec);
 								count++;
 							}
@@ -414,7 +427,7 @@ namespace Demand_Components
 
 						// erase buffer
 						//trip_records[i].clear();
-						movement_plans[i].clear();
+						multimodal_movement_plans[i].clear();
 					}
 				}
 			}

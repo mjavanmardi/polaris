@@ -665,7 +665,7 @@ namespace polaris
 		std::deque<float>& out_transfer_pen,
 		std::deque<float>& out_heur_cost,	
 		__int64& astar_time, 
-		int scan_count,
+		int& scan_count,
 		Vehicle_Components::Types::Vehicle_Type_Keys mode,
 		bool debug_route
 		)

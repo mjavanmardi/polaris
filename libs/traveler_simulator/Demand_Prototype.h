@@ -347,6 +347,8 @@ namespace Demand_Components
 						{
 							// schedule routing
 							router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+							//TODO: Omer
+							movement_plan->template is_integrated<bool>(false);
 							movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
 							vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 							continue;
@@ -405,6 +407,8 @@ namespace Demand_Components
 
 						// schedule moving
 						movement_plan->set_trajectory(path_container, cost_container);
+						//TODO: Omer
+						movement_plan->template is_integrated<bool>(false);
 						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan, false);
 						vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 					}
@@ -415,6 +419,8 @@ namespace Demand_Components
 					else
 					{
 						router->template Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
+						//TODO: Omer
+						movement_plan->template is_integrated<bool>(false);
 						movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, _Movement_Plan_Interface*>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), movement_plan);
 						vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 					}

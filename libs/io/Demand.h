@@ -25,7 +25,7 @@ class Automation_Type;
 class Connectivity_Type;
 class link_travel;
 class Path;
-class multimodalSPLabels;
+class Path_Multimodal;
 
 
 #pragma db object //table("SELECTION")
@@ -632,8 +632,8 @@ public:
 	// Default Constructor
 	Trip () {}	
 	//Constructor
-	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, shared_ptr<Path> path_, int tour_, int trip_, double start_, double end_, double duration_, double gap_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )
-	: hhold (hhold_), person (person_), path(path_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), experienced_gap(gap_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
+	Trip ( int hhold_, /*int person_*/shared_ptr<Person> person_, shared_ptr<Path> path_, shared_ptr<Path_Multimodal> path_multimodal_, int tour_, int trip_, double start_, double end_, double duration_, double gap_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, shared_ptr<Vehicle> vehicle_, int passengers_, int type_, int partition_ )
+	: hhold (hhold_), person (person_), path(path_), path_multimodal(path_multimodal_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), experienced_gap(gap_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
 	}
 	//Accessors
@@ -646,7 +646,9 @@ public:
 	/*const int& getPerson () const {return person;}
 	void setPerson (const int& person_){person = person_;}*/
 	const shared_ptr<Path> getPath() const { return path; }
-	void setPath(shared_ptr<Path> path_) { path = path_; }
+	void setPath(shared_ptr<Path> path_) { path = path_; }	
+	const shared_ptr<Path_Multimodal> getPathMultimodal() const { return path_multimodal; }
+	void setPathMultimodal(shared_ptr<Path_Multimodal> path_multimodal_) { path_multimodal = path_multimodal_; }	
 	const int& getTour () const {return tour;}
 	void setTour (const int& tour_){tour = tour_;}
 	const int& getTrip () const {return trip;}
@@ -689,6 +691,7 @@ private:
 	unsigned long trip_id;
 	int hhold;
 	shared_ptr<Path> path;
+	shared_ptr<Path_Multimodal> path_multimodal;
 	//int person;
 	int tour;
 	int trip;
@@ -956,13 +959,13 @@ private:
 };
 
 #pragma db object
-class multimodalSPLabels
+class Path_Multimodal
 {
 public:
 	// Default Constructor
-	multimodalSPLabels() {}
-	multimodalSPLabels(int id_, int traveler_id_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, float Est_Cost_, int Scan_Count_, float aStar_Time_, float visit_Time_, std::string Success_Status_, float Euc_Dist_km_)
-		: id(id_), traveler_id(traveler_id_), origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), Mode(Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Est_Cost(Est_Cost_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), visit_Time(visit_Time_), Success_Status(Success_Status_), Euc_Dist_km(Euc_Dist_km_)
+	Path_Multimodal() {}
+	Path_Multimodal(int id_, int traveler_id_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, int Scan_Count_, float aStar_Time_)
+		: id(id_), traveler_id(traveler_id_), origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), Mode(Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_)
 	{
 	}
 	//Accessors
@@ -1003,19 +1006,11 @@ public:
 	const float& getCar_Time() const { return Car_Time; }
 	void setCar_Time(const float& Car_Time_) { Car_Time = Car_Time_; }
 	const float& getTransfer_Pen() const { return Transfer_Pen; }
-	void setTransfer_Pen(const float& Transfer_Pen_) { Transfer_Pen = Transfer_Pen; }
-	const float& getEst_Cost() const { return Est_Cost; }
-	void setEst_Cost(const float& Est_Cost_) { Est_Cost = Est_Cost_; }
+	void setTransfer_Pen(const float& Transfer_Pen_) { Transfer_Pen = Transfer_Pen_; }
 	const int& getScan_Count() const { return Scan_Count; }
 	void setScan_Count(const int& Scan_Count_) { Scan_Count = Scan_Count_; }
 	const float& getaStar_Time() const { return aStar_Time; }
-	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }
-	const float& getvisit_Time() const { return visit_Time; }
-	void setvisit_Time(const float& visit_Time_) { visit_Time = visit_Time_; }
-	const std::string& getSuccess_Status() const { return Success_Status; }
-	void setSuccess_Status(const std::string& Success_Status_) { Success_Status = Success_Status_; }
-	const float& getEuc_Dist_km() const { return Euc_Dist_km; }
-	void setEuc_Dist_km(const float& Euc_Dist_km_) { Euc_Dist_km = Euc_Dist_km_; }
+	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }	
 
 	//Data Fields
 private:
@@ -1051,12 +1046,8 @@ private:
 	float IVTT;
 	float Car_Time;
 	float Transfer_Pen;
-	float Est_Cost;
 	int Scan_Count;
 	float aStar_Time;
-	float visit_Time;
-	std::string Success_Status;
-	float Euc_Dist_km;
 };
 
 }//end of io namespace
