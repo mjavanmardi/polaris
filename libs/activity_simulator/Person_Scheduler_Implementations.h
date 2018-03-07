@@ -1180,7 +1180,7 @@ namespace Person_Components
 			// get the next activity if the person is moving or else current activity if they are stationary
 			Activity_Plan* current = this->next_activity_plan<Time_Seconds, Activity_Plan*>(-1);
 			Movement_Plan* cur_move = current->template movement_plan<Movement_Plan*>();
-			if (this->_Parent_Person->Is_Moving()) cout <<"WARNING: person "<<_Parent_Person->uuid<int>()<<" is already moving."<<endl;
+			if (this->_Parent_Person->Is_Moving()) THROW_WARNING("WARNING: person "<<_Parent_Person->uuid<int>()<<" is already moving.");
 
 			Activity_Plan* next;
 			while ((next = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(current)) != nullptr)
@@ -1188,10 +1188,10 @@ namespace Person_Components
 				Movement_Plan* next_move = next->template movement_plan<Movement_Plan*>();
 
 				// first, check for errors in the current activity
-				if (cur_move->departed_time<Time_Seconds>() > current->Start_Time<Time_Seconds>()) cout << "Warning: departure time greater than start time: "<<this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
-				if (current->Start_Time<Time_Seconds>() > current->End_Time<Time_Seconds>()) cout << "Warning: negative duration: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
-				if (current->End_Time<Time_Seconds>() > next_move->departed_time<Time_Seconds>()) cout << "Warning: departing before the end of the current activity: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
-				if (current->End_Time<Time_Seconds>() > next->Start_Time<Time_Seconds>()) cout << "Warning: current activity ends after next activity begins: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
+				if (cur_move->departed_time<Time_Seconds>() > current->Start_Time<Time_Seconds>()) THROW_WARNING("Warning: departure time greater than start time: "<<this->_Parent_Person->person_record<polaris::io::Person&>().getPerson());
+				if (current->Start_Time<Time_Seconds>() > current->End_Time<Time_Seconds>()) THROW_WARNING("Warning: negative duration: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson());
+				if (current->End_Time<Time_Seconds>() > next_move->departed_time<Time_Seconds>()) THROW_WARNING("Warning: departing before the end of the current activity: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson());
+				if (current->End_Time<Time_Seconds>() > next->Start_Time<Time_Seconds>()) THROW_WARNING("Warning: current activity ends after next activity begins: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson());
 				
 
 				// is there a gap? if no continue
