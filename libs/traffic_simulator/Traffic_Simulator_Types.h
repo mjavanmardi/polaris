@@ -50,6 +50,10 @@ namespace Scenario_Components
 				END_OF_ITERATION=40,
 				OUTPUT_WRITING_SUB_ITERATION,
 			};
+			enum Demand_Iteration_keys
+			{
+				END_OF_ACTIVITY_GENERATION = 300
+			};
 			enum Demand_Sub_Iteration_keys
 			{
 				PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION = 14,

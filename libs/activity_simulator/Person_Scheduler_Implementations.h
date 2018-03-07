@@ -176,6 +176,8 @@ namespace Person_Components
 			template<typename ActivityItfType> bool Define_Conflict(ActivityItfType conflicting_activity, ActivityItfType original_activity, std::vector<Activity_Conflict<MT>>& conflict_list);
 
 			template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
+
+			void Verify_Activity_Travel_Schedule();
 		};
 
 		// member features
@@ -599,7 +601,7 @@ namespace Person_Components
 				if (new_act != nullptr)
 				{
 					//just shift the 2nd half of the activity later as the following gap accomodates it
-					new_act->End_Time<Time_Seconds>(act->template End_Time<Time_Seconds>() + act->Duration<Time_Seconds>(), false);
+					new_act->End_Time<Time_Seconds>(act->template End_Time<Time_Seconds>() + new_act->Duration<Time_Seconds>(), false);
 				}
 				// otherwise place new activity in the existing gap
 				else
@@ -774,14 +776,7 @@ namespace Person_Components
 				int test = 1;
 			}
 
-			//======================================================
-			// log the activity throught the global person logger
-			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-			typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
-			if (scenario->template write_activity_output<bool>()) ((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act, false);
-
-
+			
 			// catch skipped movement plans
 			if (move->template departed_time<Simulation_Timestep_Increment>() < iteration()) return;
 
@@ -837,6 +832,14 @@ namespace Person_Components
 
 			// no logging if the movement is a return home movement
 			if (act == nullptr) return;
+
+			//======================================================
+			// log the activity throught the global person logger
+			/*typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+			typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
+			if (scenario->template write_activity_output<bool>()) ((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act, false);
+			*/
 
 			// cache the movement plans activity in the activity record container since all attributes have been planned at this point			
 			//Activity_Records* act_records = _Parent_Person->template Activity_Record_Container<Activity_Records*>();
@@ -1161,6 +1164,119 @@ namespace Person_Components
 			else return END;
 
 
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void General_Person_Scheduler_Implementation<MasterType, InheritanceList>::Verify_Activity_Travel_Schedule()
+		{
+			typedef Vehicle_Components::Types::Vehicle_Type_Keys MODE;
+			typedef Back_Insertion_Sequence<type_of(Activity_Container)> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<get_component_type(Activity_Plans)> Activity_Plan;
+			typedef Person_Components::Prototypes::Person_Mover<typename type_of(Parent_Person)::get_type_of(Moving_Faculty)> Moving_Faculty_Interface;
+
+			_Network_Interface* network = _Parent_Person->network_reference<_Network_Interface*>();
+			_Generator_Interface* generator = _Parent_Person->template Planning_Faculty<_Planner_Interface*>()->template Activity_Generation_Faculty<_Generator_Interface*>();
+
+			// get the next activity if the person is moving or else current activity if they are stationary
+			Activity_Plan* current = this->next_activity_plan<Time_Seconds, Activity_Plan*>(-1);
+			Movement_Plan* cur_move = current->template movement_plan<Movement_Plan*>();
+			if (this->_Parent_Person->Is_Moving()) cout <<"WARNING: person "<<_Parent_Person->uuid<int>()<<" is already moving."<<endl;
+
+			Activity_Plan* next;
+			while ((next = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(current)) != nullptr)
+			{
+				Movement_Plan* next_move = next->template movement_plan<Movement_Plan*>();
+
+				// first, check for errors in the current activity
+				if (cur_move->departed_time<Time_Seconds>() > current->Start_Time<Time_Seconds>()) cout << "Warning: departure time greater than start time: "<<this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
+				if (current->Start_Time<Time_Seconds>() > current->End_Time<Time_Seconds>()) cout << "Warning: negative duration: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
+				if (current->End_Time<Time_Seconds>() > next_move->departed_time<Time_Seconds>()) cout << "Warning: departing before the end of the current activity: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
+				if (current->End_Time<Time_Seconds>() > next->Start_Time<Time_Seconds>()) cout << "Warning: current activity ends after next activity begins: " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson();
+				
+
+				// is there a gap? if no continue
+				Time_Seconds gap = next_move->departed_time<Time_Seconds>() - current->End_Time<Time_Seconds>();
+				if (gap < 5.0 && gap > -5.0)
+				{
+					next_move->departed_time(current->End_Time<Time_Seconds>());
+					current = next;
+					continue;
+				}
+
+				// if the current activity is a home activity, just extend it
+				if (current->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY || current->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::WORK_AT_HOME_ACTIVITY)
+				{
+					current->End_Time<Time_Seconds>(next_move->departed_time<Time_Seconds>(), false);
+					current = next;
+					continue;
+				}
+
+				// Error, should not be a negative gap....investigate
+				if (gap < -5.0)
+				{
+					cout << "ERROR: negative gap observed in planned activity schedule for " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson() << ", current activity = " << current->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << ", next activity = " << next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()<<endl;
+					current = next;
+					continue;
+				}
+
+				// determine how to fill the gap after a non-home activity
+				Time_Seconds end_this = current->template End_Time<Time_Seconds>();
+				Time_Seconds ttime_this_to_home = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(current->template Location<_Activity_Location_Interface*>(), _Parent_Person->template Home_Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+				Time_Seconds ttime_this_to_next = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(current->template Location<_Activity_Location_Interface*>(), next->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+				Time_Seconds ttime_home_to_next = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(_Parent_Person->template Home_Location<_Activity_Location_Interface*>(), next->template Location<_Activity_Location_Interface*>(), MODE::SOV, end_this + ttime_this_to_home);
+				Time_Seconds min_home_duration = max(900.f, min((float)ttime_this_to_home, (float)ttime_home_to_next));
+
+				// Person can go home first, schedule an additional return home movement
+				if (next->template Start_Time<Time_Seconds>() - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
+				{
+					//cout << "Schedule return home..." << endl;
+					Time_Seconds home_duration = (next->Start_Time<Time_Seconds>() - ttime_home_to_next) - (end_this + ttime_this_to_home);
+					generator->template Create_Home_Activity<At_Home_Activity_Plan*, Time_Seconds, Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this + ttime_this_to_home, home_duration, current->template Mode<MODE>());
+
+				}
+				// Person can't go home, extend either the current or next activity
+				else
+				{
+					// if the next activity is a home activity, arrive there early
+					if (next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::AT_HOME_ACTIVITY || next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::WORK_AT_HOME_ACTIVITY)
+					{
+						Time_Seconds new_start = next->Start_Time<Time_Seconds>() - (next_move->departed_time<Time_Seconds>() - current->End_Time<Time_Seconds>());
+						next->Start_Time(new_start);
+						next_move->departed_time(current->End_Time<Time_Seconds>());
+					}
+					else
+					{
+						current->End_Time<Time_Seconds>(next_move->departed_time<Time_Seconds>(),false);
+					}
+				}
+
+				current = next;
+			}
+
+			// Add the return home activity at the end of the day if there is time
+			Time_Seconds end_this = current->template End_Time<Time_Seconds>();
+			Time_Seconds ttime_this_to_home = network->template Get_TTime<_Activity_Location_Interface*, MODE, Time_Seconds, Time_Seconds>(current->template Location<_Activity_Location_Interface*>(), _Parent_Person->template Home_Location<_Activity_Location_Interface*>(), MODE::SOV, end_this);
+			if (end_this + ttime_this_to_home < END)
+			{
+				Time_Seconds home_duration = END - (end_this + ttime_this_to_home);
+				generator->template Create_Home_Activity<At_Home_Activity_Plan*, Time_Seconds, Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this + ttime_this_to_home, home_duration, current->template Mode<MODE>());
+			}
+
+			//==================================================================================
+			// Log all the planned activities...
+			//----------------------------------------------------------------------------------
+			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+			typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
+
+			if (scenario->template write_activity_output<bool>())
+			{
+				current = this->next_activity_plan<Time_Seconds, Activity_Plan*>(-1);
+				while (current != nullptr)
+				{
+					((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(current, false);
+					current = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(current);
+				}
+			}
 		}
 
 		template<typename MasterType, typename InheritanceList> _lock General_Person_Scheduler_Implementation<MasterType, InheritanceList>::_update_lock;

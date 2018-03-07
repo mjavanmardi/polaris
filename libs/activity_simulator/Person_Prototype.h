@@ -162,6 +162,7 @@ namespace Prototypes
 		template<typename TimeType> TimeType Get_Estimated_Return_Home_Time();
 		bool Is_Moving();
 		void Leave_Vehicle();
+		void Verify_Schedule_Event();
 	};
 
 	// Event handling
@@ -178,8 +179,9 @@ namespace Prototypes
 		// First do the 'Set Locations Event', 
 		if (iteration() == pthis->template First_Iteration<Simulation_Timestep_Increment>())
 		{
-			Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
-			response.next._iteration = Round<int, Basic_Units::Time_Value_Type>(first_plan_time);
+			//Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
+			//response.next._iteration = Round<int, Basic_Units::Time_Value_Type>(first_plan_time);
+			response.next._iteration = Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION;
 			response.next._sub_iteration = 0;
 			pthis->Set_Locations_Event<NT>();
 		}
@@ -189,7 +191,8 @@ namespace Prototypes
 			//_pthis->Swap_Event((Event)&Person::Print_Preplanned_Activities_Event<NULLTYPE>);
 			response.next._iteration = END;
 			response.next._sub_iteration = 0;
-			pthis->Print_Preplanned_Activities_Event<NT>();
+			//pthis->Print_Preplanned_Activities_Event<NT>();
+			pthis->Verify_Schedule_Event();
 		}
 	}
 
@@ -207,11 +210,13 @@ namespace Prototypes
 	}
 
 	template<typename ComponentType>
-	template<typename T>
-	void Person<ComponentType>::Print_Preplanned_Activities_Event()
+	void Person<ComponentType>::Verify_Schedule_Event()
 	{
 		//%%%RLW
 		//this_component()->template Print_Preplanned_Activities_Event();
+		typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
+		scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
+		scheduler->Verify_Activity_Travel_Schedule();
 	}
 
 	template<typename ComponentType>

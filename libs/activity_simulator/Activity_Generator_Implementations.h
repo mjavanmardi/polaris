@@ -101,9 +101,8 @@ namespace Person_Components
 			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 			activity->template Activity_Plan_ID<int>(activity_count);
 
-			// Activity planning time
-			Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
-			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
+
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, start_plan_time);
 
 			activity->template Schedule_Activity_Events<NT>();
 
@@ -137,8 +136,7 @@ namespace Person_Components
 			activity->template Parent_Planner<Parent_Planner_type>(_Parent_Planner);
 			activity->template Activity_Plan_ID<int>(activity_count);
 
-			Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
-			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
+			activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, start_plan_time);
 
 			activity->template Schedule_Activity_Events<NT>();
 
@@ -464,8 +462,8 @@ namespace Person_Components
 
 			//=========================================================================================================================
 			// Get random start plan time inthe first 3 minutes for generation
-			int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*180.0f) + iteration();
-
+			int start_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*(Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION - iteration() - 60.0) + iteration());
+			int start_plan_time = start_time;
 
 			//=========================================================================================================================
 			// Initialize person with at-home activity
@@ -492,9 +490,13 @@ namespace Person_Components
 				if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;
 				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type, act_count, start_plan_time);
 
+				start_plan_time = start_time + act_count*6.0;
+
 				float num_pwork = part_time_work_activity_freq[person_index];
 				if (GLOBALS::Uniform_RNG.Next_Rand<float>() >= p_work_from_home) work_type = ACTIVITY_TYPES::PART_TIME_WORK_ACTIVITY;
 				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pwork) this->template Create_Routine_Activity<ACTIVITY_TYPES>(work_type, act_count, start_plan_time);
+
+				start_plan_time = start_time + act_count*6.0;
 			}
 			//-------------------------------------------------------------------------------------------------------------------------
 
@@ -506,11 +508,13 @@ namespace Person_Components
 			{
 				float num_school = school_activity_freq[person_index];
 				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school) this->template Create_Routine_Activity<ACTIVITY_TYPES>(SCHOOL_ACTIVITY, act_count, start_plan_time);
+
+				start_plan_time = start_time + act_count*6.0;
 			}
 			//-------------------------------------------------------------------------------------------------------------------------
 
 			// separate routine and regular activity planning i.e. make sure all routine planning is done first
-			start_plan_time += 20;
+			start_time += 20;
 
 			float activity_overgeneration_factor = 1.3;
 
@@ -530,17 +534,27 @@ namespace Person_Components
 			float num_social = social_activity_freq[person_index] * activity_overgeneration_factor;
 
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out) this->template Create_Activity<ACTIVITY_TYPES>(EAT_OUT_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand) this->template Create_Activity<ACTIVITY_TYPES>(ERRANDS_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare) this->template Create_Activity<ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure) this->template Create_Activity<ACTIVITY_TYPES>(LEISURE_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			//if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_rec) this->template Create_Activity<ACTIVITY_TYPES>(RECREATION_ACTIVITY, act_count, start_plan_time);
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop) this->template Create_Activity<ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop) this->template Create_Activity<ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb) this->template Create_Activity<ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic) this->template Create_Activity<ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service) this->template Create_Activity<ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 			if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social) this->template Create_Activity<ACTIVITY_TYPES>(SOCIAL_ACTIVITY, act_count, start_plan_time);
+			start_plan_time = start_time + act_count*6.0;
 
 		}
 
