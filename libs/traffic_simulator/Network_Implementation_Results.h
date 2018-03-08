@@ -193,8 +193,21 @@ namespace Network_Components
 			{
 				//flow
 				_Link_Interface* link = (_Link_Interface*)(*link_itr);
-				float bwtt = (float) (link->template length<float>()/(link->template backward_wave_speed<float>()*5280.0/3600.0)); // in seconds
-				float fftt = (float) (link->template length<float>()/(link->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
+
+				Miles_Per_Hour bwsp_mph = link->template backward_wave_speed<float>();
+				Miles_Per_Hour ffsp_mph = link->template free_flow_speed<float>();
+
+				Feet_Per_Second bwsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(bwsp_mph);
+				Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+
+				float bwtt = (float)(link->template length<float>() / bwsp_fps); // in seconds
+				float fftt = (float)(link->template length<float>() / ffsp_fps); //in seconds
+
+				bwtt = nearbyint(bwtt);
+				fftt = nearbyint(fftt);
+
+				bwtt = max((float)1.0, bwtt);
+				fftt = max((float)1.0, fftt);
 
 				int link_fftt_cached_simulation_interval_size = max(1, int(ceil(float(fftt/((float)simulation_interval_length)))));
 				int link_bwtt_cached_simulation_interval_size = max(1, int(ceil(float(bwtt/((float)simulation_interval_length)))));
@@ -247,7 +260,13 @@ namespace Network_Components
 				_Turn_Movement_Interface* movement = (_Turn_Movement_Interface*)(*movement_itr);
 				_Link_Interface* link = movement->template inbound_link<_Link_Interface*>();
 					
-				float fftt = (float) (movement->template inbound_link<_Link_Interface*>()->template length<float>()/(movement->template inbound_link<_Link_Interface*>()->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
+				Miles_Per_Hour ffsp_mph = movement->template inbound_link<_Link_Interface*>()->template free_flow_speed<float>();
+				Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+				float link_length = movement->template inbound_link<_Link_Interface*>()->template length<float>(); // length in feet
+				float fftt = (float)(link_length / ffsp_fps); //in seconds
+				fftt = nearbyint(fftt);
+				fftt = max((float)1.0, fftt);								
+				
 				int link_fftt_cached_simulation_interval_size = max(1,int(ceil(float(fftt/(simulation_interval_length*1.0)))));
 					
 					

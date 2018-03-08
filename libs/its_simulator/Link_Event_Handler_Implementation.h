@@ -129,8 +129,13 @@ namespace Link_Components
 			_maximum_flow_rate *= _capacity_adjustment_factor_due_to_weather;
 			_free_flow_speed = free_flow_speed_estimate<TargetType>() * _speed_adjustment_factor_due_to_accident;
 			_free_flow_speed *= _speed_adjustment_factor_due_to_weather;
-			//_free_flow_speed = min(_free_flow_speed, _speed_limit + 5.0f);
-			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			
+			Miles_Per_Hour ffsp_mph = _free_flow_speed;
+			Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+			float fftt = (float)(_length / ffsp_fps); //in seconds
+			fftt = nearbyint(fftt);
+			fftt = max((float)1.0, fftt);
+			_link_fftt = fftt;
 		}
 
 		template<typename MasterType,typename InheritanceList>

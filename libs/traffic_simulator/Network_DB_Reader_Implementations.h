@@ -498,7 +498,7 @@ namespace Network_Components
 				const float maximum_flow_rate_arterial = 900;
 				//const float jam_density = 220.0; // in vehiles per mile per lane
 				const float jam_density = 250.0; // in vehiles per mile per lane
-				const float backward_wave_speed = 12.0;
+				const float backward_wave_speed = 12.0; //in miles per hour
 				const float distance_factor = 1.5;				
 				float num_lanes = 0.0f;
 				double scaling_factor = 0.5;
@@ -631,8 +631,9 @@ namespace Network_Components
 
 						link->template num_lanes<int>(num_lanes);
 						
-						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ab()+0.5f);
-						link->template free_flow_speed<float>(ffspd);
+						Meters_Per_Second ffsp_mps = db_itr->getFspd_Ab() + 0.5f;
+						Miles_Per_Hour ffsp_mph = GLOBALS::Convert_Units<Meters_Per_Second, Miles_Per_Hour>(ffsp_mps);
+						link->template free_flow_speed<float>(ffsp_mph);
 
 						float speed_limit_estimate = link->template speed_limit_estimate<NT>();
 						
@@ -878,9 +879,9 @@ namespace Network_Components
 
 						link->template num_lanes<int>(num_lanes);
 
-
-						float ffspd = _scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getFspd_Ba()+0.5f);
-						link->template free_flow_speed<float>(ffspd);
+						Meters_Per_Second ffsp_mps = db_itr->getFspd_Ab() + 0.5f;
+						Miles_Per_Hour ffsp_mph = GLOBALS::Convert_Units<Meters_Per_Second, Miles_Per_Hour>(ffsp_mps);
+						link->template free_flow_speed<float>(ffsp_mph);
 
 						float speed_limit_estimate = link->template speed_limit_estimate<NT>();
 						

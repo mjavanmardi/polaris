@@ -944,9 +944,10 @@ namespace Network_Components
 
 					if (facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 					{		
-						float free_flow_speed = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
-						free_flow_speed = 3.28084 * free_flow_speed; // feet per second
-						float link_travel_time = float(link->template length<float>() / free_flow_speed); // length was already converted to feet
+						Kilometers_Per_Hour walkSpeed_kph = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkSpeed<float>();
+						Feet_Per_Second walkSpeed_fps = GLOBALS::Convert_Units<Kilometers_Per_Hour, Feet_Per_Second>(walkSpeed_kph); // feet per second
+						float link_travel_time = float(link->template length<float>() / walkSpeed_fps); // length was already converted to feet
+						link_travel_time = nearbyint(link_travel_time);
 						
 						// Link length is defined in feet by "template<typename TargetType> void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)"
 						
@@ -962,10 +963,12 @@ namespace Network_Components
 					}
 					else
 					{ 
-						float free_flow_speed = (float) ((5280.0) * link->template free_flow_speed<float>()/3600.0); // feet per second
-						float link_travel_time = float (link->template length<float>() / free_flow_speed);
-					
-						_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
+						Miles_Per_Hour ffsp_mph = link->template free_flow_speed<float>();
+						Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+						float link_travel_time = float (link->template length<float>() / ffsp_fps);
+						link_travel_time = nearbyint(link_travel_time);
+
+						_max_free_flow_speed = max(_max_free_flow_speed, (float)ffsp_fps);
 
 						link_travel_time = max((float)1.0,link_travel_time);
 

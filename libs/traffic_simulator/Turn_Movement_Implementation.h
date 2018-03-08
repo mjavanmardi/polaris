@@ -295,6 +295,9 @@ namespace Turn_Movement_Components
 								float delay = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() + _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_minus_one];
 								_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = delay;
 
+								//TODO: Omer
+								_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = nearbyint(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+
 								// update vehicles currently being delayed by the signal
 								
 								//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
@@ -370,6 +373,8 @@ namespace Turn_Movement_Components
 					//((_Link_Interface*)_outbound_link)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 				}
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = total_delay_time / (float)num_transfer_vehicles_of_turn_movement;
+				//TODO: Omer
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = nearbyint(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 			}
 
 
@@ -422,6 +427,9 @@ namespace Turn_Movement_Components
 					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay =_movement_demand*estimated_per_vehicle_delay;
 				}
+
+				//TODO: Omer
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = nearbyint(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 
 				//------------------------------------------------------------------------------
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;

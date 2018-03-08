@@ -985,8 +985,21 @@ namespace Link_Components
 			this->_link_destination_cumulative_arrived_vehicles = 0;
 
 			////bwtt and fftt
-			float bwtt = (float)(_length / (_backward_wave_speed*5280.0 / 3600.0)); // in seconds
-			float fftt = (float)(_length / (_free_flow_speed*5280.0 / 3600.0)); //in seconds
+			Miles_Per_Hour bwsp_mph = _backward_wave_speed;
+			Miles_Per_Hour ffsp_mph = _free_flow_speed;
+
+			Feet_Per_Second bwsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(bwsp_mph);
+			Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+
+			float bwtt = (float)(_length / bwsp_fps); // in seconds
+			float fftt = (float)(_length / ffsp_fps); //in seconds
+
+			bwtt = nearbyint(bwtt);
+			fftt = nearbyint(fftt);
+
+			bwtt = max((float)1.0, bwtt);
+			fftt = max((float)1.0, fftt);
+
 			_link_fftt = fftt;
 			_link_bwtt = bwtt;
 
@@ -1440,7 +1453,13 @@ namespace Link_Components
 			//_free_flow_speed = min(_free_flow_speed, _speed_limit + 5.0f);
 			_free_flow_speed = free_flow_speed_estimate<TargetType>() * _speed_adjustment_factor_due_to_accident;
 			_free_flow_speed *= _speed_adjustment_factor_due_to_weather;
-			_link_fftt = (float)(_length / (_free_flow_speed*5280.0 / 3600.0)); //in seconds
+
+			Miles_Per_Hour ffsp_mph = _free_flow_speed;
+			Feet_Per_Second ffsp_fps = GLOBALS::Convert_Units<Miles_Per_Hour, Feet_Per_Second>(ffsp_mph);
+			float fftt = (float)(_length / ffsp_fps); //in seconds
+			fftt = nearbyint(fftt);
+			fftt = max((float)1.0, fftt);
+			_link_fftt = fftt;
 		}
 
 		template<typename MasterType, typename InheritanceList>
