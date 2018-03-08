@@ -286,21 +286,24 @@ namespace Prototypes
 			typename person_container_itf::iterator p_itr;
 			person_container_itf* persons = pthis->Persons_Container<person_container_itf*>();
 			//if (persons->size() == 1)
+			if (_this->uuid<long long>() < 200)  //491
 			{
 				pthis->Vehicle_Chooser<vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
-				response.next._iteration = 301;
+				response.next._iteration = 361;
 				response.next._sub_iteration = 0;
 			}
-			//else
-			//{
-			//	response.next._iteration = END;
-			//	response.next._sub_iteration = 0;
-			//}
+			else
+			{
+				response.next._iteration = END;
+				response.next._sub_iteration = 0;
+			}
 			//Activities are generated at iteration = 60
 			//Activities are planned by iteration = 300
 		}
-		else if (iteration() == 301)
+		else if (iteration() == 361)
 		{
+			
+
 			//pthis-><vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
 			pthis->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles();
 			//Activities are generated at iteration = 60

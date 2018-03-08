@@ -18,6 +18,7 @@ namespace Household_Components
 {
 	namespace Implementations
 	{
+
 		implementation struct IntraHousehold_AV_Assignment_Implementation : public Polaris_Component<MasterType, INHERIT(IntraHousehold_AV_Assignment_Implementation), Data_Object>
 		{
 		
@@ -86,6 +87,17 @@ namespace Household_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 
 
+			struct G_Object
+			{
+				_activity_itf origin;
+				bool origin_start;
+
+				_activity_itf destination;
+				bool destination_start;
+			};
+
+
+
 			template<typename T> void Initialize(T household)
 			{
 				this->Parent_Household(household);
@@ -95,20 +107,28 @@ namespace Household_Components
 
 			int Get_Max_Number_of_AVs()
 			{
-				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
-				//return 1;
-				float HH_size = household_properties->Household_size<float>();
-				return HH_size;
+				int maxVehicles = 0;
+				_persons_container_itf* persons = _Parent_Household->Persons_Container<_persons_container_itf*>();
+				for (auto per_itr = persons->begin(); per_itr != persons->end(); per_itr++)
+				{
+					auto per = (*per_itr);
+					_person_static_properties_itf* per_properties = per->Static_Properties<_person_static_properties_itf*>();
+					float age = per_properties->Age<float>();
+					if (age > 6) 
+					{
+						maxVehicles++ ;
+					}
+				}
+				return maxVehicles;
+				
+				//_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
+				//float HH_size = household_properties->Household_size<float>();
+				//float male = per1_properties->Gender<Person_Components::Types::GENDER>() == Person_Components::Types::GENDER::MALE ? 1.0 : 0.0;
 			}
 
 			string GetstrActID(_activity_itf* activity, map<pair<long, int>, string>& act_ID_map, _person_itf* per)
 			{
-				//auto per = activity->_Parent_Planner->template Parent_Person<_person_itf*>();
 				auto key = make_pair(per->uuid<long>(), activity->Activity_Plan_ID<int>());
-				if (act_ID_map.find(key) == act_ID_map.end() || act_ID_map[key] == "")
-				{
-					cout << "Check this one!";
-				}
 				return  act_ID_map[key];
 			}
 
@@ -129,23 +149,24 @@ namespace Household_Components
 				return &new_var;
 			}
 
-			GRBVar& Add_New_Variable(map<string, GRBVar>& grb_Vars, GRBModel& model, string strVarName, char vType)
+			void Add_New_Variable(map<string, GRBVar>& grb_Vars, GRBModel& model, string strVarName, char vType)
 			{
 				
 				GRBVar new_var;
 				if (vType == GRB_CONTINUOUS)
 				{
 					auto result = grb_Vars.insert(std::pair<string, GRBVar>(strVarName, model.addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, strVarName)));
-					return (*(result.first)).second;
+					//return (*(result.first)).second;
 				}
 				else if (vType == GRB_BINARY)
 				{
 					auto result = grb_Vars.insert(std::pair<string, GRBVar>(strVarName, model.addVar(0, 1, 0.0, GRB_BINARY, strVarName)));
-					return (*(result.first)).second;
+					//(*(result.first)).second;
 				}
 				else
 				{
-					return model.addVar(0, 1, 0.0, GRB_BINARY, strVarName);
+					//return model.addVar(0, 1, 0.0, GRB_BINARY, strVarName);
+					model.addVar(0, 1, 0.0, GRB_BINARY, strVarName);
 				}
 			}
 
@@ -267,8 +288,7 @@ namespace Household_Components
 				{
 					GRBEnv env = GRBEnv();
 					GRBModel model = GRBModel(env);
-					map<string, GRBVar> grb_Vars;
-					//map<string, GRBVar>& grb_Vars = *p_grb_Vars;
+					map<string, GRBVar> grb_Vars;					
 					
 					_persons_container_itf* persons = this->_Parent_Household->Persons_Container<_persons_container_itf*>();
 					_activity_itf *per1_activity, *per1_activity_next, *per1_activity_prev;
@@ -290,10 +310,6 @@ namespace Household_Components
 							int act_id = per_activity->Activity_Plan_ID<int>();
 							string per_strActID = act_counter >= 100 ? to_string(act_counter) : act_counter >= 10 ? "0" + to_string(act_counter) : "00" + to_string(act_counter);
 							std::pair<long, int> key = std::make_pair(per->uuid<long>(), act_id );
-							if (per_strActID == "")
-							{
-								cout << "Check this out" << endl;
-							}
 							act_ID_map.insert(std::pair<std::pair<long, int>, string>(key, per_strActID));
 							act_counter++;
 						}
@@ -370,17 +386,23 @@ namespace Household_Components
 														//GRBVar start = model.addVar(start_lb, start_ub, 0.0, GRB_CONTINUOUS, strVarName);
 														//grb_Vars.insert(std::pair<string, GRBVar*>(strVarName, &start));
 
-														auto start = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														//auto start = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														auto start = grb_Vars[strVarName];
 														model.addConstr(start >= start_lb, "c_start_lb_" + per1_strActID);
 														model.addConstr(start <= start_ub, "c_start_ub_" + per1_strActID);
 
 														strVarName = "end_" + per1_strActID;
-														auto end = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														//auto end = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														auto end = grb_Vars[strVarName];
 														model.addConstr(end >= start_lb, "c_end_lb_" + per1_strActID);
 														model.addConstr(end <= start_ub + duration_ub, "c_end_ub_" + per1_strActID);
 
 														strVarName = "duration_" + per1_strActID;
-														auto duration = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														//auto duration = Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+														auto duration = grb_Vars[strVarName];
 														model.addConstr(end - start == duration);
 
 														model.addConstr(duration >= duration_lb, "c_dur_lb_" + per1_strActID);
@@ -1065,8 +1087,6 @@ namespace Household_Components
 								Obj_LinExpr += (grb_Vars["t_AV_00_" + per1_strActID + "_E_" + per1_strActID_next + "_S"]) * (cost_taxi_fixed + cost_taxi_by_minute * Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1_activity_next->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>()));
 							}
 
-
-
 #pragma region One-Person related
 							for (auto const& kvp : grb_Vars)
 							{
@@ -1250,7 +1270,7 @@ namespace Household_Components
 					//model.write("C:\\Mahmoud\\" + std::to_string(floor(HHID)) + "_test.txt");
 					auto HHID = this->_Parent_Household->uuid<long long>();
 					ofstream myfile;
-					model.write("C:\\Mahmoud\\model_" + to_string(HHID) + ".lp");
+					model.write("C:\\Mahmoud1\\model_" + to_string(HHID) + ".lp");
 					model.optimize();
 
 					//cout << x.get(GRB_StringAttr_VarName) << " "  << x.get(GRB_DoubleAttr_X) << endl;
@@ -1347,7 +1367,7 @@ namespace Household_Components
 
 				//Vehicle_ID: parseInt(d["Vehicle_ID"]), From_Act: d["From_Act_Loc"], From_Act_OSE: d["OSE"], To_Act: d["To_Act_Loc"], To_Act_DSE: d["DSE"]};
 				ofstream myfile;
-				myfile.open("c:\\Mahmoud\\Trips_" + to_string(HHID) + ".txt");
+				myfile.open("c:\\Mahmoud1\\Trips_" + to_string(HHID) + ".txt");
 				std::stringstream file_content;				
 				file_content << "Term,Vehicle_ID,From_Act_Loc,OSE,To_Act_Loc,DSE\n";
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
@@ -1384,10 +1404,10 @@ namespace Household_Components
 				//auto HHID = household_properties->ID<float>();
 				auto HHID = this->_Parent_Household->uuid<long long>();
 				ofstream myfile;
-				myfile.open("c:\\Mahmoud\\Activities_" + to_string(HHID) + ".txt");
+				myfile.open("c:\\Mahmoud1\\Activities_" + to_string(HHID) + ".txt");
 				std::stringstream file_content;
 				//file_content << "Houehols_ID,Person_ID,Activity_ID,Activity_Order,Activity_Location,Start,End,Min_Start,Max_Start,Min_Duration,Max_Duration,New_Start,New_End,New_Duration\n";
-				file_content << "Houehols_ID,Person_ID,Activity_ID,Start,End,New_Start,New_End\n";
+				file_content << "Household_ID,Person_ID,Activity_ID,Start,End,New_Start,New_End,At_Home\n";
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
 				_persons_container_itf* persons = this->_Parent_Household->Persons_Container<_persons_container_itf*>();
 
@@ -1409,7 +1429,11 @@ namespace Household_Components
 						int end = (int)per_activity->template End_Time<Time_Minutes>().Value;
 						int new_start = (int)grb_Vars["start_" + act_ID_map[key]].get(GRB_DoubleAttr_X);
 						int new_end = (int)grb_Vars["end_" + act_ID_map[key]].get(GRB_DoubleAttr_X);
-						file_content << HHID << "," << perID << "," << act_ID_map[key] << "," << start	 << "," << end << "," << new_start << "," << new_end << endl;
+						int  at_home = 0;
+						if (per_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY || 
+							per_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
+							at_home = 1;
+						file_content << HHID << "," << perID << "," << act_ID_map[key] << "," << start	 << "," << end << "," << new_start << "," << new_end << "," << at_home << endl;
 					}
 				}
 				myfile << file_content.rdbuf();
@@ -1421,7 +1445,7 @@ namespace Household_Components
 				auto HHID = this->_Parent_Household->uuid<long long>();
 
 				ofstream myfile;
-				myfile.open("c:\\Mahmoud\\results_" + to_string(HHID) + ".txt");
+				myfile.open("c:\\Mahmoud1\\results_" + to_string(HHID) + ".txt");
 				//x.get(GRB_StringAttr_VarName) << " "
 				//x.get(GRB_DoubleAttr_X) << endl;
 				for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
@@ -1445,7 +1469,7 @@ namespace Household_Components
 				auto HHID = this->_Parent_Household->uuid<long long>();
 
 				ofstream myfile;
-				myfile.open("c:\\Mahmoud\\results2_" + to_string(HHID) + ".txt");
+				myfile.open("c:\\Mahmoud1\\results2_" + to_string(HHID) + ".txt");
 				//x.get(GRB_StringAttr_VarName) << " "
 				//x.get(GRB_DoubleAttr_X) << endl;
 				int numvars = model.get(GRB_IntAttr_NumVars);
@@ -1471,7 +1495,56 @@ namespace Household_Components
 				myfile.close();
 			}
 
+			
+			void Eliminate_Infeasible_Trips(map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
+			{
+				size_t pos1 = 0, pos2 = 0;
+				for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
+				{
+					string key = it->first;
+					if (key.substr(0, 8) != "t_AV_" || key.find("_Hom_") != std::string::npos ) continue;
 
+
+					_persons_container_itf* persons = this->_Parent_Household->Persons_Container<_persons_container_itf*>();
+					_activity_itf *per1_activity, *per1_activity_next, *per1_activity_prev;
+					_activity_itf *per2_activity, *per2_activity_next, *per2_activity_prev;
+					bool firstAct, lastAct;
+					string per1_strActID, per1_strActID_next, per1_strActID_prev;
+					string per2_strActID, per2_strActID_next, per2_strActID_prev;
+					string strVarName, strVehID;
+
+					for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
+					{
+						auto per1 = (*per1_itr);
+						_scheduler_itf* per1_scheduler = per1->Scheduling_Faculty<_scheduler_itf*>();
+						_activity_container_itf* per1_activities = per1_scheduler->Activity_Container<_activity_container_itf*>();
+						for (auto per1_act_itr = per1_activities->begin(); per1_act_itr != per1_activities->end(); per1_act_itr++)
+						{
+							auto per1_activity = *per1_act_itr;
+							string per1_strActID = GetstrActID(per1_activity, act_ID_map, per1);							
+
+							for (auto per2_itr = persons->begin(); per2_itr != persons->end(); per2_itr++)
+							{
+								auto per2 = (*per2_itr);
+								_person_static_properties_itf* per2_properties = per2->Static_Properties<_person_static_properties_itf*>();
+								_scheduler_itf* per2_scheduler = per2->Scheduling_Faculty<_scheduler_itf*>();
+								_activity_container_itf* per2_activities = per2_scheduler->Activity_Container<_activity_container_itf*>();
+
+								for (auto per2_act_itr = per2_activities->begin(); per2_act_itr != per2_activities->end(); per2_act_itr++)
+								{
+									auto per2_activity = *per2_act_itr;
+									string per2_strActID = GetstrActID(per2_activity, act_ID_map, per2);
+
+								}
+
+
+						}
+					}
+
+				}
+
+			}
+			
 	};
 		//template<typename MasterType, typename InheritanceList> typename IntraHousehold_AV_Assignment_Implementation <MasterType, InheritanceList>::type_of(is_initialized) IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::_is_initialized = false;
 		
