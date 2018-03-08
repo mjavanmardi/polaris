@@ -1279,6 +1279,85 @@ namespace Person_Components
 			trajectory_stream << "Node is:\t" << link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>() << "\t";
 			trajectory_stream << "I just arrived here ";
 
+			trajectory_unit->template actual_arrival_time<float>(cur_iter);
+
+			//To set the actual experienced values
+			if (current_position > 0)
+			{
+				//Get the previous trajectory position
+				int previous_position = current_position - 1;
+				//Get the previous trajectory unit
+				_Multimodal_Trajectory_Unit_Interface* previous_trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[previous_position];
+				//Get the previous link mode
+				Link_Components::Types::Link_Type_Keys previous_link_mode = previous_trajectory_unit->template link_mode<Link_Components::Types::Link_Type_Keys>();
+				
+				//Calculate the actual travel time based on arrival times
+				float travel_time = trajectory_unit->template actual_arrival_time<float>() - previous_trajectory_unit->template actual_arrival_time<float>();
+				//Set the actual travel time
+				previous_trajectory_unit->template actual_travel_time<float>(travel_time);
+				
+				//Get the waiting time
+				float waiting_time = previous_trajectory_unit->template actual_wait_time<float>();
+
+				//Get the previous wait count
+				int previous_wait_count = previous_trajectory_unit->template actual_wait_count<int>();
+				//Set the current wait count
+				trajectory_unit->template actual_wait_count<int>(previous_wait_count);
+
+				//Get the previous transfer penalty
+				int previous_transfer_penalty = previous_trajectory_unit->template actual_transfer_penalty<float>();
+				//Set the current transfer penalty
+				trajectory_unit->template actual_transfer_penalty<float>(previous_transfer_penalty);
+
+				//Set values based on mode
+				if (previous_link_mode == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				{
+					//ivt_time is travel_time minus waiting_time
+					float ivt_time = travel_time - waiting_time;
+					//Set the ivt_time
+					previous_trajectory_unit->template actual_ivt_time<float>(ivt_time);					
+					//Get the ivt weight
+					float ivtWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::ivtWeight<float>();
+					//Augment the generalized cost
+					float gen_cost = previous_trajectory_unit->template actual_gen_cost<float>() + ivtWeight * ivt_time;
+					//Set the generalized cost
+					previous_trajectory_unit->template actual_gen_cost<float>(gen_cost);
+				}
+				else if (previous_link_mode == Link_Components::Types::Link_Type_Keys::WALK && movement->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+				{
+					//Walk time is travel time
+					previous_trajectory_unit->template actual_walk_time<float>(travel_time);
+					//Get the ivt weight
+					float walkWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::walkWeight<float>();					
+					//Augment the generalized cost
+					float gen_cost = previous_trajectory_unit->template actual_gen_cost<float>() + walkWeight * travel_time;
+					//Set the generalized cost
+					previous_trajectory_unit->template actual_gen_cost<float>(gen_cost);
+				}
+				else if (previous_link_mode == Link_Components::Types::Link_Type_Keys::WALK && movement->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
+				{
+					//Bike time is travel time
+					previous_trajectory_unit->template actual_bike_time<float>(travel_time);
+					//Get the ivt weight
+					float bikeWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::bikeWeight<float>();
+					//Augment the generalized cost
+					float gen_cost = previous_trajectory_unit->template actual_gen_cost<float>() + bikeWeight * travel_time;
+					//Set the generalized cost
+					previous_trajectory_unit->template actual_gen_cost<float>(gen_cost);
+				}
+				else
+				{
+					//Car time is travel time
+					previous_trajectory_unit->template actual_car_time<float>(travel_time);
+					//Get the car weight
+					float carWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::carWeight<float>();
+					//Augment the generalized cost
+					float gen_cost = previous_trajectory_unit->template actual_gen_cost<float>() + carWeight * travel_time;
+					//Set the generalized cost
+					previous_trajectory_unit->template actual_gen_cost<float>(gen_cost);
+				}
+			}
+
 			int next_simulation_time;
 			int next_sub;
 			Person_Components::Types::Movement_Status_Keys next_status;
@@ -1598,6 +1677,40 @@ namespace Person_Components
 			//Set the values
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
+
+			//Calculate the waiting time as departure time minus arrival time
+			float wait_time = next_simulation_time - trajectory_unit->template actual_arrival_time<float>();
+			//Set the waiting time
+			trajectory_unit->template actual_wait_time<float>(wait_time);
+
+			//To set the actual experienced values
+			if (current_position > 0)
+			{
+				//Get the previous trajectory position
+				int previous_position = current_position - 1;
+				//Get the previous trajectory unit
+				_Multimodal_Trajectory_Unit_Interface* previous_trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[previous_position];
+				//Get the previous waiting count
+				int wait_count = previous_trajectory_unit->template actual_wait_count<int>();
+				//Augment the waiting count
+				wait_count++;
+				//Set the current waiting_count;
+				trajectory_unit->template actual_wait_count<int>(wait_count);
+				//Get the base transfer penalty
+				float transferPenalty = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::transferPenalty<float>();
+				//Get the previous transfer penalty
+				float previousTransferPen = previous_trajectory_unit->template actual_transfer_penalty<float>();
+				//Calculate the transfer penalty
+				float effectiveTransferPen = std::max(wait_count - 1, 0) * transferPenalty;
+				//Set the actual transfer penalty
+				trajectory_unit->template actual_transfer_penalty<float>(previousTransferPen + effectiveTransferPen);
+				//Get the waiting weight
+				float waitWeight = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::waitWeight<float>();
+				//Augment the generalized cost
+				float gen_cost = trajectory_unit->template actual_gen_cost<float>() + waitWeight * wait_time + effectiveTransferPen;
+				//Set the generalized cost
+				trajectory_unit->template actual_gen_cost<float>(gen_cost);
+			}
 
 			trajectory_stream << "I am person:\t" << person->template uuid<int>() << "\t";
 			trajectory_stream << "At position:\t" << current_position << "\t";

@@ -45,20 +45,15 @@ namespace Movement_Plan_Components
 		//=============================================================================================================================================================================
 		implementation struct Multimodal_Trajectory_Unit_Implementation :public Polaris_Component<MasterType, INHERIT(Multimodal_Trajectory_Unit_Implementation), Data_Object>
 		{
-			m_data(int, delayed_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, enter_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, enter_interval_index, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(float, estimated_link_accepting_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-			m_data(int, intersection_delay_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
-
 			m_prototype(Link_Components::Prototypes::Link, typename MasterType::link_type, link, NONE, NONE);
-
 			template<typename TargetType> void Initialize(TargetType link_val);
 
-			m_data(float, estimated_gen_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(Link_Components::Types::Link_Type_Keys, link_mode, NONE, NONE);
 			m_prototype(Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip, typename MasterType::transit_vehicle_trip_type, transit_vehicle_trip, NONE, NONE);
 			m_data(int, transit_vehicle_stop_sequence, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
+			m_data(float, estimated_gen_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, estimated_travel_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_arrival_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_wait_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_walk_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
@@ -68,16 +63,35 @@ namespace Movement_Plan_Components
 			m_data(int, estimated_wait_count, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(float, estimated_transfer_penalty, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
+			m_data(float, actual_gen_cost, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_travel_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_arrival_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_wait_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_walk_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_bike_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_ivt_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_car_time, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, actual_wait_count, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(float, actual_transfer_penalty, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
 		};
 
 		template<typename MasterType, typename InheritanceList>
 		template<typename TargetType>
 		void Multimodal_Trajectory_Unit_Implementation<MasterType, InheritanceList>::Initialize(TargetType link_val)
 		{
-			_link = (Link_Components::Prototypes::Link<typename MasterType::link_type>*)(type_of(link)*)link_val;
-			_enter_time = 0.0;
-			_delayed_time = 0.0;
-			_intersection_delay_time = 0.0;
+			_link = (Link_Components::Prototypes::Link<typename MasterType::link_type>*)(type_of(link)*)link_val;			
+
+			_actual_gen_cost = 0.0;
+			_actual_travel_time - 0.0;
+			_actual_arrival_time = 0.0;
+			_actual_wait_time = 0.0;
+			_actual_walk_time = 0.0;
+			_actual_bike_time = 0.0;
+			_actual_ivt_time = 0.0;
+			_actual_car_time = 0.0;
+			_actual_wait_count = 0.0;
+			_actual_transfer_penalty = 0.0;
 		}
 		//=============================================================================================================================================================================
 		//Multimodal Trajectories End==================================================================================================================================================
@@ -518,19 +532,22 @@ namespace Movement_Plan_Components
 			{
 				Multimodal_Trajectory_Unit_Interface* vehicle_trajectory_data = (Multimodal_Trajectory_Unit_Interface*)Allocate<typename Multimodal_Trajectory_Unit_Interface::Component_Type>();
 
+				//Get the link
 				Link_Interface* link = net->template get_link_ptr< typename Multimodal_Trajectory_Unit_Interface::get_type_of(link) >(itr->edge_id);
+				//Set the link
 				vehicle_trajectory_data->template Initialize<Link_Interface*>(link);
 
+				//Get the mode
 				Link_Components::Types::Link_Type_Keys mode = out_type[other_itr];
+				//Set the mode
 				vehicle_trajectory_data->template link_mode<Link_Components::Types::Link_Type_Keys>(mode);
 
+				//Get the trip
 				Transit_Vehicle_Trip_Interface* trip = out_trip[other_itr];
+				//Set the trip
 				vehicle_trajectory_data->template transit_vehicle_trip<Transit_Vehicle_Trip_Interface*>(trip);
-
-				vehicle_trajectory_data->template estimated_wait_count<int>(out_wait_count[other_itr]);
-				vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr]);
-				vehicle_trajectory_data->template estimated_transfer_penalty<float>(out_transfer_pen[other_itr]);
-
+				
+				//Set the stop sequence
 				if (mode == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr] - 1);
@@ -551,25 +568,32 @@ namespace Movement_Plan_Components
 					}
 				}
 
+				//Set the wait count
+				vehicle_trajectory_data->template estimated_wait_count<int>(out_wait_count[other_itr]);
+				//Set the transfer penalty
+				vehicle_trajectory_data->template estimated_transfer_penalty<float>(out_transfer_pen[other_itr]);
+
 				if (other_itr != 0)
 				{
-					vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_link_accepting_time<float>(out_time[other_itr - 1]);
 					vehicle_trajectory_data->template estimated_arrival_time<float>(out_arr_time[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_bike_time<float>(out_bike_time[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr - 1]);
-					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[other_itr] - out_cost[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr] - out_wait_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_travel_time<float>(out_time[other_itr] - out_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr] - out_walk_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_bike_time<float>(out_bike_time[other_itr] - out_bike_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr] - out_ivt_time[other_itr - 1]);
+					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr] - out_car_time[other_itr - 1]);
 				}
 				else
 				{
-					vehicle_trajectory_data->template estimated_gen_cost<float>(0.0f);
-					vehicle_trajectory_data->template estimated_link_accepting_time<float>(0.0f);
 					vehicle_trajectory_data->template estimated_arrival_time<float>(departed_time<Time_Seconds>());
-					vehicle_trajectory_data->template estimated_walk_time<float>(0.0f);
-					vehicle_trajectory_data->template estimated_bike_time<float>(0.0f);
-					vehicle_trajectory_data->template estimated_ivt_time<float>(0.0f);
-					vehicle_trajectory_data->template estimated_car_time<float>(0.0f);
+					vehicle_trajectory_data->template estimated_gen_cost<float>(out_cost[other_itr]);
+					vehicle_trajectory_data->template estimated_wait_time<float>(out_wait_time[other_itr]);
+					vehicle_trajectory_data->template estimated_travel_time<float>(out_time[other_itr]);
+					vehicle_trajectory_data->template estimated_walk_time<float>(out_walk_time[other_itr]);
+					vehicle_trajectory_data->template estimated_bike_time<float>(out_bike_time[other_itr]);
+					vehicle_trajectory_data->template estimated_ivt_time<float>(out_ivt_time[other_itr]);
+					vehicle_trajectory_data->template estimated_car_time<float>(out_car_time[other_itr]);
 				}
 
 				trajectory.push_back(vehicle_trajectory_data);

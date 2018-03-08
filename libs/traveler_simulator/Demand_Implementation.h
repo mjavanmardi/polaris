@@ -300,6 +300,8 @@ namespace Demand_Components
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename MasterType::transit_vehicle_trip_type> transit_vehicle_trip_itf;
+
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				if (!scenario->template write_demand_to_database<bool>()) return;
@@ -338,9 +340,7 @@ namespace Demand_Components
 								if (write_trajectory)
 								{
 									// Fill the PATH DB record
-									path_mm_db_record = make_shared<polaris::io::Path_Multimodal>();
-									//path_mm_db_record->setVehicle(vehicle->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
-									
+									path_mm_db_record = make_shared<polaris::io::Path_Multimodal>();									
 									path_mm_db_record->setTraveler_ID(move->traveler_id<int>());									
 									path_mm_db_record->setOrigin_Activity_Location(move->template origin<location_itf*>()->template uuid<int>());
 									path_mm_db_record->setDestination_Activity_Location(move->template destination<location_itf*>()->template uuid<int>());
@@ -348,50 +348,116 @@ namespace Demand_Components
 									path_mm_db_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
 									path_mm_db_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
 									path_mm_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
-									//path_mm_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
-									//path_mm_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
 									path_mm_db_record->setMode(move->template mode<int>());
-
 
 									_Multimodal_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
 									auto link_itr = --trajectory.end();
 									_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
 
-									path_mm_db_record->setArrival_Time(trajectory_unit->template estimated_arrival_time<float>());
-									path_mm_db_record->setGen_Cost(trajectory_unit->template estimated_gen_cost<float>());
-									path_mm_db_record->setDuration(trajectory_unit->template estimated_link_accepting_time<float>());
-									path_mm_db_record->setWait_Count(trajectory_unit->template estimated_wait_count<int>());
-									path_mm_db_record->setWait_Time(trajectory_unit->template estimated_wait_time<float>());
-									path_mm_db_record->setWalk_Time(trajectory_unit->template estimated_walk_time<float>());
-									path_mm_db_record->setBike_Time(trajectory_unit->template estimated_bike_time<float>());
-									path_mm_db_record->setIVTT(trajectory_unit->template estimated_ivt_time<float>());
-									path_mm_db_record->setCar_Time(trajectory_unit->template estimated_car_time<float>());
-									path_mm_db_record->setTransfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
+									path_mm_db_record->setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+									path_mm_db_record->setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
+									path_mm_db_record->setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
+
+									path_mm_db_record->setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+									path_mm_db_record->setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
+									path_mm_db_record->setAct_Transfer_Pen(trajectory_unit->template actual_transfer_penalty<float>());
+
 									path_mm_db_record->setScan_Count(move->template routing_scan_count<int>());
-									path_mm_db_record->setaStar_Time(move->template routing_execution_time<float>());
+									path_mm_db_record->setaStar_Time(move->template routing_execution_time<float>());															
 
-									//float start = 0;
-									//int route_link_counter = 0;
-									//for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr, ++route_link_counter)
-									//{
-									//	// FIll the path link DB record for each step of the path
-									//	polaris::io::link_travel path_link_record;
-									//	_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*link_itr);
-									//	link_itf* route_link = trajectory_unit->template link<link_itf*>();
-									//	int route_link_id = route_link->template uuid<int>();
-									//	int route_link_enter_time = trajectory_unit->template enter_time<int>();
-									//	float route_link_delayed_time = float(trajectory_unit->template intersection_delay_time<float>());
-									//	int route_link_exit_time = move->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
-									//	float route_link_travel_time = float((route_link_exit_time - route_link_enter_time));
+									float start = 0;
+									
+									float total_estimated_gen_cost = 0;
+									float total_estimated_travel_time = 0;
+									float total_estimated_wait_time = 0;
+									float total_estimated_walk_time = 0;
+									float total_estimated_bike_time = 0;
+									float total_estimated_ivt_time = 0;
+									float total_estimated_car_time = 0;
 
-									//	path_link_record.setLink(route_link->dbid<int>());
-									//	path_link_record.setDir(route_link->direction<int>());
-									//	path_link_record.setEntering_Time(route_link_enter_time);
-									//	path_link_record.setTravel_Time(route_link_travel_time);
-									//	path_link_record.setDelayed_Time(route_link_delayed_time);
-									//	path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
-									//	path_mm_db_record->setLink(path_link_record);
-									//}
+									float total_actual_gen_cost = 0;
+									float total_actual_travel_time = 0;
+									float total_actual_wait_time = 0;
+									float total_actual_walk_time = 0;
+									float total_actual_bike_time = 0;
+									float total_actual_ivt_time = 0;
+									float total_actual_car_time = 0;
+
+									for (auto link_itr = trajectory.begin(); link_itr != trajectory.end(); ++link_itr)
+									{
+										// FIll the path link DB record for each step of the path
+										polaris::io::link_travel_multimodal path_mm_link_record;
+										_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
+										link_itf* route_link = trajectory_unit->template link<link_itf*>();
+										transit_vehicle_trip_itf* transit_vehicle_trip  = trajectory_unit->template transit_vehicle_trip<transit_vehicle_trip_itf*>();
+
+										path_mm_link_record.setLink(route_link->template dbid<int>());
+										path_mm_link_record.setDir(route_link->template direction<int>());
+										path_mm_link_record.setLinkMode(route_link->template link_type<int>());
+										
+										if (transit_vehicle_trip != nullptr)
+										{
+											path_mm_link_record.setTransitVehicleTrip(transit_vehicle_trip->template dbid<std::string>());
+										}										
+										path_mm_link_record.setStopSequence(trajectory_unit->template transit_vehicle_stop_sequence<int>());
+										
+										path_mm_link_record.setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+										path_mm_link_record.setEst_Gen_Cost(trajectory_unit->template estimated_gen_cost<float>());
+										path_mm_link_record.setEst_Duration(trajectory_unit->template estimated_travel_time<float>());
+										path_mm_link_record.setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
+										path_mm_link_record.setEst_Wait_Time(trajectory_unit->template estimated_wait_time<float>());
+										path_mm_link_record.setEst_Walk_Time(trajectory_unit->template estimated_walk_time<float>());
+										path_mm_link_record.setEst_Bike_Time(trajectory_unit->template estimated_bike_time<float>());
+										path_mm_link_record.setEst_IVTT(trajectory_unit->template estimated_ivt_time<float>());
+										path_mm_link_record.setEst_Car_Time(trajectory_unit->template estimated_car_time<float>());
+										path_mm_link_record.setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
+
+										path_mm_link_record.setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+										path_mm_link_record.setAct_Gen_Cost(trajectory_unit->template actual_gen_cost<float>());
+										path_mm_link_record.setAct_Duration(trajectory_unit->template actual_travel_time<float>());
+										path_mm_link_record.setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
+										path_mm_link_record.setAct_Wait_Time(trajectory_unit->template actual_wait_time<float>());
+										path_mm_link_record.setAct_Walk_Time(trajectory_unit->template actual_walk_time<float>());
+										path_mm_link_record.setAct_Bike_Time(trajectory_unit->template actual_bike_time<float>());
+										path_mm_link_record.setAct_IVTT(trajectory_unit->template actual_ivt_time<float>());
+										path_mm_link_record.setAct_Car_Time(trajectory_unit->template actual_car_time<float>());
+										path_mm_link_record.setAct_Transfer_Pen(trajectory_unit->template actual_transfer_penalty<float>());
+										
+										path_mm_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));				
+										path_mm_db_record->setLink(path_mm_link_record);
+
+										total_estimated_gen_cost += trajectory_unit->template estimated_gen_cost<float>();
+										total_estimated_travel_time += trajectory_unit->template estimated_travel_time<float>();
+										total_estimated_wait_time += trajectory_unit->template estimated_wait_time<float>();
+										total_estimated_walk_time += trajectory_unit->template estimated_walk_time<float>();
+										total_estimated_bike_time += trajectory_unit->template estimated_bike_time<float>();
+										total_estimated_ivt_time += trajectory_unit->template estimated_ivt_time<float>();
+										total_estimated_car_time += trajectory_unit->template estimated_car_time<float>();
+
+										total_actual_gen_cost += trajectory_unit->template actual_gen_cost<float>();
+										total_actual_travel_time += trajectory_unit->template actual_travel_time<float>();
+										total_actual_wait_time += trajectory_unit->template actual_wait_time<float>();
+										total_actual_walk_time += trajectory_unit->template actual_walk_time<float>();
+										total_actual_bike_time += trajectory_unit->template actual_bike_time<float>();
+										total_actual_ivt_time += trajectory_unit->template actual_ivt_time<float>();
+										total_actual_car_time += trajectory_unit->template actual_car_time<float>();
+									}
+
+									path_mm_db_record->setEst_Gen_Cost(total_estimated_gen_cost);
+									path_mm_db_record->setEst_Duration(total_estimated_travel_time);
+									path_mm_db_record->setEst_Wait_Time(total_estimated_wait_time);
+									path_mm_db_record->setEst_Walk_Time(total_estimated_walk_time);
+									path_mm_db_record->setEst_Bike_Time(total_estimated_bike_time);
+									path_mm_db_record->setEst_IVTT(total_estimated_ivt_time);
+									path_mm_db_record->setEst_Car_Time(total_estimated_car_time);
+
+									path_mm_db_record->setAct_Gen_Cost(total_actual_gen_cost);
+									path_mm_db_record->setAct_Duration(total_actual_travel_time);
+									path_mm_db_record->setAct_Wait_Time(total_actual_wait_time);
+									path_mm_db_record->setAct_Walk_Time(total_actual_walk_time);
+									path_mm_db_record->setAct_Bike_Time(total_actual_bike_time);
+									path_mm_db_record->setAct_IVTT(total_actual_ivt_time);
+									path_mm_db_record->setAct_Car_Time(total_actual_car_time);
 								}
 
 								if (path_mm_db_record) this->_db_ptr->persist(path_mm_db_record);

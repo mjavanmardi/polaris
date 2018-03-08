@@ -44,20 +44,17 @@ namespace Movement_Plan_Components
 			}
 
 			accessor(link, NONE, NONE);
-			accessor(delayed_time, NONE, NONE);
-			accessor(enter_time, NONE, NONE);
-			accessor(enter_interval_index, NONE, NONE);
-			accessor(estimated_link_accepting_time, NONE, NONE);
-			accessor(intersection_delay_time, NONE, NONE);
-			template<typename TargetType> TargetType exit_time()
+			/*template<typename TargetType> TargetType exit_time()
 			{
 				return (TargetType)(enter_time<int>() + delayed_time<float>());
-			}
-
-			accessor(estimated_gen_cost, NONE, NONE);
+			}*/
+						
 			accessor(link_mode, NONE, NONE);
 			accessor(transit_vehicle_trip, NONE, NONE);
 			accessor(transit_vehicle_stop_sequence, NONE, NONE);
+
+			accessor(estimated_gen_cost, NONE, NONE);
+			accessor(estimated_travel_time, NONE, NONE);
 			accessor(estimated_arrival_time, NONE, NONE);
 			accessor(estimated_wait_time, NONE, NONE);
 			accessor(estimated_walk_time, NONE, NONE);
@@ -66,6 +63,17 @@ namespace Movement_Plan_Components
 			accessor(estimated_car_time, NONE, NONE);
 			accessor(estimated_wait_count, NONE, NONE);
 			accessor(estimated_transfer_penalty, NONE, NONE);
+
+			accessor(actual_gen_cost, NONE, NONE);
+			accessor(actual_travel_time, NONE, NONE);
+			accessor(actual_arrival_time, NONE, NONE);
+			accessor(actual_wait_time, NONE, NONE);
+			accessor(actual_walk_time, NONE, NONE);
+			accessor(actual_bike_time, NONE, NONE);
+			accessor(actual_ivt_time, NONE, NONE);
+			accessor(actual_car_time, NONE, NONE);
+			accessor(actual_wait_count, NONE, NONE);
+			accessor(actual_transfer_penalty, NONE, NONE)
 
 		};
 		//TODO: Omer - Multimodal Trajectory END

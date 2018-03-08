@@ -25,6 +25,7 @@ class Automation_Type;
 class Connectivity_Type;
 class link_travel;
 class Path;
+class link_travel_multimodal;
 class Path_Multimodal;
 
 
@@ -958,14 +959,108 @@ private:
 	shared_ptr<Vehicle> vehicle;
 };
 
+#pragma db value
+class link_travel_multimodal
+{
+public:
+	// Default Constructor
+	link_travel_multimodal() {}
+	link_travel_multimodal(int link_, bool dir_, int link_mode_, std::string transit_vehicle_trip_, int transit_vehicle_stop_sequence_, float Est_Arrival_Time_, float Act_Arrival_Time_, float Est_Gen_Cost_, float Act_Gen_Cost_, float Est_Duration_, float Act_Duration_, int Est_Wait_Count_, int Act_Wait_Count_, float Est_Wait_Time_, float Act_Wait_Time_, float Est_Walk_Time_, float Act_Walk_Time_, float Est_Bike_Time_, float Act_Bike_Time_, float Est_IVTT_, float Act_IVTT_, float Est_Car_Time_, float Act_Car_Time_, float Est_Transfer_Pen_, float Act_Transfer_Pen_, float exit_position_)
+		: link(link_), dir(dir_), link_mode(link_mode_), transit_vehicle_trip(transit_vehicle_trip_), transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Gen_Cost(Est_Gen_Cost_), Act_Gen_Cost(Act_Gen_Cost_), Est_Duration(Est_Duration_), Act_Duration(Act_Duration_), Est_Wait_Count(Est_Wait_Count_), Act_Wait_Count(Act_Wait_Count_), Est_Wait_Time(Est_Wait_Time_), Act_Wait_Time(Act_Wait_Time_), Est_Walk_Time(Est_Walk_Time_), Act_Walk_Time(Act_Walk_Time_), Est_Bike_Time(Est_Bike_Time_), Act_Bike_Time(Act_Bike_Time_), Est_IVTT(Est_IVTT_), Act_IVTT(Act_IVTT_), Est_Car_Time(Est_Car_Time_), Act_Car_Time(Act_Car_Time_), Est_Transfer_Pen(Est_Transfer_Pen_), Act_Transfer_Pen(Act_Transfer_Pen_), exit_position(exit_position_)
+	{
+	}
+	//Accessors
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const bool& getDir() const { return dir; }
+	void setDir(const bool& dir_) { dir = dir_; }
+	const int& getLinkMode() const { return link_mode; }
+	void setLinkMode(const int& link_mode_) { link_mode = link_mode_; }
+	const std::string& getTransitVehicleTrip() const { return transit_vehicle_trip; }
+	void setTransitVehicleTrip(const std::string& transit_vehicle_trip_) { transit_vehicle_trip = transit_vehicle_trip_; }
+	const int& getStopSequence() const { return transit_vehicle_stop_sequence; }
+	void setStopSequence(const int& transit_vehicle_stop_sequence_) { transit_vehicle_stop_sequence = transit_vehicle_stop_sequence_; }
+	const float& getEst_Arrival_Time() const { return Est_Arrival_Time; }
+	void setEst_Arrival_Time(const float& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
+	const float& getAct_Arrival_Time() const { return Act_Arrival_Time; }
+	void setAct_Arrival_Time(const float& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
+	const float& Est_getGen_Cost() const { return Est_Gen_Cost; }
+	void setEst_Gen_Cost(const float& Est_Gen_Cost_) { Est_Gen_Cost = Est_Gen_Cost_; }
+	const float& getAct_Gen_Cost() const { return Act_Gen_Cost; }
+	void setAct_Gen_Cost(const float& Act_Gen_Cost_) { Act_Gen_Cost = Act_Gen_Cost_; }
+	const float& getEst_Duration() const { return Est_Duration; }
+	void setEst_Duration(const float& Est_Duration_) { Est_Duration = Est_Duration_; }
+	const float& getAct_Duration() const { return Act_Duration; }
+	void setAct_Duration(const float& Act_Duration_) { Act_Duration = Act_Duration_; }
+	const int& getEst_Wait_Count() const { return Est_Wait_Count; }
+	void setEst_Wait_Count(const int& Est_Wait_Count_) { Est_Wait_Count = Est_Wait_Count_; }
+	const int& getAct_Wait_Count() const { return Act_Wait_Count; }
+	void setAct_Wait_Count(const int& Act_Wait_Count_) { Act_Wait_Count = Act_Wait_Count_; }
+	const float& getEst_Wait_Timet() const { return Est_Wait_Time; }
+	void setEst_Wait_Time(const float& Est_Wait_Time_) { Est_Wait_Time = Est_Wait_Time_; }
+	const float& getAct_Wait_Time() const { return Act_Wait_Time; }
+	void setAct_Wait_Time(const float& Act_Wait_Time_) { Act_Wait_Time = Act_Wait_Time_; }
+	const float& getEst_Walk_Time() const { return Est_Walk_Time; }
+	void setEst_Walk_Time(const float& Est_Walk_Time_) { Est_Walk_Time = Est_Walk_Time_; }
+	const float& getAct_Walk_Time() const { return Act_Walk_Time; }
+	void setAct_Walk_Time(const float& Act_Walk_Time_) { Act_Walk_Time = Act_Walk_Time_; }
+	const float& getEst_Bike_Time() const { return Est_Bike_Time; }
+	void setEst_Bike_Time(const float& Est_Bike_Time_) { Est_Bike_Time = Est_Bike_Time_; }
+	const float& getAct_Bike_Time() const { return Act_Bike_Time; }
+	void setAct_Bike_Time(const float& Act_Bike_Time_) { Act_Bike_Time = Act_Bike_Time_; }
+	const float& getEst_IVTT() const { return Est_IVTT; }
+	void setEst_IVTT(const float& Est_IVTT_) { Est_IVTT = Est_IVTT_; }
+	const float& getAct_IVTT() const { return Act_IVTT; }
+	void setAct_IVTT(const float& Act_IVTT_) { Act_IVTT = Act_IVTT_; }
+	const float& getEst_Car_Time() const { return Est_Car_Time; }
+	void setEst_Car_Time(const float& Est_Car_Time_) { Est_Car_Time = Est_Car_Time_; }
+	const float& getAct_Car_Time() const { return Act_Car_Time; }
+	void setAct_Car_Time(const float& Act_Car_Time_) { Act_Car_Time = Act_Car_Time_; }
+	const float& getEst_Transfer_Pen() const { return Est_Transfer_Pen; }
+	void setEst_Transfer_Pen(const float& Est_Transfer_Pen_) { Est_Transfer_Pen = Est_Transfer_Pen_; }
+	const float& getAct_Transfer_Pen() const { return Act_Transfer_Pen; }
+	void setAct_Transfer_Pen(const float& Act_Transfer_Pen_) { Act_Transfer_Pen = Act_Transfer_Pen_; }
+	const float& getExit_Position() const { return exit_position; }
+	void setExit_Position(const float& exit_position_) { exit_position = exit_position_; }
+	//Data Fields
+private:
+	friend class odb::access;
+	int link;
+	bool dir;
+	int link_mode;
+	std::string transit_vehicle_trip;
+	int transit_vehicle_stop_sequence;
+	float Est_Arrival_Time;
+	float Act_Arrival_Time;
+	float Est_Gen_Cost;
+	float Act_Gen_Cost;
+	float Est_Duration;
+	float Act_Duration;
+	int Est_Wait_Count;
+	int Act_Wait_Count;
+	float Est_Wait_Time;
+	float Act_Wait_Time;
+	float Est_Walk_Time;
+	float Act_Walk_Time;
+	float Est_Bike_Time;
+	float Act_Bike_Time;
+	float Est_IVTT;
+	float Act_IVTT;
+	float Est_Car_Time;
+	float Act_Car_Time;
+	float Est_Transfer_Pen;
+	float Act_Transfer_Pen;
+	float exit_position;
+};
+
 #pragma db object
 class Path_Multimodal
 {
 public:
 	// Default Constructor
 	Path_Multimodal() {}
-	Path_Multimodal(int id_, int traveler_id_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int Mode_, float Arrival_Time_, float Gen_Cost_, float Duration_, int Wait_Count_, float Wait_Time_, float Walk_Time_, float Bike_Time_, float IVTT_, float Car_Time_, float Transfer_Pen_, int Scan_Count_, float aStar_Time_)
-		: id(id_), traveler_id(traveler_id_), origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), Mode(Mode_), Arrival_Time(Arrival_Time_), Gen_Cost(Gen_Cost_), Duration(Duration_), Wait_Count(Wait_Count_), Wait_Time(Wait_Time_), Walk_Time(Walk_Time_), Bike_Time(Bike_Time_), IVTT(IVTT_), Car_Time(Car_Time_), Transfer_Pen(Transfer_Pen_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_)
+	Path_Multimodal(int id_, int traveler_id_, int origin_activity_location_, int destination_activity_location_, int origin_link_, int destination_link_, int num_links_, int departure_time_, int Mode_, float Est_Arrival_Time_, float Act_Arrival_Time_, float Est_Gen_Cost_, float Act_Gen_Cost_, float Est_Duration_, float Act_Duration_, int Est_Wait_Count_, int Act_Wait_Count_, float Est_Wait_Time_, float Act_Wait_Time_, float Est_Walk_Time_, float Act_Walk_Time_, float Est_Bike_Time_, float Act_Bike_Time_, float Est_IVTT_, float Act_IVTT_, float Est_Car_Time_, float Act_Car_Time_, float Est_Transfer_Pen_, float Act_Transfer_Pen_, int Scan_Count_, float aStar_Time_, std::vector<link_travel_multimodal > links_)
+		: id(id_), traveler_id(traveler_id_), origin_activity_location(origin_activity_location_), destination_activity_location(destination_activity_location_), origin_link(origin_link_), destination_link(destination_link_), num_links(num_links_), departure_time(departure_time_), Mode(Mode_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Gen_Cost(Est_Gen_Cost_), Act_Gen_Cost(Act_Gen_Cost_), Est_Duration(Est_Duration_), Act_Duration(Act_Duration_), Est_Wait_Count(Est_Wait_Count_), Act_Wait_Count(Act_Wait_Count_), Est_Wait_Time(Est_Wait_Time_), Act_Wait_Time(Act_Wait_Time_), Est_Walk_Time(Est_Walk_Time_), Act_Walk_Time(Act_Walk_Time_), Est_Bike_Time(Est_Bike_Time_), Act_Bike_Time(Act_Bike_Time_), Est_IVTT(Est_IVTT_), Act_IVTT(Act_IVTT_), Est_Car_Time(Est_Car_Time_), Act_Car_Time(Act_Car_Time_), Est_Transfer_Pen(Est_Transfer_Pen_), Act_Transfer_Pen(Act_Transfer_Pen_), Scan_Count(Scan_Count_), aStar_Time(aStar_Time_), links(links_)
 	{
 	}
 	//Accessors
@@ -987,30 +1082,53 @@ public:
 	void setDeparture_Time(const int& departure_time_) { departure_time = departure_time_; }
 	const int& getMode() const { return Mode; }
 	void setMode(const int& Mode_) { Mode = Mode_; }
-	const float& getArrival_Time() const { return Arrival_Time; }
-	void setArrival_Time(const float& Arrival_Time_) { Arrival_Time = Arrival_Time_; }
-	const float& getGen_Cost() const { return Gen_Cost; }
-	void setGen_Cost(const float& Gen_Cost_) { Gen_Cost = Gen_Cost_; }
-	const float& getDuration() const { return Duration; }
-	void setDuration(const float& Duration_) { Duration = Duration_; }
-	const int& getWait_Count() const { return Wait_Count; }
-	void setWait_Count(const int& Wait_Count_) { Wait_Count = Wait_Count_; }
-	const float& getWait_Timet() const { return Wait_Time; }
-	void setWait_Time(const float& Wait_Time_) { Wait_Time = Wait_Time_; }
-	const float& getWalk_Time() const { return Walk_Time; }
-	void setWalk_Time(const float& Walk_Time_) { Walk_Time = Walk_Time_; }
-	const float& getBike_Time() const { return Bike_Time; }
-	void setBike_Time(const float& Bike_Time_) { Bike_Time = Bike_Time_; }
-	const float& getIVTT() const { return IVTT; }
-	void setIVTT(const float& IVTT_) { IVTT = IVTT_; }
-	const float& getCar_Time() const { return Car_Time; }
-	void setCar_Time(const float& Car_Time_) { Car_Time = Car_Time_; }
-	const float& getTransfer_Pen() const { return Transfer_Pen; }
-	void setTransfer_Pen(const float& Transfer_Pen_) { Transfer_Pen = Transfer_Pen_; }
+	const float& getEst_Arrival_Time() const { return Est_Arrival_Time; }
+	void setEst_Arrival_Time(const float& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
+	const float& getAct_Arrival_Time() const { return Act_Arrival_Time; }
+	void setAct_Arrival_Time(const float& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
+	const float& Est_getGen_Cost() const { return Est_Gen_Cost; }
+	void setEst_Gen_Cost(const float& Est_Gen_Cost_) { Est_Gen_Cost = Est_Gen_Cost_; }
+	const float& getAct_Gen_Cost() const { return Act_Gen_Cost; }
+	void setAct_Gen_Cost(const float& Act_Gen_Cost_) { Act_Gen_Cost = Act_Gen_Cost_; }
+	const float& getEst_Duration() const { return Est_Duration; }
+	void setEst_Duration(const float& Est_Duration_) { Est_Duration = Est_Duration_; }
+	const float& getAct_Duration() const { return Act_Duration; }
+	void setAct_Duration(const float& Act_Duration_) { Act_Duration = Act_Duration_; }
+	const int& getEst_Wait_Count() const { return Est_Wait_Count; }
+	void setEst_Wait_Count(const int& Est_Wait_Count_) { Est_Wait_Count = Est_Wait_Count_; }
+	const int& getAct_Wait_Count() const { return Act_Wait_Count; }
+	void setAct_Wait_Count(const int& Act_Wait_Count_) { Act_Wait_Count = Act_Wait_Count_; }
+	const float& getEst_Wait_Timet() const { return Est_Wait_Time; }
+	void setEst_Wait_Time(const float& Est_Wait_Time_) { Est_Wait_Time = Est_Wait_Time_; }
+	const float& getAct_Wait_Timet() const { return Act_Wait_Time; }
+	void setAct_Wait_Time(const float& Act_Wait_Time_) { Act_Wait_Time = Act_Wait_Time_; }
+	const float& getEst_Walk_Time() const { return Est_Walk_Time; }
+	void setEst_Walk_Time(const float& Est_Walk_Time_) { Est_Walk_Time = Est_Walk_Time_; }
+	const float& getAct_Walk_Time() const { return Act_Walk_Time; }
+	void setAct_Walk_Time(const float& Act_Walk_Time_) { Act_Walk_Time = Act_Walk_Time_; }
+	const float& getEst_Bike_Time() const { return Est_Bike_Time; }
+	void setEst_Bike_Time(const float& Est_Bike_Time_) { Est_Bike_Time = Est_Bike_Time_; }
+	const float& getAct_Bike_Time() const { return Act_Bike_Time; }
+	void setAct_Bike_Time(const float& Act_Bike_Time_) { Act_Bike_Time = Act_Bike_Time_; }
+	const float& getEst_IVTT() const { return Est_IVTT; }
+	void setEst_IVTT(const float& Est_IVTT_) { Est_IVTT = Est_IVTT_; }
+	const float& getAct_IVTT() const { return Act_IVTT; }
+	void setAct_IVTT(const float& Act_IVTT_) { Act_IVTT = Act_IVTT_; }
+	const float& getEst_Car_Time() const { return Est_Car_Time; }
+	void setEst_Car_Time(const float& Est_Car_Time_) { Est_Car_Time = Est_Car_Time_; }
+	const float& getAct_Car_Time() const { return Act_Car_Time; }
+	void setAct_Car_Time(const float& Act_Car_Time_) { Act_Car_Time = Act_Car_Time_; }
+	const float& getEst_Transfer_Pen() const { return Est_Transfer_Pen; }
+	void setEst_Transfer_Pen(const float& Est_Transfer_Pen_) { Est_Transfer_Pen = Est_Transfer_Pen_; }
+	const float& getAct_Transfer_Pen() const { return Act_Transfer_Pen; }
+	void setAct_Transfer_Pen(const float& Act_Transfer_Pen_) { Act_Transfer_Pen = Act_Transfer_Pen_; }
 	const int& getScan_Count() const { return Scan_Count; }
 	void setScan_Count(const int& Scan_Count_) { Scan_Count = Scan_Count_; }
 	const float& getaStar_Time() const { return aStar_Time; }
-	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }	
+	void setaStar_Time(const float& aStar_Time_) { aStar_Time = aStar_Time_; }
+	const std::vector<link_travel_multimodal >& getLinks() const { return links; }
+	void setLinks(const std::vector<link_travel_multimodal >& links_) { links = links_; }
+	void setLink(const link_travel_multimodal  links_) { links.push_back(links_); }
 
 	//Data Fields
 private:
@@ -1036,18 +1154,29 @@ private:
 #pragma db not_null
 	int departure_time;
 	int Mode;
-	float Arrival_Time;
-	float Gen_Cost;
-	float Duration;
-	int Wait_Count;
-	float Wait_Time;
-	float Walk_Time;
-	float Bike_Time;
-	float IVTT;
-	float Car_Time;
-	float Transfer_Pen;
+	float Est_Arrival_Time;
+	float Act_Arrival_Time;
+	float Est_Gen_Cost;
+	float Act_Gen_Cost;
+	float Est_Duration;
+	float Act_Duration;
+	int Est_Wait_Count;
+	int Act_Wait_Count;
+	float Est_Wait_Time;
+	float Act_Wait_Time;
+	float Est_Walk_Time;
+	float Act_Walk_Time;
+	float Est_Bike_Time;
+	float Act_Bike_Time;
+	float Est_IVTT;
+	float Act_IVTT;
+	float Est_Car_Time;
+	float Act_Car_Time;
+	float Est_Transfer_Pen;
+	float Act_Transfer_Pen;
 	int Scan_Count;
 	float aStar_Time;
+	std::vector<link_travel_multimodal > links;
 };
 
 }//end of io namespace
