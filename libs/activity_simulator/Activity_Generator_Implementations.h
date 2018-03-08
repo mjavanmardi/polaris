@@ -462,7 +462,7 @@ namespace Person_Components
 
 			//=========================================================================================================================
 			// Get random start plan time inthe first 3 minutes for generation
-			int start_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*(Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION - iteration() - 60.0) + iteration());
+			int start_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*(Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION - iteration() - 120.0) + iteration());
 			int start_plan_time = start_time;
 
 			//=========================================================================================================================

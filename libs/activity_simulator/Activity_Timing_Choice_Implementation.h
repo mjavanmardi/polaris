@@ -155,7 +155,7 @@ namespace Person_Components
 			
 				// times are in minutes, so add a randomized amount of seconds to the start/duration to ensure variation
 				pair<ReturnTimeType,ReturnTimeType> return_val;
-				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first) + GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0;
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first) + GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0 + Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION;
 				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.second) + GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0;
 				return return_val;
 			}

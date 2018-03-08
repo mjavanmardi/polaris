@@ -1178,14 +1178,26 @@ namespace Person_Components
 			_Generator_Interface* generator = _Parent_Person->template Planning_Faculty<_Planner_Interface*>()->template Activity_Generation_Faculty<_Generator_Interface*>();
 
 			// get the next activity if the person is moving or else current activity if they are stationary
-			Activity_Plan* current = this->next_activity_plan<Time_Seconds, Activity_Plan*>(-1);
-			Movement_Plan* cur_move = current->template movement_plan<Movement_Plan*>();
+			Activity_Plan* current = this->next_activity_plan<Time_Seconds, Activity_Plan*>(-1);	
 			if (this->_Parent_Person->Is_Moving()) THROW_WARNING("WARNING: person "<<_Parent_Person->uuid<int>()<<" is already moving.");
 
 			Activity_Plan* next;
 			while ((next = this->next_activity_plan<Activity_Plan*, Activity_Plan*>(current)) != nullptr)
 			{
+				Movement_Plan* cur_move = current->template movement_plan<Movement_Plan*>();
 				Movement_Plan* next_move = next->template movement_plan<Movement_Plan*>();
+
+				if (cur_move == nullptr)
+				{
+					current = next;
+					continue;
+				}
+
+				if (next_move == nullptr)
+				{
+					current = next;
+					continue;
+				}
 
 				// first, check for errors in the current activity
 				if (cur_move->departed_time<Time_Seconds>() > current->Start_Time<Time_Seconds>()) THROW_WARNING("Warning: departure time greater than start time: "<<this->_Parent_Person->person_record<polaris::io::Person&>().getPerson());
