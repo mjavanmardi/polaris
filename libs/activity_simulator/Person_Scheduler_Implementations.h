@@ -1226,7 +1226,7 @@ namespace Person_Components
 				// Error, should not be a negative gap....investigate
 				if (gap < -5.0)
 				{
-					cout << "ERROR: negative gap observed in planned activity schedule for " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson() << ", current activity = " << current->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << ", next activity = " << next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()<<endl;
+					THROW_WARNING("ERROR: negative gap observed in planned activity schedule for " << this->_Parent_Person->person_record<polaris::io::Person&>().getPerson() << ", current activity = " << current->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << ", next activity = " << next->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>());
 					current = next;
 					continue;
 				}

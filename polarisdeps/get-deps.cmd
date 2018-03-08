@@ -49,7 +49,7 @@ IF NOT EXIST %LOGDIR% ( mkdir %LOGDIR% )
 IF EXIST %LOGDIR%\boost_build.log (DEL %LOGDIR%\boost_build.log)
 IF EXIST %LOGDIR%\odb_build.log (DEL %LOGDIR%\odb_build.log)
 IF EXIST %LOGDIR%\gtest_build.log (DEL %LOGDIR%\gtest_build.log)
-IF EXIST %LOGDIR%\rapidjson_build.log (DEL %LOGDIR%\rapisjson_build.log)
+IF EXIST %LOGDIR%\rapidjson_build.log (DEL %LOGDIR%\rapidjson_build.log)
 
 set BUILD_ERROR=0
 
