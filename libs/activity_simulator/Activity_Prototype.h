@@ -8,25 +8,7 @@
 //#include "Scenario_Prototype.h"
 
 namespace Activity_Components
-{
-
-
-	namespace Concepts
-	{
-		
-		concept struct Is_Activity_Plan_Prototype
-		{
-			check_component_accessor_name(has_id,Activity_Plan_ID);
-			define_default_check(has_id);
-		};
-		concept struct Is_Activity_Plan
-		{
-			check_accessor_name(has_id,Activity_Plan_ID);
-			check_concept(is_prototype, Is_Activity_Plan_Prototype, T, V);
-			define_default_check(has_id || is_prototype);
-		};
-	}
-	
+{	
 	namespace Prototypes
 	{
 		prototype struct Activity_Planner ADD_DEBUG_INFO
@@ -164,6 +146,8 @@ namespace Activity_Components
 
 			int id = this_ptr->Parent_ID<int>();
 			int actid = this_ptr->Activity_Plan_ID<int>();
+
+			int iter = iteration();
 
 			//---------------------
 			//typedef Person_Components::Prototypes::Person_Planner<Parent_Planner_component_type> _planning_itf;

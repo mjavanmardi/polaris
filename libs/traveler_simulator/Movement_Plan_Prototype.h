@@ -33,6 +33,41 @@ namespace Movement_Plan_Components
 			}
 		};
 
+		//TODO: Omer - Multimodal Trajectory
+		prototype struct Multimodal_Trajectory_Unit ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+
+			template<typename TargetType> void Initialize(TargetType link_ptr)
+			{
+				this_component()->template Initialize<TargetType>(link_ptr);
+			}
+
+			accessor(link, NONE, NONE);
+			accessor(delayed_time, NONE, NONE);
+			accessor(enter_time, NONE, NONE);
+			accessor(enter_interval_index, NONE, NONE);
+			accessor(estimated_link_accepting_time, NONE, NONE);
+			accessor(intersection_delay_time, NONE, NONE);
+			template<typename TargetType> TargetType exit_time()
+			{
+				return (TargetType)(enter_time<int>() + delayed_time<float>());
+			}
+
+			accessor(estimated_gen_cost, NONE, NONE);
+			accessor(link_mode, NONE, NONE);
+			accessor(transit_vehicle_trip, NONE, NONE);
+			accessor(transit_vehicle_stop_sequence, NONE, NONE);
+			accessor(estimated_arrival_time, NONE, NONE);
+			accessor(estimated_wait_time, NONE, NONE);
+			accessor(estimated_walk_time, NONE, NONE);
+			accessor(estimated_ivt_time, NONE, NONE);
+			accessor(estimated_car_time, NONE, NONE);
+			accessor(estimated_wait_count, NONE, NONE);
+			accessor(estimated_transfer_penalty, NONE, NONE);
+
+		};
+		//TODO: Omer - Multimodal Trajectory END
 
 		prototype struct Movement_Plan ADD_DEBUG_INFO
 		{
@@ -41,8 +76,11 @@ namespace Movement_Plan_Components
 			accessor(network, NONE, NONE);
 
 			accessor(trajectory_container, NONE, NONE);
-
+			//TODO: Omer - Multimodal Trajectory
+			accessor(multimodal_trajectory_container, NONE, NONE);
+			//TODO: Omer - Multimodal Trajectory END
 			accessor(current_trajectory_position, NONE, NONE);
+			accessor(current_multimodal_trajectory_position, NONE, NONE);
 			accessor(departed_time, NONE, NONE);
 			accessor(arrived_time, NONE, NONE);
 			accessor(planning_time, NONE, NONE);
@@ -58,7 +96,10 @@ namespace Movement_Plan_Components
 			accessor(route_length, NONE, NONE);
 			accessor(entry_time, NONE, NONE);
 			accessor(traveler_id, NONE,NONE);
+			accessor(path_id, NONE, NONE);
 			accessor(mode, NONE, NONE);
+
+			accessor(experienced_gap, NONE, NONE);
 
 			//TODO: Remove when done testing routing execution time
 			accessor(routing_execution_time, NONE, NONE);
@@ -199,74 +240,7 @@ namespace Movement_Plan_Components
 #endif
 			void set_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
 			{
-				//TODO: check that this has been correctly translated!
-
-				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  Trajectory_Unit_Interface;
-				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), Trajectory_Unit_Interface*> Trajectory_Container_Interface;
-
-				typedef  Link_Components::Prototypes::Link< typename Trajectory_Unit_Interface::get_type_of(link)> Link_Interface;
-
-				typedef  Network_Components::Prototypes::Network< typename get_type_of(network) > Network_Interface;
-
-				
-				Network_Interface* net = network<Network_Interface*>();
-
-				
-
-				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
-				//trajectory.clear();
-				clear_trajectory();
-
-				typename std::deque<global_edge_id>::iterator itr;
-				typename std::deque<float>::iterator arrival_time_itr;
-
-				for(itr = path_container.begin(), arrival_time_itr = arrival_time_container.begin(); itr != path_container.end(); itr++,arrival_time_itr++)
-				{
-					Trajectory_Unit_Interface* vehicle_trajectory_data=(Trajectory_Unit_Interface*)Allocate<typename Trajectory_Unit_Interface::Component_Type>();
-
-					Link_Interface* link = net->template get_link_ptr< typename Trajectory_Unit_Interface::get_type_of(link) >( itr->edge_id );
-					
-
-					vehicle_trajectory_data->template Initialize<Link_Interface*>( link );
-
-					if (arrival_time_itr != arrival_time_container.begin()) vehicle_trajectory_data->template estimated_link_accepting_time<int>( *(arrival_time_itr /*- 1*/) );
-					else vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);
-
-
-					trajectory.push_back(vehicle_trajectory_data);
-				}
-
-				number_of_switches<int>(0.0);
-				update_route_length<NT>();
-
-				//ofstream paths("path_data.txt",ios::app);
-
-				//for(Trajectory_Container_Interface::iterator itr = trajectory.begin();itr!=trajectory.end();itr++)
-				//{
-				//	Trajectory_Unit_Interface* trajectory_unit = (Trajectory_Unit_Interface*)(*itr);
-
-				//	paths << trajectory_unit->link<Link_Interface*>()->template uuid<int>() << ":" << trajectory_unit->template estimated_link_accepting_time<int>() << ", ";
-				//}
-
-				//paths << endl;
-
-				//paths.close();
-
-
-				//typename TargetType::reverse_iterator itr;
-				//typename std::vector<float>::reverse_iterator arrival_time_itr;
-				//for(itr = path_container.rbegin(), arrival_time_itr = reversed_arrival_time_container.rbegin(); itr != path_container.rend(); itr++,arrival_time_itr++)
-				//{
-				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
-				//	vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::value_type*>((typename TargetType::Component_Type::value_type*)*itr);
-				//	//vehicle_trajectory_data->Initialize<_Link_Interface*>((_Link_Interface*)*itr);
-				//	if (arrival_time_itr != reversed_arrival_time_container.rbegin())
-				//		vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr /*- 1*/));
-				//	else
-				//		vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);
-				//	trajectory.push_back(vehicle_trajectory_data);
-				//}
-
+				this_component()->set_trajectory(path_container, arrival_time_container);
 			}
 
 			void update_trajectory(std::deque<global_edge_id>& path_container, std::deque<float>& arrival_time_container)
@@ -317,21 +291,9 @@ namespace Movement_Plan_Components
 
 			void clear_trajectory()
 			{
-				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container)> Trajectory_Container_Interface;
-				typedef  Trajectory_Unit<get_component_type(Trajectory_Container_Interface)>  Trajectory_Unit_Interface;
-
-				Trajectory_Container_Interface& trajectory=trajectory_container<Trajectory_Container_Interface&>();
-
-				// Free the allocated memory in the trajectory, if exists
-				for (auto itr = trajectory.begin(); itr != trajectory.end(); ++itr)
-				{
-					Free<get_component_type(Trajectory_Container_Interface)>(*itr);
-				}
-				trajectory.clear();
-
-				typedef typename Trajectory_Container_Interface::Component_Type trajectory_container_type;
-				trajectory_container_type().swap((trajectory_container_type&)trajectory);
+				this_component()->clear_trajectory();
 			}
+
 			void clear_trajectory(int offset)
 			{
 				// get interface to trajectory
@@ -351,23 +313,14 @@ namespace Movement_Plan_Components
 				//erase 
 				trajectory.erase(trajectory.begin()+offset,trajectory.end());
 			}
+			
 
 			template<typename TargetType> void update_route_length()
 			{
-				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
-				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
-
-				typedef  Link_Components::Prototypes::Link< typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
-				
-				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
-				route_length<float>(0.0);
-				typename _Trajectory_Container_Interface::iterator itr;
-				for (itr = trajectory.begin(); itr != trajectory.end(); itr++)
-				{
-					_Trajectory_Unit_Interface* vehicle_trajectory_data = (_Trajectory_Unit_Interface*)(*itr);
-					route_length<float&>() += vehicle_trajectory_data->template link<_Link_Interface*>()->template length<float>() / 5280.0;
-				}
+				this_component()->template update_route_length<TargetType>();
 			}
+
+			
 
 			template<typename TargetType> void advance_trajectory()
 			{
@@ -444,9 +397,9 @@ namespace Movement_Plan_Components
 				return (TargetType)(trajectory->size());
 			}
 
-			void arrive_to_destination()
+			void arrive_to_destination(bool write_trajectory)
 			{
-				this_component()->arrive_to_destination();
+				this_component()->arrive_to_destination(write_trajectory);
 			}
 
 			template<typename TargetType> void transfer_to_next_link(int delayed_time)
@@ -497,8 +450,48 @@ namespace Movement_Plan_Components
 			void Display_Movement()
 			{
 				this_component()->Display_Movement();
-			}			
+			}		
+			
+			//TODO: Omer
+			//=============================================================================================================================================================================
+			//Multimodal Section===========================================================================================================================================================
+			//=============================================================================================================================================================================
+			template<typename T> void set_multimodal_trajectory(
+				std::deque< global_edge_id >& out_path,
+				std::deque< float >& out_cost,
+				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
+				T& out_trip,
+				std::deque<int>& out_seq,
+				std::deque<float>& out_time,
+				std::deque<float>& out_arr_time,
+				std::deque<float>& out_wait_time,
+				std::deque<float>& out_walk_time,
+				std::deque<float>& out_ivt_time,
+				std::deque<float>& out_car_time,
+				std::deque<int>& out_wait_count,
+				std::deque<float>& out_transfer_pen)
+			{
+				this_component()->template set_multimodal_trajectory<T>(out_path, out_cost, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+			}
 
+			void clear_multimodal_trajectory()
+			{
+				this_component()->template clear_multimodal_trajectory();
+			}
+
+			template<typename TargetType> void update_multimodal_route_length()
+			{
+				this_component()->template update_multimodal_route_length();
+			}
+
+			template<typename TargetType> void advance_multimodal_trajectory()
+			{
+				this_component()->template advance_multimodal_trajectory<TargetType>();
+			}
+
+			//=============================================================================================================================================================================
+			//Multimodal Section End=======================================================================================================================================================
+			//=============================================================================================================================================================================
 		};
 	}
 }

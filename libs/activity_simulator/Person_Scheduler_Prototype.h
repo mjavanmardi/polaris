@@ -11,28 +11,7 @@
 
 namespace Person_Components
 {
-	namespace Types
-	{
-		enum CONFLICT_TYPES
-		{
-			OVERLAP_START=1,
-			OVERLAP_END,
-			INSERT,
-			OVERLAP_ALL
-		};
-		enum RESOLUTION_TYPES
-		{
-			MODIFY_ORIGINAL = 1,
-			MODIFY_CONFLICTING = 2,
-			MODIFY_BOTH = 3,
-			DELETE_ORIGINAL = 4
-		};
-	}
 
-	namespace Concepts
-	{
-	}
-	
 	namespace Prototypes
 	{
 		prototype struct Person_Scheduler ADD_DEBUG_INFO
@@ -68,6 +47,7 @@ namespace Person_Components
 			template<typename TargetType> void Add_Activity_Plan(TargetType activity_plan);
 			template<typename TargetType> void Remove_Activity_Plan(TargetType activity_plan, bool delete_activity=true);
 			template<typename TargetType> void Sort_Activity_Schedule();
+			void Verify_Activity_Travel_Schedule();
 			template<typename TimeType> float Percent_Free_Time_In_Schedule(TimeType range_start, TimeType range_end);
 		};
 
@@ -175,6 +155,12 @@ namespace Person_Components
 		void Person_Scheduler<ComponentType>::Sort_Activity_Schedule()
 		{
 			this_component()->Sort_Activity_Schedule<TargetType>();
+		}
+
+		template<typename ComponentType>
+		void Person_Scheduler<ComponentType>::Verify_Activity_Travel_Schedule()
+		{
+			this_component()->Verify_Activity_Travel_Schedule();
 		}
 
 		template<typename ComponentType>

@@ -5,9 +5,6 @@
 
 namespace Person_Components
 {
-	namespace Concepts
-	{
-	}
 	
 	namespace Prototypes
 	{

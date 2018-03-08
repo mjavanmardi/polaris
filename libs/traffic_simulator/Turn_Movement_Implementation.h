@@ -18,6 +18,8 @@ namespace Turn_Movement_Components
 		struct Movement_MOE_Data
 		{
 			float movement_flow_rate; 
+			float movement_flow_rate_prev; //TODO: Omer
+			float intervals_with_demand; //TODO: Omer
 			float turn_penalty;
 			float turn_penalty_standard_deviation;
 			float inbound_link_turn_time;
@@ -46,63 +48,22 @@ namespace Turn_Movement_Components
 
 			m_data(float, forward_link_turn_travel_time, NONE, NONE);
 			m_data(float, realtime_forward_link_turn_travel_time, NONE, NONE);
-			//TODO:ROUTING
-			//m_container(std::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
-			//m_container(std::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
-
-			//==================================================================================================================
-			// forward_link_turn_travel_time
-			//------------------------------------------------------------------------------------------------------------------
-			//template<typename TargetType>
-			//TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
-			//
-			//template<typename TargetType>
-			//void forward_link_turn_travel_time(TargetType set_value,void* = nullptr)
-			//{
-			//	_forward_link_turn_travel_time = (float)set_value;
-			//	//TODO:ROUTING_OPERATION
-			//	// update replicas
-			//	//typename _Replicas_Container_Interface::iterator replica_itr;
-			//	//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-			//	//{
-			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-			//	//	replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
-			//	//}
-			//}
-			//tag_setter_as_available(forward_link_turn_travel_time);
-			//
-			//float _forward_link_turn_travel_time;
-			//
-			//template<typename TargetType>
-			//TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
-			//template<typename TargetType>
-			//void realtime_forward_link_turn_travel_time(TargetType set_value)
-			//{
-			//	_realtime_forward_link_turn_travel_time = (float)set_value;
-			//	//TODO:ROUTING_OPERATION
-			//	// update replicas
-			//	//typename _Replicas_Container_Interface::iterator replica_itr;
-			//	//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-			//	//{
-			//	//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-			//	//	replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
-			//	//}
-			//}
-			//tag_setter_as_available(realtime_forward_link_turn_travel_time);
-			//float _realtime_forward_link_turn_travel_time;
-
-			//TODO:ROUTING
-			//typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
-			//typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
 
 			m_container(std::vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, NONE, NONE);
 			m_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, NONE, NONE);
 
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//----------------------------------------------------------------------------------
+			m_container(std::vector<int>, vehicles_processed_by_entry_time, NONE, NONE);
+			m_container(std::vector<float>, turn_delay_by_entry_time, NONE, NONE);
+			m_container(std::vector<float>, add_delay_by_entry_time, NONE, NONE);
+			//----------------------------------------------------------------------------------
+
 			m_container(std::deque<typename MasterType::vehicle_type*>, vehicles_container, NONE, NONE);
 
-			m_prototype(Null_Prototype,typename MasterType::link_type, inbound_link, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, inbound_link, NONE, NONE);
 
-			m_prototype(Null_Prototype,typename MasterType::link_type, outbound_link, NONE, NONE);
+			m_prototype(Link_Components::Prototypes::Link,typename MasterType::link_type, outbound_link, NONE, NONE);
 
 			m_data(int, uuid, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 			m_data(int, internal_id, NONE, NONE);
@@ -280,7 +241,8 @@ namespace Turn_Movement_Components
 						
 				int num_transfer_vehicles_of_turn_movement = (int)transfer_flow_turn_movement;
 				transfer_flow_turn_movement = transfer_flow_turn_movement - num_transfer_vehicles_of_turn_movement;
-				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
+				//TODO: Omer: Re-enable the condition later
+				//if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					if(transfer_flow_turn_movement > 0.0)
 					{
@@ -335,6 +297,12 @@ namespace Turn_Movement_Components
 
 								// update vehicles currently being delayed by the signal
 								
+								//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+								//----------------------------------------------------------------------------------
+								int assignment_index = current_simulation_interval_index / ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
+								_add_delay_by_entry_time[assignment_index] += ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+								//----------------------------------------------------------------------------------
+
 								for (auto itr =_vehicles_container.begin(); itr != _vehicles_container.end(); ++itr)
 								{
 									_Vehicle_Interface* vehicle=(_Vehicle_Interface*)*itr;
@@ -368,6 +336,14 @@ namespace Turn_Movement_Components
 					int delayed_time = max(0,    (int)ceil(((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<float>() - (float)enter_time - ((_Link_Interface*)_inbound_link)->template link_fftt<float>())   );
 					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
+
+					//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+					//----------------------------------------------------------------------------------
+					int assignment_index = enter_time / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()*((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+					
+					_vehicles_processed_by_entry_time[assignment_index]++;
+					_turn_delay_by_entry_time[assignment_index] += delayed_time;
+					//----------------------------------------------------------------------------------
 
 					//update inbound link state: N(a',L,t)
 					((_Link_Interface*)_inbound_link)->template link_downstream_cumulative_vehicles<int&>()++;
@@ -411,29 +387,75 @@ namespace Turn_Movement_Components
 					t_cached_delay = 0;
 				}
 
+				//=========================================================================================================
+				//TODO: Omer - we are removing the add signal penalty as it should already be accounted for from simulation
+				//JOSH: only do this when there is no observed delay on the link, so that router has some basis for assuming the link performance.  Added a new 'sign_penalty' function, which just assumes 6 second delay at intersection
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+				if (_outbound_link_arrived_time_based_experienced_link_turn_travel_delay == 0 && _movement_demand == 0)
+				{				
+					typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+					_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+					if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::PRE_TIMED_SIGNAL_CONTROL ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ACTUATED_SIGNAL_CONTROL ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ADAPTIVE_SIGNAL_CONTROL)
+					{
+						add_signal_penalty<TargetType>();
+					}
+					if (itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::TWO_WAY_STOP_SIGN ||
+						itx->intersection_type<Intersection_Components::Types::Intersection_Type_Keys>() == Intersection_Components::Types::ALL_WAY_STOP_SIGN)
+					{
+						add_sign_penalty<TargetType>();
+					}
+				}
+
+				//TODO: Omer: 2018.02.20
+				/*if (t_cached_delay>0)
+				{ 
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay-1] - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+				}*/
+
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = max(_outbound_link_arrived_time_based_experienced_link_turn_travel_delay, _movement_demand * 2.0f);
+
+				// if the current probe vehicle travel time estimate (_outbound_link_arrived....) is greater than the assignment update period, use the delay based on the turn flow rate instead.
+				if (movement_moe_data.movement_flow_rate_prev > 0 && _outbound_link_arrived_time_based_experienced_link_turn_travel_delay > ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()* ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
+				{
+					float estimated_per_vehicle_delay = 3600.0f / movement_moe_data.movement_flow_rate_prev;
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay =_movement_demand*estimated_per_vehicle_delay;
+				}
+
+				//------------------------------------------------------------------------------
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				//------------------------------------------------------------------------------				
 
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
-					//TODO:BIG_CHANGE
-					//realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 				}
 
+				//==============================================================================================================
+				// UPDATE THE ASSIGNMENT INTERVAL TRAVEL DELAY
+				//TODO: Check - JA, 01/25/18 restored the update to only occur on assignment intervals.....
 				//if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
-				{	
-					float turn_travel_penalty = 0.0;
-					turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
-					_turn_travel_penalty = turn_travel_penalty;
-					add_signal_penalty<TargetType>();
-					//TODO:BIG_CHANGE
-					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
+				//{	
+					_turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+
+					
+					//==============================================================================================================
 					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);
-				}
+				//}
 			}
 
             template<typename TargetType> void add_signal_penalty()
             {
+				typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Intersection_Control_Components::Prototypes::Intersection_Control<_Intersection_Interface::get_type_of(intersection_control)> _Intersection_Control_Interface;
+				typedef Intersection_Control_Components::Prototypes::Control_Plan<_Intersection_Control_Interface::get_type_of(current_control_plan)> _Interscetion_Control_Plan_Interface;
+				
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;		
+				_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+				_Intersection_Control_Interface* signal = itx->intersection_control<_Intersection_Control_Interface*>();
+				_Interscetion_Control_Plan_Interface* signal_control_plan = signal->current_control_plan<_Interscetion_Control_Plan_Interface*>();
+
                 int outbound_link_type = ((_Link_Interface*)_outbound_link)->template link_type<int>();
                 int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
                 bool eligible_for_signal_penalty = false;
@@ -466,20 +488,85 @@ namespace Turn_Movement_Components
 					//float vc = 1.0f;
 
 
-                    float cycle=75; // 75 seconds
-                    float green;
-                    if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
-                    else green=30;
-                    float Du=6.8 * vc - 0.39 * green + 0.35 * cycle - 4.5;
+                    float cycle= signal_control_plan->cycle_length<int>(); // 75 seconds
+
+                    /*if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
+                    else green=30;*/
+
+                    float Du=6.8 * vc - 0.39 * _green_time + 0.35 * cycle - 4.5;
                     Du = max(Du, 0.0f);
-                    float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;
+                    float Di = 2.7 * pow(vc,8) - 7.3 * (_green_time / cycle) + 3.4;
                     Di = max(Di, 0.0f);
                     signal_control_penalty = max(8.0f, Du + Di);
 					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
                 }
-                _turn_travel_penalty += signal_control_penalty;
+
+				//TODO: JA - 18-2-15: add the additional turn penalty from the signal to the experienced travel time (this is only called when no cars have experienced the turn movement, so it will always be 0 before adding the penalty
+				//_turn_travel_penalty += signal_control_penalty;
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += signal_control_penalty;
 
             }
+
+			template<typename TargetType> void add_sign_penalty()
+			{
+				typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Intersection_Control_Components::Prototypes::Intersection_Control<_Intersection_Interface::get_type_of(intersection_control)> _Intersection_Control_Interface;
+				typedef Intersection_Control_Components::Prototypes::Control_Plan<_Intersection_Control_Interface::get_type_of(current_control_plan)> _Interscetion_Control_Plan_Interface;
+
+				_Link_Interface* lnk = (_Link_Interface*)_inbound_link;
+				_Intersection_Interface* itx = lnk->template downstream_intersection<_Intersection_Interface*>();
+				_Intersection_Control_Interface* signal = itx->intersection_control<_Intersection_Control_Interface*>();
+				_Interscetion_Control_Plan_Interface* signal_control_plan = signal->current_control_plan<_Interscetion_Control_Plan_Interface*>();
+
+				int outbound_link_type = ((_Link_Interface*)_outbound_link)->template link_type<int>();
+				int inbound_link_type = ((_Link_Interface*)_inbound_link)->template link_type<int>();
+				bool eligible_for_signal_penalty = false;
+				float signal_control_penalty = 0.0;
+				if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || inbound_link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+				{
+					eligible_for_signal_penalty = true;
+				}
+				else
+				{
+					if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ON_RAMP && (outbound_link_type != Link_Components::Types::Link_Type_Keys::FREEWAY && outbound_link_type != Link_Components::Types::Link_Type_Keys::EXPRESSWAY))
+					{
+						eligible_for_signal_penalty = true;
+					}
+					else
+					{
+						eligible_for_signal_penalty = false;
+					}
+				}
+
+				if (!eligible_for_signal_penalty)
+				{
+					signal_control_penalty = 0.0;
+				}
+				else
+				{
+					//float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+					float vc = ((typename MasterType::link_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
+
+					//float vc = 1.0f;
+
+
+					float cycle = signal_control_plan->cycle_length<int>(); // 75 seconds
+
+																			/*if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
+																			else green=30;*/
+
+					float Du = 6.8 * vc - 0.39 * _green_time + 0.35 * cycle - 4.5;
+					Du = max(Du, 0.0f);
+					float Di = 2.7 * pow(vc, 8) - 7.3 * (_green_time / cycle) + 3.4;
+					Di = max(Di, 0.0f);
+					signal_control_penalty = max(8.0f, Du + Di);
+					//if(((_link_component_type*)_inbound_link)->template uuid<int>() == 104) cout << _movement_transferred << endl;
+				}
+
+				//TODO: JA - 18-2-15: add the additional turn penalty from the signal to the experienced travel time (this is only called when no cars have experienced the turn movement, so it will always be 0 before adding the penalty
+				//_turn_travel_penalty += signal_control_penalty;
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += signal_control_penalty;
+			}
 
 
 			template<typename TargetType> void accept_vehicle(void* vehicle)
@@ -504,8 +591,21 @@ namespace Turn_Movement_Components
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = 0.0;
 
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.clear();
-
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.resize(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				_vehicles_processed_by_entry_time.clear();
+				_vehicles_processed_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+
+				_turn_delay_by_entry_time.clear();
+				_turn_delay_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+
+				_add_delay_by_entry_time.clear();
+				_add_delay_by_entry_time.resize(num_of_assignment_intervals_in_a_day);
+				//----------------------------------------------------------------------------------
 
 				int j;
 
@@ -515,6 +615,15 @@ namespace Turn_Movement_Components
 
 				}
 
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				for (j = 0; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					_vehicles_processed_by_entry_time[j] = 0;
+					_turn_delay_by_entry_time[j] = 0.0;
+					_add_delay_by_entry_time[j] = 0.0;
+				}
+				//----------------------------------------------------------------------------------
 
 				if (_movement_type == Turn_Movement_Components::Types::THROUGH_TURN)
 				{
@@ -534,6 +643,8 @@ namespace Turn_Movement_Components
 				movement_moe_data.outbound_link_turn_time = 0.0f;
 				movement_moe_data.turn_penalty = 0.0f;
 				movement_moe_data.turn_penalty_standard_deviation = 0.0f;
+				movement_moe_data.movement_flow_rate_prev = movement_moe_data.movement_flow_rate; //TODO: Omer
+				movement_moe_data.intervals_with_demand = 0.0f; //TODO: Omer
 				movement_moe_data.movement_flow_rate = 0.0f;
 			}
 
@@ -542,6 +653,13 @@ namespace Turn_Movement_Components
 				realtime_movement_moe_data.turn_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay / 60.0f;
 				realtime_movement_moe_data.movement_flow_rate = (float)_movement_transferred;			
 				((_link_component_type*)_outbound_link)->realtime_link_moe_data.link_in_volume += (float)_movement_transferred;
+
+				//TODO: Omer
+				if (_movement_demand > 0)
+				{
+					movement_moe_data.intervals_with_demand++;
+				}
+				//------------------------------------------------
 
 				movement_moe_data.movement_flow_rate += (float)_movement_transferred;
 				
@@ -555,14 +673,28 @@ namespace Turn_Movement_Components
 			{
 				float _tmp_turn_travel_penalty;
 				float _tmp_turn_travel_penalty_standard_divation;
-				::calculate_mean_standard_deviation
+				//TODO: Omer replacing this with what the route is really seeing
+				/*::calculate_mean_standard_deviation
 					(_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array,
 					_tmp_turn_travel_penalty,
 					_tmp_turn_travel_penalty_standard_divation);
 				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
+				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;*/				
+				//TODO: Omer Change the above back to the old one ASAP
+				_tmp_turn_travel_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				_tmp_turn_travel_penalty_standard_divation = 0.0f;
+				//--------------------------------------------------------------------------------------------------------------------------------------------------------
+				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
 				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;
+				//-------------------------------------------------------------------------------------------------------------------------------------------------------
+				
 				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->link_fftt<float>() + _tmp_turn_travel_penalty) / 60.0f;
-				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
+
+				//TODO:Omer
+				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (movement_moe_data.intervals_with_demand * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+				//movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
+
+				//------------------------------------------------------------------------------------------------------------------
 			}
 
 			template<typename TargetType> void calculate_moe_for_simulation_interval_from_inbound_link()
@@ -579,6 +711,52 @@ namespace Turn_Movement_Components
 			{
 				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->link_fftt<float>()/60.0f + movement_moe_data.turn_penalty);
 			}
+
+			//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+			//----------------------------------------------------------------------------------
+			template<typename TargetType> void calculate_moe_for_assignment_interval_from_outbound_link_end()
+			{
+				int num_of_assignment_intervals_in_a_day = (int)((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>() / (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+
+				/*for (int j = 1; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					if (_add_delay_by_entry_time[j] > 0)
+					{
+						_add_delay_by_entry_time[j] += _add_delay_by_entry_time[j - 1];
+					}
+				}*/
+				
+				for (int j = 0; j < num_of_assignment_intervals_in_a_day; j++)
+				{
+					if (_vehicles_processed_by_entry_time[j] > 0)
+					{
+						_turn_delay_by_entry_time[j] = _turn_delay_by_entry_time[j] / _vehicles_processed_by_entry_time[j];
+						/*_turn_delay_by_entry_time[j] += std::min(_turn_delay_by_entry_time[j],_add_delay_by_entry_time[j]);*/
+						_turn_delay_by_entry_time[j] += _add_delay_by_entry_time[j];
+
+						if (j > 0)
+						{						
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+						}
+
+						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
+					}
+					else
+					{
+						_turn_delay_by_entry_time[j] = _add_delay_by_entry_time[j];
+						
+						if (j > 0)
+						{
+							_turn_delay_by_entry_time[j] = std::max(_turn_delay_by_entry_time[j], _turn_delay_by_entry_time[j - 1] - (float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+						}
+
+						_turn_delay_by_entry_time[j] = std::max(6.0f, _turn_delay_by_entry_time[j]);
+					}
+
+				}
+			}
+			//----------------------------------------------------------------------------------
+
 		};
 	}
 }

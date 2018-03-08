@@ -383,7 +383,11 @@ namespace Routing_Components
 				//==============================================================================
 				// ADD TURN MOEs
 				//------------------------------------------------------------------------------
-				result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+				//----------------------------------------------------------------------------------
+				//result<TurnMOE> turn_moe_result = db->template query<TurnMOE>(query<TurnMOE>::true_expr);
+				result<TurnMOE_by_entry> turn_moe_result = db->template query<TurnMOE_by_entry>(query<TurnMOE_by_entry>::true_expr + "ORDER BY" + query<TurnMOE_by_entry>::start_time + "," + query<TurnMOE_by_entry>::turn_uid);
+				//----------------------------------------------------------------------------------
 
 				int turn_id;
 				float turn_delay;
@@ -392,7 +396,7 @@ namespace Routing_Components
 
 				time_advance = false;
 
-				for (typename result<TurnMOE>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
+				for (typename result<TurnMOE_by_entry>::iterator db_itr = turn_moe_result.begin(); db_itr != turn_moe_result.end(); ++db_itr)
 				{
 					if (++counter % 100000 == 0) cout << counter << endl;
 
@@ -578,7 +582,82 @@ namespace Routing_Components
 
 				Interactive_Graph<typename MT::time_dependent_graph_type>* routable_network_graph = time_dependent_graph->template Compile_Graph<Types::time_dependent_attributes<MT>>();
 	
-				//graph_pool->Link_Graphs();
+				#ifdef _DEBUG
+				this->time_dependent_routable_network_unit_test();
+				#endif
+			}
+
+			void time_dependent_routable_network_unit_test()
+			{
+				typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
+				typedef typename Graph_Pool<typename MT::graph_pool_type>::base_edge_type base_edge_type;
+				//typedef typename Base_t::Anonymous_Connection_Group Anonymous_Connection_Group;
+				//typedef typename Base_t::current_edge_type current_edge_type;
+				//typedef typename Base_t::base_edge_type base_edge_type;
+				//typedef typename Base_t::connection_type connection_type;
+				//typedef typename Base_t::Connection_Implementation Connection_Implementation;
+				//typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
+				//typedef typename Base_t::connection_attributes_type connection_attributes_type;
+
+				cout << "*********************************************************************" << endl;
+				cout << "* Unit tests for construction of time-dependent routable network..." << endl;
+				cout << "* Press 'y' to continue or any other key to skip: ";
+				char cont;
+				cin >> cont;
+				if (cont != 'y' && cont != 'Y') return;
+
+				while (true)
+				{
+					// Initialize the test.....
+					int upstream_edge_id, downstream_edge_id, time;
+					// get an upstream and downstream edge and time
+					cout <<endl<< "Enter upstream edge id: ";
+					cin >> upstream_edge_id;
+					cout << "Enter downstream edge id: ";
+					cin >> downstream_edge_id;
+					cout << "Entry time (in seconds): ";
+					cin >> time;
+
+					// Lookup edges.....
+					global_edge_id start;
+					start.edge_id = upstream_edge_id;
+					start.graph_id = _time_dependent_network_graph_id;
+					global_edge_id end;
+					end.edge_id = downstream_edge_id;
+					end.graph_id = _time_dependent_network_graph_id;
+					A_Star_Edge<typename MasterType::time_dependent_edge_type>* start_edge = (A_Star_Edge<typename MasterType::time_dependent_edge_type>*)_routable_graph_pool->template Get_Edge<typename MasterType::time_dependent_graph_type>(start);
+					if (start_edge == nullptr) { cout <<endl<< "Origin: " << upstream_edge_id << " not found in graph pool!"; continue; }
+					base_edge_type* start_base = (base_edge_type*)start_edge;
+					A_Star_Edge<typename MasterType::time_dependent_edge_type>* end_edge = (A_Star_Edge<typename MasterType::time_dependent_edge_type>*)_routable_graph_pool->template Get_Edge<typename MasterType::time_dependent_graph_type>(end);
+					if (end_edge == nullptr) { cout <<endl<< "Dest: " << downstream_edge_id << " not found in graph pool!"; continue; }
+					base_edge_type* end_base = (base_edge_type*)end_edge;
+
+					// check all the connections from start to see if end is found....
+					bool found = false;
+					Anonymous_Connection_Group<MasterType, Base_Edge_A_Star<MT>>* connection_group = start_edge->begin_connection_groups();
+					while (connection_group != start_edge->end_connection_groups())
+					{
+						Connection_Group<typename MasterType::time_dependent_to_time_dependent_connection_type>* current_connection_group = (Connection_Group<typename MasterType::time_dependent_to_time_dependent_connection_type>*)connection_group;
+						Connection<typename MasterType::time_dependent_to_time_dependent_connection_type::connection_type>* current_neighbor = current_connection_group->forward_edges();
+						while (current_neighbor != current_connection_group->end_forward_edges())
+						{
+							if (current_neighbor->edge_id() == end_edge->edge_id())
+							{
+								Types::time_dependent_to_time_dependent* current_connection_attributes = (Types::time_dependent_to_time_dependent*)current_neighbor->connection_attributes();
+								cout <<endl<<"Historical turn delay @"<<time<<": "<< current_connection_attributes->turn_moe_data()->get_closest_element(current_connection_attributes->turn_moe_ptr(), time)<<endl;
+								found = true;
+								break;
+							}
+							current_neighbor = current_neighbor->next_connection();
+						}
+						connection_group = connection_group->Next_Connection_Group();
+					}
+					if (!found) cout << "No connection found between edges '" << upstream_edge_id << "' and '" << downstream_edge_id << "'" << endl;
+					cout << endl << "Press 'y' to continue or any other key to quit: ";
+					cin >> cont;
+					if (cont != 'y' && cont != 'Y') break;
+
+				}
 			}
 
 			void finalize()
@@ -982,6 +1061,7 @@ namespace Routing_Components
 			}
 
 			//TODO: Remove when done testing routing execution time
+			template<typename T>
 			float compute_multimodal_network_path(
 				std::vector<unsigned int>& origins, 
 				std::vector<unsigned int>& destinations, 
@@ -990,7 +1070,7 @@ namespace Routing_Components
 				std::deque<global_edge_id>& path_container, 
 				std::deque<float>& cost_container,
 				std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
-				std::deque<int>& out_trip,
+				T& out_trip,
 				std::deque<int>& out_seq,
 				std::deque<float>& out_time,
 				std::deque<float>& out_arr_time,
@@ -1057,10 +1137,11 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route, std::string& summary_paragraph)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
+				proxy_agent.experienced_gap(max(min(experienced_gap,1.0f),0.00001f));
 			
 				// get start id list from link id list
 				std::vector<global_edge_id> starts;

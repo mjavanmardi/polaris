@@ -26,12 +26,16 @@ namespace Person_Components
 			}
 
 			m_prototype(Prototypes::Person,typename MasterType::person_type,Parent_Person, NONE, NONE);
-			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::movement_plan_type,Movement, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan,typename MasterType::integrated_movement_plan_type,Movement, NONE, NONE);
 			m_data(bool, Movement_Scheduled, NONE, NONE);
 			m_data(bool, Is_Moving, NONE, NONE);
 			m_data(bool, Artificial_Movement_Scheduled, NONE, NONE);
 			m_data(Simulation_Timestep_Increment, Artificial_Arrival_Time, NONE, NONE);
 			m_data(bool, Replanning_Needed, NONE, NONE);
+
+			//TODO: Omer
+			member_component_and_feature_accessor(Next_Simulation_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
+			m_data(int, Next_Sub_Iteration, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 		};
 
 	}
