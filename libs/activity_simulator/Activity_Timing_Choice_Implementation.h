@@ -153,9 +153,10 @@ namespace Person_Components
 					THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() << "' and random value = " << rand);
 				}
 			
+				// times are in minutes, so add a randomized amount of seconds to the start/duration to ensure variation
 				pair<ReturnTimeType,ReturnTimeType> return_val;
-				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first);
-				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.second);
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.first) + GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0 + Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION;
+				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Time_Minutes,ReturnTimeType>(itr->second.second) + GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0;
 				return return_val;
 			}
 
@@ -271,6 +272,7 @@ namespace Person_Components
 					Night_TTV = tts_evening.second;
 				}
 				// Unknown destination, use TT characteristics from the accessibilty calculations
+				else
 				{
 					AM_Peak_TT =	home_taz->template avg_ttime_auto_ampeak<Time_Minutes>();
 					PM_Peak_TT =	home_taz->template avg_ttime_auto_pmpeak<Time_Minutes>();

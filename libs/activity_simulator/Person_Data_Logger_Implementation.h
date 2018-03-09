@@ -659,8 +659,8 @@ namespace Person_Components
 
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
-				location_itf* orig = move->template origin<location_itf*>();
-				location_itf* dest = move->template destination<location_itf*>();
+				//location_itf* orig = move->template origin<location_itf*>();
+				//location_itf* dest = move->template destination<location_itf*>();
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 				household_itf* hh = person->person_itf::template Household<household_itf*>();
@@ -727,6 +727,9 @@ namespace Person_Components
 					}
 					//=END of trajectory writing ====================================================================================
 
+					location_itf* orig = move->template origin<location_itf*>();
+					location_itf* dest = move->template destination<location_itf*>();
+
 					trip_rec.setConstraint(0);
 					trip_rec.setPerson(person->person_record<shared_ptr<polaris::io::Person>>());
 					trip_rec.setTrip(act->template Activity_Plan_ID<int>());
@@ -770,7 +773,7 @@ namespace Person_Components
 				polaris::io::Activity act_rec;
 				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
 				if (new_destination<0)
-					act_rec.setLocation_Id(dest->template uuid<int>());
+					act_rec.setLocation_Id(act->Location<location_itf*>()->template uuid<int>());
 				else 
 					act_rec.setLocation_Id(new_destination);
 				act_rec.setStart_Time (act->template Start_Time<Time_Seconds>());
@@ -805,7 +808,7 @@ namespace Person_Components
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip (0/*trip_rec->getTrip_Id()*/);	
 				
-				if (new_origin < 0) act_rec.setOrigin_Id(orig->template uuid<int>());
+				if (new_origin < 0) act_rec.setOrigin_Id(0);//act_rec.setOrigin_Id(orig->template uuid<int>());
 				else act_rec.setOrigin_Id(new_origin);
 
 

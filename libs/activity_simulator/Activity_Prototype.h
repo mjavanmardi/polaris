@@ -147,6 +147,8 @@ namespace Activity_Components
 			int id = this_ptr->Parent_ID<int>();
 			int actid = this_ptr->Activity_Plan_ID<int>();
 
+			int iter = iteration();
+
 			//---------------------
 			//typedef Person_Components::Prototypes::Person_Planner<Parent_Planner_component_type> _planning_itf;
 			//typedef Person_Components::Prototypes::Person<typename _planning_itf::get_type_of(Parent_Person)> _person_itf;

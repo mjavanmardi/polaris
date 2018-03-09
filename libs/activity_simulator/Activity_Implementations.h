@@ -396,8 +396,12 @@ namespace Activity_Components
 				// get a free adult available for escort
 				_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
-				// If no adults free and not school trip - cancel act
-				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+				// If no adults free and not school trip - cancel act ---- DELETE!
+				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY)
+				{
+					scheduler->Remove_Activity_Plan(this);
+					return;
+				}
 				// if no adult but is school activity, force trip to transit
 				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 				// otherwise, assign escort duty to adult
@@ -417,8 +421,12 @@ namespace Activity_Components
 					//%%%RLW
 					_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
-					// If no adults free and not school trip - cancel act
-					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+					// If no adults free and not school trip - cancel act ---- DELETE!
+					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY)
+					{
+						scheduler->Remove_Activity_Plan(this);
+						return;
+					}
 					// if no adult but is school activity, force trip to transit
 					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 					// otherwise, assign escort duty to adult
