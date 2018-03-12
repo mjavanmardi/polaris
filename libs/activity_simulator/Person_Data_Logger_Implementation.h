@@ -283,7 +283,9 @@ namespace Person_Components
 					typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
 					movement_itf* move = act->template movement_plan<movement_itf*>();
 
-					if (scenario->template multimodal_routing<bool>() && (move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || move->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
+					Vehicle_Components::Types::Vehicle_Type_Keys mode = act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
+					if (scenario->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE))
 					{
 						/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
 						typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
@@ -833,14 +835,11 @@ namespace Person_Components
 				//typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
 				//typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
 
-				act_itf* act = (act_itf*)act_record;
-				movement_itf* move = act->template movement_plan<movement_itf*>();
-				location_itf* orig = move->template origin<location_itf*>();
-				location_itf* dest = move->template destination<location_itf*>();
+				
+				act_itf* act = (act_itf*)act_record; 
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();
 				household_itf* hh = person->person_itf::template Household<household_itf*>();
-				//vehicle_itf* vehicle = person->vehicle<vehicle_itf*>();
 
 				//==============================================================================================
 				// create trip record, only if it represents a valid movement (i.e. not the null first trip of the day)		
@@ -850,7 +849,11 @@ namespace Person_Components
 				shared_ptr<polaris::io::Path_Multimodal> path_mm_db_record;
 
 				if (is_executed)
-				{
+				{					
+					movement_itf* move = act->template movement_plan<movement_itf*>();
+					location_itf* orig = move->template origin<location_itf*>();
+					location_itf* dest = move->template destination<location_itf*>();
+
 					//================================================================================
 					// First, add the trajectory if we are writing the vehicle trajectory
 					_Multimodal_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
@@ -1020,7 +1023,7 @@ namespace Person_Components
 				polaris::io::Activity act_rec;
 				act_rec.setSeq_num(act->Activity_Plan_ID<int>());
 				if (new_destination<0)
-					act_rec.setLocation_Id(dest->template uuid<int>());
+					act_rec.setLocation_Id(act->Location<location_itf*>()->template uuid<int>());
 				else
 					act_rec.setLocation_Id(new_destination);
 				act_rec.setStart_Time(act->template Start_Time<Time_Seconds>());
@@ -1055,7 +1058,7 @@ namespace Person_Components
 				//act_rec.setTrip (trip_rec);	
 				act_rec.setTrip(0/*trip_rec->getTrip_Id()*/);
 
-				if (new_origin < 0) act_rec.setOrigin_Id(orig->template uuid<int>());
+				if (new_origin < 0) act_rec.setOrigin_Id(0);//act_rec.setOrigin_Id(orig->template uuid<int>());
 				else act_rec.setOrigin_Id(new_origin);
 
 

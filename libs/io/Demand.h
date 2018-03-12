@@ -27,6 +27,8 @@ class link_travel;
 class Path;
 class link_travel_multimodal;
 class Path_Multimodal;
+class Transit_Vehicle_Links;
+class Transit_Vehicle;
 
 
 #pragma db object //table("SELECTION")
@@ -984,7 +986,7 @@ public:
 	void setEst_Arrival_Time(const float& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
 	const float& getAct_Arrival_Time() const { return Act_Arrival_Time; }
 	void setAct_Arrival_Time(const float& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
-	const float& Est_getGen_Cost() const { return Est_Gen_Cost; }
+	const float& getEst_Gen_Cost() const { return Est_Gen_Cost; }
 	void setEst_Gen_Cost(const float& Est_Gen_Cost_) { Est_Gen_Cost = Est_Gen_Cost_; }
 	const float& getAct_Gen_Cost() const { return Act_Gen_Cost; }
 	void setAct_Gen_Cost(const float& Act_Gen_Cost_) { Act_Gen_Cost = Act_Gen_Cost_; }
@@ -996,7 +998,7 @@ public:
 	void setEst_Wait_Count(const int& Est_Wait_Count_) { Est_Wait_Count = Est_Wait_Count_; }
 	const int& getAct_Wait_Count() const { return Act_Wait_Count; }
 	void setAct_Wait_Count(const int& Act_Wait_Count_) { Act_Wait_Count = Act_Wait_Count_; }
-	const float& getEst_Wait_Timet() const { return Est_Wait_Time; }
+	const float& getEst_Wait_Time() const { return Est_Wait_Time; }
 	void setEst_Wait_Time(const float& Est_Wait_Time_) { Est_Wait_Time = Est_Wait_Time_; }
 	const float& getAct_Wait_Time() const { return Act_Wait_Time; }
 	void setAct_Wait_Time(const float& Act_Wait_Time_) { Act_Wait_Time = Act_Wait_Time_; }
@@ -1086,7 +1088,7 @@ public:
 	void setEst_Arrival_Time(const float& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
 	const float& getAct_Arrival_Time() const { return Act_Arrival_Time; }
 	void setAct_Arrival_Time(const float& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
-	const float& Est_getGen_Cost() const { return Est_Gen_Cost; }
+	const float& getEst_Gen_Cost() const { return Est_Gen_Cost; }
 	void setEst_Gen_Cost(const float& Est_Gen_Cost_) { Est_Gen_Cost = Est_Gen_Cost_; }
 	const float& getAct_Gen_Cost() const { return Act_Gen_Cost; }
 	void setAct_Gen_Cost(const float& Act_Gen_Cost_) { Act_Gen_Cost = Act_Gen_Cost_; }
@@ -1098,9 +1100,9 @@ public:
 	void setEst_Wait_Count(const int& Est_Wait_Count_) { Est_Wait_Count = Est_Wait_Count_; }
 	const int& getAct_Wait_Count() const { return Act_Wait_Count; }
 	void setAct_Wait_Count(const int& Act_Wait_Count_) { Act_Wait_Count = Act_Wait_Count_; }
-	const float& getEst_Wait_Timet() const { return Est_Wait_Time; }
+	const float& getEst_Wait_Time() const { return Est_Wait_Time; }
 	void setEst_Wait_Time(const float& Est_Wait_Time_) { Est_Wait_Time = Est_Wait_Time_; }
-	const float& getAct_Wait_Timet() const { return Act_Wait_Time; }
+	const float& getAct_Wait_Time() const { return Act_Wait_Time; }
 	void setAct_Wait_Time(const float& Act_Wait_Time_) { Act_Wait_Time = Act_Wait_Time_; }
 	const float& getEst_Walk_Time() const { return Est_Walk_Time; }
 	void setEst_Walk_Time(const float& Est_Walk_Time_) { Est_Walk_Time = Est_Walk_Time_; }
@@ -1177,6 +1179,125 @@ private:
 	int Scan_Count;
 	float aStar_Time;
 	std::vector<link_travel_multimodal > links;
+};
+
+#pragma db value
+class Transit_Vehicle_Links
+{
+public:
+	// Default Constructor
+	Transit_Vehicle_Links() {}
+	Transit_Vehicle_Links(int transit_vehicle_stop_sequence_, int link_, bool dir_, int link_mode_, int Est_Arrival_Time_, int Act_Arrival_Time_, int Est_Departure_Time_, int Act_Departure_Time_, int Est_Dwell_Time_, int Act_Dwell_Time_, int Est_Travel_Time_, int Act_Travel_Time_, int Seated_Load_, int Seated_Capacity_, int Standing_Load_, int Standing_Capacity_, float exit_position_)
+		: transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), link(link_), dir(dir_), link_mode(link_mode_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Departure_Time(Est_Departure_Time_), Act_Departure_Time(Act_Departure_Time_), Est_Dwell_Time(Est_Dwell_Time_), Act_Dwell_Time(Act_Dwell_Time_), Est_Travel_Time(Est_Travel_Time_), Act_Travel_Time(Act_Travel_Time_), Seated_Load(Seated_Load_), Seated_Capacity(Seated_Capacity_), Standing_Load(Standing_Load_), Standing_Capacity(Standing_Capacity_), exit_position(exit_position_)
+	{
+	}
+	//Accessors	
+	const int& getStopSequence() const { return transit_vehicle_stop_sequence; }
+	void setStopSequence(const int& transit_vehicle_stop_sequence_) { transit_vehicle_stop_sequence = transit_vehicle_stop_sequence_; }
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const bool& getDir() const { return dir; }
+	void setDir(const bool& dir_) { dir = dir_; }
+	const int& getLinkMode() const { return link_mode; }
+	void setLinkMode(const int& link_mode_) { link_mode = link_mode_; }	
+	const int& getEst_Arrival_Time() const { return Est_Arrival_Time; }
+	void setEst_Arrival_Time(const int& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
+	const int& getAct_Arrival_Time() const { return Act_Arrival_Time; }
+	void setAct_Arrival_Time(const int& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
+	const int& getEst_Departure_Time() const { return Est_Departure_Time; }
+	void setEst_Departure_Time(const int& Est_Departure_Time_) { Est_Departure_Time = Est_Departure_Time_; }
+	const int& getAct_Departure_Time() const { return Act_Departure_Time; }
+	void setAct_Departure_Time(const int& Act_Departure_Time_) { Act_Departure_Time = Act_Departure_Time_; }
+	const int& getEst_Dwell_Time() const { return Est_Dwell_Time; }
+	void setEst_Dwell_Time(const int& Est_Dwell_Time_) { Est_Dwell_Time = Est_Dwell_Time_; }
+	const int& getAct_Dwell_Time() const { return Act_Dwell_Time; }
+	void setAct_Dwell_Time(const int& Act_Dwell_Time_) { Act_Dwell_Time = Act_Dwell_Time_; }
+	const int& getEst_Travel_Time() const { return Est_Travel_Time; }
+	void setEst_Travel_Time(const int& Est_Travel_Time_) { Est_Travel_Time = Est_Travel_Time_; }
+	const int& getAct_Travel_Time() const { return Act_Travel_Time; }
+	void setAct_Travel_Time(const int& Act_Travel_Time_) { Act_Travel_Time = Act_Travel_Time_; }
+	const int& getSeated_Load() const { return Seated_Load; }
+	void setSeated_Load(const int& Seated_Load_) { Seated_Load = Seated_Load_; }
+	const int& getSeated_Capacity() const { return Seated_Capacity; }
+	void setSeated_Capacity(const int& Seated_Capacity_) { Seated_Capacity = Seated_Capacity_; }
+	const int& getStanding_Load() const { return Standing_Load; }
+	void setStanding_Load(const int& Standing_Load_) { Standing_Load = Standing_Load_; }
+	const int& getStanding_Capacity() const { return Standing_Capacity; }
+	void setStanding_Capacity(const int& Standing_Capacity_) { Standing_Capacity = Standing_Capacity_; }	
+	const float& getExit_Position() const { return exit_position; }
+	void setExit_Position(const float& exit_position_) { exit_position = exit_position_; }
+	//Data Fields
+private:
+	friend class odb::access;
+	int transit_vehicle_stop_sequence;
+	int link;
+	bool dir;
+	int link_mode;
+	int Est_Arrival_Time;
+	int Act_Arrival_Time;
+	int Est_Departure_Time;
+	int Act_Departure_Time;
+	int Est_Dwell_Time;
+	int Act_Dwell_Time;
+	int Est_Travel_Time;
+	int Act_Travel_Time;
+	int Seated_Load;
+	int Seated_Capacity;
+	int Standing_Load;
+	int Standing_Capacity;
+	float exit_position;
+};
+
+#pragma db object
+class Transit_Vehicle
+{
+public:
+	// Default Constructor
+	Transit_Vehicle() {}
+	Transit_Vehicle(std::string transit_vehicle_trip_, std::string mode_, int Est_Departure_Time_, int Act_Departure_Time_, int Est_Arrival_Time_, int Act_Arrival_Time_,  int Est_Travel_Time_, int Act_Travel_Time_, int Seated_Capacity_, int Standing_Capacity_, std::vector<Transit_Vehicle_Links > links_)
+		: transit_vehicle_trip(transit_vehicle_trip_), mode(mode_), Est_Departure_Time(Est_Departure_Time_), Act_Departure_Time(Act_Departure_Time_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Travel_Time(Est_Travel_Time_), Act_Travel_Time(Act_Travel_Time_), Seated_Capacity(Seated_Capacity_), Standing_Capacity(Standing_Capacity_), links(links_)
+	{
+	}
+	//Accessors
+	const std::string& getTransitVehicleTrip() const { return transit_vehicle_trip; }
+	void setTransitVehicleTrip(const std::string& transit_vehicle_trip_) { transit_vehicle_trip = transit_vehicle_trip_; }	
+	const std::string& getMode() const { return mode; }
+	void setMode(const std::string& mode_) { mode = mode_; }
+	const int& getEst_Departure_Time() const { return Est_Departure_Time; }
+	void setEst_Departure_Time(const int& Est_Departure_Time_) { Est_Departure_Time = Est_Departure_Time_; }
+	const int& getAct_Departure_Time() const { return Act_Departure_Time; }
+	void setAct_Departure_Time(const int& Act_Departure_Time_) { Act_Departure_Time = Act_Departure_Time_; }
+	const int& getEst_Arrival_Time() const { return Est_Arrival_Time; }
+	void setEst_Arrival_Time(const int& Est_Arrival_Time_) { Est_Arrival_Time = Est_Arrival_Time_; }
+	const int& getAct_Arrival_Time() const { return Act_Arrival_Time; }
+	void setAct_Arrival_Time(const int& Act_Arrival_Time_) { Act_Arrival_Time = Act_Arrival_Time_; }
+	const int& getEst_Travel_Time() const { return Est_Travel_Time; }
+	void setEst_Travel_Time(const int& Est_Travel_Time_) { Est_Travel_Time = Est_Travel_Time_; }
+	const int& getAct_Travel_Time() const { return Act_Travel_Time; }
+	void setAct_Travel_Time(const int& Act_Travel_Time_) { Act_Travel_Time = Act_Travel_Time_; }
+	const int& getSeated_Capacity() const { return Seated_Capacity; }
+	void setSeated_Capacity(const int& Seated_Capacity_) { Seated_Capacity = Seated_Capacity_; }
+	const int& getStanding_Capacity() const { return Standing_Capacity; }
+	void setStanding_Capacity(const int& Standing_Capacity_) { Standing_Capacity = Standing_Capacity_; }
+	const std::vector<Transit_Vehicle_Links >& getLinks() const { return links; }
+	void setLinks(const std::vector<Transit_Vehicle_Links >& links_) { links = links_; }
+	void setLink(const Transit_Vehicle_Links  links_) { links.push_back(links_); }
+	//Data Fields		
+private:
+	friend class odb::access;
+#pragma db auto id
+	int id;
+	std::string transit_vehicle_trip;
+	std::string mode;
+	int Est_Departure_Time;
+	int Act_Departure_Time;	
+	int Est_Arrival_Time;
+	int Act_Arrival_Time;
+	int Est_Travel_Time;
+	int Act_Travel_Time;
+	int Seated_Capacity;
+	int Standing_Capacity;
+	std::vector<Transit_Vehicle_Links > links;
 };
 
 }//end of io namespace

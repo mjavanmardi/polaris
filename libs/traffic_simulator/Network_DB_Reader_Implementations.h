@@ -366,6 +366,9 @@ namespace Network_Components
 					transit_vehicle_trip->template direction<int>(db_itr->getDir());
 					transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>((_Transit_Pattern_Interface*)net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()->getPattern()]);
 
+					transit_vehicle_trip->template seated_capacity<int>(2);
+					transit_vehicle_trip->template standing_capacity<int>(2);
+
 					const string& arrivalseconds_string = db_itr->getArrivals();
 					std::stringstream ss(arrivalseconds_string);
 					std::string sub_string;
@@ -376,6 +379,9 @@ namespace Network_Components
 						myTime = stoi(sub_string);
 						myTime = myTime - _scenario_reference->template simulation_start_time<int>();
 						transit_vehicle_trip->template arrival_seconds<std::vector<int>&>().push_back(myTime);
+						transit_vehicle_trip->template act_arrival_seconds<std::vector<int>&>().push_back(-1);
+						transit_vehicle_trip->template seated_load<std::vector<int>&>().push_back(0);
+						transit_vehicle_trip->template standing_load<std::vector<int>&>().push_back(0);
 					}
 
 					const string& departureseconds_string = db_itr->getDepartures();
@@ -387,6 +393,7 @@ namespace Network_Components
 						myTime = stoi(sub_string);
 						myTime = myTime - _scenario_reference->template simulation_start_time<int>();
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
+						transit_vehicle_trip->template act_departure_seconds<std::vector<int>&>().push_back(-1);
 					}
 
 					int number_of_stops = transit_vehicle_trip->template departure_seconds<std::vector<int>&>().size();

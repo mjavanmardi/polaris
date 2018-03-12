@@ -18,9 +18,13 @@ namespace Demand_Components
 		implementation struct Demand_Implementation:public Polaris_Component<MasterType,INHERIT(Demand_Implementation),Execution_Object>
 		{
 			typedef typename Polaris_Component<MasterType, INHERIT(Demand_Implementation), Execution_Object>::Component_Type ComponentType;
+			
 			typedef typename MasterType::movement_plan_type movement_plan_type;
 			typedef std::pair<typename MasterType::movement_plan_type*, bool> movement_plan_pair_type;
 			typedef std::vector<movement_plan_pair_type> movement_plans_vector_type;
+
+			typedef typename MasterType::transit_vehicle_trip_type transit_vehicle_trip_type;
+			typedef std::vector<transit_vehicle_trip_type*> transit_vehicle_trip_vector_type;
 
 			m_prototype(Null_Prototype,typename MasterType::scenario_type, scenario_reference, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);		
@@ -50,6 +54,8 @@ namespace Demand_Components
 				movement_plans_buffer = new movement_plans_vector_type[num_sim_threads()];
 				multimodal_movement_plans = new movement_plans_vector_type[num_sim_threads()];
 				multimodal_movement_plans_buffer = new movement_plans_vector_type[num_sim_threads()];
+				transit_vehicle_trips = new transit_vehicle_trip_vector_type[num_sim_threads()];
+				transit_vehicle_trips_buffer = new transit_vehicle_trip_vector_type[num_sim_threads()];
 				//trip_records = new std::vector<polaris::io::Trip>[num_sim_threads()];
 				//trip_records_buffer = new std::vector<polaris::io::Trip>[num_sim_threads()];
 
@@ -86,6 +92,8 @@ namespace Demand_Components
 			movement_plans_vector_type* movement_plans_buffer; 
 			movement_plans_vector_type* multimodal_movement_plans;
 			movement_plans_vector_type* multimodal_movement_plans_buffer;
+			transit_vehicle_trip_vector_type* transit_vehicle_trips;
+			transit_vehicle_trip_vector_type* transit_vehicle_trips_buffer;
 
 			static void Logging_Event_Controller(ComponentType* _this, Event_Response& response)
 			{
@@ -122,10 +130,15 @@ namespace Demand_Components
 					pthis->multimodal_movement_plans_buffer = pthis->multimodal_movement_plans;
 					pthis->multimodal_movement_plans = multimodal_tmp;
 
+					transit_vehicle_trip_vector_type* veh_trp_tmp = pthis->transit_vehicle_trips_buffer;
+					pthis->transit_vehicle_trips_buffer = pthis->transit_vehicle_trips;
+					pthis->transit_vehicle_trips = veh_trp_tmp;
+
 					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
 					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::OUTPUT_WRITING_SUB_ITERATION;
 					pthis->Write_Trips_To_Database<NT>();
 					pthis->Write_MM_Trips_To_Database<NT>();
+					pthis->Write_Transit_Vehicle_Trips_To_Database<NT>();
 				}
 				else
 				{
@@ -147,6 +160,11 @@ namespace Demand_Components
 				{
 					movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan), write_trajectory));
 				}
+			}
+
+			template<typename TargetType> void Add_Transit_Vehicle_Trip_Record(TargetType transit_vehicle_trip)
+			{
+				transit_vehicle_trips_buffer[__thread_id].push_back((transit_vehicle_trip_type*)(transit_vehicle_trip));
 			}
 
 			template<typename TargetType> void Write_Trips_To_Database()
@@ -510,11 +528,147 @@ namespace Demand_Components
 					}
 				}
 			}
-
 			
+			//TODO: Omer
+			template<typename TargetType> void Write_Transit_Vehicle_Trips_To_Database()
+			{				
+				typedef typename MasterType::link_type link_itf;
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename MasterType::transit_vehicle_trip_type> transit_vehicle_trip_itf;
+				typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> transit_pattern_itf;
+				typedef Transit_Route_Components::Prototypes::Transit_Route<typename MasterType::transit_route_type> transit_route_itf;
+
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+				if (!scenario->template write_demand_to_database<bool>()) return;
+
+				for (int i = 0; i< (int)num_sim_threads(); ++i)
+				{
+					// database write for trips
+					typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+					_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+					if (scenario->template write_demand_to_database<bool>())
+					{
+						int count = 0;
+
+						try
+						{
+							odb::transaction t(this->_db_ptr->begin());
+							
+							for (transit_vehicle_trip_vector_type::iterator itr = transit_vehicle_trips[i].begin(); itr != transit_vehicle_trips[i].end(); ++itr)
+							{
+								shared_ptr<polaris::io::Transit_Vehicle> transit_vehicle_record;
+
+								transit_vehicle_trip_itf* vehicle_trip = (transit_vehicle_trip_itf*)(*itr);
+								transit_pattern_itf* pattern = vehicle_trip->template pattern<transit_pattern_itf*>();
+								transit_route_itf* route = pattern->template route<transit_route_itf*>();
+									
+								transit_vehicle_record = make_shared<polaris::io::Transit_Vehicle>();
+								
+								transit_vehicle_record->setTransitVehicleTrip(vehicle_trip->template dbid<std::string>());
+								
+								std::string mode;
+								if (route->template type<int>() == 0)
+								{
+									mode = "LIGHT RAIL";
+								}
+								else if (route->template type<int>() == 1)
+								{
+									mode = "SUBWAY";
+								}
+								else if (route->template type<int>() == 2)
+								{
+									mode = "RAIL";
+								}
+								else if (route->template type<int>() == 3)
+								{
+									mode = "BUS";
+								}
+								else if (route->template type<int>() == 4)
+								{
+									mode = "FERRY";
+								}
+								else if (route->template type<int>() == 5)
+								{
+									mode = "CABLE CAR";
+								}
+								else if (route->template type<int>() == 6)
+								{
+									mode = "GONDOLA";
+								}
+								else if (route->template type<int>() == 7)
+								{
+									mode = "FUNICULAR";
+								}							
+								transit_vehicle_record->setMode(mode);
+
+								int end_pos = vehicle_trip->template number_of_stops<int>() - 1;
+
+								transit_vehicle_record->setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[end_pos]);
+								transit_vehicle_record->setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[end_pos]);
+								transit_vehicle_record->setEst_Travel_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[end_pos] - vehicle_trip->template departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setAct_Travel_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[end_pos] - vehicle_trip->template act_departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setSeated_Capacity(vehicle_trip->template seated_capacity<int>());
+								transit_vehicle_record->setStanding_Capacity(vehicle_trip->template standing_capacity<int>());
+								
+								float start = 0;
+								for (int link_itr = 0; link_itr != vehicle_trip->template number_of_stops<int>()-1; ++link_itr)
+								{
+									// FIll the path link DB record for each step of the path
+									polaris::io::Transit_Vehicle_Links transit_vehicle_link_record;
+									
+									link_itf* route_link = pattern->template pattern_links<std::vector<link_itf*>>()[link_itr];
+
+									transit_vehicle_link_record.setStopSequence(link_itr);
+									transit_vehicle_link_record.setLink(route_link->template dbid<int>());
+									transit_vehicle_link_record.setDir(route_link->template direction<int>());
+									transit_vehicle_link_record.setLinkMode(route_link->template link_type<int>());
+									
+									transit_vehicle_link_record.setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setEst_Dwell_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Dwell_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setEst_Travel_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr+1] - vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Travel_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr + 1] - vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setSeated_Load(vehicle_trip->template seated_load<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setSeated_Capacity(vehicle_trip->template seated_capacity<int>());
+									transit_vehicle_link_record.setStanding_Load(vehicle_trip->template standing_load<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setStanding_Capacity(vehicle_trip->template standing_capacity<int>());
+									transit_vehicle_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
+									transit_vehicle_record->setLink(transit_vehicle_link_record);									
+								}
+								
+								this->_db_ptr->persist(transit_vehicle_record);
+								count++;
+							}
+							t.commit();
+						}
+						catch (const odb::exception& e)
+						{
+							cout << e.what() << ". DB error in demand_implementation, line 235.  count=" << count << endl;
+							//polaris::io::Trip p = trip_records[i][count];
+
+						}
+						catch (std::exception& e)
+						{
+							cout << e.what() << ". DB error in demand_implementation, line 241.  count=" << count << endl;
+						}
+						catch (...)
+						{
+							cout << "some other error in database writing" << endl;
+						}
+
+						// erase buffer
+						//trip_records[i].clear();
+						transit_vehicle_trips[i].clear();
+					}
+				}
+			}
+
 		};
-
-
 	}
-
 }

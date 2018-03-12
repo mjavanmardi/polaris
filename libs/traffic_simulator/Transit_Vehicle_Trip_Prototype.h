@@ -25,7 +25,14 @@ namespace Transit_Vehicle_Trip_Components
 			accessor(network_reference, NONE, NONE);
 			accessor(arrival_seconds, NONE, NONE);
 			accessor(departure_seconds, NONE, NONE);
-			accessor(number_of_stops, NONE, NONE)
+			accessor(number_of_stops, NONE, NONE);
+
+			accessor(act_arrival_seconds, NONE, NONE);
+			accessor(act_departure_seconds, NONE, NONE);
+			accessor(seated_load, NONE, NONE);
+			accessor(standing_load, NONE, NONE);
+			accessor(seated_capacity, NONE, NONE);
+			accessor(standing_capacity, NONE, NONE);
 			
 			//Simulation related
 			accessor(people_standing, NONE, NONE);

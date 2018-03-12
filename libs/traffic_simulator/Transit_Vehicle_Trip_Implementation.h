@@ -36,6 +36,7 @@ namespace Transit_Vehicle_Trip_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
+			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
 			typedef typename std::list<_Person_Interface*>::iterator queue_iterator_type;
 			
 
@@ -48,6 +49,14 @@ namespace Transit_Vehicle_Trip_Components
 			m_container(std::vector<int>, arrival_seconds, NONE, NONE);
 			m_container(std::vector<int>, departure_seconds, NONE, NONE);
 			m_data(int, number_of_stops, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
+			m_container(std::vector<int>, act_arrival_seconds, NONE, NONE);
+			m_container(std::vector<int>, act_departure_seconds, NONE, NONE);
+			m_container(std::vector<int>, seated_load, NONE, NONE);
+			m_container(std::vector<int>, standing_load, NONE, NONE);
+			m_data(int, seated_capacity, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+			m_data(int, standing_capacity, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
+
 			member_component_and_feature_accessor(Next_Simulation_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			
 			//Simulation related
@@ -61,7 +70,6 @@ namespace Transit_Vehicle_Trip_Components
 
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_stops) _Pattern_Stops_Container_Interface;
 			typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
-			
 			
 
 			template<typename TargetType> void schdeule_vehicle_movements_in_transit_network(void* network)
@@ -142,13 +150,16 @@ namespace Transit_Vehicle_Trip_Components
 				_Pattern_Links_Container_Interface& pattern_links = pattern->template pattern_links<_Pattern_Links_Container_Interface&>();
 
 				int cur_iter = iteration();
-				int cur_sub = sub_iteration();
+				int cur_sub = sub_iteration();				
 
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
+
 				position++;
 				this->template current_position<int>(position);
 				int arrival_time = this->template arrival_seconds<std::vector<int>>()[position];
+				
+				this->template act_arrival_seconds<std::vector<int>&>()[position] = cur_iter;
 
 				if (position < pattern_links.size())
 				{
@@ -235,7 +246,7 @@ namespace Transit_Vehicle_Trip_Components
 				queue_iterator_type position_in_vehicle_seated_queue;
 				queue_iterator_type position_in_vehicle_standing_queue = people_standing->begin();
 				//Loop over the standing list
-				while (people_seated->size() < 2 && position_in_vehicle_standing_queue != people_standing->end())
+				while (people_seated->size() < this->template seated_capacity<int>() && position_in_vehicle_standing_queue != people_standing->end())
 				{					
 					//Get the person
 					_Person_Interface* person = (_Person_Interface*)*position_in_vehicle_standing_queue;
@@ -328,7 +339,7 @@ namespace Transit_Vehicle_Trip_Components
 					//Check if the person is waiting for this vehicle
 					if (person_vehicle_trip == this)
 					{
-						if (people_seated->size() < 2)
+						if (people_seated->size() < this->template seated_capacity<int>())
 						{
 							//Delete person from the waiting queue and increment the iterator
 							people_waiting->erase(position_in_link_waiting_queue++);
@@ -347,7 +358,7 @@ namespace Transit_Vehicle_Trip_Components
 							//Report the person
 							trajectory_stream << "\tSIT\t" << person->template uuid<int>();
 						}
-						else if (people_standing->size() < 2)
+						else if (people_standing->size() < this->template standing_capacity<int>())
 						{
 							//Delete person from the waiting queue and increment the iterator
 							people_waiting->erase(position_in_link_waiting_queue++);	
@@ -376,6 +387,8 @@ namespace Transit_Vehicle_Trip_Components
 						position_in_link_waiting_queue++;
 					}
 
+					this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
+					this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
 				}
 
 				trajectory_stream << endl;
@@ -393,9 +406,13 @@ namespace Transit_Vehicle_Trip_Components
 				int cur_iter = iteration();
 				int cur_sub = sub_iteration();
 
+				
+
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
 				int departure_time = this->template departure_seconds<std::vector<int>>()[position];
+
+				this->template act_departure_seconds<std::vector<int>&>()[position] = cur_iter;
 
 				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position]);
 				std::string stop_ID = pattern_link->template upstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
@@ -461,6 +478,10 @@ namespace Transit_Vehicle_Trip_Components
 				std::string trip_ID = this->template dbid<std::string>();
 				int position = this->template current_position<int>();
 				int depature_time = this->template departure_seconds<std::vector<int>>()[position];
+
+				this->template act_departure_seconds<std::vector<int>&>()[position] = cur_iter;
+
+				((_Demand_Interface*)_global_demand)->Add_Transit_Vehicle_Trip_Record(this);
 				
 				_Link_Interface* pattern_link = (_Link_Interface*)(pattern_links[position - 1]);
 				std::string stop_ID = pattern_link->template downstream_intersection<_Intersection_Interface*>()->template dbid<std::string>();
@@ -476,7 +497,6 @@ namespace Transit_Vehicle_Trip_Components
 
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
-
 		};
 
 	}
