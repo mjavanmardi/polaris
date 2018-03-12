@@ -197,8 +197,6 @@ namespace Routing_Components
 				std::deque<int> out_wait_count;
 				std::deque<float> out_transfer_pen;
 				std::deque<float> out_heur_cost;
-				std::string summary_paragraph = "";
-				std::string detail_paragraph = "";
 
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = _movement_plan->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
@@ -218,7 +216,7 @@ namespace Routing_Components
 					}
 					else
 					{
-						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 					}
 					
 				}
@@ -235,7 +233,7 @@ namespace Routing_Components
 					}
 					else
 					{ 
-						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, _movement_plan->experienced_gap<float>(), debug_route, summary_paragraph);
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, _movement_plan->experienced_gap<float>(), debug_route);
 					}
 
 				}
@@ -304,8 +302,6 @@ namespace Routing_Components
 
 					_movement_plan->routing_execution_time(astar_time);
 					_movement_plan->routing_scan_count(scan_count);
-					_movement_plan->summary_string(summary_paragraph);
-					_movement_plan->detail_string(detail_paragraph);
 					
 					// update movement plan O/D based on returned routing results					
 					if (olink != nullptr && dlink != nullptr)
@@ -313,15 +309,6 @@ namespace Routing_Components
 						_movement_plan->template origin<Link_Interface*>(olink);
 						_movement_plan->template destination<Link_Interface*>(dlink);
 					}
-				}
-				else
-				{
-					//cout << "Unable to route: " << origin_id << "," << destination_id << endl;
-					//if (astar_time >= 0)
-					//{
-						_movement_plan->routing_execution_time(astar_time);
-						_movement_plan->summary_string(summary_paragraph);
-					//}
 				}
 
 				path_container.clear();
@@ -339,8 +326,6 @@ namespace Routing_Components
 				out_wait_count.clear();
 				out_transfer_pen.clear();
 				out_heur_cost.clear();
-				summary_paragraph = "";
-				detail_paragraph = "";
 			}
 
 		};
@@ -481,9 +466,7 @@ namespace Routing_Components
 
 				// Debug_route is false, set to true under certain conditions to print the routing output
 				bool debug_route = Routing_Components::Implementations::Routable_Network_Implementation<MasterType>::debug_route<bool>();
-
-				std::string summary_paragraph = "";
-
+				
 				// get a routable network; routable_network know what thread you are
 				Routable_Network<typename MasterType::routable_network_type>* routable_network = _network->template routable_network<typename MasterType::routable_network_type>();
 								
@@ -500,7 +483,7 @@ namespace Routing_Components
 					origin_ids.push_back(origin_link->template uuid<unsigned int>());
 				}				
 
-				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route, summary_paragraph);
+				routable_network->compute_dijkstra_network_tree(origin_ids, origin_zone_index, debug_route);
 
 			}
 		};

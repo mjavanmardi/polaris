@@ -20,7 +20,7 @@ namespace polaris
 	};
 
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
-	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph )
+	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -122,20 +122,6 @@ namespace polaris
 			base_edge_type* current = end_base;//(base_edge_type*)end;
 			base_edge_type* cached_current = (base_edge_type*)current;
 
-			if (debug_route)
-			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%f\t%d\n",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					current->_time_label,
-					current->_cost_from_origin,
-					current->_time_from_origin,
-					current->_estimated_cost_origin_destination,
-					scan_count);
-				summary_paragraph.insert(0, myLine);
-			}
-
 			while(current != nullptr)
 			{
 				global.edge_id = current->_edge_id;
@@ -175,20 +161,6 @@ namespace polaris
 				end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
 				end->_cost = end->_cost_backup;
 				end->_time_cost = end->_time_cost_backup;
-			}
-
-			if (debug_route)
-			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%f\t%f\t%f\t%f\t%d\n",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					864000.0,
-					864000.0,
-					864000.0,
-					864000.0,
-					scan_count);
-				summary_paragraph.insert(0, myLine);
 			}
 		}
 		
@@ -291,7 +263,7 @@ namespace polaris
 	}
 	
 	template<typename MasterType, typename AgentType, typename GraphPoolType>
-	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route, std::string& summary_paragraph)
+	static float Dijkstra_Tree(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, int zone_index, bool debug_route)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 		
@@ -378,22 +350,7 @@ namespace polaris
 		}			
 
 		float total_cost = 0;
-
-		/*if (debug_route)
-		{
-			float perf_time = A_Star_Time.Stop();
-			sprintf_s(myLine, "\n%s\t%s\t%d\t%s\t%d\t%s\t%f",
-				"success",
-				"zone:",
-				zone,
-				"scanScount:",
-				scan_count,
-				"Router run-time (ms):",
-				perf_time
-				);
-			summary_paragraph.insert(0, myLine);			
-		}*/
-
+		
 		global_edge_id current_g;
 		current_g.graph_id = graph_id;
 		std::vector<base_edge_type*>* edges = graph_pool->Get_Edges(graph_id);

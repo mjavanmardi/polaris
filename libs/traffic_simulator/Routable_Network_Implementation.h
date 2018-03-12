@@ -1024,7 +1024,7 @@ namespace Routing_Components
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id,	unsigned int destination_loc_id, bool debug_route, std::string& summary_paragraph)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id,	unsigned int destination_loc_id, bool debug_route)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -1049,7 +1049,7 @@ namespace Routing_Components
 					ends.push_back(end);
 				}
 
-				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1136,7 +1136,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route, std::string& summary_paragraph)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -1164,8 +1164,8 @@ namespace Routing_Components
 
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 				
-				//float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
-				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+				//float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1230,7 +1230,7 @@ namespace Routing_Components
 				}
 			}
 
-			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route, std::string& summary_paragraph)
+			void compute_dijkstra_network_tree(std::vector<unsigned int>& origins, int zone_index, bool debug_route)
 			{		
 				Routable_Agent<typename MT::multi_modal_tree_agent_type> proxy_agent;
 
@@ -1252,7 +1252,7 @@ namespace Routing_Components
 
 				if (!starts.empty())
 				{
-					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route, summary_paragraph);
+					float routed_time = Dijkstra_Tree<MT, typename MT::multi_modal_tree_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, zone_index, debug_route);
 				}
 
 

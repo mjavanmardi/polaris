@@ -915,7 +915,6 @@ namespace Vehicle_Components
 			_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
 			std::vector<unsigned int> origin_ids;
 			origin_ids.push_back(origin_link->template uuid<unsigned int>());
-			std::string summary_paragraph = "";
 
 			// Fill the destination ids list from the destination location (in case there is more than one possible destination link)
 			std::vector<unsigned int> destination_ids;
@@ -933,11 +932,11 @@ namespace Vehicle_Components
 
 			if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 			{
-				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, false, summary_paragraph);
+				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, false);
 			}
 			else
 			{
-				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, _movement_plan->experienced_gap<float>(), false, summary_paragraph);
+				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, _movement_plan->experienced_gap<float>(), false);
 			}
 
 
