@@ -459,12 +459,15 @@ namespace Person_Components
 				Activity_Plan* current_activity = _Mode_Chooser->current_activity<Activity_Plan*>();
 				Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
+				// account for CAV effects on VOTT
+				float VOTT_change = properties->template Value_of_Travel_Time_Adjustment<float>();
+
 				// calculate utilty model variable requirements
 				Time_Minutes start = current_activity->Start_Time<Time_Minutes>();
 				double h_inc = hh_properties->Income<Basic_Units::Currency_Variables::Dollars>() > 100000 ? 1.0 : 0.0;
 				double m_inc = hh_properties->Income<Basic_Units::Currency_Variables::Dollars>() > 50000 && h_inc == 0.0 ? 1.0 : 0.0;
 				double PEAK = (start > 420 && start < 600) || (start > 900 && start < 1080) ? 1.0 : 0.0;
-				double AUTO_TT = los->auto_ttime<Time_Minutes>();
+				double AUTO_TT = los->auto_ttime<Time_Minutes>() * VOTT_change;
 				double AUTO_COST = los->auto_distance<Miles>() * 0.2;
 				double AUTO_COST_M = AUTO_COST * m_inc;
 				double AUTO_COST_H = AUTO_COST * h_inc;
