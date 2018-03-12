@@ -411,6 +411,7 @@ namespace Person_Components
 			// Interface definitions
 			typedef Prototypes::Person_Planner<typename type_of(Mode_Chooser)::type_of(Parent_Planner)> planner_itf;
 			typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_base_properties_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_properties_itf;
 			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
 			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_properties_itf;
@@ -452,7 +453,7 @@ namespace Person_Components
 				household_itf* household = _Parent_Person->Household<household_itf*>();
 				household_properties_itf* hh_properties = household->Static_Properties<household_properties_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
-				person_properties_itf* base_properties = _Parent_Person->template Properties<person_properties_itf*>();
+				person_base_properties_itf* base_properties = _Parent_Person->template Properties<person_base_properties_itf*>();
 				person_properties_itf* properties = _Parent_Person->template Static_Properties<person_properties_itf*>();
 				vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
 				_Zone_Interface* dest_zone = _Mode_Chooser->destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
