@@ -445,13 +445,14 @@ namespace Person_Components
 			virtual double Calculate_Utility()
 			{
 				los_itf* los = _Mode_Chooser->los<los_itf*>();
-			
+
 				float utility = -1.0*FLT_MAX;
 
 				person_itf* _Parent_Person = this->_Mode_Chooser->Parent_Planner<planner_itf*>()->template Parent_Person<person_itf*>();
 				household_itf* household = _Parent_Person->Household<household_itf*>();
 				household_properties_itf* hh_properties = household->Static_Properties<household_properties_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				person_properties_itf* base_properties = _Parent_Person->template Properties<person_properties_itf*>();
 				person_properties_itf* properties = _Parent_Person->template Static_Properties<person_properties_itf*>();
 				vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
 				_Zone_Interface* dest_zone = _Mode_Chooser->destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
@@ -460,7 +461,7 @@ namespace Person_Components
 				Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
 				// account for CAV effects on VOTT
-				float VOTT_change = properties->template Value_of_Travel_Time_Adjustment<float>();
+				float VOTT_change = base_properties->template Value_of_Travel_Time_Adjustment<float>();
 
 				// calculate utilty model variable requirements
 				Time_Minutes start = current_activity->Start_Time<Time_Minutes>();
