@@ -1373,9 +1373,21 @@ namespace Person_Components
 				//Set the values
 				this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 				this->template Next_Sub_Iteration<int>(next_sub);
+
+				//If the person is on board they it means they are alighting
+				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
+				{							
+					trajectory_stream << ", will alight my trip, and this is my destination!" << endl;
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					this->template person_alighting_transit_vehicle<NT>();							
+				}
+				else
+				{
+					trajectory_stream << "and this is my destination!" << endl;
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
+
 				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
-				trajectory_stream << "and this is my destination!" << endl;
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 
 				bool write_trajectory = true;
 				//Check if the movement is basic or integrated

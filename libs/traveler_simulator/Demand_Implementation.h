@@ -533,6 +533,7 @@ namespace Demand_Components
 			template<typename TargetType> void Write_Transit_Vehicle_Trips_To_Database()
 			{				
 				typedef typename MasterType::link_type link_itf;
+				typedef typename MasterType::intersection_type intersection_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename MasterType::transit_vehicle_trip_type> transit_vehicle_trip_itf;
 				typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> transit_pattern_itf;
@@ -621,9 +622,10 @@ namespace Demand_Components
 									
 									link_itf* route_link = pattern->template pattern_links<std::vector<link_itf*>>()[link_itr];
 
+									transit_vehicle_link_record.setTransitVehicleTrip(vehicle_trip->template dbid<std::string>());
 									transit_vehicle_link_record.setStopSequence(link_itr);
-									transit_vehicle_link_record.setLink(route_link->template dbid<int>());
-									transit_vehicle_link_record.setDir(route_link->template direction<int>());
+									transit_vehicle_link_record.setA_node(route_link->template upstream_intersection<intersection_itf*>()->template dbid<std::string>());
+									transit_vehicle_link_record.setB_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
 									transit_vehicle_link_record.setLinkMode(route_link->template link_type<int>());
 									
 									transit_vehicle_link_record.setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
@@ -641,6 +643,32 @@ namespace Demand_Components
 									transit_vehicle_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
 									transit_vehicle_record->setLink(transit_vehicle_link_record);									
 								}
+
+								polaris::io::Transit_Vehicle_Links transit_vehicle_link_record;
+
+								int link_itr = vehicle_trip->template number_of_stops<int>() - 1;
+								link_itf* route_link = pattern->template pattern_links<std::vector<link_itf*>>()[link_itr-1];
+
+								transit_vehicle_link_record.setTransitVehicleTrip(vehicle_trip->template dbid<std::string>());
+								transit_vehicle_link_record.setStopSequence(link_itr);
+								transit_vehicle_link_record.setA_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
+								transit_vehicle_link_record.setB_node("");
+								transit_vehicle_link_record.setLinkMode(route_link->template link_type<int>());
+
+								transit_vehicle_link_record.setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setEst_Dwell_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setAct_Dwell_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setEst_Travel_Time(0);
+								transit_vehicle_link_record.setAct_Travel_Time(0);
+								transit_vehicle_link_record.setSeated_Load(vehicle_trip->template seated_load<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setSeated_Capacity(vehicle_trip->template seated_capacity<int>());
+								transit_vehicle_link_record.setStanding_Load(vehicle_trip->template standing_load<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setStanding_Capacity(vehicle_trip->template standing_capacity<int>());
+								transit_vehicle_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
+								transit_vehicle_record->setLink(transit_vehicle_link_record);
 								
 								this->_db_ptr->persist(transit_vehicle_record);
 								count++;

@@ -386,9 +386,7 @@ namespace Transit_Vehicle_Trip_Components
 					{
 						position_in_link_waiting_queue++;
 					}
-
-					this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
-					this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
+				
 				}
 
 				trajectory_stream << endl;
@@ -461,6 +459,9 @@ namespace Transit_Vehicle_Trip_Components
 				}
 				trajectory_stream << endl;
 
+				this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
+				this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
+
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
 
@@ -494,6 +495,13 @@ namespace Transit_Vehicle_Trip_Components
 				trajectory_stream << "Pattern is:\t" << pattern_ID << "\t";
 				trajectory_stream << "Last stop is:\t" << stop_ID << "\t";
 				trajectory_stream << "I am going to my depot" << endl;
+
+				//Get the list of people standing in the vehicle
+				std::list<_Person_Interface*>* people_standing = this->template people_standing<std::list<_Person_Interface*>*>();
+				//Get the list of people seated in the vehicle
+				std::list<_Person_Interface*>* people_seated = this->template people_seated<std::list<_Person_Interface*>*>();
+				this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
+				this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
 
 				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
 			}
