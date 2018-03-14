@@ -4,6 +4,7 @@
 
 //#include "activity_simulator/activity_simulator_concepts.h"
 //#include "activity_simulator/activity_simulator_forward_declaration.h"
+#include "Activity_Simulator_Types.h"
 #include "Activity_Simulator_Forward_Declaration.h"
 #include "Activity_Simulator_Concepts.h"
 #include "../traffic_simulator/Traffic_Simulator_Forward_Declaration.h"

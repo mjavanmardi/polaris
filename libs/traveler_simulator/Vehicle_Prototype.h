@@ -146,7 +146,16 @@ namespace Vehicle_Components
 
 			typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(movement_plan)> _Movement_Plan_Interface;
 			movement_plan<_Movement_Plan_Interface*>()->template is_integrated<bool>(is_integrated<bool>());
-			movement_plan<_Movement_Plan_Interface*>()->arrive_to_destination();
+			
+			if (is_integrated<bool>())
+			{
+				typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename MasterType::integrated_movement_plan_type> _Integrated_Movement_Plan_Interface;
+				movement_plan<_Integrated_Movement_Plan_Interface*>()->arrive_to_destination(this->write_trajectory());
+			}
+			else
+			{
+				movement_plan<_Movement_Plan_Interface*>()->arrive_to_destination(this->write_trajectory());
+			}
 		}
 
 		template<typename ComponentType>

@@ -8,14 +8,6 @@
 namespace Person_Components
 {
 
-namespace Concepts
-{
-}
-
-namespace Types
-{
-}
-
 namespace Prototypes
 {
 	prototype struct Person_Data_Logger ADD_DEBUG_INFO

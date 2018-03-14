@@ -652,7 +652,7 @@ namespace polaris
 		std::deque< global_edge_id >& out_path, 
 		std::deque< float >& out_cost, 
 		std::deque<Link_Components::Types::Link_Type_Keys>& out_type,
-		std::deque<int>& out_trip,
+		std::deque<typename MasterType::transit_vehicle_trip_type*>& out_trip,
 		std::deque<int>& out_seq,
 		std::deque<float>& out_time,
 		std::deque<float>& out_arr_time,
@@ -782,7 +782,7 @@ namespace polaris
 		routing_data.ends = &ends;
 		routing_data.start_time = start_time;
 
-		//TODO OMER: Check if these additions damages anything
+		//Multiomdal Routing Data Added
 		//----------------------------------------------------
 		routing_data.transferPenalty = transferPenalty;
 		routing_data.waitWeight = waitWeight;
@@ -883,35 +883,6 @@ namespace polaris
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scanCount;
 			
-			/*if (origin_loc_id == 67 && destination_loc_id == 128)
-			{								
-				global.edge_id = current->_edge_id;
-				_Link_Interface* current_link = net->template get_link_ptr<typename MasterType::link_type>(global.edge_id);
-
-				int came_from_id = 0;
-				if (current->_came_from != nullptr)
-				{
-					base_edge_type* temp_prev = (base_edge_type*)current->came_from();
-					came_from_id = temp_prev->_edge_id;
-				}
-				
-
-				sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%d\t%f\t%f\t%f",
-					origin_loc_id,
-					destination_loc_id,
-					start_time,
-					scanCount,
-					current->_edge_id,
-					current_link->_upstream_intersection->_dbid.c_str(),
-					current_link->_downstream_intersection->_dbid.c_str(),
-					came_from_id,
-					current->_cost,
-					current->_estimated_cost_origin_destination,
-					current->_cost_from_origin
-					);
-				detail_paragraph.insert(0, myLine);
-			}*/
-			
 			current_fail = current;
 			if (current->_cost_from_origin > costThreshold || scanCount >= (int)scanThreshold || scanCount >= (int)scanThreshold2)
 			{
@@ -1011,7 +982,7 @@ namespace polaris
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
-					out_trip.push_back(current_trip->uuid<int>());
+					out_trip.push_back(current_trip);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -1046,7 +1017,7 @@ namespace polaris
 				
 				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
 				{
-					out_trip.push_back(-1);
+					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
@@ -1080,7 +1051,7 @@ namespace polaris
 
 				else
 				{
-					out_trip.push_back(-1);
+					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
 						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",

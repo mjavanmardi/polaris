@@ -16,7 +16,7 @@ namespace polaris
 		std::vector< Base_Edge_Type* >* ends;
 		unsigned int start_time;
 
-		//TODO OMER: Check if these additions damages anything
+		//Multiomdal Routing Data Added
 		//----------------------------------------------------
 		float transferPenalty;
 		float waitWeight;

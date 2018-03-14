@@ -5,9 +5,15 @@ namespace polaris
 {
 	prototype struct Routable_Agent ADD_DEBUG_INFO
 	{
+		Routable_Agent()
+		{
+			this_component()->Initialize();
+		}
+		accessor(experienced_gap, NONE, NONE);
+
 		//some of those functions are called in Evaluate_Neighbor
 
-		//returns a set of edges the agent wold like to visit, thus agent is responsable for prooning
+		//returns a set of edges the agent wold like to visit, thus agent is responsible for pruning
 		//typedef typename ComponentType::agent_state_type agent_state_type;
 		template<typename CurrentEdgeType, typename ConnectionType>
 		bool process_connection_set(CurrentEdgeType* current){ return this_component()->process_connection_set<CurrentEdgeType,ConnectionType>(current); }

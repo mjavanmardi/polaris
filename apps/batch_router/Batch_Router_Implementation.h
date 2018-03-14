@@ -151,7 +151,7 @@ namespace Batch_Router_Components
 				router->Schedule_Route_Computation(departed_time, t + 1);
 
 				// Load the trip conditional at timestep t + 5, which fills the trip results after routing is completed
-				//TODO Omer: Check t + 2 vs t+ 5 does not affect things badly.
+				//TODO: Omer: Check t + 2 vs t+ 5 does not affect things badly.
 				//Load_Event<ComponentType>(Trip_Conditional, t + 5, Types::SUB_ITERATIONS::INITIALIZE);
 				Load_Event<ComponentType>(Trip_Conditional, t + 2, Types::SUB_ITERATIONS::INITIALIZE);
 			}

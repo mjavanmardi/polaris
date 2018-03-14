@@ -9,13 +9,6 @@
 
 namespace Person_Components
 {
-	namespace Types
-	{
-	}
-
-	namespace Concepts
-	{
-	}
 	
 	namespace Prototypes
 	{

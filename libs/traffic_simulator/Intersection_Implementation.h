@@ -604,7 +604,7 @@ namespace Intersection_Components
 			m_container(std::vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, NONE, NONE);
 			//m_data(RNG_Components::RngStream, rng_stream, NONE, NONE);
 			m_prototype(Null_Prototype,typename MasterType::network_type, network_reference, NONE, NONE);
-			m_prototype(Null_Prototype,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
+			m_prototype(Intersection_Control_Components::Prototypes::Intersection_Control,typename MasterType::intersection_control_type, intersection_control, NONE, NONE);
 
 			typedef typename MasterType::vehicle_type vehicle_type;
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
@@ -943,6 +943,13 @@ namespace Intersection_Components
 					for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
 					{
 						((_Inbound_Movement_Interface*)(*inbound_movement_itr))->template calculate_moe_for_assignment_interval_from_outbound_link<NULLTYPE>();
+						//TODO: Omer: 2018.01.25 added for time-dependent reporting by entry time
+						//----------------------------------------------------------------------------------
+						if (((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>() + 1 == ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals<int>())
+						{
+							((_Inbound_Movement_Interface*)(*inbound_movement_itr))->template calculate_moe_for_assignment_interval_from_outbound_link_end<NULLTYPE>();
+						}
+						//----------------------------------------------------------------------------------
 					}
 				}
 
@@ -964,6 +971,7 @@ namespace Intersection_Components
 					{
 						_movement_component_type* outbound_movement_component = (_movement_component_type*)(*outbound_movement_itr);
 						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_assignment_interval_from_inbound_link<NULLTYPE>();
+
 						if (outbound_movement_component->turn_travel_penalty<float>() < 0.01f*INFINITY_FLOAT)
 						{
 							allowed_movement_size++;
@@ -1157,6 +1165,75 @@ namespace Intersection_Components
 				{
 					_this_ptr->template calculate_moe_for_assignment_interval<NULLTYPE>();
 				}
+			}
+
+			// ensures that all movements of a signalized intersection are controlled
+			bool Validate_Control(stringstream& err_string)
+			{
+				typedef  Random_Access_Sequence< typename _Intersection_Control_Interface::get_type_of(control_plan_data_array), _Control_Plan_Interface*> _Control_Plans_Container_Interface;
+				typedef  Intersection_Control_Components::Prototypes::Phase<typename remove_pointer< typename _Control_Plan_Interface::get_type_of(phase_data_array)::value_type>::type>  _Phase_Interface;
+				typedef  Random_Access_Sequence< typename _Control_Plan_Interface::get_type_of(phase_data_array), _Phase_Interface*> _Phases_Container_Interface;
+				typedef  Intersection_Control_Components::Prototypes::Phase_Movement<typename remove_pointer< typename _Phase_Interface::get_type_of(turn_movements_in_the_phase_array)::value_type>::type>  _Phase_Movement_Interface;
+				typedef  Random_Access_Sequence< typename _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), _Phase_Movement_Interface*> _Phase_Movements_Container_Interface;
+				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Network_Interface::get_type_of(turn_movements_container)::value_type>::type>  _Movement_Interface;
+				typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(turn_movements_container), _Movement_Interface*> _Movements_Container_Interface;
+				typedef  Intersection_Control_Components::Prototypes::Approach<typename remove_pointer< typename _Control_Plan_Interface::get_type_of(approach_data_array)::value_type>::type>  _Approach_Interface;
+				typedef  Random_Access_Sequence< typename _Control_Plan_Interface::get_type_of(approach_data_array), _Approach_Interface*> _Approaches_Container_Interface;
+
+				_Intersection_Control_Interface* intersection_control = this->intersection_control<_Intersection_Control_Interface*>();
+
+				// skip if this is not a controlled intersection
+				if (intersection_control == nullptr) return true;
+
+				bool control_valid = true;
+
+				// validate each movement
+				_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_container = this->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+				for (_Inbound_Outbound_Movements_Container_Interface::iterator io_itr = inbound_outbound_container.begin(); io_itr != inbound_outbound_container.end(); ++io_itr)
+				{
+					_Inbound_Outbound_Movements_Interface* io_mvmt = (_Inbound_Outbound_Movements_Interface*)(*io_itr);
+					_Outbound_Movements_Container_Interface& movements = io_mvmt->outbound_movements<_Outbound_Movements_Container_Interface&>();
+					for (_Outbound_Movements_Container_Interface::iterator mvmt_itr = movements.begin(); mvmt_itr != movements.end(); ++mvmt_itr)
+					{
+						// this is the movement to search for in the control plan
+						_Outbound_Movement_Interface* movement = (_Outbound_Movement_Interface*)(*mvmt_itr);
+						bool mvmt_valid = true;
+
+						//validate each control time period
+						_Control_Plans_Container_Interface& control_plans = intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>();
+						for (_Control_Plans_Container_Interface::iterator control_plan_itr = control_plans.begin(); control_plan_itr != control_plans.end(); control_plan_itr++)
+						{
+							_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)(*control_plan_itr);
+							_Phases_Container_Interface& phase_array = control_plan->phase_data_array<_Phases_Container_Interface&>();
+							bool mvmt_found_in_control = false;
+							// look through each phase for the specific movement
+
+							for (_Phases_Container_Interface::iterator phase_itr = phase_array.begin(); phase_itr != phase_array.end(); ++phase_itr)
+							{
+								_Phase_Interface* cur_phase = (_Phase_Interface*)(*phase_itr);
+								_Phase_Movements_Container_Interface& phase_movements = cur_phase->turn_movements_in_the_phase_array<_Phase_Movements_Container_Interface&>();
+
+								for (_Phase_Movements_Container_Interface::iterator phase_move_itr = phase_movements.begin(); phase_move_itr != phase_movements.end(); ++phase_move_itr)
+								{
+									_Phase_Movement_Interface* phase_movement = (_Phase_Movement_Interface*)(*phase_move_itr);
+									_Movement_Interface* movement_in_phase = phase_movement->movement<_Movement_Interface*>();
+									if (movement_in_phase == movement) mvmt_found_in_control = true;
+								}
+							}
+
+							// movement is not found in the list of phases, so invalidate
+							if (!mvmt_found_in_control) mvmt_valid = false;
+						}
+						if (!mvmt_valid)
+						{
+							control_valid = false;
+							err_string << "Movement " << movement->uuid<int>() << " at signalized intersection " << this->uuid<int>() << " was not found in phasing control plan." << endl;
+						}
+					}
+
+				}
+
+				return control_valid;
 			}
 		};
 	}

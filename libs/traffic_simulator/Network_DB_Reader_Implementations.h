@@ -305,6 +305,9 @@ namespace Network_Components
 						}
 					}
 
+					int number_of_stops = transit_pattern->template pattern_stops<_Intersections_Container_Interface&>().size();
+					transit_pattern->template number_of_stops<int>(number_of_stops);
+
 					net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()] = transit_pattern;
 					transit_patterns_container_ptr->push_back(transit_pattern);
 					//DO the stop sequence!
@@ -386,8 +389,11 @@ namespace Network_Components
 						transit_vehicle_trip->template departure_seconds<std::vector<int>&>().push_back(myTime);
 					}
 
+					int number_of_stops = transit_vehicle_trip->template departure_seconds<std::vector<int>&>().size();
+					transit_vehicle_trip->template number_of_stops<int>(number_of_stops);
+
 					if (transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->departure_seconds<_Trip_Departure_Seconds_Interface&>().size() ||
-						transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size()
+						transit_vehicle_trip->arrival_seconds<_Trip_Arrival_Seconds_Interface&>().size() != transit_vehicle_trip->pattern<_Transit_Pattern_Interface*>()->pattern_stops<_Pattern_Stops_Container_Interface&>().size() || transit_vehicle_trip->template number_of_stops<int>() != transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>()->template number_of_stops<int>()
 						)
 					{
 						cout << "Inconsistency between at least two of the following:" << endl;
@@ -2132,10 +2138,12 @@ namespace Network_Components
 				int skipped_counter=0;
 				_Link_Interface* link;
 
+				int test = -1;
 				for(typename result<Location>::iterator db_itr = location_result.begin (); db_itr != location_result.end (); ++db_itr)
 				{
 					try
 					{
+						test = db_itr->getLocation();
 						link_id_dir.id=db_itr->getLink()->getLink();
 						link_id_dir.dir=db_itr->getDir();
 
@@ -2530,7 +2538,7 @@ namespace Network_Components
 						}
 						else
 						{
-							code=Activity_Location_Components::Types::LU_NONE;
+							THROW_EXCEPTION("Error: undefined land use code '"<<land_use<<"' found in database.")
 						}
 						activity_location->land_use_type(code);
 
@@ -2591,7 +2599,9 @@ namespace Network_Components
 						loc_id_to_idx_container.insert(pair<int,int>(activity_location->template uuid<int>(),activity_location->template internal_id<int>()));
 						++counter;
 					}
-					catch (const odb::exception& e) {THROW_WARNING(e.what()); e.what(); continue;}
+					catch (const odb::exception& e){
+						THROW_WARNING(e.what()); e.what(); continue;
+					}
 					//catch (exception e){THROW_WARNING(e.what()); continue;}
 				}
 

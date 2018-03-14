@@ -223,6 +223,120 @@ namespace Intersection_Control_Components
 				}
 			};
 			
+			template<typename TargetType> void calculate_turn_movement_green_time_all_way_stop()
+			{
+				typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;
+				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
+				typedef  Intersection_Control_Components::Prototypes::Control_Plan<typename remove_pointer< typename get_type_of(control_plan_data_array)::value_type>::type>  _Control_Plan_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(control_plan_data_array), _Control_Plan_Interface*> _Control_Plans_Container_Interface;
+
+				typedef Intersection_Components::Prototypes::Intersection<typename get_type_of(intersection)> _Intersection_Interface;
+				typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer< typename _Intersection_Interface::get_type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
+				typedef  Random_Access_Sequence< typename _Intersection_Interface::get_type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+
+				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
+				typedef  Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
+
+				typedef  Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
+				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
+
+				//green times for each movement are assumed to be the length of the simulation interval
+				if ((int*)intersection<_Intersection_Interface*>() == nullptr) return;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
+
+				// Loop over outbound movements
+				for (outbound_inbound_movements_itr = outbound_inbound_movements_container.begin();outbound_inbound_movements_itr != outbound_inbound_movements_container.end();outbound_inbound_movements_itr++)
+				{
+					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
+					_Link_Interface* outbound_link = outbound_inbound_movements->template outbound_link_reference<_Link_Interface*>();
+					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
+					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
+
+					// Loop over inbound movements for each outbound movement
+					for (inbound_movement_itr = inbound_movements_container.begin();inbound_movement_itr != inbound_movements_container.end();inbound_movement_itr++)
+					{
+						_Inbound_Movement_Interface* inbound_movement = (_Inbound_Movement_Interface*)(*inbound_movement_itr);
+
+						//turn movement green time
+						//allowed
+						if (inbound_movement->template movement_rule<int>() == ALLOWED)
+						{
+							//TODO: JA 2/13/18 - simplified application of stop sign. the red/green state will switch every iteration
+							if (inbound_movement->template green_time<float>() > 0.0) inbound_movement->template green_time<float>(0.0);
+							else inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+						}
+
+						//prohibited
+						if (inbound_movement->template movement_rule<int>() == PROHIBITED)
+						{
+							// Set green time as 0
+							inbound_movement->template green_time<float>(0.0);
+						}
+
+						//merge priority
+						inbound_movement->template merge_priority<int>(0.0);
+					}
+				}
+			};
+
+			template<typename TargetType> void calculate_turn_movement_green_time_two_way_stop()
+			{
+				typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;
+				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
+				typedef  Intersection_Control_Components::Prototypes::Control_Plan<typename remove_pointer< typename get_type_of(control_plan_data_array)::value_type>::type>  _Control_Plan_Interface;
+				typedef  Random_Access_Sequence< typename get_type_of(control_plan_data_array), _Control_Plan_Interface*> _Control_Plans_Container_Interface;
+
+				typedef Intersection_Components::Prototypes::Intersection<typename get_type_of(intersection)> _Intersection_Interface;
+				typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer< typename _Intersection_Interface::get_type_of(outbound_inbound_movements)::value_type>::type>  _Outbound_Inbound_Movements_Interface;
+				typedef  Random_Access_Sequence< typename _Intersection_Interface::get_type_of(outbound_inbound_movements), _Outbound_Inbound_Movements_Interface*> _Outbound_Inbound_Movements_Container_Interface;
+
+				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements)::value_type>::type>  _Inbound_Movement_Interface;
+				typedef  Random_Access_Sequence< typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), _Inbound_Movement_Interface*> _Inbound_Movements_Container_Interface;
+
+				typedef  Link_Components::Prototypes::Link< typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference)> _Link_Interface;
+				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
+
+				//green times for each movement are assumed to be the length of the simulation interval
+				if ((int*)intersection<_Intersection_Interface*>() == nullptr) return;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
+
+				// Loop over outbound movements
+				for (outbound_inbound_movements_itr = outbound_inbound_movements_container.begin();outbound_inbound_movements_itr != outbound_inbound_movements_container.end();outbound_inbound_movements_itr++)
+				{
+					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
+					_Link_Interface* outbound_link = outbound_inbound_movements->template outbound_link_reference<_Link_Interface*>();
+					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
+					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
+
+					// Loop over inbound movements for each outbound movement
+					for (inbound_movement_itr = inbound_movements_container.begin();inbound_movement_itr != inbound_movements_container.end();inbound_movement_itr++)
+					{
+						_Inbound_Movement_Interface* inbound_movement = (_Inbound_Movement_Interface*)(*inbound_movement_itr);
+
+						//turn movement green time
+						//allowed
+						if (inbound_movement->template movement_rule<int>() == ALLOWED)
+						{
+							//TODO: JA 2/13/18 - simplified application of stop sign. the red/green state will switch every iteration
+							if (inbound_movement->template green_time<float>() > 0.0) inbound_movement->template green_time<float>(0.0);
+							else inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+						}
+
+						//prohibited
+						if (inbound_movement->template movement_rule<int>() == PROHIBITED)
+						{
+							// Set green time as 0
+							inbound_movement->template green_time<float>(0.0);
+						}
+
+						//merge priority
+						inbound_movement->template merge_priority<int>(0.0);
+					}
+				}
+			};
+
 			template<typename TargetType> void calculate_turn_movement_green_time_no_control()
 			{
 				typedef  Network_Components::Prototypes::Network< typename get_type_of(network_reference)> _Network_Interface;
@@ -492,7 +606,7 @@ namespace Intersection_Control_Components
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
 				// calculate green time
-				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>();
+				this->template calculate_turn_movement_green_time_all_way_stop<NULLTYPE>();
 
 				// end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -520,7 +634,7 @@ namespace Intersection_Control_Components
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
 				// calculate green time
-				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>();
+				this->template calculate_turn_movement_green_time_two_way_stop<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
