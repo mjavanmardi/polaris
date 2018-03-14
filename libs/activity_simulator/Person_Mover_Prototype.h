@@ -3,35 +3,8 @@
 #include "Activity_Simulator_Includes.h"
 //#include "traffic_simulator\Network_Event_Prototype.h"
 
-
-
 namespace Person_Components
 {
-
-namespace Concepts
-{
-	concept struct Is_Person_Mover_Prototype
-	{
-		check_component_accessor_name(Has_Parent_Person,Parent_Person);
-		// TODO: Movement needs to be renamed, conflicts with the template Movement
-		//check_component_accessor_name(Has_Movement, Movement);
-		define_default_check(Has_Parent_Person/* && Has_Movement*/);
-	};
-	concept struct Is_Person_Mover
-	{
-		check_accessor_name(Has_Parent_Person,Parent_Person);
-		// TODO: Movement needs to be renamed, conflicts with the template Movement
-		//check_accessor_name(Has_Movement, Movement);
-		check_concept(is_prototype, Is_Person_Mover_Prototype, T, V);
-		define_default_check(is_prototype || (Has_Parent_Person/* && Has_Movement*/) );
-	};
-}
-
-namespace Types
-{
-
-}
-
 namespace Prototypes
 {
 	prototype struct Person_Mover ADD_DEBUG_INFO
@@ -47,11 +20,11 @@ namespace Prototypes
 		//========================================================
 		// Main hook to person planner - called 5 minutes prior to estimated departure
 		//--------------------------------------------------------
-		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 			check(TimeType, Basic_Units::Concepts::Is_Time_Value) &&
 			check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) &&
 			(check(MovementItfType, is_pointer) || check(MovementItfType, is_reference))));
-		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 			!check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value) ||
 			!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) ||
 			(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))));
@@ -98,6 +71,17 @@ namespace Prototypes
 		void Arrive_At_Destination();
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event();
+
+		
+		//TODO: Omer Multimodal Movement
+		accessor(Next_Sub_Iteration, NONE, NONE);
+		template<typename TargetType> void Do_Multimodal_Movement();
+		template<typename TargetType> void schdeule_person_movements_in_multimodal_network();
+		static void move_persons_in_multimodal_network_conditional(ComponentType* _this, Event_Response& response);
+		template<typename TargetType> void teleport_multimodal_person_to_next_link();
+		template<typename TargetType> void person_action_at_beginning_of_link();
+		template<typename TargetType> void person_waiting_at_beginning_of_link();
+		//--------------------------------------------------------
 
 		//========================================================
 		// Basic Forms
@@ -192,7 +176,21 @@ namespace Prototypes
 			response.next._iteration = END;
 			response.next._sub_iteration = END;
 
-			pthis->Do_Movement<NT>();
+			
+
+			//TODO: Omer: Multimodal
+			Vehicle_Components::Types::Vehicle_Type_Keys mode = movement->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+
+			if (((scenario_itf*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+			{
+				pthis->Do_Multimodal_Movement<NT>();
+				response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+				response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+			}
+			else
+			{
+				pthis->Do_Movement<NT>();
+			}
 
 			if (pthis->Artificial_Movement_Scheduled<bool>() == true)
 			{
@@ -217,7 +215,7 @@ namespace Prototypes
 	//--------------------------------------------------------
 	template<typename ComponentType>
 	template<typename TimeType, typename MovementItfType> 
-	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing=true, requires(MovementItfType,
 		check(TimeType, Basic_Units::Concepts::Is_Time_Value) &&
 		check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) &&
 		(check(MovementItfType, is_pointer) || check(MovementItfType, is_reference))))
@@ -225,23 +223,32 @@ namespace Prototypes
 		this->Movement<MovementItfType>(movement);
 		this->Movement_Scheduled<bool>(true);
 
-		// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
 		int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<TimeType>(iteration() + 1);
-		if (departure_time > iteration() + 2)
+
+		if (do_routing)
 		{
-			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION);
-			//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
+			
+			if (departure_time > iteration() + 2)
+			{
+				static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION_SUB_ITERATION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			}
+			else
+			{
+				static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
+				//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+			}
 		}
 		else
 		{
-			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, iter, Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION);
-			//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&Movement_Event_Controller, departure_time, Scenario_Components::Types::MOVEMENT_SUB_ITERATION);
 		}
 	}
 
 	template<typename ComponentType>
 	template<typename TimeType, typename MovementItfType>
-	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+	void Person_Mover<ComponentType>::Schedule_Movement(TimeType departure_time, MovementItfType movement, bool do_routing = true, requires(MovementItfType,
 		!check(strip_modifiers(TimeType), Basic_Units::Concepts::Is_Time_Value) ||
 		!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) ||
 		(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))))
@@ -265,7 +272,7 @@ namespace Prototypes
 
 		typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef  Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 		Parent_Person_Itf* person = pthis->Parent_Person<Parent_Person_Itf*>();
@@ -287,7 +294,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -356,8 +363,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person_Scheduler< typename Parent_Person_Itf::get_type_of(Scheduling_Faculty)> scheduler_itf;
 		typedef Person_Components::Prototypes::Destination_Chooser< typename planning_itf::get_type_of(Destination_Choice_Faculty)> destination_chooser_itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-		//typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(activity_reference)> activity_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -643,7 +649,7 @@ namespace Prototypes
 		// interfaces
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 
@@ -677,7 +683,7 @@ namespace Prototypes
 		typedef Household_Components::Prototypes::Household<typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planning_Itf;
 		typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef  Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef  Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef  Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
@@ -693,13 +699,23 @@ namespace Prototypes
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
 
-		// Skip routing if the mode is not SOV (remove when transit router is developed - 6/14/17 - Testing multimodal router developmen so commenting out this line below
-		movements->mode(act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
-		//if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
 
-		//=================================================
-		// Do routing at the next timestep for the movement
-		planner->template Schedule_New_Routing<movement_itf*>(iteration() + 1, movements);
+		//TODO: Omer - Everthing is put under if condition to enable routing from demand table
+		if (act != nullptr && planner != nullptr)
+		{
+			// Skip routing if the mode is not SOV (remove when transit router is developed - 6/14/17 - Testing multimodal router developmen so commenting out this line below
+			movements->mode(act->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
+			//if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
+
+			//=================================================
+			// Do routing at the next timestep for the movement
+			planner->template Schedule_New_Routing<movement_itf*>(iteration() + 1, movements);
+		}
+		else
+		{
+			Routing_Itf* router = person->template router<Routing_Itf*>();
+			router->Schedule_Route_Computation(movements->template departed_time<Simulation_Timestep_Increment>());
+		}
 	}
 
 	//========================================================
@@ -713,7 +729,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
@@ -727,9 +743,10 @@ namespace Prototypes
 		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
 		Routing_Itf* itf = person ->template router<Routing_Itf*>();
 		Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
-		network_itf* network = person->template network_reference<network_itf*>();
+		//network_itf* network = person->template network_reference<network_itf*>();
 		movement_itf* movements = this->Movement<movement_itf*>();
 		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
+		Vehicle_Components::Types::Vehicle_Type_Keys mode = movements->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 		this->Is_Moving(true);
 
@@ -757,7 +774,7 @@ namespace Prototypes
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
 		// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point.....)
-		else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+		else if (mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 		{
 			this->Schedule_Artificial_Arrival_Event<NT>();
 		}
@@ -768,7 +785,7 @@ namespace Prototypes
 			person->template current_location<location_itf*>(movements->template destination<location_itf*>());
 
 			// if auto trip, push to network, if not skip (for now)
-			if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 			{
 				link_itf* origin_link = movements->template origin<link_itf*>();
 				origin_link->push_vehicle_from_origin(vehicle);
@@ -807,7 +824,7 @@ namespace Prototypes
 		typedef Person_Components::Prototypes::Person_Planner< typename Parent_Person_Itf::get_type_of(Planning_Faculty)> Planner_Itf;
 		typedef Person_Components::Prototypes::Activity_Generator< typename Planner_Itf::get_type_of(Activity_Generation_Faculty)> Generator_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
 		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
 		typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename network_itf::get_type_of(skimming_faculty)> skim_itf;
@@ -1043,7 +1060,7 @@ namespace Prototypes
 		// interfaces
 		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 		typedef Vehicle_Components::Prototypes::Vehicle< typename Parent_Person_Itf::get_type_of(vehicle)> Vehicle_Itf;
-		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
 		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 		movement_itf* movements = this->Movement<movement_itf*>();
@@ -1051,7 +1068,16 @@ namespace Prototypes
 
 		this->Artificial_Movement_Scheduled<bool>(true);
 
-		int arrival_time = iteration() + movements->routed_travel_time<Simulation_Timestep_Increment>();
+		// get adjustment to the routed travel time based on mode type...
+		Vehicle_Components::Types::Vehicle_Type_Keys mode = movements->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+		float ttime_adjust = 1.0;
+		if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) ttime_adjust = 12.0f;
+		else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) ttime_adjust = 3.5f;
+		else if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS) ttime_adjust = 2.0f; //TODO: replace this with LOS lookup
+
+
+
+		int arrival_time = iteration() + movements->routed_travel_time<Simulation_Timestep_Increment>() * ttime_adjust;
 		//int arrival_time = max((int)act->template Start_Time<Simulation_Timestep_Increment>(), iteration() + 1);
 
 		this->Artificial_Arrival_Time<Simulation_Timestep_Increment>(arrival_time);
@@ -1059,6 +1085,284 @@ namespace Prototypes
 		//((ComponentType*)this)->Load_Event<ComponentType>(&Movement_Event_Controller,arrival_time,0);
 		//load_event(ComponentType,Movement_Conditional,Artificial_Arrival_Event,arrival_time,0,NULLTYPE);
 	}
-}
 
+	//========================================================
+	// Movement Functionality
+	//--------------------------------------------------------
+	//TODO: Omer Multimodal Movement
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::Do_Multimodal_Movement()
+	{
+		// interfaces
+		typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+		typedef Household_Components::Prototypes::Household< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
+		typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
+		typedef Network_Components::Prototypes::Network< typename Parent_Person_Itf::get_type_of(network_reference)> network_itf;
+		typedef Activity_Location_Components::Prototypes::Activity_Location< typename Parent_Person_Itf::get_type_of(current_location)> location_itf;
+		typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container)> links;
+		typedef Link_Components::Prototypes::Link<get_component_type(links)>  link_itf;
+		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> Activity_Itf;
+		typedef Pair_Associative_Container< typename network_itf::get_type_of(zones_container)> zones;
+		typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones)>  zone_itf;
+
+		Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+		Household_Itf* household = person->Parent_Person_Itf::template Household<Household_Itf*>();
+		Routing_Itf* itf = person ->template router<Routing_Itf*>();
+		//network_itf* network = person->template network_reference<network_itf*>();
+		movement_itf* movements = this->Movement<movement_itf*>();
+		Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();
+
+		this->Is_Moving(true);
+
+		// If no movement involved - i.e. different activity at same location, do automatic arrival
+		if (movements->template origin<location_itf*>() == movements->template destination<location_itf*>())
+		{
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+		else if (movements->template origin<link_itf*>() == movements->template destination<link_itf*>())
+		{
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+		// Schedule the routing if the vehicle is not already in the network, otherwise return false
+		else if (movements->template valid_trajectory<bool>() && (person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::UNLOADED || person->template simulation_status<Person_Components::Types::Movement_Status_Keys>() == Person_Components::Types::Movement_Status_Keys::OUT_NETWORK))
+		{
+			this->schdeule_person_movements_in_multimodal_network<NT>();
+			
+		}
+		// else, if no valid trajectory, unschedule movement
+		else
+		{
+			THROW_WARNING("Warning: invalid movement trajectory specified.  Trip advanced to end-point without simulation.");
+			this->Schedule_Artificial_Arrival_Event<NT>();
+		}
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::schdeule_person_movements_in_multimodal_network()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+
+		movement->template advance_multimodal_trajectory<_Multimodal_Trajectory_Unit_Interface*>();
+
+		int position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*) trajectory[position];
+		
+		int next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+		int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+
+		static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&move_persons_in_multimodal_network_conditional, next_simulation_time, next_sub);
+	}
+
+	template<typename ComponentType>
+	void Person_Mover<ComponentType>::move_persons_in_multimodal_network_conditional(ComponentType* _this, Event_Response& response)
+	{
+		int cur_iter = iteration();
+		int cur_sub = sub_iteration();
+
+		typedef Person_Mover<ComponentType> _Person_Mover_Interface;
+		ComponentType* _pthis = (ComponentType*)_this;
+		_Person_Mover_Interface* pthis = (_Person_Mover_Interface*)_pthis;
+
+		typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+		typedef Household_Components::Prototypes::Household< typename person_itf::get_type_of(Household)> household_itf;
+		typedef Scenario_Components::Prototypes::Scenario< typename person_itf::get_type_of(scenario_reference)> scenario_itf;
+		typedef Vehicle_Components::Prototypes::Vehicle< typename person_itf::get_type_of(vehicle)> vehicle_itf;
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef Activity_Components::Prototypes::Activity_Planner< typename movement_itf::get_type_of(destination_activity_reference)> activity_itf;
+		
+		if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION)
+		{
+			pthis->template person_action_at_beginning_of_link<NT>();
+			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+		}
+		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION)
+		{
+			pthis->template person_waiting_at_beginning_of_link<NT>();
+			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+		}
+		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION)
+		{
+			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+		}
+		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_REROUTING_SUBITERATION)
+		{
+			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+		}
+		else if (sub_iteration() == Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION)
+		{
+			pthis->template teleport_multimodal_person_to_next_link<NT>();
+			response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
+			response.next._sub_iteration = pthis->template Next_Sub_Iteration<int>();
+		}
+		else
+		{
+			assert(false);
+			cout << "Should never reach here in transit multimodal person mover conditional!" << endl;
+		}
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::person_action_at_beginning_of_link()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+		typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+		typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+
+		person_itf* person = this->Parent_Person<person_itf*>();
+		Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
+		Person_Components::Types::Movement_Status_Keys next_status;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+				
+		int current_position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
+
+		_Link_Interface* link = trajectory_unit->template link<_Link_Interface*>();
+
+		Link_Components::Types::Link_Type_Keys link_type = link->template link_type<Link_Components::Types::Link_Type_Keys>();
+		Link_Components::Types::Link_Type_Keys link_mode = trajectory_unit->template link_mode<Link_Components::Types::Link_Type_Keys>();
+
+		if (link_type != link_mode)
+		{
+			assert(false);
+			cout << "Link and trajectory data are inconsistent in terms of mode!" << endl;
+		}
+
+		int next_simulation_time;
+		int next_sub;
+		if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+		{
+			next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::WALKING;
+		}
+		else
+		{
+			if (current_status == ON_BOARD)
+			{
+				next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_MOVING_SUBITERATION;
+				next_status = Person_Components::Types::Movement_Status_Keys::ON_BOARD;
+			}
+			else
+			{
+				next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+				next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
+				next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
+			}
+		}
+		
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+		person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::teleport_multimodal_person_to_next_link()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+
+		movement->template advance_multimodal_trajectory<_Multimodal_Trajectory_Unit_Interface*>();
+
+		int position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[position];
+
+		int next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+		int next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_ARRIVING_SUBITERATION;
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+	}
+
+	template<typename ComponentType>
+	template<typename TargetType>
+	void Person_Mover<ComponentType>::person_waiting_at_beginning_of_link()
+	{
+		typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename get_type_of(Movement)> movement_itf;
+		typedef  Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
+		typedef  Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
+		typedef Link_Components::Prototypes::Link< typename _Multimodal_Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
+		typedef Prototypes::Person< typename get_type_of(Parent_Person)> person_itf;
+		typedef typename _Multimodal_Trajectory_Unit_Interface::get_type_of(transit_vehicle_trip) _Transit_Vehicle_Trip_Interface;
+		typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename MasterType::transit_pattern_type> _Transit_Pattern_Interface;
+		typedef  typename _Transit_Pattern_Interface::get_type_of(pattern_links) _Pattern_Links_Container_Interface;
+
+		person_itf* person = this->Parent_Person<person_itf*>();
+		Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
+		Person_Components::Types::Movement_Status_Keys next_status;
+
+		movement_itf* movement = this->Movement<movement_itf*>();
+		_Multimodal_Trajectory_Container_Interface& trajectory = movement->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
+
+		int current_position = movement->template current_multimodal_trajectory_position<int>();
+
+		_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)trajectory[current_position];
+
+		_Link_Interface* person_link = trajectory_unit->template link<_Link_Interface*>();
+		_Transit_Vehicle_Trip_Interface* person_trip = trajectory_unit->template transit_vehicle_trip<_Transit_Vehicle_Trip_Interface*>();
+		_Transit_Pattern_Interface* trip_pattern = person_trip->template pattern<_Transit_Pattern_Interface*>();
+		_Pattern_Links_Container_Interface& pattern_links = trip_pattern->template pattern_links<_Pattern_Links_Container_Interface&>();		
+		int transit_vehicle_position = person_trip->template current_position<int>(); 
+		_Link_Interface* vehicle_link;
+		if (transit_vehicle_position >= 0)
+		{
+			vehicle_link = (_Link_Interface*)(pattern_links[transit_vehicle_position]);
+		}
+		else 
+		{
+			vehicle_link = nullptr;
+		}
+		
+		int next_simulation_time;
+		int next_sub;
+		if (vehicle_link == person_link)
+		{
+			next_simulation_time = trajectory_unit->estimated_arrival_time<int>();
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_BOARDING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::ON_BOARD;
+		}
+		else
+		{
+			next_simulation_time = iteration() + 6;
+			next_sub = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRAVELER_WAITING_SUBITERATION;
+			next_status = Person_Components::Types::Movement_Status_Keys::WAITING;
+		}
+
+		this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
+		this->template Next_Sub_Iteration<int>(next_sub);
+		person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
+	}
+
+	//TODO: Omer END
+}
 }

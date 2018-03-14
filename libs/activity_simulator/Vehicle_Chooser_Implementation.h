@@ -124,11 +124,12 @@ namespace Household_Components
 				string line;
 				long long census_tract;
 				float prob ;
-				string veh_class_txt, pt_type_txt;
+				string veh_class_txt, fuel_type_txt, pt_type_txt;
 				string strCensusTract;
 				string type;
 				Vehicle_Components::Types::EPA_Vehicle_Class_Keys veh_class;
 				Vehicle_Components::Types::Powertrain_Type_Keys pt_type;
+				Vehicle_Components::Types::Fuel_Type_Keys fuel_type;
 				//int veh_class_i, pt_type_i;
 								
 				getline(data_file, line); //throw out header
@@ -139,21 +140,45 @@ namespace Household_Components
 					std::getline(linestream, strCensusTract, '\t');
 					census_tract = stoll(strCensusTract);
 					std::getline(linestream, veh_class_txt, '\t');
+					std::getline(linestream, fuel_type_txt, '\t');
 					std::getline(linestream, pt_type_txt, '\t');
 					linestream >> prob;
 
+					if (prob < 0.0 || prob > 1.0) THROW_EXCEPTION("ERROR: incorrect format in vehicle distribution file. Ensure that file is tab-delimited with fields: tract (long),segment(text),fuel_type(text), powertrain(text) and probability(float:0<=x<=1.0)");
+
+					// custom class conversions
 					if (veh_class_txt == "Compact" || veh_class_txt == "COMPACT" || veh_class_txt == "compact")						veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
 					else if (veh_class_txt == "Midsize" || veh_class_txt == "MIDSIZE" || veh_class_txt == "midsize")				veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MID_SIZE;
 					else if ( veh_class_txt == "Midsize SUV" || veh_class_txt == "MIDSIZE SUV" || veh_class_txt == "midsize SUV")	veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
 					else if ( veh_class_txt == "Small SUV" || veh_class_txt == "SMALL SUV" || veh_class_txt == "small SUV")			veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::WAGON_COMPACT;
 					else if ( veh_class_txt == "Pickup" || veh_class_txt == "PICKUP" || veh_class_txt == "pickup")					veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;
+					// standard classes
+					else if (veh_class_txt == "CAR_COMPACT")																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
+					else if (veh_class_txt == "CAR_MID_SIZE") 																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_MID_SIZE;
+					else if (veh_class_txt == "CAR_FULL_SIZE") 																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_FULL_SIZE;
+					else if (veh_class_txt == "SUV_COMPACT") 																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_COMPACT;
+					else if (veh_class_txt == "SUV_MID_SIZE") 																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_MID_SIZE;
+					else if (veh_class_txt == "SUV_FULL_SIZE") 																		veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::SUV_FULL_SIZE;
+					else if (veh_class_txt == "TRUCK_MID_SIZE") 																	veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_MID_SIZE;
+					else if (veh_class_txt == "TRUCK_FULL_SIZE") 																	veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::TRUCK_FULL_SIZE;
 					else    																										veh_class = Vehicle_Components::Types::EPA_Vehicle_Class_Keys::CAR_COMPACT;
-					
+
+					// fuel type conversion
+					if (fuel_type_txt == "Gas" || fuel_type_txt == "GAS" || fuel_type_txt == "Gasoline" || fuel_type_txt == "GASOLINE")		fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::GASOLINE;
+					else if (fuel_type_txt == "Diesel" || fuel_type_txt == "DIESEL" || fuel_type_txt == "diesel")							fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::DIESEL;
+					else if (fuel_type_txt == "CNG" || fuel_type_txt == "cng" || fuel_type_txt == "natural gas")							fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::CNG;
+					else if (fuel_type_txt == "H2" || fuel_type_txt == "h2" || fuel_type_txt == "HYDROGEN" || fuel_type_txt == "hydrogen")	fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::H2;
+					else if (fuel_type_txt == "Electric" || fuel_type_txt == "electric" || fuel_type_txt == "BEV" || fuel_type_txt == "bev") fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::ELECTRIC;
+					else																													fuel_type = Vehicle_Components::Types::Fuel_Type_Keys::GASOLINE;
+
+					//powertrain
 					if(pt_type_txt ==  "PHEV" || pt_type_txt == "phev")				pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::PHEV;
 					else if (pt_type_txt == "HEV" || pt_type_txt == "hev")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::HEV;
 					else if (pt_type_txt == "ICE" || pt_type_txt == "ice")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
+					else if (pt_type_txt == "Conventional" || pt_type_txt == "conventional" || pt_type_txt == "CONVENTIONAL") pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;
 					else if (pt_type_txt == "LSEV" || pt_type_txt == "lsev")		pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
 					else if (pt_type_txt == "EV" || pt_type_txt == "ev")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
+					else if (pt_type_txt == "BEV" || pt_type_txt == "bev")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::BEV;
 					else if (pt_type_txt == "H2" || pt_type_txt == "h2")			pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::FCEV;
 					else 															pt_type = Vehicle_Components::Types::Powertrain_Type_Keys::CONVENTIONAL;	
 
@@ -164,16 +189,15 @@ namespace Household_Components
 					for (vehicle_types_container_type::iterator t_itr = all_vehicle_types->begin(); t_itr != all_vehicle_types->end(); ++t_itr)
 					{
 						vehicle_characteristics_interface* veh = (vehicle_characteristics_interface*)(*t_itr);
-						if (veh->vehicle_class<Vehicle_Components::Types::EPA_Vehicle_Class_Keys>() == veh_class && veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == pt_type)
+						if (veh->vehicle_class<Vehicle_Components::Types::EPA_Vehicle_Class_Keys>() == veh_class && 
+							veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == pt_type &&
+							veh->fuel_type<Vehicle_Components::Types::Fuel_Type_Keys>() == fuel_type)
 						{
-							if ((veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() == Vehicle_Components::Types::CONVENTIONAL && veh->fuel_type<Vehicle_Components::Types::Fuel_Type_Keys>() == Vehicle_Components::Types::GASOLINE) || veh->powertrain_type<Vehicle_Components::Types::Powertrain_Type_Keys>() != Vehicle_Components::Types::CONVENTIONAL)
-							{
-								veh_char = (vehicle_characteristics_interface*)*t_itr;
-								break;
-							}
+							veh_char = (vehicle_characteristics_interface*)*t_itr;
+							break;
 						}
 					}
-					if (veh_char == nullptr) THROW_EXCEPTION("ERROR: vehicle class '"<<veh_class<<"' and powertrain type '"<<pt_type<<"' combination not found in the input demand database.");
+					if (veh_char == nullptr) THROW_EXCEPTION("ERROR: vehicle class '"<<veh_class<<"', powertrain type '"<<pt_type<< "'and fuel type '" << fuel_type << "' combination not found in the input demand database."<<pt_type_txt<<","<<fuel_type_txt<<","<<veh_class_txt);
 
 
 					vehicle_distribution_container_type::iterator itr = _vehicle_distribution_container.find(census_tract);

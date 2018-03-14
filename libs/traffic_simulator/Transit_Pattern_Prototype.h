@@ -25,6 +25,7 @@ namespace Transit_Pattern_Components
 			accessor(pattern_links, NONE, NONE);
 			accessor(pattern_edge_ids, NONE, NONE);
 			accessor(pattern_trips, NONE, NONE);
+			accessor(number_of_stops, NONE, NONE)
 		};
 
 

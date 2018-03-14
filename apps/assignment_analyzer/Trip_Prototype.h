@@ -164,6 +164,8 @@ namespace Trip_Components
 
 				double ttime_min = 0;
 				double ttime_sim = 0;
+
+				double omer_gap = 0.0;
 				
 
 				for (_Trips_Container_Interface::iterator itr = trips->begin(); itr != trips->end(); ++itr)
@@ -174,6 +176,8 @@ namespace Trip_Components
 					ttime_min += trip->result_travel_time<Simulation_Timestep_Increment>();
 					ttime_sim += trip->input_travel_time<Simulation_Timestep_Increment>();
 
+					omer_gap += max(0.0, ttime_sim - ttime_min);
+
 					out<<"T,"<<trip->trip_id<int>()<<","<<trip->veh_id<int>()<<","<<o->uuid<int>()<<","<<d->uuid<int>()<<","<<trip->departure_time<Simulation_Timestep_Increment>()<<","<<trip->result_travel_time<Time_Minutes>()<<","<<trip->input_travel_time<Time_Minutes>()<<","<<trip->Print_Trajectory_Times();
 					fh.Write_Line(out);
 					out<<"L,"<<trip->trip_id<int>()<<","<<trip->veh_id<int>()<<","<<o->uuid<int>()<<","<<d->uuid<int>()<<","<<trip->departure_time<Simulation_Timestep_Increment>()<<","<<trip->result_travel_time<Time_Minutes>()<<","<<trip->input_travel_time<Time_Minutes>()<<","<<trip->Print_Trajectory_Links();
@@ -181,14 +185,16 @@ namespace Trip_Components
 				}
 
 				cout <<"Relative gap = "<<(ttime_sim - ttime_min)/ttime_min;
+				omer_gap = omer_gap / (float)trips->size();
+				cout << "Omer gap = " << omer_gap;
 
 				File_IO::File_Writer fhr;
 				string res_filename(((_Scenario_Interface*)_global_scenario)->template historical_results_database_name<string&>());
 				string res_extension("-assignment_results.csv");
 				res_filename = res_filename + res_extension;
 				fhr.Open(res_filename);
-				fhr.Write_Line("TTIME_MINIMUM,TTIME_SIMULATION,REL_GAP");
-				out<<ttime_min<<","<<ttime_sim<<","<<(ttime_sim - ttime_min)/ttime_min;
+				fhr.Write_Line("TTIME_MINIMUM,TTIME_SIMULATION,REL_GAP,OMER_GAP");
+				out<<ttime_min<<","<<ttime_sim<<","<<(ttime_sim - ttime_min)/ttime_min<<","<< omer_gap;
 				fhr.Write_Line(out);
 				fhr.Close();
 

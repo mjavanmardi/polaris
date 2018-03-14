@@ -82,7 +82,8 @@ namespace Vehicle_Components
 			TRUCK_MID_SIZE,
 			TRUCK_FULL_SIZE,
 			VAN_MID_SIZE,
-			VAN_FULL_SIZE
+			VAN_FULL_SIZE,
+			SUV_COMPACT
 		};
 
 		enum Vehicle_Type_Keys

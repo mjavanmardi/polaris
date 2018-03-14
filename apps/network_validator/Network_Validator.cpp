@@ -53,8 +53,8 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Approach_Implementation<M> approach_type;
 	typedef Analyze_Link_Group_Components::Implementations::Analyze_Link_Group_Implementation<MasterType> analyze_link_group_type;
 	typedef Plan_Components::Implementations::Plan_Implementation<M> plan_type;
-	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> basic_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Movement_Plan_Implementation<M> integrated_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 	typedef Movement_Plan_Components::Implementations::Trajectory_Unit_Implementation<M> trajectory_unit_type;
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;

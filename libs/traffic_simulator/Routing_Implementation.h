@@ -109,6 +109,7 @@ namespace Routing_Components
 				
 
 				// Get the current origin/destination information
+				int traveler_id = _movement_plan->traveler_id<int>();
 				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
 				unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
 				Activity_Location_Interface* origin_loc = _movement_plan->template origin<Activity_Location_Interface*>();
@@ -183,7 +184,7 @@ namespace Routing_Components
 				//cost of traversing each of the edges
 				std::deque<float> cost_container;
 				std::deque<Link_Components::Types::Link_Type_Keys> out_type;
-				std::deque<int> out_trip;
+				std::deque<typename MasterType::transit_vehicle_trip_type*> out_trip;
 				std::deque<int> out_seq;
 				std::deque<float> out_time;
 				std::deque<float> out_arr_time;
@@ -232,7 +233,7 @@ namespace Routing_Components
 					}
 					else
 					{ 
-						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, debug_route, summary_paragraph);
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, _movement_plan->experienced_gap<float>(), debug_route, summary_paragraph);
 					}
 
 				}
@@ -246,25 +247,64 @@ namespace Routing_Components
 					_movement_plan->template routed_travel_time<float>(routed_travel_time);
 					_movement_plan->template estimated_time_of_arrival<Simulation_Timestep_Increment>(_movement_plan->template absolute_departure_time<int>() + routed_travel_time);
 					_movement_plan->template estimated_travel_time_when_departed<float>(routed_travel_time);
-					_movement_plan->set_trajectory(path_container, cost_container);
+									
+					
+					Link_Interface* olink = nullptr;
+					Link_Interface* dlink = nullptr;
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE))
+					{
+						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+						
+						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == origin_walk_ids.front()) olink = link;
+						}
+
+						for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == destination_walk_ids.front()) dlink = link;
+						}
+					}
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					{
+						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
+
+						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == origin_ids.front()) olink = link;
+						}
+
+						for (auto itr = destination_walk_links->begin(); itr != destination_walk_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == destination_walk_ids.front()) dlink = link;
+						}
+					}
+					else
+					{						
+						_movement_plan->set_trajectory(path_container, cost_container);
+
+						for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == origin_ids.front()) olink = link;
+						}
+						
+						for (auto itr = destination_links->begin(); itr != destination_links->end(); ++itr)
+						{
+							Link_Interface* link = (Link_Interface*)(*itr);
+							if (link->template uuid<unsigned int>() == destination_ids.front()) dlink = link;
+						}
+					}
+
 					_movement_plan->routing_execution_time(astar_time);
 					_movement_plan->summary_string(summary_paragraph);
 					_movement_plan->detail_string(detail_paragraph);
 					
-					// update movement plan O/D based on returned routing results
-					Link_Interface* olink = nullptr;
-					for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
-					{
-						Link_Interface* link = (Link_Interface*)(*itr);
-						if (link->template uuid<unsigned int>()  == origin_ids.front()) olink=link;
-					}
-					Link_Interface* dlink = nullptr;
-					for (auto itr = destination_links->begin(); itr != destination_links->end(); ++itr)
-					{
-						Link_Interface* link = (Link_Interface*)(*itr);
-						if (link->template uuid<unsigned int>()  == destination_ids.front()) dlink=link;
-					}
-
+					// update movement plan O/D based on returned routing results					
 					if (olink != nullptr && dlink != nullptr)
 					{
 						_movement_plan->template origin<Link_Interface*>(olink);

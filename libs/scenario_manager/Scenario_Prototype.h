@@ -116,6 +116,8 @@ namespace Scenario_Components
 			accessor(vehicle_tracking_list, NONE, NONE);
 			accessor(use_vehicle_tracking_list, NONE, NONE);
 
+			accessor(read_trajectories, NONE, NONE);
+
 			accessor(routed_path_file_name, NONE, NONE);
 			accessor(routed_path_file, NONE, NONE);
 
@@ -429,6 +431,7 @@ namespace Scenario_Components
 				cacc_capacity_adjustment_alpha<double>(1.0121);
 				cacc_capacity_adjustment_beta<double>(2.4697);
 				multimodal_routing<bool>(false);
+				read_trajectories<bool>(false);
 			}
 
 			void get_KV_paths(std::map<string,string>& key_paths, const rapidjson::Value &obj, std::string path, size_t indent = 0)
@@ -704,6 +707,8 @@ namespace Scenario_Components
 				{
 					use_vehicle_tracking_list<bool>(false);
 				}
+
+				set_parameter<bool>(document, "read_trajectories", read_trajectories<bool &>()); // if reading trajectories from the database, we will use them for trips instead of routing...
 
 				// GET NETWORK SKIMMING PARAMETERS
 				set_parameter<bool>(document, "write_skim_tables", this->template write_skim_tables<bool &>());

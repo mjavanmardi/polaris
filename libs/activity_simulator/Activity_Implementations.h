@@ -38,7 +38,7 @@ namespace Activity_Components
 			m_prototype(Person_Components::Prototypes::Person_Planner, typename MasterType::person_planner_type, Parent_Planner, NONE, NONE);
 
 			// pointer to movement plan associated with activity
-			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, movement_plan, NONE, NONE);
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::integrated_movement_plan_type, movement_plan, NONE, NONE);
 
 			m_static_data(int, Route_Planning_Count, NONE, NONE);
 			//m_static_data(_lock, update_lock, NONE, NONE);
@@ -81,7 +81,8 @@ namespace Activity_Components
 			typedef Prototypes::Activity_Planner<ComponentType> _activity_plan_itf;
 
 			typedef Back_Insertion_Sequence< typename _scheduler_itf::get_type_of(Movement_Plans_Container)> _movement_plans_container_itf;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
+			//typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
+			typedef movement_plan_interface _movement_plan_itf;
 
 			
 			//================================================================================================================================================================================================
@@ -311,7 +312,8 @@ namespace Activity_Components
 			move->template initialize_trajectory<NULLTYPE>();
 			move->template destination_activity_reference<ComponentType*>(static_cast<ComponentType*>(this));
 			move->template network<_network_itf*>(network);
-			move->traveler_id(person->template uuid<int>());
+			//move->traveler_id(person->template uuid<int>());
+			move->traveler_id(person->person_record<shared_ptr<polaris::io::Person>>()->getPerson());
 
 			// Get the origin and destination locations
 			_activity_location_itf* orig;
@@ -394,8 +396,12 @@ namespace Activity_Components
 				// get a free adult available for escort
 				_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
-				// If no adults free and not school trip - cancel act
-				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+				// If no adults free and not school trip - cancel act ---- DELETE!
+				if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY)
+				{
+					scheduler->Remove_Activity_Plan(this);
+					return;
+				}
 				// if no adult but is school activity, force trip to transit
 				else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 				// otherwise, assign escort duty to adult
@@ -415,8 +421,12 @@ namespace Activity_Components
 					//%%%RLW
 					_person_itf* adult = household->template Get_Free_Escort<_person_itf*, Time_Seconds>(this->Start_Time<Time_Seconds>(), this->End_Time<Time_Seconds>());
 
-					// If no adults free and not school trip - cancel act
-					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY) return;
+					// If no adults free and not school trip - cancel act ---- DELETE!
+					if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() != Types::SCHOOL_ACTIVITY)
+					{
+						scheduler->Remove_Activity_Plan(this);
+						return;
+					}
 					// if no adult but is school activity, force trip to transit
 					else if (adult == nullptr && this->Activity_Type<Types::ACTIVITY_TYPES>() == Types::SCHOOL_ACTIVITY) this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SCHOOLBUS);
 					// otherwise, assign escort duty to adult
@@ -438,10 +448,10 @@ namespace Activity_Components
 					// If no adults free, force trip to transit
 					if (adult == nullptr)
 					{
-						//TODO OMER: Change back to bus when done
+						//TODO: Omer: Change back to bus when done
 						this->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::TRUCK);
 
-						//TODO OMER: Delete when done
+						//TODO: Omer: Delete when done
 						char myLine[2000];
 						std::string bus_mode_paragraph;
 						stringstream bus_mode_stream;

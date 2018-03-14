@@ -11,39 +11,6 @@
 
 namespace Person_Components
 {
-	namespace Types
-	{
-		//enum PLANNING_ITERATION_STEP_KEYS
-		//{
-		//	ACTIVITY_GENERATION=19,
-		//	ACTIVITY_PLANNING=20,
-		//	MOVEMENT_PLANNING=21,
-		//};
-	}
-
-	namespace Concepts
-	{
-		concept struct Is_Person_Planner_Prototype
-		{
-			check_component_accessor_name(Has_Parent_Person, Parent_Person);
-			check_component_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
-			check_component_accessor_name(Has_Activity_Plans_Container, Activity_Container);
-			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
-		};
-		concept struct Is_Person_Planner_Component
-		{
-			check_accessor_name(Has_Parent_Person,Parent_Person);
-			check_accessor_name(Has_Movement_Plans_Container, Movement_Plans_Container);
-			check_accessor_name(Has_Activity_Plans_Container, Activity_Container);
-			define_default_check(Has_Parent_Person && Has_Movement_Plans_Container && Has_Activity_Plans_Container);
-		};
-		concept struct Is_Person_Planner
-		{
-			check_concept(is_prototype, Is_Person_Planner_Prototype, T, V);
-			check_concept(is_component, Is_Person_Planner_Component, T, V);
-			define_default_check(is_prototype || is_component);
-		};
-	}
 	
 	namespace Prototypes
 	{
@@ -277,6 +244,12 @@ namespace Person_Components
 					}
 
 					movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment, Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(), move);
+					// move the scheduled movement out of the movements list
+					// TODO: JAA - 2/19/18 - check to make sure this doesn't blow anything up...
+					movements->erase(move_itr);
+
+					//TODO: JAA - 1/30/2018 - returning here after movement scheduled in order to ignore multiple moves per timestep.
+					return;
 
 					//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
 					typename Movement_Plans::iterator prev = move_itr++;
@@ -332,10 +305,11 @@ namespace Person_Components
 		{
 			// interfaces	
 			typedef Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
+			typedef Person_Components::Prototypes::Person_Mover< typename Parent_Person_Itf::get_type_of(Moving_Faculty)> Person_Mover_Itf;
 			typedef Scenario_Components::Prototypes::Scenario< typename Parent_Person_Itf::get_type_of(scenario_reference)> Scenario_Itf;
 			typedef Vehicle_Components::Prototypes::Vehicle< typename get_type_of(Parent_Person)::get_type_of(vehicle)> Vehicle_Itf;
 			typedef Routing_Components::Prototypes::Routing< typename get_type_of(Parent_Person)::get_type_of(router)> Routing_Itf;
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Routing_Itf::get_type_of(movement_plan)> Movement_Itf;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Person_Mover_Itf::get_type_of(Movement)> Movement_Itf;
 			typedef Activity_Components::Prototypes::Activity_Planner< typename Movement_Itf::get_type_of(destination_activity_reference)> Activity_Itf;
 
 			// references
@@ -358,10 +332,11 @@ namespace Person_Components
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time/*,scenario->template read_network_snapshots<bool>()*/);
 				return;
 			}
-			else //if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
-			{
+			//TODO: JAA-2/1/18 - Do routing for all trips; afterwards adjust routed travel times for walk/bike/transit in the person movement planner if not using multimodal routing...
+			//else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV || scenario->multimodal_routing<bool>()) // 6/14/17-JA-Testing multimodal router so removing the restriction to SOV only
+			//{
 				itf->Schedule_Route_Computation(movement_plan->template departed_time<Simulation_Timestep_Increment>()/*, planning_time,scenario->template read_network_snapshots<bool>()*/);
-			}
+			//}
 
 		}
 
