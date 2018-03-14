@@ -26,7 +26,6 @@ namespace polaris
 		
 		int graph_id = start_ids.front().graph_id;
 
-		char myLine[2000];
 		std::deque< base_edge_type* > modified_edges;
 		boost::intrusive::multiset< base_edge_type > open_set;
 
@@ -675,9 +674,6 @@ namespace polaris
 
 		int graph_id = start_ids.front().graph_id;
 
-		char myLine[2000];
-		//Counter A_Star_Time;
-		//Counter Visit_Time;
 		high_resolution_clock::time_point t1;
 		high_resolution_clock::time_point t2;
 

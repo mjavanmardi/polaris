@@ -75,6 +75,8 @@ namespace Person_Components
 				//trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
 				activity_records = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 				activity_records_buffer = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
+				transit_vehicle_trips = new transit_vehicle_trip_vector_type[num_sim_threads()];
+				transit_vehicle_trips_buffer = new transit_vehicle_trip_vector_type[num_sim_threads()];
 				//TODO: Omer
 				//multimodal_activity_records = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
 				//multimodal_activity_records_buffer = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
@@ -659,6 +661,9 @@ namespace Person_Components
 				typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
 				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
 
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
 				//location_itf* orig = move->template origin<location_itf*>();
@@ -674,6 +679,8 @@ namespace Person_Components
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
 				shared_ptr<polaris::io::Path> path_db_record;
+
+				int simulation_start_time = scenario->template simulation_start_time<int>();
 
 				if (is_executed)
 				{
@@ -692,7 +699,7 @@ namespace Person_Components
 							path_db_record->setOrigin_Link(move->template origin<_Link_Interface*>()->template uuid<int>());
 							path_db_record->setDestination_Link(move->template destination<_Link_Interface*>()->template uuid<int>());
 							path_db_record->setNum_Links(move->template trajectory_container<_Trajectory_Container_Interface&>().size());
-							path_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+							path_db_record->setDeparture_Time(simulation_start_time + move->template departed_time<Time_Seconds>());
 							path_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
 							path_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
 
@@ -715,7 +722,7 @@ namespace Person_Components
 								//{
 								path_link_record.setLink(route_link->dbid<int>());
 								path_link_record.setDir(route_link->direction<int>());
-								path_link_record.setEntering_Time(route_link_enter_time);
+								path_link_record.setEntering_Time(simulation_start_time + route_link_enter_time);
 								path_link_record.setTravel_Time(route_link_travel_time);
 								path_link_record.setDelayed_Time(route_link_delayed_time);
 								path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
@@ -742,7 +749,7 @@ namespace Person_Components
 					if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
 					else trip_rec.setGap(0.0f);
 
-					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec.setEnd(simulation_start_time + move->template arrived_time<Time_Seconds>());
 					trip_rec.setHhold(0);
 					if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					{
@@ -754,7 +761,7 @@ namespace Person_Components
 					trip_rec.setPartition(move->template routed_travel_time<int>());
 					trip_rec.setPassengers(0);
 					trip_rec.setPurpose(0);
-					trip_rec.setStart(move->template departed_time<Time_Seconds>());
+					trip_rec.setStart(simulation_start_time + move->template departed_time<Time_Seconds>());
 					trip_rec.setTour(0);
 					trip_rec.setPriority(0);
 					trip_rec.setType(1);
@@ -778,7 +785,7 @@ namespace Person_Components
 					act_rec.setLocation_Id(act->Location<location_itf*>()->template uuid<int>());
 				else 
 					act_rec.setLocation_Id(new_destination);
-				act_rec.setStart_Time (act->template Start_Time<Time_Seconds>());
+				act_rec.setStart_Time (simulation_start_time + act->template Start_Time<Time_Seconds>());
 				act_rec.setDuration (act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					act_rec.setMode("SOV");
@@ -826,6 +833,7 @@ namespace Person_Components
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_itf::get_type_of(movement_plan)> movement_itf;
 				typedef Link_Components::Prototypes::Link<typename movement_itf::get_type_of(origin)> link_itf;
+				typedef typename MasterType::intersection_type intersection_itf;
 				typedef Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 				typedef Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 				typedef Prototypes::Person_Planner<typename act_itf::get_type_of(Parent_Planner)> planner_itf;
@@ -834,7 +842,8 @@ namespace Person_Components
 				typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename MasterType::transit_vehicle_trip_type> transit_vehicle_trip_itf;
 				//typedef Random_Access_Sequence<typename household_itf::get_type_of(Vehicles_Container)> vehicles_container_itf;
 				//typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_itf)> vehicle_itf;
-
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 				
 				act_itf* act = (act_itf*)act_record; 
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
@@ -847,6 +856,8 @@ namespace Person_Components
 				//polaris::io::Trip* trip_rec = new polaris::io::Trip();
 				polaris::io::Trip trip_rec;
 				shared_ptr<polaris::io::Path_Multimodal> path_mm_db_record;
+
+				int simulation_start_time = scenario->template simulation_start_time<int>();
 
 				if (is_executed)
 				{					
@@ -869,17 +880,17 @@ namespace Person_Components
 							path_mm_db_record->setOrigin_Link(move->template origin<link_itf*>()->template uuid<int>());
 							path_mm_db_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
 							path_mm_db_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
-							path_mm_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+							path_mm_db_record->setDeparture_Time(simulation_start_time + move->template departed_time<Time_Seconds>());
 							path_mm_db_record->setMode(move->template mode<int>());
 							
 							auto link_itr = --trajectory.end();
 							_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
 
-							path_mm_db_record->setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+							path_mm_db_record->setEst_Arrival_Time(simulation_start_time + trajectory_unit->template estimated_arrival_time<float>());
 							path_mm_db_record->setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
 							path_mm_db_record->setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
 
-							path_mm_db_record->setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+							path_mm_db_record->setAct_Arrival_Time(simulation_start_time + trajectory_unit->template actual_arrival_time<float>());
 							path_mm_db_record->setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
 							path_mm_db_record->setAct_Transfer_Pen(trajectory_unit->template actual_transfer_penalty<float>());
 
@@ -914,6 +925,8 @@ namespace Person_Components
 
 								path_mm_link_record.setLink(route_link->template dbid<int>());
 								path_mm_link_record.setDir(route_link->template direction<int>());
+								path_mm_link_record.setA_node(route_link->template upstream_intersection<intersection_itf*>()->template dbid<std::string>());
+								path_mm_link_record.setB_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
 								path_mm_link_record.setLinkMode(route_link->template link_type<int>());
 
 								if (transit_vehicle_trip != nullptr)
@@ -922,7 +935,7 @@ namespace Person_Components
 								}
 								path_mm_link_record.setStopSequence(trajectory_unit->template transit_vehicle_stop_sequence<int>());
 
-								path_mm_link_record.setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+								path_mm_link_record.setEst_Arrival_Time(simulation_start_time + trajectory_unit->template estimated_arrival_time<float>());
 								path_mm_link_record.setEst_Gen_Cost(trajectory_unit->template estimated_gen_cost<float>());
 								path_mm_link_record.setEst_Duration(trajectory_unit->template estimated_travel_time<float>());
 								path_mm_link_record.setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
@@ -933,7 +946,7 @@ namespace Person_Components
 								path_mm_link_record.setEst_Car_Time(trajectory_unit->template estimated_car_time<float>());
 								path_mm_link_record.setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
 
-								path_mm_link_record.setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+								path_mm_link_record.setAct_Arrival_Time(simulation_start_time + trajectory_unit->template actual_arrival_time<float>());
 								path_mm_link_record.setAct_Gen_Cost(trajectory_unit->template actual_gen_cost<float>());
 								path_mm_link_record.setAct_Duration(trajectory_unit->template actual_travel_time<float>());
 								path_mm_link_record.setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
@@ -994,7 +1007,7 @@ namespace Person_Components
 					if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
 					else trip_rec.setGap(0.0f);
 
-					trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec.setEnd(simulation_start_time + move->template arrived_time<Time_Seconds>());
 					trip_rec.setHhold(0);					
 					trip_rec.setMode(act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>());
 					if (new_origin < 0) trip_rec.setOrigin(orig->template uuid<int>());
@@ -1002,7 +1015,7 @@ namespace Person_Components
 					trip_rec.setPartition(move->template routed_travel_time<int>());
 					trip_rec.setPassengers(0);
 					trip_rec.setPurpose(0);
-					trip_rec.setStart(move->template departed_time<Time_Seconds>());
+					trip_rec.setStart(simulation_start_time + move->template departed_time<Time_Seconds>());
 					trip_rec.setTour(0);
 					trip_rec.setPriority(0);
 					trip_rec.setType(1);
@@ -1026,7 +1039,7 @@ namespace Person_Components
 					act_rec.setLocation_Id(act->Location<location_itf*>()->template uuid<int>());
 				else
 					act_rec.setLocation_Id(new_destination);
-				act_rec.setStart_Time(act->template Start_Time<Time_Seconds>());
+				act_rec.setStart_Time(simulation_start_time + act->template Start_Time<Time_Seconds>());
 				act_rec.setDuration(act->template Duration<Time_Seconds>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 					act_rec.setMode("SOV");

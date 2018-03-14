@@ -1763,7 +1763,6 @@ namespace Person_Components
 			person_itf* person = this->Parent_Person<person_itf*>();
 			//Get their status
 			Person_Components::Types::Movement_Status_Keys current_status = person->template simulation_status<Person_Components::Types::Movement_Status_Keys>();
-			Person_Components::Types::Movement_Status_Keys next_status;
 			//Get the movement plan
 			movement_itf* movement = this->Movement<movement_itf*>();
 			//Get the planned trajectory

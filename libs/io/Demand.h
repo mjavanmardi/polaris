@@ -967,8 +967,8 @@ class link_travel_multimodal
 public:
 	// Default Constructor
 	link_travel_multimodal() {}
-	link_travel_multimodal(int link_, bool dir_, int link_mode_, std::string transit_vehicle_trip_, int transit_vehicle_stop_sequence_, float Est_Arrival_Time_, float Act_Arrival_Time_, float Est_Gen_Cost_, float Act_Gen_Cost_, float Est_Duration_, float Act_Duration_, int Est_Wait_Count_, int Act_Wait_Count_, float Est_Wait_Time_, float Act_Wait_Time_, float Est_Walk_Time_, float Act_Walk_Time_, float Est_Bike_Time_, float Act_Bike_Time_, float Est_IVTT_, float Act_IVTT_, float Est_Car_Time_, float Act_Car_Time_, float Est_Transfer_Pen_, float Act_Transfer_Pen_, float exit_position_)
-		: link(link_), dir(dir_), link_mode(link_mode_), transit_vehicle_trip(transit_vehicle_trip_), transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Gen_Cost(Est_Gen_Cost_), Act_Gen_Cost(Act_Gen_Cost_), Est_Duration(Est_Duration_), Act_Duration(Act_Duration_), Est_Wait_Count(Est_Wait_Count_), Act_Wait_Count(Act_Wait_Count_), Est_Wait_Time(Est_Wait_Time_), Act_Wait_Time(Act_Wait_Time_), Est_Walk_Time(Est_Walk_Time_), Act_Walk_Time(Act_Walk_Time_), Est_Bike_Time(Est_Bike_Time_), Act_Bike_Time(Act_Bike_Time_), Est_IVTT(Est_IVTT_), Act_IVTT(Act_IVTT_), Est_Car_Time(Est_Car_Time_), Act_Car_Time(Act_Car_Time_), Est_Transfer_Pen(Est_Transfer_Pen_), Act_Transfer_Pen(Act_Transfer_Pen_), exit_position(exit_position_)
+	link_travel_multimodal(int link_, bool dir_, std::string a_node_, std::string b_node_, int link_mode_, std::string transit_vehicle_trip_, int transit_vehicle_stop_sequence_, float Est_Arrival_Time_, float Act_Arrival_Time_, float Est_Gen_Cost_, float Act_Gen_Cost_, float Est_Duration_, float Act_Duration_, int Est_Wait_Count_, int Act_Wait_Count_, float Est_Wait_Time_, float Act_Wait_Time_, float Est_Walk_Time_, float Act_Walk_Time_, float Est_Bike_Time_, float Act_Bike_Time_, float Est_IVTT_, float Act_IVTT_, float Est_Car_Time_, float Act_Car_Time_, float Est_Transfer_Pen_, float Act_Transfer_Pen_, float exit_position_)
+		: link(link_), dir(dir_), a_node(a_node_), b_node(b_node_), link_mode(link_mode_), transit_vehicle_trip(transit_vehicle_trip_), transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Gen_Cost(Est_Gen_Cost_), Act_Gen_Cost(Act_Gen_Cost_), Est_Duration(Est_Duration_), Act_Duration(Act_Duration_), Est_Wait_Count(Est_Wait_Count_), Act_Wait_Count(Act_Wait_Count_), Est_Wait_Time(Est_Wait_Time_), Act_Wait_Time(Act_Wait_Time_), Est_Walk_Time(Est_Walk_Time_), Act_Walk_Time(Act_Walk_Time_), Est_Bike_Time(Est_Bike_Time_), Act_Bike_Time(Act_Bike_Time_), Est_IVTT(Est_IVTT_), Act_IVTT(Act_IVTT_), Est_Car_Time(Est_Car_Time_), Act_Car_Time(Act_Car_Time_), Est_Transfer_Pen(Est_Transfer_Pen_), Act_Transfer_Pen(Act_Transfer_Pen_), exit_position(exit_position_)
 	{
 	}
 	//Accessors
@@ -976,6 +976,10 @@ public:
 	void setLink(const int& link_) { link = link_; }
 	const bool& getDir() const { return dir; }
 	void setDir(const bool& dir_) { dir = dir_; }
+	const std::string& getA_node() const { return a_node; }
+	void setA_node(const std::string& a_node_) { a_node = a_node_; }
+	const std::string& getB_node() const { return b_node; }
+	void setB_node(const std::string& b_node_) { b_node = b_node_; }	
 	const int& getLinkMode() const { return link_mode; }
 	void setLinkMode(const int& link_mode_) { link_mode = link_mode_; }
 	const std::string& getTransitVehicleTrip() const { return transit_vehicle_trip; }
@@ -1029,6 +1033,8 @@ private:
 	friend class odb::access;
 	int link;
 	bool dir;
+	std::string a_node;
+	std::string b_node;
 	int link_mode;
 	std::string transit_vehicle_trip;
 	int transit_vehicle_stop_sequence;
@@ -1187,8 +1193,8 @@ class Transit_Vehicle_Links
 public:
 	// Default Constructor
 	Transit_Vehicle_Links() {}
-	Transit_Vehicle_Links(std::string transit_vehicle_trip_, int transit_vehicle_stop_sequence_, std::string a_node_, std::string b_node_, int link_mode_, int Est_Arrival_Time_, int Act_Arrival_Time_, int Est_Departure_Time_, int Act_Departure_Time_, int Est_Dwell_Time_, int Act_Dwell_Time_, int Est_Travel_Time_, int Act_Travel_Time_, int Seated_Load_, int Seated_Capacity_, int Standing_Load_, int Standing_Capacity_, float exit_position_)
-		: transit_vehicle_trip(transit_vehicle_trip_), transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), a_node(a_node_), b_node(b_node_), link_mode(link_mode_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Departure_Time(Est_Departure_Time_), Act_Departure_Time(Act_Departure_Time_), Est_Dwell_Time(Est_Dwell_Time_), Act_Dwell_Time(Act_Dwell_Time_), Est_Travel_Time(Est_Travel_Time_), Act_Travel_Time(Act_Travel_Time_), Seated_Load(Seated_Load_), Seated_Capacity(Seated_Capacity_), Standing_Load(Standing_Load_), Standing_Capacity(Standing_Capacity_), exit_position(exit_position_)
+	Transit_Vehicle_Links(std::string transit_vehicle_trip_, int transit_vehicle_stop_sequence_, int link_, bool dir_, std::string a_node_, std::string b_node_, int link_mode_, int Est_Arrival_Time_, int Act_Arrival_Time_, int Est_Departure_Time_, int Act_Departure_Time_, int Est_Dwell_Time_, int Act_Dwell_Time_, int Est_Travel_Time_, int Act_Travel_Time_, int Seated_Load_, int Seated_Capacity_, int Standing_Load_, int Standing_Capacity_, float exit_position_)
+		: transit_vehicle_trip(transit_vehicle_trip_), transit_vehicle_stop_sequence(transit_vehicle_stop_sequence_), link(link_), dir(dir_), a_node(a_node_), b_node(b_node_), link_mode(link_mode_), Est_Arrival_Time(Est_Arrival_Time_), Act_Arrival_Time(Act_Arrival_Time_), Est_Departure_Time(Est_Departure_Time_), Act_Departure_Time(Act_Departure_Time_), Est_Dwell_Time(Est_Dwell_Time_), Act_Dwell_Time(Act_Dwell_Time_), Est_Travel_Time(Est_Travel_Time_), Act_Travel_Time(Act_Travel_Time_), Seated_Load(Seated_Load_), Seated_Capacity(Seated_Capacity_), Standing_Load(Standing_Load_), Standing_Capacity(Standing_Capacity_), exit_position(exit_position_)
 	{
 	}
 	//Accessors	
@@ -1196,10 +1202,14 @@ public:
 	void setTransitVehicleTrip(const std::string& transit_vehicle_trip_) { transit_vehicle_trip = transit_vehicle_trip_; }
 	const int& getStopSequence() const { return transit_vehicle_stop_sequence; }
 	void setStopSequence(const int& transit_vehicle_stop_sequence_) { transit_vehicle_stop_sequence = transit_vehicle_stop_sequence_; }
+	const int& getLink() const { return link; }
+	void setLink(const int& link_) { link = link_; }
+	const bool& getDir() const { return dir; }
+	void setDir(const bool& dir_) { dir = dir_; }
 	const std::string& getA_node() const { return a_node; }
 	void setA_node(const std::string& a_node_) { a_node = a_node_; }
 	const std::string& getB_node() const { return b_node; }
-	void setB_node(const std::string& b_node_) { b_node = b_node_; }	
+	void setB_node(const std::string& b_node_) { b_node = b_node_; }
 	const int& getLinkMode() const { return link_mode; }
 	void setLinkMode(const int& link_mode_) { link_mode = link_mode_; }	
 	const int& getEst_Arrival_Time() const { return Est_Arrival_Time; }
@@ -1233,6 +1243,8 @@ private:
 	friend class odb::access;
 	std::string transit_vehicle_trip;
 	int transit_vehicle_stop_sequence;
+	int link;
+	bool dir;
 	std::string a_node;
 	std::string b_node;
 	int link_mode;

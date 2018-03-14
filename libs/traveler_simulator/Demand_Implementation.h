@@ -183,6 +183,8 @@ namespace Demand_Components
 
 				if (!scenario->template write_demand_to_database<bool>()) return;
 
+				int simulation_start_time = scenario->template simulation_start_time<int>();
+
 				for (int i = 0; i< (int)num_sim_threads(); ++i)
 				{
 					// database write for trips
@@ -225,7 +227,7 @@ namespace Demand_Components
 									path_db_record->setOrigin_Link(move->template origin<link_itf*>()->template uuid<int>());
 									path_db_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
 									path_db_record->setNum_Links(move->template trajectory_container<_Trajectory_Container_Interface&>().size());
-									path_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+									path_db_record->setDeparture_Time(simulation_start_time + move->template departed_time<Time_Seconds>());
 									path_db_record->setTravel_Time(move->template arrived_time<Time_Seconds>() - move->template departed_time<Time_Seconds>());
 									path_db_record->setRouted_Time(move->template estimated_travel_time_when_departed<float>());
 
@@ -246,7 +248,7 @@ namespace Demand_Components
 
 										path_link_record.setLink(route_link->dbid<int>());
 										path_link_record.setDir(route_link->direction<int>());
-										path_link_record.setEntering_Time(route_link_enter_time);
+										path_link_record.setEntering_Time(simulation_start_time + route_link_enter_time);
 										path_link_record.setTravel_Time(route_link_travel_time);
 										path_link_record.setDelayed_Time(route_link_delayed_time);
 										path_link_record.setExit_Position(start += GLOBALS::Convert_Units<Feet, Meters>(route_link->template length<float>()));
@@ -266,14 +268,14 @@ namespace Demand_Components
 								trip_rec.setDuration(0);
 								if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
 								else trip_rec.setGap(0.0f);
-								trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+								trip_rec.setEnd(simulation_start_time + move->template arrived_time<Time_Seconds>());
 								trip_rec.setHhold(0);
 								trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 								trip_rec.setOrigin(orig->template uuid<int>());
 								trip_rec.setPartition(move->template routed_travel_time<int>());
 								trip_rec.setPassengers(0);
 								trip_rec.setPurpose(0);
-								trip_rec.setStart(move->template departed_time<Time_Seconds>());
+								trip_rec.setStart(simulation_start_time + move->template departed_time<Time_Seconds>());
 								trip_rec.setTour(0);
 								trip_rec.setPriority(0);
 								trip_rec.setType(1);
@@ -310,6 +312,7 @@ namespace Demand_Components
 			{
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
 				typedef Link_Components::Prototypes::Link<typename movement_itf::get_type_of(origin)> link_itf;
+				typedef typename MasterType::intersection_type intersection_itf;
 				typedef Movement_Plan_Components::Prototypes::Multimodal_Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(multimodal_trajectory_container)::value_type>::type>  _Multimodal_Trajectory_Unit_Interface;
 				typedef Random_Access_Sequence< typename movement_itf::get_type_of(multimodal_trajectory_container), _Multimodal_Trajectory_Unit_Interface*> _Multimodal_Trajectory_Container_Interface;
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> location_itf;
@@ -323,6 +326,8 @@ namespace Demand_Components
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				if (!scenario->template write_demand_to_database<bool>()) return;
+
+				int simulation_start_time = scenario->template simulation_start_time<int>();
 
 				for (int i = 0; i< (int)num_sim_threads(); ++i)
 				{
@@ -365,18 +370,18 @@ namespace Demand_Components
 									path_mm_db_record->setOrigin_Link(move->template origin<link_itf*>()->template uuid<int>());
 									path_mm_db_record->setDestination_Link(move->template destination<link_itf*>()->template uuid<int>());
 									path_mm_db_record->setNum_Links(move->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>().size());
-									path_mm_db_record->setDeparture_Time(move->template departed_time<Time_Seconds>());
+									path_mm_db_record->setDeparture_Time(simulation_start_time + move->template departed_time<Time_Seconds>());
 									path_mm_db_record->setMode(move->template mode<int>());
 
 									_Multimodal_Trajectory_Container_Interface& trajectory = ((movement_itf*)move)->template multimodal_trajectory_container<_Multimodal_Trajectory_Container_Interface&>();
 									auto link_itr = --trajectory.end();
 									_Multimodal_Trajectory_Unit_Interface* trajectory_unit = (_Multimodal_Trajectory_Unit_Interface*)(*link_itr);
 
-									path_mm_db_record->setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+									path_mm_db_record->setEst_Arrival_Time(simulation_start_time + trajectory_unit->template estimated_arrival_time<float>());
 									path_mm_db_record->setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
 									path_mm_db_record->setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
 
-									path_mm_db_record->setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+									path_mm_db_record->setAct_Arrival_Time(simulation_start_time + trajectory_unit->template actual_arrival_time<float>());
 									path_mm_db_record->setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
 									path_mm_db_record->setAct_Transfer_Pen(trajectory_unit->template actual_transfer_penalty<float>());
 
@@ -411,6 +416,8 @@ namespace Demand_Components
 
 										path_mm_link_record.setLink(route_link->template dbid<int>());
 										path_mm_link_record.setDir(route_link->template direction<int>());
+										path_mm_link_record.setA_node(route_link->template upstream_intersection<intersection_itf*>()->template dbid<std::string>());
+										path_mm_link_record.setB_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
 										path_mm_link_record.setLinkMode(route_link->template link_type<int>());
 										
 										if (transit_vehicle_trip != nullptr)
@@ -419,7 +426,7 @@ namespace Demand_Components
 										}										
 										path_mm_link_record.setStopSequence(trajectory_unit->template transit_vehicle_stop_sequence<int>());
 										
-										path_mm_link_record.setEst_Arrival_Time(trajectory_unit->template estimated_arrival_time<float>());
+										path_mm_link_record.setEst_Arrival_Time(simulation_start_time + trajectory_unit->template estimated_arrival_time<float>());
 										path_mm_link_record.setEst_Gen_Cost(trajectory_unit->template estimated_gen_cost<float>());
 										path_mm_link_record.setEst_Duration(trajectory_unit->template estimated_travel_time<float>());
 										path_mm_link_record.setEst_Wait_Count(trajectory_unit->template estimated_wait_count<int>());
@@ -430,7 +437,7 @@ namespace Demand_Components
 										path_mm_link_record.setEst_Car_Time(trajectory_unit->template estimated_car_time<float>());
 										path_mm_link_record.setEst_Transfer_Pen(trajectory_unit->template estimated_transfer_penalty<float>());
 
-										path_mm_link_record.setAct_Arrival_Time(trajectory_unit->template actual_arrival_time<float>());
+										path_mm_link_record.setAct_Arrival_Time(simulation_start_time + trajectory_unit->template actual_arrival_time<float>());
 										path_mm_link_record.setAct_Gen_Cost(trajectory_unit->template actual_gen_cost<float>());
 										path_mm_link_record.setAct_Duration(trajectory_unit->template actual_travel_time<float>());
 										path_mm_link_record.setAct_Wait_Count(trajectory_unit->template actual_wait_count<int>());
@@ -490,14 +497,14 @@ namespace Demand_Components
 								trip_rec.setDuration(0);
 								if (move->routed_travel_time<Time_Seconds>() > 0) trip_rec.setGap(max(float((move->arrived_time<Time_Seconds>() - move->departed_time<Time_Seconds>()) / move->routed_travel_time<Time_Seconds>() - 1.0f), 0.0f));
 								else trip_rec.setGap(0.0f);
-								trip_rec.setEnd(move->template arrived_time<Time_Seconds>());
+								trip_rec.setEnd(simulation_start_time + move->template arrived_time<Time_Seconds>());
 								trip_rec.setHhold(0);
 								trip_rec.setMode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 								trip_rec.setOrigin(orig->template uuid<int>());
 								trip_rec.setPartition(move->template routed_travel_time<int>());
 								trip_rec.setPassengers(0);
 								trip_rec.setPurpose(0);
-								trip_rec.setStart(move->template departed_time<Time_Seconds>());
+								trip_rec.setStart(simulation_start_time + move->template departed_time<Time_Seconds>());
 								trip_rec.setTour(0);
 								trip_rec.setPriority(0);
 								trip_rec.setType(1);
@@ -542,6 +549,8 @@ namespace Demand_Components
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				if (!scenario->template write_demand_to_database<bool>()) return;
+
+				int simulation_start_time = scenario->template simulation_start_time<int>();
 
 				for (int i = 0; i< (int)num_sim_threads(); ++i)
 				{
@@ -605,10 +614,10 @@ namespace Demand_Components
 
 								int end_pos = vehicle_trip->template number_of_stops<int>() - 1;
 
-								transit_vehicle_record->setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[0]);
-								transit_vehicle_record->setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[0]);
-								transit_vehicle_record->setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[end_pos]);
-								transit_vehicle_record->setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[end_pos]);
+								transit_vehicle_record->setEst_Departure_Time(simulation_start_time + vehicle_trip->template departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setAct_Departure_Time(simulation_start_time + vehicle_trip->template act_departure_seconds<std::vector<int>>()[0]);
+								transit_vehicle_record->setEst_Arrival_Time(simulation_start_time + vehicle_trip->template arrival_seconds<std::vector<int>>()[end_pos]);
+								transit_vehicle_record->setAct_Arrival_Time(simulation_start_time + vehicle_trip->template act_arrival_seconds<std::vector<int>>()[end_pos]);
 								transit_vehicle_record->setEst_Travel_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[end_pos] - vehicle_trip->template departure_seconds<std::vector<int>>()[0]);
 								transit_vehicle_record->setAct_Travel_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[end_pos] - vehicle_trip->template act_departure_seconds<std::vector<int>>()[0]);
 								transit_vehicle_record->setSeated_Capacity(vehicle_trip->template seated_capacity<int>());
@@ -624,14 +633,16 @@ namespace Demand_Components
 
 									transit_vehicle_link_record.setTransitVehicleTrip(vehicle_trip->template dbid<std::string>());
 									transit_vehicle_link_record.setStopSequence(link_itr);
+									transit_vehicle_link_record.setLink(route_link->template dbid<int>());
+									transit_vehicle_link_record.setDir(route_link->template direction<int>());
 									transit_vehicle_link_record.setA_node(route_link->template upstream_intersection<intersection_itf*>()->template dbid<std::string>());
 									transit_vehicle_link_record.setB_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
 									transit_vehicle_link_record.setLinkMode(route_link->template link_type<int>());
 									
-									transit_vehicle_link_record.setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
-									transit_vehicle_link_record.setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
-									transit_vehicle_link_record.setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
-									transit_vehicle_link_record.setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setEst_Arrival_Time(simulation_start_time + vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Arrival_Time(simulation_start_time + vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setEst_Departure_Time(simulation_start_time + vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
+									transit_vehicle_link_record.setAct_Departure_Time(simulation_start_time + vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
 									transit_vehicle_link_record.setEst_Dwell_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
 									transit_vehicle_link_record.setAct_Dwell_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
 									transit_vehicle_link_record.setEst_Travel_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr+1] - vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
@@ -651,14 +662,16 @@ namespace Demand_Components
 
 								transit_vehicle_link_record.setTransitVehicleTrip(vehicle_trip->template dbid<std::string>());
 								transit_vehicle_link_record.setStopSequence(link_itr);
+								transit_vehicle_link_record.setLink(-1);
+								transit_vehicle_link_record.setDir(0);
 								transit_vehicle_link_record.setA_node(route_link->template downstream_intersection<intersection_itf*>()->template dbid<std::string>());
 								transit_vehicle_link_record.setB_node("");
 								transit_vehicle_link_record.setLinkMode(route_link->template link_type<int>());
 
-								transit_vehicle_link_record.setEst_Arrival_Time(vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
-								transit_vehicle_link_record.setAct_Arrival_Time(vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
-								transit_vehicle_link_record.setEst_Departure_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
-								transit_vehicle_link_record.setAct_Departure_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setEst_Arrival_Time(simulation_start_time + vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setAct_Arrival_Time(simulation_start_time + vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setEst_Departure_Time(simulation_start_time + vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr]);
+								transit_vehicle_link_record.setAct_Departure_Time(simulation_start_time + vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr]);
 								transit_vehicle_link_record.setEst_Dwell_Time(vehicle_trip->template departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template arrival_seconds<std::vector<int>>()[link_itr]);
 								transit_vehicle_link_record.setAct_Dwell_Time(vehicle_trip->template act_departure_seconds<std::vector<int>>()[link_itr] - vehicle_trip->template act_arrival_seconds<std::vector<int>>()[link_itr]);
 								transit_vehicle_link_record.setEst_Travel_Time(0);

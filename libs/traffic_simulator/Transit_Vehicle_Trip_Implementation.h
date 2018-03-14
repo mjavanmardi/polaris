@@ -109,7 +109,7 @@ namespace Transit_Vehicle_Trip_Components
 					}
 					else
 					{
-						response.next._iteration = iteration();
+						response.next._iteration = _this->template departure_seconds<std::vector<int>>()[position];
 						response.next._sub_iteration = Scenario_Components::Types::Transit_Sub_Iteration_keys::TRANSIT_VEHICLE_DEPOT_SUBITERATION;
 					}
 				}

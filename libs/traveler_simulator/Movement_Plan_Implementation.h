@@ -83,7 +83,7 @@ namespace Movement_Plan_Components
 			_link = (Link_Components::Prototypes::Link<typename MasterType::link_type>*)(type_of(link)*)link_val;			
 
 			_actual_gen_cost = 0.0;
-			_actual_travel_time - 0.0;
+			_actual_travel_time = 0.0;
 			_actual_arrival_time = 0.0;
 			_actual_wait_time = 0.0;
 			_actual_walk_time = 0.0;
