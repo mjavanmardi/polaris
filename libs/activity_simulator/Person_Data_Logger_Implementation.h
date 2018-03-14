@@ -75,8 +75,6 @@ namespace Person_Components
 				//trip_records_buffer = new std::vector<polaris::io::Trip*>[num_sim_threads()];
 				activity_records = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
 				activity_records_buffer = new std::vector<pair<polaris::io::Trip,polaris::io::Activity>>[num_sim_threads()];
-				transit_vehicle_trips = new transit_vehicle_trip_vector_type[num_sim_threads()];
-				transit_vehicle_trips_buffer = new transit_vehicle_trip_vector_type[num_sim_threads()];
 				//TODO: Omer
 				//multimodal_activity_records = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
 				//multimodal_activity_records_buffer = new std::vector<pair<polaris::io::Trip, polaris::io::Activity>>[num_sim_threads()];
