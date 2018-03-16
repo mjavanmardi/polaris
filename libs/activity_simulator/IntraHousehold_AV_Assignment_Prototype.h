@@ -18,9 +18,9 @@ namespace Household_Components
 				this_component()->template Initialize<T>(Household);
 			}
 
-			void Assign_Shared_Vehicles()
+			template<typename MovementPlanType> vector<MovementPlanType*>* Assign_Shared_Vehicles()
 			{
-				this_component()->Assign_Shared_Vehicles();
+				return this_component()->Assign_Shared_Vehicles<MovementPlanType>();
 			}
 
 			int Get_Max_Number_of_AVs()

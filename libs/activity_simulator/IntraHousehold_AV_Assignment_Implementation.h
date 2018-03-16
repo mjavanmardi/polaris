@@ -348,12 +348,12 @@ namespace Household_Components
 				//Time_Minutes ttime_auto_ampeak_max = skim->template Get_TTime<zone_itf*, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours, Time_Minutes>(zone, dzone, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, 7.5);
 			}
 
-			vector<_movement_plan_itf* >*  Assign_Shared_Vehicles()
+			template<typename MovementPlanType> vector<MovementPlanType*>* Assign_Shared_Vehicles()
 			{												
 				_scenario_itf* scenario = _Parent_Household->template scenario_reference<_scenario_itf*>();
 				string folder_name = scenario->template output_dir_name<string>() + "\\ZOV";
 #ifdef _WIN32		
-				_mkdir(folder_name.c_str());
+				//_mkdir(folder_name.c_str());
 				//while (_mkdir(temp_dir_name.c_str()) == -1)
 #else
 				mkdir(folder_name.c_str());
@@ -366,9 +366,9 @@ namespace Household_Components
 				auto HHID = this->_Parent_Household->uuid<long long>();
 				float HH_size = household_properties->Household_size<float>();
 
-				std::clock_t start;
+				Counter timer;
 				double duration;
-				start = std::clock();
+				timer.Start();
 
 				map<string, _activity_itf*> act_String_map;
 				map<pair<long,int>, string> act_ID_map;
@@ -1236,8 +1236,14 @@ namespace Household_Components
 					ofstream myfile;
 					model.write(scenario->template output_dir_name<string>() + "\\ZOV\\model_" + to_string(HHID) + ".lp");
 #endif
+					cout << "Setup time=" << timer.Stop() << endl;
+					timer.Start();
+
 					model.optimize();
 
+
+
+					cout << "Optimization time=" << timer.Stop() << endl;
 					//cout << x.get(GRB_StringAttr_VarName) << " "  << x.get(GRB_DoubleAttr_X) << endl;
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
