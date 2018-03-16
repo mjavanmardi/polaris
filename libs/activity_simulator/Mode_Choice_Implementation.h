@@ -411,6 +411,7 @@ namespace Person_Components
 			// Interface definitions
 			typedef Prototypes::Person_Planner<typename type_of(Mode_Chooser)::type_of(Parent_Planner)> planner_itf;
 			typedef Prototypes::Person<typename planner_itf::get_type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Properties)> person_base_properties_itf;
 			typedef Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> person_properties_itf;
 			typedef Household_Components::Prototypes::Household<typename person_itf::get_type_of(Household)> household_itf;
 			typedef Household_Components::Prototypes::Household_Properties<typename household_itf::get_type_of(Static_Properties)> household_properties_itf;
@@ -445,13 +446,14 @@ namespace Person_Components
 			virtual double Calculate_Utility()
 			{
 				los_itf* los = _Mode_Chooser->los<los_itf*>();
-			
+
 				float utility = -1.0*FLT_MAX;
 
 				person_itf* _Parent_Person = this->_Mode_Chooser->Parent_Planner<planner_itf*>()->template Parent_Person<person_itf*>();
 				household_itf* household = _Parent_Person->Household<household_itf*>();
 				household_properties_itf* hh_properties = household->Static_Properties<household_properties_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
+				person_base_properties_itf* base_properties = _Parent_Person->template Properties<person_base_properties_itf*>();
 				person_properties_itf* properties = _Parent_Person->template Static_Properties<person_properties_itf*>();
 				vehicle_itf* vehicle = _Parent_Person->template vehicle<vehicle_itf*>();
 				_Zone_Interface* dest_zone = _Mode_Chooser->destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>();
@@ -459,12 +461,15 @@ namespace Person_Components
 				Activity_Plan* current_activity = _Mode_Chooser->current_activity<Activity_Plan*>();
 				Activity_Components::Types::ACTIVITY_TYPES activity_type = current_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 
+				// account for CAV effects on VOTT
+				float VOTT_change = base_properties->template Value_of_Travel_Time_Adjustment<float>();
+
 				// calculate utilty model variable requirements
 				Time_Minutes start = current_activity->Start_Time<Time_Minutes>();
 				double h_inc = hh_properties->Income<Basic_Units::Currency_Variables::Dollars>() > 100000 ? 1.0 : 0.0;
 				double m_inc = hh_properties->Income<Basic_Units::Currency_Variables::Dollars>() > 50000 && h_inc == 0.0 ? 1.0 : 0.0;
 				double PEAK = (start > 420 && start < 600) || (start > 900 && start < 1080) ? 1.0 : 0.0;
-				double AUTO_TT = los->auto_ttime<Time_Minutes>();
+				double AUTO_TT = los->auto_ttime<Time_Minutes>() * VOTT_change;
 				double AUTO_COST = los->auto_distance<Miles>() * 0.2;
 				double AUTO_COST_M = AUTO_COST * m_inc;
 				double AUTO_COST_H = AUTO_COST * h_inc;
