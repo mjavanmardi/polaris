@@ -22,7 +22,7 @@
 #define  Ignore_Taxi
 #define  Ignore_RideSharing
 #define  Ignore_None_Auto_Modes
-//#define Debug_Intrahousehold_Vehicle_Assignment
+#define Debug_Intrahousehold_Vehicle_Assignment
 
 #pragma region Setting_prev_and_Next_Acts
 
@@ -351,14 +351,15 @@ namespace Household_Components
 			vector<_movement_plan_itf* >*  Assign_Shared_Vehicles()
 			{												
 				_scenario_itf* scenario = _Parent_Household->template scenario_reference<_scenario_itf*>();
-				string folder_name = scenario->template output_dir_name<string>() + "\\ZOV";
-#ifdef _WIN32		
-				_mkdir(folder_name.c_str());
-				//while (_mkdir(temp_dir_name.c_str()) == -1)
-#else
-				mkdir(folder_name.c_str());
-				//while (mkdir(temp_dir_name.c_str(), 0777) == -1)
-#endif
+				//string folder_name = scenario->template output_dir_name<string>() + "\\ZOV";
+				string folder_name = scenario->template output_dir_name<string>() ;
+//#ifdef _WIN32		
+//				_mkdir(folder_name.c_str());
+//				//while (_mkdir(temp_dir_name.c_str()) == -1)
+//#else
+//				mkdir(folder_name.c_str());
+//				//while (mkdir(temp_dir_name.c_str(), 0777) == -1)
+//#endif
 
 				_network_itf* network = this->_Parent_Household->network_reference<_network_itf*>();
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
@@ -1236,14 +1237,17 @@ namespace Household_Components
 					ofstream myfile;
 					model.write(scenario->template output_dir_name<string>() + "\\ZOV\\model_" + to_string(HHID) + ".lp");
 #endif
+					duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+					start = std::clock();
+					cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 					model.optimize();
 
 					//cout << x.get(GRB_StringAttr_VarName) << " "  << x.get(GRB_DoubleAttr_X) << endl;
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
 					{
-						//duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
+						duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+						cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
 						auto dv = std::div(counter_solved, 10);
 						if (dv.rem ==  0)
@@ -1712,7 +1716,7 @@ namespace Household_Components
 							auto home_location = (*persons->begin())->template Home_Location<_activity_location_itf*>();
 							bool Inter_Person_Trip = false;
 							long per1_ID = -1, per2_ID = -1;
-							if (From_Act == "Hom" || From_Act == "Prk")
+							if (From_Act.find("Hom") != string::npos || From_Act.find("Prk") != string::npos)
 							{
 								origin_location = home_location;
 								Inter_Person_Trip = true;
@@ -1724,7 +1728,7 @@ namespace Household_Components
 								origin_location = origin_act->Location<_activity_location_itf*>();
 							}
 
-							if (To_Act == "Hom" || To_Act == "Prk")
+							if (To_Act.find("Hom") != string::npos || To_Act.find("Prk") != string::npos)
 							{
 								destination_location = home_location;
 								Inter_Person_Trip = true;
