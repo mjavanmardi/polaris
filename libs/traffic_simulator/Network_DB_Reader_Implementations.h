@@ -366,8 +366,8 @@ namespace Network_Components
 					transit_vehicle_trip->template direction<int>(db_itr->getDir());
 					transit_vehicle_trip->template pattern<_Transit_Pattern_Interface*>((_Transit_Pattern_Interface*)net_io_maps.transit_pattern_id_to_ptr[db_itr->getPattern()->getPattern()]);
 
-					transit_vehicle_trip->template seated_capacity<int>(2);
-					transit_vehicle_trip->template standing_capacity<int>(2);
+					transit_vehicle_trip->template seated_capacity<int>(db_itr->getSeated_capacity());
+					transit_vehicle_trip->template standing_capacity<int>(db_itr->getTotal_capacity() - db_itr->getSeated_capacity());
 
 					const string& arrivalseconds_string = db_itr->getArrivals();
 					std::stringstream ss(arrivalseconds_string);

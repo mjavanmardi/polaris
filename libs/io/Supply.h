@@ -434,8 +434,8 @@ public:
 	// Default Constructor
 	Transit_Trips() {}
 	//Constructor
-	Transit_Trips(std::string trip_, int dir_, std::string agency_, pattern_ptr pattern_, route_ptr route_, std::string arrivals_, std::string departures_)
-		: trip(trip_), dir(dir_), agency(agency_), pattern(pattern_), route(route_), arrivals(arrivals_), departures(departures_)
+	Transit_Trips(std::string trip_, int dir_, std::string agency_, pattern_ptr pattern_, route_ptr route_, std::string arrivals_, std::string departures_, int seated_capacity_, int total_capacity_)
+		: trip(trip_), dir(dir_), agency(agency_), pattern(pattern_), route(route_), arrivals(arrivals_), departures(departures_), seated_capacity(seated_capacity_), total_capacity(total_capacity_)
 	{
 	}
 	//Accessors
@@ -456,6 +456,10 @@ public:
 	const std::string& getDepartures() const { return departures; }
 	void setDepartures(const std::string& departures_) { departures = departures_; }
 	const std::string& getPrimaryKey() const { return trip; }
+	const int& getSeated_capacity() const { return seated_capacity; }
+	void setSeated_capacity(const int& seated_capacity_) { seated_capacity = seated_capacity_; }
+	const int& getTotal_capacity() const { return total_capacity; }
+	void setTotal_capacity(const int& total_capacity_) { total_capacity = total_capacity_; }
 
 	//Data Fields
 private:
@@ -469,6 +473,8 @@ private:
 	route_ptr route;
 	std::string arrivals;
 	std::string departures;
+	int seated_capacity;
+	int total_capacity;
 };
 
 
