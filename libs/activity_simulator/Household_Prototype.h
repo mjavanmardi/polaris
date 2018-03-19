@@ -2,7 +2,10 @@
 
 
 #include "Activity_Simulator_Includes.h"
+
+#ifndef _GUROBI_INSTALLED
 #include "IntraHousehold_AV_Assignment_Implementation.h"
+#endif
 
 namespace Household_Components
 {

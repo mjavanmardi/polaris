@@ -202,5 +202,16 @@ namespace Household_Components
 			}
 		};
 
+		implementation struct NULL_IntraHousehold_AV_Assignment_Implementation : public Polaris_Component<MasterType, INHERIT(NULL_IntraHousehold_AV_Assignment_Implementation), Data_Object>
+		{
+			template<typename T> void Initialize(T household)
+			{										
+			}
+
+			template<typename MovementPlanType> vector<MovementPlanType*>* Assign_Shared_Vehicles()
+			{
+				return nullptr;
+			}
+		};
 	}
 }

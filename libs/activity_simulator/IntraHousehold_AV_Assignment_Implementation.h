@@ -1,4 +1,4 @@
-#pragma once
+#pragma onceIntraHousehold_AV_Assignment_Implementation
 
 #pragma push_macro("check")
 #undef check

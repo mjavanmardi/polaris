@@ -147,8 +147,13 @@ struct MasterType
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
 	typedef Household_Components::Implementations::Vehicle_Chooser_Implementation<M> vehicle_chooser_type;
 	typedef Household_Components::Implementations::UIC_Vehicle_Technology_Chooser_Implementation<M> vehicle_technology_chooser_type;
-	
+
+#ifdef _GUROBI_INSTALLED
 	typedef Household_Components::Implementations::IntraHousehold_AV_Assignment_Implementation<M> intrahousehold_av_assignment_type;
+#else
+	typedef Household_Components::Implementations::NULL_IntraHousehold_AV_Assignment_Implementation<M> intrahousehold_av_assignment_type;
+#endif
+
 
 	//typedef RNG_Components::Implementations::Uniform_RNG<M> rng_type;
 
