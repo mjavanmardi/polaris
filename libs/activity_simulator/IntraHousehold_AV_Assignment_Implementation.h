@@ -495,11 +495,19 @@ namespace Household_Components
 
 							#pragma endregion 
 
+							bool travel_required = true;
 							//Adding Taxi trip from an activity to next activity
 							if (per1_activity_next)
 							{
 								strVarName = "t_AV_00_" + per1_strActID + "_E_" + per1_strActID_next + "_S";
 								Add_New_Variable(grb_Vars, model, strVarName, GRB_BINARY);
+
+								//if origin and destination are the same, make sure a trip is not generated. Inthe objective function, no term is added when o==d
+								if (per1_activity->Location<_activity_location_itf*>() == per1_activity_next->Location<_activity_location_itf*>())
+								{
+									model.addConstr(grb_Vars[strVarName] == 1);
+									travel_required = false;
+								}
 							}
 
 							//adding a few other movements
@@ -509,19 +517,19 @@ namespace Household_Components
 								if(veh_id < 10) strVehID = "0" + strVehID;
 
 								//from parking to first Activity.
-								if (per1_activity_next)
+								if (per1_activity_next && travel_required)
 								{
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_Hom_S_" + per1_strActID + "_E", GRB_BINARY);
 								}
 
 								//parking at activity location variable
-								if (per1_activity_next && per1_activity_prev)
+								if (per1_activity_next && per1_activity_prev && travel_required)
 								{
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_" + per1_strActID + "_E", GRB_BINARY);
 								}
 
 								//Trip from one activity to another for the same person
-								if (per1_activity_next)
+								if (per1_activity_next && travel_required)
 								{
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_E_" + per1_strActID_next + "_S", GRB_BINARY);
 								}
@@ -539,6 +547,9 @@ namespace Household_Components
 										Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Prk_S", GRB_BINARY);
 									}
 								}
+
+								//In case this activity and next one are at the same location, no trip is required.
+								if (!travel_required) continue;
 
 								//Trip from Parking
 								if (per1_activity_next)
@@ -1051,186 +1062,10 @@ namespace Household_Components
 					//Only disutilities are included in the cost function
 					//Initializing the objective function
 					
-					auto Obj_LinExpr = GRBLinExpr(0.0);
+					GRBLinExpr Obj_LinExpr = GRBLinExpr(0.0);
+					Generate_Objective_function_New(model, Obj_LinExpr, grb_Vars,  act_ID_map, act_String_map);
+					model.setObjective(Obj_LinExpr, GRB_MAXIMIZE);
 
-					//One person movements
-					for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
-					{
-						auto per1 = (*per1_itr);
-						firstAct = true;
-						lastAct = false;
-
-						_person_static_properties_itf* per1_properties = per1->Static_Properties<_person_static_properties_itf*>();
-						_scheduler_itf* per1_scheduler = per1->Scheduling_Faculty<_scheduler_itf*>();
-						_activity_container_itf* per1_activities = per1_scheduler->Activity_Container<_activity_container_itf*>();
-
-						for (auto per1_act_itr = per1_activities->begin(); per1_act_itr != per1_activities->end(); per1_act_itr++)
-						{
-							Setting_prev_and_Next_Acts(1);
-
-							Add_Absolute(grb_Vars, model, *per1_activity, "start", per1_activity->Start_Time<Time_Minutes>(), grb_Vars["start_" + per1_strActID], Obj_LinExpr, per1_strActID);
-							Add_Absolute(grb_Vars, model, *per1_activity, "duration", per1_activity->Duration<Time_Minutes>(), grb_Vars["duration_" + per1_strActID], Obj_LinExpr, per1_strActID);
-
-							//#for Taxi and Walk, These variables are 1 when person takes taxi or walks to the next activity location
-							//#disutility / cost  of taking taxi to next activity
-							//#cost of taxi : $2 + $24 per hour($0.4 per minute)
-							//Obj_LinExpr.addTerms(cost_taxi_fixed + cost_taxi_by_minute * Get_Travel_Time(Act.id, Act.nextAct.id), AllVariables["t_AV_00_" + Act.id + "_E_" + Act.nextAct.id + "_S"].Var)										
-							if (per1_activity_next)
-							{
-								Obj_LinExpr += (grb_Vars["t_AV_00_" + per1_strActID + "_E_" + per1_strActID_next + "_S"]) * (cost_taxi_fixed + cost_taxi_by_minute * Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1_activity_next->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>()));
-							}
-
-#pragma region One-Person related
-							for (auto const& kvp : grb_Vars)
-							{
-								const string& key = kvp.first;
-								const GRBVar& var = (kvp.second);
-
-								if (key.substr(0, 5) != "t_AV_" || key.substr(0, 8) == "t_AV_00_") continue;
-
-								if (per1_activity_prev)
-								{
-									//exiting the system
-									if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S_Hom_E")
-									{
-										auto tt = Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1->template Home_Location<_activity_location_itf*>(), per1_activity->Start_Time<Time_Minutes>());
-										Obj_LinExpr += var * cost_AV_energy * tt.Value;
-
-										//	#TODO: make sure we do not double charge this.This should be removed when I know how many people are in the car, and charge empty vehicles instead of looking at whether their last stop was the last activity!!!!
-										//	#just charge ZOV tax if the vehilce is sent home from an activity other than the last activity
-										if (per1_activity_next)
-											Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-									}
-
-									//traveling to parking(to save parking cost)
-									if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S_Prk_S")
-									{
-										auto tt = Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1->template Home_Location<_activity_location_itf*>(), per1_activity->Start_Time<Time_Minutes>());
-										Obj_LinExpr += var * cost_AV_energy * tt.Value;
-										Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-									}
-								}
-								if (per1_activity_next)
-								{
-									//entering the system
-									if (key.substr(key.size() - 12) == "_Hom_S_" + per1_strActID + "_E")
-									{
-										//fixed Cost of new AV in the system
-										auto tt = Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
-										Obj_LinExpr += var * cost_AV_fixed;
-										Obj_LinExpr += var * cost_AV_energy * tt.Value;
-										//TODO : charge the ZOV tax if it enters an activity location other than the first one.make sure it is not double counted when empty vehicles are being taxed.
-										if (per1_activity_prev)
-											Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-									}
-
-									//returning from parking to an act location
-									if (key.substr(key.size() - 11) == "Prk_E_" + per1_strActID + "_E")
-									{
-										//fixed Cost of new AV in the system
-										auto tt = Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
-										Obj_LinExpr += var * cost_AV_energy * tt.Value;
-										if (per1_activity_prev)
-											Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-									}
-
-									//This is the variable that shows movement from an activity to the next activity for one person
-									//cost / disutility(fuel cost) of traveling to next act
-									//disutility / cost for travelling. (taking the person from one activity to the next activity is applied as a constraint).
-									//Cost of AV : $5 per hour(0.0833 per minute)
-									if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E_" + per1_strActID_next + "_S")
-									{
-										Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
-									}
-								}
-
-								//disutility for parking at the location
-								//Cost of Parking : $0.5 per hour(0.00833 per minute)
-								if (per1_activity_prev && per1_activity_next &&  key.substr(key.size() - 12) == "_" + per1_strActID + "_S_" + per1_strActID + "_E")
-								{
-									if(!Home_Activity(per1_activity))
-										Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
-								}
-							}
-#pragma endregion
-
-#pragma region Intrer-Personal movements related
-							if (!per1_activity_prev) continue;
-
-							for (auto per2_itr = persons->begin(); per2_itr != persons->end(); per2_itr++)
-							{
-								auto per2 = (*per2_itr);
-								_person_static_properties_itf* per2_properties = per2->Static_Properties<_person_static_properties_itf*>();
-								_scheduler_itf* per2_scheduler = per2->Scheduling_Faculty<_scheduler_itf*>();
-								_activity_container_itf* per2_activities = per2_scheduler->Activity_Container<_activity_container_itf*>();
-
-								if (per1->uuid<long>() == per2->uuid<long>()) continue;
-
-								for (auto per2_act_itr = per2_activities->begin(); per2_act_itr != per2_activities->end(); per2_act_itr++)
-								{
-									Setting_prev_and_Next_Acts(2);
-
-									for (auto const& kvp : grb_Vars)
-									{
-										const string& key = kvp.first;
-										const GRBVar& var = (kvp.second);
-										if (key.substr(0, 5) != "t_AV_" || key.substr(0, 8) == "t_AV_00_") continue;
-
-										//#Non ZOV
-										//#E - S: has picked up person i and is going to drop off person j
-										if (per1_activity_next && per2_activity_prev)
-										{
-											if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E" + per2_strActID + "_S")
-											{
-												Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
-											}
-										}
-
-										//#s - s  has droped off person i, and is going to drop off person j
-										else if (per1_activity_prev && per2_activity_prev)
-										{
-											if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S" + per2_strActID + "_S")
-											{
-												Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
-
-											}
-										}
-
-										//#s - E: has droped off person i, and is going to pick up person j
-										else if (per1_activity_prev && per2_activity_next)
-										{
-											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
-											if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S" + per2_strActID + "_E")
-											{
-												Obj_LinExpr += var * cost_AV_energy * tt;
-
-												//	#if a vehicle arrives early, it has to wait for the person to be picked up
-												//	#TODO : lets fix the parking time.other variables need to be added in order to use variable parking time
-												//TODO: Keep in mind this implies if the first activity is somehow a home location, the vehicle will be charge for parking, even when the vehicle could have waited at home before going to act location												
-												double parking_time = max(0.0, per2_activity->End_Time<Time_Minutes>() - per1_activity->Start_Time<Time_Minutes>() - tt.Value);
-												Obj_LinExpr += var * cost_parking * parking_time;
-
-												Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-											}
-										}
-
-										//	#E - E: has picked up person i, and is going to pick up person j
-										else if (per1_activity_next && per2_activity_next)
-										{
-											if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E" + per2_strActID + "_E")
-											{
-												Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
-											}
-										}
-									}
-								}
-							}
-#pragma endregion
-
-						}
-					}
-
-					model.setObjective(Obj_LinExpr, GRB_MAXIMIZE);					
 #ifdef Write_Visualization_Files
 					model.update();
 					auto HHID = this->_Parent_Household->uuid<long long>();
@@ -1239,7 +1074,7 @@ namespace Household_Components
 #endif
 					duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 					start = std::clock();
-					cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
+					//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 					model.optimize();
 
 					//cout << x.get(GRB_StringAttr_VarName) << " "  << x.get(GRB_DoubleAttr_X) << endl;
@@ -1247,12 +1082,12 @@ namespace Household_Components
 					if (status_code == GRB_OPTIMAL)
 					{
 						duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-						cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
+						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
 						auto dv = std::div(counter_solved, 10);
 						if (dv.rem ==  0)
 						{
-							cout << "\r" << "solved: " << counter_solved <<  "\ttimed out: " << counter_timedout << "\terror: " << counter_error << std::flush;
+							cout << "\r" << "solved: " << counter_solved << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << endl; // << std::flush;
 						}
 
 #ifdef Write_Visualization_Files
@@ -1539,7 +1374,345 @@ namespace Household_Components
 				myfile.close();
 			}
 
-			
+/*			
+			void Generate_Objective_function(GRBModel& model, map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
+			{
+				_activity_itf *per1_activity, *per1_activity_next, *per1_activity_prev;
+				_activity_itf *per2_activity, *per2_activity_next, *per2_activity_prev;				
+				string per1_strActID, per1_strActID_next, per1_strActID_prev;
+				string per2_strActID, per2_strActID_next, per2_strActID_prev;
+				string strVarName, strVehID;
+
+				_persons_container_itf* persons = _Parent_Household->Persons_Container<_persons_container_itf*>();
+
+				auto Obj_LinExpr = GRBLinExpr(0.0);
+
+				//One person movements
+				for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
+				{
+					auto per1 = (*per1_itr);
+					_person_static_properties_itf* per1_properties = per1->Static_Properties<_person_static_properties_itf*>();
+					_scheduler_itf* per1_scheduler = per1->Scheduling_Faculty<_scheduler_itf*>();
+					_activity_container_itf* per1_activities = per1_scheduler->Activity_Container<_activity_container_itf*>();
+
+					for (auto per1_act_itr = per1_activities->begin(); per1_act_itr != per1_activities->end(); per1_act_itr++)
+					{
+						Setting_prev_and_Next_Acts(1);
+
+						Add_Absolute(grb_Vars, model, *per1_activity, "start", per1_activity->Start_Time<Time_Minutes>(), grb_Vars["start_" + per1_strActID], Obj_LinExpr, per1_strActID);
+						Add_Absolute(grb_Vars, model, *per1_activity, "duration", per1_activity->Duration<Time_Minutes>(), grb_Vars["duration_" + per1_strActID], Obj_LinExpr, per1_strActID);
+
+						//#for Taxi and Walk, These variables are 1 when person takes taxi or walks to the next activity location
+						//#disutility / cost  of taking taxi to next activity
+						//#cost of taxi : $2 + $24 per hour($0.4 per minute)
+						//Obj_LinExpr.addTerms(cost_taxi_fixed + cost_taxi_by_minute * Get_Travel_Time(Act.id, Act.nextAct.id), AllVariables["t_AV_00_" + Act.id + "_E_" + Act.nextAct.id + "_S"].Var)										
+						if (per1_activity_next)
+						{
+							Obj_LinExpr += (grb_Vars["t_AV_00_" + per1_strActID + "_E_" + per1_strActID_next + "_S"]) * (cost_taxi_fixed + cost_taxi_by_minute * Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1_activity_next->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>()));
+						}
+
+#pragma region One-Person related
+						for (auto const& kvp : grb_Vars)
+						{
+							const string& key = kvp.first;
+							const GRBVar& var = (kvp.second);
+
+							if (key.substr(0, 5) != "t_AV_" || key.substr(0, 8) == "t_AV_00_") continue;
+
+							if (per1_activity_prev)
+							{
+								//exiting the system
+								if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S_Hom_E")
+								{
+									auto tt = Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1->template Home_Location<_activity_location_itf*>(), per1_activity->Start_Time<Time_Minutes>());
+									Obj_LinExpr += var * cost_AV_energy * tt.Value;
+
+									//	#TODO: make sure we do not double charge this.This should be removed when I know how many people are in the car, and charge empty vehicles instead of looking at whether their last stop was the last activity!!!!
+									//	#just charge ZOV tax if the vehilce is sent home from an activity other than the last activity
+									if (per1_activity_next)
+										Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+								}
+
+								//traveling to parking(to save parking cost)
+								if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S_Prk_S")
+								{
+									auto tt = Get_Travel_Time(per1_activity->Location<_activity_location_itf*>(), per1->template Home_Location<_activity_location_itf*>(), per1_activity->Start_Time<Time_Minutes>());
+									Obj_LinExpr += var * cost_AV_energy * tt.Value;
+									Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+								}
+							}
+							if (per1_activity_next)
+							{
+								//entering the system
+								if (key.substr(key.size() - 12) == "_Hom_S_" + per1_strActID + "_E")
+								{
+									//fixed Cost of new AV in the system
+									auto tt = Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
+									Obj_LinExpr += var * cost_AV_fixed;
+									Obj_LinExpr += var * cost_AV_energy * tt.Value;
+									//TODO : charge the ZOV tax if it enters an activity location other than the first one.make sure it is not double counted when empty vehicles are being taxed.
+									if (per1_activity_prev)
+										Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+								}
+
+								//returning from parking to an act location
+								if (key.substr(key.size() - 11) == "Prk_E_" + per1_strActID + "_E")
+								{
+									//fixed Cost of new AV in the system
+									auto tt = Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
+									Obj_LinExpr += var * cost_AV_energy * tt.Value;
+									if (per1_activity_prev)
+										Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+								}
+
+								//This is the variable that shows movement from an activity to the next activity for one person
+								//cost / disutility(fuel cost) of traveling to next act
+								//disutility / cost for travelling. (taking the person from one activity to the next activity is applied as a constraint).
+								//Cost of AV : $5 per hour(0.0833 per minute)
+								if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E_" + per1_strActID_next + "_S")
+								{
+									Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1->template Home_Location<_activity_location_itf*>(), per1_activity->Location<_activity_location_itf*>(), per1_activity->End_Time<Time_Minutes>());
+								}
+							}
+
+							//disutility for parking at the location
+							//Cost of Parking : $0.5 per hour(0.00833 per minute)
+							if (per1_activity_prev && per1_activity_next &&  key.substr(key.size() - 12) == "_" + per1_strActID + "_S_" + per1_strActID + "_E")
+							{
+								if (!Home_Activity(per1_activity))
+									Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
+							}
+						}
+#pragma endregion
+
+#pragma region Intrer-Personal movements related
+						if (!per1_activity_prev) continue;
+
+						for (auto per2_itr = persons->begin(); per2_itr != persons->end(); per2_itr++)
+						{
+							auto per2 = (*per2_itr);
+							_person_static_properties_itf* per2_properties = per2->Static_Properties<_person_static_properties_itf*>();
+							_scheduler_itf* per2_scheduler = per2->Scheduling_Faculty<_scheduler_itf*>();
+							_activity_container_itf* per2_activities = per2_scheduler->Activity_Container<_activity_container_itf*>();
+
+							if (per1->uuid<long>() == per2->uuid<long>()) continue;
+
+							for (auto per2_act_itr = per2_activities->begin(); per2_act_itr != per2_activities->end(); per2_act_itr++)
+							{
+								Setting_prev_and_Next_Acts(2);
+
+								for (auto const& kvp : grb_Vars)
+								{
+									const string& key = kvp.first;
+									const GRBVar& var = (kvp.second);
+									if (key.substr(0, 5) != "t_AV_" || key.substr(0, 8) == "t_AV_00_") continue;
+
+									//#Non ZOV
+									//#E - S: has picked up person i and is going to drop off person j
+									if (per1_activity_next && per2_activity_prev)
+									{
+										if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E" + per2_strActID + "_S")
+										{
+											Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
+										}
+									}
+
+									//#s - s  has droped off person i, and is going to drop off person j
+									else if (per1_activity_prev && per2_activity_prev)
+									{
+										if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S" + per2_strActID + "_S")
+										{
+											Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
+
+										}
+									}
+
+									//#s - E: has droped off person i, and is going to pick up person j
+									else if (per1_activity_prev && per2_activity_next)
+									{
+										auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
+										if (key.substr(key.size() - 12) == "_" + per1_strActID + "_S" + per2_strActID + "_E")
+										{
+											Obj_LinExpr += var * cost_AV_energy * tt;
+
+											//	#if a vehicle arrives early, it has to wait for the person to be picked up
+											//	#TODO : lets fix the parking time.other variables need to be added in order to use variable parking time
+											//TODO: Keep in mind this implies if the first activity is somehow a home location, the vehicle will be charge for parking, even when the vehicle could have waited at home before going to act location												
+											double parking_time = max(0.0, per2_activity->End_Time<Time_Minutes>() - per1_activity->Start_Time<Time_Minutes>() - tt.Value);
+											Obj_LinExpr += var * cost_parking * parking_time;
+
+											Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+										}
+									}
+
+									//	#E - E: has picked up person i, and is going to pick up person j
+									else if (per1_activity_next && per2_activity_next)
+									{
+										if (key.substr(key.size() - 12) == "_" + per1_strActID + "_E" + per2_strActID + "_E")
+										{
+											Obj_LinExpr += var * cost_AV_energy * Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
+										}
+									}
+								}
+							}
+						}
+#pragma endregion
+
+					}
+				}
+
+				model.setObjective(Obj_LinExpr, GRB_MAXIMIZE);
+
+			}
+*/
+			void Generate_Objective_function_New(GRBModel& model, GRBLinExpr& Obj_LinExpr,  map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map, map<string, _activity_itf*>& act_String_map)
+			{
+				_activity_itf *per1_activity; // , *per1_activity_next, *per1_activity_prev;
+				_activity_itf *per2_activity; // , *per2_activity_next, *per2_activity_prev;
+				string per1_strActID; //  , per1_strActID_next, per1_strActID_prev;
+				string per2_strActID; // , per2_strActID_next, per2_strActID_prev;
+				string strVarName, strVehID;
+
+				_persons_container_itf* persons = _Parent_Household->Persons_Container<_persons_container_itf*>();
+
+				//Obj_LinExpr = GRBLinExpr(0.0);
+				size_t pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, pos5 = 0;
+				for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
+				{
+					auto key = it->first;
+					auto var = it->second;
+
+					if (key.substr(0, 6) == "start_")
+					{
+						per1_strActID = key.substr(6, 3);
+						per1_activity = act_String_map[per1_strActID] ;
+						Add_Absolute(grb_Vars, model, *per1_activity, "start", per1_activity->Start_Time<Time_Minutes>(), grb_Vars["start_" + per1_strActID], Obj_LinExpr, per1_strActID);
+					}
+					else if (key.substr(0, 9) == "duration_")
+					{
+						per1_strActID = key.substr(9, 3);
+						per1_activity = act_String_map[per1_strActID];
+						Add_Absolute(grb_Vars, model, *per1_activity, "duration", per1_activity->Duration<Time_Minutes>(), grb_Vars["duration_" + per1_strActID], Obj_LinExpr, per1_strActID);
+					}
+					else if (key.substr(0, 5) == "t_AV_")
+					{
+						string Vehicle_ID = key.substr(5, 2);
+						pos1 = key.find('_', 8);
+						string From_Act = key.substr(8, pos1 - 8);
+						string From_Act_OSE = key.substr(pos1 + 1, 1);
+						pos2 = key.find('_', pos1 + 1);
+						string To_Act = key.substr(pos2 + 1, pos2 - pos1 + 1);
+						string To_Act_DSE = key.substr(key.size() - 1, 1);
+
+						_activity_itf *per1_activity = nullptr, *per2_activity = nullptr;
+						_activity_location_itf *origin_location, *destination_location;
+						_persons_container_itf* persons = _Parent_Household->Persons_Container<_persons_container_itf*>();
+						auto home_location = (*persons->begin())->template Home_Location<_activity_location_itf*>();
+						long per1_ID = -1, per2_ID = -1;
+
+						//Setting origin and destination locations
+						if (From_Act == "Hom" || From_Act.find("Prk") != string::npos)
+						{
+							origin_location = home_location;
+						}
+						else
+						{
+							per1_activity = act_String_map[From_Act];
+							auto per1_ID = per1_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+							origin_location = per1_activity->Location<_activity_location_itf*>();
+						}
+
+						if (To_Act == "Hom"  || To_Act.find("Prk") != string::npos)
+						{
+							destination_location = home_location;
+						}
+						else
+						{
+							per2_activity = act_String_map[To_Act];
+							auto per2_ID = per2_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+							destination_location = per2_activity->Location<_activity_location_itf*>();
+						}						
+
+						//no cost is added if O==D
+						if (origin_location == destination_location) continue;
+
+						//Adding costs
+						//Taxi Trip
+						else if(Vehicle_ID == "00" )
+						{
+							auto tt = Get_Travel_Time(origin_location, destination_location, per1_activity->End_Time<Time_Minutes>());
+							Obj_LinExpr += it->second * (cost_taxi_fixed + cost_taxi_by_minute * tt.Value);
+						}
+						//exiting the system
+						else if (To_Act == "Hom" )
+						{
+							auto tt = Get_Travel_Time(origin_location, destination_location, per1_activity->Start_Time<Time_Minutes>());
+							Obj_LinExpr += var * cost_AV_energy * tt.Value;
+
+							//TODO: if the origin activity is not the last activity of the day, it means the vehicle goes to home in hte middle of hte day, so it will be a ZOV trip.
+							//apply ZOV Tax
+						}
+						//Travel to Parking
+						else if (To_Act == "Prk")
+						{
+							auto tt = Get_Travel_Time(origin_location, destination_location, per1_activity->Start_Time<Time_Minutes>());
+							Obj_LinExpr += var * cost_AV_energy * tt.Value;
+							Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+						}
+						//Travel from parking
+						else if (From_Act.find("Prk") != string::npos)
+						{
+							auto tt = Get_Travel_Time(origin_location, destination_location, per2_activity->End_Time<Time_Minutes>());
+							Obj_LinExpr += var * cost_AV_energy * tt.Value;
+							Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+						}
+						//entering the system
+						else if (From_Act == "Hom")
+						{
+							auto tt = Get_Travel_Time(origin_location, destination_location, per2_activity->End_Time<Time_Minutes>());
+							Obj_LinExpr += var * cost_AV_fixed; //fixed Cost of new AV in the system
+							Obj_LinExpr += var * cost_AV_energy * tt.Value; //cost of travel
+							//TODO : charge the ZOV tax if it enters an activity location other than the first one.make sure it is not double counted when empty vehicles are being taxed.
+							if (origin_location != destination_location)
+								Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+						}
+						//Parking at activity location
+						else if (per1_activity == per1_activity && !Home_Activity(per1_activity))
+						{
+							Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
+						}
+						//a trip between two activity locations (other than home or parking)
+						else 
+						{
+							Time_Minutes tt, departure_time, preferred_arrival_time;
+							departure_time = From_Act_OSE == "S" ? per1_activity->Start_Time<Time_Minutes>() : per1_activity->End_Time<Time_Minutes>();
+							preferred_arrival_time = To_Act_DSE == "S" ? per2_activity->Start_Time<Time_Minutes>() : per2_activity->End_Time<Time_Minutes>();
+
+							tt = Get_Travel_Time(origin_location, destination_location, departure_time);
+
+							//cost of fuel 
+							Obj_LinExpr += var * cost_AV_energy * tt.Value;
+							
+							//cost of parking
+							double parking_time = max(0.0, preferred_arrival_time - tt.Value - departure_time);
+							Obj_LinExpr += var * cost_parking * parking_time;
+
+							//cost of ZOV tax
+							//#ifdef Ignore_Travel_To_Parking
+							if (per1_ID != per2_ID)
+							{
+								Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
+							}
+
+							//
+
+						}						
+
+					}
+
+				}
+			}
+
 			void Eliminate_Infeasible_Trips(map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
 			{
 				size_t pos1 = 0, pos2 = 0;
@@ -1605,7 +1778,7 @@ namespace Household_Components
 				bool firstAct, lastAct;
 				string per1_strActID, per1_strActID_next, per1_strActID_prev;
 				string per2_strActID, per2_strActID_next, per2_strActID_prev;
-				string strVarName, strVehID;
+				string strVarName, strVehID;				
 
 				for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
 				{
@@ -1621,7 +1794,8 @@ namespace Household_Components
 						{
 							strVarName = "t_AV_00_" + per1_strActID_prev + "_E_" + per1_strActID + "_S";
 #if defined Ignore_None_Auto_Modes
-							if (mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV && mode != Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
+							if ((mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV && mode != Vehicle_Components::Types::Vehicle_Type_Keys::HOV) ||
+								per1_activity_prev->Location<_activity_location_itf*>() == per1_activity->Location<_activity_location_itf*>())
 							{
 								model.addConstr(grb_Vars[strVarName] == 1, "X8_" + strVarName);
 
@@ -1652,8 +1826,12 @@ namespace Household_Components
 
 #if defined Ignore_Taxi 
 	#if defined Ignore_None_Auto_Modes
-							if (!(mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV && mode != Vehicle_Components::Types::Vehicle_Type_Keys::HOV))
-								model.addConstr(grb_Vars[strVarName] == 0);							
+							//if the mode is not SOV or HOV and if origin and destination are not the same(where the mode has alreay been set to tax with a cost of 0 in other part of the model)
+							if (!(mode != Vehicle_Components::Types::Vehicle_Type_Keys::SOV && mode != Vehicle_Components::Types::Vehicle_Type_Keys::HOV)
+								&& per1_activity_prev->Location<_activity_location_itf*>() != per1_activity->Location<_activity_location_itf*>() )
+							{
+								model.addConstr(grb_Vars[strVarName] == 0);
+							}
 	#else 
 							model.addConstr(grb_Vars[strVarName] == 0);
 	#endif
@@ -1796,7 +1974,7 @@ namespace Household_Components
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_fixed = -3.0;			//#cost of taxi : $2
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -20.0 / 60.0;	//#$24 per hour($0.4 per minute)
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -60.0 / 60.0;		//  #$1 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -100 / 100;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -100.0 / 100.0;
 		
 		template<typename MasterType, typename InheritanceList> int IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_solved = 0;
 		template<typename MasterType, typename InheritanceList> int IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_timedout = 0;
