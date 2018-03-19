@@ -50,13 +50,22 @@ namespace Household_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Person_Components::Prototypes::Person<get_component_type(Persons_Container_type)> person_interface;
+			typedef Demand_Components::Prototypes::Demand<typename MasterType::demand_type> _Demand_Interface;
 			typedef Person_Components::Prototypes::Person_Properties<typename person_interface::get_type_of(Static_Properties)> person_properties_interface;
 			typedef Pair_Associative_Container< typename type_of(network_reference)::get_type_of(zones_container)> zones_container_interface;
 			typedef Zone_Components::Prototypes::Zone<get_mapped_component_type(zones_container_interface)>  zone_interface;			
 			typedef Random_Access_Sequence< typename type_of(network_reference)::get_type_of(activity_locations_container)> locations_container_interface;
 			typedef Activity_Location_Components::Prototypes::Activity_Location<get_component_type(locations_container_interface)>  location_interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(Vehicles_Container_type)> vehicle_interface;
-			
+			typedef Household_Components::Prototypes::IntraHousehold_AV_Assignment <type_of(IntraHousehold_AV_Assignment)> intrahousehold_av_assignment_interface;
+
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
+			typedef Link_Components::Prototypes::Link<typename movement_itf::get_type_of(origin)> link_itf;
+			typedef Movement_Plan_Components::Prototypes::Trajectory_Unit<typename remove_pointer< typename movement_itf::get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
+			typedef Random_Access_Sequence< typename movement_itf::get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
+			typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
+			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+
 
 			//=======================================================================================================================================================================
 			// FEATURES
@@ -109,7 +118,7 @@ namespace Household_Components
 				_Properties->template Initialize<home_synthesis_zone_type>(this->_home_synthesis_zone);
 			}
 			
-			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle()
+			template<typename VehicleItfType> VehicleItfType Get_Free_Vehicle(requires(VehicleItfType, check(VehicleItfType, is_pointer)))
 			{
 				for (Vehicles_Container_type::iterator v_itr = _Vehicles_Container.begin(); v_itr != _Vehicles_Container.end(); ++v_itr)
 				{
@@ -137,6 +146,19 @@ namespace Household_Components
 				return static_cast<PersonItfType>(primary);
 			}
 
+			template<typename VehicleItfType> VehicleItfType Get_AV(requires(VehicleItfType, check(VehicleItfType, is_pointer)))
+			{
+				VehicleItfType veh = nullptr;
+
+				// Check if the household has an AV, otherwise return
+				for (Vehicles_Container_type::iterator v_itr = this->_Vehicles_Container.begin(); v_itr != this->_Vehicles_Container.end(); ++v_itr)
+				{
+					VehicleItfType av = (VehicleItfType)(*v_itr);
+					if (av->is_autonomous<bool>()) return av;
+				}
+				return veh;
+			}
+
 			// return the estimated iteration when a vehicle will next be available
 			template<typename TimeType> TimeType Get_Next_Available_Vehicle_Time()
 			{
@@ -158,6 +180,25 @@ namespace Household_Components
 
 				}
 				return GLOBALS::Time_Converter.Convert_Value<Simulation_Timestep_Increment,TimeType>(min_available_iter);
+			}
+
+			template<typename T> void Assign_Shared_Vehicles()
+			{
+				// Get a pointer to the AV, return if null
+				vehicle_interface* av = Get_AV<vehicle_interface*>();
+				if (av == nullptr) return;
+
+				// get the movements from optimizer - exit if no new movements created
+				vector<movement_itf*>* movements = this->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles<movement_itf>();
+				if (movements == nullptr) return;
+
+				// get a pointer to the household AV
+
+				// Create a new simulated trip for each ZOV movement
+				for (vector<movement_itf*>::iterator itr = movements->begin(); itr != movements->end(); ++itr)
+				{
+					cout << this->_uuid << ", new movement" << endl;
+				}
 			}
 		};
 

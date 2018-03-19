@@ -268,7 +268,6 @@ namespace Prototypes
 		typedef Household_Components::Prototypes::Vehicle_Chooser<get_type_of(Vehicle_Chooser)> vehicle_chooser_interface;		
 		typedef PopSyn::Prototypes::Synthesis_Zone<get_type_of(home_synthesis_zone)> zone_interface;
 
-		typedef Household_Components::Prototypes::IntraHousehold_AV_Assignment <get_type_of(IntraHousehold_AV_Assignment)> intrahousehold_av_assignment_interface;
 
 		// Do choose vehicle routine - must occur after persons are intialized and all locations set		
 		_Household_Interface* pthis = (_Household_Interface*)_this;
@@ -296,7 +295,9 @@ namespace Prototypes
 		}
 		else if (iteration() == Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5)
 		{
-			pthis->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles();
+			_this->Assign_Shared_Vehicles<NT>();
+
+			//pthis->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles();
 			response.next._iteration = END;
 			response.next._sub_iteration = 0;
 		}
