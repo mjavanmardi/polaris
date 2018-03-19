@@ -1957,8 +1957,12 @@ namespace Household_Components
 
 				if (!movements->empty()) 
 					return movements;
-				else 
+				else
+				{
 					delete movements;
+					return nullptr;
+				}
+
 
 			}
 		};
