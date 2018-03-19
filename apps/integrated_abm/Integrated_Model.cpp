@@ -25,6 +25,8 @@
 //#define ENABLE_DEBUG_MESSAGES
 //#define SHOW_WARNINGS
 
+#define _GUROBI_INSTALLED
+
 
 #include "Polaris_PCH.h"
 #include "Traffic_Simulator.h"

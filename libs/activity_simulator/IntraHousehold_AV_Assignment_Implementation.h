@@ -1,4 +1,4 @@
-#pragma onceIntraHousehold_AV_Assignment_Implementation
+#pragma once
 
 #pragma push_macro("check")
 #undef check
@@ -1084,7 +1084,6 @@ namespace Household_Components
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
 					{
-						duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
 						auto dv = std::div(counter_solved, 10);
