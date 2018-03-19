@@ -268,7 +268,6 @@ namespace Prototypes
 		typedef Household_Components::Prototypes::Vehicle_Chooser<get_type_of(Vehicle_Chooser)> vehicle_chooser_interface;		
 		typedef PopSyn::Prototypes::Synthesis_Zone<get_type_of(home_synthesis_zone)> zone_interface;
 
-		typedef Household_Components::Prototypes::IntraHousehold_AV_Assignment <get_type_of(IntraHousehold_AV_Assignment)> intrahousehold_av_assignment_interface;
 
 		// Do choose vehicle routine - must occur after persons are intialized and all locations set		
 		_Household_Interface* pthis = (_Household_Interface*)_this;
@@ -278,12 +277,12 @@ namespace Prototypes
 			typedef Person_Components::Prototypes::Person<get_component_type(person_container_itf)>  person_itf;
 			typedef Person_Components::Prototypes::Person_Properties<typename person_itf::get_type_of(Static_Properties)> properties_itf;
 
-			typename person_container_itf::iterator p_itr;
 			person_container_itf* persons = pthis->Persons_Container<person_container_itf*>();
-			//if (persons->size() == 1)
+
+			//if (_this->uuid<long long>() < 500  )
 			{
 				pthis->Vehicle_Chooser<vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
-				response.next._iteration = 301;
+				response.next._iteration = Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5;
 				response.next._sub_iteration = 0;
 			}
 			//else
@@ -294,12 +293,11 @@ namespace Prototypes
 			//Activities are generated at iteration = 60
 			//Activities are planned by iteration = 300
 		}
-		else if (iteration() == 301)
+		else if (iteration() == Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5)
 		{
-			//pthis-><vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
-			pthis->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles();
-			//Activities are generated at iteration = 60
-			//Activities are planned by iteration = 300
+			_this->Assign_Shared_Vehicles<NT>();
+
+			//pthis->IntraHousehold_AV_Assignment<intrahousehold_av_assignment_interface*>()->Assign_Shared_Vehicles();
 			response.next._iteration = END;
 			response.next._sub_iteration = 0;
 		}
