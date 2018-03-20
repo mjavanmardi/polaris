@@ -19,7 +19,7 @@
 
 #define Write_Visualization_Files
 #define  Prevent_Write_to_Console
-//#define  Ignore_Taxi
+#define  Ignore_Taxi
 #define  consider_RideSharing
 #define  Ignore_None_Auto_Modes
 //#define  Ignore_Travel_To_Parking
@@ -177,6 +177,11 @@ namespace Household_Components
 			int Get_Max_Number_of_AVs()
 			{
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
+				if (this->_Parent_Household->uuid<long long>() == 70)
+				{
+					cout << "stop here!\tNumber of vehicles: " << household_properties->Number_of_vehicles<float>()<< endl;
+				}
+				
 				
 				//Number of AVs = Number of Vehicles in the household
 				return household_properties->Number_of_vehicles<float>();
@@ -1109,13 +1114,13 @@ namespace Household_Components
 					model.write(scenario->template output_dir_name<string>() + "\\ZOV\\model_" + to_string(HHID) + ".lp");
 #endif
 #ifdef Debug_Intrahousehold_Vehicle_Assignment
-					cout << "Setup time=" << timer.Stop() << endl;
+					//cout << "Setup time=" << timer.Stop() << endl;
 					timer.Start();
 #endif
 					model.optimize();
 
 #ifdef Debug_Intrahousehold_Vehicle_Assignment
-					cout << "Optimization time=" << timer.Stop() << endl;
+					//cout << "Optimization time=" << timer.Stop() << endl;
 #endif
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
