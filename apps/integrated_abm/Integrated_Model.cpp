@@ -835,6 +835,10 @@ int main(int argc,char** argv)
 
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events<NT>();
 
+#ifdef _GUROBI_INSTALLED	
+	//MasterType::IntraHousehold_AV_Assignment_Implementation::Static_Initializer();
+	MasterType::intrahousehold_av_assignment_type::Static_Initializer();
+#endif
 
 
 	//==================================================================================================================================
