@@ -19,7 +19,7 @@
 
 #define Write_Visualization_Files
 #define  Prevent_Write_to_Console
-//#define  Ignore_Taxi
+#define  Ignore_Taxi
 #define  consider_RideSharing
 #define  Ignore_None_Auto_Modes
 //#define  Ignore_Travel_To_Parking
@@ -179,6 +179,11 @@ namespace Household_Components
 			int Get_Max_Number_of_AVs()
 			{
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
+				if (this->_Parent_Household->uuid<long long>() == 70)
+				{
+					cout << "stop here!\tNumber of vehicles: " << household_properties->Number_of_vehicles<float>()<< endl;
+				}
+				
 				
 				//Number of AVs = Number of Vehicles in the household
 				return household_properties->Number_of_vehicles<float>();
@@ -1110,8 +1115,9 @@ namespace Household_Components
 					ofstream myfile;
 					model.write(scenario->template output_dir_name<string>() + "\\ZOV\\model_" + to_string(HHID) + ".lp");
 #endif
+#ifdef Debug_Intrahousehold_Vehicle_Assignment
 					//cout << "Setup time=" << timer.Stop() << endl;
-					//timer.Start();
+					timer.Start();
 
 					model.optimize();
 
@@ -1120,7 +1126,7 @@ namespace Household_Components
 #endif
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
-					{
+					{						
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
 
@@ -1745,7 +1751,7 @@ namespace Household_Components
 
 			}
 		};
-
+			
 			
 		//template<typename MasterType, typename InheritanceList> typename IntraHousehold_AV_Assignment_Implementation <MasterType, InheritanceList>::type_of(is_initialized) IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::_is_initialized = false;
 		//template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>
