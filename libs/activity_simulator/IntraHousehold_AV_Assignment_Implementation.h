@@ -22,6 +22,7 @@
 #define  Ignore_Taxi
 #define  Ignore_RideSharing
 #define  Ignore_None_Auto_Modes
+//#define  Ignore_Travel_To_Parking
 #define Debug_Intrahousehold_Vehicle_Assignment
 
 #pragma region Setting_prev_and_Next_Acts
@@ -539,18 +540,17 @@ namespace Household_Components
 								{
 									//exit the system
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Hom_E", GRB_BINARY);
-
+									
+#ifndef Ignore_Travel_To_Parking
 									//Binary : Trip to Parking
-									//Prevent going to parking for short term trips
-									//if (per1_activity->Duration<Time_Minutes>() > 15  )
-									{
-										Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Prk_S", GRB_BINARY);
-									}
+									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Prk_S", GRB_BINARY);
+#endif									
 								}
 
 								//In case this activity and next one are at the same location, no trip is required.
 								if (!travel_required) continue;
 
+#ifndef Ignore_Travel_To_Parking
 								//Trip from Parking
 								if (per1_activity_next)
 								{
@@ -595,6 +595,7 @@ namespace Household_Components
 
 									}
 								}
+#endif
 
 								//Travel Between two persons' activities
 								for (auto per2_itr = persons->begin(); per2_itr != persons->end(); per2_itr++)
@@ -823,7 +824,8 @@ namespace Household_Components
 					}
 					#pragma endregion
 
-					#pragma region before leaving the parking, the vehicle should have gone to the parking
+#ifndef Ignore_Travel_To_Parking
+#pragma region before leaving the parking, the vehicle should have gone to the parking
 					for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
 					{
 						auto per1 = (*per1_itr);
@@ -862,6 +864,7 @@ namespace Household_Components
 						}
 					}
 #pragma endregion
+#endif
 
 					#pragma region 	constraints: Making sure each person is 1-picked up and 2-dropped off 3- by the same mode 4-a vehicle has arrived for pick up 5- Vehicle leaves after drop off
 					for (auto per1_itr = persons->begin(); per1_itr != persons->end(); per1_itr++)
@@ -1036,6 +1039,7 @@ namespace Household_Components
 
 										}
 
+#ifndef Ignore_Travel_To_Parking
 										it = grb_Vars.find("t_AV_" + strVehID + "_" + per1_strActID + "SPrk_E_" + per2_strActID + "_E");
 										if (it != grb_Vars.end())
 										{
@@ -1046,6 +1050,7 @@ namespace Household_Components
 											model.addConstr((grb_Vars["start_" + per1_strActID]) - (grb_Vars["end_" + per2_strActID]) + tt1.Value + tt2.Value <= 10000 - ((it->second)) * (0.0001 + 10000), "c2_Feasib_AV2_" + strVehID + "_" + per1_strActID + "SPrk_E_" + per2_strActID + "_E");
 
 										}
+#endif
 									}
 								}
 							}
@@ -1648,7 +1653,7 @@ namespace Household_Components
 
 						//Adding costs
 						//Taxi Trip
-						else if(Vehicle_ID == "00" )
+						if(Vehicle_ID == "00" )
 						{
 							tt = Get_Travel_Time(origin_location, destination_location, per1_activity->End_Time<Time_Minutes>());
 							Obj_LinExpr += it->second * (cost_taxi_fixed + cost_taxi_by_minute * tt.Value);
