@@ -1079,21 +1079,21 @@ namespace Household_Components
 					ofstream myfile;
 					model.write(scenario->template output_dir_name<string>() + "\\ZOV\\model_" + to_string(HHID) + ".lp");
 #endif
-					cout << "Setup time=" << timer.Stop() << endl;
-					timer.Start();
+					//cout << "Setup time=" << timer.Stop() << endl;
+					//timer.Start();
 
 					model.optimize();
 
 
 
-					cout << "Optimization time=" << timer.Stop() << endl;
+					//cout << "Optimization time=" << timer.Stop() << endl;
 					//cout << x.get(GRB_StringAttr_VarName) << " "  << x.get(GRB_DoubleAttr_X) << endl;
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
 					{
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
-						auto dv = std::div(counter_solved, 10);
+						auto dv = std::div(counter_solved, 100);
 						if (dv.rem ==  0)
 						{
 							cout << "\r" << "solved: " << counter_solved << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << endl; // << std::flush;
@@ -1977,13 +1977,15 @@ namespace Household_Components
 
 				if (!movements->empty()) 
 					return movements;
-				else 
+				else
 				{
 					delete movements;
-				return nullptr;
+					return nullptr;
+				}
 
 			}
 		};
+
 			
 		//template<typename MasterType, typename InheritanceList> typename IntraHousehold_AV_Assignment_Implementation <MasterType, InheritanceList>::type_of(is_initialized) IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::_is_initialized = false;
 		//template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>
