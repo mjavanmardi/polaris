@@ -117,7 +117,6 @@ namespace Vehicle_Components
 
 		implementation struct Vehicle_Implementation:public Polaris_Component<MasterType,INHERIT(Vehicle_Implementation),Execution_Object>
 		{
-
 			m_data(bool, is_integrated, NONE, NONE);
 
 			m_data(bool, is_autonomous, NONE, NONE);
@@ -250,6 +249,7 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void initialize(TargetType characteristics, int household_id);
 			template<typename TargetType> void initialize();
+			void initialize(ComponentType* obj);
 
 			template<typename TargetType> void update_eta(float& current_route_time_to_destination);
 		};
@@ -1105,6 +1105,20 @@ namespace Vehicle_Components
 
 			// create DB writing pointer
 
+		}
+
+		template<typename MasterType, typename InheritanceList>
+		void Vehicle_Implementation<MasterType, InheritanceList>::initialize(ComponentType* obj)
+		{
+			this->_is_integrated = obj->_is_integrated;
+			this->_is_autonomous = obj->_is_autonomous;
+			this->_willingness_to_pay = obj->_willingness_to_pay;
+			this->_vehicle_ptr = obj->_vehicle_ptr;
+			this->_write_trajectory = obj->_write_trajectory;
+			this->_simulation_status = obj->_simulation_status;
+			this->_uuid = obj->_uuid;
+			this->_internal_id = obj->_internal_id;
+			this->_vehicle_characteristics = obj->_vehicle_characteristics;
 		}
 
 		template<typename MasterType, typename InheritanceList>

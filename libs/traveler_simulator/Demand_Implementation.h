@@ -142,6 +142,7 @@ namespace Demand_Components
 				typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> zone_itf;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Vehicle_Components::Prototypes::Vehicle<typename get_component_type(vehicles_container_type)> _Vehicle_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				if (!scenario->template write_demand_to_database<bool>()) return;
@@ -241,6 +242,7 @@ namespace Demand_Components
 								trip_rec.setPriority(0);
 								trip_rec.setType(1);
 								trip_rec.setPath(path_db_record);
+								trip_rec.setVehicle(move->vehicle<_Vehicle_Interface*>()->vehicle_ptr<shared_ptr<polaris::io::Vehicle>>());
 								this->_db_ptr->persist(trip_rec);
 								count++;
 							}

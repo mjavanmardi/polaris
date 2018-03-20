@@ -197,7 +197,13 @@ namespace Household_Components
 				// Create a new simulated trip for each ZOV movement
 				for (vector<movement_itf*>::iterator itr = movements->begin(); itr != movements->end(); ++itr)
 				{
-					//cout << this->_uuid << ", new movement" << endl;
+					// allocate temporary vehicle, based on the household AV
+					vehicle_interface* veh = (vehicle_interface*)Allocate<vehicle_interface::ComponentType>();
+					veh->initialize(av);
+					veh->is_integrated(false);
+					veh->movement_plan(*itr);
+					(*itr)->vehicle(veh);
+					((_Demand_Interface*)_global_demand)->Schedule_Generic_Travel(*itr, veh, this->_network_reference, -1);
 				}
 			}
 		};

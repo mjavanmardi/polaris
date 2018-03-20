@@ -100,6 +100,8 @@ namespace Movement_Plan_Components
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(std::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
 
+			m_prototype(Vehicle_Components::Prototypes::Vehicle, typename MasterType::vehicle_type, vehicle, NONE, NONE);
+
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
@@ -125,7 +127,7 @@ namespace Movement_Plan_Components
 			member_component_and_feature_accessor(arrived_time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::template Time_Implementation<NT>);
 			member_component_and_feature_accessor(expected_travel_time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::template Time_Implementation<NT>);
 
-			m_prototype(Null_Prototype, typename MasterType::plan_type, plan, NONE, NONE);
+			//m_prototype(Null_Prototype, typename MasterType::plan_type, plan, NONE, NONE);
 			m_data(int, routed_travel_time, NONE, NONE);
 			m_data(int, estimated_travel_time_when_departed, NONE, NONE);
 			m_data(int, number_of_switches, NONE, NONE);
@@ -671,6 +673,7 @@ namespace Movement_Plan_Components
 			// doesn't do anything since this version is used for router only applications....
 			return;
 		}
+
 
 		//=====================================================================
 		// RECORDING VERSION OF THE MOVEMENT PLAN

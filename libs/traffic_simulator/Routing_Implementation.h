@@ -110,8 +110,8 @@ namespace Routing_Components
 
 				// Get the current origin/destination information
 				int traveler_id = _movement_plan->traveler_id<int>();
-				unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
-				unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
+				//unsigned int origin_id = _movement_plan->template origin<Link_Interface*>()->template uuid<unsigned int>();
+				//unsigned int destination_id = _movement_plan->template destination<Link_Interface*>()->template uuid<unsigned int>();
 				Activity_Location_Interface* origin_loc = _movement_plan->template origin<Activity_Location_Interface*>();
 				Activity_Location_Interface* destination_loc = _movement_plan->template destination<Activity_Location_Interface*>();
 				unsigned int origin_loc_id = origin_loc->template uuid<unsigned int>();

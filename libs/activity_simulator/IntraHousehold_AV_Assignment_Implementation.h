@@ -109,6 +109,8 @@ namespace Household_Components
 			typedef Network_Components::Prototypes::Network< typename _household_itf::get_type_of(network_reference)> _network_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> _activity_location_itf;
+			typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
+			typedef  Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links), _Link_Interface*> _Links_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _movement_plan_itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
@@ -1125,8 +1127,9 @@ namespace Household_Components
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
 					{						
-						auto counter = counter_solved++;
-						auto dv = std::div((long)counter, (long)100);
+						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
+						counter_solved++;
+						auto dv = std::div(counter_solved, 100);
 						if (dv.rem ==  0)
 						{
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
@@ -1705,8 +1708,14 @@ namespace Household_Components
 								destination_location = destination_act->Location<_activity_location_itf*>();
 							}
 							
+							// ignore if no movement or vehicle is loaded
 							if (per1_ID == per2_ID || origin_location == destination_location) continue;
+							if (origin_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>() == destination_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>()) continue;
+
+							// Construct a new movement plan and set minimal fields
 							_movement_plan_itf* movement_plan = (_movement_plan_itf*)Allocate<typename _movement_plan_itf::Component_Type>();
+							movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+							movement_plan->network(_Parent_Household->network_reference<_network_itf*>());
 							movement_plan->template origin<_activity_location_itf*>(origin_location);
 							movement_plan->template destination<_activity_location_itf*>(destination_location);
 							Time_Minutes tt;
@@ -1738,8 +1747,10 @@ namespace Household_Components
 					delete movements;
 					return nullptr;
 				}
+
 			}
 		};
+			
 			
 		//template<typename MasterType, typename InheritanceList> typename IntraHousehold_AV_Assignment_Implementation <MasterType, InheritanceList>::type_of(is_initialized) IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::_is_initialized = false;
 		//template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>
