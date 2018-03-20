@@ -13,6 +13,8 @@ namespace Household_Components
 			accessor(Parent_Household, NONE, NONE);
 
 
+
+
 			template<typename T> void Initialize(T Household)
 			{
 				this_component()->template Initialize<T>(Household);

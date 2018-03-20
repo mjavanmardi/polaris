@@ -197,7 +197,7 @@ namespace Household_Components
 				// Create a new simulated trip for each ZOV movement
 				for (vector<movement_itf*>::iterator itr = movements->begin(); itr != movements->end(); ++itr)
 				{
-					cout << this->_uuid << ", new movement" << endl;
+					//cout << this->_uuid << ", new movement" << endl;
 				}
 			}
 		};
