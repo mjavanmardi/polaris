@@ -1118,7 +1118,7 @@ namespace Household_Components
 #ifdef Debug_Intrahousehold_Vehicle_Assignment
 					//cout << "Setup time=" << timer.Stop() << endl;
 					timer.Start();
-
+#endif
 					model.optimize();
 
 #ifdef Debug_Intrahousehold_Vehicle_Assignment
@@ -1128,7 +1128,7 @@ namespace Household_Components
 					if (status_code == GRB_OPTIMAL)
 					{						
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
-						counter_solved++;
+						auto counter = counter_solved++;
 
 						auto dv = std::div(counter_solved, 100L);
 						if (dv.rem ==  0)
