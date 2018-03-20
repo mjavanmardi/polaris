@@ -106,6 +106,8 @@ namespace Household_Components
 			typedef Network_Components::Prototypes::Network< typename _household_itf::get_type_of(network_reference)> _network_itf;
 
 			typedef Activity_Location_Components::Prototypes::Activity_Location<typename MasterType::activity_location_type> _activity_location_itf;
+			typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
+			typedef  Random_Access_Sequence< typename _activity_location_itf::get_type_of(origin_links), _Link_Interface*> _Links_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _movement_plan_itf;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _movement_plan_itf;
@@ -1620,7 +1622,7 @@ namespace Household_Components
 						else
 						{
 							per1_activity = act_String_map[From_Act];
-							auto per1_ID = per1_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+							per1_ID = per1_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
 							origin_location = per1_activity->Location<_activity_location_itf*>();
 						}
 
@@ -1631,7 +1633,7 @@ namespace Household_Components
 						else
 						{
 							per2_activity = act_String_map[To_Act];
-							auto per2_ID = per2_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+							per2_ID = per2_activity->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
 							destination_location = per2_activity->Location<_activity_location_itf*>();
 						}						
 
@@ -1904,7 +1906,7 @@ namespace Household_Components
 							else
 							{
 								origin_act = act_String_map[From_Act];
-								auto per1_ID = origin_act->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+								per1_ID = origin_act->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
 								origin_location = origin_act->Location<_activity_location_itf*>();
 							}
 
@@ -1915,13 +1917,19 @@ namespace Household_Components
 							}
 							else
 							{
-								_activity_itf* destination_act = act_String_map[To_Act];
-								auto per2_ID = destination_act->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
+								destination_act = act_String_map[To_Act];
+								per2_ID = destination_act->template Parent_Planner<_planning_itf*>()->template Parent_Person<_person_itf*>()->template uuid<long>();
 								destination_location = destination_act->Location<_activity_location_itf*>();
 							}
 							
+							// ignore if no movement or vehicle is loaded
 							if (per1_ID == per2_ID || origin_location == destination_location) continue;
+							if (origin_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>() == destination_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>()) continue;
+
+							// Construct a new movement plan and set minimal fields
 							_movement_plan_itf* movement_plan = (_movement_plan_itf*)Allocate<typename _movement_plan_itf::Component_Type>();
+							movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+							movement_plan->network(_Parent_Household->network_reference<_network_itf*>());
 							movement_plan->template origin<_activity_location_itf*>(origin_location);
 							movement_plan->template destination<_activity_location_itf*>(destination_location);
 							Time_Minutes tt;

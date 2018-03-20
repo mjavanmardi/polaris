@@ -74,7 +74,7 @@ namespace Movement_Plan_Components
 			tag_as_prototype;
 
 			accessor(network, NONE, NONE);
-
+			accessor(vehicle, NONE, NONE);
 			accessor(trajectory_container, NONE, NONE);
 			//TODO: Omer - Multimodal Trajectory
 			accessor(multimodal_trajectory_container, NONE, NONE);
