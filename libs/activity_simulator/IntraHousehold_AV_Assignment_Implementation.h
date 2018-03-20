@@ -1112,7 +1112,7 @@ namespace Household_Components
 #endif
 					//cout << "Setup time=" << timer.Stop() << endl;
 					//timer.Start();
-#endif
+
 					model.optimize();
 
 #ifdef Debug_Intrahousehold_Vehicle_Assignment
@@ -1123,7 +1123,8 @@ namespace Household_Components
 					{
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						counter_solved++;
-						auto dv = std::div(counter_solved, 100);
+
+						auto dv = std::div(counter_solved, 100L);
 						if (dv.rem ==  0)
 						{
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
