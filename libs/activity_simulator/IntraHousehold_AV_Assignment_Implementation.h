@@ -17,13 +17,13 @@
 #include <cstdio>
 #include <ctime>
 
-#define Write_Visualization_Files
+//#define Write_Visualization_Files
 #define  Prevent_Write_to_Console
 #define  Ignore_Taxi
 #define  consider_RideSharing
 #define  Ignore_None_Auto_Modes
 //#define  Ignore_Travel_To_Parking
-#define Debug_Intrahousehold_Vehicle_Assignment
+//#define Debug_Intrahousehold_Vehicle_Assignment
 
 #pragma region Setting_prev_and_Next_Acts
 
@@ -179,12 +179,7 @@ namespace Household_Components
 			int Get_Max_Number_of_AVs()
 			{
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
-				if (this->_Parent_Household->uuid<long long>() == 70)
-				{
-					cout << "stop here!\tNumber of vehicles: " << household_properties->Number_of_vehicles<float>()<< endl;
-				}
-				
-				
+
 				//Number of AVs = Number of Vehicles in the household
 				return household_properties->Number_of_vehicles<float>();
 
@@ -479,57 +474,45 @@ namespace Household_Components
 
 						_scheduler_itf* per1_scheduler = per1->Scheduling_Faculty<_scheduler_itf*>();
 						_activity_container_itf* per1_activities = per1_scheduler->Activity_Container<_activity_container_itf*>();
-						//per1->Sort_Activity_Records<void>();
-						
-						//for (auto per1_act_itr = per1_activities->begin(); per1_act_itr != per1_activities->end(); per1_act_itr++)
-						//{
-						//	per1_activity = *per1_act_itr;
-						//	int act_id = per1_activity->Activity_Plan_ID<int>();
-						//	string per1_strActID = act_counter > 100 ? to_string(act_counter) : act_counter > 10 ? "0" + to_string(act_counter) : "00" + to_string(act_counter);
-						//	act_ID_map.insert(std::pair<int, string>(act_id, per1_strActID));
-						//	act_counter++;
-						//}
 
 						for (auto per1_act_itr = per1_activities->begin(); per1_act_itr != per1_activities->end(); per1_act_itr++)
 						{
-							Setting_prev_and_Next_Acts ( 1 );
-							//Movement_Plans* movements = scheduler->template Movement_Plans_Container<Movement_Plans*>();
-							//cout << "Start_Time = " << pActivity1->template Start_Time<Time_Minutes>() << endl;
+							Setting_prev_and_Next_Acts(1);
 
-							#pragma region Start and duration of activy  
+#pragma region Start and duration of activy  
 							//defining start and end of activity and lower and upper bounds of start(lowe bounds are set in activity class construction)
-														double start_lb = max(0.0, per1_activity->template Start_Time<Time_Minutes>().Value - min_start_flex);
-														double start_ub = per1_activity-> template Start_Time<Time_Minutes>().Value + min_start_flex;
+							double start_lb = max(0.0, per1_activity->template Start_Time<Time_Minutes>().Value - min_start_flex);
+							double start_ub = per1_activity-> template Start_Time<Time_Minutes>().Value + min_start_flex;
 
-														//constraint duration of activity
-														double duration_lb = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
-														double duration_ub = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value + min_dur_flex);
+							//constraint duration of activity
+							double duration_lb = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
+							double duration_ub = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value + min_dur_flex);
 
-														strVarName = "start_" + per1_strActID;
-														//GRBVar start = model.addVar(start_lb, start_ub, 0.0, GRB_CONTINUOUS, strVarName);
-														//grb_Vars.insert(std::pair<string, GRBVar*>(strVarName, &start));
+							strVarName = "start_" + per1_strActID;
+							//GRBVar start = model.addVar(start_lb, start_ub, 0.0, GRB_CONTINUOUS, strVarName);
+							//grb_Vars.insert(std::pair<string, GRBVar*>(strVarName, &start));
 
-														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
-														auto start = grb_Vars[strVarName];
-														model.addConstr(start >= start_lb, "c_start_lb_" + per1_strActID);
-														model.addConstr(start <= start_ub, "c_start_ub_" + per1_strActID);
+							Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+							auto start = grb_Vars[strVarName];
+							model.addConstr(start >= start_lb, "c_start_lb_" + per1_strActID);
+							model.addConstr(start <= start_ub, "c_start_ub_" + per1_strActID);
 
-														strVarName = "end_" + per1_strActID;
-														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
-														auto end = grb_Vars[strVarName];
-														model.addConstr(end >= start_lb, "c_end_lb_" + per1_strActID);
-														model.addConstr(end <= start_ub + duration_ub, "c_end_ub_" + per1_strActID);
+							strVarName = "end_" + per1_strActID;
+							Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+							auto end = grb_Vars[strVarName];
+							model.addConstr(end >= start_lb, "c_end_lb_" + per1_strActID);
+							model.addConstr(end <= start_ub + duration_ub, "c_end_ub_" + per1_strActID);
 
-														strVarName = "duration_" + per1_strActID;
-														Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
-														auto duration = grb_Vars[strVarName];
-														model.addConstr(end - start == duration);
+							strVarName = "duration_" + per1_strActID;
+							Add_New_Variable(grb_Vars, model, strVarName, GRB_CONTINUOUS);
+							auto duration = grb_Vars[strVarName];
+							model.addConstr(end - start == duration);
 
-														model.addConstr(duration >= duration_lb, "c_dur_lb_" + per1_strActID);
-														model.addConstr(duration <= duration_ub, "c_dur_ub_" + per1_strActID);
+							model.addConstr(duration >= duration_lb, "c_dur_lb_" + per1_strActID);
+							model.addConstr(duration <= duration_ub, "c_dur_ub_" + per1_strActID);
 
 
-							#pragma endregion 
+#pragma endregion 
 
 							bool travel_required = true;
 							//Adding Taxi trip from an activity to next activity
@@ -558,7 +541,7 @@ namespace Household_Components
 							for (int veh_id = 1; veh_id <= Get_Max_Number_of_AVs(); ++veh_id)
 							{
 								strVehID = std::to_string(veh_id);
-								if(veh_id < 10) strVehID = "0" + strVehID;
+								if (veh_id < 10) strVehID = "0" + strVehID;
 
 								//from parking to first Activity.
 								if (per1_activity_next && travel_required)
@@ -583,19 +566,17 @@ namespace Household_Components
 								{
 									//exit the system
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Hom_E", GRB_BINARY);
-									
+
 #ifndef Ignore_Travel_To_Parking
 									//Binary : Trip to Parking
 									Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per1_strActID + "_S_Prk_S", GRB_BINARY);
 #endif									
 								}
 
-								//In case this activity and next one are at the same location, no trip is required.
-								if (!travel_required) continue;
 
 #ifndef Ignore_Travel_To_Parking
 								//Trip from Parking
-								if (per1_activity_next)
+								if (per1_activity_next && travel_required)
 								{
 									for (auto per2_itr = persons->begin(); per2_itr != persons->end(); per2_itr++)
 									{
@@ -623,7 +604,7 @@ namespace Household_Components
 												//trying to limit the size of the problem by eliminating infeasible combinations
 												if (per1->uuid<long>() == per2->uuid<long>())
 												{
-													if(per2_activity->Start_Time<Time_Minutes>() < per1_activity->Start_Time<Time_Minutes>() || per2_strActID == per1_strActID)
+													if (per2_activity->Start_Time<Time_Minutes>() < per1_activity->Start_Time<Time_Minutes>() || per2_strActID == per1_strActID)
 														Add_New_Variable(grb_Vars, model, "t_AV_" + strVehID + "_" + per2_strActID + "SPrk_E_" + per1_strActID + "_E", GRB_BINARY);
 												}
 												else
@@ -648,11 +629,11 @@ namespace Household_Components
 									_scheduler_itf* per2_scheduler = per2->Scheduling_Faculty<_scheduler_itf*>();
 									_activity_container_itf* per2_activities = per2_scheduler->Activity_Container<_activity_container_itf*>();
 
-									if (per1->uuid<long>() == per2->uuid<long>()){continue;}
+									if (per1->uuid<long>() == per2->uuid<long>()) { continue; }
 
 									for (auto per2_act_itr = per2_activities->begin(); per2_act_itr != per2_activities->end(); per2_act_itr++)
 									{
-										#pragma region Setting prev and next activities
+#pragma region Setting prev and next activities
 										per2_activity = *per2_act_itr;
 										auto per2_strActID = GetstrActID(per2_activity, act_ID_map, per2);
 										auto per2_act_itr_next = std::next(per2_act_itr);
@@ -679,7 +660,7 @@ namespace Household_Components
 											per2_strActID_prev = "";
 										}
 #pragma endregion
-										
+
 										if (per1_activity_prev && per2_activity_next)
 										{
 											strVarName = "t_AV_" + strVehID + "_" + per1_strActID + "_S_" + per2_strActID + "_E";
@@ -689,7 +670,7 @@ namespace Household_Components
 										}
 
 #ifdef consider_RideSharing
-										if (per1_activity_prev && per2_activity_prev )
+										if (per1_activity_prev && per2_activity_prev)
 										{
 											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
 											if (Get_Start_lb(per1_activity) + tt.Value - 2.0 <= Get_Start_ub(per2_activity))
@@ -699,18 +680,18 @@ namespace Household_Components
 											}
 										}
 
-										if (per1_activity_next && per2_activity_prev)
+										if (per1_activity_next && per2_activity_prev && travel_required)
 										{
 											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
 											if (Get_End_lb(per1_activity) + tt.Value - 2.0 <= Get_Start_ub(per2_activity))
 											{
 
 												strVarName = "t_AV_" + strVehID + "_" + per1_strActID + "_E_" + per2_strActID + "_S";
-												Add_New_Variable(grb_Vars, model, strVarName , GRB_BINARY);
+												Add_New_Variable(grb_Vars, model, strVarName, GRB_BINARY);
 											}
 										}
 
-										if (per1_activity_next && per2_activity_next)
+										if (per1_activity_next && per2_activity_next && travel_required)
 										{
 											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
 											if (Get_End_lb(per1_activity) + tt - 2.0 <= Get_End_ub(per2_activity))
@@ -1040,7 +1021,7 @@ namespace Household_Components
 										{
 											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->Start_Time<Time_Minutes>());
 											model.addConstr((grb_Vars["start_" + per1_strActID]) + tt.Value - (grb_Vars["end_" + per2_strActID]) <= 1 + 10000 - ((it->second)) * (0.0001 + 10000), "c2_Feasib_AV1_" + strVehID + "_" + per1_strActID + "_S_" + per2_strActID + "_E");
-											model.addConstr((grb_Vars["start_" + per1_strActID]) + tt.Value - (grb_Vars["end_" + per2_strActID]) >= -1 - 10000 + ((it->second)) * (0.0001 + 10000), "c2_Feasib_AV2_" + strVehID + "_" + per1_strActID + "_S_" + per2_strActID + "_E");
+											//model.addConstr((grb_Vars["start_" + per1_strActID]) + tt.Value - (grb_Vars["end_" + per2_strActID]) >= -1 - 10000 + ((it->second)) * (0.0001 + 10000), "c2_Feasib_AV2_" + strVehID + "_" + per1_strActID + "_S_" + per2_strActID + "_E");
 
 											//Making sure a loop trip does not happen!
 											auto it1 = grb_Vars.find("t_AV_" + strVehID + "_" + per2_strActID + "_E_" + per1_strActID + "_S");
@@ -1128,8 +1109,8 @@ namespace Household_Components
 					if (status_code == GRB_OPTIMAL)
 					{						
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
-						counter_solved++;
-						auto dv = std::div(counter_solved, 100);
+						auto counter = ++counter_solved;
+						auto dv = std::div(counter, 100L);
 						if (dv.rem ==  0)
 						{
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
@@ -1284,7 +1265,7 @@ namespace Household_Components
 				myfile.open(scenario->template output_dir_name<string>() + "\\ZOV\\Activities_" + to_string(HHID) + ".txt");
 				std::stringstream file_content;
 				//file_content << "Houehols_ID,Person_ID,Activity_ID,Activity_Order,Activity_Location,Start,End,Min_Start,Max_Start,Min_Duration,Max_Duration,New_Start,New_End,New_Duration\n";
-				file_content << "Household_ID,Person_ID,Activity_ID,Start,End,New_Start,New_End,At_Home,Mode\n";
+				file_content << "Household_ID,Person_ID,Activity_ID,Start,End,New_Start,New_End,At_Home,Mode,Vehicles\n";
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
 				_persons_container_itf* persons = this->_Parent_Household->Persons_Container<_persons_container_itf*>();
 
@@ -1311,7 +1292,7 @@ namespace Household_Components
 						if (per_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY ||
 							per_activity->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() == Activity_Components::Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
 							at_home = 1;
-						file_content << HHID << "," << perID << "," << act_ID_map[key] << "," << start << "," << end << "," << new_start << "," << new_end << "," << at_home <<"," << mode << endl;
+						file_content << HHID << "," << perID << "," << act_ID_map[key] << "," << start << "," << end << "," << new_start << "," << new_end << "," << at_home <<"," << mode <<","<< Get_Max_Number_of_AVs() << endl;
 					}
 				}
 				myfile << file_content.rdbuf();
