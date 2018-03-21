@@ -1436,6 +1436,12 @@ namespace Household_Components
 							Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
 						}
 
+						//Trying to make trip visualization more readable by preventing intra-person travel in equal objective function values!
+						if (per1_ID != per2_ID)
+						{
+							Obj_LinExpr += 0.1;
+						}
+
 						//no cost is added if O==D
 						if (origin_location == destination_location) continue;
 
