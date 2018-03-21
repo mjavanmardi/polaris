@@ -17,7 +17,7 @@
 #include <cstdio>
 #include <ctime>
 
-//#define Write_Visualization_Files
+#define Write_Visualization_Files
 #define  Prevent_Write_to_Console
 #define  Ignore_Taxi
 #define  consider_RideSharing
@@ -180,12 +180,10 @@ namespace Household_Components
 			{
 				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
 
-				//Number of AVs = Number of Vehicles in the household
-				return household_properties->Number_of_vehicles<float>();
+				int HH_size = household_properties->Household_size<int>();
+				int nVehicles = household_properties->Number_of_vehicles<int>();
 
-				//Number of AVs = Number of people in the household
-				float HH_size = household_properties->Household_size<float>();
-				return HH_size;
+				return  std::min(nVehicles, HH_size);
 
 				//Number of AVs = Number of people above 6 years old
 				int maxVehicles = 0;
@@ -1426,6 +1424,18 @@ namespace Household_Components
 							destination_location = per2_activity->Location<_activity_location_itf*>();
 						}						
 
+						//entering the system
+						if (From_Act == "Hom")
+						{
+							Obj_LinExpr += var * cost_AV_fixed; //fixed Cost of new AV in the system
+						}
+						
+						//Parking at activity location
+						if (per1_activity == per2_activity && !Home_Activity(per1_activity))
+						{
+							Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
+						}
+
 						//no cost is added if O==D
 						if (origin_location == destination_location) continue;
 
@@ -1442,8 +1452,9 @@ namespace Household_Components
 							tt = Get_Travel_Time(origin_location, destination_location, per1_activity->Start_Time<Time_Minutes>());
 							Obj_LinExpr += var * cost_AV_energy * tt.Value;
 
-							//TODO: if the origin activity is not the last activity of the day, it means the vehicle goes to home in hte middle of hte day, so it will be a ZOV trip.
+							//TODO: if the origin activity is not the last activity of the day, it means the vehicle goes to home in the middle of the day, so it will be a ZOV trip.
 							//apply ZOV Tax
+							Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
 						}
 						//Travel to Parking
 						else if (To_Act == "Prk")
@@ -1463,16 +1474,8 @@ namespace Household_Components
 						else if (From_Act == "Hom")
 						{
 							tt = Get_Travel_Time(origin_location, destination_location, per2_activity->End_Time<Time_Minutes>());
-							Obj_LinExpr += var * cost_AV_fixed; //fixed Cost of new AV in the system
 							Obj_LinExpr += var * cost_AV_energy * tt.Value; //cost of travel
-							//TODO : charge the ZOV tax if it enters an activity location other than the first one.make sure it is not double counted when empty vehicles are being taxed.
-							if (origin_location != destination_location)
-								Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
-						}
-						//Parking at activity location
-						else if (per1_activity == per1_activity && !Home_Activity(per1_activity))
-						{
-							Obj_LinExpr += var * cost_parking *  per1_activity->Duration<Time_Minutes>();
+							Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
 						}
 						//a trip between two activity locations (other than home or parking)
 						else 
@@ -1737,14 +1740,14 @@ namespace Household_Components
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_act_dur = 5;
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_start_flex = 15;
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_dur_flex = 15;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -5.0;				//fixed cost of each AV in the system
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -3.0 / 60.0;		//$0.5 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -20.0;				//fixed cost of each AV in the system
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -3.0 / 60.0;		//$3 per hour
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_energy = -5.0 / 60.0;		//Cost of AV : $5 per hour(0.0833 per minute)
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_vot = -10.0 / 60.0;				//Person time cost : $10 / hr($0.167 / min) When changes to the activity start and duration is made
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_fixed = -3.0;			//#cost of taxi : $2
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -20.0 / 60.0;	//#$24 per hour($0.4 per minute)
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -60.0 / 60.0;		//  #$1 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -100.0 / 100.0;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_fixed = -3.0;			//cost of taxi : $2
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -20.0 / 60.0;	//$24 per hour($0.4 per minute)
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -10.0 / 60.0;		//  $10 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -2.0; //2 $ per hour
 		
 		template<typename MasterType, typename InheritanceList> _atomic_counter IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_solved = 0;
 		template<typename MasterType, typename InheritanceList> _atomic_counter IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_timedout = 0;
