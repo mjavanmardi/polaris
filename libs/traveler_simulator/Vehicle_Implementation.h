@@ -1115,7 +1115,7 @@ namespace Vehicle_Components
 			this->_willingness_to_pay = obj->_willingness_to_pay;
 			this->_vehicle_ptr = obj->_vehicle_ptr;
 			this->_write_trajectory = obj->_write_trajectory;
-			this->_simulation_status = obj->_simulation_status;
+			this->_simulation_status = Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED;
 			this->_uuid = obj->_uuid;
 			this->_internal_id = obj->_internal_id;
 			this->_vehicle_characteristics = obj->_vehicle_characteristics;
