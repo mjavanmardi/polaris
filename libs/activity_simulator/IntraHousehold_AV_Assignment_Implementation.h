@@ -1109,8 +1109,9 @@ namespace Household_Components
 					if (status_code == GRB_OPTIMAL)
 					{						
 						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
-						auto counter = ++counter_solved;
-						auto dv = std::div(counter, 100L);
+						auto counter = counter_solved++;
+
+						auto dv = std::div(counter_solved, 100L);
 						if (dv.rem ==  0)
 						{
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
@@ -1691,7 +1692,7 @@ namespace Household_Components
 							
 							// ignore if no movement or vehicle is loaded
 							if (per1_ID == per2_ID || origin_location == destination_location) continue;
-							if (origin_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>() == destination_location->origin_links<_Links_Container_Interface&>()[0]->uuid<int>()) continue;
+							if (origin_location->origin_links<_Links_Container_Interface&>()[0]->dbid<int>() == destination_location->origin_links<_Links_Container_Interface&>()[0]->dbid<int>()) continue;
 
 							// Construct a new movement plan and set minimal fields
 							_movement_plan_itf* movement_plan = (_movement_plan_itf*)Allocate<typename _movement_plan_itf::Component_Type>();

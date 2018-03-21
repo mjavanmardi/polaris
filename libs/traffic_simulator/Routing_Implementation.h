@@ -99,9 +99,13 @@ namespace Routing_Components
 				{
 					THROW_EXCEPTION("Movement plan is undefined.");
 				}
-				else if (_movement_plan->template origin<Link_Interface*>() == nullptr)
+				else if (_movement_plan->template origin<Activity_Location_Interface*>() == nullptr)
 				{
 					THROW_EXCEPTION("Origin is undefined.");
+				}
+				else if (_movement_plan->template destination<Activity_Location_Interface*>() == nullptr)
+				{
+					THROW_EXCEPTION("Destination is undefined.");
 				}
 
 				// get a routable network; routable_network know what thread you are
