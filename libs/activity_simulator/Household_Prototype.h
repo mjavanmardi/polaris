@@ -282,12 +282,9 @@ namespace Prototypes
 
 			person_container_itf* persons = pthis->Persons_Container<person_container_itf*>();
 
-				pthis->Vehicle_Chooser<vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
-				response.next._iteration = Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5;
-				response.next._sub_iteration = 0;
-
-			//Activities are generated at iteration = 60
-			//Activities are planned by iteration = 300
+			pthis->Vehicle_Chooser<vehicle_chooser_interface*>()->Select_Vehicles(pthis->home_synthesis_zone<zone_interface*>());
+			response.next._iteration = Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5;
+			response.next._sub_iteration = 0;
 		}
 		else if (iteration() == Scenario_Components::Types::Demand_Iteration_keys::END_OF_ACTIVITY_GENERATION + 5)
 		{

@@ -1108,11 +1108,8 @@ namespace Household_Components
 					auto status_code = model.get(GRB_IntAttr_Status);
 					if (status_code == GRB_OPTIMAL)
 					{						
-						//cout << "End " << HHID << "\tHH_SIZ: " << HH_size << "\ttime: " << duration << "\tcounter: " << counter_solved <<  endl;
 						auto counter = counter_solved++;
-
-						auto dv = std::div(counter_solved, 100L);
-						if (dv.rem ==  0)
+						if (counter % 100 ==  0)
 						{
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
 							aggregate_timer.Start();
