@@ -190,7 +190,10 @@ namespace Transit_Vehicle_Trip_Components
 					trajectory_stream << "I arrived" << endl;
 				}
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 			}
 
 			void alight_travelers()
@@ -267,7 +270,10 @@ namespace Transit_Vehicle_Trip_Components
 				}
 
 				trajectory_stream << endl;
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 			}			
 
 			void board_travelers()
@@ -390,7 +396,10 @@ namespace Transit_Vehicle_Trip_Components
 				}
 
 				trajectory_stream << endl;
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 			}
 
 			void transit_vehicle_departing()
@@ -462,7 +471,10 @@ namespace Transit_Vehicle_Trip_Components
 				this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
 				this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 			}
 
 			void transit_vehicle_depot()
@@ -503,7 +515,10 @@ namespace Transit_Vehicle_Trip_Components
 				this->template seated_load<std::vector<int>&>()[position] = people_seated->size();
 				this->template standing_load<std::vector<int>&>()[position] = people_standing->size();
 
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 			}
 		};
 

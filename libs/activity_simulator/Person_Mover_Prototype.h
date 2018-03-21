@@ -1203,7 +1203,10 @@ namespace Person_Components
 				//TODO: Omer
 				stringstream trajectory_stream;
 				trajectory_stream << "help this poor soul" << endl;
-				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				if ((int)num_sim_threads() == 1)
+				{
+					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+				}
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
 				//response.next._iteration = pthis->template Next_Simulation_Time<Simulation_Timestep_Increment>();
@@ -1378,13 +1381,19 @@ namespace Person_Components
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
 				{							
 					trajectory_stream << ", will alight my trip, and this is my destination!" << endl;
-					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					if ((int)num_sim_threads() == 1)
+					{
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					}
 					this->template person_alighting_transit_vehicle<NT>();							
 				}
 				else
 				{
 					trajectory_stream << "and this is my destination!" << endl;
-					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					if ((int)num_sim_threads() == 1)
+					{
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					}
 				}
 
 				person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
@@ -1408,7 +1417,10 @@ namespace Person_Components
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)
 				{
 					trajectory_stream << "and will alight my trip to start walking/driving." << endl;
-					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					if ((int)num_sim_threads() == 1)
+					{
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					}
 					this->template person_alighting_transit_vehicle<NT>();
 					//Next simulation time is the current time
 					next_simulation_time = iteration();
@@ -1420,7 +1432,10 @@ namespace Person_Components
 				else
 				{
 					trajectory_stream << "and will continue moving." << endl; 
-					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					if ((int)num_sim_threads() == 1)
+					{
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					}
 					//Next simulation time is the current time
 					next_simulation_time = iteration();
 					//Next subiteration is moving
@@ -1456,7 +1471,10 @@ namespace Person_Components
 					if (current_transit_vehicle == transit_vehicle_trip)
 					{
 						trajectory_stream << "and will move in my vehicle with trip ID:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
-						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+						if ((int)num_sim_threads() == 1)
+						{
+							fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+						}
 						//Next simulation time is the vehicle departure time
 						next_simulation_time = transit_vehicle_trip->template departure_seconds<std::vector<int>>()[transit_vehicle_position];
 						//Next subiteration is moving
@@ -1472,7 +1490,10 @@ namespace Person_Components
 					else
 					{
 						trajectory_stream << "and will alight the following trip:\t" << current_transit_vehicle->template dbid<std::string>() << "\t to wait for another trip:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
-						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+						if ((int)num_sim_threads() == 1)
+						{
+							fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+						}
 						this->template person_alighting_transit_vehicle<NT>();
 						this->template person_waiting_at_beginning_of_link<NT>();
 					}
@@ -1481,7 +1502,10 @@ namespace Person_Components
 				else
 				{			
 					trajectory_stream << "and will wait for my trip:\t" << transit_vehicle_trip->template dbid<std::string>() << endl;
-					fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					if ((int)num_sim_threads() == 1)
+					{
+						fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+					}
 					this->template person_waiting_at_beginning_of_link<NT>();
 				}
 			}		
@@ -1536,7 +1560,10 @@ namespace Person_Components
 			this->template Next_Simulation_Time<Simulation_Timestep_Increment>(next_simulation_time);
 			this->template Next_Sub_Iteration<int>(next_sub);
 
-			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			if ((int)num_sim_threads() == 1)
+			{
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
 		}
 		
 		template<typename ComponentType>
@@ -1640,7 +1667,10 @@ namespace Person_Components
 			this->template Next_Sub_Iteration<int>(next_sub);
 			person->template simulation_status<Person_Components::Types::Movement_Status_Keys>(next_status);
 
-			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			if ((int)num_sim_threads() == 1)
+			{
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
 		}	
 
 		template<typename ComponentType>
@@ -1736,7 +1766,10 @@ namespace Person_Components
 			//Schedule departure event for person
 			static_cast<ComponentType*>(this)->template Load_Event<ComponentType>(&move_persons_in_multimodal_network_conditional, next_simulation_time, next_sub);		
 
-			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			if ((int)num_sim_threads() == 1)
+			{
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
 		}
 
 		template<typename ComponentType>
@@ -1814,7 +1847,10 @@ namespace Person_Components
 				trajectory_stream << "\t and I was standing" << endl;
 			}
 
-			fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			if ((int)num_sim_threads() == 1)
+			{
+				fw_transit_vehicle_trajectory.Write_NoDelim(trajectory_stream);
+			}
 		}
 		//TODO: Omer END
 	}
