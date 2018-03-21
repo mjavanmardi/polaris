@@ -1490,12 +1490,14 @@ namespace Household_Components
 							Obj_LinExpr += var * cost_AV_energy * tt.Value;
 							
 							//cost of parking
-							double parking_time = max(0.0, preferred_arrival_time - tt.Value - departure_time);
-							Obj_LinExpr += var * cost_parking * parking_time;
-
+							if (!Home_Activity(per1_activity) && !Home_Activity(per2_activity))
+							{
+								double parking_time = max(0.0, preferred_arrival_time - tt.Value - departure_time);
+								Obj_LinExpr += var * cost_parking * parking_time;
+							}
 							//cost of ZOV tax
-							//#ifdef Ignore_Travel_To_Parking
-							if (per1_ID != per2_ID)
+							//TODO: cases where From_Act_OSE == "S" && To_Act_DSE == "S" could also not be a ZOV, but we need to have a passenger counter to make sure of that! Add a counter later to fix this
+							if (per1_ID != per2_ID && From_Act_OSE == "S" && To_Act_DSE != "S")
 							{
 								Obj_LinExpr += var * (cost_ZOV_fixed_tax + cost_ZOV_tax * tt.Value);
 							}
