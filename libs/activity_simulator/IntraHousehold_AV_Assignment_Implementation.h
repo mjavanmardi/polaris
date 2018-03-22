@@ -19,7 +19,7 @@
 
 #define Write_Visualization_Files
 #define  Prevent_Write_to_Console
-#define  Ignore_Taxi
+//#define  Ignore_Taxi
 #define  consider_RideSharing
 #define  Ignore_None_Auto_Modes
 //#define  Ignore_Travel_To_Parking
@@ -255,23 +255,43 @@ namespace Household_Components
 				//}
 				//else
 				{
+					Time_Minutes start_flex_val = min_start_flex;
+					Activity_Components::Types::FLEXIBILITY_VALUES start_flex = activity->Start_Time_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
+					if (start_flex == Activity_Components::Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY) start_flex_val = min_start_flex * 12.0;
+					else if (start_flex == Activity_Components::Types::FLEXIBILITY_VALUES::MODERATE_FLEXIBILITY) start_flex_val = min_start_flex * 3.0;
+
 					return  max(0.0, activity-> template Start_Time<Time_Minutes>().Value - min_start_flex);
 				}
 			}
 
 			Time_Minutes  Get_Start_ub(_activity_itf* activity)
 			{
-				return  activity-> template Start_Time<Time_Minutes>().Value + min_start_flex;
+				Time_Minutes start_flex_val = min_start_flex;
+				Activity_Components::Types::FLEXIBILITY_VALUES start_flex = activity->Start_Time_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
+				if (start_flex == Activity_Components::Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY) start_flex_val = min_start_flex * 12.0;
+				else if (start_flex == Activity_Components::Types::FLEXIBILITY_VALUES::MODERATE_FLEXIBILITY) start_flex_val = min_start_flex * 3.0;
+				
+				return  activity-> template Start_Time<Time_Minutes>().Value + start_flex_val;
 			}
 
 			Time_Minutes  Get_Duration_lb(_activity_itf* activity)
 			{
-				return max(min_act_dur, activity-> template End_Time<Time_Minutes>().Value - activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
+				Time_Minutes duration_flex_val = min_dur_flex;
+				Activity_Components::Types::FLEXIBILITY_VALUES duration_flex = activity->Duration_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
+				if (duration_flex == Activity_Components::Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY) duration_flex_val = min_start_flex * 12.0;
+				else if (duration_flex == Activity_Components::Types::FLEXIBILITY_VALUES::MODERATE_FLEXIBILITY) duration_flex_val = min_start_flex * 3.0;
+
+				return max(min_act_dur, activity-> template End_Time<Time_Minutes>().Value - activity-> template Start_Time<Time_Minutes>().Value - duration_flex_val);
 			}
 
 			Time_Minutes  Get_Duration_ub(_activity_itf* activity)
 			{
-				return max(min_act_dur, activity-> template End_Time<Time_Minutes>().Value - activity-> template Start_Time<Time_Minutes>().Value + min_dur_flex);
+				Time_Minutes duration_flex_val = min_dur_flex;
+				Activity_Components::Types::FLEXIBILITY_VALUES duration_flex = activity->Duration_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
+				if (duration_flex == Activity_Components::Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY) duration_flex_val = min_start_flex * 12.0;
+				else if (duration_flex == Activity_Components::Types::FLEXIBILITY_VALUES::MODERATE_FLEXIBILITY) duration_flex_val = min_start_flex * 3.0;
+
+				return activity-> template End_Time<Time_Minutes>().Value - activity-> template Start_Time<Time_Minutes>().Value + duration_flex_val;
 			}
 
 			Time_Minutes  Get_End_lb(_activity_itf* activity)
@@ -479,12 +499,12 @@ namespace Household_Components
 
 #pragma region Start and duration of activy  
 							//defining start and end of activity and lower and upper bounds of start(lowe bounds are set in activity class construction)
-							double start_lb = max(0.0, per1_activity->template Start_Time<Time_Minutes>().Value - min_start_flex);
-							double start_ub = per1_activity-> template Start_Time<Time_Minutes>().Value + min_start_flex;
+							double start_lb = Get_Start_lb(per1_activity);  
+							double start_ub = Get_Start_ub(per1_activity); 
 
 							//constraint duration of activity
-							double duration_lb = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value - min_dur_flex);
-							double duration_ub = max(min_act_dur, per1_activity-> template End_Time<Time_Minutes>().Value - per1_activity-> template Start_Time<Time_Minutes>().Value + min_dur_flex);
+							double duration_lb = Get_Duration_lb(per1_activity); 
+							double duration_ub = Get_Duration_ub(per1_activity); 
 
 							strVarName = "start_" + per1_strActID;
 							//GRBVar start = model.addVar(start_lb, start_ub, 0.0, GRB_CONTINUOUS, strVarName);
@@ -1746,16 +1766,16 @@ namespace Household_Components
 		//template<typename MasterType, typename InheritanceList> float Simple_Activity_Generator_Implementation<MasterType, InheritanceList>
 		//template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_travel_time = 1;
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_act_dur = 5;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_start_flex = 15;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_dur_flex = 15;
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -20.0;				//fixed cost of each AV in the system
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -3.0 / 60.0;		//$3 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_energy = -5.0 / 60.0;		//Cost of AV : $5 per hour(0.0833 per minute)
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_start_flex = 5;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::min_dur_flex = 5;
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_fixed = -0.0;				//fixed cost of each AV in the system
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_parking = -0.0 / 60.0;		//$3 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_AV_energy = -4.0 / 60.0;		//Cost of AV : $5 per hour(0.0833 per minute)
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_vot = -10.0 / 60.0;				//Person time cost : $10 / hr($0.167 / min) When changes to the activity start and duration is made
 		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_fixed = -3.0;			//cost of taxi : $2
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -20.0 / 60.0;	//$24 per hour($0.4 per minute)
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -10.0 / 60.0;		//  $10 per hour
-		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -2.0; //2 $ per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_taxi_by_minute = -24.0 / 60.0;	//$24 per hour($0.4 per minute)
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_tax = -5.0 / 60.0;		//  $10 per hour
+		template<typename MasterType, typename InheritanceList> double IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::cost_ZOV_fixed_tax = -0.0; //2 $ per hour
 		
 		template<typename MasterType, typename InheritanceList> _atomic_counter IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_solved = 0;
 		template<typename MasterType, typename InheritanceList> _atomic_counter IntraHousehold_AV_Assignment_Implementation<MasterType, InheritanceList>::counter_timedout = 0;
