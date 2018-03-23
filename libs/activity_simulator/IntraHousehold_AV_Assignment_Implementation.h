@@ -23,7 +23,7 @@
 #define  consider_RideSharing
 #define  Ignore_None_Auto_Modes
 //#define  Ignore_Travel_To_Parking
-//#define Debug_Intrahousehold_Vehicle_Assignment
+#define Debug_Intrahousehold_Vehicle_Assignment
 
 #pragma region Setting_prev_and_Next_Acts
 
@@ -77,6 +77,9 @@ namespace Household_Components
 			static _atomic_counter counter_solved;
 			static _atomic_counter counter_timedout;
 			static _atomic_counter counter_error;
+
+			std::vector<string>* output_data;
+			std::vector<string>* output_data_buffer;
 
 			static Counter aggregate_timer;
 		
@@ -166,6 +169,7 @@ namespace Household_Components
 								mkdir(folder_name.c_str());
 				#endif
 
+				//output_data = new std::vector<string>[num_sim_threads()];
 				aggregate_timer.Start();
 			}
 
@@ -529,6 +533,11 @@ namespace Household_Components
 							model.addConstr(duration >= duration_lb, "c_dur_lb_" + per1_strActID);
 							model.addConstr(duration <= duration_ub, "c_dur_ub_" + per1_strActID);
 
+							if (per1_activity_prev)
+							{
+								model.addConstr(start >= grb_Vars["end_" + per1_strActID_prev] + 1, "c_order_" + per1_strActID);
+							}
+
 
 #pragma endregion 
 
@@ -699,13 +708,15 @@ namespace Household_Components
 										}
 
 										if (per1_activity_next && per2_activity_prev && travel_required)
-										{
-											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
-											if (Get_End_lb(per1_activity) + tt.Value - 2.0 <= Get_Start_ub(per2_activity))
+										{											
+											if (!(Home_Activity(per1_activity) && Home_Activity(per2_activity)))
 											{
-
-												strVarName = "t_AV_" + strVehID + "_" + per1_strActID + "_E_" + per2_strActID + "_S";
-												Add_New_Variable(grb_Vars, model, strVarName, GRB_BINARY);
+												auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
+												if (Get_End_lb(per1_activity) + tt.Value - 2.0 <= Get_Start_ub(per2_activity))
+												{
+													strVarName = "t_AV_" + strVehID + "_" + per1_strActID + "_E_" + per2_strActID + "_S";
+													Add_New_Variable(grb_Vars, model, strVarName, GRB_BINARY);
+												}
 											}
 										}
 
@@ -714,17 +725,15 @@ namespace Household_Components
 											auto tt = Get_Travel_Time(per1_activity, per2_activity, per1_activity->End_Time<Time_Minutes>());
 											if (Get_End_lb(per1_activity) + tt - 2.0 <= Get_End_ub(per2_activity))
 											{
-
 												strVarName = "t_AV_" + strVehID + "_" + per1_strActID + "_E_" + per2_strActID + "_E";
 												Add_New_Variable(grb_Vars, model, strVarName, GRB_BINARY);
 											}
-
 										}
 #endif
 									}
 								}
 							}
-						}
+						}					
 					}					
 
 #pragma region Create variable for each vehicle moving in the system
@@ -1132,6 +1141,7 @@ namespace Household_Components
 							cout << "\r" << "solved: " << counter << "\ttimed out: " << counter_timedout << "\terror: " << counter_error << "\ttime: " << std::setw(4) << std::right <<(int)(aggregate_timer.Stop()/1000.0) << " s" << endl; // << std::flush;
 							aggregate_timer.Start();
 						}
+						Generate_Objective_Value_File(model, grb_Vars);
 
 #ifdef Write_Visualization_Files
 						//void Generate_Activities_File(map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map)
@@ -1370,6 +1380,32 @@ namespace Household_Components
 				myfile.close();
 			}
 
+			void Generate_Objective_Value_File(GRBModel& model, map<string, GRBVar>& grb_Vars)
+			{
+				_scenario_itf* scenario = static_cast<_scenario_itf*>(_global_scenario);
+				_household_static_properties_itf* household_properties = _Parent_Household->template Static_Properties<_household_static_properties_itf*>();
+
+				int HH_size = household_properties->Household_size<int>();
+				int count_avaiable_vehicle = household_properties->Number_of_vehicles<int>();
+
+				auto HHID = this->_Parent_Household->uuid<long long>();
+				ofstream myfile;				
+				myfile.open(scenario->template output_dir_name<string>() + "\\ZOV\\Score_" + to_string(HHID) + ".txt");
+				double objective_value = model.get(GRB_DoubleAttr_ObjVal);;
+				int count_used_vehicle = 0;				
+				
+				for (auto it = grb_Vars.begin(); it != grb_Vars.end(); it++)
+				{
+					if (it->first.find("_Hom_S_") != string::npos && it->second.get(GRB_DoubleAttr_X) > 0.00001)
+					{
+						count_used_vehicle++;
+					}
+				}
+
+				myfile << HHID << "\t" << HH_size << "\t" <<  objective_value <<"\t"<< count_used_vehicle <<"\t" << count_avaiable_vehicle << endl;
+				myfile.close();
+			}
+
 			void Generate_Objective_function_New(GRBModel& model, GRBLinExpr& Obj_LinExpr,  map<string, GRBVar>& grb_Vars, map<pair<long, int>, string>& act_ID_map, map<string, _activity_itf*>& act_String_map)
 			{
 				_activity_itf *per1_activity , *per1_activity_next, *per1_activity_prev;
@@ -1459,7 +1495,7 @@ namespace Household_Components
 						//Trying to make trip visualization more readable by preventing intra-person travel in equal objective function values!
 						if (per1_ID != per2_ID)
 						{
-							Obj_LinExpr += 0.1;
+							Obj_LinExpr += var * (-0.0001);
 						}
 
 						//no cost is added if O==D
@@ -1759,6 +1795,41 @@ namespace Household_Components
 				}
 
 			}
+
+			/*
+			template<typename TargetType> void Write_Summary_Data_To_File()
+			{
+				int i = sub_iteration();
+
+				// display the ttime and executed activity count distributions once
+				if (i == 0)
+				{
+					this->_ttime_file << iteration();
+					for (int j = 0; j < 25; j++)
+					{
+						int count = 0;
+						for (int k = 0; k < num_sim_threads(); k++) // collect value over all threads
+						{
+							count += ttime_distribution[k][j];
+						}
+						this->_ttime_file << "," << count;
+					}
+					this->_ttime_file << endl;
+
+					this->_executed_acts_file << iteration();
+					for (int j = 0; j < 20; j++)
+					{
+						int count = 0;
+						for (int k = 0; k < num_sim_threads(); k++) // collect value over all threads
+						{
+							count += executed_acts[k][j];
+						}
+						this->_executed_acts_file << "," << count;
+					}
+					this->_executed_acts_file << endl;
+				}
+			}
+			*/
 		};
 			
 			
