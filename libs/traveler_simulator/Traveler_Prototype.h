@@ -15,6 +15,7 @@ namespace Traveler_Components
 			accessor(uuid, NONE, NONE);
 			accessor(internal_id, NONE, NONE);
 			accessor(plan, NONE, NONE);
+			accessor(Moving_Faculty, NONE, NONE);
 
 			void Schedule_New_Departure(int departed_time){this_component()->Schedule_New_Departure(departed_time);}
 		};

@@ -13,6 +13,15 @@ namespace Traveler_Components
 	
 	namespace Implementations
 	{
+		implementation struct Traveler_Mover_Implementation : public Polaris_Component<MasterType, INHERIT(Traveler_Mover_Implementation), Execution_Object>
+		{
+			m_prototype(Movement_Plan_Components::Prototypes::Movement_Plan, typename MasterType::movement_plan_type, Movement, NONE, NONE);
+			template<typename T> void person_boarded_transit_vehicle(T t)
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+		};
+
 		implementation struct Traveler_Implementation:public Polaris_Component<MasterType,INHERIT(Traveler_Implementation),Execution_Object>
 		{
 			typedef Polaris_Component<MasterType,INHERIT(Traveler_Implementation),Execution_Object> Base_t;
@@ -61,6 +70,43 @@ namespace Traveler_Components
 
 			m_prototype(Routing_Components::Prototypes::Routing,typename MasterType::routing_type, router, NONE, NONE);
 			m_prototype(Vehicle_Components::Prototypes::Vehicle,typename MasterType::vehicle_type, vehicle, NONE, NONE);
+
+
+			//TODO: OMER - please address this at some point...
+			// UNUSED FEATURES WHICH ARE CURRENTLY REQUIRED BY THE TRANSIT MODEL
+			m_prototype(Null_Prototype, Traveler_Mover_Implementation<MasterType>, Moving_Faculty, NONE, NONE);
+			template<typename T> T position_in_vehicle_seated_queue()
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> void position_in_vehicle_seated_queue(T simulation_status)
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> T position_in_vehicle_standing_queue()
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> void position_in_vehicle_standing_queue(T simulation_status)
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> T position_in_link_waiting_queue()
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> void position_in_link_waiting_queue(T simulation_status)
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> T simulation_status()
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
+			template<typename T> void simulation_status(T simulation_status)
+			{
+				THROW_EXCEPTION("ERROR: THIS CLASS SHOULD NOT BE USED IN A SIMULATION CONTEXT - IT IS PROVIDED FOR COMPILATION PURPOSES ONLY....")
+			}
 			//m_prototype(Null_Prototype,typename MasterType::plan_type>, plan, NONE, NONE);
 		};
 	}

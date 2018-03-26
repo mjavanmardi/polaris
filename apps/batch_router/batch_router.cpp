@@ -14,6 +14,9 @@
 using namespace polaris;
 
 
+//TODO: OMER: Delete when done
+static File_IO::File_Writer fw_bus_mode;
+static File_IO::File_Writer fw_transit_vehicle_trajectory;
 
 
 struct MasterType
@@ -76,7 +79,7 @@ struct MasterType
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 
-
+	typedef Demand_Components::Implementations::Demand_Implementation<MasterType> demand_type;
 
 	//==============================================================================================
 	#pragma region TMC Types
