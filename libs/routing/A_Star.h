@@ -685,7 +685,7 @@ namespace polaris
 		high_resolution_clock::time_point t4;
 
 		__int64 Total_Visit_Time;
-
+		char myLine[2000];
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
@@ -879,6 +879,33 @@ namespace polaris
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
 			astar_time = elapsed_time;
+
+			if (debug_route)
+			{
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					mode,
+					current->_time_label,
+					current->_cost_from_origin,
+					current->_time_from_origin,
+					current->_wait_count_from_origin,
+					current->_wait_time_from_origin,
+					current->_walk_time_from_origin,
+					current->_bike_time_from_origin,
+					current->_ivt_time_from_origin,
+					current->_car_time_from_origin,
+					current->_transfer_pen_from_origin,
+					current->_estimated_cost_origin_destination,
+					scan_count,
+					astar_time,
+					Total_Visit_Time,
+					"success",
+					Euc_Distance_km
+				);
+				summary_paragraph.insert(0, myLine);
+			}
 			
 			int route_ctr = 0;
 			while (current != nullptr)
@@ -907,11 +934,102 @@ namespace polaris
 				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
 				{
 					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
-					out_trip.push_back(current_trip);					
+					out_trip.push_back(current_trip);	
+
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							mode,
+							route_ctr,
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_trip->dbid<std::string>().c_str(),
+							current->_came_on_seq_index,
+							"TRANSIT",
+							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
+							scan_count,
+							astar_time);
+						detail_paragraph.insert(0, myLine);
+					}
+				}
+				else if (current_type == Link_Components::Types::Link_Type_Keys::WALK)
+				{
+					out_trip.push_back(nullptr);
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							mode,
+							route_ctr,
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							"WALK",
+							current->_came_on_seq_index,
+							"WALK",
+							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
+							scan_count,
+							astar_time);
+						detail_paragraph.insert(0, myLine);
+					}
+
 				}
 				else
 				{
 					out_trip.push_back(nullptr);
+					if (debug_route)
+					{
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+							origin_loc_id,
+							destination_loc_id,
+							start_time,
+							mode,
+							route_ctr,
+							current_link->upstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							current_link->downstream_intersection<_Intersection_Interface*>()->dbid<std::string>().c_str(),
+							"DRIVE",
+							current->_came_on_seq_index,
+							"DRIVE",
+							current->_time_label,
+							current->_cost_from_origin,
+							current->_time_from_origin,
+							current->_wait_count_from_origin,
+							current->_wait_time_from_origin,
+							current->_walk_time_from_origin,
+							current->_bike_time_from_origin,
+							current->_ivt_time_from_origin,
+							current->_car_time_from_origin,
+							current->_transfer_pen_from_origin,
+							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
+							scan_count,
+							astar_time);
+						detail_paragraph.insert(0, myLine);
+					}
+
 				}
 
 				current = (multimodal_edge_type*)current->came_from();
@@ -962,7 +1080,39 @@ namespace polaris
 
 			t2 = high_resolution_clock::now();
 			auto elapsed_time = duration_cast<microseconds>(t2 - t1).count();
-			astar_time = elapsed_time;			
+			astar_time = elapsed_time;	
+
+			if (debug_route)
+			{
+
+				global.edge_id = current_fail->_edge_id;
+
+				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
+
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					mode,
+					current->_time_label,
+					current->_cost_from_origin,
+					current->_time_from_origin,
+					current->_wait_count_from_origin,
+					current->_wait_time_from_origin,
+					current->_walk_time_from_origin,
+					current->_bike_time_from_origin,
+					current->_ivt_time_from_origin,
+					current->_car_time_from_origin,
+					current->_transfer_pen_from_origin,
+					current->_estimated_cost_origin_destination,
+					scan_count,
+					astar_time,
+					Total_Visit_Time,
+					"fail",
+					Euc_Distance_km
+				);
+				summary_paragraph.insert(0, myLine);
+			}
 		}		
 
 		for (auto itr = modified_edges.begin(); itr != modified_edges.end(); itr++)

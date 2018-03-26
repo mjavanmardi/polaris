@@ -255,6 +255,12 @@ namespace Routing_Components
 					Link_Interface* dlink = nullptr;
 					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE))
 					{
+						if (debug_route)
+						{
+							_movement_plan->summary_string(summary_paragraph);
+							_movement_plan->detail_string(detail_paragraph);
+						}
+
 						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 						
 						for (auto itr = origin_walk_links->begin(); itr != origin_walk_links->end(); ++itr)
@@ -271,6 +277,12 @@ namespace Routing_Components
 					}
 					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
 					{
+						if (debug_route)
+						{
+							_movement_plan->summary_string(summary_paragraph);
+							_movement_plan->detail_string(detail_paragraph);
+						}
+
 						_movement_plan->set_multimodal_trajectory(path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen);
 
 						for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
@@ -303,13 +315,24 @@ namespace Routing_Components
 					}
 
 					_movement_plan->routing_execution_time(astar_time);
-					_movement_plan->routing_scan_count(scan_count);
+					_movement_plan->routing_scan_count(scan_count);					
 					
 					// update movement plan O/D based on returned routing results					
 					if (olink != nullptr && dlink != nullptr)
 					{
 						_movement_plan->template origin<Link_Interface*>(olink);
 						_movement_plan->template destination<Link_Interface*>(dlink);
+					}
+				}
+				else
+				{
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					{
+						if (debug_route)
+						{
+							_movement_plan->summary_string(summary_paragraph);
+							_movement_plan->detail_string(detail_paragraph);
+						}
 					}
 				}
 
