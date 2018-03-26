@@ -3,6 +3,9 @@
 #include "Polaris_PCH.h"
 #include "Traffic_Simulator.h"
 #include "Traveler_Simulator.h"
+#include "ITS_Simulator.h"
+#include "Activity_Simulator.h"
+#include "Population_Synthesis.h"
 #include "Scenario_Manager.h"
 #include "Application_Includes.h"
 
@@ -42,6 +45,8 @@ struct MasterType
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> person_type;
+	typedef Person_Components::Implementations::Person_Mover_Implementation<M> person_mover_type;
+
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
@@ -128,6 +133,8 @@ struct MasterType
 
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
+
+	
 };
 
 

@@ -623,6 +623,10 @@ namespace polaris
 		__int64& astar_time, 
 		int& scan_count,
 		Vehicle_Components::Types::Vehicle_Type_Keys mode,
+		unsigned int origin_loc_id,
+		unsigned int destination_loc_id,
+		std::string& summary_paragraph,
+		std::string& detail_paragraph,
 		bool debug_route
 		)
 	{
@@ -682,12 +686,6 @@ namespace polaris
 
 		__int64 Total_Visit_Time;
 
-		if (debug_route)
-		{
-			// do route calculation timing for debug routes
-			//A_Star_Time.Start();		
-			
-		}
 
 		//TODO: Remove when done testing routing execution time		
 		t1 = high_resolution_clock::now();
