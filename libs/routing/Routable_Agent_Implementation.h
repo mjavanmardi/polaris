@@ -213,7 +213,9 @@ namespace polaris
 
 				float factored_gap = (1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor();
 
-				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * factored_gap), current->ttime_weight_shape())) * factored_gap;
+				// if the ttime-weight scale parameter = 0 then only use historical information
+				float w = 0.0f;
+				if (current->ttime_weight_scale()) w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * factored_gap), current->ttime_weight_shape())) * factored_gap;
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 
@@ -341,7 +343,9 @@ namespace polaris
 				/*float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * _experienced_gap), current->ttime_weight_shape())) * ((1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor());*/
 				float factored_gap = (1.0f - current->ttime_weight_factor())* _experienced_gap + current->ttime_weight_factor();
 				
-				float w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * factored_gap), current->ttime_weight_shape())) * factored_gap;
+				// if the ttime-weight scale parameter = 0 then only use historical information
+				float w = 0.0f;
+				if (current->ttime_weight_scale()) w = exp(-1.0*pow(t_diff / (current->ttime_weight_scale() * factored_gap), current->ttime_weight_shape())) * factored_gap;
 
 				float time_cost = w*time_cost_current + (1-w)*t;
 
@@ -408,7 +412,9 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+				// if the ttime-weight scale parameter = 0 then only use historical information
+				float w = 0.0f;
+				if (current->ttime_weight_scale()) w = exp(-1.0*pow(t_diff / current->ttime_weight_scale(), current->ttime_weight_shape()));
 
 				float time_cost = w*time_cost_current + (1 - w)*t;
 				
@@ -532,7 +538,9 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+				// if the ttime-weight scale parameter = 0 then only use historical information
+				float w = 0.0f;
+				if (current->ttime_weight_scale()) w = exp(-1.0*pow(t_diff / current->ttime_weight_scale(), current->ttime_weight_shape()));
 
 				float time_cost = w*time_cost_current + (1 - w)*t;
 
@@ -657,7 +665,9 @@ namespace polaris
 
 				// modified time dependent mixing function to be parameterized with shape and scale set in scenario
 				// ttime_weight_factor allows extra control to turn off information mixing -> setting to 0 will use only historical info
-				float w = (exp(-1.0*pow(((float)t_diff / current->ttime_weight_scale()), current->ttime_weight_shape())))*current->ttime_weight_factor();
+				// if the ttime-weight scale parameter = 0 then only use historical information
+				float w = 0.0f;
+				if (current->ttime_weight_scale()) w = exp(-1.0*pow(t_diff / current->ttime_weight_scale(), current->ttime_weight_shape()));
 
 				float time_cost = w*time_cost_current + (1 - w)*t;
 
