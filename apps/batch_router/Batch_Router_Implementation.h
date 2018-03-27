@@ -173,6 +173,7 @@ namespace Batch_Router_Components
 					}					
 					else
 					{
+						summary_by_thread[__thread_id] << _ID << "\t" << __thread_id << "\t\t\t\t\t\t" << movement->routed_travel_time<float>()<<endl;
 						results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
 
 						_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
@@ -194,6 +195,7 @@ namespace Batch_Router_Components
 					}
 					else
 					{
+						summary_by_thread[__thread_id] << _ID << "\t" << __thread_id << "\t" << "fail" << endl;
 						results_by_thread[__thread_id] << _ID << ": Error, movement was not routable." << endl;
 					}
 					
