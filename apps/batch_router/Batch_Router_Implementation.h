@@ -157,29 +157,46 @@ namespace Batch_Router_Components
 			}
 			template<typename TargetType> void Get_Results()
 			{
+				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+
 				_Movement_Plan_Interface* movement = this->_router->movement_plan<_Movement_Plan_Interface*>();
+
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = movement->mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
 				if (movement->valid_trajectory<bool>())
 				{
 					
-					summary_by_thread[__thread_id] << _ID<<"\t"<<__thread_id << "\t" << movement->summary_string<std::string>() ;
-					details_by_thread[__thread_id] << movement->detail_string<std::string>();					
-					results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
-
-					_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
-
-					for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
 					{
-						_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
-						link_itf* link = tu->link<link_itf*>();
-						results_by_thread[__thread_id]<<_ID<<": (" << link->dbid<int>()<<"."<<link->direction<int>()<<") "<<tu->estimated_link_accepting_time<int>()<<", ";
+						summary_by_thread[__thread_id] << _ID <<"\t"<< __thread_id << "\t" << movement->summary_string<std::string>();
+						details_by_thread[__thread_id] << movement->detail_string<std::string>();
+					}					
+					else
+					{
+						results_by_thread[__thread_id] << movement->routed_travel_time<float>() << ": ";
+
+						_Trajectory_Container_Interface* trajectory = movement->trajectory_container<_Trajectory_Container_Interface*>();
+
+						for (_Trajectory_Container_Interface::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+						{
+							_Trajectory_Unit_Interface* tu = (_Trajectory_Unit_Interface*)*itr;
+							link_itf* link = tu->link<link_itf*>();
+							results_by_thread[__thread_id] << _ID << ": (" << link->dbid<int>() << "." << link->direction<int>() << ") " << tu->estimated_link_accepting_time<int>() << ", ";
+						}
+						results_by_thread[__thread_id] << endl;
 					}
-					results_by_thread[__thread_id] << endl;
 				}
 				else
 				{
-					results_by_thread[__thread_id] << _ID <<"\t: Error, movement was not routable."<<endl;
-					summary_by_thread[__thread_id] << _ID << "\t"<<__thread_id << "\t" << movement->summary_string<std::string>();
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					{
+						summary_by_thread[__thread_id] << _ID <<"\t"<<__thread_id << "\t" << movement->summary_string<std::string>();
+					}
+					else
+					{
+						results_by_thread[__thread_id] << _ID << ": Error, movement was not routable." << endl;
+					}
+					
 				}
 
 				object_count_by_thread[__thread_id]++;
