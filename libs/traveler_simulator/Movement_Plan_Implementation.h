@@ -548,7 +548,7 @@ namespace Movement_Plan_Components
 				vehicle_trajectory_data->template transit_vehicle_trip<Transit_Vehicle_Trip_Interface*>(trip);
 				
 				//Set the stop sequence
-				if (mode == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				if (mode == Link_Components::Types::Link_Type_Keys::TRANSIT || mode == Link_Components::Types::Link_Type_Keys::RAIL)
 				{
 					vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>(out_seq[other_itr] - 1);
 					if (vehicle_trajectory_data->template transit_vehicle_stop_sequence<int>() < 0)

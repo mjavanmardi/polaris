@@ -1313,7 +1313,7 @@ namespace Person_Components
 				trajectory_unit->template actual_transfer_penalty<float>(previous_transfer_penalty);
 
 				//Set values based on mode
-				if (previous_link_mode == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				if (previous_link_mode == Link_Components::Types::Link_Type_Keys::TRANSIT || previous_link_mode == Link_Components::Types::Link_Type_Keys::RAIL)
 				{
 					//ivt_time is travel_time minus waiting_time
 					float ivt_time = travel_time - waiting_time;
@@ -1411,7 +1411,7 @@ namespace Person_Components
 				}
 			}
 			//If the mode is non-transit person can walk/bike/drive freely
-			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+			else if (link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 			{
 				//If the person is on board they it means they are alighting
 				if (current_status == ON_BOARD_SEATED || current_status == ON_BOARD_STANDING)

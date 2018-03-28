@@ -483,7 +483,7 @@ namespace Person_Components
 
 								std::string mode = a.getMode();
 								// first, persist the path if it exists...
-								if (scenario->template multimodal_routing<bool>() && (mode == "WALK" || mode == "BIKE" || mode == "PARK_AND_RIDE" || mode == "TRANSIT"))
+								if (scenario->template multimodal_routing<bool>() && (mode == "WALK" || mode == "BIKE" || mode == "PARK_AND_RIDE" || mode == "KISS_AND_RIDE" || mode == "BUS" || mode == "RAIL"))
 								{
 									shared_ptr<polaris::io::Path_Multimodal> p = trip.getPathMultimodal();
 									if (p) this->_db_ptr->persist(p);

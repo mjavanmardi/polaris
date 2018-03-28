@@ -581,7 +581,7 @@ namespace Link_Components
 		void Link_Implementation<MasterType, InheritanceList>::network_state_update()
 		{
 			//TODO: Omer fix later!
-			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+			if (this->_link_type != Link_Components::Types::Link_Type_Keys::WALK && this->_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && this->_link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 			{
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
@@ -1148,7 +1148,7 @@ namespace Link_Components
 		void Link_Implementation<MasterType, InheritanceList>::Initialize()
 		{
 			//TODO:Omer make sure this does not cause any issues
-			if (this->_link_type != Types::Link_Type_Keys::WALK && this->_link_type != Types::Link_Type_Keys::TRANSIT)
+			if (this->_link_type != Types::Link_Type_Keys::WALK && this->_link_type != Types::Link_Type_Keys::TRANSIT && this->_link_type != Types::Link_Type_Keys::RAIL)
 			{
 				this->template Load_Event<ComponentType>(&ComponentType::Newells_Conditional, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1, Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
 			}

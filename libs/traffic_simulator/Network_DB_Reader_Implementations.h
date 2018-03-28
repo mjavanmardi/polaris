@@ -1412,6 +1412,12 @@ namespace Network_Components
 
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::TRANSIT);
 
+							int gtfs_type = db_itr->getType();
+							if (gtfs_type != 3 && gtfs_type != 4)
+							{
+								link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::RAIL);
+							}
+
 							link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 							link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 							
@@ -1664,7 +1670,7 @@ namespace Network_Components
 										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
 										turn_movements_container.push_back(turn_movement);
 									}
-									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || out_facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 									{
 										//cout << "\tWalk to Transit\n";
 										counter++;
@@ -1707,7 +1713,7 @@ namespace Network_Components
 										turn_movements_container.push_back(turn_movement);
 									}
 								}
-								else if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+								else if (in_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || in_facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 								{
 									if (out_facility_type == Link_Components::Types::Link_Type_Keys::WALK)
 									{
@@ -1730,7 +1736,7 @@ namespace Network_Components
 										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
 										turn_movements_container.push_back(turn_movement);
 									}
-									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || out_facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 									{
 										//cout << "\tTransit to Transit\n";
 										counter++;
@@ -1796,7 +1802,7 @@ namespace Network_Components
 										link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
 										turn_movements_container.push_back(turn_movement);
 									}
-									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+									else if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || out_facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 									{
 										//cout << "\tDrive to Transit\n";
 										counter++;
@@ -1947,7 +1953,7 @@ namespace Network_Components
 
 								Link_Components::Types::Link_Type_Keys out_type = out_link->link_type<Link_Components::Types::Link_Type_Keys>();
 
-								if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && out_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+								if (a_Stop_Candidate == a_Stop && b_Stop_Candidate == b_Stop && (out_type == Link_Components::Types::Link_Type_Keys::TRANSIT || out_type == Link_Components::Types::Link_Type_Keys::RAIL))
 								{
 									pattern->pattern_links<_Pattern_Links_Container_Interface&>().push_back(out_link);
 

@@ -955,7 +955,7 @@ namespace Network_Components
 
 						link->template travel_time<float>(link_travel_time);
 					}
-					else if (facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+					else if (facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 					{
 						//TODO: Omer fix later!
 						float link_travel_time = 1;

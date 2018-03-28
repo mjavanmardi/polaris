@@ -496,7 +496,7 @@ namespace Routing_Components
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-					if (link_type != Link_Components::Types::Link_Type_Keys::WALK && link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+					if (link_type != Link_Components::Types::Link_Type_Keys::WALK && link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 					{
 
 						Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
@@ -541,7 +541,7 @@ namespace Routing_Components
 							Link_Interface* out_link = current_movement->template outbound_link<Link_Interface*>();
 							Link_Components::Types::Link_Type_Keys out_link_type = out_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							if (out_link_type != Link_Components::Types::Link_Type_Keys::WALK && out_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+							if (out_link_type != Link_Components::Types::Link_Type_Keys::WALK && out_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && out_link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 							{
 
 								if (_turn_id_to_moe_data.count(current_movement->template uuid<int>()))
@@ -704,7 +704,7 @@ namespace Routing_Components
 					Link_Interface* current_link = (Link_Interface*)(*links_itr);
 					Link_Components::Types::Link_Type_Keys link_type = current_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-					if (link_type != Link_Components::Types::Link_Type_Keys::WALK && link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+					if (link_type != Link_Components::Types::Link_Type_Keys::WALK && link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 					{
 						Intersection_Interface* downstream_intersection = current_link->template downstream_intersection<Intersection_Interface*>();
 
@@ -736,7 +736,7 @@ namespace Routing_Components
 							Link_Interface* out_link = current_movement->template outbound_link<Link_Interface*>();
 							Link_Components::Types::Link_Type_Keys out_link_type = out_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
-							if (out_link_type != Link_Components::Types::Link_Type_Keys::WALK && out_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT)
+							if (out_link_type != Link_Components::Types::Link_Type_Keys::WALK && out_link_type != Link_Components::Types::Link_Type_Keys::TRANSIT && out_link_type != Link_Components::Types::Link_Type_Keys::RAIL)
 							{
 								long long neighbor_id = current_movement->template outbound_link<Link_Interface*>()->template uuid<int>();
 
@@ -857,7 +857,7 @@ namespace Routing_Components
 						input_multimodal_edge._time_cost_backup = current_link->template travel_time<float>();
 						input_multimodal_edge._source_link = current_link;
 						
-						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+						if (link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::RAIL)
 						{
 							int my_itr = 0;
 							float min_travel_time = FLT_MAX / 2.0f;
@@ -919,7 +919,7 @@ namespace Routing_Components
 						}
 
 						if (link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || link_type == Link_Components::Types::Link_Type_Keys::LOCAL ||
-							link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							link_type == Link_Components::Types::Link_Type_Keys::WALK || link_type == Link_Components::Types::Link_Type_Keys::TRANSIT || link_type == Link_Components::Types::Link_Type_Keys::RAIL)
 						{
 							input_multimodal_edge._is_highway = false;
 						}
@@ -1308,7 +1308,7 @@ namespace Routing_Components
 						{
 							Link_Interface* outbound_link = (Link_Interface*)(*out_links_itr);
 							Link_Components::Types::Link_Type_Keys out_facility_type = outbound_link->template link_type<Link_Components::Types::Link_Type_Keys>();
-							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+							if (out_facility_type == Link_Components::Types::Link_Type_Keys::TRANSIT || out_facility_type == Link_Components::Types::Link_Type_Keys::RAIL)
 							{							
 								link->template touch_transit<bool>(true);
 								break;

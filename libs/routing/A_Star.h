@@ -931,7 +931,7 @@ namespace polaris
 				out_heur_cost.push_back(current->_estimated_cost_origin_destination - current->_cost_from_origin);
 
 				Link_Components::Types::Link_Type_Keys current_type = current->_edge_type;
-				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT)
+				if (current_type == Link_Components::Types::Link_Type_Keys::TRANSIT || current_type == Link_Components::Types::Link_Type_Keys::RAIL)
 				{
 					current_trip = static_cast<_Transit_Vehicle_Trip_Interface*>(current->_came_on_trip);
 					out_trip.push_back(current_trip);	

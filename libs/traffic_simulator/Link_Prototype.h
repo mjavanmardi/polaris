@@ -20,7 +20,8 @@ namespace Link_Components
 			WATERWAY,
 			EXTERNAL,
 			WALK,
-			TRANSIT
+			TRANSIT,
+			RAIL
 		};
 	}
 
