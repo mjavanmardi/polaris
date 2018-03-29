@@ -326,6 +326,11 @@ namespace polaris
 							seq_edge->_car_time_from_origin = current->_car_time_from_origin;
 							seq_edge->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
+							_Link_Interface* seq_link = (_Link_Interface*)seq_edge->_source_link;
+							Feet length_feet = seq_link->template length<float>();
+							Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+							seq_edge->_length_from_origin = current->_length_from_origin + length_meters;
+
 							float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)seq_edge, *(routing_data.ends), multimodal_dijkstra);
 							seq_edge->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -469,6 +474,11 @@ namespace polaris
 						current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 						current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin + effectiveTransferPen;
 
+						_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+						Feet length_feet = current_neighbor_link->template length<float>();
+						Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+						current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
+
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 						current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -529,6 +539,11 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 					
+				_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+				Feet length_feet = current_neighbor_link->template length<float>();
+				Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+				current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
+
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -590,6 +605,11 @@ namespace polaris
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
 
+				_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+				Feet length_feet = current_neighbor_link->template length<float>();
+				Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+				current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
+
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);
 
@@ -647,6 +667,11 @@ namespace polaris
 				current_neighbor->_ivt_time_from_origin = current->_ivt_time_from_origin;
 				current_neighbor->_car_time_from_origin = current->_car_time_from_origin + time_cost_between;
 				current_neighbor->_transfer_pen_from_origin = current->_transfer_pen_from_origin;
+
+				_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+				Feet length_feet = current_neighbor_link->template length<float>();
+				Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+				current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
 
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + heuristicPortion;
 				current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);			

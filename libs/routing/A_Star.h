@@ -720,7 +720,7 @@ namespace polaris
 		Feet Distance_y = start_base->_y - end_base->_y;
 		Feet Euc_Distance_ft = sqrt(Distance_x*Distance_x + Distance_y*Distance_y);
 		Kilometers Euc_Distance_km = GLOBALS::Convert_Units<Feet, Kilometers>(Euc_Distance_ft);
-		float scanThreshold2 = Euc_Distance_km * 2500;
+		float scanThreshold2 = Euc_Distance_km * 25000000;
 
 		Routing_Data<base_edge_type> routing_data;
 
@@ -768,6 +768,11 @@ namespace polaris
 
 			multimodal_edge_type* start_t = (multimodal_edge_type*)graph_pool->Get_Edge(start_g);
 			Link_Components::Types::Link_Type_Keys current_type = start_t->_edge_type;
+
+			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
+			Feet length_feet = start_link->template length<float>();
+			Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+			start_t->_length_from_origin = length_meters;
 
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK && mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
@@ -882,7 +887,7 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -902,7 +907,8 @@ namespace polaris
 					astar_time,
 					Total_Visit_Time,
 					"success",
-					Euc_Distance_km
+					Euc_Distance_km,
+					current->_length_from_origin
 				);
 				summary_paragraph.insert(0, myLine);
 			}
@@ -938,7 +944,7 @@ namespace polaris
 
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%f",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -961,7 +967,9 @@ namespace polaris
 							current->_transfer_pen_from_origin,
 							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scan_count,
-							astar_time);
+							astar_time,
+							current->_length_from_origin
+						);
 						detail_paragraph.insert(0, myLine);
 					}
 				}
@@ -970,7 +978,7 @@ namespace polaris
 					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%f",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -993,7 +1001,9 @@ namespace polaris
 							current->_transfer_pen_from_origin,
 							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scan_count,
-							astar_time);
+							astar_time,
+							current->_length_from_origin
+						);
 						detail_paragraph.insert(0, myLine);
 					}
 
@@ -1003,7 +1013,7 @@ namespace polaris
 					out_trip.push_back(nullptr);
 					if (debug_route)
 					{
-						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d",
+						sprintf_s(myLine, "\n%d\t%d\t%d\t%d\t%d\t%s\t%s\t%s\t%d\t%s\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%f",
 							origin_loc_id,
 							destination_loc_id,
 							start_time,
@@ -1026,7 +1036,9 @@ namespace polaris
 							current->_transfer_pen_from_origin,
 							(current->_estimated_cost_origin_destination - current->_cost_from_origin),
 							scan_count,
-							astar_time);
+							astar_time,
+							current->_length_from_origin
+						);
 						detail_paragraph.insert(0, myLine);
 					}
 
@@ -1089,7 +1101,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1109,7 +1121,8 @@ namespace polaris
 					astar_time,
 					Total_Visit_Time,
 					"fail",
-					Euc_Distance_km
+					Euc_Distance_km,
+					current->_length_from_origin
 				);
 				summary_paragraph.insert(0, myLine);
 			}

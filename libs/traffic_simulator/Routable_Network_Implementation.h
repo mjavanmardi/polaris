@@ -177,6 +177,7 @@ namespace Routing_Components
 			t_data(int, wait_count_from_origin);
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
+			t_data(float, length_from_origin);
 
 			t_static_data(Layered_Data_Array<float>*, moe_data);
 			t_static_data(float, ttime_weight_shape);
