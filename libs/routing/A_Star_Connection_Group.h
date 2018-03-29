@@ -17,6 +17,8 @@ namespace polaris
 		typedef typename Base_t::Connection_Implementation Connection_Implementation;
 		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
 		typedef typename Base_t::connection_attributes_type connection_attributes_type;
+		typedef Network<typename MasterType::network_type> Network_Interface;
+		typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
@@ -69,6 +71,11 @@ namespace polaris
 				current_neighbor->time_from_origin( time_from_origin );
 				
 				current_neighbor->time_label( current_edge->time_label() + time_cost_between );
+
+				_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+				Feet length_feet = current_neighbor_link->template length<float>();
+				Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+				current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
 
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 
@@ -704,6 +711,8 @@ namespace polaris
 		typedef typename Base_t::Connection_Implementation Connection_Implementation;
 		typedef typename Base_t::neighbor_edge_type neighbor_edge_type;
 		typedef typename Base_t::connection_attributes_type connection_attributes_type;
+		typedef Network<typename MasterType::network_type> Network_Interface;
+		typedef Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
 
 		template<typename AgentType>
 		Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<AgentType>* agent, current_edge_type* current, Routing_Data<base_edge_type>& routing_data)
@@ -738,6 +747,11 @@ namespace polaris
 
 				//float time_cost_between = agent->time_cost_between(current, (neighbor_edge_type*)current_neighbor, (connection_attributes_type*)connection);
 				float time_from_origin = current->time_from_origin() + time_cost_between;
+				
+				_Link_Interface* current_neighbor_link = (_Link_Interface*)current_neighbor->_source_link;
+				Feet length_feet = current_neighbor_link->template length<float>();
+				Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+				current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
 
 				if(!current_neighbor->marked_for_reset())
 				{
@@ -751,6 +765,7 @@ namespace polaris
 				current_neighbor->time_from_origin( time_from_origin );
 				
 				current_neighbor->time_label( current_edge->time_label() + time_cost_between );
+
 
 				float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends));
 

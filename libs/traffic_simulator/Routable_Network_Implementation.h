@@ -177,7 +177,6 @@ namespace Routing_Components
 			t_data(int, wait_count_from_origin);
 			t_data(typename MasterType::transit_vehicle_trip_type*, came_on_trip);
 			t_data(int, came_on_seq_index);
-			t_data(float, length_from_origin);
 
 			t_static_data(Layered_Data_Array<float>*, moe_data);
 			t_static_data(float, ttime_weight_shape);
@@ -1025,7 +1024,7 @@ namespace Routing_Components
 				}
 			}
 			//currently calls A* algorithm
-			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id,	unsigned int destination_loc_id, bool debug_route)
+			float compute_static_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id,	unsigned int destination_loc_id, std::string& summary_paragraph, bool debug_route)
 			{
 				//use hamogeneous agent for now
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -1050,7 +1049,7 @@ namespace Routing_Components
 					ends.push_back(end);
 				}
 
-				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, 0, path_container, cost_container, origin_loc_id, destination_loc_id, summary_paragraph, debug_route);
 
 				// update origins/destinations lists in from A_Star results
 				origins.clear();
@@ -1141,7 +1140,7 @@ namespace Routing_Components
 				return routed_time;
 			}
 
-			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, bool debug_route)
+			float compute_time_dependent_network_path(std::vector<unsigned int>& origins, std::vector<unsigned int>& destinations, unsigned int start_time, std::deque<global_edge_id>& path_container, std::deque<float>& cost_container, unsigned int origin_loc_id, unsigned int destination_loc_id, float experienced_gap, std::string& summary_paragraph, bool debug_route)
 			{
 				//Routable_Agent<typename MT::time_dependent_agent_type> proxy_agent;
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
@@ -1170,7 +1169,7 @@ namespace Routing_Components
 				//float routed_time = Time_Dependent_A_Star<MT,typename MT::time_dependent_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,start_time,path_container,cost_container);
 				
 				//float routed_time = Time_Dependent_A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
-				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+				float routed_time = A_Star<MT, typename MT::routable_agent_type, typename MT::graph_pool_type>(&proxy_agent, _routable_graph_pool, starts, ends, start_time, path_container, cost_container, origin_loc_id, destination_loc_id, summary_paragraph, debug_route);
 				
 				// update origins/destinations lists in from A_Star results
 				origins.clear();

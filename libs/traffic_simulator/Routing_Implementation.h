@@ -218,7 +218,7 @@ namespace Routing_Components
 					}
 					else
 					{
-						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, debug_route);
+						best_route_time_to_destination = routable_network->compute_static_network_path(origin_ids, destination_ids, _departure_time, path_container, cost_container, origin_loc_id, destination_loc_id, summary_paragraph, debug_route);
 					}
 					
 				}
@@ -235,7 +235,7 @@ namespace Routing_Components
 					}
 					else
 					{ 
-						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, _movement_plan->experienced_gap<float>(), debug_route);
+						best_route_time_to_destination = routable_network->compute_time_dependent_network_path(origin_ids,destination_ids,_departure_time/*iteration()*/,path_container,cost_container, origin_loc_id, destination_loc_id, _movement_plan->experienced_gap<float>(), summary_paragraph, debug_route);
 					}
 
 				}
@@ -300,6 +300,11 @@ namespace Routing_Components
 					else
 					{						
 						_movement_plan->set_trajectory(path_container, cost_container);
+						
+						if (debug_route)
+						{
+							_movement_plan->summary_string(summary_paragraph);
+						}
 
 						for (auto itr = origin_links->begin(); itr != origin_links->end(); ++itr)
 						{

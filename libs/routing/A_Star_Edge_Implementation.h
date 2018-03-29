@@ -41,7 +41,8 @@ namespace polaris
 		t_data(float, time_cost_backup);
 		t_data(float, cost_from_origin);
 		t_data(float, time_from_origin);
-		t_data(float, time_label);		
+		t_data(float, time_label);
+		t_data(float, length_from_origin);
 
 		t_data(float, estimated_cost_origin_destination);
 		t_data(bool, marked_for_reset);

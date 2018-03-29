@@ -923,6 +923,7 @@ namespace Vehicle_Components
 
 			std::deque<global_edge_id> path_container;
 			std::deque<float> cumulative_cost_container;
+			std::string summary_paragraph;
 
 			int best_route_link_sum = 0;
 
@@ -932,11 +933,11 @@ namespace Vehicle_Components
 
 			if (!((_Scenario_Interface*)_global_scenario)->template time_dependent_routing<bool>())
 			{
-				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, false);
+				best_route_time_to_destination = routable_net->compute_static_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, summary_paragraph, false);
 			}
 			else
 			{
-				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, _movement_plan->experienced_gap<float>(), false);
+				best_route_time_to_destination = routable_net->compute_time_dependent_network_path(origin_ids, destination_ids, iteration(), path_container, cumulative_cost_container, 0, 0, _movement_plan->experienced_gap<float>(), summary_paragraph, false);
 			}
 
 

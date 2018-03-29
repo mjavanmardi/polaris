@@ -20,10 +20,15 @@ namespace polaris
 	};
 
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
-	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, bool debug_route)
+	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, std::vector<global_edge_id>& start_ids, std::vector<global_edge_id>& end_ids, unsigned int start_time, std::deque< global_edge_id >& out_path, std::deque< float >& out_cost, unsigned int origin_loc_id, unsigned int destination_loc_id, std::string& summary_paragraph, bool debug_route)
 	{
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
-		
+		typedef Network_Components::Prototypes::Network<typename MasterType::network_type> Network_Interface;
+		Network_Interface* net = (Network_Interface*)_global_network;
+		//Network_Interface* net = (Network_Interface*)Allocate<typename MasterType::network_type>();
+
+		typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename Network_Interface::get_type_of(links_container)::value_type>::type>  _Link_Interface;
+
 		int graph_id = start_ids.front().graph_id;
 
 		std::deque< base_edge_type* > modified_edges;
@@ -60,6 +65,8 @@ namespace polaris
 		routing_data.ends = &ends;
 		routing_data.start_time = start_time;
 
+		char myLine[2000];
+
 		for (auto itr = starts.begin(); itr != starts.end(); ++itr)
 		{
 			start = (A_Star_Edge<base_edge_type>*)(*itr);
@@ -70,6 +77,10 @@ namespace polaris
 			start->time_from_origin(start->_time_cost);
 			start->time_label((float)start_time + start->_time_cost);
 			
+			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
+			Feet length_feet = start_link->template length<float>();
+			Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
+			start->_length_from_origin = length_meters;
 
 			float initial_estimated_cost_origin_destination = start->cost_from_origin() + agent->estimated_cost_between((base_edge_type*)start, ends);
 
@@ -86,11 +97,14 @@ namespace polaris
 		
 		bool success = false;
 		int scan_count = 0;
+		
+		A_Star_Edge<base_edge_type>* current_fail;
 		while( open_set.size() )
 		{
 			A_Star_Edge<base_edge_type>* current = (A_Star_Edge<base_edge_type>*)&(*open_set.begin());
 			++scan_count;
-			
+			current_fail = current;
+
 			if( agent->at_destination((base_edge_type*)current, ends, &end_base) )
 			{
 				success = true;
@@ -120,6 +134,34 @@ namespace polaris
 		{
 			base_edge_type* current = end_base;//(base_edge_type*)end;
 			base_edge_type* cached_current = (base_edge_type*)current;
+
+			if (debug_route)
+			{
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					1,
+					current->_time_label,
+					current->_cost_from_origin,
+					current->_time_from_origin,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					current->_time_from_origin,
+					-1,
+					current->_estimated_cost_origin_destination,
+					scan_count,
+					-1,
+					-1,
+					"success",
+					-1,
+					current->_length_from_origin
+				);
+				summary_paragraph.insert(0, myLine);
+			}
 
 			while(current != nullptr)
 			{
@@ -155,6 +197,38 @@ namespace polaris
 		}
 		else
 		{
+			global.edge_id = current_fail->_edge_id;
+
+			base_edge_type* current = (base_edge_type*)graph_pool->Get_Edge(global);
+
+			if (debug_route)
+			{
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
+					origin_loc_id,
+					destination_loc_id,
+					start_time,
+					1,
+					current->_time_label,
+					current->_cost_from_origin,
+					current->_time_from_origin,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					current->_time_from_origin,
+					-1,
+					current->_estimated_cost_origin_destination,
+					scan_count,
+					-1,
+					-1,
+					"fail",
+					-1,
+					current->_length_from_origin
+				);
+				summary_paragraph.insert(0, myLine);
+			}
+
 			for (auto itr = end_ids.begin(); itr != end_ids.end(); ++itr)
 			{
 				end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(*itr);
@@ -772,7 +846,7 @@ namespace polaris
 			_Link_Interface* start_link = (_Link_Interface*)start->_source_link;
 			Feet length_feet = start_link->template length<float>();
 			Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
-			start_t->_length_from_origin = length_meters;
+			start->_length_from_origin = length_meters;
 
 			if (current_type == Link_Components::Types::Link_Type_Keys::WALK && mode != Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE)
 			{
