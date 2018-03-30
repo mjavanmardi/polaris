@@ -285,7 +285,7 @@ namespace Person_Components
 
 					Vehicle_Components::Types::Vehicle_Type_Keys mode = act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 
-					if (scenario->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE))
+					if (scenario->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE))
 					{
 						/*typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename act_record_itf::get_type_of(movement_plan)> movement_itf;
 						typedef Prototypes::Person_Planner<typename act_record_itf::get_type_of(Parent_Planner)> planner_itf;
@@ -483,7 +483,7 @@ namespace Person_Components
 
 								std::string mode = a.getMode();
 								// first, persist the path if it exists...
-								if (scenario->template multimodal_routing<bool>() && (mode == "WALK" || mode == "BIKE" || mode == "PARK_AND_RIDE" || mode == "KISS_AND_RIDE" || mode == "BUS" || mode == "RAIL"))
+								if (scenario->template multimodal_routing<bool>() && (mode == "WALK" || mode == "BIKE" || mode == "PARK_AND_RIDE" || mode == "KISS_AND_RIDE" || mode == "PARK_AND_RAIL" || mode == "KISS_AND_RAIL" || mode == "BUS" || mode == "RAIL"))
 								{
 									shared_ptr<polaris::io::Path_Multimodal> p = trip.getPathMultimodal();
 									if (p) this->_db_ptr->persist(p);
@@ -799,6 +799,12 @@ namespace Person_Components
 					act_rec.setMode("SCHOOLBUS");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 					act_rec.setMode("PARK_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE)
+					act_rec.setMode("KISS_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL)
+					act_rec.setMode("PARK_AND_RAIL");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL)
+					act_rec.setMode("KISS_AND_RAIL");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 					act_rec.setMode("BUS");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL)
@@ -1055,6 +1061,12 @@ namespace Person_Components
 					act_rec.setMode("SCHOOLBUS");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE)
 					act_rec.setMode("PARK_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE)
+					act_rec.setMode("KISS_AND_RIDE");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL)
+					act_rec.setMode("PARK_AND_RAIL");
+				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL)
+					act_rec.setMode("KISS_AND_RAIL");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::BUS)
 					act_rec.setMode("BUS");
 				else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL)

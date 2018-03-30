@@ -212,7 +212,7 @@ namespace Routing_Components
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, scan_count, mode, origin_loc_id, destination_loc_id, summary_paragraph, detail_paragraph, debug_route);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, scan_count, mode, origin_loc_id, destination_loc_id, summary_paragraph, detail_paragraph, debug_route);
 					}
@@ -229,7 +229,7 @@ namespace Routing_Components
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_walk_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, scan_count, mode, origin_loc_id, destination_loc_id, summary_paragraph, detail_paragraph, debug_route);
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE) )
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && !destination_walk_ids.empty() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL) )
 					{
 						best_route_time_to_destination = routable_network->compute_multimodal_network_path(origin_ids, destination_walk_ids, /*destination_tr_ids,*/ _departure_time, path_container, cost_container, out_type, out_trip, out_seq, out_time, out_arr_time, out_wait_time, out_walk_time, out_bike_time, out_ivt_time, out_car_time, out_wait_count, out_transfer_pen, out_heur_cost, astar_time, scan_count, mode, origin_loc_id, destination_loc_id, summary_paragraph, detail_paragraph, debug_route);
 					}
@@ -275,7 +275,7 @@ namespace Routing_Components
 							if (link->template uuid<unsigned int>() == destination_walk_ids.front()) dlink = link;
 						}
 					}
-					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					else if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL))
 					{
 						if (debug_route)
 						{
@@ -331,7 +331,7 @@ namespace Routing_Components
 				}
 				else
 				{
-					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL))
 					{
 						if (debug_route)
 						{

@@ -138,6 +138,9 @@ namespace Batch_Router_Components
 				else if (strcmp(mode.c_str(), "bike") == 0 || strcmp(mode.c_str(), "Bike") == 0 || strcmp(mode.c_str(), "BIKE") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE);
 				else if (strcmp(mode.c_str(), "bicycle") == 0 || strcmp(mode.c_str(), "Bicycle") == 0 || strcmp(mode.c_str(), "BICYCLE") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE);
 				else if (strcmp(mode.c_str(), "pnr") == 0 || strcmp(mode.c_str(), "Pnr") == 0 || strcmp(mode.c_str(), "PNR") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE);
+				else if (strcmp(mode.c_str(), "knr") == 0 || strcmp(mode.c_str(), "Knr") == 0 || strcmp(mode.c_str(), "KNR") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE);
+				else if (strcmp(mode.c_str(), "pnrail") == 0 || strcmp(mode.c_str(), "Pnrail") == 0 || strcmp(mode.c_str(), "PNRAIL") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL);
+				else if (strcmp(mode.c_str(), "knrail") == 0 || strcmp(mode.c_str(), "Knrail") == 0 || strcmp(mode.c_str(), "KNRAIL") == 0)	movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL);
 				else movement_plan->mode(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 
 				router->template network<_Network_Interface*>(network);
@@ -166,7 +169,7 @@ namespace Batch_Router_Components
 				if (movement->valid_trajectory<bool>())
 				{
 					
-					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL))
 					{
 						summary_by_thread[__thread_id] << _ID <<"\t"<< __thread_id << "\t" << movement->summary_string<std::string>();
 						details_by_thread[__thread_id] << movement->detail_string<std::string>();
@@ -190,7 +193,7 @@ namespace Batch_Router_Components
 				}
 				else
 				{
-					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE))
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_routing<bool>() && (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL))
 					{
 						summary_by_thread[__thread_id] << _ID <<"\t"<<__thread_id << "\t" << movement->summary_string<std::string>();
 					}

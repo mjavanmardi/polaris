@@ -152,7 +152,7 @@ namespace Demand_Components
 				//Get the mode
 				Vehicle_Components::Types::Vehicle_Type_Keys mode = movement_plan->template mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				//Check the mode for multimodal buffer
-				if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE)
+				if (mode == Vehicle_Components::Types::Vehicle_Type_Keys::BUS || mode == Vehicle_Components::Types::Vehicle_Type_Keys::RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::WALK || mode == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RIDE || mode == Vehicle_Components::Types::Vehicle_Type_Keys::PARK_AND_RAIL || mode == Vehicle_Components::Types::Vehicle_Type_Keys::KISS_AND_RAIL)
 				{
 					multimodal_movement_plans_buffer[__thread_id].push_back(movement_plan_pair_type((movement_plan_type*)(movement_plan), write_trajectory));
 				}

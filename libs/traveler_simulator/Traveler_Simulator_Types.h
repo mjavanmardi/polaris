@@ -100,7 +100,9 @@ namespace Vehicle_Components
 			TAXI,
 			SCHOOLBUS,
 			PARK_AND_RIDE,
-			KISS_AND_RIDE
+			KISS_AND_RIDE,
+			PARK_AND_RAIL,
+			KISS_AND_RAIL
 		};
 
 		enum Route_Choice_Use_Class_Keys
