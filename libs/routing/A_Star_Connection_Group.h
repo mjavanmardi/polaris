@@ -491,7 +491,7 @@ namespace polaris
 						{
 							_Transit_Route_Interface* next_route = next_pattern->template route<_Transit_Route_Interface*>();
 							char myLine[1];
-							sprintf_s(myLine, "%.1s", next_route->template agency<std::string>());
+							snprintf(myLine, 1, "%s", next_route->template agency<std::string>());
 
 							stringstream myChain("");
 							myChain << "-" << myLine;
