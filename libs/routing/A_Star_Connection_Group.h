@@ -490,10 +490,11 @@ namespace polaris
 						if (wait_binary == 1)
 						{
 							_Transit_Route_Interface* next_route = next_pattern->template route<_Transit_Route_Interface*>();
-							std::string next_agency = next_route->template agency<std::string>();
+							char myLine[1];
+							sprintf_s(myLine, "%s", next_route->template agency<std::string>());
 
-							std::string myChain;
-							myChain << "-" << next_agency.at(1);
+							stringstream myChain("");
+							myChain << "-" << myLine;
 
 							Link_Components::Types::Link_Type_Keys link_type = current_neighbor_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
@@ -506,7 +507,7 @@ namespace polaris
 								myChain << "B";
 							}
 
-							current_neighbor->_agency_chain << myChain;
+							current_neighbor->_agency_chain.append(myChain.str());
 						}
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
