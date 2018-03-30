@@ -114,6 +114,7 @@ namespace polaris
 		typedef Transit_Vehicle_Trip_Components::Prototypes::Transit_Vehicle_Trip<typename remove_pointer< typename Network_Interface::get_type_of(transit_vehicle_trips_container)::value_type>::type>  _Transit_Vehicle_Trip_Interface;
 		typedef Random_Access_Sequence< typename Network_Interface::get_type_of(transit_vehicle_trips_container), _Transit_Vehicle_Trip_Interface*> _Transit_Vehicle_Trips_Container_Interface;
 
+		typedef  Transit_Route_Components::Prototypes::Transit_Route<typename remove_pointer< typename Network_Interface::get_type_of(transit_routes_container)::value_type>::type>  _Transit_Route_Interface;
 		typedef Transit_Pattern_Components::Prototypes::Transit_Pattern<typename remove_pointer< typename Network_Interface::get_type_of(transit_patterns_container)::value_type>::type>  _Transit_Pattern_Interface;
 		typedef typename Network_Interface::get_type_of(transit_patterns_container) _Transit_Patterns_Container_Interface;
 
@@ -485,6 +486,28 @@ namespace polaris
 						Feet length_feet = current_neighbor_link->template length<float>();
 						Meters length_meters = GLOBALS::Length_Converter.Convert_Value<Feet, Meters>(length_feet);
 						current_neighbor->_length_from_origin = current->_length_from_origin + length_meters;
+
+						if (wait_binary == 1)
+						{
+							_Transit_Route_Interface* next_route = next_pattern->template route<_Transit_Route_Interface*>();
+							std::string next_agency = next_route->template agency<std::string>();
+
+							std::string myChain;
+							myChain << "-" << next_agency.at(1);
+
+							Link_Components::Types::Link_Type_Keys link_type = current_neighbor_link->template link_type<Link_Components::Types::Link_Type_Keys>();
+
+							if (link_type == Link_Components::Types::Link_Type_Keys::RAIL)
+							{
+								myChain << "R";
+							}
+							else
+							{
+								myChain << "B";
+							}
+
+							current_neighbor->_agency_chain << myChain;
+						}
 
 						float neighbor_estimated_cost_origin_destination = cost_from_origin + agent->estimated_cost_between((neighbor_edge_type*)current_neighbor, *(routing_data.ends), multimodal_dijkstra);
 						current_neighbor->estimated_cost_origin_destination(neighbor_estimated_cost_origin_destination);

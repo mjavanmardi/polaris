@@ -961,7 +961,7 @@ namespace polaris
 
 			if (debug_route)
 			{
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -982,7 +982,8 @@ namespace polaris
 					Total_Visit_Time,
 					"success",
 					Euc_Distance_km,
-					current->_length_from_origin
+					current->_length_from_origin,
+					current->_agency_chain
 				);
 				summary_paragraph.insert(0, myLine);
 			}
@@ -1175,7 +1176,7 @@ namespace polaris
 
 				multimodal_edge_type* current = (multimodal_edge_type*)graph_pool->Get_Edge(global);
 
-				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\n",
+				sprintf_s(myLine, "%d\t%d\t%d\t%d\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%I64d\t%I64d\t%s\t%f\t%f\t%s\n",
 					origin_loc_id,
 					destination_loc_id,
 					start_time,
@@ -1196,7 +1197,8 @@ namespace polaris
 					Total_Visit_Time,
 					"fail",
 					Euc_Distance_km,
-					current->_length_from_origin
+					current->_length_from_origin,
+					current->_agency_chain
 				);
 				summary_paragraph.insert(0, myLine);
 			}
