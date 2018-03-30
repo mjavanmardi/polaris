@@ -479,7 +479,7 @@ void write_scenario_file(File_IO::File_Info& scenario, File_IO::File_Info& db, F
 	fw.Write_Line("\t\"time_dependent_routing_weight_shape\" : 0.0,");
 	fw.Write_Line("\t\"time_dependent_routing_weight_scale\" : 1.0,");
 	fw.Write_Line("\t\"time_dependent_routing_weight_factor\" : 0.0,");
-	fw.Write_Line("\t\"time_dependent_routing\" : true,");
+	fw.Write_Line("\t\"time_dependent_routing\" : false,");
 	fw.Write_Line("\t\"write_demand_to_database\" : true\n}");
 	
 	fw.Close();

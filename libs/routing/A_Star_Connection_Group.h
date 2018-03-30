@@ -490,11 +490,13 @@ namespace polaris
 						if (wait_binary == 1)
 						{
 							_Transit_Route_Interface* next_route = next_pattern->template route<_Transit_Route_Interface*>();
-							char myLine[1];
-							snprintf(myLine, 1, "%s", next_route->template agency<std::string>());
+							//char myLine[1];
+							//snprintf(myLine, 1, "%s", next_route->template agency<std::string>());
 
-							stringstream myChain("");
-							myChain << "-" << myLine;
+							stringstream myChain;
+							myChain << "-";
+							myChain << next_route->template agency<std::string>();
+							myChain	<< "_";
 
 							Link_Components::Types::Link_Type_Keys link_type = current_neighbor_link->template link_type<Link_Components::Types::Link_Type_Keys>();
 
